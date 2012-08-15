@@ -14,12 +14,15 @@ class KeyInfo
       @key    = String.fromCharCode(event.charCode)
     else
       switch event.keyCode
-        when KeyboardEvent.DOM_VK_ESCAPE then @key = 'Esc'
+        when KeyboardEvent.DOM_VK_ESCAPE  then @key = 'Esc'
+        when KeyboardEvent.DOM_VK_TAB     then @key = 'Tab'
 
     @shift  = event.shiftKey
     @alt    = event.altKey
     @ctrl   = event.ctrlKey
     @meta   = event.metaKey
+
+  isValid: -> @key
 
   toString: ->
     k = (a, b) -> if a then b else ''
@@ -38,9 +41,10 @@ handlers =
     if event.keyCode == KeyboardEvent.DOM_VK_ESCAPE or not isEditable
       if window = utils.getEventTabWindow event
         keyInfo = new KeyInfo event
-        console.log event.keyCode, event.which, event.charCode
-        if vimBucket.get(window)?.keypress keyInfo
-          suppressEvent event
+        if keyInfo.isValid()
+          console.log event.keyCode, event.which, event.charCode, keyInfo.toString()
+          if vimBucket.get(window)?.keypress keyInfo
+            suppressEvent event
 
 
   'focus': (event) ->

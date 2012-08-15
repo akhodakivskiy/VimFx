@@ -41,6 +41,8 @@ commands =
       if ss and ss.getClosedTabCount(rootWindow) > 0
         ss.undoCloseTab rootWindow, 0
 
+  'f': (window) ->
+
   'Esc': (window) ->
     window.document.activeElement?.blur()
 

@@ -1,4 +1,5 @@
 mozmill-tests
 developer
+node_modules
 *.js
 
