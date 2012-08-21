@@ -1,5 +1,19 @@
 { WindowTracker, isBrowserWindow } = require 'window-utils'
 
+
+class Bucket
+  constructor: (@idFunc, @newFunc) ->
+    @bucket = {}
+
+  get: (obj) ->
+    id = @idFunc obj
+    @bucket[id] or @bucket[id] = @newFunc obj
+
+  forget: (obj) ->
+    id = @idFunc obj
+    delete @bucket[id] if id
+
+
 class WindowEventTracker
   constructor: (events, eventFilter = null) ->
 
@@ -89,6 +103,7 @@ getSessionStore = ->
   Cc["@mozilla.org/browser/sessionstore;1"].getService(Ci.nsISessionStore);
 
 exports.WindowEventTracker      = WindowEventTracker
+exports.Bucket                  = Bucket
 exports.isRootWindow            = isRootWindow
 exports.getEventWindow          = getEventWindow
 exports.getEventTabWindow       = getEventTabWindow

@@ -3,6 +3,7 @@ SCROLL_AMOUNT = 60
 { classes: Cc, interfaces: Ci, utils: Cu } = Components
 
 utils = require 'utils'
+{ addHints, removeHints, hasHints } = require 'hints'
 
 commands = 
   'g,g': (window) ->
@@ -42,9 +43,13 @@ commands =
         ss.undoCloseTab rootWindow, 0
 
   'f': (window) ->
+    addHints window.top.document, (el) ->
+      console.log 'f hint', el
 
   'Esc': (window) ->
     window.document.activeElement?.blur()
+    if hasHints window.top.document
+      removeHints window.top.document
 
 
 getCommand = (keys) ->
