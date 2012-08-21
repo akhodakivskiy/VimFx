@@ -1,5 +1,5 @@
 { getCommand, maybeCommand }    = require 'commands'
-{ getWindowId }                 = require 'utils'
+{ getWindowId, Bucket }         = require 'utils'
 
 MODE_NORMAL = 1
 
@@ -28,19 +28,4 @@ class Vim
     console.log 'blur', @activeElement
     delete @activeElement if @activeElement == element
 
-
-  
-
-class VimBucket
-  constructor: ->
-    @vims = {}
-  
-  get: (window) ->
-    id = getWindowId window
-    @vims[id] or @vims[id] = new Vim window
-
-  forget: (window) ->
-    id = getWindowId window
-    delete @vims[id] if id
-
-exports.VimBucket = VimBucket
+exports.Vim = Vim

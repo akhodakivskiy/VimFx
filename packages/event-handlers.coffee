@@ -1,12 +1,12 @@
 utils           = require 'utils'
 { getCommand }  = require 'commands'
-{ VimBucket }   = require 'vim'
+{ Vim }         = require 'vim'
 
 { interfaces: Ci } = Components
 
 KeyboardEvent = Ci.nsIDOMKeyEvent
 
-vimBucket = new VimBucket
+vimBucket = new utils.Bucket utils.getWindowId, (obj) -> new Vim obj
 
 class KeyInfo
   constructor: (event) ->
@@ -37,14 +37,17 @@ suppressEvent = (event) ->
 
 handlers = 
   'keypress': (event) ->
-    isEditable =  utils.isElementEditable event.originalTarget
-    if event.keyCode == KeyboardEvent.DOM_VK_ESCAPE or not isEditable
-      if window = utils.getEventTabWindow event
-        keyInfo = new KeyInfo event
-        if keyInfo.isValid()
-          console.log event.keyCode, event.which, event.charCode, keyInfo.toString()
-          if vimBucket.get(window)?.keypress keyInfo
-            suppressEvent event
+    try
+      isEditable =  utils.isElementEditable event.originalTarget
+      if event.keyCode == KeyboardEvent.DOM_VK_ESCAPE or not isEditable
+        if window = utils.getEventTabWindow event
+          keyInfo = new KeyInfo event
+          if keyInfo.isValid()
+            console.log event.keyCode, event.which, event.charCode, keyInfo.toString()
+            if vimBucket.get(window)?.keypress keyInfo
+              suppressEvent event
+    catch err
+      console.log err
 
 
   'focus': (event) ->
