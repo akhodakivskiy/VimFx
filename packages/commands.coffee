@@ -43,13 +43,18 @@ commands =
         ss.undoCloseTab rootWindow, 0
 
   'f': (window) ->
-    addHints window.top.document, (el) ->
-      console.log 'f hint', el
+    try
+      addHints window.top.document, (el) ->
+        console.log 'f hint', el
+    catch err
+      console.log err
 
   'Esc': (window) ->
-    window.document.activeElement?.blur()
-    if hasHints window.top.document
+    try
+      window.document.activeElement?.blur()
       removeHints window.top.document
+    catch err
+      console.log err
 
 
 getCommand = (keys) ->

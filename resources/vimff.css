@@ -1,0 +1,76 @@
+/* Copied over from vimium project */
+.vimffReset,
+div.vimffReset,
+span.vimffReset,
+table.vimffReset,
+a.vimffReset,
+a:visited.vimffReset,
+a:link.vimffReset,
+a:hover.vimffReset,
+td.vimffReset,
+tr.vimffReset 
+{
+  background: none;
+  border: none;
+  bottom: auto;
+  box-shadow: none;
+  color: black;
+  cursor: auto;
+  display: inline;
+  float: none;
+  font-family : "Helvetica Neue", "Helvetica", "Arial", sans-serif;
+  font-size: inherit;
+  font-style: normal;
+  font-variant: normal;
+  font-weight: normal;
+  height: auto;
+  left: auto;
+  letter-spacing: 0;
+  line-height: 100%;
+  margin: 0;
+  max-height: none;
+  max-width: none;
+  min-height: 0;
+  min-width: 0;
+  opacity: 1;
+  padding: 0;
+  position: static;
+  right: auto;
+  text-align: left;
+  text-decoration: none;
+  text-indent: 0;
+  text-shadow: none;
+  text-transform: none;
+  top: auto;
+  vertical-align: baseline;
+  white-space: normal;
+  width: auto;
+  z-index: 99999999;
+}
+
+div.vimffHintMarker {
+  position: absolute;
+  display: block;
+  top: -1px;
+  left: -1px;
+  white-space: nowrap;
+  overflow: hidden;
+  font-size: 11px;
+  padding: 1px 3px 0px 3px;
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#FFF785), color-stop(100%,#FFC542));
+  border: solid 1px #C38A22;
+  border-radius: 3px;
+  box-shadow: 0px 3px 7px 0px rgba(0, 0, 0, 0.3);
+}
+
+div.vimffHintMarker span {
+  color: #302505;
+  font-family: Helvetica, Arial, sans-serif;
+  font-weight: bold;
+  font-size: 11px;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+div.vimffHintMarker > span.vimffCharMatch {
+  color: #D4AC3A;
+}

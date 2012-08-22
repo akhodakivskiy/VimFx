@@ -1,5 +1,9 @@
 { WindowTracker, isBrowserWindow } = require 'window-utils'
 
+{ interfaces: Ci, classes: Cc } = Components
+
+sss = Cc["@mozilla.org/content/style-sheet-service;1"].getService(Ci.nsIStyleSheetService)
+ios = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService)
 
 class Bucket
   constructor: (@idFunc, @newFunc) ->
@@ -41,8 +45,6 @@ class WindowEventTracker
 
   start: -> @windowTracker.start()
   stop: -> @windowTracker.stop()
-
-{ interfaces: Ci } = Components
 
 HTMLInputElement    = Ci.nsIDOMHTMLInputElement
 HTMLTextAreaElement = Ci.nsIDOMHTMLTextAreaElement
@@ -102,6 +104,22 @@ getWindowId = (window) ->
 getSessionStore = ->
   Cc["@mozilla.org/browser/sessionstore;1"].getService(Ci.nsISessionStore);
 
+cssUri = do () ->
+  tools = {}
+  Cu.import "resource://gre/modules/Services.jsm", tools
+  (name) ->
+    baseURI = tools.Services.io.newURI __SCRIPT_URI_SPEC__, null, null
+    uri = tools.Services.io.newURI "resources/#{ name }.css", null, baseURI
+    return uri
+
+loadCss = (name) ->
+  sss.loadAndRegisterSheet(cssUri(name), sss.USER_SHEET)
+
+unloadCss = (name) ->
+  uri = cssUri(name)
+  if sss.sheetRegistered(uri, sss.USER_SHEET)
+    sss.unregisterSheet(uri, sss.USER_SHEET)
+
 exports.WindowEventTracker      = WindowEventTracker
 exports.Bucket                  = Bucket
 exports.isRootWindow            = isRootWindow
@@ -114,3 +132,6 @@ exports.getWindowId             = getWindowId
 exports.getRootWindow           = getRootWindow
 exports.isElementEditable       = isElementEditable
 exports.getSessionStore         = getSessionStore
+
+exports.loadCss                 = loadCss
+exports.unloadCss               = unloadCss

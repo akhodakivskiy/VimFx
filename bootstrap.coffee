@@ -34,21 +34,22 @@
       return modules[src] = scope.exports;
 
   Console = require("console").Console
-  global.console = new Console "vimroll"
+  global.console = new Console "vimff"
   global.include = include
   global.require = require
 
 )(this);
 
-{ WindowEventTracker }  = require 'utils'
-{ handlers }            = require 'event-handlers'
+{ WindowEventTracker, loadCss, unloadCss, } = require 'utils'
+{ handlers } = require 'event-handlers'
 
 tracker = new WindowEventTracker handlers
 
 
-
 startup = (data, reason) ->
+  loadCss 'vimff'
   tracker.start()
 
 shutdown = (data, reason) ->
   tracker.stop()
+  unloadCss 'vimff'
