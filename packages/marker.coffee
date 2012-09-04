@@ -1,34 +1,164 @@
+{ interfaces: Ci }      = Components
+XPathResult             = Ci.nsIDOMXPathResult
+
+HINTCHARS     = 'asdfgercvhjkl;uinm'
+
+# All elements that have one or more of the following properties 
+# qualify for their own marker in hints mode
+MARKABLE_ELEMENT_PROPERTIES = [
+  "@tabindex"
+  "@onclick"
+  "@onmousedown"
+  "@onmouseup"
+  "@oncommand"
+  "@role='link'"
+  "@role='button'"
+  "contains(@class, 'button')"
+  "@contenteditable='' or translate(@contenteditable, 'TRUE', 'true')='true'"
+]
+
+# All the following elements qualify for their own marker in hints mode
+MARKABLE_ELEMENTS = [
+  "a"
+  "area[@href]"
+  "textarea"
+  "button" 
+  "select"
+  "input[not(@type='hidden' or @disabled or @readonly)]"
+]
+
+
+# Marker class wraps the markable element and provides
+# methods to manipulate the markers
 class Marker
-  constructor: (@element, @container) ->
+  # Creates the marker DOM node
+  constructor: (@element) ->
     document = @element.ownerDocument
     window = document.defaultView
     @markerElement = document.createElement 'div'
     @markerElement.className = 'vimffReset vimffHintMarker'
 
-    @container.appendChild @markerElement
+  # Hides the marker
+  hide: -> @markerElement.style.display = 'none'
 
-  show: -> @markerElement.style.display = 'none'
-  hide: -> delete @markerElement.style.display
+  # Shows the marker
+  show: -> @markerElement.style.display = 'block'
 
+  # Positions the marker on the page. The positioning is absulute
   setPosition: (rect) ->
     @markerElement.style.left = rect.left + 'px'
     @markerElement.style.top  = rect.top  + 'px'
 
-  setHint: (@hint) ->
+  # Assigns hint string to the marker
+  setHint: (@hintChars) ->
+    # number of hint chars that have been matched so far
+    @matchedHintCharCount = 0 
+
     document = @element.ownerDocument
 
     while @markerElement.hasChildNodes()
       @markerElement.removeChild @markedElement.firstChild
 
-    for char in @hint
+    for char in @hintChars
       span = document.createElement 'span'
       span.className = 'vimffReset'
       span.textContent = char.toUpperCase()
       
       @markerElement.appendChild span
 
+  matchHintChar: (char) ->
+    if char == 'backspace' 
+      if @matchedHintCharCount > 0
+        @matchedHintCharCount -= 1
+        @markerElement.children[@matchedHintCharCount].className = 'vimffReset'
+    else
+      if @hintChars[@matchedHintCharCount] == char
+        @markerElement.children[@matchedHintCharCount].className = 'vimffReset vimffCharMatch'
+        @matchedHintCharCount += 1
 
-# The login in this method is copied from Vimium for Chrome
+    return @matchedHintCharCount
+
+  isComplete: ->
+    return @hintChars.length == @hintCompletion
+
+
+# Selects all markable elements on the page, creates markers
+# for each of them The markers are then positioned on the page
+#
+# The array of markers is returned
+Marker.createMarkers = (document) ->
+  elementsSet = getMarkableElements(document)
+  markers = {};
+  j = 0
+  for i in [0...elementsSet.snapshotLength] by 1
+    element = elementsSet.snapshotItem(i)
+    if rect = getElementRect element
+      hint = indexToHint(j++)
+      marker = new Marker(element)
+      marker.setPosition rect
+      marker.setHint hint
+      markers[hint] = marker
+
+  return markers
+
+# Function generator that creates a function that 
+# returns hint string for supplied numeric index.
+indexToHint = do ->
+  # split the characters into two groups:
+  #
+  # *  left chars are used for the head
+  # *  right chars are used to build the tail
+  left = HINTCHARS[...HINTCHARS.length / 3]
+  right = HINTCHARS[HINTCHARS.length / 3...]
+
+  # Helper function that returns a permutation number `i`
+  # of some of the characters in the `chars` agrument
+  f = (i, chars) ->
+    return '' if i < 0
+
+    n = chars.length
+    l = Math.floor(i / n); k = i % n;
+
+    return f(l - 1, chars) + chars[k]
+
+  return (i) ->
+    n = Math.floor(i / left.length)
+    m = i % left.length
+    return f(n - 1, right) + left[m]
+      
+
+# Returns elements that qualify for hint markers in hints mode.
+# Generates and memoizes an XPath query internally
+getMarkableElements = do ->
+  # Some preparations done on startup
+  elements = Array.concat \
+    MARKABLE_ELEMENTS,
+    ["*[#{ MARKABLE_ELEMENT_PROPERTIES.join(" or ") }]"]
+
+  xpath = elements.reduce((m, rule) -> 
+    m.concat(["//#{ rule }", "//xhtml:#{ rule }"])
+  , []).join(' | ')
+
+  namespaceResolver = (namespace) ->
+    if (namespace == "xhtml") then "http://www.w3.org/1999/xhtml" else null
+
+  # The actual function that will return the desired elements 
+  return (document, resultType = XPathResult.ORDERED_NODE_SNAPSHOT_TYPE) ->
+    document.evaluate xpath, document.documentElement, namespaceResolver, resultType, null
+
+# Checks if the given TextRectangle object qualifies 
+# for its own Marker with respect to the `window` object
+isRectOk = (rect, window) ->
+  rect.width > 2 and rect.height > 2 and \
+  rect.top > -2 and rect.left > -2 and \
+  rect.top < window.innerHeight - 2 and \
+  rect.left < window.innerWidth - 2
+
+# Will scan through `element.getClientRects()` and look for 
+# the first visible rectange. If there are no visible rectangles, then
+# will look at the children of the markable node. 
+#
+# The logic has been copied over from Vimiun
 getElementRect = (element) ->
   document = element.ownerDocument
   window   = document.defaultView
@@ -44,14 +174,10 @@ getElementRect = (element) ->
   rects.push element.getBoundingClientRect()
 
   for rect in rects
-    if rect.width > 2 and rect.height > 2 and \
-       rect.top > -2 and rect.left > -2 and \
-       rect.top < window.innerHeight - 2 and \
-       rect.left < window.innerWidth - 2
-
+    if isRectOk rect, window
       return {
-        top:    rect.top  + scrollTop  - clientTop;
-        left:   rect.left + scrollLeft - clientLeft;
+        top:    rect.top  + scrollTop  - clientTop
+        left:   rect.left + scrollLeft - clientLeft
         width:  rect.width
         height: rect.height
       }
@@ -65,9 +191,8 @@ getElementRect = (element) ->
         if computedStyle.getPropertyValue 'float' != 'none' or \
            computedStyle.getPropertyValue 'position' == 'absolute'
 
-          return childRect if childRect = getElementRect childElement
+          childRect if childRect = getElementRect childElement
 
   return undefined
 
-exports.Marker = Marker
-exports.getElementRect = getElementRect
+exports.Marker              = Marker

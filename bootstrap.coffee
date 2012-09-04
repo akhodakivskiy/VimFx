@@ -45,7 +45,6 @@
 
 tracker = new WindowEventTracker handlers
 
-
 startup = (data, reason) ->
   loadCss 'vimff'
   tracker.start()

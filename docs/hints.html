@@ -1,0 +1,40 @@
+<!DOCTYPE html>  <html> <head>   <title>hints.coffee</title>   <meta http-equiv="content-type" content="text/html; charset=UTF-8">   <link rel="stylesheet" media="all" href="docco.css" /> </head> <body>   <div id="container">     <div id="background"></div>            <div id="jump_to">         Jump To &hellip;         <div id="jump_wrapper">           <div id="jump_page">                                           <a class="source" href="commands.html">                 commands.coffee               </a>                                           <a class="source" href="console.html">                 console.coffee               </a>                                           <a class="source" href="event-handlers.html">                 event-handlers.coffee               </a>                                           <a class="source" href="hints.html">                 hints.coffee               </a>                                           <a class="source" href="marker.html">                 marker.coffee               </a>                                           <a class="source" href="utils.html">                 utils.coffee               </a>                                           <a class="source" href="vim.html">                 vim.coffee               </a>                                           <a class="source" href="window-utils.html">                 window-utils.coffee               </a>                        </div>         </div>       </div>          <table cellpadding="0" cellspacing="0">       <thead>         <tr>           <th class="docs">             <h1>               hints.coffee             </h1>           </th>           <th class="code">           </th>         </tr>       </thead>       <tbody>                               <tr id="section-1">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-1">&#182;</a>               </div>                            </td>             <td class="code">               <div class="highlight"><pre><span class="nv">CONTAINER_ID  = </span><span class="s">&#39;vimffHintMarkerContainer&#39;</span>
+
+<span class="p">{</span> <span class="nv">interfaces: </span><span class="nx">Ci</span> <span class="p">}</span>  <span class="o">=</span> <span class="nx">Components</span>
+<span class="nv">HTMLDocument        = </span><span class="nx">Ci</span><span class="p">.</span><span class="nx">nsIDOMHTMLDocument</span>
+<span class="p">{</span> <span class="nx">Marker</span> <span class="p">}</span>          <span class="o">=</span> <span class="nx">require</span> <span class="s">&#39;marker&#39;</span>
+
+<span class="nv">getHintsContainer = </span><span class="nf">(document) -&gt;</span>
+  <span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span> <span class="nx">CONTAINER_ID</span>
+
+<span class="nv">createHintsContainer = </span><span class="nf">(document) -&gt;</span>
+  <span class="nv">container = </span><span class="nb">document</span><span class="p">.</span><span class="nx">createElement</span> <span class="s">&#39;div&#39;</span>
+  <span class="nv">container.id = </span><span class="nx">CONTAINER_ID</span>
+  <span class="nv">container.className = </span><span class="s">&#39;vimffReset&#39;</span>
+  <span class="k">return</span> <span class="nx">container</span>
+    
+<span class="nv">injectHints = </span><span class="nf">(document) -&gt;</span>
+  <span class="nx">removeHints</span> <span class="nb">document</span>
+
+  <span class="k">if</span> <span class="nb">document</span> <span class="k">instanceof</span> <span class="nx">HTMLDocument</span>
+    <span class="nv">markers = </span><span class="nx">Marker</span><span class="p">.</span><span class="nx">createMarkers</span> <span class="nb">document</span>
+
+    <span class="nv">container = </span><span class="nx">createHintsContainer</span> <span class="nb">document</span>
+    <span class="k">for</span> <span class="nx">hint</span><span class="p">,</span> <span class="nx">marker</span> <span class="k">of</span> <span class="nx">markers</span>
+      <span class="nx">container</span><span class="p">.</span><span class="nx">appendChild</span> <span class="nx">marker</span><span class="p">.</span><span class="nx">markerElement</span>
+
+    <span class="nb">document</span><span class="p">.</span><span class="nx">body</span><span class="p">.</span><span class="nx">appendChild</span> <span class="nx">container</span>
+
+    <span class="k">return</span> <span class="nx">markers</span>
+
+<span class="nv">removeHints = </span><span class="nf">(document, markers) -&gt;</span>
+  <span class="k">if</span> <span class="nv">container = </span><span class="nx">getHintsContainer</span> <span class="nb">document</span>
+    <span class="nb">document</span><span class="p">.</span><span class="nx">body</span><span class="p">.</span><span class="nx">removeChild</span> <span class="nx">container</span> 
+
+<span class="nv">handleHintChar = </span><span class="nf">(markers, char) -&gt;</span>
+
+<span class="nv">exports.injectHints     = </span><span class="nx">injectHints</span>
+<span class="nv">exports.removeHints     = </span><span class="nx">removeHints</span>
+<span class="nv">exports.handleHintChar  = </span><span class="nx">handleHintChar</span>
+
+</pre></div>             </td>           </tr>                </tbody>     </table>   </div> </body> </html> 
