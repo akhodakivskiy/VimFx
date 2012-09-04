@@ -1,26 +1,38 @@
-HINTCHARS = 'asdfghjkl;'
+CONTAINER_ID  = 'vimffHintMarkerContainer'
 
-{ interfaces: Ci } = Components
+{ interfaces: Ci }  = Components
 HTMLDocument        = Ci.nsIDOMHTMLDocument
+{ Marker }          = require 'marker'
 
-class Marker
-  constructor: (@element) ->
+getHintsContainer = (document) ->
+  document.getElementById CONTAINER_ID
 
-class DocumentMarkers
-  constroctor: (@document) ->
-
-
-hasHints = (document) ->
-  false
+createHintsContainer = (document) ->
+  container = document.createElement 'div'
+  container.id = CONTAINER_ID
+  container.className = 'vimffReset'
+  return container
     
-addHints = (document, cb) ->
+injectHints = (document) ->
+  removeHints document
+
   if document instanceof HTMLDocument
-    document
+    markers = Marker.createMarkers document
 
-removeHints = (document) ->
-  if hasHints document
-    null
+    container = createHintsContainer document
+    for hint, marker of markers
+      container.appendChild marker.markerElement
 
-exports.addHints    = addHints
-exports.removeHints = removeHints
-exports.hasHints    = removeHints
+    document.body.appendChild container
+
+    return markers
+
+removeHints = (document, markers) ->
+  if container = getHintsContainer document
+    document.body.removeChild container 
+
+handleHintChar = (markers, char) ->
+
+exports.injectHints     = injectHints
+exports.removeHints     = removeHints
+exports.handleHintChar  = handleHintChar

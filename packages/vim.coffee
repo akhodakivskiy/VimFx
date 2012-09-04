@@ -1,31 +1,66 @@
-{ getCommand, maybeCommand }    = require 'commands'
-{ getWindowId, Bucket }         = require 'utils'
+{ getWindowId, Bucket } = require 'utils'
+
+{ commands,
+  hintCharHandler 
+} = require 'commands'
 
 MODE_NORMAL = 1
-
+MODE_HINTS  = 2
 
 class Vim
   constructor: (@window) ->
-    @mode = MODE_NORMAL
-    @keys = []
+    @mode     = MODE_NORMAL
+    @keys     = []
+    @markers  = undefined
+    @cb       = undefined
 
-  keypress: (keyInfo) ->
-    @keys.push keyInfo
-    if command = getCommand @keys
-      command @window
+  keypress: (key) ->
+    @keys.push key
+    if command = _getCommand(@mode, @keys)
+      command @
       @keys = []
-      true
-    else if maybeCommand @keys
-      true
+      return key != 'Esc' 
+    else if _maybeCommand(@mode, @keys) 
+      return true
     else
-      false
+      @keys.pop()
+      return false
 
-  focus: (element) ->
-    @activeElement = element
-    console.log 'focus', @activeElement
+  enterHintsMode: () ->
+    @mode = MODE_HINTS
 
-  blur: (element) ->
-    console.log 'blur', @activeElement
-    delete @activeElement if @activeElement == element
+  enterNormalMode: () ->
+    @markers = @cb = undefined
+
+    @mode = MODE_NORMAL
+
+_endsWithEsc = (keys) ->
+  return keys.join(',').match(/Esc$/)
+
+_getCommand = (mode, keys) ->
+  if mode == MODE_NORMAL or _endsWithEsc(keys)
+    sequence = keys.join(',')
+    if command = commands[sequence]
+      return command
+    else if keys.length > 0
+      return _getCommand mode, keys.slice(1)
+
+  else if mode == MODE_HINTS
+    return (vim) =>
+      char = keys[keys.length - 1].toLowerCase()
+      return hintCharHandler(vim, char)
+
+  return undefined
+
+_maybeCommand = (mode, keys) ->
+  if mode == MODE_NORMAL and keys.length > 0
+    sequence = keys.join(',')
+    for commandSequence in Object.keys(commands)
+      if commandSequence.search(sequence) == 0
+        return true
+
+    return _maybeCommand mode, keys.slice(1)
+
+  return false
 
 exports.Vim = Vim

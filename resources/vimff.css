@@ -1,0 +1,67 @@
+/* Copied over from vimium project */
+div.vimffReset,
+span.vimffReset,
+{
+    background: none;
+    border: none;
+    bottom: auto;
+    box-shadow: none;
+    color: black;
+    cursor: auto;
+    display: inline;
+    float: none;
+    font-family : "Helvetica Neue", "Helvetica", "Arial", sans-serif;
+    font-size: inherit;
+    font-style: normal;
+    font-variant: normal;
+    font-weight: normal;
+    height: auto;
+    left: auto;
+    letter-spacing: 0;
+    line-height: 100%;
+    margin: 0;
+    max-height: none;
+    max-width: none;
+    min-height: 0;
+    min-width: 0;
+    opacity: 1;
+    padding: 0;
+    position: static;
+    right: auto;
+    text-align: left;
+    text-decoration: none;
+    text-indent: 0;
+    text-shadow: none;
+    text-transform: none;
+    top: auto;
+    vertical-align: baseline;
+    white-space: normal;
+    width: auto;
+    z-index: 99999999;
+}
+
+div.vimffHintMarker {
+    position: absolute;
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    font-size: 11px;
+    padding: 1px 3px 0px 3px;
+    box-shadow: 0px 3px 7px 0px rgba(0, 0, 0, 0.3);
+    background-color: #AEDC3A;
+    border: solid 1px #2B95B0;
+    border-radius: 5px;
+}
+
+
+div.vimffHintMarker span {
+    color: #303030;
+    font-family: Helvetica, Arial, sans-serif;
+    font-weight: bold;
+    font-size: 11px;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+div.vimffHintMarker span.vimffCharMatch {
+    color: #FFFFFF;
+}

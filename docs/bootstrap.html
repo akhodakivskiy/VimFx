@@ -1,0 +1,56 @@
+<!DOCTYPE html>  <html> <head>   <title>bootstrap.coffee</title>   <meta http-equiv="content-type" content="text/html; charset=UTF-8">   <link rel="stylesheet" media="all" href="docco.css" /> </head> <body>   <div id="container">     <div id="background"></div>          <table cellpadding="0" cellspacing="0">       <thead>         <tr>           <th class="docs">             <h1>               bootstrap.coffee             </h1>           </th>           <th class="code">           </th>         </tr>       </thead>       <tbody>                               <tr id="section-1">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-1">&#182;</a>               </div>                            </td>             <td class="code">               <div class="highlight"><pre><span class="s">&quot;use strict&quot;</span>
+
+<span class="p">{</span> <span class="nv">classes: </span><span class="nx">Cc</span><span class="p">,</span> <span class="nv">interfaces: </span><span class="nx">Ci</span><span class="p">,</span> <span class="nv">utils: </span><span class="nx">Cu</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">Components</span>
+
+<span class="p">(</span><span class="nf">(global) -&gt;</span>
+
+  <span class="nv">tools = </span><span class="p">{}</span>
+  <span class="nx">Cu</span><span class="p">.</span><span class="nx">import</span> <span class="s">&quot;resource://gre/modules/Services.jsm&quot;</span><span class="p">,</span> <span class="nx">tools</span>
+  <span class="nv">baseURI = </span><span class="nx">tools</span><span class="p">.</span><span class="nx">Services</span><span class="p">.</span><span class="nx">io</span><span class="p">.</span><span class="nx">newURI</span> <span class="nx">__SCRIPT_URI_SPEC__</span><span class="p">,</span> <span class="kc">null</span><span class="p">,</span> <span class="kc">null</span>
+
+  <span class="nv">include = </span><span class="nf">(src, scope = {}) -&gt;</span>
+    <span class="k">try</span>
+      <span class="nv">uri = </span><span class="nx">tools</span><span class="p">.</span><span class="nx">Services</span><span class="p">.</span><span class="nx">io</span><span class="p">.</span><span class="nx">newURI</span> <span class="s">&quot;packages/</span><span class="si">#{</span> <span class="nx">src</span> <span class="si">}</span><span class="s">.js&quot;</span><span class="p">,</span> <span class="kc">null</span><span class="p">,</span> <span class="nx">baseURI</span>
+      <span class="nx">tools</span><span class="p">.</span><span class="nx">Services</span><span class="p">.</span><span class="nx">scriptloader</span><span class="p">.</span><span class="nx">loadSubScript</span> <span class="nx">uri</span><span class="p">.</span><span class="nx">spec</span><span class="p">,</span> <span class="nx">scope</span>
+    <span class="k">catch</span> <span class="nx">error</span>
+      <span class="nv">uri = </span><span class="nx">tools</span><span class="p">.</span><span class="nx">Services</span><span class="p">.</span><span class="nx">io</span><span class="p">.</span><span class="nx">newURI</span> <span class="nx">src</span><span class="p">,</span> <span class="kc">null</span><span class="p">,</span> <span class="nx">baseURI</span>
+      <span class="nx">tools</span><span class="p">.</span><span class="nx">Services</span><span class="p">.</span><span class="nx">scriptloader</span><span class="p">.</span><span class="nx">loadSubScript</span> <span class="nx">uri</span><span class="p">.</span><span class="nx">spec</span><span class="p">,</span> <span class="nx">scope</span>
+
+    <span class="k">return</span> <span class="nx">scope</span>
+  
+
+  <span class="nv">modules = </span><span class="p">{}</span>
+  <span class="nv">require = </span><span class="nf">(src) -&gt;</span>
+    <span class="k">if</span> <span class="nx">modules</span><span class="p">[</span><span class="nx">src</span><span class="p">]</span>
+      <span class="k">return</span> <span class="nx">modules</span><span class="p">[</span><span class="nx">src</span><span class="p">]</span>
+    <span class="k">else</span>
+      <span class="nv">scope = </span>
+        <span class="nv">require: </span><span class="nx">require</span>
+        <span class="nv">include: </span><span class="nx">include</span>
+        <span class="nv">exports: </span><span class="p">{}</span>
+
+      <span class="nx">include</span> <span class="nx">src</span><span class="p">,</span> <span class="nx">scope</span>
+
+      <span class="k">return</span> <span class="nx">modules</span><span class="p">[</span><span class="nx">src</span><span class="p">]</span> <span class="o">=</span> <span class="nx">scope</span><span class="p">.</span><span class="nx">exports</span><span class="p">;</span>
+
+  <span class="nv">Console = </span><span class="nx">require</span><span class="p">(</span><span class="s">&quot;console&quot;</span><span class="p">).</span><span class="nx">Console</span>
+  <span class="nv">global.console = </span><span class="k">new</span> <span class="nx">Console</span> <span class="s">&quot;vimff&quot;</span>
+  <span class="nv">global.include = </span><span class="nx">include</span>
+  <span class="nv">global.require = </span><span class="nx">require</span>
+
+<span class="p">)(</span><span class="k">this</span><span class="p">);</span>
+
+<span class="p">{</span> <span class="nx">WindowEventTracker</span><span class="p">,</span> <span class="nx">loadCss</span><span class="p">,</span> <span class="nx">unloadCss</span><span class="p">,</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">require</span> <span class="s">&#39;utils&#39;</span>
+<span class="p">{</span> <span class="nx">handlers</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">require</span> <span class="s">&#39;event-handlers&#39;</span>
+
+<span class="nv">tracker = </span><span class="k">new</span> <span class="nx">WindowEventTracker</span> <span class="nx">handlers</span>
+
+<span class="nv">startup = </span><span class="nf">(data, reason) -&gt;</span>
+  <span class="nx">loadCss</span> <span class="s">&#39;vimff&#39;</span>
+  <span class="nx">tracker</span><span class="p">.</span><span class="nx">start</span><span class="p">()</span>
+
+<span class="nv">shutdown = </span><span class="nf">(data, reason) -&gt;</span>
+  <span class="nx">tracker</span><span class="p">.</span><span class="nx">stop</span><span class="p">()</span>
+  <span class="nx">unloadCss</span> <span class="s">&#39;vimff&#39;</span>
+
+</pre></div>             </td>           </tr>                </tbody>     </table>   </div> </body> </html> 
