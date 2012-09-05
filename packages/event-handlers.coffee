@@ -1,6 +1,8 @@
-utils           = require 'utils'
-{ getCommand }  = require 'commands'
-{ Vim }         = require 'vim'
+utils               = require 'utils'
+{ getCommand }      = require 'commands'
+{ Vim }             = require 'vim'
+{ WindowTracker, 
+  isBrowserWindow } = require 'window-utils'
 
 { interfaces: Ci } = Components
 
@@ -38,4 +40,22 @@ handlers =
         if browser = gBrowser.getBrowserForTab tab
           vimBucket.forget browser.contentWindow.wrappedJSObject
 
-exports.handlers = handlers
+# Delegate for WindowTracker that will add and remove event handlers 
+# to the each window that goes through the tracker
+delegate = 
+  track: (window) -> 
+    if isBrowserWindow window
+      for name, handler of handlers
+        window.addEventListener name, handler, true
+
+  untrack: (window) ->
+    if isBrowserWindow window
+      for name, handler of handlers
+        window.removeEventListener name, handler, true
+
+# Creates and returns an instance of WindowTracker 
+# that will attach the passed event handlers to
+# each opened top level window.
+createWindowEventTracker = -> new WindowTracker delegate
+
+exports.createWindowEventTracker = createWindowEventTracker

@@ -1,5 +1,3 @@
-{ WindowTracker, isBrowserWindow } = require 'window-utils'
-
 { interfaces: Ci, classes: Cc } = Components
 
 HTMLInputElement    = Ci.nsIDOMHTMLInputElement
@@ -29,35 +27,6 @@ class Bucket
 
   forget: (obj) ->
     delete @bucket[id] if id = @idFunc obj
-
-
-class WindowEventTracker
-  constructor: (events, eventFilter = null) ->
-
-    handlerFilter = (handler) ->
-      return (event) ->
-        if !eventFilter or eventFilter event
-          handler event
-
-    addEventListeners = (window) ->
-      for name, handler of events
-        window.addEventListener name, handlerFilter(handler), true
-
-    removeEventListeners = (window) ->
-      for name, handler of events
-        window.removeEventListener name, handlerFilter(handler), true
-
-    @windowTracker = new WindowTracker
-      track: (window) -> 
-        if isBrowserWindow window
-          addEventListeners window
-
-      untrack: (window) ->
-        if isBrowserWindow window
-          removeEventListeners window
-
-  start: -> @windowTracker.start()
-  stop: -> @windowTracker.stop()
 
 isRootWindow = (window) -> 
   window.location == "chrome://browser/content/browser.xul"
@@ -119,13 +88,13 @@ cssUri = do () ->
 # The stylesheet is then appended to every document, but it can be overwritten by
 # any user css
 loadCss = (name) ->
-  _sss.loadAndRegisterSheet(cssUri(name), _sss.USER_SHEET)
+  _sss.loadAndRegisterSheet(cssUri(name), _sss.AGENT_SHEET)
 
 # Unloads the css file that's been loaded earlier with `loadCss`
 unloadCss = (name) ->
   uri = cssUri(name)
-  if _sss.sheetRegistered(uri, _sss.USER_SHEET)
-    _sss.unregisterSheet(uri, _sss.USER_SHEET)
+  if _sss.sheetRegistered(uri, _sss.AGENT_SHEET)
+    _sss.unregisterSheet(uri, _sss.AGENT_SHEET)
 
 # processes the keyboard event and extracts string representation
 # of the key *without modifiers* in case this is the kind of a key 
@@ -208,8 +177,6 @@ readFromClipboard = () ->
 
   return undefined
 
-
-exports.WindowEventTracker      = WindowEventTracker
 exports.Bucket                  = Bucket
 exports.isRootWindow            = isRootWindow
 exports.getEventWindow          = getEventWindow

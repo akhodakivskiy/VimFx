@@ -2,8 +2,8 @@
 
 { classes: Cc, interfaces: Ci, utils: Cu } = Components
 
-((global) ->
-
+# Populate the global namespace with console, require, and include
+do (global = this) ->
   tools = {}
   Cu.import "resource://gre/modules/Services.jsm", tools
   baseURI = tools.Services.io.newURI __SCRIPT_URI_SPEC__, null, null
@@ -38,17 +38,17 @@
   global.include = include
   global.require = require
 
-)(this);
+{ loadCss, unloadCss }        = require 'utils'
+{ createWindowEventTracker }  = require 'event-handlers'
 
-{ WindowEventTracker, loadCss, unloadCss, } = require 'utils'
-{ handlers } = require 'event-handlers'
+tracker = createWindowEventTracker()
 
-tracker = new WindowEventTracker handlers
-
+# Firefox will call this method on startup/enabling
 startup = (data, reason) ->
   loadCss 'vimff'
   tracker.start()
 
+# Firefox will call this method on shutdown/disabling
 shutdown = (data, reason) ->
   tracker.stop()
   unloadCss 'vimff'
