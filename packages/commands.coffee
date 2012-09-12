@@ -146,23 +146,14 @@ commands =
     vim.enterNormalMode()
 
 hintCharHandler = (vim, char) ->
-  maxCount = 0
   for hint, marker of vim.markers
-    count = marker.matchHintChar char
-    maxCount = Math.max count, maxCount
+    marker.matchHintChar char
 
-  for hint, marker of vim.markers
-    if marker.matchedHintCharCount == marker.hintChars.length == maxCount
-      console.log marker.hintChars
+    if marker.isMatched()
       vim.cb marker
       removeHints vim.window.document
       vim.enterNormalMode()
       break
-
-    if marker.matchedHintCharCount < maxCount
-      marker.hide()
-    else
-      marker.show()
 
 exports.hintCharHandler = hintCharHandler
 exports.commands        = do ->
