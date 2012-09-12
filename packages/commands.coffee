@@ -28,14 +28,15 @@ commands =
 
   # Copy current URL to the clipboard
   'y,f': (vim) ->
-    vim.markers = injectHints vim.window.document, 
-    # This callback will be called with the selected marker as argument
-    vim.cb = (marker) ->
-      if url = marker.element.href
-        utils.writeToClipboard url
+    vim.markers = injectHints vim.window.document
+    if vim.markers.length > 0
+      # This callback will be called with the selected marker as argument
+      vim.cb = (marker) ->
+        if url = marker.element.href
+          utils.writeToClipboard url
 
-    vim.enterHintsMode()
-    #
+      vim.enterHintsMode()
+
   # Copy current URL to the clipboard
   'y,y': (vim) ->
     utils.writeToClipboard vim.window.location.toString()
@@ -115,23 +116,25 @@ commands =
 
   # Follow links with hint markers
   'f': (vim) ->
-    vim.markers = injectHints vim.window.document, 
-    # This callback will be called with the selected marker as argument
-    vim.cb = (marker) ->
-      marker.element.focus()
-      utils.simulateClick marker.element
+    vim.markers = injectHints vim.window.document
+    if vim.markers.length > 0
+      # This callback will be called with the selected marker as argument
+      vim.cb = (marker) ->
+        marker.element.focus()
+        utils.simulateClick marker.element
 
-    vim.enterHintsMode()
+      vim.enterHintsMode()
     
   # Follow links in a new Tab with hint markers
   'F': (vim) ->
-    vim.markers = injectHints vim.window.document, 
-    # This callback will be called with the selected marker as argument
-    vim.cb = (marker) ->
-      marker.element.focus()
-      utils.simulateClick marker.element, metaKey: true
+    vim.markers = injectHints vim.window.document
+    if vim.markers.length > 0
+      # This callback will be called with the selected marker as argument
+      vim.cb = (marker) ->
+        marker.element.focus()
+        utils.simulateClick marker.element, metaKey: true
 
-    vim.enterHintsMode()
+      vim.enterHintsMode()
 
   'Esc': (vim) ->
     # Blur active element if it's editable. Other elements
