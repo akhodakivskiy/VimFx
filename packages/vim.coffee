@@ -15,6 +15,7 @@ class Vim
     @cb       = undefined
 
   pushKey: (keyStr) ->
+    console.log keyStr
     if _maybeCommand(@mode, @keys, keyStr)
       @keys.push keyStr
       return true
@@ -22,6 +23,7 @@ class Vim
     return false
 
   execKeys: ->
+    console.log @keys.join(',')
     if command = _getCommand(@mode, @keys)
       lastKey = @keys[@keys.length - 1]
       command @

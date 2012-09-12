@@ -97,7 +97,7 @@ class Marker
 # The array of markers is returned
 Marker.createMarkers = (document) ->
   elementsSet = getMarkableElements(document)
-  markers = {};
+  markers = [];
   j = 0
   for i in [0...elementsSet.snapshotLength] by 1
     element = elementsSet.snapshotItem(i)
@@ -106,7 +106,7 @@ Marker.createMarkers = (document) ->
       marker = new Marker(element)
       marker.setPosition rect
       marker.setHint hint
-      markers[hint] = marker
+      markers.push(marker)
 
   return markers
 

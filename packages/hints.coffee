@@ -20,7 +20,7 @@ injectHints = (document) ->
     markers = Marker.createMarkers document
 
     container = createHintsContainer document
-    for hint, marker of markers
+    for marker in markers
       container.appendChild marker.markerElement
 
     document.body.appendChild container

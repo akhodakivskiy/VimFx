@@ -9,7 +9,6 @@ utils = require 'utils'
 } = require 'hints'
 
 commands = 
-
   # Navigate to the address that is currently stored in the system clipboard
   'p':  (vim) ->
     vim.window.location.assign utils.readFromClipboard()
@@ -148,9 +147,18 @@ commands =
     removeHints vim.window.document
     vim.enterNormalMode()
 
+    
+# Split command pipes into individual commands
+commands = do (commands) ->
+  newCommands = {}
+  for keys, command of commands
+    for key in keys.split '|'
+      newCommands[key] = command
+  return newCommands
+
+# Called in hints mode. Will process the char, update and hide/show markers 
 hintCharHandler = (vim, char) ->
-  for hint, marker of vim.markers
-    console.log marker.hintChars, marker.enteredHintChars, char
+  for marker in vim.markers
     marker.matchHintChar char
 
     if marker.isMatched()
@@ -160,9 +168,4 @@ hintCharHandler = (vim, char) ->
       break
 
 exports.hintCharHandler = hintCharHandler
-exports.commands        = do ->
-  newCommands = {}
-  for keys, command of commands
-    for key in keys.split '|'
-      newCommands[key] = command
-  return newCommands
+exports.commands        = commands
