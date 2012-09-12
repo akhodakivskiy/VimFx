@@ -14,17 +14,19 @@ class Vim
     @markers  = undefined
     @cb       = undefined
 
-  keypress: (key) ->
-    @keys.push key
+  pushKey: (keyStr) ->
+    if _maybeCommand(@mode, @keys, keyStr)
+      @keys.push keyStr
+      return true
+
+    return false
+
+  execKeys: ->
     if command = _getCommand(@mode, @keys)
+      lastKey = @keys[@keys.length - 1]
       command @
       @keys = []
-      return key != 'Esc' 
-    else if _maybeCommand(@mode, @keys) 
-      return true
-    else
-      @keys.pop()
-      return false
+      return lastKey != 'Esc' 
 
   enterHintsMode: () ->
     @mode = MODE_HINTS
@@ -34,32 +36,34 @@ class Vim
 
     @mode = MODE_NORMAL
 
-_endsWithEsc = (keys) ->
-  return keys.join(',').match(/Esc$/)
-
 _getCommand = (mode, keys) ->
-  if mode == MODE_NORMAL or _endsWithEsc(keys)
+  lastKey = keys[keys.length - 1]
+
+  if mode == MODE_NORMAL or lastKey == 'Esc'
     sequence = keys.join(',')
     if command = commands[sequence]
       return command
     else if keys.length > 0
       return _getCommand mode, keys.slice(1)
 
-  else if mode == MODE_HINTS
+  else if mode == MODE_HINTS and keys.length > 0
     return (vim) =>
-      char = keys[keys.length - 1].toLowerCase()
-      return hintCharHandler(vim, char)
+      return hintCharHandler(vim, lastKey.toLowerCase())
 
   return undefined
 
-_maybeCommand = (mode, keys) ->
-  if mode == MODE_NORMAL and keys.length > 0
-    sequence = keys.join(',')
+_maybeCommand = (mode, keys, keyStr) ->
+  if mode == MODE_NORMAL || keyStr == 'Esc'
+    sequence = keys.concat([keyStr]).join(',')
     for commandSequence in Object.keys(commands)
       if commandSequence.search(sequence) == 0
         return true
 
-    return _maybeCommand mode, keys.slice(1)
+    if keys.length > 0
+      return _maybeCommand mode, keys.slice(1), keyStr
+
+  else if mode == MODE_HINTS
+    return true
 
   return false
 

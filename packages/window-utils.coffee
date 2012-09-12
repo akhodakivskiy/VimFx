@@ -15,10 +15,10 @@ runOnWindowLoad = (callback, window) ->
     callback window
   else
     onLoad = ->
-      window.removeEventListener 'load', arguments.callee, false
+      window.removeEventListener 'load', arguments.callee, true
       callback(window)
 
-    window.addEventListener 'load', onLoad, false
+    window.addEventListener 'load', onLoad, true
 
 # Applies `runOnWindowLoad` to all windows currently opened
 # passing it the `callback` argument

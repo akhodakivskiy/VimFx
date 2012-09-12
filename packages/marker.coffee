@@ -39,10 +39,10 @@ class Marker
     @markerElement.className = 'vimffReset vimffHintMarker'
 
   # Shows the marker
-  show: -> @markerElement.className = 'vimffHintMarker'
+  show: -> @markerElement.className = 'vimffReset vimffHintMarker'
 
   # Hides the marker
-  hide: -> @markerElement.className = 'vimffHiddenHintMarker'
+  hide: -> @markerElement.className = 'vimffReset vimffHiddenHintMarker'
 
   # Positions the marker on the page. The positioning is absulute
   setPosition: (rect) ->
