@@ -38,11 +38,11 @@ class Marker
     @markerElement = document.createElement 'div'
     @markerElement.className = 'vimffReset vimffHintMarker'
 
-  # Hides the marker
-  hide: -> @markerElement.style.display = 'none'
-
   # Shows the marker
-  show: -> @markerElement.style.display = 'block'
+  show: -> @markerElement.className = 'vimffHintMarker'
+
+  # Hides the marker
+  hide: -> @markerElement.className = 'vimffHiddenHintMarker'
 
   # Positions the marker on the page. The positioning is absulute
   setPosition: (rect) ->
@@ -52,7 +52,7 @@ class Marker
   # Assigns hint string to the marker
   setHint: (@hintChars) ->
     # number of hint chars that have been matched so far
-    @matchedHintCharCount = 0 
+    @enteredHintChars = ''
 
     document = @element.ownerDocument
 
@@ -66,20 +66,29 @@ class Marker
       
       @markerElement.appendChild span
 
+  # Add another char to the `enteredHintString`, 
+  # see if it still matches `hintString`, apply classes to
+  # the distinct hint characters and show/hide marker when 
+  # the entered string partially (not) matches the hint string
   matchHintChar: (char) ->
+    # Handle backspace key by removing a previously entered hint char 
+    # and resetting its class
     if char == 'backspace' 
-      if @matchedHintCharCount > 0
-        @matchedHintCharCount -= 1
-        @markerElement.children[@matchedHintCharCount].className = 'vimffReset'
-    else
-      if @hintChars[@matchedHintCharCount] == char
-        @markerElement.children[@matchedHintCharCount].className = 'vimffReset vimffCharMatch'
-        @matchedHintCharCount += 1
+      if @enteredHintChars.length > 0
+        @enteredHintChars = @enteredHintChars.slice(0, -1)
+        @markerElement.children[@enteredHintChars.length]?.className = 'vimffReset'
+    # Otherwise append hint char and change hint class
+    else 
+      @markerElement.children[@enteredHintChars.length]?.className = 'vimffReset vimffCharMatch'
+      @enteredHintChars += char
 
-    return @matchedHintCharCount
+    # If entered hint chars no longer partially match the hint chars 
+    # then hide the marker. Othersie show it back
+    if @hintChars.search(@enteredHintChars) == 0 then @show() else @hide()
 
-  isComplete: ->
-    return @hintChars.length == @hintCompletion
+  # Checks if enterd hint chars completely match the hint chars
+  isMatched: ->
+    return @hintChars == @enteredHintChars
 
 
 # Selects all markable elements on the page, creates markers

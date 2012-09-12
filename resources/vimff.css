@@ -1,10 +1,8 @@
 /* Copied over from vimium project */
-div.vimffReset,
-span.vimffReset,
-{
+div.vimffReset, span.vimffReset {
     background: none !important;
     border: none !important;
-    bottom: auto !important;
+    /*bottom: auto !important;*/
     box-shadow: none !important;
     color: black !important;
     cursor: auto !important;
@@ -16,7 +14,7 @@ span.vimffReset,
     font-variant: normal !important;
     font-weight: normal !important;
     height: auto !important;
-    left: auto !important;
+    /*left: auto !important;*/
     letter-spacing: 0 !important;
     line-height: 100% !important;
     margin: 0 !important;
@@ -27,13 +25,13 @@ span.vimffReset,
     opacity: 1 !important;
     padding: 0 !important;
     position: static !important;
-    right: auto !important;
+    /*right: auto !important;*/
     text-align: left !important;
     text-decoration: none !important;
     text-indent: 0 !important;
     text-shadow: none !important;
     text-transform: none !important;
-    top: auto !important;
+    /*top: auto !important;*/
     vertical-align: baseline !important;
     white-space: normal !important;
     width: auto !important;
@@ -53,6 +51,9 @@ div.vimffHintMarker {
     border-radius: 5px !important;
 }
 
+div.vimffHiddenHintMarker > span {
+    display: none !important;
+}
 
 div.vimffHintMarker > span {
     color: #303030 !important;
