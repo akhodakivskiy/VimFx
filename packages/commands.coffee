@@ -83,12 +83,12 @@ commands =
       rootWindow.gBrowser.tabContainer.advanceSelectedTab(1, true);
 
   # Go to the first tab
-  'g,^': (vim) ->
+  'g,H': (vim) ->
     if rootWindow = utils.getRootWindow vim.window
       rootWindow.gBrowser.tabContainer.selectedIndex = 0;
       #
   # Go to the last tab
-  'g,$': (vim) ->
+  'g,L': (vim) ->
     if rootWindow = utils.getRootWindow vim.window
       itemCount = rootWindow.gBrowser.tabContainer.itemCount;
       rootWindow.gBrowser.tabContainer.selectedIndex = itemCount - 1;
@@ -147,6 +147,7 @@ commands =
 
 hintCharHandler = (vim, char) ->
   for hint, marker of vim.markers
+    console.log marker.hintChars, marker.enteredHintChars, char
     marker.matchHintChar char
 
     if marker.isMatched()

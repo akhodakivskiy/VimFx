@@ -14,18 +14,28 @@ suppressEvent = (event) ->
 
 # The following handlers are installed on every top level DOM window
 handlers = 
-  'keypress': (event) ->
+  'keydown': (event) ->
     try
       isEditable =  utils.isElementEditable event.originalTarget
-      key = utils.keyboardEventKey event
+      keyStr = utils.keyboardEventKeyString event
 
       # We only handle the key if there is no focused editable element
       # or if it's the *Esc* key, which will remote the focus from 
       # the currently focused element
-      if key and (key == 'Esc' or not isEditable)
+      if keyStr and (keyStr == 'Esc' or not isEditable)
         if window = utils.getEventTabWindow event
-          if vimBucket.get(window)?.keypress key
+          if vimBucket.get(window)?.pushKey keyStr
             suppressEvent event
+    catch err
+      console.log err
+
+  'keypress': (event) ->
+    try
+      # Try to execute keys that were accumulated so far.
+      # Suppress event if there is a matching command.
+      if window = utils.getEventTabWindow event
+        if vimBucket.get(window)?.execKeys()
+          suppressEvent event
     catch err
       console.log err
 
@@ -34,6 +44,8 @@ handlers =
       if browser = gBrowser.getBrowserForTab event.originalTarget
         vimBucket.forget browser.contentWindow.wrappedJSObject
 
+  # When the top level window closes we should release all Vims that were 
+  # associated with tabs in this window
   'DOMWindowClose': (event) ->
     if gBrowser = event.originalTarget.gBrowser
       for tab in gBrowser.tabs

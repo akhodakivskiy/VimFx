@@ -102,10 +102,14 @@ unloadCss = (name) ->
 #
 # Currently we handle letters, Escape and Tab keys
 keyboardEventChar = (keyboardEvent) ->
-  if keyboardEvent.charCode > 0
-    char = String.fromCharCode(keyboardEvent.charCode)
-    if char.match /\s/
-      char = undefined 
+  key = keyboardEvent.keyCode
+  if key >= KeyboardEvent.DOM_VK_A and key <= KeyboardEvent.DOM_VK_Z
+    char = String.fromCharCode(key)
+    if keyboardEvent.shiftKey
+      char = char.toUpperCase()
+    else
+      char = char.toLowerCase()
+
   else
     switch keyboardEvent.keyCode
       when KeyboardEvent.DOM_VK_ESCAPE      then char = 'Esc'
@@ -116,7 +120,7 @@ keyboardEventChar = (keyboardEvent) ->
 
 # extracts string representation of the KeyboardEvent and adds 
 # relevant modifiers (_ctrl_, _alt_, _meta_) in case they were pressed
-keyboardEventKey = (keyboardEvent) ->
+keyboardEventKeyString = (keyboardEvent) ->
   char = keyboardEventChar keyboardEvent
 
   { 
@@ -126,11 +130,12 @@ keyboardEventKey = (keyboardEvent) ->
     metaKey:  meta, 
   } = keyboardEvent
 
-  if alt or ctrl or meta
-    k = (a, b) -> if a then b else ''
-    return "<#{ k(ctrl, 'c') + k(alt, 'a') + k(meta, 'm') }-#{ char }>"
-  else
-    return char
+  if char
+    if alt or ctrl or meta
+      k = (a, b) -> if a then b else ''
+      return "<#{ k(ctrl, 'c') + k(alt, 'a') + k(meta, 'm') }-#{ char }>"
+    else
+      return char
 
 # Simulate mouse click with full chain of event
 # Copied from Vimium codebase
@@ -192,7 +197,7 @@ exports.getSessionStore         = getSessionStore
 exports.loadCss                 = loadCss
 exports.unloadCss               = unloadCss
 
-exports.keyboardEventKey        = keyboardEventKey
+exports.keyboardEventKeyString  = keyboardEventKeyString
 exports.simulateClick           = simulateClick
 exports.readFromClipboard       = readFromClipboard
 exports.writeToClipboard        = writeToClipboard

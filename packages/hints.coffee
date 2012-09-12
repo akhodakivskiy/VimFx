@@ -10,7 +10,7 @@ getHintsContainer = (document) ->
 createHintsContainer = (document) ->
   container = document.createElement 'div'
   container.id = CONTAINER_ID
-  #container.className = 'vimffReset'
+  container.className = 'vimffReset'
   return container
     
 injectHints = (document) ->
