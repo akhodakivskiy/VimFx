@@ -65,11 +65,11 @@ commands =
     vim.window.scrollBy(0, -SCROLL_AMOUNT)
 
   # Scroll down a page
-  'c-d': (vim) ->
+  'd': (vim) ->
     vim.window.scrollBy(0, vim.window.innerHeight)
 
   # Scroll up a page
-  'c-u': (vim) ->
+  'u': (vim) ->
     vim.window.scrollBy(0, -vim.window.innerHeight)
 
   # Activate previous tab

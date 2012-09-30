@@ -1,7 +1,7 @@
 { interfaces: Ci }      = Components
 XPathResult             = Ci.nsIDOMXPathResult
 
-HINTCHARS     = 'asdfgercvhjkl;uinm'
+{ getPref } = require 'prefs'
 
 # All elements that have one or more of the following properties 
 # qualify for their own marker in hints mode
@@ -96,13 +96,16 @@ class Marker
 #
 # The array of markers is returned
 Marker.createMarkers = (document) ->
+  hintChars = getPref 'hint_chars'
+  console.log hintChars
+
   elementsSet = getMarkableElements(document)
   markers = [];
   j = 0
   for i in [0...elementsSet.snapshotLength] by 1
     element = elementsSet.snapshotItem(i)
     if rect = getElementRect element
-      hint = indexToHint(j++)
+      hint = indexToHint(j++, hintChars)
       marker = new Marker(element)
       marker.setPosition rect
       marker.setHint hint
@@ -113,13 +116,6 @@ Marker.createMarkers = (document) ->
 # Function generator that creates a function that 
 # returns hint string for supplied numeric index.
 indexToHint = do ->
-  # split the characters into two groups:
-  #
-  # *  left chars are used for the head
-  # *  right chars are used to build the tail
-  left = HINTCHARS[...HINTCHARS.length / 3]
-  right = HINTCHARS[HINTCHARS.length / 3...]
-
   # Helper function that returns a permutation number `i`
   # of some of the characters in the `chars` agrument
   f = (i, chars) ->
@@ -130,7 +126,14 @@ indexToHint = do ->
 
     return f(l - 1, chars) + chars[k]
 
-  return (i) ->
+  return (i, chars) ->
+    # split the characters into two groups:
+    #
+    # *  left chars are used for the head
+    # *  right chars are used to build the tail
+    left = chars[...chars.length / 3]
+    right = chars[chars.length / 3...]
+
     n = Math.floor(i / left.length)
     m = i % left.length
     return f(n - 1, right) + left[m]

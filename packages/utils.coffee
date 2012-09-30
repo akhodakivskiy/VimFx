@@ -14,6 +14,8 @@ KeyboardEvent       = Ci.nsIDOMKeyEvent
 _sss  = Cc["@mozilla.org/content/style-sheet-service;1"].getService(Ci.nsIStyleSheetService)
 _clip = Cc["@mozilla.org/widget/clipboard;1"].getService(Ci.nsIClipboard)
 
+{ getPref } = require 'prefs'
+
 class Bucket
   constructor: (@idFunc, @newFunc) ->
     @bucket = {}
@@ -77,65 +79,61 @@ getSessionStore = ->
 
 # Function that returns a URI to the css file that's part of the extension
 cssUri = do () ->
-  tools = {}
-  Cu.import "resource://gre/modules/Services.jsm", tools
   (name) ->
-    baseURI = tools.Services.io.newURI __SCRIPT_URI_SPEC__, null, null
-    uri = tools.Services.io.newURI "resources/#{ name }.css", null, baseURI
+    baseURI = Services.io.newURI __SCRIPT_URI_SPEC__, null, null
+    uri = Services.io.newURI "resources/#{ name }.css", null, baseURI
     return uri
 
 # Loads the css identified by the name in the StyleSheetService as User Stylesheet
 # The stylesheet is then appended to every document, but it can be overwritten by
 # any user css
 loadCss = (name) ->
-  _sss.loadAndRegisterSheet(cssUri(name), _sss.AGENT_SHEET)
-
-# Unloads the css file that's been loaded earlier with `loadCss`
-unloadCss = (name) ->
   uri = cssUri(name)
-  if _sss.sheetRegistered(uri, _sss.AGENT_SHEET)
+  _sss.loadAndRegisterSheet(uri, _sss.AGENT_SHEET)
+
+  unload -> 
+    console.log "unloading stylesheet #{name}"
     _sss.unregisterSheet(uri, _sss.AGENT_SHEET)
 
-# processes the keyboard event and extracts string representation
-# of the key *without modifiers* in case this is the kind of a key 
-# that can be handled by the extension
+# Processes the keyboard event and extracts string representation
+# of the key *without modifiers*. 
+# Only processes that can be handled by the extension
 #
 # Currently we handle letters, Escape and Tab keys
 keyboardEventChar = (keyboardEvent) ->
-  key = keyboardEvent.keyCode
-  if key >= KeyboardEvent.DOM_VK_A and key <= KeyboardEvent.DOM_VK_Z
-    char = String.fromCharCode(key)
-    if keyboardEvent.shiftKey
-      char = char.toUpperCase()
-    else
-      char = char.toLowerCase()
 
+  # Ignore the key if Meta of Alt are pressed
+  if keyboardEvent.metaKey or keyboardEvent.altKey
+    return
+
+  key = keyboardEvent.keyCode
+  char = String.fromCharCode(key)
+  HINTCHARS = getPref 'hint_chars'
+
+  if key >= KeyboardEvent.DOM_VK_A and key <= KeyboardEvent.DOM_VK_Z
+    if keyboardEvent.shiftKey
+      return char.toUpperCase()
+    else
+      return char.toLowerCase()
+  # Allow additional chars from the hint chars list
+  else if HINTCHARS.search(char) > -1
+    return char
   else
     switch keyboardEvent.keyCode
-      when KeyboardEvent.DOM_VK_ESCAPE      then char = 'Esc'
-      when KeyboardEvent.DOM_VK_BACK_SPACE  then char = 'Backspace'
-      else char = undefined
+      when KeyboardEvent.DOM_VK_ESCAPE
+        return 'Esc'
+      when KeyboardEvent.DOM_VK_BACK_SPACE
+        return 'Backspace'
 
-  return char
-
-# extracts string representation of the KeyboardEvent and adds 
+# Extracts string representation of the KeyboardEvent and adds 
 # relevant modifiers (_ctrl_, _alt_, _meta_) in case they were pressed
 keyboardEventKeyString = (keyboardEvent) ->
   char = keyboardEventChar keyboardEvent
 
-  { 
-    shiftKey: shift, 
-    altKey:   alt, 
-    ctrlKey:  ctrl, 
-    metaKey:  meta, 
-  } = keyboardEvent
+  if char and keyboardEvent.ctrlKey
+    char = "c-#{ char }"
 
-  if char
-    if alt or ctrl or meta
-      k = (a, b) -> if a then b else ''
-      return "<#{ k(ctrl, 'c') + k(alt, 'a') + k(meta, 'm') }-#{ char }>"
-    else
-      return char
+  return char
 
 # Simulate mouse click with full chain of event
 # Copied from Vimium codebase
@@ -195,7 +193,6 @@ exports.isElementEditable       = isElementEditable
 exports.getSessionStore         = getSessionStore
 
 exports.loadCss                 = loadCss
-exports.unloadCss               = unloadCss
 
 exports.keyboardEventKeyString  = keyboardEventKeyString
 exports.simulateClick           = simulateClick

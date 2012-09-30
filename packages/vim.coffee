@@ -15,7 +15,6 @@ class Vim
     @cb       = undefined
 
   pushKey: (keyStr) ->
-    console.log keyStr
     if _maybeCommand(@mode, @keys, keyStr)
       @keys.push keyStr
       return true
@@ -49,8 +48,11 @@ _getCommand = (mode, keys) ->
       return _getCommand mode, keys.slice(1)
 
   else if mode == MODE_HINTS and keys.length > 0
-    return (vim) =>
-      return hintCharHandler(vim, lastKey.toLowerCase())
+    # `lastKey` should be one hint chars or `Backspace`
+    hintChars = getPref('hint_chars') + 'backspace'
+    if hintChars.search(lastKey.toLowerCase()) > -1
+      return (vim) =>
+        return hintCharHandler(vim, lastKey.toLowerCase())
 
   return undefined
 

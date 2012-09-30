@@ -20,8 +20,12 @@ injectHints = (document) ->
     markers = Marker.createMarkers document
 
     container = createHintsContainer document
+
+    fragment = document.createDocumentFragment()
     for marker in markers
-      container.appendChild marker.markerElement
+      fragment.appendChild marker.markerElement
+
+    container.appendChild fragment
 
     document.body.appendChild container
 

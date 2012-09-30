@@ -1,20 +1,20 @@
 "use strict"
 
-{ classes: Cc, interfaces: Ci, utils: Cu } = Components
+{ utils: Cu } = Components
+
+Cu.import "resource://gre/modules/Services.jsm"
 
 # Populate the global namespace with console, require, and include
 do (global = this) ->
-  tools = {}
-  Cu.import "resource://gre/modules/Services.jsm", tools
-  baseURI = tools.Services.io.newURI __SCRIPT_URI_SPEC__, null, null
+  baseURI = Services.io.newURI __SCRIPT_URI_SPEC__, null, null
 
   include = (src, scope = {}) ->
     try
-      uri = tools.Services.io.newURI "packages/#{ src }.js", null, baseURI
-      tools.Services.scriptloader.loadSubScript uri.spec, scope
+      uri = Services.io.newURI "packages/#{ src }.js", null, baseURI
+      Services.scriptloader.loadSubScript uri.spec, scope
     catch error
-      uri = tools.Services.io.newURI src, null, baseURI
-      tools.Services.scriptloader.loadSubScript uri.spec, scope
+      uri = Services.io.newURI src, null, baseURI
+      Services.scriptloader.loadSubScript uri.spec, scope
 
     return scope
   
@@ -33,22 +33,30 @@ do (global = this) ->
 
       return modules[src] = scope.exports;
 
-  Console = require("console").Console
-  global.console = new Console "vimff"
   global.include = include
   global.require = require
 
-{ loadCss, unloadCss }        = require 'utils'
-{ createWindowEventTracker }  = require 'event-handlers'
+# Include into global scope
+include("includes/#{ name }.js", this) for name in [
+  'chrome',
+  'console',
+  'unload', 
+  'window-utils',
+]
 
-tracker = createWindowEventTracker()
+{ loadCss } = require 'utils'
+{ watcher } = require 'event-handlers'
+{ getPref
+, installPrefObserver } = require 'prefs'
 
 # Firefox will call this method on startup/enabling
 startup = (data, reason) ->
   loadCss 'vimff'
-  tracker.start()
+  watchWindows watcher, 'navigator:browser'
+  installPrefObserver()
 
 # Firefox will call this method on shutdown/disabling
 shutdown = (data, reason) ->
-  tracker.stop()
-  unloadCss 'vimff'
+  # Don't bother to clean up if the browser is shutting down
+  if reason != APP_SHUTDOWN
+    unload()
