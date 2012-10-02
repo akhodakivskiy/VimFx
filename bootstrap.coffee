@@ -3,17 +3,19 @@
 { utils: Cu } = Components
 
 Cu.import "resource://gre/modules/Services.jsm"
+Cu.import "resource://gre/modules/AddonManager.jsm"
 
 # Populate the global namespace with console, require, and include
 do (global = this) ->
   baseURI = Services.io.newURI __SCRIPT_URI_SPEC__, null, null
+  getResourceURI = (path) -> Services.io.newURI path, null, baseURI
 
   include = (src, scope = {}) ->
     try
-      uri = Services.io.newURI "packages/#{ src }.js", null, baseURI
+      uri = getResourceURI "packages/#{ src }.js"
       Services.scriptloader.loadSubScript uri.spec, scope
     catch error
-      uri = Services.io.newURI src, null, baseURI
+      uri = getResourceURI src
       Services.scriptloader.loadSubScript uri.spec, scope
 
     return scope
@@ -35,6 +37,7 @@ do (global = this) ->
 
   global.include = include
   global.require = require
+  global.getResourceURI = getResourceURI
 
 # Include into global scope
 include("includes/#{ name }.js", this) for name in [
@@ -44,15 +47,21 @@ include("includes/#{ name }.js", this) for name in [
   'window-utils',
 ]
 
-{ loadCss } = require 'utils'
-{ watcher } = require 'event-handlers'
+{ loadCss }             = require 'utils'
+{ addEventListeners }   = require 'events'
 { getPref
 , installPrefObserver } = require 'prefs'
+{ setButtonDefaultPosition
+, addToolbarButton }    = require 'button'
 
 # Firefox will call this method on startup/enabling
 startup = (data, reason) ->
-  loadCss 'vimff'
-  watchWindows watcher, 'navigator:browser'
+  if reason = ADDON_INSTALL
+    setButtonDefaultPosition getPref('button_id'), 'nav-bar', 'bookmarks-menu-button-container'
+
+  loadCss 'style'
+  watchWindows addEventListeners, 'navigator:browser'
+  watchWindows addToolbarButton, 'navigator:browser'
   installPrefObserver()
 
 # Firefox will call this method on shutdown/disabling

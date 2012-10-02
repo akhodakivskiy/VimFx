@@ -1,12 +1,14 @@
 { classes: Cc, interfaces: Ci } = Components
 
-PREF_BRANCH = "extension.vimff.";
+PREF_BRANCH = "extension.VimFx.";
 
 # Default values for the preference
 # All used preferences should be mentioned here becuase 
 # preference type is derived from here
 PREFS = 
   hint_chars: 'asdfgercvhjkl;uinm'
+  button_id: 'VimFx-toolbar-button'
+  disabled: false
 
 # Get Firefox preference value of type specified in `PREFS`
 getFFPref = do ->
@@ -65,5 +67,9 @@ installPrefObserver = ->
 # Get preference value from local cache - PREFS
 getPref = (key) -> return PREFS[key]
 
+# Set preference value
+setPref = (key, value) -> setFFPref key, value
+
 exports.getPref             = getPref
+exports.setPref             = setPref
 exports.installPrefObserver = installPrefObserver

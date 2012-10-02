@@ -1,4 +1,4 @@
-<!DOCTYPE html>  <html> <head>   <title>vim.coffee</title>   <meta http-equiv="content-type" content="text/html; charset=UTF-8">   <link rel="stylesheet" media="all" href="docco.css" /> </head> <body>   <div id="container">     <div id="background"></div>            <div id="jump_to">         Jump To &hellip;         <div id="jump_wrapper">           <div id="jump_page">                                           <a class="source" href="commands.html">                 commands.coffee               </a>                                           <a class="source" href="console.html">                 console.coffee               </a>                                           <a class="source" href="event-handlers.html">                 event-handlers.coffee               </a>                                           <a class="source" href="hints.html">                 hints.coffee               </a>                                           <a class="source" href="marker.html">                 marker.coffee               </a>                                           <a class="source" href="utils.html">                 utils.coffee               </a>                                           <a class="source" href="vim.html">                 vim.coffee               </a>                                           <a class="source" href="window-utils.html">                 window-utils.coffee               </a>                        </div>         </div>       </div>          <table cellpadding="0" cellspacing="0">       <thead>         <tr>           <th class="docs">             <h1>               vim.coffee             </h1>           </th>           <th class="code">           </th>         </tr>       </thead>       <tbody>                               <tr id="section-1">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-1">&#182;</a>               </div>                            </td>             <td class="code">               <div class="highlight"><pre><span class="p">{</span> <span class="nx">getWindowId</span><span class="p">,</span> <span class="nx">Bucket</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">require</span> <span class="s">&#39;utils&#39;</span>
+<!DOCTYPE html>  <html> <head>   <title>vim.coffee</title>   <meta http-equiv="content-type" content="text/html; charset=UTF-8">   <link rel="stylesheet" media="all" href="docco.css" /> </head> <body>   <div id="container">     <div id="background"></div>            <div id="jump_to">         Jump To &hellip;         <div id="jump_wrapper">           <div id="jump_page">                                           <a class="source" href="bootstrap.html">                 bootstrap.coffee               </a>                                           <a class="source" href="chrome.html">                 chrome.coffee               </a>                                           <a class="source" href="console.html">                 console.coffee               </a>                                           <a class="source" href="unload.html">                 unload.coffee               </a>                                           <a class="source" href="window-utils.html">                 window-utils.coffee               </a>                                           <a class="source" href="button.html">                 button.coffee               </a>                                           <a class="source" href="commands.html">                 commands.coffee               </a>                                           <a class="source" href="events.html">                 events.coffee               </a>                                           <a class="source" href="help.html">                 help.coffee               </a>                                           <a class="source" href="hints.html">                 hints.coffee               </a>                                           <a class="source" href="marker.html">                 marker.coffee               </a>                                           <a class="source" href="prefs.html">                 prefs.coffee               </a>                                           <a class="source" href="utils.html">                 utils.coffee               </a>                                           <a class="source" href="vim.html">                 vim.coffee               </a>                        </div>         </div>       </div>          <table cellpadding="0" cellspacing="0">       <thead>         <tr>           <th class="docs">             <h1>               vim.coffee             </h1>           </th>           <th class="code">           </th>         </tr>       </thead>       <tbody>                               <tr id="section-1">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-1">&#182;</a>               </div>                            </td>             <td class="code">               <div class="highlight"><pre><span class="p">{</span> <span class="nx">getWindowId</span><span class="p">,</span> <span class="nx">Bucket</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">require</span> <span class="s">&#39;utils&#39;</span>
 
 <span class="p">{</span> <span class="nx">commands</span><span class="p">,</span>
   <span class="nx">hintCharHandler</span> 
@@ -14,17 +14,19 @@
     <span class="vi">@markers  = </span><span class="kc">undefined</span>
     <span class="vi">@cb       = </span><span class="kc">undefined</span>
 
-  <span class="nv">keypress: </span><span class="nf">(key) -&gt;</span>
-    <span class="nx">@keys</span><span class="p">.</span><span class="nx">push</span> <span class="nx">key</span>
+  <span class="nv">pushKey: </span><span class="nf">(keyStr) -&gt;</span>
+    <span class="k">if</span> <span class="nx">_maybeCommand</span><span class="p">(</span><span class="nx">@mode</span><span class="p">,</span> <span class="nx">@keys</span><span class="p">,</span> <span class="nx">keyStr</span><span class="p">)</span>
+      <span class="nx">@keys</span><span class="p">.</span><span class="nx">push</span> <span class="nx">keyStr</span>
+      <span class="k">return</span> <span class="kc">true</span>
+
+    <span class="k">return</span> <span class="kc">false</span>
+
+  <span class="nv">execKeys: </span><span class="o">-&gt;</span>
     <span class="k">if</span> <span class="nv">command = </span><span class="nx">_getCommand</span><span class="p">(</span><span class="nx">@mode</span><span class="p">,</span> <span class="nx">@keys</span><span class="p">)</span>
+      <span class="nv">lastKey = </span><span class="nx">@keys</span><span class="p">[</span><span class="nx">@keys</span><span class="p">.</span><span class="nx">length</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
       <span class="nx">command</span> <span class="nx">@</span>
       <span class="vi">@keys = </span><span class="p">[]</span>
-      <span class="k">return</span> <span class="nx">key</span> <span class="o">!=</span> <span class="s">&#39;Esc&#39;</span> 
-    <span class="k">else</span> <span class="k">if</span> <span class="nx">_maybeCommand</span><span class="p">(</span><span class="nx">@mode</span><span class="p">,</span> <span class="nx">@keys</span><span class="p">)</span> 
-      <span class="k">return</span> <span class="kc">true</span>
-    <span class="k">else</span>
-      <span class="nx">@keys</span><span class="p">.</span><span class="nx">pop</span><span class="p">()</span>
-      <span class="k">return</span> <span class="kc">false</span>
+      <span class="k">return</span> <span class="nx">lastKey</span> <span class="o">!=</span> <span class="s">&#39;Esc&#39;</span> 
 
   <span class="nv">enterHintsMode: </span><span class="nf">() -&gt;</span>
     <span class="vi">@mode = </span><span class="nx">MODE_HINTS</span>
@@ -34,32 +36,35 @@
 
     <span class="vi">@mode = </span><span class="nx">MODE_NORMAL</span>
 
-<span class="nv">_endsWithEsc = </span><span class="nf">(keys) -&gt;</span>
-  <span class="k">return</span> <span class="nx">keys</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s">&#39;,&#39;</span><span class="p">).</span><span class="nx">match</span><span class="p">(</span><span class="sr">/Esc$/</span><span class="p">)</span>
-
 <span class="nv">_getCommand = </span><span class="nf">(mode, keys) -&gt;</span>
-  <span class="k">if</span> <span class="nx">mode</span> <span class="o">==</span> <span class="nx">MODE_NORMAL</span> <span class="o">or</span> <span class="nx">_endsWithEsc</span><span class="p">(</span><span class="nx">keys</span><span class="p">)</span>
+  <span class="nv">lastKey = </span><span class="nx">keys</span><span class="p">[</span><span class="nx">keys</span><span class="p">.</span><span class="nx">length</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+
+  <span class="k">if</span> <span class="nx">mode</span> <span class="o">==</span> <span class="nx">MODE_NORMAL</span> <span class="o">or</span> <span class="nx">lastKey</span> <span class="o">==</span> <span class="s">&#39;Esc&#39;</span>
     <span class="nv">sequence = </span><span class="nx">keys</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s">&#39;,&#39;</span><span class="p">)</span>
     <span class="k">if</span> <span class="nv">command = </span><span class="nx">commands</span><span class="p">[</span><span class="nx">sequence</span><span class="p">]</span>
       <span class="k">return</span> <span class="nx">command</span>
     <span class="k">else</span> <span class="k">if</span> <span class="nx">keys</span><span class="p">.</span><span class="nx">length</span> <span class="o">&gt;</span> <span class="mi">0</span>
       <span class="k">return</span> <span class="nx">_getCommand</span> <span class="nx">mode</span><span class="p">,</span> <span class="nx">keys</span><span class="p">.</span><span class="nx">slice</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 
-  <span class="k">else</span> <span class="k">if</span> <span class="nx">mode</span> <span class="o">==</span> <span class="nx">MODE_HINTS</span>
-    <span class="k">return</span> <span class="p">(</span><span class="nx">vim</span><span class="p">)</span> <span class="o">=&gt;</span>
-      <span class="nv">char = </span><span class="nx">keys</span><span class="p">[</span><span class="nx">keys</span><span class="p">.</span><span class="nx">length</span> <span class="o">-</span> <span class="mi">1</span><span class="p">].</span><span class="nx">toLowerCase</span><span class="p">()</span>
-      <span class="k">return</span> <span class="nx">hintCharHandler</span><span class="p">(</span><span class="nx">vim</span><span class="p">,</span> <span class="nx">char</span><span class="p">)</span>
+  <span class="k">else</span> <span class="k">if</span> <span class="nx">mode</span> <span class="o">==</span> <span class="nx">MODE_HINTS</span> <span class="o">and</span> <span class="nx">keys</span><span class="p">.</span><span class="nx">length</span> <span class="o">&gt;</span> <span class="mi">0</span></pre></div>             </td>           </tr>                               <tr id="section-2">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-2">&#182;</a>               </div>               <p><code>lastKey</code> should be one hint chars or <code>Backspace</code></p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">hintChars = </span><span class="nx">getPref</span><span class="p">(</span><span class="s">&#39;hint_chars&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="s">&#39;backspace&#39;</span>
+    <span class="k">if</span> <span class="nx">hintChars</span><span class="p">.</span><span class="nx">search</span><span class="p">(</span><span class="nx">lastKey</span><span class="p">.</span><span class="nx">toLowerCase</span><span class="p">())</span> <span class="o">&gt;</span> <span class="o">-</span><span class="mi">1</span>
+      <span class="k">return</span> <span class="p">(</span><span class="nx">vim</span><span class="p">)</span> <span class="o">=&gt;</span>
+        <span class="k">return</span> <span class="nx">hintCharHandler</span><span class="p">(</span><span class="nx">vim</span><span class="p">,</span> <span class="nx">lastKey</span><span class="p">.</span><span class="nx">toLowerCase</span><span class="p">())</span>
 
   <span class="k">return</span> <span class="kc">undefined</span>
 
-<span class="nv">_maybeCommand = </span><span class="nf">(mode, keys) -&gt;</span>
-  <span class="k">if</span> <span class="nx">mode</span> <span class="o">==</span> <span class="nx">MODE_NORMAL</span> <span class="o">and</span> <span class="nx">keys</span><span class="p">.</span><span class="nx">length</span> <span class="o">&gt;</span> <span class="mi">0</span>
-    <span class="nv">sequence = </span><span class="nx">keys</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s">&#39;,&#39;</span><span class="p">)</span>
+<span class="nv">_maybeCommand = </span><span class="nf">(mode, keys, keyStr) -&gt;</span>
+  <span class="k">if</span> <span class="nx">mode</span> <span class="o">==</span> <span class="nx">MODE_NORMAL</span> <span class="o">||</span> <span class="nx">keyStr</span> <span class="o">==</span> <span class="s">&#39;Esc&#39;</span>
+    <span class="nv">sequence = </span><span class="nx">keys</span><span class="p">.</span><span class="nx">concat</span><span class="p">([</span><span class="nx">keyStr</span><span class="p">]).</span><span class="nx">join</span><span class="p">(</span><span class="s">&#39;,&#39;</span><span class="p">)</span>
     <span class="k">for</span> <span class="nx">commandSequence</span> <span class="k">in</span> <span class="nb">Object</span><span class="p">.</span><span class="nx">keys</span><span class="p">(</span><span class="nx">commands</span><span class="p">)</span>
       <span class="k">if</span> <span class="nx">commandSequence</span><span class="p">.</span><span class="nx">search</span><span class="p">(</span><span class="nx">sequence</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span>
         <span class="k">return</span> <span class="kc">true</span>
 
-    <span class="k">return</span> <span class="nx">_maybeCommand</span> <span class="nx">mode</span><span class="p">,</span> <span class="nx">keys</span><span class="p">.</span><span class="nx">slice</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nx">keys</span><span class="p">.</span><span class="nx">length</span> <span class="o">&gt;</span> <span class="mi">0</span>
+      <span class="k">return</span> <span class="nx">_maybeCommand</span> <span class="nx">mode</span><span class="p">,</span> <span class="nx">keys</span><span class="p">.</span><span class="nx">slice</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="nx">keyStr</span>
+
+  <span class="k">else</span> <span class="k">if</span> <span class="nx">mode</span> <span class="o">==</span> <span class="nx">MODE_HINTS</span>
+    <span class="k">return</span> <span class="kc">true</span>
 
   <span class="k">return</span> <span class="kc">false</span>
 

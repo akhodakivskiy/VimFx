@@ -1,5 +1,5 @@
 /* Copied over from vimium project */
-div.vimffReset, span.vimffReset {
+div.VimFxReset, span.VimFxReset {
     background: none !important;
     border: none !important;
     /*bottom: auto !important;*/
@@ -38,7 +38,7 @@ div.vimffReset, span.vimffReset {
     z-index: 99999999 !important;
 }
 
-div.vimffHintMarker {
+div.VimFxHintMarker {
     position: absolute !important;
     display: block !important;
     white-space: nowrap !important;
@@ -51,11 +51,11 @@ div.vimffHintMarker {
     border-radius: 5px !important;
 }
 
-div.vimffHiddenHintMarker > span {
+div.VimFxHiddenHintMarker > span {
     display: none !important;
 }
 
-div.vimffHintMarker > span {
+div.VimFxHintMarker > span {
     color: #303030 !important;
     font-family: Helvetica, Arial, sans-serif !important;
     font-weight: bold !important;
@@ -63,6 +63,6 @@ div.vimffHintMarker > span {
     text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6) !important;
 }
 
-div.vimffHintMarker > span.vimffCharMatch {
+div.VimFxHintMarker > span.VimFxCharMatch {
     color: #FFFFFF !important;
 }

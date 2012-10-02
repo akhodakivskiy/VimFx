@@ -22,7 +22,6 @@ class Vim
     return false
 
   execKeys: ->
-    console.log @keys.join(',')
     if command = _getCommand(@mode, @keys)
       lastKey = @keys[@keys.length - 1]
       command @

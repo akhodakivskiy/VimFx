@@ -1,6 +1,7 @@
-utils               = require 'utils'
-{ getCommand }      = require 'commands'
-{ Vim }             = require 'vim'
+utils           = require 'utils'
+{ getCommand }  = require 'commands'
+{ Vim }         = require 'vim'
+{ getPref }     = require 'prefs'
 
 { interfaces: Ci } = Components
 
@@ -13,6 +14,9 @@ suppressEvent = (event) ->
 # The following handlers are installed on every top level DOM window
 handlers = 
   'keydown': (event) ->
+    if getPref 'disabled'
+      return
+
     try
       isEditable =  utils.isElementEditable event.originalTarget
       keyStr = utils.keyboardEventKeyString event
@@ -21,17 +25,20 @@ handlers =
       # or if it's the *Esc* key, which will remote the focus from 
       # the currently focused element
       if keyStr and (keyStr == 'Esc' or not isEditable)
-        if window = utils.getEventTabWindow event
+        if window = utils.getCurrentTabWindow event
           if vimBucket.get(window)?.pushKey keyStr
             suppressEvent event
     catch err
       console.log err
 
   'keypress': (event) ->
+    if getPref 'disabled'
+      return
+
     try
       # Try to execute keys that were accumulated so far.
       # Suppress event if there is a matching command.
-      if window = utils.getEventTabWindow event
+      if window = utils.getCurrentTabWindow event
         if vimBucket.get(window)?.execKeys()
           suppressEvent event
     catch err
@@ -50,7 +57,7 @@ handlers =
         if browser = gBrowser.getBrowserForTab tab
           vimBucket.forget browser.contentWindow.wrappedJSObject
 
-watcher = (window) ->
+addEventListeners = (window) ->
   for name, handler of handlers
     window.addEventListener name, handler, true
 
@@ -60,4 +67,4 @@ watcher = (window) ->
 
   unload -> removeEventListeners window
 
-exports.watcher = watcher
+exports.addEventListeners = addEventListeners

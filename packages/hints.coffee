@@ -1,4 +1,4 @@
-CONTAINER_ID  = 'vimffHintMarkerContainer'
+CONTAINER_ID  = 'VimFxHintMarkerContainer'
 
 { interfaces: Ci }  = Components
 HTMLDocument        = Ci.nsIDOMHTMLDocument
@@ -10,7 +10,7 @@ getHintsContainer = (document) ->
 createHintsContainer = (document) ->
   container = document.createElement 'div'
   container.id = CONTAINER_ID
-  container.className = 'vimffReset'
+  container.className = 'VimFxReset'
   return container
     
 injectHints = (document) ->

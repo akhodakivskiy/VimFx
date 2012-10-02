@@ -3,10 +3,15 @@ SCROLL_AMOUNT = 60
 { classes: Cc, interfaces: Ci, utils: Cu } = Components
 
 utils = require 'utils'
-{ handleHintChar, 
-  injectHints, 
-  removeHints, 
+
+{ handleHintChar
+, injectHints
+, removeHints
 } = require 'hints'
+
+{ showHelp
+, hideHelp
+} = require 'help'
 
 commands = 
   # Navigate to the address that is currently stored in the system clipboard
@@ -57,11 +62,11 @@ commands =
     vim.window.scrollTo(0, vim.window.document.body.scrollHeight)
 
   # Scroll down a bit
-  'j': (vim) -> 
+  'j|c-e': (vim) -> 
     vim.window.scrollBy(0, SCROLL_AMOUNT)
 
   # Scroll up a bit
-  'k': (vim) -> 
+  'k|c-y': (vim) -> 
     vim.window.scrollBy(0, -SCROLL_AMOUNT)
 
   # Scroll down a page
@@ -83,12 +88,12 @@ commands =
       rootWindow.gBrowser.tabContainer.advanceSelectedTab(1, true);
 
   # Go to the first tab
-  'g,H': (vim) ->
+  'g,H|g,0': (vim) ->
     if rootWindow = utils.getRootWindow vim.window
       rootWindow.gBrowser.tabContainer.selectedIndex = 0;
       #
   # Go to the last tab
-  'g,L': (vim) ->
+  'g,L|g,$': (vim) ->
     if rootWindow = utils.getRootWindow vim.window
       itemCount = rootWindow.gBrowser.tabContainer.itemCount;
       rootWindow.gBrowser.tabContainer.selectedIndex = itemCount - 1;
@@ -135,6 +140,10 @@ commands =
 
       vim.enterHintsMode()
 
+  # Show Help
+  '?': (vim) ->
+    showHelp vim.window.document
+
   'Esc': (vim) ->
     # Blur active element if it's editable. Other elements
     # aren't blurred - we don't want to interfere with 
@@ -143,8 +152,11 @@ commands =
     if utils.isElementEditable activeElement
       activeElement.blur()
 
-    # Remove hints and enter normal mode
+    # Remove hints
     removeHints vim.window.document
+    # Hide help dialog
+    hideHelp vim.window.document
+    # Finally enter normal mode
     vim.enterNormalMode()
 
     
@@ -167,5 +179,5 @@ hintCharHandler = (vim, char) ->
       vim.enterNormalMode()
       break
 
-exports.hintCharHandler = hintCharHandler
-exports.commands        = commands
+exports.hintCharHandler   = hintCharHandler
+exports.commands          = commands

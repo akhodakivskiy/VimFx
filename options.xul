@@ -1,6 +1,10 @@
 <?xml version="1.0"?>
 <vbox xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
-    <setting pref="extension.vimff.hint_chars" type="string" title="Hint Chars">
-        Default: asdfgercvhjkl;uinm
+    <setting pref="extension.VimFx.hint_chars" type="string" title="Hint Chars">
+Default: asdfgercvhjkl;uinm
+    </setting>
+    <setting pref="extension.VimFx.black_list" type="string" title="Disable for these URLs">
+Disable Vim functionality on the following URLs
+(comma or space separated list, wildcards allowed)
     </setting>
 </vbox>

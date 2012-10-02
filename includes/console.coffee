@@ -10,7 +10,7 @@ console = do ->
       return "<toString() error>"
 
   message = (level, args) ->
-    dump "vimff - #{ level }: #{ Array.map(args, stringify).join(" ") }\n"
+    dump "VimFx - #{ level }: #{ Array.map(args, stringify).join(" ") }\n"
 
   expand = (arg) ->
     if typeof(arg) == 'object'

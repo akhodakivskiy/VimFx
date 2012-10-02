@@ -33,6 +33,13 @@ class Bucket
 isRootWindow = (window) -> 
   window.location == "chrome://browser/content/browser.xul"
 
+# Returns the `window` from the currently active tab.
+getCurrentTabWindow = (event) ->
+  if window = getEventWindow event
+    if rootWindow = getRootWindow window
+      return rootWindow.gBrowser.selectedTab.linkedBrowser.contentWindow
+
+# Returns the window associated with the event
 getEventWindow = (event) ->
   if event.originalTarget instanceof Window
     return event.originalTarget
@@ -40,13 +47,6 @@ getEventWindow = (event) ->
     doc = event.originalTarget.ownerDocument or event.originalTarget
     if doc instanceof HTMLDocument or doc instanceof XULDocument
       return doc.defaultView 
-
-getEventTabWindow = (event) ->
-  if window = getEventWindow event
-    if isRootWindow window
-      return window.gBrowser.tabs.selectedItem?.contentWindow.wrappedJSObject
-    else
-      return window
 
 getEventRootWindow = (event) ->
   if window = getEventWindow event
@@ -92,7 +92,6 @@ loadCss = (name) ->
   _sss.loadAndRegisterSheet(uri, _sss.AGENT_SHEET)
 
   unload -> 
-    console.log "unloading stylesheet #{name}"
     _sss.unregisterSheet(uri, _sss.AGENT_SHEET)
 
 # Processes the keyboard event and extracts string representation
@@ -180,10 +179,19 @@ readFromClipboard = () ->
 
   return undefined
 
+# Executes function `func` and mearues how much time it took
+timeIt = (func, msg) ->
+  start = new Date().getTime()
+  result = func()
+  end = new Date().getTime()
+
+  console.log msg, end - start
+  return result
+
 exports.Bucket                  = Bucket
 exports.isRootWindow            = isRootWindow
+exports.getCurrentTabWindow     = getCurrentTabWindow
 exports.getEventWindow          = getEventWindow
-exports.getEventTabWindow       = getEventTabWindow
 exports.getEventRootWindow      = getEventRootWindow
 exports.getEventTabBrowser      = getEventTabBrowser
 
@@ -198,3 +206,4 @@ exports.keyboardEventKeyString  = keyboardEventKeyString
 exports.simulateClick           = simulateClick
 exports.readFromClipboard       = readFromClipboard
 exports.writeToClipboard        = writeToClipboard
+exports.timeIt                  = timeIt

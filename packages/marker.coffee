@@ -36,13 +36,13 @@ class Marker
     document = @element.ownerDocument
     window = document.defaultView
     @markerElement = document.createElement 'div'
-    @markerElement.className = 'vimffReset vimffHintMarker'
+    @markerElement.className = 'VimFxReset VimFxHintMarker'
 
   # Shows the marker
-  show: -> @markerElement.className = 'vimffReset vimffHintMarker'
+  show: -> @markerElement.className = 'VimFxReset VimFxHintMarker'
 
   # Hides the marker
-  hide: -> @markerElement.className = 'vimffReset vimffHiddenHintMarker'
+  hide: -> @markerElement.className = 'VimFxReset VimFxHiddenHintMarker'
 
   # Positions the marker on the page. The positioning is absulute
   setPosition: (rect) ->
@@ -59,12 +59,15 @@ class Marker
     while @markerElement.hasChildNodes()
       @markerElement.removeChild @markedElement.firstChild
 
+    fragment = document.createDocumentFragment()
     for char in @hintChars
       span = document.createElement 'span'
-      span.className = 'vimffReset'
+      span.className = 'VimFxReset'
       span.textContent = char.toUpperCase()
       
-      @markerElement.appendChild span
+      fragment.appendChild span
+
+    @markerElement.appendChild fragment
 
   # Add another char to the `enteredHintString`, 
   # see if it still matches `hintString`, apply classes to
@@ -76,10 +79,10 @@ class Marker
     if char == 'backspace' 
       if @enteredHintChars.length > 0
         @enteredHintChars = @enteredHintChars.slice(0, -1)
-        @markerElement.children[@enteredHintChars.length]?.className = 'vimffReset'
+        @markerElement.children[@enteredHintChars.length]?.className = 'VimFxReset'
     # Otherwise append hint char and change hint class
     else 
-      @markerElement.children[@enteredHintChars.length]?.className = 'vimffReset vimffCharMatch'
+      @markerElement.children[@enteredHintChars.length]?.className = 'VimFxReset VimFxCharMatch'
       @enteredHintChars += char
 
     # If entered hint chars no longer partially match the hint chars 
@@ -97,7 +100,6 @@ class Marker
 # The array of markers is returned
 Marker.createMarkers = (document) ->
   hintChars = getPref 'hint_chars'
-  console.log hintChars
 
   elementsSet = getMarkableElements(document)
   markers = [];
