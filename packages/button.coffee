@@ -48,8 +48,8 @@ restorePosition = (doc, button) ->
     toolbar.insertItem button.id
 
 iconUrl = do ->
-  icon_normal = getResourceURI('resources/icon.png').spec
-  icon_grey   = getResourceURI('resources/icon-grey.png').spec
+  icon_normal = getResourceURI('resources/icon16.png').spec
+  icon_grey   = getResourceURI('resources/icon16-grey.png').spec
 
   return (disabled) -> "url(#{ if disabled then icon_grey else icon_normal })"
 
