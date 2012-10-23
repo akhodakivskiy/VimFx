@@ -9,6 +9,7 @@ PREFS =
   hint_chars: 'asdfgercvhjkl;uinm'
   button_id: 'VimFx-toolbar-button'
   disabled: false
+  scroll_step: 60
 
 # Get Firefox preference value of type specified in `PREFS`
 getFFPref = do ->

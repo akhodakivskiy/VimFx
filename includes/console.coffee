@@ -1,5 +1,3 @@
-"use strict"
-
 console = do ->
   cc = Cc["@mozilla.org/consoleservice;1"].getService(Ci.nsIConsoleService)
 
@@ -14,10 +12,9 @@ console = do ->
 
   expand = (arg) ->
     if typeof(arg) == 'object'
-      keys = Object.keys(arg)
-      str = "#{ String(arg) }: #{ keys.length }"
-      for key in keys
-        str += "\n-\t#{ key }: #{ arg[key] }"
+      str = stringify(arg)
+      for key, value of arg
+        str += "\n-\t#{ key }: #{ value }"
 
       return str
     else

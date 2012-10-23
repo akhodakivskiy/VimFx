@@ -63,7 +63,7 @@ addToolbarButton = (window) ->
   button.setAttribute 'type', 'checkbox'
   button.setAttribute 'label', 'Vim for Firefox'
   button.setAttribute 'class', 'toolbarbutton-1 chromeclass-toolbar-additional'
-  button.setAttribute 'tooltiptext', 'Enable/Disable'
+  button.setAttribute 'tooltiptext', 'Enable/Disable VimFx'
   button.checked = disabled
   button.style.listStyleImage = iconUrl(disabled)
 

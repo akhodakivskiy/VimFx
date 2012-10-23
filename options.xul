@@ -7,4 +7,7 @@ Default: asdfgercvhjkl;uinm
 Disable Vim functionality on the following URLs
 (comma or space separated list, wildcards allowed)
     </setting>
+    <setting pref="extension.VimFx.stroll_step" type="integer" title="Scroll Step">
+Default: 60px
+    </setting>
 </vbox>

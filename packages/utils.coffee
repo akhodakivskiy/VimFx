@@ -9,7 +9,6 @@ HTMLDocument        = Ci.nsIDOMHTMLDocument
 HTMLElement         = Ci.nsIDOMHTMLElement
 Window              = Ci.nsIDOMWindow
 ChromeWindow        = Ci.nsIDOMChromeWindow
-KeyboardEvent       = Ci.nsIDOMKeyEvent
 
 _sss  = Cc["@mozilla.org/content/style-sheet-service;1"].getService(Ci.nsIStyleSheetService)
 _clip = Cc["@mozilla.org/widget/clipboard;1"].getService(Ci.nsIClipboard)
@@ -67,7 +66,9 @@ isElementEditable = (element) ->
   return element.isContentEditable or \
          element instanceof HTMLInputElement or \
          element instanceof HTMLTextAreaElement or \
-         element instanceof HTMLSelectElement
+         element instanceof HTMLSelectElement or \
+         element.getAttribute('g_editable') == 'true' or \
+         element.getAttribute('contenteditable') == 'true'
 
 getWindowId = (window) ->
   return window.QueryInterface(Components.interfaces.nsIInterfaceRequestor)
@@ -93,46 +94,6 @@ loadCss = (name) ->
 
   unload -> 
     _sss.unregisterSheet(uri, _sss.AGENT_SHEET)
-
-# Processes the keyboard event and extracts string representation
-# of the key *without modifiers*. 
-# Only processes that can be handled by the extension
-#
-# Currently we handle letters, Escape and Tab keys
-keyboardEventChar = (keyboardEvent) ->
-
-  # Ignore the key if Meta of Alt are pressed
-  if keyboardEvent.metaKey or keyboardEvent.altKey
-    return
-
-  key = keyboardEvent.keyCode
-  char = String.fromCharCode(key)
-  HINTCHARS = getPref 'hint_chars'
-
-  if key >= KeyboardEvent.DOM_VK_A and key <= KeyboardEvent.DOM_VK_Z
-    if keyboardEvent.shiftKey
-      return char.toUpperCase()
-    else
-      return char.toLowerCase()
-  # Allow additional chars from the hint chars list
-  else if HINTCHARS.search(char) > -1
-    return char
-  else
-    switch keyboardEvent.keyCode
-      when KeyboardEvent.DOM_VK_ESCAPE
-        return 'Esc'
-      when KeyboardEvent.DOM_VK_BACK_SPACE
-        return 'Backspace'
-
-# Extracts string representation of the KeyboardEvent and adds 
-# relevant modifiers (_ctrl_, _alt_, _meta_) in case they were pressed
-keyboardEventKeyString = (keyboardEvent) ->
-  char = keyboardEventChar keyboardEvent
-
-  if char and keyboardEvent.ctrlKey
-    char = "c-#{ char }"
-
-  return char
 
 # Simulate mouse click with full chain of event
 # Copied from Vimium codebase
@@ -202,7 +163,6 @@ exports.getSessionStore         = getSessionStore
 
 exports.loadCss                 = loadCss
 
-exports.keyboardEventKeyString  = keyboardEventKeyString
 exports.simulateClick           = simulateClick
 exports.readFromClipboard       = readFromClipboard
 exports.writeToClipboard        = writeToClipboard

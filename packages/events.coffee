@@ -1,4 +1,5 @@
 utils           = require 'utils'
+keyUtils        = require 'key-utils'
 { getCommand }  = require 'commands'
 { Vim }         = require 'vim'
 { getPref }     = require 'prefs'
@@ -14,20 +15,35 @@ suppressEvent = (event) ->
 # The following handlers are installed on every top level DOM window
 handlers = 
   'keydown': (event) ->
+
     if getPref 'disabled'
       return
 
     try
       isEditable =  utils.isElementEditable event.originalTarget
-      keyStr = utils.keyboardEventKeyString event
 
+      { ctrlKey: ctrl, metaKey: meta, altKey: alt, shiftKey: shift } = event 
+      console.log ctrl, meta, alt, shift
+
+      # any keys modified with meta or alt should be ignored
+      if meta or alt
+        return 
+
+      # Extract keyChar from keyCode and apply modifiers
+      keyChar = keyUtils.keyCharFromCode(event.keyCode, shift)
+      keyStr = keyUtils.applyModifiers(keyChar, ctrl, alt, meta)
+
+      console.log keyStr
       # We only handle the key if there is no focused editable element
-      # or if it's the *Esc* key, which will remote the focus from 
+      # or if it's the *Esc* key, which will remove the focus from 
       # the currently focused element
-      if keyStr and (keyStr == 'Esc' or not isEditable)
+      if not isEditable or keyStr == 'Esc'
         if window = utils.getCurrentTabWindow event
           if vimBucket.get(window)?.pushKey keyStr
-            suppressEvent event
+            # We don't really want to suppress the Esc key, 
+            # but we want to handle it
+            if keyStr != 'Esc'
+              suppressEvent event
     catch err
       console.log err
 
