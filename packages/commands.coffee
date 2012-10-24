@@ -1,8 +1,7 @@
-SCROLL_AMOUNT = 60
-
 { classes: Cc, interfaces: Ci, utils: Cu } = Components
 
 utils = require 'utils'
+{ getPref } = require 'prefs'
 
 { handleHintChar
 , injectHints
@@ -63,18 +62,20 @@ commands =
 
   # Scroll down a bit
   'j|c-e': (vim) -> 
-    vim.window.scrollBy(0, SCROLL_AMOUNT)
+    scroll_step = getPref 'scroll_step'
+    vim.window.scrollBy(0, scroll_step)
 
   # Scroll up a bit
   'k|c-y': (vim) -> 
-    vim.window.scrollBy(0, -SCROLL_AMOUNT)
+    scroll_step = getPref 'scroll_step'
+    vim.window.scrollBy(0, -scroll_step)
 
   # Scroll down a page
-  'd': (vim) ->
+  'd|c-d': (vim) ->
     vim.window.scrollBy(0, vim.window.innerHeight)
 
   # Scroll up a page
-  'u': (vim) ->
+  'u|c-u': (vim) ->
     vim.window.scrollBy(0, -vim.window.innerHeight)
 
   # Activate previous tab

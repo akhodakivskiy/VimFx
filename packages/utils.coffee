@@ -149,6 +149,16 @@ timeIt = (func, msg) ->
   console.log msg, end - start
   return result
 
+# Checks if the string provided matches one of the black list entries
+# `blackList`: comma/space separated list of URLs with wildcards (* and !)
+isBlacklisted = (str, blackList) ->
+  for rule in blackList.split(/[\s,]+/)
+    rule = rule.replace(/\*/g, '.*').replace(/\!/g, '.') 
+    if str.match new RegExp("^#{ rule }$")
+      return true
+
+  return false
+
 exports.Bucket                  = Bucket
 exports.isRootWindow            = isRootWindow
 exports.getCurrentTabWindow     = getCurrentTabWindow
@@ -167,3 +177,4 @@ exports.simulateClick           = simulateClick
 exports.readFromClipboard       = readFromClipboard
 exports.writeToClipboard        = writeToClipboard
 exports.timeIt                  = timeIt
+exports.isBlacklisted           = isBlacklisted

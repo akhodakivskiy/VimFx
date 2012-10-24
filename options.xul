@@ -3,11 +3,12 @@
     <setting pref="extension.VimFx.hint_chars" type="string" title="Hint Chars">
 Default: asdfgercvhjkl;uinm
     </setting>
-    <setting pref="extension.VimFx.black_list" type="string" title="Disable for these URLs">
-Disable Vim functionality on the following URLs
-(comma or space separated list, wildcards allowed)
+    <setting pref="extension.VimFx.black_list" type="string" title="Black List">
+Disable Vim functionality on the following URLs.
+Comma or space separated list, wildcards allowed: `!` to match single character and `*` to match several characters. 
+Example: `*go!gle.com*` will match http://google.com and https://go0gle.com/maps
     </setting>
-    <setting pref="extension.VimFx.stroll_step" type="integer" title="Scroll Step">
-Default: 60px
+    <setting pref="extension.VimFx.scroll_step" type="integer" title="Scroll Step">
+Default: 60
     </setting>
 </vbox>

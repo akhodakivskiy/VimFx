@@ -1,8 +1,9 @@
-utils           = require 'utils'
-keyUtils        = require 'key-utils'
-{ getCommand }  = require 'commands'
-{ Vim }         = require 'vim'
-{ getPref }     = require 'prefs'
+utils                     = require 'utils'
+keyUtils                  = require 'key-utils'
+{ getCommand }            = require 'commands'
+{ Vim }                   = require 'vim'
+{ getPref }               = require 'prefs'
+{ setToolbarButtonMark }  = require 'button'
 
 { interfaces: Ci } = Components
 
@@ -12,8 +13,8 @@ suppressEvent = (event) ->
   event.preventDefault()
   event.stopPropagation()
 
-# The following handlers are installed on every top level DOM window
-handlers = 
+# The following listeners are installed on every top level Chrome window
+windowsListener = 
   'keydown': (event) ->
 
     if getPref 'disabled'
@@ -23,26 +24,28 @@ handlers =
       isEditable =  utils.isElementEditable event.originalTarget
 
       { ctrlKey: ctrl, metaKey: meta, altKey: alt, shiftKey: shift } = event 
-      console.log ctrl, meta, alt, shift
 
       # any keys modified with meta or alt should be ignored
       if meta or alt
         return 
 
       # Extract keyChar from keyCode and apply modifiers
-      keyChar = keyUtils.keyCharFromCode(event.keyCode, shift)
-      keyStr = keyUtils.applyModifiers(keyChar, ctrl, alt, meta)
+      if keyChar = keyUtils.keyCharFromCode(event.keyCode, shift)
+        keyStr = keyUtils.applyModifiers(keyChar, ctrl, alt, meta)
 
-      console.log keyStr
-      # We only handle the key if there is no focused editable element
-      # or if it's the *Esc* key, which will remove the focus from 
-      # the currently focused element
-      if not isEditable or keyStr == 'Esc'
+      # We only handle the key if it's recognized by `keyCharFromCode`
+      # and if there is no focused editable element # or if it's the *Esc* key, 
+      # which will remove the focus from the currently focused element
+      if keyStr and (not isEditable or keyStr == 'Esc')
         if window = utils.getCurrentTabWindow event
-          if vimBucket.get(window)?.pushKey keyStr
-            # We don't really want to suppress the Esc key, 
-            # but we want to handle it
-            if keyStr != 'Esc'
+          if vim = vimBucket.get(window)
+            # No action if blacklisted
+            if vim.blacklisted
+              return
+
+            # Push new keyStr on the stack and we don't really want to 
+            # suppress the Esc key, but we want to handle it
+            if vim.pushKey(keyStr) and keyStr != 'Esc'
               suppressEvent event
     catch err
       console.log err
@@ -55,15 +58,14 @@ handlers =
       # Try to execute keys that were accumulated so far.
       # Suppress event if there is a matching command.
       if window = utils.getCurrentTabWindow event
-        if vimBucket.get(window)?.execKeys()
-          suppressEvent event
+        if vim = vimBucket.get(window)
+          # No action on blacklisted locations
+          if vim.blacklisted
+            return
+          else if vim.execKeys()
+            suppressEvent event
     catch err
       console.log err
-
-  'TabClose': (event) ->
-    if gBrowser = utils.getEventTabBrowser event
-      if browser = gBrowser.getBrowserForTab event.originalTarget
-        vimBucket.forget browser.contentWindow.wrappedJSObject
 
   # When the top level window closes we should release all Vims that were 
   # associated with tabs in this window
@@ -71,16 +73,43 @@ handlers =
     if gBrowser = event.originalTarget.gBrowser
       for tab in gBrowser.tabs
         if browser = gBrowser.getBrowserForTab tab
-          vimBucket.forget browser.contentWindow.wrappedJSObject
+          vimBucket.forget browser.contentWindow
+
+  'TabClose': (event) ->
+    if gBrowser = utils.getEventTabBrowser event
+      if browser = gBrowser.getBrowserForTab event.originalTarget
+        vimBucket.forget browser.contentWindow
+
+  # Update the toolbar button icon to reflect the blacklisted state
+  'TabSelect': (event) ->
+    if vim = vimBucket.get event.originalTarget?.linkedBrowser?.contentDocument?.defaultView
+      if rootWindow = utils.getRootWindow vim.window
+        setToolbarButtonMark rootWindow, if vim.blacklisted then 'blacklisted' else 'normal'
+
+# This listener works on individual tabs within Chrome Window
+# User for: listening for location changes and disabling the extension
+# on black listed urls
+tabsListener = 
+  onLocationChange: (browser, webProgress, request, location) ->
+    blacklisted = utils.isBlacklisted location.spec, getPref 'black_list'
+    if vim = vimBucket.get(browser.contentWindow)
+      vim.blacklisted = blacklisted
+      if rootWindow = utils.getRootWindow vim.window
+        setToolbarButtonMark rootWindow, if vim.blacklisted then 'blacklisted' else 'normal'
 
 addEventListeners = (window) ->
-  for name, handler of handlers
-    window.addEventListener name, handler, true
+  for name, listener of windowsListener
+    window.addEventListener name, listener, true
+
+  # Install onLocationChange listener
+  window.gBrowser.addTabsProgressListener tabsListener
 
   removeEventListeners = ->
-    for name, handler of handlers
-      window.removeEventListener name, handler, true
+    for name, listener of windowsListener
+      window.removeEventListener name, listener, true
 
-  unload -> removeEventListeners window
+  unload -> 
+    removeEventListeners window
+    window.gBrowser.removeTabsProgressListener tabsListener
 
 exports.addEventListeners = addEventListeners

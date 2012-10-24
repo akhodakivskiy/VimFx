@@ -57,6 +57,8 @@ include("includes/#{ name }.js", this) for name in [
 # Firefox will call this method on startup/enabling
 startup = (data, reason) ->
   if reason = ADDON_INSTALL
+    # Position the toolbar button right before the default Bookmarks button
+    # If Bookmarks button is hidden - then VimFx button will be appended to the toolbar
     setButtonDefaultPosition getPref('button_id'), 'nav-bar', 'bookmarks-menu-button-container'
 
   loadCss 'style'

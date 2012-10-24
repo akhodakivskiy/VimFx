@@ -18,12 +18,13 @@ persist = (document, toolbar, buttonID, beforeID) ->
 setButtonDefaultPosition = (buttonId, toolbarId, beforeId) ->
   positions[buttonId] = [toolbarId, beforeId]
 
+$ = (doc, sel, all) -> doc[if all then "querySelectorAll" else "getElementById"](sel)
+
 restorePosition = (doc, button) ->
-  $ = (sel, all) -> doc[if all then "querySelectorAll" else "getElementById"](sel)
   
-  ($("navigator-toolbox") || $("mail-toolbox")).palette.appendChild(button)
+  ($(doc, "navigator-toolbox") || $(doc, "mail-toolbox")).palette.appendChild(button)
   
-  for tb in $("toolbar", true)
+  for tb in $(doc, "toolbar", true)
     currentset = tb.getAttribute('currentset').split(',')
     idx = currentset.indexOf button.id
     if idx > -1
@@ -33,7 +34,7 @@ restorePosition = (doc, button) ->
   # Saved position not found, using the default one, after persisting it
   if !toolbar and (button.id in Object.keys(positions))
     [tbID, beforeID] = positions[button.id];
-    toolbar = $(tbID)
+    toolbar = $(doc, tbID)
     [currentset, idx] = persist(doc, toolbar, button.id, beforeID)
   
   if toolbar
@@ -41,36 +42,37 @@ restorePosition = (doc, button) ->
       # Inserting the button before the first item in `currentset`
       # after `idx` that is present in the document
       for i in [idx + 1 ... currentset.length]
-        if before = $(currentset[i])
+        if before = $(doc, currentset[i])
           toolbar.insertItem button.id, before
           return;
 
     toolbar.insertItem button.id
 
 iconUrl = do ->
-  icon_normal = getResourceURI('resources/icon16.png').spec
-  icon_grey   = getResourceURI('resources/icon16-grey.png').spec
+  kinds = 
+    normal:       getResourceURI('resources/icon16.png').spec
+    disabled:     getResourceURI('resources/icon16-grey.png').spec
+    blacklisted:  getResourceURI('resources/icon16-red.png').spec
 
-  return (disabled) -> "url(#{ if disabled then icon_grey else icon_normal })"
+  return (kind) -> "url(#{ kinds[kind] })"
 
 addToolbarButton = (window) ->
-  buttonId = getPref 'button_id'
   disabled = getPref 'disabled'
 
   doc = window.document
   button = doc.createElement 'toolbarbutton'
-  button.setAttribute 'id', buttonId
+  button.setAttribute 'id', getPref 'button_id'
   button.setAttribute 'type', 'checkbox'
-  button.setAttribute 'label', 'Vim for Firefox'
+  button.setAttribute 'label', getPref 'button_label'
   button.setAttribute 'class', 'toolbarbutton-1 chromeclass-toolbar-additional'
-  button.setAttribute 'tooltiptext', 'Enable/Disable VimFx'
+  button.setAttribute 'tooltiptext', getPref 'button_tooltip'
   button.checked = disabled
-  button.style.listStyleImage = iconUrl(disabled)
+  button.style.listStyleImage = iconUrl(if disabled then 'disabled' else 'normal')
 
   onButtonCommand = (event) ->
     dis = button.checked
     setPref 'disabled', dis
-    button.style.listStyleImage = iconUrl(dis)
+    button.style.listStyleImage = iconUrl(if dis then 'disabled' else 'normal')
 
   button.addEventListener 'command', onButtonCommand, false
   
@@ -79,5 +81,22 @@ addToolbarButton = (window) ->
 
   unload -> button.parentNode.removeChild button
 
+setToolbarButtonMark = (window, mark) ->
+  button = $(window.document, getPref 'button_id')
+  try
+    if mark == 'normal'
+      button.disabled = false
+      disabled = getPref 'disabled'
+      button.style.listStyleImage = iconUrl(if disabled then 'disabled' else 'normal')
+      button.setAttribute 'tooltiptext', getPref 'button_tooltip'
+    else if mark == 'blacklisted'
+      button.disabled = true
+      button.style.listStyleImage = iconUrl('blacklisted')
+      button.setAttribute 'tooltiptext', getPref 'button_blacklisted_tooltip'
+  catch err
+    console.log err
+
+
 exports.addToolbarButton          = addToolbarButton
+exports.setToolbarButtonMark      = setToolbarButtonMark 
 exports.setButtonDefaultPosition  = setButtonDefaultPosition

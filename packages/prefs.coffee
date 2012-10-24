@@ -6,10 +6,15 @@ PREF_BRANCH = "extension.VimFx.";
 # All used preferences should be mentioned here becuase 
 # preference type is derived from here
 PREFS = 
-  hint_chars: 'asdfgercvhjkl;uinm'
-  button_id: 'VimFx-toolbar-button'
+  button_id:                  'VimFx-toolbar-button'
+  button_label:               'Vim for Firefox'
+  button_tooltip:             'Enable/Disable VimFx'
+  button_blacklisted_tooltip: 'VimFx Blacklisted'
+
+  hint_chars:                 'asdfgercvhjkl;uinm'
   disabled: false
   scroll_step: 60
+  black_list: ''
 
 # Get Firefox preference value of type specified in `PREFS`
 getFFPref = do ->
@@ -30,7 +35,7 @@ getFFPref = do ->
       else
         return branch.getCharPref key
 
-# Set firefox preference value
+# Assign and save Firefox preference value
 setFFPref = do ->
   branch = Services.prefs.getBranch PREF_BRANCH
 

@@ -58,6 +58,9 @@ keyCharFromCode = (keyCode, shiftKey=false) ->
 
 # Format keyChar that arrives during `keypress` into keyStr
 applyModifiers = (keyChar, ctrlKey=false, altKey=false, metaKey=false) ->
+  if not keyChar
+    return keyChar
+
   modifier = ''
   modifier += 'c' if ctrlKey
   modifier += 'm' if metaKey
