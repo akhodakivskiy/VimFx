@@ -18,13 +18,14 @@ persist = (document, toolbar, buttonID, beforeID) ->
 setButtonDefaultPosition = (buttonId, toolbarId, beforeId) ->
   positions[buttonId] = [toolbarId, beforeId]
 
-$ = (doc, sel, all) -> doc[if all then "querySelectorAll" else "getElementById"](sel)
+$ = (doc, sel) -> doc.getElementById(sel)
+$$ = (doc, sel) -> doc.querySelectorAll(sel)
 
 restorePosition = (doc, button) ->
   
   ($(doc, "navigator-toolbox") || $(doc, "mail-toolbox")).palette.appendChild(button)
   
-  for tb in $(doc, "toolbar", true)
+  for tb in $$(doc, "toolbar")
     currentset = tb.getAttribute('currentset').split(',')
     idx = currentset.indexOf button.id
     if idx > -1
@@ -50,9 +51,10 @@ restorePosition = (doc, button) ->
 
 iconUrl = do ->
   kinds = 
-    normal:       getResourceURI('resources/icon16.png').spec
-    disabled:     getResourceURI('resources/icon16-grey.png').spec
-    blacklisted:  getResourceURI('resources/icon16-red.png').spec
+    normal:    getResourceURI('resources/icon16.png').spec
+    grey:      getResourceURI('resources/icon16-grey.png').spec
+    red:       getResourceURI('resources/icon16-red.png').spec
+    blacklist: getResourceURI('resources/icon16-blacklist.png').spec
 
   return (kind) -> "url(#{ kinds[kind] })"
 
@@ -60,43 +62,92 @@ addToolbarButton = (window) ->
   disabled = getPref 'disabled'
 
   doc = window.document
+
+  blacklistTextbox = doc.createElement 'textbox'
+  blacklistButton = doc.createElement 'toolbarbutton'
+  blacklistButton.setAttribute 'tooltiptext', 'Blacklist'
+  blacklistButton.setAttribute 'class', 'toolbarbutton-1'
+  blacklistButton.style.listStyleImage = iconUrl('blacklist')
+  hbox = doc.createElement 'hbox'
+  hbox.appendChild blacklistTextbox
+  hbox.appendChild blacklistButton
+
+  itemPreferences = doc.createElement 'menuitem'
+  itemPreferences.setAttribute 'label', 'Preferences'
+
+  itemHelp = doc.createElement 'menuitem'
+  itemHelp.setAttribute 'label', 'Help'
+
+  menupopup = doc.createElement 'menupopup'
+  menupopup.appendChild hbox
+  menupopup.appendChild itemPreferences
+  menupopup.appendChild itemHelp
+
   button = doc.createElement 'toolbarbutton'
   button.setAttribute 'id', getPref 'button_id'
-  button.setAttribute 'type', 'checkbox'
-  button.setAttribute 'label', getPref 'button_label'
-  button.setAttribute 'class', 'toolbarbutton-1 chromeclass-toolbar-additional'
-  button.setAttribute 'tooltiptext', getPref 'button_tooltip'
-  button.checked = disabled
-  button.style.listStyleImage = iconUrl(if disabled then 'disabled' else 'normal')
+  button.setAttribute 'type', 'menu-button'
+  button.setAttribute 'label', 'VimFx'
+  button.setAttribute 'class', 'toolbarbutton-1'
+  button.appendChild menupopup
 
+  updateToolbarButton button
+
+  # Create and install event listeners 
   onButtonCommand = (event) ->
-    dis = button.checked
-    setPref 'disabled', dis
-    button.style.listStyleImage = iconUrl(if dis then 'disabled' else 'normal')
+    # Change disabled state value which is stored in Prefs
+    setPref('disabled', not getPref 'disabled')
+    updateToolbarButton button
 
-  button.addEventListener 'command', onButtonCommand, false
-  
+  onPopupShowing = (event) ->
+    if tabWindow = window.gBrowser.selectedTab.linkedBrowser.contentWindow
+      blacklistTextbox.value = "*#{ tabWindow.location.host }*"
+
+  onBlacklistButtonCommand = (event) ->
+    blackList = getPref('black_list')
+
+    if blackList.length > 0
+      blackList += ', '
+    blackList += blacklistTextbox.value
+
+    setPref 'black_list', blackList
+    menupopup.hidePopup()
+
+    event.stopPropagation()
+
+  onPreferencesCommand = (event) ->
+    id = encodeURIComponent getPref('addon_id')
+    window.BrowserOpenAddonsMgr("addons://detail/#{ id }/preferences")
+    event.stopPropagation()
+
+  onHelpCommand = (event) ->
+    event.stopPropagation()
+
+  button.addEventListener           'command',      onButtonCommand,          false
+  menupopup.addEventListener        'popupshowing', onPopupShowing,           false
+  blacklistButton.addEventListener  'command',      onBlacklistButtonCommand, false
+  itemPreferences.addEventListener  'command',      onPreferencesCommand,     false
+  itemHelp.addEventListener         'popupshowing', onHelpCommand,            false
 
   restorePosition doc, button, 'nav-bar', 'bookmarks-menu-button-container'
 
   unload -> button.parentNode.removeChild button
 
-setToolbarButtonMark = (window, mark) ->
-  button = $(window.document, getPref 'button_id')
-  try
-    if mark == 'normal'
-      button.disabled = false
-      disabled = getPref 'disabled'
-      button.style.listStyleImage = iconUrl(if disabled then 'disabled' else 'normal')
-      button.setAttribute 'tooltiptext', getPref 'button_tooltip'
-    else if mark == 'blacklisted'
-      button.disabled = true
-      button.style.listStyleImage = iconUrl('blacklisted')
-      button.setAttribute 'tooltiptext', getPref 'button_blacklisted_tooltip'
-  catch err
-    console.log err
+updateToolbarButton = (button) ->
+  if getPref 'disabled'
+    button.style.listStyleImage = iconUrl('grey')
+    button.setAttribute 'tooltiptext', 'VimFx is Disabled. Click to Enable'
+  else if button['VimFx_blacklisted']
+    button.style.listStyleImage = iconUrl('red')
+    button.setAttribute 'tooltiptext', 'VimFx is Blacklisted on this Site'
+  else
+    button.style.listStyleImage = iconUrl('normal')
+    button.setAttribute 'tooltiptext', 'VimFx is Enabled. Click to Disable'
 
+setWindowBlacklisted = (window, blacklisted) ->
+  if button = $(window.document, getPref 'button_id')
+    button['VimFx_blacklisted'] = blacklisted
+    updateToolbarButton button
 
-exports.addToolbarButton          = addToolbarButton
-exports.setToolbarButtonMark      = setToolbarButtonMark 
-exports.setButtonDefaultPosition  = setButtonDefaultPosition
+exports.addToolbarButton         = addToolbarButton
+exports.setWindowBlacklisted     = setWindowBlacklisted 
+exports.setButtonDefaultPosition = setButtonDefaultPosition

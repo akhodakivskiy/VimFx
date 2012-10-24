@@ -1,9 +1,9 @@
-utils                     = require 'utils'
-keyUtils                  = require 'key-utils'
-{ getCommand }            = require 'commands'
-{ Vim }                   = require 'vim'
-{ getPref }               = require 'prefs'
-{ setToolbarButtonMark }  = require 'button'
+utils                           = require 'utils'
+keyUtils                        = require 'key-utils'
+{ getCommand }                  = require 'commands'
+{ Vim }                         = require 'vim'
+{ getPref }                     = require 'prefs'
+{ setWindowBlacklisted } = require 'button'
 
 { interfaces: Ci } = Components
 
@@ -84,7 +84,7 @@ windowsListener =
   'TabSelect': (event) ->
     if vim = vimBucket.get event.originalTarget?.linkedBrowser?.contentDocument?.defaultView
       if rootWindow = utils.getRootWindow vim.window
-        setToolbarButtonMark rootWindow, if vim.blacklisted then 'blacklisted' else 'normal'
+        setWindowBlacklisted rootWindow, vim.blacklisted
 
 # This listener works on individual tabs within Chrome Window
 # User for: listening for location changes and disabling the extension
@@ -95,7 +95,7 @@ tabsListener =
     if vim = vimBucket.get(browser.contentWindow)
       vim.blacklisted = blacklisted
       if rootWindow = utils.getRootWindow vim.window
-        setToolbarButtonMark rootWindow, if vim.blacklisted then 'blacklisted' else 'normal'
+        setWindowBlacklisted rootWindow, vim.blacklisted
 
 addEventListeners = (window) ->
   for name, listener of windowsListener
