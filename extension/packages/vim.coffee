@@ -56,18 +56,18 @@ _getCommand = (mode, keys) ->
   return undefined
 
 _maybeCommand = (mode, keys, keyStr) ->
-  if mode == MODE_NORMAL || keyStr == 'Esc'
-    sequence = keys.concat([keyStr]).join(',')
-    for commandSequence in Object.keys(commands)
-      if commandSequence.search(sequence) == 0
-        return true
+    if mode == MODE_NORMAL || keyStr == 'Esc'
+      sequence = keys.concat([keyStr]).join(',')
+      for commandSequence in Object.keys(commands)
+        if commandSequence.indexOf(sequence) == 0
+          return true
 
-    if keys.length > 0
-      return _maybeCommand mode, keys.slice(1), keyStr
+      if keys.length > 0
+        return _maybeCommand mode, keys.slice(1), keyStr
 
-  else if mode == MODE_HINTS
-    return true
+    else if mode == MODE_HINTS
+      return true
 
-  return false
+    return false
 
 exports.Vim = Vim

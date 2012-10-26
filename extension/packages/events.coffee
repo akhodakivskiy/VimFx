@@ -48,7 +48,7 @@ windowsListener =
             if vim.pushKey(keyStr) and keyStr != 'Esc'
               suppressEvent event
     catch err
-      console.log err
+      console.log err, 'keydown'
 
   'keypress': (event) ->
     if getPref 'disabled'
@@ -65,7 +65,7 @@ windowsListener =
           else if vim.execKeys()
             suppressEvent event
     catch err
-      console.log err
+      console.log err, 'keypress'
 
   # When the top level window closes we should release all Vims that were 
   # associated with tabs in this window

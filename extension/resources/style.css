@@ -1,5 +1,5 @@
 /* Copied over from vimium project */
-div.VimFxReset, span.VimFxReset {
+.VimFxReset {
     background: none !important;
     border: none !important;
     /*bottom: auto !important;*/
@@ -36,6 +36,7 @@ div.VimFxReset, span.VimFxReset {
     white-space: normal !important;
     width: auto !important;
     z-index: 99999999 !important;
+    float: clear !important;
 }
 
 div.VimFxHintMarker {
@@ -44,11 +45,11 @@ div.VimFxHintMarker {
     white-space: nowrap !important;
     overflow: hidden !important;
     font-size: 11px !important;
-    padding: 0px 3px 0px 3px !important;
-    box-shadow: 0px 3px 7px 0px rgba(0, 0, 0, 0.3) !important;
-    background-color: #AEDC3A !important;
-    border: solid 1px #2B95B0 !important;
-    border-radius: 5px !important;
+    padding: 1px 3px 1px 3px !important;
+    box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3) !important;
+    background-color: #ff9103 !important;
+    border: solid 1px #bd6b00 !important;
+    border-radius: 3px !important;
 }
 
 div.VimFxHiddenHintMarker > span {
@@ -64,5 +65,138 @@ div.VimFxHintMarker > span {
 }
 
 div.VimFxHintMarker > span.VimFxCharMatch {
-    color: #FFFFFF !important;
+    color: #ffa22a !important;
+}
+
+/* Help Dialog */
+
+div#VimFxHelpDialog {
+    opacity:0.92 !important;
+    background-color:white !important;
+    position:fixed !important;
+    border-radius:3px !important;
+    padding:15px 30px !important;
+    width:600px !important;
+    left:50% !important;
+    /* This needs to be 1/2 width to horizontally center the help dialog */
+    margin-left:-330px !important;
+    top:50px !important;
+    box-shadow: rgba(1, 2, 1, 0.4) 0px 0px 6px !important;
+    overflow-y: auto !important;
+    z-index:99999998 !important;
+    font-size: 13px !important;
+    max-height: 75% !important;
+}
+
+div#VimFxHelpDialog .VimFxTitle {
+    font-size: 30px !important;
+    line-height: 130% !important;
+    display: block !important;
+    float: left !important;
+}
+
+div#VimFxHelpDialog .VimFxClearFix {
+    clear: both !important;
+    float: none !important;
+    display: block !important;
+    visibility: hidden !important;
+    height: 0 !important;
+}
+
+div#VimFxHelpDialog .VimFxTitleVim {
+    color: darkgreen !important;
+}
+
+div#VimFxHelpDialog .VimFxTitleFx {
+    color: darkred !important;
+}
+
+div#VimFxHelpDialog .VimFxClose {
+    float: right !important;
+    font-family: "courier new" !important;
+    position: absolute !important;
+    right: 20px !important;
+    top: 20px !important;
+    font-size: 20px !important;
+    cursor: hand !important;
+    cursor: pointer !important;
+}
+
+div#VimFxHelpDialog .VimFxSocial {
+    float: left !important;
+}
+
+div#VimFxHelpDialog .VimFxVersion {
+    position: absolute !important;
+    right: 20px !important;
+    bottom: 20px !important;
+    font-size: 10px !important;
+}
+
+div#VimFxHelpDialog .VimFxColumn {
+    width: 46% !important;
+    margin: 0 0 0 8% !important;
+    float: left !important;
+
+    margin-bottom: 10px !important;
+}
+
+div#VimFxHelpDialog .VimFxColumn:first-child
+{    margin: 0 !important;}
+
+div#VimFxHelpDialog .VimFxSectionTitle {
+    display: block !important;
+    font-size: 13px !important;
+    font-weight: bold !important;
+    line-height: 140% !important;
+    text-transform: uppercase !important;
+    margin: 30px 0 10px 0 !important;
+
+}
+
+div#VimFxHelpDialog table.VimFxReset {
+    display: table !important;
+    table-layout: auto !important;
+}
+
+div#VimFxHelpDialog tr.VimFxReset {
+    display: table-row !important;
+}
+
+div#VimFxHelpDialog td.VimFxReset {
+    display: table-cell !important;
+    padding-top: 2px !important;
+    padding-bottom: 4px !important;
+    line-height: 15px !important;
+
+}
+
+div#VimFxHelpDialog td.VimFxSequence {
+    min-width:50px !important;
+    text-align: right !important;
+    padding-right:5px !important;
+    font-weight:bold !important;
+    color:#2f508e !important;
+}
+
+div#VimFxHelpDialog .VimFxSocial {
+    margin: 30px 0 0 0 !important;
+    font-size: 11px !important;
+}
+
+div#VimFxHelpDialog .VimFxSocial p {
+    display: block !important;
+    line-height: 150% !important;
+    margin: 0 0 5px 0 !important;
+}
+
+div#VimFxHelpDialog .VimFxSocial a {
+    text-decoration: underline !important;
+    color: darkblue !important;
+    cursor: hand !important;
+    cursor: pointer !important;
+}
+
+div#VimFxHelpDialog span.VimFxDot {
+    color: #818181 !important; 
 }

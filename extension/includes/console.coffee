@@ -1,5 +1,5 @@
 console = do ->
-  cc = Cc["@mozilla.org/consoleservice;1"].getService(Ci.nsIConsoleService)
+  cs = Cc["@mozilla.org/consoleservice;1"].getService(Ci.nsIConsoleService)
 
   stringify = (arg) ->
     try 
@@ -8,7 +8,9 @@ console = do ->
       return "<toString() error>"
 
   message = (level, args) ->
-    dump "VimFx - #{ level }: #{ Array.map(args, stringify).join(" ") }\n"
+    str = "VimFx - #{ level }: #{ Array.map(args, stringify).join(" ") }\n" 
+    dump str
+    cs.logStringMessage str
 
   expand = (arg) ->
     if typeof(arg) == 'object'

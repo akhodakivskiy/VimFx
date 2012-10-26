@@ -1,10 +1,12 @@
 { getPref 
 , setPref } = require 'prefs'
 
+{ showHelp } = require 'help'
+
 positions = {}
 
 persist = (document, toolbar, buttonID, beforeID) ->
-  currentset = tb.getAttribute('currentset').split(',')
+  currentset = toolbar.getAttribute('currentset').split(',')
   idx = if beforeID then currentset.indexOf(beforeID) else -1;
   if idx != -1
     currentset.splice(idx, 0, buttonID);
@@ -23,7 +25,7 @@ $$ = (doc, sel) -> doc.querySelectorAll(sel)
 
 restorePosition = (doc, button) ->
   
-  ($(doc, "navigator-toolbox") || $(doc, "mail-toolbox")).palette.appendChild(button)
+  $(doc, "navigator-toolbox").palette.appendChild(button)
   
   for tb in $$(doc, "toolbar")
     currentset = tb.getAttribute('currentset').split(',')
@@ -58,9 +60,7 @@ iconUrl = do ->
 
   return (kind) -> "url(#{ kinds[kind] })"
 
-addToolbarButton = (window) ->
-  disabled = getPref 'disabled'
-
+createMenupopup = (window) ->
   doc = window.document
 
   blacklistTextbox = doc.createElement 'textbox'
@@ -83,54 +83,79 @@ addToolbarButton = (window) ->
   menupopup.appendChild itemPreferences
   menupopup.appendChild itemHelp
 
-  button = doc.createElement 'toolbarbutton'
-  button.setAttribute 'id', getPref 'button_id'
-  button.setAttribute 'type', 'menu-button'
-  button.setAttribute 'label', 'VimFx'
-  button.setAttribute 'class', 'toolbarbutton-1'
-  button.appendChild menupopup
-
-  updateToolbarButton button
-
-  # Create and install event listeners 
-  onButtonCommand = (event) ->
-    # Change disabled state value which is stored in Prefs
-    setPref('disabled', not getPref 'disabled')
-    updateToolbarButton button
-
   onPopupShowing = (event) ->
     if tabWindow = window.gBrowser.selectedTab.linkedBrowser.contentWindow
       blacklistTextbox.value = "*#{ tabWindow.location.host }*"
 
   onBlacklistButtonCommand = (event) ->
-    blackList = getPref('black_list')
-
-    if blackList.length > 0
-      blackList += ', '
+    blackList = getPref 'black_list'
+    blackList += ', ' if blackList.length > 0 
     blackList += blacklistTextbox.value
 
     setPref 'black_list', blackList
     menupopup.hidePopup()
+
+    if tabWindow = window.gBrowser.selectedTab.linkedBrowser.contentWindow
+      tabWindow.location.reload(false)
 
     event.stopPropagation()
 
   onPreferencesCommand = (event) ->
     id = encodeURIComponent getPref('addon_id')
     window.BrowserOpenAddonsMgr("addons://detail/#{ id }/preferences")
+
     event.stopPropagation()
 
   onHelpCommand = (event) ->
+    if tabWindow = window.gBrowser.selectedTab.linkedBrowser.contentWindow
+      showHelp tabWindow.document
+
     event.stopPropagation()
 
-  button.addEventListener           'command',      onButtonCommand,          false
   menupopup.addEventListener        'popupshowing', onPopupShowing,           false
   blacklistButton.addEventListener  'command',      onBlacklistButtonCommand, false
   itemPreferences.addEventListener  'command',      onPreferencesCommand,     false
-  itemHelp.addEventListener         'popupshowing', onHelpCommand,            false
+  itemHelp.addEventListener         'command',      onHelpCommand,            false
 
-  restorePosition doc, button, 'nav-bar', 'bookmarks-menu-button-container'
+  return menupopup
 
-  unload -> button.parentNode.removeChild button
+createButton = (window) ->
+  doc = window.document
+
+  button = doc.createElement 'toolbarbutton'
+  button.setAttribute 'id', getPref 'button_id'
+  button.setAttribute 'type', 'menu-button'
+  button.setAttribute 'label', 'VimFx'
+  button.setAttribute 'class', 'toolbarbutton-1'
+  #
+  # Create and install event listeners 
+  onButtonCommand = (event) ->
+    # Change disabled state value which is stored in Prefs
+    setPref('disabled', not getPref 'disabled')
+    updateToolbarButton button
+
+  button.addEventListener 'command', onButtonCommand, false
+
+  menupopup = createMenupopup window
+  button.appendChild menupopup
+
+  return button
+
+
+addToolbarButton = (window) ->
+  doc = window.document
+
+  try
+    button = createButton window
+
+    updateToolbarButton button
+    restorePosition doc, button, 'nav-bar', 'bookmarks-menu-button-container'
+  catch err
+    console.log err
+
+  unload -> 
+    button.parentNode.removeChild button
+    $(doc, "navigator-toolbox").palette.removeChild(button)
 
 updateToolbarButton = (button) ->
   if getPref 'disabled'

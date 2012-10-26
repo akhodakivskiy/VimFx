@@ -12,162 +12,214 @@ utils = require 'utils'
 , hideHelp
 } = require 'help'
 
-commands = 
-  # Navigate to the address that is currently stored in the system clipboard
-  'p':  (vim) ->
-    vim.window.location.assign utils.readFromClipboard()
+# Navigate to the address that is currently stored in the system clipboard
+command_p = (vim) -> 
+  vim.window.location.assign utils.readFromClipboard(vim.window)
+
+# Open new tab and navigate to the address that is currently stored in the system clipboard
+command_P = (vim) ->
+  if chromeWindow = utils.getRootWindow vim.window
+    if gBrowser = chromeWindow.gBrowser
+      gBrowser.selectedTab = gBrowser.addTab utils.readFromClipboard(vim.window)
+
+# Open new tab and focus the address bar
+command_t = (vim) ->
+  if chromeWindow = utils.getRootWindow vim.window
+    if gBrowser = chromeWindow.gBrowser
+      gBrowser.selectedTab = chromeWindow.gBrowser.addTab()
+
+# Copy current URL to the clipboard
+command_yf = (vim) ->
+  vim.markers = injectHints vim.window.document
+  if vim.markers.length > 0
+    # This callback will be called with the selected marker as argument
+    vim.cb = (marker) ->
+      if url = marker.element.href
+        utils.writeToClipboard vim.window, url
+
+    vim.enterHintsMode()
+
+# Copy current URL to the clipboard
+command_yy = (vim) ->
+  utils.writeToClipboard vim.window, vim.window.location.toString()
+
+# Reload the page, possibly from cache
+command_r = (vim) ->
+  vim.window.location.reload(false)
+
+# Reload the page from the server
+command_R = (vim) ->
+  vim.window.location.reload(true)
+
+# Scroll to the top of the page
+command_gg = (vim) ->
+  vim.window.scrollTo(0, 0)
+
+# Scroll to the bottom of the page
+command_G = (vim) ->
+  vim.window.scrollTo(0, vim.window.document.body.scrollHeight)
+
+# Scroll down a bit
+command_j_ce = (vim) -> 
+  vim.window.scrollBy(0, getPref 'scroll_step')
+
+# Scroll up a bit
+command_k_cy = (vim) -> 
+  vim.window.scrollBy(0, - getPref 'scroll_step')
+
+# Scroll left a bit
+command_h = (vim) -> 
+  vim.window.scrollBy(- getPref 'scroll_step', 0)
+
+# Scroll right a bit
+command_l = (vim) -> 
+  vim.window.scrollBy(getPref 'scroll_step', 0)
+
+# Scroll down a page
+command_d_cd = (vim) ->
+  vim.window.scrollBy(0, vim.window.innerHeight)
+
+# Scroll up a page
+command_u_cu = (vim) ->
+  vim.window.scrollBy(0, -vim.window.innerHeight)
+
+# Activate previous tab
+command_J_gT = (vim) ->
+  if rootWindow = utils.getRootWindow vim.window
+    rootWindow.gBrowser.tabContainer.advanceSelectedTab(-1, true);
+
+# Activate next tab
+command_K_gt = (vim) ->
+  if rootWindow = utils.getRootWindow vim.window
+    rootWindow.gBrowser.tabContainer.advanceSelectedTab(1, true);
+
+# Go to the first tab
+command_gH_g0 = (vim) ->
+  if rootWindow = utils.getRootWindow vim.window
+    rootWindow.gBrowser.tabContainer.selectedIndex = 0;
+
+# Go to the last tab
+command_gL_g$ = (vim) ->
+  if rootWindow = utils.getRootWindow vim.window
+    itemCount = rootWindow.gBrowser.tabContainer.itemCount;
+    rootWindow.gBrowser.tabContainer.selectedIndex = itemCount - 1;
+
+# Go back in history
+command_H = (vim) ->
+  vim.window.history.back()
     
-  # Open new tab and navigate to the address that is currently stored in the system clipboard
-  'P':  (vim) ->
-    if chromeWindow = utils.getRootWindow vim.window
-      if gBrowser = chromeWindow.gBrowser
-        gBrowser.selectedTab = gBrowser.addTab utils.readFromClipboard()
-        #
-  # Open new tab and focus the address bar
-  't':  (vim) ->
-    if chromeWindow = utils.getRootWindow vim.window
-      if gBrowser = chromeWindow.gBrowser
-        gBrowser.selectedTab = chromeWindow.gBrowser.addTab()
+# Go forward in history
+command_L = (vim) ->
+  vim.window.history.forward()
 
-  # Copy current URL to the clipboard
-  'y,f': (vim) ->
-    vim.markers = injectHints vim.window.document
-    if vim.markers.length > 0
-      # This callback will be called with the selected marker as argument
-      vim.cb = (marker) ->
-        if url = marker.element.href
-          utils.writeToClipboard url
+# Close current tab
+command_x = (vim) ->
+  if rootWindow = utils.getRootWindow vim.window
+    rootWindow.gBrowser.removeCurrentTab()
 
-      vim.enterHintsMode()
+# Restore last closed tab
+command_X = (vim) -> 
+  if rootWindow = utils.getRootWindow vim.window
+    ss = utils.getSessionStore()
+    if ss and ss.getClosedTabCount(rootWindow) > 0
+      ss.undoCloseTab rootWindow, 0
 
-  # Copy current URL to the clipboard
-  'y,y': (vim) ->
-    utils.writeToClipboard vim.window.location.toString()
+# Follow links with hint markers
+command_f = (vim) ->
+  vim.markers = injectHints vim.window.document
+  if vim.markers.length > 0
+    # This callback will be called with the selected marker as argument
+    vim.cb = (marker) ->
+      marker.element.focus()
+      utils.simulateClick marker.element
 
-  # Reload the page, possibly from cache
-  'r': (vim) ->
-    vim.window.location.reload(false)
-    #
-  # Reload the page from the server
-  'R': (vim) ->
-    vim.window.location.reload(false)
+    vim.enterHintsMode()
+  
+# Follow links in a new Tab with hint markers
+command_F = (vim) ->
+  vim.markers = injectHints vim.window.document
+  if vim.markers.length > 0
+    # This callback will be called with the selected marker as argument
+    vim.cb = (marker) ->
+      marker.element.focus()
+      utils.simulateClick marker.element, { metaKey: true, ctrlKey: true }
 
-  # Scroll to the top of the page
-  'g,g': (vim) ->
-    vim.window.scrollTo(0, 0)
+    vim.enterHintsMode()
 
-  # Scroll to the bottom of the page
-  'G': (vim) ->
-    vim.window.scrollTo(0, vim.window.document.body.scrollHeight)
+# Display the Help Dialog
+command_help = (vim) ->
+  showHelp vim.window.document, commandsHelp
 
-  # Scroll down a bit
-  'j|c-e': (vim) -> 
-    scroll_step = getPref 'scroll_step'
-    vim.window.scrollBy(0, scroll_step)
+command_Esc = (vim) ->
+  # Blur active element if it's editable. Other elements
+  # aren't blurred - we don't want to interfere with 
+  # the browser too much
+  activeElement = vim.window.document.activeElement
+  if utils.isElementEditable activeElement
+    activeElement.blur()
 
-  # Scroll up a bit
-  'k|c-y': (vim) -> 
-    scroll_step = getPref 'scroll_step'
-    vim.window.scrollBy(0, -scroll_step)
+  # Remove hints
+  removeHints vim.window.document
+  # Hide help dialog
+  hideHelp vim.window.document
+  # Finally enter normal mode
+  vim.enterNormalMode()
 
-  # Scroll down a page
-  'd|c-d': (vim) ->
-    vim.window.scrollBy(0, vim.window.innerHeight)
-
-  # Scroll up a page
-  'u|c-u': (vim) ->
-    vim.window.scrollBy(0, -vim.window.innerHeight)
-
-  # Activate previous tab
-  'J|g,T': (vim) ->
-    if rootWindow = utils.getRootWindow vim.window
-      rootWindow.gBrowser.tabContainer.advanceSelectedTab(-1, true);
-
-  # Activate next tab
-  'K|g,t': (vim) ->
-    if rootWindow = utils.getRootWindow vim.window
-      rootWindow.gBrowser.tabContainer.advanceSelectedTab(1, true);
-
-  # Go to the first tab
-  'g,H|g,0': (vim) ->
-    if rootWindow = utils.getRootWindow vim.window
-      rootWindow.gBrowser.tabContainer.selectedIndex = 0;
-      #
-  # Go to the last tab
-  'g,L|g,$': (vim) ->
-    if rootWindow = utils.getRootWindow vim.window
-      itemCount = rootWindow.gBrowser.tabContainer.itemCount;
-      rootWindow.gBrowser.tabContainer.selectedIndex = itemCount - 1;
-
-  # Go back in history
-  'H': (vim) ->
-    vim.window.history.back()
+commandGroups = 
+  'urls':
+    'p':        [ command_p,      "Navigate to the address in the clipboard" ]
+    'P':        [ command_P,      "Open new tab and navigate to the address in the clipboard" ]
+    'y,f':      [ command_yf,     "Copy link url to the clipboard" ]
+    'y,y':      [ command_yy,     "Copy current page link to the clipboard" ]
+    'r':        [ command_r,      "Reload current page" ]
+    'R':        [ command_R,      "Reload current page and all the assets (js, css, etc.)" ]
+  'nav':
+    'g,g':      [ command_gg ,    "Scroll to the Top of the page" ]
+    'G':        [ command_G,      "Scroll to the Bottom of the page" ]
+    'j|c-e':    [ command_j_ce,   "Scroll Left" ]
+    'k|c-y':    [ command_k_cy,   "Scroll Right" ]
+    'h':        [ command_h,      "Scroll Down" ]
+    'l':        [ command_l ,     "Scroll Up" ]
+    'd|c-d':    [ command_d_cd,   "Scroll a Page Down" ]
+    'u|c-u':    [ command_u_cu,   "Scroll a Page Up" ]
+  'tabs':
+    't':        [ command_t,      "Open New Blank tab" ]
+    'J|g,T':    [ command_J_gT,   "Go to the Previous tab" ]
+    'K|g,t':    [ command_K_gt,   "Go to the Next tab" ]
+    'g,H|g,0':  [ command_gH_g0,  "Go to the First tab" ]
+    'g,L|g,$':  [ command_gL_g$,  "Go to the Last tab" ]
+    'x':        [ command_x,      "Close current tab" ]
+    'X':        [ command_X,      "Restore last closed tab" ]
+  'browse':
+    'f':        [ command_f,      "Follow a link on the current page" ]
+    'F':        [ command_F,      "Follow a link on the current page in a new tab" ]
+    'H':        [ command_H,      "Go Back in history" ]
+    'L':        [ command_L,      "Go Forward in history" ]
+  'misc':
+    '?':        [ command_help,   "Show Help Dialog" ]
+    'Esc':      [ command_Esc,    "Close this dialog and cancel hint markers" ]
     
-  # Go forward in history
-  'L': (vim) ->
-    vim.window.history.forward()
-
-  # Close current tab
-  'x': (vim) ->
-    if rootWindow = utils.getRootWindow vim.window
-      rootWindow.gBrowser.removeCurrentTab()
-
-  # Restore last closed tab
-  'X': (vim) ->
-    if rootWindow = utils.getRootWindow vim.window
-      ss = utils.getSessionStore()
-      if ss and ss.getClosedTabCount(rootWindow) > 0
-        ss.undoCloseTab rootWindow, 0
-
-  # Follow links with hint markers
-  'f': (vim) ->
-    vim.markers = injectHints vim.window.document
-    if vim.markers.length > 0
-      # This callback will be called with the selected marker as argument
-      vim.cb = (marker) ->
-        marker.element.focus()
-        utils.simulateClick marker.element
-
-      vim.enterHintsMode()
-    
-  # Follow links in a new Tab with hint markers
-  'F': (vim) ->
-    vim.markers = injectHints vim.window.document
-    if vim.markers.length > 0
-      # This callback will be called with the selected marker as argument
-      vim.cb = (marker) ->
-        marker.element.focus()
-        utils.simulateClick marker.element, metaKey: true
-
-      vim.enterHintsMode()
-
-  # Show Help
-  '?': (vim) ->
-    showHelp vim.window.document
-
-  'Esc': (vim) ->
-    # Blur active element if it's editable. Other elements
-    # aren't blurred - we don't want to interfere with 
-    # the browser too much
-    activeElement = vim.window.document.activeElement
-    if utils.isElementEditable activeElement
-      activeElement.blur()
-
-    # Remove hints
-    removeHints vim.window.document
-    # Hide help dialog
-    hideHelp vim.window.document
-    # Finally enter normal mode
-    vim.enterNormalMode()
-
-    
-# Split command pipes into individual commands
-commands = do (commands) ->
+# Merge groups and split command pipes into individual commands
+commands = do (commandGroups) ->
   newCommands = {}
-  for keys, command of commands
-    for key in keys.split '|'
-      newCommands[key] = command
+  for group, commandsList of commandGroups
+    for keys, command of commandsList
+      for key in keys.split '|'
+        newCommands[key] = command[0]
+
   return newCommands
+
+# Extract the help text from the commands preserving groups formation
+commandsHelp = do (commandGroups) ->
+  help = {}
+  for group, commandsList of commandGroups
+    helpGroup = {}
+    for keys, command of commandsList
+      key = keys.replace(',', '').replace('|', ', ')
+      helpGroup[key] = command[1]
+
+    help[group] = helpGroup
+  return help
 
 # Called in hints mode. Will process the char, update and hide/show markers 
 hintCharHandler = (vim, char) ->
@@ -180,5 +232,6 @@ hintCharHandler = (vim, char) ->
       vim.enterNormalMode()
       break
 
-exports.hintCharHandler   = hintCharHandler
-exports.commands          = commands
+exports.hintCharHandler = hintCharHandler
+exports.commands        = commands
+exports.commandsHelp    = commandsHelp

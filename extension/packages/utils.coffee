@@ -1,4 +1,4 @@
-{ interfaces: Ci, classes: Cc } = Components
+{ interfaces: Ci, classes: Cc, utils: Cu } = Components
 
 HTMLInputElement    = Ci.nsIDOMHTMLInputElement
 HTMLTextAreaElement = Ci.nsIDOMHTMLTextAreaElement
@@ -90,7 +90,8 @@ cssUri = do () ->
 # any user css
 loadCss = (name) ->
   uri = cssUri(name)
-  _sss.loadAndRegisterSheet(uri, _sss.AGENT_SHEET)
+  if !_sss.sheetRegistered(uri, _sss.AGENT_SHEET)
+    _sss.loadAndRegisterSheet(uri, _sss.AGENT_SHEET)
 
   unload -> 
     _sss.unregisterSheet(uri, _sss.AGENT_SHEET)
@@ -112,19 +113,33 @@ simulateClick = (element, modifiers) ->
     element.dispatchEvent(mouseEvent)
 
 # Write a string into system clipboard
-writeToClipboard = (text) ->
+writeToClipboard = (window, text) ->
   str = Cc["@mozilla.org/supports-string;1"].createInstance(Ci.nsISupportsString);
   str.data = text
 
   trans = Cc["@mozilla.org/widget/transferable;1"].createInstance(Ci.nsITransferable);
+
+  if trans.init
+    privacyContext = window.QueryInterface(Ci.nsIInterfaceRequestor)
+      .getInterface(Ci.nsIWebNavigation)
+      .QueryInterface(Ci.nsILoadContext);
+    trans.init(privacyContext);
+
   trans.addDataFlavor("text/unicode");
   trans.setTransferData("text/unicode", str, text.length * 2);
 
   _clip.setData trans, null, Ci.nsIClipboard.kGlobalClipboard
   #
 # Write a string into system clipboard
-readFromClipboard = () ->
+readFromClipboard = (window) ->
   trans = Cc["@mozilla.org/widget/transferable;1"].createInstance(Ci.nsITransferable);
+
+  if trans.init 
+    privacyContext = window.QueryInterface(Ci.nsIInterfaceRequestor)
+      .getInterface(Ci.nsIWebNavigation)
+      .QueryInterface(Ci.nsILoadContext);
+    trans.init(privacyContext);
+
   trans.addDataFlavor("text/unicode");
 
   _clip.getData trans, Ci.nsIClipboard.kGlobalClipboard
@@ -159,6 +174,18 @@ isBlacklisted = (str, blackList) ->
 
   return false
 
+# Gets VimFx verions. AddonManager only provides async API to access addon data, so it's a bit tricky...
+getVersion = do ->
+  version = null
+
+  if version == null
+    scope = {}
+    addonId = getPref 'addon_id'
+    Cu.import("resource://gre/modules/AddonManager.jsm", scope);
+    scope.AddonManager.getAddonByID addonId, ((addon) -> version = addon.version)
+
+  -> version
+
 exports.Bucket                  = Bucket
 exports.isRootWindow            = isRootWindow
 exports.getCurrentTabWindow     = getCurrentTabWindow
@@ -178,3 +205,4 @@ exports.readFromClipboard       = readFromClipboard
 exports.writeToClipboard        = writeToClipboard
 exports.timeIt                  = timeIt
 exports.isBlacklisted           = isBlacklisted
+exports.getVersion              = getVersion

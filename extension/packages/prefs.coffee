@@ -12,6 +12,7 @@ PREFS =
   disabled:     false
   scroll_step:  60
   black_list:   ''
+  version:      0.1
 
 # Get Firefox preference value of type specified in `PREFS`
 getFFPref = do ->
@@ -57,7 +58,6 @@ do ->
 # Monitor preference changes and update values in local cache - PREFS
 installPrefObserver = ->
   branch = Services.prefs.getBranch(PREF_BRANCH)
-    .QueryInterface(Components.interfaces.nsIPrefBranch2)
 
   observer = 
     observe: (subject, topic, data) ->
