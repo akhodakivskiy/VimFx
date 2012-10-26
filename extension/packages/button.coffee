@@ -2,6 +2,7 @@
 , setPref } = require 'prefs'
 
 { showHelp } = require 'help'
+{ commandsHelp } = require 'commands'
 
 positions = {}
 
@@ -108,7 +109,7 @@ createMenupopup = (window) ->
 
   onHelpCommand = (event) ->
     if tabWindow = window.gBrowser.selectedTab.linkedBrowser.contentWindow
-      showHelp tabWindow.document
+      showHelp tabWindow.document, commandsHelp
 
     event.stopPropagation()
 
