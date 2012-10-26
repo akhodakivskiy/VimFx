@@ -23,7 +23,7 @@
 
     <!-- Front End MetaData -->
     <em:name>VimFx</em:name>
-    <em:description>Vim powered browsing</em:description>
+    <em:description>Vim keyboard shortcuts for Firefox</em:description>
     <em:creator>Anton Khodakivskiy</em:creator>
   </Description>
 </RDF>

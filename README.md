@@ -21,8 +21,8 @@ VimFx will be nice to your browser and to your habits.  Promise.
 ## Key Features
 
 - Concise shortcuts for most commonly performed actions
-- Easily follow links and access controls on the page using hint markers
-- Easy access to the Help page which describes all available shortcuts
+- Follow and access controls on the page using hint markers
+- Easy access to the Help page which describes all available shortcuts (press ?)
 
 ## Shortcuts
 
