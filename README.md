@@ -4,19 +4,24 @@ VimFx is a [Mozilla Firefox](https://www.mozilla.org/en-US/firefox/fx/#desktop)
 extension which introduces Vim-style keyboard shortcuts for browsing and navigation, 
 significantly reducing the use of mouse, and allowing your hands to rest on the home row.
 
-VimFx was designed after [Vimium](http://vimium.github.com/) for 
+VimFx was inspired by [Vimperator](http://www.vimperator.org/) 
+and designed after [Vimium](http://vimium.github.com/) for 
 [Google Chrome](https://www.google.com/intl/en/chrome/browser/) preserving the shortcuts and behavior.
 If your are used to Vimium then it will be easy to get started with VimFx.
 
 ## Why VimFx was created
 
-Even before Vimium there was [Vimperator](http://www.vimperator.org/) for Firefox. 
-The problem with Vimperator is that it has too many features and aggressively
-change the default Firefox appearance and behavior. Vimium was developed for Google Chrome
+Even before Vimium there was Vimperator for Firefox.  In my opinion the problem 
+with Vimperator is that it has too many features and aggressively changes 
+the default Firefox appearance and behavior. Vimium was developed for Google Chrome
 and it was exactly what I needed in terms of added functionality. That's why I decided 
 to develop similar extension for Firefox.
 
-VimFx will be nice to your browser and to your habits.  Promise.
+VimFx will be nice to your browser and to your habits. Promise.
+
+## Credits
+
+  
 
 ## Key Features
 
@@ -76,3 +81,4 @@ for the most relevant list.
 0.1 (26 Oct 2012)
 
 - Initial Release
+
