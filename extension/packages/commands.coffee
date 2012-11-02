@@ -27,6 +27,8 @@ command_t = (vim) ->
   if chromeWindow = utils.getRootWindow vim.window
     if gBrowser = chromeWindow.gBrowser
       gBrowser.selectedTab = chromeWindow.gBrowser.addTab()
+      if urlbar = chromeWindow.document.getElementById('urlbar')
+        urlbar.focus()
 
 # Copy current URL to the clipboard
 command_yf = (vim) ->
@@ -176,10 +178,10 @@ commandGroups =
   'nav':
     'g,g':      [ command_gg ,    "Scroll to the Top of the page" ]
     'G':        [ command_G,      "Scroll to the Bottom of the page" ]
-    'j|c-e':    [ command_j_ce,   "Scroll Left" ]
-    'k|c-y':    [ command_k_cy,   "Scroll Right" ]
-    'h':        [ command_h,      "Scroll Down" ]
-    'l':        [ command_l ,     "Scroll Up" ]
+    'j|c-e':    [ command_j_ce,   "Scroll Down" ]
+    'k|c-y':    [ command_k_cy,   "Scroll Up" ]
+    'h':        [ command_h,      "Scroll Left" ]
+    'l':        [ command_l ,     "Scroll Right" ]
     'd|c-d':    [ command_d_cd,   "Scroll a Page Down" ]
     'u|c-u':    [ command_u_cu,   "Scroll a Page Up" ]
   'tabs':
