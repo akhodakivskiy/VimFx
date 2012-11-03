@@ -89,6 +89,10 @@ class Marker
     # then hide the marker. Othersie show it back
     if @hintChars.search(@enteredHintChars) == 0 then @show() else @hide()
 
+  # Checks if the marker will be matched if the next character entered is `char`
+  willMatch: (char) ->
+    char == 'backspace' or @hintChars.search(@enteredHintChars + char) == 0
+
   # Checks if enterd hint chars completely match the hint chars
   isMatched: ->
     return @hintChars == @enteredHintChars

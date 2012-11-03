@@ -227,14 +227,19 @@ commandsHelp = do (commandGroups) ->
 
 # Called in hints mode. Will process the char, update and hide/show markers 
 hintCharHandler = (vim, char) ->
-  for marker in vim.markers
-    marker.matchHintChar char
+  # First count how many markers will match with the new character entered
+  preMatch = vim.markers.reduce ((v, marker) -> v + marker.willMatch char), 0
 
-    if marker.isMatched()
-      vim.cb marker
-      removeHints vim.window.document
-      vim.enterNormalMode()
-      break
+  # If prematch is greater than 0, then proceed with matching, else ignore the new char
+  if preMatch > 0
+    for marker in vim.markers
+      marker.matchHintChar char
+
+      if marker.isMatched()
+        vim.cb marker
+        removeHints vim.window.document
+        vim.enterNormalMode()
+        break
 
 exports.hintCharHandler = hintCharHandler
 exports.commands        = commands
