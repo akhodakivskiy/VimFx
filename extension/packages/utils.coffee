@@ -29,9 +29,6 @@ class Bucket
   forget: (obj) ->
     delete @bucket[id] if id = @idFunc obj
 
-isRootWindow = (window) -> 
-  window.location == "chrome://browser/content/browser.xul"
-
 # Returns the `window` from the currently active tab.
 getCurrentTabWindow = (event) ->
   if window = getEventWindow event
@@ -187,7 +184,6 @@ getVersion = do ->
   -> version
 
 exports.Bucket                  = Bucket
-exports.isRootWindow            = isRootWindow
 exports.getCurrentTabWindow     = getCurrentTabWindow
 exports.getEventWindow          = getEventWindow
 exports.getEventRootWindow      = getEventRootWindow

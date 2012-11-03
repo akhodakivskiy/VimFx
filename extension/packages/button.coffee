@@ -8,7 +8,7 @@ positions = {}
 
 persist = (document, toolbar, buttonID, beforeID) ->
   currentset = toolbar.getAttribute('currentset').split(',')
-  idx = if beforeID then currentset.indexOf(beforeID) else -1;
+  idx = if beforeID then currentset.indexOf(beforeID) else -1
   if idx != -1
     currentset.splice(idx, 0, buttonID);
   else
@@ -25,30 +25,28 @@ $ = (doc, sel) -> doc.getElementById(sel)
 $$ = (doc, sel) -> doc.querySelectorAll(sel)
 
 restorePosition = (doc, button) ->
-  
   $(doc, "navigator-toolbox").palette.appendChild(button)
   
   for tb in $$(doc, "toolbar")
-    currentset = tb.getAttribute('currentset').split(',')
+    currentset = tb.getAttribute('currentset').split ','
     idx = currentset.indexOf button.id
-    if idx > -1
+    if idx != -1
       toolbar = tb
       break
   
   # Saved position not found, using the default one, after persisting it
-  if !toolbar and (button.id in Object.keys(positions))
-    [tbID, beforeID] = positions[button.id];
-    toolbar = $(doc, tbID)
-    [currentset, idx] = persist(doc, toolbar, button.id, beforeID)
+  if !toolbar and pos = positions[button.id]
+    [tbID, beforeID] = pos
+    if toolbar = $(doc, tbID)
+      [currentset, idx] = persist(doc, toolbar, button.id, beforeID)
   
-  if toolbar
-    if idx > -1
-      # Inserting the button before the first item in `currentset`
-      # after `idx` that is present in the document
-      for i in [idx + 1 ... currentset.length]
-        if before = $(doc, currentset[i])
-          toolbar.insertItem button.id, before
-          return;
+  if toolbar and idx != -1
+    # Inserting the button before the first item in `currentset`
+    # after `idx` that is present in the document
+    for i in [idx + 1 ... currentset.length]
+      if before = $(doc, currentset[i])
+        toolbar.insertItem button.id, before
+        return
 
     toolbar.insertItem button.id
 
@@ -146,16 +144,14 @@ createButton = (window) ->
 addToolbarButton = (window) ->
   doc = window.document
 
-  try
-    button = createButton window
+  button = createButton window
+  updateToolbarButton button
 
-    updateToolbarButton button
-    restorePosition doc, button, 'nav-bar', 'bookmarks-menu-button-container'
-  catch err
-    console.log err
+  restorePosition doc, button, 'nav-bar', 'bookmarks-menu-button-container'
 
   unload -> 
-    button.parentNode.removeChild button
+    if buttonParent = button.parentNode
+      buttonParent.removeChild button
     $(doc, "navigator-toolbox").palette.removeChild(button)
 
 updateToolbarButton = (button) ->
