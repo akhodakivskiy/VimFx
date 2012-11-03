@@ -3,22 +3,23 @@ utils             = require 'utils'
 CONTAINER_ID = 'VimFxHelpDialogContainer'
 
 showHelp = (document, commandsHelp) ->
-  if div = document.getElementById CONTAINER_ID
-    div.parentNode.removeChild div
-  div = document.createElement 'div'
-  div.id = CONTAINER_ID 
-  div.className = 'VimFxReset'
+  if body = document.body
+    if div = document.getElementById CONTAINER_ID
+      div.parentNode.removeChild div
+    div = document.createElement 'div'
+    div.id = CONTAINER_ID 
+    div.className = 'VimFxReset'
 
-  div.innerHTML = helpDialogHtml(commandsHelp)
+    div.innerHTML = helpDialogHtml(commandsHelp)
 
-  document.body.appendChild div
+    body.appendChild div
 
-  if button = document.getElementById('VimFxClose')
-    clickHandler = (event) ->
-      event.stopPropagation()
-      event.preventDefault()
-      hideHelp(document)
-    button.addEventListener 'click', clickHandler, false
+    if button = document.getElementById('VimFxClose')
+      clickHandler = (event) ->
+        event.stopPropagation()
+        event.preventDefault()
+        hideHelp(document)
+      button.addEventListener 'click', clickHandler, false
 
 hideHelp = (document) ->
   if div = document.getElementById CONTAINER_ID

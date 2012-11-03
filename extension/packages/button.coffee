@@ -4,6 +4,15 @@
 { showHelp } = require 'help'
 { commandsHelp } = require 'commands'
 
+KEYSET_ID             = 'vimfx-keyset'
+BUTTON_ID             = 'vimfx-toolbar-button'
+KEY_ID                = 'vimfx-key'
+MENUPOPUP_ID          = 'vimfx-menupopup'
+MENU_ITEM_PREF        = 'vimfx-menu-item-preferences'
+MENU_ITEM_HELP        = 'vimfx-menu-item-help'
+TEXTBOX_BLACKLIST_ID  = 'vimfx-textbox-blacklist-id'
+BUTTON_BLACKLIST_ID   = 'vimfx-button-blacklist-id'
+
 positions = {}
 
 persist = (document, toolbar, buttonID, beforeID) ->
@@ -18,8 +27,8 @@ persist = (document, toolbar, buttonID, beforeID) ->
   document.persist toolbar.id, "currentset"
   return [currentset, idx]
 
-setButtonDefaultPosition = (buttonId, toolbarId, beforeId) ->
-  positions[buttonId] = [toolbarId, beforeId]
+setButtonDefaultPosition = (toolbarId, beforeId) ->
+  positions[BUTTON_ID] = [toolbarId, beforeId]
 
 $ = (doc, sel) -> doc.getElementById(sel)
 $$ = (doc, sel) -> doc.querySelectorAll(sel)
@@ -59,11 +68,14 @@ iconUrl = do ->
 
   return (kind) -> "url(#{ kinds[kind] })"
 
+
 createMenupopup = (window) ->
   doc = window.document
 
   blacklistTextbox = doc.createElement 'textbox'
+  blacklistTextbox.id = TEXTBOX_BLACKLIST_ID
   blacklistButton = doc.createElement 'toolbarbutton'
+  blacklistButton.id = BUTTON_BLACKLIST_ID
   blacklistButton.setAttribute 'tooltiptext', 'Blacklist'
   blacklistButton.setAttribute 'class', 'toolbarbutton-1'
   blacklistButton.style.listStyleImage = iconUrl('blacklist')
@@ -72,12 +84,15 @@ createMenupopup = (window) ->
   hbox.appendChild blacklistButton
 
   itemPreferences = doc.createElement 'menuitem'
+  itemPreferences.id = MENU_ITEM_PREF  
   itemPreferences.setAttribute 'label', 'Preferences'
 
   itemHelp = doc.createElement 'menuitem'
+  itemHelp.id = MENU_ITEM_HELP  
   itemHelp.setAttribute 'label', 'Help'
 
   menupopup = doc.createElement 'menupopup'
+  menupopup.id = MENUPOPUP_ID
   menupopup.appendChild hbox
   menupopup.appendChild itemPreferences
   menupopup.appendChild itemHelp
@@ -122,7 +137,7 @@ createButton = (window) ->
   doc = window.document
 
   button = doc.createElement 'toolbarbutton'
-  button.setAttribute 'id', getPref 'button_id'
+  button.setAttribute 'id', BUTTON_ID
   button.setAttribute 'type', 'menu-button'
   button.setAttribute 'label', 'VimFx'
   button.setAttribute 'class', 'toolbarbutton-1'
@@ -132,41 +147,61 @@ createButton = (window) ->
     # Change disabled state value which is stored in Prefs
     setPref('disabled', not getPref 'disabled')
     updateToolbarButton button
+    
+    event.stopPropagation()
 
   button.addEventListener 'command', onButtonCommand, false
 
   menupopup = createMenupopup window
   button.appendChild menupopup
 
-  return button
+  vimkey = doc.createElement 'key'
+  vimkey.setAttribute "id", KEY_ID
+  vimkey.setAttribute "key", "V"
+  vimkey.setAttribute "modifiers", "shift,alt"
+  vimkey.setAttribute "oncommand", "void(0);"
+  vimkey.addEventListener "command", onButtonCommand, false
+
+  keyset = doc.createElement 'keyset'
+  keyset.setAttribute 'id', KEYSET_ID
+  keyset.appendChild(vimkey)
+
+  return [button, keyset]
 
 
 addToolbarButton = (window) ->
   doc = window.document
+  win = doc.querySelector 'window'
 
-  button = createButton window
-  updateToolbarButton button
+  try
+    [button, keyset] = createButton window
+    updateToolbarButton button
+  catch err
+    console.log err
 
   restorePosition doc, button, 'nav-bar', 'bookmarks-menu-button-container'
+  win.appendChild keyset
 
   unload -> 
     if buttonParent = button.parentNode
       buttonParent.removeChild button
+    if keysetParent = keyset.parentNode
+      keysetParent.removeChild keyset
     $(doc, "navigator-toolbox").palette.removeChild(button)
 
 updateToolbarButton = (button) ->
   if getPref 'disabled'
     button.style.listStyleImage = iconUrl('grey')
-    button.setAttribute 'tooltiptext', 'VimFx is Disabled. Click to Enable'
+    button.setAttribute 'tooltiptext', 'VimFx is Disabled. Click to Enable (Shift+Alt+V)'
   else if button['VimFx_blacklisted']
     button.style.listStyleImage = iconUrl('red')
-    button.setAttribute 'tooltiptext', 'VimFx is Blacklisted on this Site'
+    button.setAttribute 'tooltiptext', 'VimFx is Blacklisted on this Page'
   else
     button.style.listStyleImage = iconUrl('normal')
-    button.setAttribute 'tooltiptext', 'VimFx is Enabled. Click to Disable'
+    button.setAttribute 'tooltiptext', 'VimFx is Enabled. Click to Disable (Shift+Alt+V)'
 
 setWindowBlacklisted = (window, blacklisted) ->
-  if button = $(window.document, getPref 'button_id')
+  if button = $(window.document, BUTTON_ID)
     button['VimFx_blacklisted'] = blacklisted
     updateToolbarButton button
 

@@ -7,7 +7,6 @@ PREF_BRANCH = "extension.VimFx.";
 # preference type is derived from here
 PREFS = 
   addon_id:     'VimFx@akhodakivskiy.github.com'
-  button_id:    'VimFx-toolbar-button'
   hint_chars:   'asdfgercvhjkl;uinm'
   disabled:     false
   scroll_step:  60

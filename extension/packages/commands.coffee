@@ -59,7 +59,8 @@ command_gg = (vim) ->
 
 # Scroll to the bottom of the page
 command_G = (vim) ->
-  vim.window.scrollTo(0, vim.window.document.body.scrollHeight)
+  if document = vim.window.document
+    vim.window.scrollTo(0, document.body.scrollHeight)
 
 # Scroll down a bit
 command_j_ce = (vim) -> 
@@ -128,14 +129,15 @@ command_X = (vim) ->
 
 # Follow links with hint markers
 command_f = (vim) ->
-  vim.markers = injectHints vim.window.document
-  if vim.markers.length > 0
-    # This callback will be called with the selected marker as argument
-    vim.cb = (marker) ->
-      marker.element.focus()
-      utils.simulateClick marker.element
+  if document = vim.window.document
+    vim.markers = injectHints document
+    if vim.markers.length > 0
+      # This callback will be called with the selected marker as argument
+      vim.cb = (marker) ->
+        marker.element.focus()
+        utils.simulateClick marker.element
 
-    vim.enterHintsMode()
+      vim.enterHintsMode()
   
 # Follow links in a new Tab with hint markers
 command_F = (vim) ->
