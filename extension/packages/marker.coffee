@@ -103,7 +103,7 @@ class Marker
 #
 # The array of markers is returned
 Marker.createMarkers = (document) ->
-  hintChars = getPref 'hint_chars'
+  hintChars = getPref('hint_chars').toLowerCase()
 
   elementsSet = getMarkableElements(document)
   markers = [];

@@ -48,7 +48,7 @@ _getCommand = (mode, keys) ->
 
   else if mode == MODE_HINTS and keys.length > 0
     # `lastKey` should be one hint chars or `Backspace`
-    hintChars = getPref('hint_chars') + 'backspace'
+    hintChars = getPref('hint_chars').toLowerCase() + 'backspace'
     if hintChars.search(lastKey.toLowerCase()) > -1
       return (vim) =>
         return hintCharHandler(vim, lastKey.toLowerCase())
@@ -66,7 +66,8 @@ _maybeCommand = (mode, keys, keyStr) ->
         return _maybeCommand mode, keys.slice(1), keyStr
 
     else if mode == MODE_HINTS
-      return true
+      hintChars = getPref('hint_chars').toLowerCase()
+      return (hintChars.search keyStr != -1)
 
     return false
 
