@@ -78,12 +78,20 @@ command_h = (vim) ->
 command_l = (vim) -> 
   vim.window.scrollBy(getPref 'scroll_step', 0)
 
-# Scroll down a page
+# Scroll down half a page
 command_d = (vim) ->
+  vim.window.scrollBy(0, vim.window.innerHeight / 2)
+
+# Scroll up half a page
+command_u = (vim) ->
+  vim.window.scrollBy(0, -vim.window.innerHeight / 2)
+  #
+# Scroll down full a page
+command_cf = (vim) ->
   vim.window.scrollBy(0, vim.window.innerHeight)
 
-# Scroll up a page
-command_u = (vim) ->
+# Scroll up full a page
+command_cb = (vim) ->
   vim.window.scrollBy(0, -vim.window.innerHeight)
 
 # Activate previous tab
@@ -206,8 +214,10 @@ commandGroups =
     'k|c-y':    [ command_k_cy,   "Scroll Up" ]
     'h':        [ command_h,      "Scroll Left" ]
     'l':        [ command_l ,     "Scroll Right" ]
-    'd':        [ command_d,      "Scroll a Page Down" ]
-    'u':        [ command_u,      "Scroll a Page Up" ]
+    'd':        [ command_d,      "Scroll half a Page Down" ]
+    'u':        [ command_u,      "Scroll half a Page Up" ]
+    'c-f':      [ command_cf,     "Scroll a full Page Down" ]
+    'c-b':      [ command_cb,     "Scroll a full Page Up" ]
   'tabs':
     't':        [ command_t,      "Open New Blank tab" ]
     'J|g,T':    [ command_J_gT,   "Go to the Previous tab" ]
