@@ -13,31 +13,31 @@ MENU_ITEM_HELP        = 'vimfx-menu-item-help'
 TEXTBOX_BLACKLIST_ID  = 'vimfx-textbox-blacklist-id'
 BUTTON_BLACKLIST_ID   = 'vimfx-button-blacklist-id'
 
-positions = {}
-
-persist = (document, toolbar, buttonID, beforeID) ->
-  currentset = toolbar.getAttribute('currentset').split(',')
-  idx = if beforeID then currentset.indexOf(beforeID) else -1
-  if idx != -1
-    currentset.splice(idx, 0, buttonID);
-  else
-    currentset.push(buttonID);
-
-  toolbar.setAttribute "currentset", currentset.join(",")
-  document.persist toolbar.id, "currentset"
-  return [currentset, idx]
-
-setButtonDefaultPosition = (toolbarId, beforeId) ->
-  positions[BUTTON_ID] = [toolbarId, beforeId]
-
 $ = (doc, sel) -> doc.getElementById(sel)
 $$ = (doc, sel) -> doc.querySelectorAll(sel)
+
+positions = {}
+
+setButtonInstallPosition = (toolbarId, beforeId) ->
+  positions[BUTTON_ID] = [toolbarId, beforeId]
+
+persist = (document, toolbar, buttonId, beforeId) ->
+  currentset = toolbar.getAttribute("currentset").split ','
+  idx = if beforeId then currentset.indexOf(beforeId) else -1
+  if idx != -1
+    currentset.splice(idx, 0, buttonId);
+  else
+    currentset.push(buttonId);
+
+  toolbar.setAttribute "currentset", currentset.join ','
+  document.persist toolbar.id, "currentset"
+  return [currentset, idx]
 
 restorePosition = (doc, button) ->
   $(doc, "navigator-toolbox").palette.appendChild(button)
   
   for tb in $$(doc, "toolbar")
-    currentset = tb.getAttribute('currentset').split ','
+    currentset = tb.getAttribute("currentset").split ','
     idx = currentset.indexOf button.id
     if idx != -1
       toolbar = tb
@@ -45,9 +45,9 @@ restorePosition = (doc, button) ->
   
   # Saved position not found, using the default one, after persisting it
   if !toolbar and pos = positions[button.id]
-    [tbID, beforeID] = pos
+    [tbID, beforeId] = pos
     if toolbar = $(doc, tbID)
-      [currentset, idx] = persist(doc, toolbar, button.id, beforeID)
+      [currentset, idx] = persist(doc, toolbar, button.id, beforeId)
   
   if toolbar and idx != -1
     # Inserting the button before the first item in `currentset`
@@ -179,7 +179,7 @@ addToolbarButton = (window) ->
   catch err
     console.log err
 
-  restorePosition doc, button, 'nav-bar', 'bookmarks-menu-button-container'
+  restorePosition doc, button
   win.appendChild keyset
 
   unload -> 
@@ -207,4 +207,4 @@ setWindowBlacklisted = (window, blacklisted) ->
 
 exports.addToolbarButton         = addToolbarButton
 exports.setWindowBlacklisted     = setWindowBlacklisted 
-exports.setButtonDefaultPosition = setButtonDefaultPosition
+exports.setButtonInstallPosition = setButtonInstallPosition
