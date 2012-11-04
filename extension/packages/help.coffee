@@ -58,6 +58,7 @@ helpDialogHtml = (help) ->
       <span class="VimFxReset VimFxTitleVim">Vim</span><span class="VimFxReset VimFxTitleFx">Fx</span>
       <span class="VimFxReset">Help</span>
     </div>
+    <span class="VimFxReset VimFxVersion">Version #{ utils.getVersion() }</span>
     <a class="VimFxReset VimFxClose" id="VimFxClose" href="#">&#10006;</a>
     <div class="VimFxReset VimFxClearFix"></div>
   </div>
@@ -85,12 +86,11 @@ helpDialogHtml = (help) ->
       </p>
       <p class="VimFxReset">
         Enjoying VimFx? 
-        <a class="VimFxReset" target="_blank" href="https://github.com/akhodakivskiy/VimFx">
+        <a class="VimFxReset" target="_blank" href="https://addons.mozilla.org/en-US/firefox/addon/vimfx/">
           Leave us Feedback!
         </a>
       </p>
     </div>
-    <span class="VimFxReset VimFxVersion">Version #{ utils.getVersion() }</span>
   </div>
 </div>
 

@@ -150,10 +150,32 @@ command_F = (vim) ->
 
     vim.enterHintsMode()
 
+# Move current tab to the left
+command_cJ = (vim) ->
+  if gBrowser = utils.getRootWindow(vim.window)?.gBrowser
+    if tab = gBrowser.selectedTab
+      index = gBrowser.tabContainer.selectedIndex
+      total = gBrowser.tabContainer.itemCount
+
+      # `total` is added to deal with negative offset
+      console.log index, total, (total + index - 1) % total, 'left'
+      gBrowser.moveTabTo tab, (total + index - 1) % total
+  
+# Move current tab to the right
+command_cK = (vim) ->
+  if gBrowser = utils.getRootWindow(vim.window)?.gBrowser
+    if tab = gBrowser.selectedTab
+      index = gBrowser.tabContainer.selectedIndex
+      total = gBrowser.tabContainer.itemCount
+
+      console.log index, total, (index + 1) % total, 'right'
+      gBrowser.moveTabTo tab, (index + 1) % total
+
 # Display the Help Dialog
 command_help = (vim) ->
   showHelp vim.window.document, commandsHelp
 
+# Close the Help dialog and cancel the pending hint marker action
 command_Esc = (vim) ->
   # Blur active element if it's editable. Other elements
   # aren't blurred - we don't want to interfere with 
@@ -190,6 +212,8 @@ commandGroups =
     't':        [ command_t,      "Open New Blank tab" ]
     'J|g,T':    [ command_J_gT,   "Go to the Previous tab" ]
     'K|g,t':    [ command_K_gt,   "Go to the Next tab" ]
+    'c-J':      [ command_cJ,     "Move current tab to the left" ]
+    'c-K':      [ command_cK,     "Move current tab to the right" ]
     'g,H|g,0':  [ command_gH_g0,  "Go to the First tab" ]
     'g,L|g,$':  [ command_gL_g$,  "Go to the Last tab" ]
     'x':        [ command_x,      "Close current tab" ]
