@@ -93,6 +93,7 @@ createMenupopup = (window) ->
 
   menupopup = doc.createElement 'menupopup'
   menupopup.id = MENUPOPUP_ID
+  menupopup.setAttribute 'ignorekeys', true
   menupopup.appendChild hbox
   menupopup.appendChild itemPreferences
   menupopup.appendChild itemHelp
