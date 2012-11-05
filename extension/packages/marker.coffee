@@ -20,6 +20,7 @@ MARKABLE_ELEMENT_PROPERTIES = [
 # All the following elements qualify for their own marker in hints mode
 MARKABLE_ELEMENTS = [
   "a"
+  "iframe"
   "area[@href]"
   "textarea"
   "button" 

@@ -65,7 +65,8 @@ isElementEditable = (element) ->
          element instanceof HTMLTextAreaElement or \
          element instanceof HTMLSelectElement or \
          element.getAttribute('g_editable') == 'true' or \
-         element.getAttribute('contenteditable') == 'true'
+         element.getAttribute('contenteditable')?.toLowerCase() == 'true' or \
+         element.ownerDocument?.designMode?.toLowerCase() == 'on'
 
 getWindowId = (window) ->
   return window.QueryInterface(Components.interfaces.nsIInterfaceRequestor)
