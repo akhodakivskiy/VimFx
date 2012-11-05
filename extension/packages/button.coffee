@@ -22,7 +22,7 @@ setButtonInstallPosition = (toolbarId, beforeId) ->
   positions[BUTTON_ID] = [toolbarId, beforeId]
 
 persist = (document, toolbar, buttonId, beforeId) ->
-  currentset = toolbar.getAttribute("currentset").split ','
+  currentset = toolbar.currentSet.split ','
   idx = if beforeId then currentset.indexOf(beforeId) else -1
   if idx != -1
     currentset.splice(idx, 0, buttonId);

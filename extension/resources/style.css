@@ -8,7 +8,7 @@
     cursor: auto !important;
     display: inline !important;
     float: none !important;
-    font-family : "Helvetica Neue", "Helvetica", "Arial", sans-serif !important;
+    font-family: Calibri, Candara, Segoe, "Segoe UI", Optima, Arial, sans-serif; !important
     font-size: inherit !important;
     font-style: normal !important;
     font-variant: normal !important;
@@ -84,7 +84,7 @@ div#VimFxHelpDialog {
     box-shadow: rgba(1, 2, 1, 0.4) 0px 0px 6px !important;
     overflow-y: auto !important;
     z-index:99999998 !important;
-    font-size: 13px !important;
+    font-size: 15px !important;
     max-height: 75% !important;
 }
 
@@ -116,7 +116,7 @@ div#VimFxHelpDialog .VimFxVersion {
     position: absolute !important;
     top: 20px; !important;
     right: 100px; !important;
-    font-size: 10px !important;
+    font-size: 12px !important;
 }
 
 div#VimFxHelpDialog .VimFxClose {
@@ -147,7 +147,7 @@ div#VimFxHelpDialog .VimFxColumn:first-child
 
 div#VimFxHelpDialog .VimFxSectionTitle {
     display: block !important;
-    font-size: 13px !important;
+    font-size: 15px !important;
     font-weight: bold !important;
     line-height: 140% !important;
     text-transform: uppercase !important;
@@ -182,7 +182,7 @@ div#VimFxHelpDialog td.VimFxSequence {
 
 div#VimFxHelpDialog .VimFxSocial {
     margin: 30px 0 0 0 !important;
-    font-size: 11px !important;
+    font-size: 12px !important;
 }
 
 div#VimFxHelpDialog .VimFxSocial p {
