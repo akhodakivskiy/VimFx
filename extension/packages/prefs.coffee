@@ -11,7 +11,6 @@ PREFS =
   disabled:     false
   scroll_step:  60
   black_list:   ''
-  version:      0.1
 
 # Get Firefox preference value of type specified in `PREFS`
 getFFPref = do ->
