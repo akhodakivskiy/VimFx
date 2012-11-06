@@ -51,14 +51,18 @@ for the most relevant list.
     k c-y   Scroll Right
     h       Scroll Down
     l       Scroll Up
-    d c-d   Scroll a Page Down
-    u c-u   Scroll a Page Up
+    d       Scroll half a Page Down
+    u       Scroll half a Page Up
+    c-f     Scroll a full page Down
+    c-b     Scroll a full page Up
 
 ### Tabs
 
     t       Open New Blank tab
     J gT    Go to the Previous tab
     K gt    Go to the Next tab
+    c-J     Move current tab to the Left
+    c-K     Move current tab to the Right
     gH g0   Go to the First tab
     gL g$   Go to the Last tab
     x       Close current tab
@@ -82,3 +86,19 @@ for the most relevant list.
 
 - Initial Release
 
+0.1.1 (27 Oct 2012)
+
+- Just to deal with AMO - no changes
+
+0.2 (5 Nov 2012)
+
+- document.designMode='on' is now honored. Will also provide hint markers for iframes on the page.
+- Bug fixed where it would completely reset the toolbar while installing the toolbar button.
+- Bug fixed where it's not possible to change the text in the blaclisting textbox
+- Changed u/d to scroll half a page, added ^f/^b to scroll full page
+- Added tab movement commands: ^J and ^K.
+- Invisible markers bug fixed.
+- Global hotkey to disable the commands (equal to the toolbar button click): Alt-Shift V
+- ^u and ^d are removed from the command list. ^u is commonly used to show the page source code
+- Opening new tab with now focuses the Address Bar
+- Other small bugs nailed down.
