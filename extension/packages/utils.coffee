@@ -184,6 +184,26 @@ getVersion = do ->
 
   -> version
 
+# Simulate smooth scrolling
+smoothScroll = (window, dx, dy, msecs) ->
+  if msecs <= 0 || !Services.prefs.getBoolPref 'general.smoothScroll'
+    window.scrollBy dx, dy
+  else
+    # Callback
+    fn = (_x, _y) -> 
+      window.scrollBy(_x, _y)
+    # Number of steps
+    delta = 10
+    l = Math.round(msecs / delta)
+    while l > 0
+      x = Math.round(dx / l)
+      y = Math.round(dy / l)
+      dx -= x
+      dy -= y
+
+      l -= 1
+      window.setTimeout fn, l * delta, x, y
+
 exports.Bucket                  = Bucket
 exports.getCurrentTabWindow     = getCurrentTabWindow
 exports.getEventWindow          = getEventWindow
@@ -198,6 +218,7 @@ exports.getSessionStore         = getSessionStore
 exports.loadCss                 = loadCss
 
 exports.simulateClick           = simulateClick
+exports.smoothScroll            = smoothScroll
 exports.readFromClipboard       = readFromClipboard
 exports.writeToClipboard        = writeToClipboard
 exports.timeIt                  = timeIt

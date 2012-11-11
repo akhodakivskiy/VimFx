@@ -64,19 +64,19 @@ command_G = (vim) ->
 
 # Scroll down a bit
 command_j_ce = (vim) -> 
-  vim.window.scrollBy(0, getPref 'scroll_step')
+  utils.smoothScroll vim.window, 0, (getPref 'scroll_step'), getPref 'scroll_time'
 
 # Scroll up a bit
 command_k_cy = (vim) -> 
-  vim.window.scrollBy(0, - getPref 'scroll_step')
+  utils.smoothScroll vim.window, 0, -(getPref 'scroll_step'), getPref 'scroll_time'
 
 # Scroll left a bit
 command_h = (vim) -> 
-  vim.window.scrollBy(- getPref 'scroll_step', 0)
+  vim.window.scrollBy -(getPref 'scroll_step'), 0
 
 # Scroll right a bit
 command_l = (vim) -> 
-  vim.window.scrollBy(getPref 'scroll_step', 0)
+  vim.window.scrollBy (getPref 'scroll_step'), 0
 
 # Scroll down half a page
 command_d = (vim) ->

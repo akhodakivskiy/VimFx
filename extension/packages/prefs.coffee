@@ -10,6 +10,7 @@ PREFS =
   hint_chars:   'asdfgercvhjkl;uinm'
   disabled:     false
   scroll_step:  60
+  scroll_time:  100
   black_list:   ''
 
 # Get Firefox preference value of type specified in `PREFS`

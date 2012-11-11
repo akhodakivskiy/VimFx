@@ -11,4 +11,15 @@ Example: `*go!gle.com*` will match http://google.com and https://go0gle.com/maps
     <setting pref="extension.VimFx.scroll_step" type="integer" title="Scroll Step">
 Default: 60
     </setting>
+    <!-- List example (this example would be stored as an integer) -->
+    <setting pref="extension.VimFx.scroll_time" type="menulist" title="Smooth Scroll">
+        <menulist>
+            <menupopup>
+                <menuitem value="0" label="Disabled"/>
+                <menuitem value="100" label="Fast"/>
+                <menuitem value="200" label="Normal"/>
+                <menuitem value="400" label="Slow"/>
+            </menupopup>
+        </menulist>
+    </setting>
 </vbox>
