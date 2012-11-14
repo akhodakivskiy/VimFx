@@ -1,5 +1,7 @@
 # VimFx - Vim keyboard shortcuts for Firefox
 
+https://addons.mozilla.org/en-US/firefox/addon/vimfx/
+
 [VimFx](https://addons.mozilla.org/en-US/firefox/addon/vimfx/) 
 is a [Mozilla Firefox](https://www.mozilla.org/en-US/firefox/fx/#desktop) 
 extension which introduces Vim-style keyboard shortcuts for browsing and navigation, 
