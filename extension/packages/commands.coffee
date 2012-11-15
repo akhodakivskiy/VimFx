@@ -60,7 +60,9 @@ command_gg = (vim) ->
 # Scroll to the bottom of the page
 command_G = (vim) ->
   if document = vim.window.document
-    vim.window.scrollTo(0, document.body.scrollHeight)
+    # Workaround the pages where body isn't the scrollable element.
+    # In this case we try to scroll 100k pixels
+    vim.window.scrollTo(0, Math.max(document.body.scrollHeight, 100000))
 
 # Scroll down a bit
 command_j_ce = (vim) -> 

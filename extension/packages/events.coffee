@@ -33,8 +33,6 @@ windowsListener =
       if keyChar = keyUtils.keyCharFromCode(event.keyCode, shift)
         keyStr = keyUtils.applyModifiers(keyChar, ctrl, alt, meta)
 
-      console.log keyStr
-
       # We only handle the key if it's recognized by `keyCharFromCode`
       # and if there is no focused editable element # or if it's the *Esc* key, 
       # which will remove the focus from the currently focused element
