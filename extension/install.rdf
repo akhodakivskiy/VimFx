@@ -3,14 +3,21 @@
    - License, v. 2.0. If a copy of the MPL was not distributed with this
    - file, You can obtain one at http://mozilla.org/MPL/2.0/. 
    -->
-<RDF xmlns="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:em="http://www.mozilla.org/2004/em-rdf#">
+<RDF xmlns="http://www.w3.org/1999/02/22-rdf-syntax-ns#" 
+     xmlns:em="http://www.mozilla.org/2004/em-rdf#">
 
   <Description about="urn:mozilla:install-manifest">
     <em:id>VimFx@akhodakivskiy.github.com</em:id>
+    <em:homepageURL>http://www.github.com/akhodakivskiy/VimFx</em:homepageURL>
     <em:version>0.2</em:version>
     <em:type>2</em:type>
     <em:bootstrap>true</em:bootstrap>
     <em:optionsType>2</em:optionsType>
+
+    <!-- Front End MetaData -->
+    <em:name>VimFx</em:name>
+    <em:description>Vim keyboard shortcuts for Firefox</em:description>
+    <em:creator>Anton Khodakivskiy</em:creator>
 
     <!-- Firefox -->
     <em:targetApplication>
@@ -21,9 +28,14 @@
       </Description>
     </em:targetApplication>
 
-    <!-- Front End MetaData -->
-    <em:name>VimFx</em:name>
-    <em:description>Vim keyboard shortcuts for Firefox</em:description>
-    <em:creator>Anton Khodakivskiy</em:creator>
+    <!-- Localization -->
+    <em:localized>
+      <Description>
+        <em:locale>ru</em:locale>
+        <em:name>VimFx</em:name>
+        <em:description>Горячие клавиши в стиле Vim</em:description>
+        <em:creator>Антон Ходаковский</em:creator>
+      </Description>
+    </em:localized>
   </Description>
 </RDF>

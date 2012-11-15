@@ -1,8 +1,10 @@
 { getWindowId, Bucket } = require 'utils'
 
 { commands,
-  hintCharHandler 
-} = require 'commands'
+  hintCharHandler } = require 'commands'
+
+{ getPref } = require 'prefs'
+
 
 MODE_NORMAL = 1
 MODE_HINTS  = 2

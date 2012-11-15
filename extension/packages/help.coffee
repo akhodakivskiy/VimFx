@@ -26,10 +26,11 @@ hideHelp = (document) ->
     div.parentNode.removeChild div
 
 td = (text, klass='') ->
+  console.log text
   """<td class="VimFxReset #{ klass }">#{ text }</td>"""
 
 tr = (key, text) ->
-  key = """#{ key } <span class="VimFxReset VimFxDot">&#8729;"""
+  key = """#{ key } <span class="VimFxReset VimFxDot">&#8729;</span>"""
   """<tr class="VimFxReset">#{ td(key, 'VimFxSequence') }#{ td(text) }</tr>"""
 
 table = (commands) ->
@@ -46,32 +47,28 @@ section = (title, commands) ->
   """
 
 helpDialogHtml = (help) -> 
-
-
-  html = null
-  if html == null
-    html = """
+  return """
 
 <div id="VimFxHelpDialog" class="VimFxReset">
   <div class="VimFxReset VimFxHeader">
     <div class="VimFxReset VimFxTitle">
       <span class="VimFxReset VimFxTitleVim">Vim</span><span class="VimFxReset VimFxTitleFx">Fx</span>
-      <span class="VimFxReset">Help</span>
+      <span class="VimFxReset">#{ _('help') }</span>
     </div>
-    <span class="VimFxReset VimFxVersion">Version #{ utils.getVersion() }</span>
+    <span class="VimFxReset VimFxVersion">#{ _('help_version') } #{ utils.getVersion() }</span>
     <a class="VimFxReset VimFxClose" id="VimFxClose" href="#">&#10006;</a>
     <div class="VimFxReset VimFxClearFix"></div>
   </div>
 
   <div class="VimFxReset VimFxBody">
     <div class="VimFxReset VimFxColumn">
-      #{ section('Dealing with URLs', help['urls']) }
-      #{ section('Navigating the page', help['nav']) }
+      #{ section(_('help_section_urls'),    help['urls']) }
+      #{ section(_('help_section_nav'),     help['nav']) }
     </div>
     <div class="VimFxReset VimFxColumn">
-      #{ section('Working with Tabs', help['tabs']) }
-      #{ section('Browsing', help['browse']) }
-      #{ section('Misc', help['misc']) }
+      #{ section(_('help_section_tabs'),    help['tabs']) }
+      #{ section(_('help_section_browse'),  help['browse']) }
+      #{ section(_('help_section_misc'),    help['misc']) }
     </div>
     <div class="VimFxReset VimFxClearFix"></div>
   </div>
@@ -79,15 +76,15 @@ helpDialogHtml = (help) ->
   <div class="VimFxReset VimFxFooter">
     <div class="VimFxReset VimFxSocial">
       <p class="VimFxReset">
-        Found a bug? 
+        #{ _('help_found_bug') }
         <a class="VimFxReset" target="_blank" href="https://github.com/akhodakivskiy/VimFx/issues">
-          Report it Here!
+          #{ _('help_report_bug') }
         </a>
       </p>
       <p class="VimFxReset">
-        Enjoying VimFx? 
+        #{ _('help_enjoying') }
         <a class="VimFxReset" target="_blank" href="https://addons.mozilla.org/en-US/firefox/addon/vimfx/">
-          Leave us Feedback!
+          #{ _('help_feedback') }
         </a>
       </p>
     </div>
@@ -95,7 +92,6 @@ helpDialogHtml = (help) ->
 </div>
 
 """
-  return html
 
 exports.showHelp = showHelp
 exports.hideHelp = hideHelp

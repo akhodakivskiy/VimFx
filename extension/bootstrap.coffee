@@ -39,35 +39,41 @@ do (global = this) ->
   global.require = require
   global.getResourceURI = getResourceURI
 
-# Include into global scope
-include("includes/#{ name }.js", this) for name in [
-  'chrome',
-  'console',
-  'unload', 
-  'window-utils',
-]
+  # Include into global scope
+  include("includes/#{ name }.js", global) for name in [
+    'chrome',
+    'console',
+    'unload', 
+    'window-utils',
+  ]
 
-{ loadCss }             = require 'utils'
-{ addEventListeners }   = require 'events'
-{ getPref
-, installPrefObserver } = require 'prefs'
-{ setButtonInstallPosition
-, addToolbarButton }    = require 'button'
+  # Init localization `underscore` method
+  { l10n }                = require 'l10n'
+  global._ = l10n "vimfx.properties"
 
-# Firefox will call this method on startup/enabling
-startup = (data, reason) ->
-  if reason = ADDON_INSTALL
-    # Position the toolbar button right before the default Bookmarks button
-    # If Bookmarks button is hidden - then VimFx button will be appended to the toolbar
-    setButtonInstallPosition 'nav-bar', 'bookmarks-menu-button-container'
+  { loadCss }             = require 'utils'
+  { addEventListeners }   = require 'events'
+  { getPref
+  , installPrefObserver } = require 'prefs'
+  { setButtonInstallPosition
+  , addToolbarButton }    = require 'button'
 
-  loadCss 'style'
-  watchWindows addEventListeners, 'navigator:browser'
-  watchWindows addToolbarButton, 'navigator:browser'
-  installPrefObserver()
+  # Firefox will call this method on startup/enabling
+  global.startup = (data, reason) ->
 
-# Firefox will call this method on shutdown/disabling
-shutdown = (data, reason) ->
-  # Don't bother to clean up if the browser is shutting down
-  if reason != APP_SHUTDOWN
-    unload()
+
+    if reason = ADDON_INSTALL
+      # Position the toolbar button right before the default Bookmarks button
+      # If Bookmarks button is hidden - then VimFx button will be appended to the toolbar
+      setButtonInstallPosition 'nav-bar', 'bookmarks-menu-button-container'
+
+    loadCss 'style'
+    watchWindows addEventListeners, 'navigator:browser'
+    watchWindows addToolbarButton, 'navigator:browser'
+    installPrefObserver()
+
+  # Firefox will call this method on shutdown/disabling
+  global.shutdown = (data, reason) ->
+    # Don't bother to clean up if the browser is shutting down
+    if reason != APP_SHUTDOWN
+      unload()

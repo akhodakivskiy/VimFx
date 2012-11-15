@@ -26,7 +26,7 @@ command_P = (vim) ->
 command_t = (vim) ->
   if chromeWindow = utils.getRootWindow vim.window
     if gBrowser = chromeWindow.gBrowser
-      gBrowser.selectedTab = chromeWindow.gBrowser.addTab()
+      gBrowser.selectedTab = chromeWindow.gBrowser.addTab('about:blank')
       if urlbar = chromeWindow.document.getElementById('urlbar')
         urlbar.focus()
 
@@ -201,41 +201,41 @@ command_Esc = (vim) ->
 
 commandGroups = 
   'urls':
-    'p':        [ command_p,      "Navigate to the address in the clipboard" ]
-    'P':        [ command_P,      "Open new tab and navigate to the address in the clipboard" ]
-    'y,f':      [ command_yf,     "Copy link url to the clipboard" ]
-    'y,y':      [ command_yy,     "Copy current page link to the clipboard" ]
-    'r':        [ command_r,      "Reload current page" ]
-    'R':        [ command_R,      "Reload current page and all the assets (js, css, etc.)" ]
+    'p':        [ command_p,      _('help_command_p') ]
+    'P':        [ command_P,      _('help_command_P') ]
+    'y,f':      [ command_yf,     _('help_command_yf') ]
+    'y,y':      [ command_yy,     _('help_command_yy') ]
+    'r':        [ command_r,      _('help_command_r') ]
+    'R':        [ command_R,      _('help_command_R') ]
   'nav':
-    'g,g':      [ command_gg ,    "Scroll to the Top of the page" ]
-    'G':        [ command_G,      "Scroll to the Bottom of the page" ]
-    'j|c-e':    [ command_j_ce,   "Scroll Down" ]
-    'k|c-y':    [ command_k_cy,   "Scroll Up" ]
-    'h':        [ command_h,      "Scroll Left" ]
-    'l':        [ command_l ,     "Scroll Right" ]
-    'd':        [ command_d,      "Scroll half a Page Down" ]
-    'u':        [ command_u,      "Scroll half a Page Up" ]
-    'c-f':      [ command_cf,     "Scroll a full Page Down" ]
-    'c-b':      [ command_cb,     "Scroll a full Page Up" ]
+    'g,g':      [ command_gg ,    _('help_command_gg') ]
+    'G':        [ command_G,      _('help_command_G') ]
+    'j|c-e':    [ command_j_ce,   _('help_command_j_ce') ]
+    'k|c-y':    [ command_k_cy,   _('help_command_k_cy') ]
+    'h':        [ command_h,      _('help_command_h') ]
+    'l':        [ command_l ,     _('help_command_l') ]
+    'd':        [ command_d,      _('help_command_d') ]
+    'u':        [ command_u,      _('help_command_u') ]
+    'c-f':      [ command_cf,     _('help_command_cf') ]
+    'c-b':      [ command_cb,     _('help_command_cb') ]
   'tabs':
-    't':        [ command_t,      "Open New Blank tab" ]
-    'J|g,T':    [ command_J_gT,   "Go to the Previous tab" ]
-    'K|g,t':    [ command_K_gt,   "Go to the Next tab" ]
-    'c-J':      [ command_cJ,     "Move current tab to the left" ]
-    'c-K':      [ command_cK,     "Move current tab to the right" ]
-    'g,H|g,0':  [ command_gH_g0,  "Go to the First tab" ]
-    'g,L|g,$':  [ command_gL_g$,  "Go to the Last tab" ]
-    'x':        [ command_x,      "Close current tab" ]
-    'X':        [ command_X,      "Restore last closed tab" ]
+    't':        [ command_t,      _('help_command_t') ]
+    'J|g,T':    [ command_J_gT,   _('help_command_J_gT') ]
+    'K|g,t':    [ command_K_gt,   _('help_command_K_gt') ]
+    'c-J':      [ command_cJ,     _('help_command_cJ') ]
+    'c-K':      [ command_cK,     _('help_command_cK') ]
+    'g,H|g,0':  [ command_gH_g0,  _('help_command_gH_g0') ]
+    'g,L|g,$':  [ command_gL_g$,  _('help_command_gL_g$') ]
+    'x':        [ command_x,      _('help_command_x') ]
+    'X':        [ command_X,      _('help_command_X') ]
   'browse':
-    'f':        [ command_f,      "Follow a link on the current page" ]
-    'F':        [ command_F,      "Follow a link on the current page in a new tab" ]
-    'H':        [ command_H,      "Go Back in history" ]
-    'L':        [ command_L,      "Go Forward in history" ]
+    'f':        [ command_f,      _('help_command_f') ]
+    'F':        [ command_F,      _('help_command_F') ]
+    'H':        [ command_H,      _('help_command_H') ]
+    'L':        [ command_L,      _('help_command_L') ]
   'misc':
-    '?':        [ command_help,   "Show Help Dialog" ]
-    'Esc':      [ command_Esc,    "Close this dialog and cancel hint markers" ]
+    '?':        [ command_help,   _('help_command_help') ]
+    'Esc':      [ command_Esc,    _('help_command_Esc') ]
     
 # Merge groups and split command pipes into individual commands
 commands = do (commandGroups) ->

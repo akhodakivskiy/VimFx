@@ -76,7 +76,7 @@ createMenupopup = (window) ->
   blacklistTextbox.id = TEXTBOX_BLACKLIST_ID
   blacklistButton = doc.createElement 'toolbarbutton'
   blacklistButton.id = BUTTON_BLACKLIST_ID
-  blacklistButton.setAttribute 'tooltiptext', 'Blacklist'
+  blacklistButton.setAttribute 'tooltiptext', _('item_blacklist_button_tooltip')
   blacklistButton.setAttribute 'class', 'toolbarbutton-1'
   blacklistButton.style.listStyleImage = iconUrl('blacklist')
   hbox = doc.createElement 'hbox'
@@ -85,11 +85,11 @@ createMenupopup = (window) ->
 
   itemPreferences = doc.createElement 'menuitem'
   itemPreferences.id = MENU_ITEM_PREF  
-  itemPreferences.setAttribute 'label', 'Preferences'
+  itemPreferences.setAttribute 'label', _('item_preferences')
 
   itemHelp = doc.createElement 'menuitem'
   itemHelp.id = MENU_ITEM_HELP  
-  itemHelp.setAttribute 'label', 'Help'
+  itemHelp.setAttribute 'label', _('item_help')
 
   menupopup = doc.createElement 'menupopup'
   menupopup.id = MENUPOPUP_ID
@@ -193,13 +193,13 @@ addToolbarButton = (window) ->
 updateToolbarButton = (button) ->
   if getPref 'disabled'
     button.style.listStyleImage = iconUrl('grey')
-    button.setAttribute 'tooltiptext', 'VimFx is Disabled. Click to Enable (Shift+Alt+V)'
+    button.setAttribute 'tooltiptext', _('button_tooltip_disabled')
   else if button['VimFx_blacklisted']
     button.style.listStyleImage = iconUrl('red')
-    button.setAttribute 'tooltiptext', 'VimFx is Blacklisted on this Page'
+    button.setAttribute 'tooltiptext', _('button_tooltip_blacklisted')
   else
     button.style.listStyleImage = iconUrl('normal')
-    button.setAttribute 'tooltiptext', 'VimFx is Enabled. Click to Disable (Shift+Alt+V)'
+    button.setAttribute 'tooltiptext', _('button_tooltip_enabled')
 
 setWindowBlacklisted = (window, blacklisted) ->
   if button = $(window.document, BUTTON_ID)

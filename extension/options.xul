@@ -1,24 +1,21 @@
 <?xml version="1.0"?>
+
+<!DOCTYPE mydialog SYSTEM "chrome://vimfx/locale/options.dtd">
+
 <vbox xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
-    <setting pref="extension.VimFx.hint_chars" type="string" title="Hint Chars">
-Default: asdfgercvhjkl;uinm
-    </setting>
-    <setting pref="extension.VimFx.black_list" type="string" title="Black List">
-Disable Vim functionality on the following URLs.
-Comma or space separated list, wildcards allowed: `!` to match single character and `*` to match several characters. 
-Example: `*go!gle.com*` will match http://google.com and https://go0gle.com/maps
-    </setting>
-    <setting pref="extension.VimFx.scroll_step" type="integer" title="Scroll Step">
-Default: 60
-    </setting>
-    <!-- List example (this example would be stored as an integer) -->
-    <setting pref="extension.VimFx.scroll_time" type="menulist" title="Smooth Scroll">
+    <setting pref="extension.VimFx.hint_chars" type="string" 
+        title="&pref.hint_chars.title;" desc="&pref.hint_chars.desc;" />
+    <setting pref="extension.VimFx.black_list" type="string" 
+        title="&pref.black_list.title;" desc="&pref.black_list.desc;" />
+    <setting pref="extension.VimFx.scroll_step" type="integer" 
+        title="&pref.scroll_step.title;" desc="&pref.scroll_step.desc;" />
+    <setting pref="extension.VimFx.scroll_time" type="menulist" title="&pref.scroll_time.title;">
         <menulist>
             <menupopup>
-                <menuitem value="0" label="Disabled"/>
-                <menuitem value="100" label="Fast"/>
-                <menuitem value="200" label="Normal"/>
-                <menuitem value="400" label="Slow"/>
+                <menuitem value="0"     label="&pref.smooth_time.disabled;"/>
+                <menuitem value="100"   label="&pref.smooth_time.fast;"/>
+                <menuitem value="200"   label="&pref.smooth_time.normal;"/>
+                <menuitem value="400"   label="&pref.smooth_time.slow;"/>
             </menupopup>
         </menulist>
     </setting>

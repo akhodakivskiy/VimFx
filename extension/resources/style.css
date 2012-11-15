@@ -80,12 +80,12 @@ div#VimFxHelpDialog {
     left:50% !important;
     /* This needs to be 1/2 width to horizontally center the help dialog */
     margin-left:-330px !important;
-    top:50px !important;
+    top:30px !important;
     box-shadow: rgba(1, 2, 1, 0.4) 0px 0px 6px !important;
     overflow-y: auto !important;
     z-index:99999998 !important;
     font-size: 15px !important;
-    max-height: 75% !important;
+    max-height: 80% !important;
 }
 
 div#VimFxHelpDialog .VimFxTitle {
