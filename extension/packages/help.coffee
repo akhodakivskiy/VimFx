@@ -26,7 +26,6 @@ hideHelp = (document) ->
     div.parentNode.removeChild div
 
 td = (text, klass='') ->
-  console.log text
   """<td class="VimFxReset #{ klass }">#{ text }</td>"""
 
 tr = (key, text) ->

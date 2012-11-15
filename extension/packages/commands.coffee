@@ -166,7 +166,6 @@ command_cJ = (vim) ->
       total = gBrowser.tabContainer.itemCount
 
       # `total` is added to deal with negative offset
-      console.log index, total, (total + index - 1) % total, 'left'
       gBrowser.moveTabTo tab, (total + index - 1) % total
   
 # Move current tab to the right
@@ -176,7 +175,6 @@ command_cK = (vim) ->
       index = gBrowser.tabContainer.selectedIndex
       total = gBrowser.tabContainer.itemCount
 
-      console.log index, total, (index + 1) % total, 'right'
       gBrowser.moveTabTo tab, (index + 1) % total
 
 # Display the Help Dialog
@@ -233,8 +231,10 @@ commandGroups =
     'F':        [ command_F,      _('help_command_F') ]
     'H':        [ command_H,      _('help_command_H') ]
     'L':        [ command_L,      _('help_command_L') ]
-  'misc':
-    '?':        [ command_help,   _('help_command_help') ]
+  'misc': 
+    # `>` is added to help command mapping to hack around russian keyboard layout
+    # See key-utils.coffee for more info
+    '?|>':      [ command_help,   _('help_command_help') ]
     'Esc':      [ command_Esc,    _('help_command_Esc') ]
     
 # Merge groups and split command pipes into individual commands
@@ -253,7 +253,7 @@ commandsHelp = do (commandGroups) ->
   for group, commandsList of commandGroups
     helpGroup = {}
     for keys, command of commandsList
-      key = keys.replace(',', '').replace('|', ', ')
+      key = keys.replace(/,/g, '').replace('|', ', ')
       helpGroup[key] = command[1]
 
     help[group] = helpGroup

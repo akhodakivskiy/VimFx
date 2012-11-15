@@ -174,11 +174,8 @@ addToolbarButton = (window) ->
   doc = window.document
   win = doc.querySelector 'window'
 
-  try
-    [button, keyset] = createButton window
-    updateToolbarButton button
-  catch err
-    console.log err
+  [button, keyset] = createButton window
+  updateToolbarButton button
 
   restorePosition doc, button
   win.appendChild keyset
