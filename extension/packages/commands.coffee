@@ -72,27 +72,27 @@ command_k_cy = (vim) ->
 
 # Scroll left a bit
 command_h = (vim) -> 
-  vim.window.scrollBy -(getPref 'scroll_step'), 0
+  utils.smoothScroll vim.window, -(getPref 'scroll_step'), 0, getPref 'scroll_time'
 
 # Scroll right a bit
 command_l = (vim) -> 
-  vim.window.scrollBy (getPref 'scroll_step'), 0
+  utils.smoothScroll vim.window, (getPref 'scroll_step'), 0, getPref 'scroll_time'
 
 # Scroll down half a page
 command_d = (vim) ->
-  vim.window.scrollBy(0, vim.window.innerHeight / 2)
+  utils.smoothScroll vim.window, 0, vim.window.innerHeight / 2, getPref 'scroll_time'
 
 # Scroll up half a page
 command_u = (vim) ->
-  vim.window.scrollBy(0, -vim.window.innerHeight / 2)
-  #
+  utils.smoothScroll vim.window, 0, -vim.window.innerHeight / 2, getPref 'scroll_time'
+  
 # Scroll down full a page
 command_cf = (vim) ->
-  vim.window.scrollBy(0, vim.window.innerHeight)
+  vim.window.scrollByPages(1)
 
 # Scroll up full a page
 command_cb = (vim) ->
-  vim.window.scrollBy(0, -vim.window.innerHeight)
+  vim.window.scrollByPages(-1)
 
 # Activate previous tab
 command_J_gT = (vim) ->
