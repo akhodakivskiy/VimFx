@@ -26,7 +26,7 @@ command_P = (vim) ->
 command_t = (vim) ->
   if chromeWindow = utils.getRootWindow vim.window
     if gBrowser = chromeWindow.gBrowser
-      gBrowser.selectedTab = chromeWindow.gBrowser.addTab('about:blank')
+      gBrowser.selectedTab = chromeWindow.gBrowser.addTab()
       if urlbar = chromeWindow.document.getElementById('urlbar')
         urlbar.focus()
 
@@ -214,8 +214,8 @@ commandGroups =
     'k|c-y':    [ command_k_cy,   _('help_command_k_cy') ]
     'h':        [ command_h,      _('help_command_h') ]
     'l':        [ command_l ,     _('help_command_l') ]
-    'd':        [ command_d,      _('help_command_d') ]
-    'u':        [ command_u,      _('help_command_u') ]
+    'd|c-d':    [ command_d,      _('help_command_d') ]
+    'u|c-u':    [ command_u,      _('help_command_u') ]
     'c-f':      [ command_cf,     _('help_command_cf') ]
     'c-b':      [ command_cb,     _('help_command_cb') ]
   'tabs':
