@@ -214,10 +214,12 @@ commandGroups =
     'k|c-y':    [ command_k_cy,   _('help_command_k_cy') ]
     'h':        [ command_h,      _('help_command_h') ]
     'l':        [ command_l ,     _('help_command_l') ]
-    'd|c-d':    [ command_d,      _('help_command_d') ]
-    'u|c-u':    [ command_u,      _('help_command_u') ]
-    'c-f':      [ command_cf,     _('help_command_cf') ]
-    'c-b':      [ command_cb,     _('help_command_cb') ]
+    'd':        [ command_d,      _('help_command_d') ]
+    # Can't use c-u because it's generally used for viewing sources
+    'u':        [ command_u,      _('help_command_u') ]
+    # Can't use c-f because it's generally used for viewing sources
+    #'c-f':      [ command_cf,     _('help_command_cf') ]
+    #'c-b':      [ command_cb,     _('help_command_cb') ]
   'tabs':
     't':        [ command_t,      _('help_command_t') ]
     'J|g,T':    [ command_J_gT,   _('help_command_J_gT') ]
