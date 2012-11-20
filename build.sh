@@ -6,7 +6,7 @@ coffee -c --bare \
     extension/includes/*.coffee
 
 cd extension
-zip ../VimFx.xpi \
+zip -r ../VimFx.xpi \
     bootstrap.js \
     icon.png \
     install.rdf \
@@ -14,5 +14,5 @@ zip ../VimFx.xpi \
     includes/*.js \
     packages/*.js \
     resources/* \
-    locale/*
+    locale
 cd ..
