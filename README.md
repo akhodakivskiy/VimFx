@@ -37,6 +37,8 @@ VimFx will be nice to your browser and to your habits. Promise.
 Might not be up to date. Please refer to the Help dialog withing the extension 
 for the most relevant list.
 
+Global shortcut to enable/disable VimFx: `Shift-Alt-v`
+
 ### URLs
 
     p       Navigate to the address in the clipboard
@@ -50,14 +52,12 @@ for the most relevant list.
 
     gg      Scroll to the Top of the page
     G       Scroll to the Bottom of the page
-    j c-e   Scroll Left
-    k c-y   Scroll Right
-    h       Scroll Down
-    l       Scroll Up
+    j c-e   Scroll Down
+    k c-y   Scroll Up
+    h       Scroll Left
+    l       Scroll Right
     d       Scroll half a Page Down
     u       Scroll half a Page Up
-    c-f     Scroll a full page Down
-    c-b     Scroll a full page Up
 
 ### Tabs
 
@@ -105,3 +105,12 @@ for the most relevant list.
 - ^u and ^d are removed from the command list. ^u is commonly used to show the page source code
 - Opening new tab with now focuses the Address Bar
 - Other small bugs nailed down.
+
+0.3 (19 Nov 2012)
+
+- Fixed [Desktop](https://addons.mozilla.org/en-us/firefox/addon/desktop/) extension compatibility problem
+- Removed c-b/c-f for now. c-f is a standard search hotkey. Will put c-f back when proper Vim-like search with / is implemented
+- Scrolling with G will now reach the bottom of the page
+- Implemented localization, currently there is only Russian localization. Community is welcome
+  [to contribute your localizations](https://github.com/akhodakivskiy/VimFx/tree/master/extension/locale)! 
+- Implemented simple smooth scolling
