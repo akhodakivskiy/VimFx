@@ -26,9 +26,11 @@ command_P = (vim) ->
 command_t = (vim) ->
   if chromeWindow = utils.getRootWindow vim.window
     if gBrowser = chromeWindow.gBrowser
-      gBrowser.selectedTab = chromeWindow.gBrowser.addTab('about:blank')
-      if urlbar = chromeWindow.document.getElementById('urlbar')
-        urlbar.focus()
+      # Get the default url for the new tab
+      newtab_url = Services.prefs.getCharPref 'browser.newtab.url'
+      gBrowser.addTab newtab_url
+      # Focus the address bar
+      chromeWindow.focusAndSelectUrlBar()
 
 # Copy current URL to the clipboard
 command_yf = (vim) ->
@@ -60,7 +62,9 @@ command_gg = (vim) ->
 # Scroll to the bottom of the page
 command_G = (vim) ->
   if document = vim.window.document
-    vim.window.scrollTo(0, document.body.scrollHeight)
+    # Workaround the pages where body isn't the scrollable element.
+    # In this case we try to scroll 100k pixels
+    vim.window.scrollTo(0, Math.max(document.body.scrollHeight, 100000))
 
 # Scroll down a bit
 command_j_ce = (vim) -> 
@@ -72,27 +76,27 @@ command_k_cy = (vim) ->
 
 # Scroll left a bit
 command_h = (vim) -> 
-  vim.window.scrollBy -(getPref 'scroll_step'), 0
+  utils.smoothScroll vim.window, -(getPref 'scroll_step'), 0, getPref 'scroll_time'
 
 # Scroll right a bit
 command_l = (vim) -> 
-  vim.window.scrollBy (getPref 'scroll_step'), 0
+  utils.smoothScroll vim.window, (getPref 'scroll_step'), 0, getPref 'scroll_time'
 
 # Scroll down half a page
 command_d = (vim) ->
-  vim.window.scrollBy(0, vim.window.innerHeight / 2)
+  utils.smoothScroll vim.window, 0, vim.window.innerHeight / 2, getPref 'scroll_time'
 
 # Scroll up half a page
 command_u = (vim) ->
-  vim.window.scrollBy(0, -vim.window.innerHeight / 2)
-  #
+  utils.smoothScroll vim.window, 0, -vim.window.innerHeight / 2, getPref 'scroll_time'
+  
 # Scroll down full a page
 command_cf = (vim) ->
-  vim.window.scrollBy(0, vim.window.innerHeight)
+  vim.window.scrollByPages(1)
 
 # Scroll up full a page
 command_cb = (vim) ->
-  vim.window.scrollBy(0, -vim.window.innerHeight)
+  vim.window.scrollByPages(-1)
 
 # Activate previous tab
 command_J_gT = (vim) ->
@@ -166,7 +170,6 @@ command_cJ = (vim) ->
       total = gBrowser.tabContainer.itemCount
 
       # `total` is added to deal with negative offset
-      console.log index, total, (total + index - 1) % total, 'left'
       gBrowser.moveTabTo tab, (total + index - 1) % total
   
 # Move current tab to the right
@@ -176,7 +179,6 @@ command_cK = (vim) ->
       index = gBrowser.tabContainer.selectedIndex
       total = gBrowser.tabContainer.itemCount
 
-      console.log index, total, (index + 1) % total, 'right'
       gBrowser.moveTabTo tab, (index + 1) % total
 
 # Display the Help Dialog
@@ -214,10 +216,14 @@ commandGroups =
     'k|c-y':    [ command_k_cy,   _('help_command_k_cy') ]
     'h':        [ command_h,      _('help_command_h') ]
     'l':        [ command_l ,     _('help_command_l') ]
+
+    # Can't use c-u/c-d because it's generally used for viewing sources
     'd':        [ command_d,      _('help_command_d') ]
     'u':        [ command_u,      _('help_command_u') ]
-    'c-f':      [ command_cf,     _('help_command_cf') ]
-    'c-b':      [ command_cb,     _('help_command_cb') ]
+
+    # Can't use c-f because it's generally used for viewing sources
+    #'c-f':      [ command_cf,     _('help_command_cf') ]
+    #'c-b':      [ command_cb,     _('help_command_cb') ]
   'tabs':
     't':        [ command_t,      _('help_command_t') ]
     'J|g,T':    [ command_J_gT,   _('help_command_J_gT') ]
@@ -233,8 +239,10 @@ commandGroups =
     'F':        [ command_F,      _('help_command_F') ]
     'H':        [ command_H,      _('help_command_H') ]
     'L':        [ command_L,      _('help_command_L') ]
-  'misc':
-    '?':        [ command_help,   _('help_command_help') ]
+  'misc': 
+    # `>` is added to help command mapping to hack around russian keyboard layout
+    # See key-utils.coffee for more info
+    '?|>':      [ command_help,   _('help_command_help') ]
     'Esc':      [ command_Esc,    _('help_command_Esc') ]
     
 # Merge groups and split command pipes into individual commands
@@ -253,7 +261,7 @@ commandsHelp = do (commandGroups) ->
   for group, commandsList of commandGroups
     helpGroup = {}
     for keys, command of commandsList
-      key = keys.replace(',', '').replace('|', ', ')
+      key = keys.replace(/,/g, '').replace('|', ', ')
       helpGroup[key] = command[1]
 
     help[group] = helpGroup
