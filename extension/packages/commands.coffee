@@ -26,9 +26,11 @@ command_P = (vim) ->
 command_t = (vim) ->
   if chromeWindow = utils.getRootWindow vim.window
     if gBrowser = chromeWindow.gBrowser
-      gBrowser.selectedTab = chromeWindow.gBrowser.addTab()
-      if urlbar = chromeWindow.document.getElementById('urlbar')
-        urlbar.focus()
+      # Get the default url for the new tab
+      newtab_url = Services.prefs.getCharPref 'browser.newtab.url'
+      gBrowser.addTab newtab_url
+      # Focus the address bar
+      chromeWindow.focusAndSelectUrlBar()
 
 # Copy current URL to the clipboard
 command_yf = (vim) ->
@@ -214,9 +216,11 @@ commandGroups =
     'k|c-y':    [ command_k_cy,   _('help_command_k_cy') ]
     'h':        [ command_h,      _('help_command_h') ]
     'l':        [ command_l ,     _('help_command_l') ]
+
+    # Can't use c-u/c-d because it's generally used for viewing sources
     'd':        [ command_d,      _('help_command_d') ]
-    # Can't use c-u because it's generally used for viewing sources
     'u':        [ command_u,      _('help_command_u') ]
+
     # Can't use c-f because it's generally used for viewing sources
     #'c-f':      [ command_cf,     _('help_command_cf') ]
     #'c-b':      [ command_cb,     _('help_command_cb') ]
