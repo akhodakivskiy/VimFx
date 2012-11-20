@@ -13,5 +13,6 @@ zip ../VimFx.xpi \
     options.xul \
     includes/*.js \
     packages/*.js \
-    resources/*
+    resources/* \
+    locale/*
 cd ..
