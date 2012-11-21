@@ -8,6 +8,7 @@ coffee -c --bare \
 cd extension
 zip -r ../VimFx.xpi \
     bootstrap.js \
+    chrome.manifest \
     icon.png \
     install.rdf \
     options.xul \
