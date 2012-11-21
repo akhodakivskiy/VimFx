@@ -114,3 +114,7 @@ Global shortcut to enable/disable VimFx: `Shift-Alt-v`
 - Implemented localization, currently there is only Russian localization. Community is welcome
   [to contribute your localizations](https://github.com/akhodakivskiy/VimFx/tree/master/extension/locale)! 
 - Implemented simple smooth scolling
+
+0.3.2, 0.3.2, 0.3.3 (20-21 Nov 2012)
+
+- Hotfixes for the build script to include localization related files and folders
