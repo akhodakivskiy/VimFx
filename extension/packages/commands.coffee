@@ -28,7 +28,7 @@ command_t = (vim) ->
     if gBrowser = chromeWindow.gBrowser
       # Get the default url for the new tab
       newtab_url = Services.prefs.getCharPref 'browser.newtab.url'
-      gBrowser.addTab newtab_url
+      gBrowser.selectedTab = gBrowser.addTab newtab_url
       # Focus the address bar
       chromeWindow.focusAndSelectUrlBar()
 
@@ -54,6 +54,22 @@ command_r = (vim) ->
 # Reload the page from the server
 command_R = (vim) ->
   vim.window.location.reload(true)
+  
+# Reload the page, possibly from cache
+command_ar = (vim) ->
+  if rootWindow = utils.getRootWindow vim.window
+    if tabs = rootWindow.gBrowser.tabContainer
+      for i in [0...tabs.itemCount]
+        window = tabs.getItemAtIndex(i).linkedBrowser.contentWindow
+        window.location.reload(false)
+
+# Reload the page from the server
+command_aR = (vim) ->
+  if rootWindow = utils.getRootWindow vim.window
+    if tabs = rootWindow.gBrowser.tabContainer
+      for i in [0...tabs.itemCount]
+        window = tabs.getItemAtIndex(i).linkedBrowser.contentWindow
+        window.location.reload(true)
 
 # Scroll to the top of the page
 command_gg = (vim) ->
@@ -209,6 +225,8 @@ commandGroups =
     'y,y':      [ command_yy,     _('help_command_yy') ]
     'r':        [ command_r,      _('help_command_r') ]
     'R':        [ command_R,      _('help_command_R') ]
+    'a,r':      [ command_ar,     _('help_command_ar') ]
+    'a,R':      [ command_aR,     _('help_command_aR') ]
   'nav':
     'g,g':      [ command_gg ,    _('help_command_gg') ]
     'G':        [ command_G,      _('help_command_G') ]
