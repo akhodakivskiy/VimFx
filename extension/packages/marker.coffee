@@ -106,17 +106,31 @@ class Marker
 Marker.createMarkers = (document) ->
   hintChars = getPref('hint_chars').toLowerCase()
 
-  elementsSet = getMarkableElements(document)
+  set = getMarkableElements(document)
   markers = [];
   j = 0
-  for i in [0...elementsSet.snapshotLength] by 1
-    element = elementsSet.snapshotItem(i)
-    if rect = getElementRect element
-      hint = indexToHint(j++, hintChars)
-      marker = new Marker(element)
-      marker.setPosition rect
-      marker.setHint hint
-      markers.push(marker)
+
+  elements = []
+  for i in [0...set.snapshotLength] by 1
+    e = set.snapshotItem(i)
+    if rect = getElementRect e
+      elements.push [e, rect]
+
+  elements.sort ([e1, r1], [e2, r2]) ->
+    if r1.area > r2.area
+      return -1
+    else if r1.area < r2.area
+      return 1
+    else
+      return 0
+
+  for [element, rect] in elements
+    console.log element.text, rect.height * rect.width, rect.area
+    hint = indexToHint(j++, hintChars)
+    marker = new Marker(element)
+    marker.setPosition rect
+    marker.setHint hint
+    markers.push(marker)
 
   return markers
 
@@ -188,9 +202,10 @@ getElementRect = (element) ->
   clientLeft = docElem.clientLeft || body.clientLeft || 0;
   scrollTop  = window.pageYOffset || docElem.scrollTop;
   scrollLeft = window.pageXOffset || docElem.scrollLeft;
-
+  
+  clientRect = element.getBoundingClientRect()
   rects = [rect for rect in element.getClientRects()]
-  rects.push element.getBoundingClientRect()
+  rects.push clientRect 
 
   for rect in rects
     if isRectOk rect, window
@@ -199,6 +214,7 @@ getElementRect = (element) ->
         left:   rect.left + scrollLeft - clientLeft
         width:  rect.width
         height: rect.height
+        area: clientRect.width * clientRect.height
       }
 
   # If the element has 0 dimentions then check what's inside.
