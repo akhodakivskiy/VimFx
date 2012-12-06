@@ -11,7 +11,7 @@ PREFS =
   disabled:     false
   scroll_step:  60
   scroll_time:  100
-  black_list:   ''
+  black_list:   '*mail.google.com*'
 
 # Get Firefox preference value of type specified in `PREFS`
 getFFPref = do ->
