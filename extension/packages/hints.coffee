@@ -16,7 +16,7 @@ createHintsContainer = (document) ->
 injectHints = (document) ->
   removeHints document
 
-  if document instanceof HTMLDocument
+  if document instanceof HTMLDocument and document.documentElement
     markers = Marker.createMarkers document
 
     container = createHintsContainer document
@@ -27,13 +27,13 @@ injectHints = (document) ->
 
     container.appendChild fragment
 
-    document.body.appendChild container
+    document.documentElement.appendChild container
 
     return markers
 
 removeHints = (document, markers) ->
   if container = getHintsContainer document
-    document.body.removeChild container 
+    document.documentElement.removeChild container 
 
 handleHintChar = (markers, char) ->
 
