@@ -1,6 +1,6 @@
 { classes: Cc, interfaces: Ci } = Components
 
-PREF_BRANCH = "extension.VimFx.";
+PREF_BRANCH = "extensions.VimFx.";
 
 # Default values for the preference
 # All used preferences should be mentioned here becuase 
@@ -72,6 +72,28 @@ getPref = (key) -> return PREFS[key]
 # Set preference value
 setPref = (key, value) -> setFFPref key, value
 
+# Transfer all setting values from one branch to another
+transferPrefs = (from, to) ->
+  fromBranch = Services.prefs.getBranch from
+  toBranch = Services.prefs.getBranch to
+
+  count = {}
+  vals = fromBranch.getChildList("", count)
+
+  for i in [0...count.value]
+    name = vals[i]
+    switch fromBranch.getPrefType name
+      when fromBranch.PREF_STRING 
+        toBranch.setCharPref name, fromBranch.getCharPref name
+      when fromBranch.PREF_INT 
+        toBranch.setIntPref name, fromBranch.getIntPref name
+      when fromBranch.PREF_BOOL 
+        toBranch.setBoolPref name, fromBranch.getBoolPref name
+
+  fromBranch.deleteBranch("")
+
+
 exports.getPref             = getPref
 exports.setPref             = setPref
 exports.installPrefObserver = installPrefObserver
+exports.transferPrefs       = transferPrefs

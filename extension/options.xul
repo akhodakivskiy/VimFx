@@ -3,13 +3,13 @@
 <!DOCTYPE mydialog SYSTEM "chrome://vimfx/locale/options.dtd">
 
 <vbox xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
-    <setting pref="extension.VimFx.hint_chars" type="string" 
+    <setting pref="extensions.VimFx.hint_chars" type="string" 
         title="&pref.hint_chars.title;" desc="&pref.hint_chars.desc;" />
-    <setting pref="extension.VimFx.black_list" type="string" 
+    <setting pref="extensions.VimFx.black_list" type="string" 
         title="&pref.black_list.title;" desc="&pref.black_list.desc;" />
-    <setting pref="extension.VimFx.scroll_step" type="integer" 
+    <setting pref="extensions.VimFx.scroll_step" type="integer" 
         title="&pref.scroll_step.title;" desc="&pref.scroll_step.desc;" />
-    <setting pref="extension.VimFx.scroll_time" type="menulist" title="&pref.scroll_time.title;">
+    <setting pref="extensions.VimFx.scroll_time" type="menulist" title="&pref.scroll_time.title;">
         <menulist>
             <menupopup>
                 <menuitem value="0"     label="&pref.smooth_time.disabled;"/>

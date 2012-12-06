@@ -54,18 +54,21 @@ do (global = this) ->
   { loadCss }             = require 'utils'
   { addEventListeners }   = require 'events'
   { getPref
-  , installPrefObserver } = require 'prefs'
+  , installPrefObserver 
+  , transferPrefs }       = require 'prefs'
   { setButtonInstallPosition
   , addToolbarButton }    = require 'button'
 
   # Firefox will call this method on startup/enabling
   global.startup = (data, reason) ->
 
-
-    if reason = ADDON_INSTALL
+    if reason == ADDON_INSTALL
       # Position the toolbar button right before the default Bookmarks button
       # If Bookmarks button is hidden - then VimFx button will be appended to the toolbar
       setButtonInstallPosition 'nav-bar', 'bookmarks-menu-button-container'
+    else if reason == ADDON_UPGRADE 
+      if data["version"] > "0.3.3"
+        transferPrefs "extension.VimFx.", "extensions.VimFx."
 
     loadCss 'style'
     watchWindows addEventListeners, 'navigator:browser'
