@@ -10,7 +10,7 @@ showHelp = (document, commandsHelp) ->
     div.id = CONTAINER_ID 
     div.className = 'VimFxReset'
 
-    div.innerHTML = helpDialogHtml(commandsHelp)
+    div.appendChild parseHTML(document, helpDialogHtml(commandsHelp))
 
     body.appendChild div
 
@@ -20,6 +20,11 @@ showHelp = (document, commandsHelp) ->
         event.preventDefault()
         hideHelp(document)
       button.addEventListener 'click', clickHandler, false
+
+parseHTML = (doc, html) ->
+  parser = Cc["@mozilla.org/parserutils;1"].getService(Ci.nsIParserUtils)
+  flags = parser.SanitizerAllowStyle
+  return parser.parseFragment(html, flags, false, null, doc.documentElement)
 
 hideHelp = (document) ->
   if div = document.getElementById CONTAINER_ID
