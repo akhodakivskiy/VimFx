@@ -1,16 +1,11 @@
 { classes: Cc, interfaces: Ci, utils: Cu } = Components
 
 utils = require 'utils'
+hints = require 'hints'
+help  = require 'help'
+find  = require 'find'
+
 { getPref } = require 'prefs'
-
-{ handleHintChar
-, injectHints
-, removeHints
-} = require 'hints'
-
-{ showHelp
-, hideHelp
-} = require 'help'
 
 # Navigate to the address that is currently stored in the system clipboard
 command_p = (vim) -> 
@@ -34,14 +29,14 @@ command_t = (vim) ->
 
 # Copy current URL to the clipboard
 command_yf = (vim) ->
-  vim.markers = injectHints vim.window.document
-  if vim.markers.length > 0
+  markers = hints.injectHints vim.window.document
+  if markers.length > 0
     # This callback will be called with the selected marker as argument
-    vim.cb = (marker) ->
+    cb = (marker) ->
       if url = marker.element.href
         utils.writeToClipboard vim.window, url
 
-    vim.enterHintsMode()
+    vim.enterHintsMode(markers, cb)
 
 # Copy current URL to the clipboard
 command_yy = (vim) ->
@@ -108,11 +103,13 @@ command_u = (vim) ->
   
 # Scroll down full a page
 command_cf = (vim) ->
-  vim.window.scrollByPages(1)
+  step = (vim.window.innerHeight - (getPref 'scroll_step'))
+  utils.smoothScroll vim.window, 0, step, getPref 'scroll_time'
 
 # Scroll up full a page
 command_cb = (vim) ->
-  vim.window.scrollByPages(-1)
+  step = - (vim.window.innerHeight - (getPref 'scroll_step'))
+  utils.smoothScroll vim.window, 0, step, getPref 'scroll_time'
 
 # Activate previous tab
 command_J_gT = (vim) ->
@@ -158,25 +155,25 @@ command_X = (vim) ->
 # Follow links with hint markers
 command_f = (vim) ->
   if document = vim.window.document
-    vim.markers = injectHints document
-    if vim.markers.length > 0
+    markers = hints.injectHints document
+    if markers.length > 0
       # This callback will be called with the selected marker as argument
-      vim.cb = (marker) ->
+      cb = (marker) ->
         marker.element.focus()
         utils.simulateClick marker.element
 
-      vim.enterHintsMode()
+      vim.enterHintsMode markers, cb
   
 # Follow links in a new Tab with hint markers
 command_F = (vim) ->
-  vim.markers = injectHints vim.window.document
-  if vim.markers.length > 0
+  markers = hints.injectHints vim.window.document
+  if markers.length > 0
     # This callback will be called with the selected marker as argument
-    vim.cb = (marker) ->
+    cb = (marker) ->
       marker.element.focus()
       utils.simulateClick marker.element, { metaKey: true, ctrlKey: true }
 
-    vim.enterHintsMode()
+    vim.enterHintsMode markers, cb
 
 # Move current tab to the left
 command_cJ = (vim) ->
@@ -199,7 +196,22 @@ command_cK = (vim) ->
 
 # Display the Help Dialog
 command_help = (vim) ->
-  showHelp vim.window.document, commandsHelp
+  help.injectHelp vim.window.document, commandsHelp
+
+# Switch into find mode
+command_find = (vim) ->
+  vim.enterFindMode()
+  vim.findStr = ""
+
+  find.injectFind vim.window.document
+
+# Search for the last pattern
+command_n = (vim) ->
+  find.find vim.window, vim.findStr, false
+  
+# Search for the last pattern backwards
+command_N = (vim) ->
+  find.find vim.window, vim.findStr, true
 
 # Close the Help dialog and cancel the pending hint marker action
 command_Esc = (vim) ->
@@ -210,10 +222,15 @@ command_Esc = (vim) ->
   if utils.isElementEditable activeElement
     activeElement.blur()
 
+  #Remove Find input
+  find.removeFind vim.window.document
+
   # Remove hints
-  removeHints vim.window.document
+  hints.removeHints vim.window.document
+
   # Hide help dialog
-  hideHelp vim.window.document
+  help.removeHelp vim.window.document
+
   # Finally enter normal mode
   vim.enterNormalMode()
 
@@ -234,21 +251,18 @@ commandGroups =
     'k|c-y':    [ command_k_cy,   _('help_command_k_cy') ]
     'h':        [ command_h,      _('help_command_h') ]
     'l':        [ command_l ,     _('help_command_l') ]
-
-    # Can't use c-u/c-d because it's generally used for viewing sources
+    # Can't use c-u/c-d because it's widely used for viewing sources
     'd':        [ command_d,      _('help_command_d') ]
     'u':        [ command_u,      _('help_command_u') ]
-
-    # Can't use c-f because it's generally used for viewing sources
-    #'c-f':      [ command_cf,     _('help_command_cf') ]
-    #'c-b':      [ command_cb,     _('help_command_cb') ]
+    'c-f':      [ command_cf,     _('help_command_cf') ]
+    'c-b':      [ command_cb,     _('help_command_cb') ]
   'tabs':
     't':        [ command_t,      _('help_command_t') ]
     'J|g,T':    [ command_J_gT,   _('help_command_J_gT') ]
     'K|g,t':    [ command_K_gt,   _('help_command_K_gt') ]
     'c-J':      [ command_cJ,     _('help_command_cJ') ]
     'c-K':      [ command_cK,     _('help_command_cK') ]
-    'g,H|g,0':  [ command_gH_g0,  _('help_command_gH_g0') ]
+    "g,H|g,\^": [ command_gH_g0,  _('help_command_gH_g0') ]
     'g,L|g,$':  [ command_gL_g$,  _('help_command_gL_g$') ]
     'x':        [ command_x,      _('help_command_x') ]
     'X':        [ command_X,      _('help_command_X') ]
@@ -258,6 +272,9 @@ commandGroups =
     'H':        [ command_H,      _('help_command_H') ]
     'L':        [ command_L,      _('help_command_L') ]
   'misc': 
+    '/':        [ command_find,   _('help_command_find') ]
+    'n':        [ command_n,      _('help_command_n') ]
+    'N':        [ command_N,      _('help_command_N') ]
     # `>` is added to help command mapping to hack around russian keyboard layout
     # See key-utils.coffee for more info
     '?|>':      [ command_help,   _('help_command_help') ]
@@ -275,32 +292,71 @@ commands = do (commandGroups) ->
 
 # Extract the help text from the commands preserving groups formation
 commandsHelp = do (commandGroups) ->
-  help = {}
+  helpStrings = {}
   for group, commandsList of commandGroups
     helpGroup = {}
     for keys, command of commandsList
       key = keys.replace(/,/g, '').replace('|', ', ')
       helpGroup[key] = command[1]
 
-    help[group] = helpGroup
-  return help
+    helpStrings[group] = helpGroup
+  return helpStrings
 
 # Called in hints mode. Will process the char, update and hide/show markers 
-hintCharHandler = (vim, char) ->
-  # First count how many markers will match with the new character entered
-  preMatch = vim.markers.reduce ((v, marker) -> v + marker.willMatch char), 0
+hintCharHandler = (vim, keyStr, charCode) ->
+  if charCode > 0
+    key = if keyStr == 'Backspace' then keyStr else String.fromCharCode(charCode)
 
-  # If prematch is greater than 0, then proceed with matching, else ignore the new char
-  if preMatch > 0
-    for marker in vim.markers
-      marker.matchHintChar char
+    # Get char and escape it to avoid problems with String.search
+    key = utils.regexpEscape key 
 
-      if marker.isMatched()
-        vim.cb marker
-        removeHints vim.window.document
-        vim.enterNormalMode()
-        break
+    # First do a pre match - count how many markers will match with the new character entered
+    if vim.markers.reduce ((v, marker) -> v + marker.willMatch key), 0
+      for marker in vim.markers
+        marker.matchHintChar key
+
+        if marker.isMatched()
+          vim.cb marker
+          hints.removeHints vim.window.document
+          vim.enterNormalMode()
+          break
+
+# Called in find mode. Will process charCode, update find, or close the 
+findCharHandler = (vim, keyStr, charCode) ->
+  backwards = false
+
+  toNormalMode = ->
+    find.removeFind vim.window.document 
+    vim.enterNormalMode()
+
+  if keyStr.match(/.*Return/)
+    return toNormalMode()
+  else if keyStr == 'Backspace'
+    # Delete last available character from the query string 
+    if vim.findStr.length > 0
+      vim.findStr = vim.findStr.substr(0, vim.findStr.length - 1)
+    # Leave Find Mode the query string is already empty
+    else
+      return toNormalMode()
+  else if charCode > 0
+    vim.findStr += String.fromCharCode(charCode)
+  else
+    return
+
+  # Update the interface string
+  find.setFindStr vim.window.document, vim.findStr
+
+  # Clear selection to avoid jumping between matching search results
+  vim.window.getSelection().removeAllRanges()
+
+  # Search only if the query string isn't emply.
+  # Otherwise it will pop up Find dialog
+  if vim.findStr.length > 0
+    find.find vim.window, vim.findStr, backwards
+
+
 
 exports.hintCharHandler = hintCharHandler
+exports.findCharHandler = findCharHandler
 exports.commands        = commands
 exports.commandsHelp    = commandsHelp

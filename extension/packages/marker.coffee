@@ -77,14 +77,14 @@ class Marker
   matchHintChar: (char) ->
     # Handle backspace key by removing a previously entered hint char 
     # and resetting its class
-    if char == 'backspace' 
+    if char == 'Backspace' 
       if @enteredHintChars.length > 0
         @enteredHintChars = @enteredHintChars.slice(0, -1)
         @markerElement.children[@enteredHintChars.length]?.className = 'VimFxReset'
     # Otherwise append hint char and change hint class
     else 
       @markerElement.children[@enteredHintChars.length]?.className = 'VimFxReset VimFxCharMatch'
-      @enteredHintChars += char
+      @enteredHintChars += char.toLowerCase()
 
     # If entered hint chars no longer partially match the hint chars 
     # then hide the marker. Othersie show it back
@@ -92,7 +92,7 @@ class Marker
 
   # Checks if the marker will be matched if the next character entered is `char`
   willMatch: (char) ->
-    char == 'backspace' or @hintChars.search(@enteredHintChars + char) == 0
+    char == 'Backspace' or @hintChars.search(@enteredHintChars + char.toLowerCase()) == 0
 
   # Checks if enterd hint chars completely match the hint chars
   isMatched: ->
@@ -108,7 +108,6 @@ Marker.createMarkers = (document) ->
 
   set = getMarkableElements(document)
   markers = [];
-  j = 0
 
   elements = []
   for i in [0...set.snapshotLength] by 1
@@ -117,16 +116,18 @@ Marker.createMarkers = (document) ->
       elements.push [e, rect]
 
   elements.sort ([e1, r1], [e2, r2]) ->
-    if r1.area > r2.area
+    if r1.area < r2.area
       return -1
-    else if r1.area < r2.area
+    else if r1.area > r2.area
       return 1
     else
       return 0
 
+  # start from the end because the list is sorted in ascending order
+  j = elements.length 
   for [element, rect] in elements
-    console.log element.text, rect.height * rect.width, rect.area
-    hint = indexToHint(j++, hintChars)
+    # Get a hint for an element
+    hint = indexToHint(--j, hintChars)
     marker = new Marker(element)
     marker.setPosition rect
     marker.setHint hint
