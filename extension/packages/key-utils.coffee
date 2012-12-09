@@ -19,11 +19,11 @@ keyCharFromCode = (keyCode, shiftKey=false) ->
         return charWithShift
 
     options = [
-      [ KE.DOM_VK_RETURN,     undefined, 'Return',    undefined ],
-      [ KE.DOM_VK_ESCAPE,     undefined, 'Esc',       undefined ],
-      [ KE.DOM_VK_BACK_SPACE, undefined, 'Backspace', undefined ],
-      [ KE.DOM_VK_SPACE,      undefined, 'Space',     undefined ],
-      [ KE.DOM_VK_TAB,        undefined, 'Tab',       undefined ],
+      [ KE.DOM_VK_ESCAPE,         KE.DOM_VK_ESCAPE,     'Esc',       'Shift-Esc'        ],
+      [ KE.DOM_VK_BACK_SPACE,     KE.DOM_VK_BACK_SPACE, 'Backspace', 'Shift-Backspace'  ],
+      [ KE.DOM_VK_SPACE,          KE.DOM_VK_SPACE,      'Space',     'Shift-Space'      ],
+      [ KE.DOM_VK_TAB,            KE.DOM_VK_TAB,        'Tab',       'Shift-Tab'        ],
+      [ KE.DOM_VK_RETURN,         KE.DOM_VK_RETURN,     'Return',    'Shift-Return'     ],
 
       [ KE.DOM_VK_1,              KE.DOM_VK_EXCLAMATION,          '1',  '!' ],
       [ KE.DOM_VK_2,              KE.DOM_VK_AT,                   '2',  '@' ],

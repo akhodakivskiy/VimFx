@@ -204,6 +204,13 @@ smoothScroll = (window, dx, dy, msecs) ->
       l -= 1
       window.setTimeout fn, l * delta, x, y
 
+parseHTML = (document, html) ->
+  parser = Cc["@mozilla.org/parserutils;1"].getService(Ci.nsIParserUtils)
+  flags = parser.SanitizerAllowStyle
+  return parser.parseFragment(html, flags, false, null, document.documentElement)
+
+regexpEscape = (s) -> return s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')
+
 exports.Bucket                  = Bucket
 exports.getCurrentTabWindow     = getCurrentTabWindow
 exports.getEventWindow          = getEventWindow
@@ -224,3 +231,5 @@ exports.writeToClipboard        = writeToClipboard
 exports.timeIt                  = timeIt
 exports.isBlacklisted           = isBlacklisted
 exports.getVersion              = getVersion
+exports.parseHTML               = parseHTML
+exports.regexpEscape            = regexpEscape 

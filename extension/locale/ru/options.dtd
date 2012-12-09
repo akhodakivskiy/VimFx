@@ -8,6 +8,9 @@
 <!ENTITY pref.scroll_step.title     "Шаг прокрутки страницы">
 <!ENTITY pref.scroll_step.desc      "По умолчанию: 60">
 
+<!ENTITY pref.blur_on_esc.title      "Esc - Убрать фокус">
+<!ENTITY pref.blur_on_esc.desc       "Убрать фокус из текущего поля ввода (напр. адресно строки) при нажатии Esc">
+
 <!ENTITY pref.scroll_time.title     "Плавная прокрутка">
 <!ENTITY pref.smooth_time.disabled  "Отключена">
 <!ENTITY pref.smooth_time.fast      "Быстрая">

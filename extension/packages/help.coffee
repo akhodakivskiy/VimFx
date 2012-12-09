@@ -2,28 +2,28 @@ utils             = require 'utils'
 
 CONTAINER_ID = 'VimFxHelpDialogContainer'
 
-showHelp = (document, commandsHelp) ->
-  if body = document.body
+removeHelp = (document) ->
+  if div = document.getElementById CONTAINER_ID
+    div.parentNode.removeChild div
+
+injectHelp = (document, commandsHelp) ->
+  if document.documentElement
     if div = document.getElementById CONTAINER_ID
       div.parentNode.removeChild div
     div = document.createElement 'div'
     div.id = CONTAINER_ID 
     div.className = 'VimFxReset'
 
-    div.innerHTML = helpDialogHtml(commandsHelp)
+    div.appendChild utils.parseHTML document, helpDialogHtml(commandsHelp)
 
-    body.appendChild div
+    document.documentElement.appendChild div
 
     if button = document.getElementById('VimFxClose')
       clickHandler = (event) ->
         event.stopPropagation()
         event.preventDefault()
-        hideHelp(document)
+        removeHelp(document)
       button.addEventListener 'click', clickHandler, false
-
-hideHelp = (document) ->
-  if div = document.getElementById CONTAINER_ID
-    div.parentNode.removeChild div
 
 td = (text, klass='') ->
   """<td class="VimFxReset #{ klass }">#{ text }</td>"""
@@ -92,5 +92,5 @@ helpDialogHtml = (help) ->
 
 """
 
-exports.showHelp = showHelp
-exports.hideHelp = hideHelp
+exports.injectHelp = injectHelp
+exports.removeHelp = removeHelp

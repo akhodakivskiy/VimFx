@@ -77,14 +77,14 @@ class Marker
   matchHintChar: (char) ->
     # Handle backspace key by removing a previously entered hint char 
     # and resetting its class
-    if char == 'backspace' 
+    if char == 'Backspace' 
       if @enteredHintChars.length > 0
         @enteredHintChars = @enteredHintChars.slice(0, -1)
         @markerElement.children[@enteredHintChars.length]?.className = 'VimFxReset'
     # Otherwise append hint char and change hint class
     else 
       @markerElement.children[@enteredHintChars.length]?.className = 'VimFxReset VimFxCharMatch'
-      @enteredHintChars += char
+      @enteredHintChars += char.toLowerCase()
 
     # If entered hint chars no longer partially match the hint chars 
     # then hide the marker. Othersie show it back
@@ -92,7 +92,7 @@ class Marker
 
   # Checks if the marker will be matched if the next character entered is `char`
   willMatch: (char) ->
-    char == 'backspace' or @hintChars.search(@enteredHintChars + char) == 0
+    char == 'Backspace' or @hintChars.search(@enteredHintChars + char.toLowerCase()) == 0
 
   # Checks if enterd hint chars completely match the hint chars
   isMatched: ->
@@ -106,17 +106,32 @@ class Marker
 Marker.createMarkers = (document) ->
   hintChars = getPref('hint_chars').toLowerCase()
 
-  elementsSet = getMarkableElements(document)
+  set = getMarkableElements(document)
   markers = [];
-  j = 0
-  for i in [0...elementsSet.snapshotLength] by 1
-    element = elementsSet.snapshotItem(i)
-    if rect = getElementRect element
-      hint = indexToHint(j++, hintChars)
-      marker = new Marker(element)
-      marker.setPosition rect
-      marker.setHint hint
-      markers.push(marker)
+
+  elements = []
+  for i in [0...set.snapshotLength] by 1
+    e = set.snapshotItem(i)
+    if rect = getElementRect e
+      elements.push [e, rect]
+
+  elements.sort ([e1, r1], [e2, r2]) ->
+    if r1.area < r2.area
+      return -1
+    else if r1.area > r2.area
+      return 1
+    else
+      return 0
+
+  # start from the end because the list is sorted in ascending order
+  j = elements.length 
+  for [element, rect] in elements
+    # Get a hint for an element
+    hint = indexToHint(--j, hintChars)
+    marker = new Marker(element)
+    marker.setPosition rect
+    marker.setHint hint
+    markers.push(marker)
 
   return markers
 
@@ -188,9 +203,10 @@ getElementRect = (element) ->
   clientLeft = docElem.clientLeft || body.clientLeft || 0;
   scrollTop  = window.pageYOffset || docElem.scrollTop;
   scrollLeft = window.pageXOffset || docElem.scrollLeft;
-
+  
+  clientRect = element.getBoundingClientRect()
   rects = [rect for rect in element.getClientRects()]
-  rects.push element.getBoundingClientRect()
+  rects.push clientRect 
 
   for rect in rects
     if isRectOk rect, window
@@ -199,6 +215,7 @@ getElementRect = (element) ->
         left:   rect.left + scrollLeft - clientLeft
         width:  rect.width
         height: rect.height
+        area: clientRect.width * clientRect.height
       }
 
   # If the element has 0 dimentions then check what's inside.

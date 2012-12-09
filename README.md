@@ -2,6 +2,8 @@
 
 *Extension AMO page*: https://addons.mozilla.org/en-US/firefox/addon/vimfx/
 
+*Contribute your localization! See `locale` folder*
+
 [VimFx](https://addons.mozilla.org/en-US/firefox/addon/vimfx/) 
 is a [Mozilla Firefox](https://www.mozilla.org/en-US/firefox/fx/#desktop) 
 extension which introduces Vim-style keyboard shortcuts for browsing and navigation, 
@@ -47,6 +49,8 @@ Global shortcut to enable/disable VimFx: `Shift-Alt-v`
     yy      Copy current page link to the clipboard
     r       Reload current page
     R       Reload current page and all the assets (js, css, etc.)
+    ar      Reload pages in all tabs
+    aR      Reload pages in all tabs including assets (js, css, img)
 
 ### Navigating
 
@@ -58,6 +62,8 @@ Global shortcut to enable/disable VimFx: `Shift-Alt-v`
     l       Scroll Right
     d       Scroll half a Page Down
     u       Scroll half a Page Up
+    c-f     Scroll full Page Down
+    c-b     Scroll full Page Up
 
 ### Tabs
 
@@ -80,6 +86,9 @@ Global shortcut to enable/disable VimFx: `Shift-Alt-v`
 
 ### Misc
 
+    /       Enter Find mode
+    n       Go ot the next Find match
+    N       Go ot the previous Find match
     ?       Show Help Dialog
     Esc     Close this dialog and cancel hint markers
 
@@ -98,8 +107,8 @@ Global shortcut to enable/disable VimFx: `Shift-Alt-v`
 - document.designMode='on' is now honored. Will also provide hint markers for iframes on the page.
 - Bug fixed where it would completely reset the toolbar while installing the toolbar button.
 - Bug fixed where it's not possible to change the text in the blaclisting textbox
-- Changed u/d to scroll half a page, added ^f/^b to scroll full page
-- Added tab movement commands: ^J and ^K.
+- Changed u/d to scroll half a page, added c-f/c-b to scroll full page
+- Added tab movement commands: c-J and c-K.
 - Invisible markers bug fixed.
 - Global hotkey to disable the commands (equal to the toolbar button click): Alt-Shift V
 - ^u and ^d are removed from the command list. ^u is commonly used to show the page source code
@@ -118,3 +127,13 @@ Global shortcut to enable/disable VimFx: `Shift-Alt-v`
 0.3.2, 0.3.2, 0.3.3 (20-21 Nov 2012)
 
 - Hotfixes for the build script to include localization related files and folders
+
+0.4 (9 Dec 2012)
+
+- Implemented find with `/` and `n/N`
+- Added `ar` and `aR` commands to reload pages in all open tabs.
+- Added a preference that enables bluring from any element that has input focus in the browser on Esc keydown (on by default)
+- Fixed bug where markers and help dialog would blow up some of the pages.
+- Marker hints are now sorted with respect to the underlying element area. Elements with larger area get shorter hints
+- Added *mail.google.com* to the default black list
+- Various bug fixed and improvements.

@@ -1,6 +1,6 @@
 "use strict"
 
-{ utils: Cu } = Components
+{ utils: Cu, classes: Cc, interfaces: Ci } = Components
 
 Cu.import "resource://gre/modules/Services.jsm"
 Cu.import "resource://gre/modules/AddonManager.jsm"
@@ -10,13 +10,14 @@ do (global = this) ->
   baseURI = Services.io.newURI __SCRIPT_URI_SPEC__, null, null
   getResourceURI = (path) -> Services.io.newURI path, null, baseURI
 
+  loader = Cc["@mozilla.org/moz/jssubscript-loader;1"].getService(Ci.mozIJSSubScriptLoader); 
+
   include = (src, scope = {}) ->
     try
-      uri = getResourceURI "packages/#{ src }.js"
-      Services.scriptloader.loadSubScript uri.spec, scope
-    catch error
       uri = getResourceURI src
-      Services.scriptloader.loadSubScript uri.spec, scope
+      loader.loadSubScript uri.spec, scope
+    catch error
+      dump "Failed to load #{ src }: #{ error }\n"
 
     return scope
   
@@ -31,7 +32,7 @@ do (global = this) ->
         include: include
         exports: {}
 
-      include src, scope
+      include "packages/#{ src }.js", scope
 
       return modules[src] = scope.exports;
 
@@ -44,32 +45,35 @@ do (global = this) ->
     'chrome',
     'console',
     'unload', 
-    'window-utils',
   ]
 
   # Init localization `underscore` method
-  { l10n }                = require 'l10n'
-  global._ = l10n "vimfx.properties"
+  global._ = require('l10n').l10n "vimfx.properties"
 
+  # Requires for startup/install
   { loadCss }             = require 'utils'
   { addEventListeners }   = require 'events'
   { getPref
-  , installPrefObserver } = require 'prefs'
+  , installPrefObserver 
+  , transferPrefs }       = require 'prefs'
   { setButtonInstallPosition
   , addToolbarButton }    = require 'button'
+  wu                      = require 'window-utils'
 
   # Firefox will call this method on startup/enabling
   global.startup = (data, reason) ->
 
-
-    if reason = ADDON_INSTALL
+    if reason == ADDON_INSTALL
       # Position the toolbar button right before the default Bookmarks button
       # If Bookmarks button is hidden - then VimFx button will be appended to the toolbar
       setButtonInstallPosition 'nav-bar', 'bookmarks-menu-button-container'
+    else if reason == ADDON_UPGRADE 
+      if data["version"] > "0.3.3"
+        transferPrefs "extension.VimFx.", "extensions.VimFx."
 
     loadCss 'style'
-    watchWindows addEventListeners, 'navigator:browser'
-    watchWindows addToolbarButton, 'navigator:browser'
+    wu.watchWindows addEventListeners, 'navigator:browser'
+    wu.watchWindows addToolbarButton, 'navigator:browser'
     installPrefObserver()
 
   # Firefox will call this method on shutdown/disabling
@@ -77,3 +81,8 @@ do (global = this) ->
     # Don't bother to clean up if the browser is shutting down
     if reason != APP_SHUTDOWN
       unload()
+
+  global.install = (data, reason) ->
+
+  global.uninstall = (data, reason) ->
+

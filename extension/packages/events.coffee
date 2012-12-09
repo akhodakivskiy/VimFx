@@ -3,7 +3,7 @@ keyUtils                        = require 'key-utils'
 { getCommand }                  = require 'commands'
 { Vim }                         = require 'vim'
 { getPref }                     = require 'prefs'
-{ setWindowBlacklisted } = require 'button'
+{ setWindowBlacklisted }        = require 'button'
 
 { interfaces: Ci } = Components
 
@@ -43,10 +43,9 @@ windowsListener =
             if vim.blacklisted
               return
 
-            # Push new keyStr on the stack and we don't really want to 
-            # suppress the Esc key, but we want to handle it
-            if vim.pushKey(keyStr) and keyStr != 'Esc'
-              suppressEvent event
+            if vim.handleKeyDown(event, keyStr)
+              if keyStr != 'Esc'
+                suppressEvent event
     catch err
       console.log err, 'keydown'
 
@@ -62,8 +61,18 @@ windowsListener =
           # No action on blacklisted locations
           if vim.blacklisted
             return
-          else if vim.execKeys()
+          
+          # Blur from any active element on Esc. Calling before `handleKeyPress` 
+          # because `vim.keys` will be reset afterwards`
+          blur_on_esc = vim.keys[vim.keys.length - 1] == 'Esc' and getPref 'blur_on_esc'
+
+          if vim.handleKeyPress event
             suppressEvent event
+
+          # Calling after the command has been executed
+          if blur_on_esc
+            event.originalTarget?.ownerDocument?.activeElement?.blur()
+
     catch err
       console.log err, 'keypress'
 

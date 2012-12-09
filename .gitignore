@@ -3,4 +3,5 @@ developer
 node_modules
 *.js
 .DS_Store
+builds
 *.xpi

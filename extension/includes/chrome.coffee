@@ -1,3 +1,4 @@
-{ classes: Cc
-, interfaces: Ci
-, utils: Cu } = Components
+{ utils: Cu
+, classes: Cc
+, interfaces: Ci 
+} = Components
