@@ -12,6 +12,7 @@ PREFS =
   scroll_step:  60
   scroll_time:  100
   black_list:   '*mail.google.com*'
+  blur_on_esc:  true
 
 # Get Firefox preference value of type specified in `PREFS`
 getFFPref = do ->

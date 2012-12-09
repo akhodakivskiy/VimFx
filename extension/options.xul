@@ -7,6 +7,8 @@
         title="&pref.hint_chars.title;" desc="&pref.hint_chars.desc;" />
     <setting pref="extensions.VimFx.black_list" type="string" 
         title="&pref.black_list.title;" desc="&pref.black_list.desc;" />
+    <setting pref="extensions.VimFx.blur_on_esc" type="bool" 
+        title="&pref.blur_on_esc.title;" desc="&pref.blur_on_esc.desc;" />
     <setting pref="extensions.VimFx.scroll_step" type="integer" 
         title="&pref.scroll_step.title;" desc="&pref.scroll_step.desc;" />
     <setting pref="extensions.VimFx.scroll_time" type="menulist" title="&pref.scroll_time.title;">

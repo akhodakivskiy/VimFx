@@ -6,7 +6,10 @@
 Wildcards allowed: *, !">
 
 <!ENTITY pref.scroll_step.title     "Scroll Step">
-<!ENTITY pref.scroll_step.desc      "Default: 60">
+<!ENTITY pref.scroll_step.desc      "Scroll Step">
+
+<!ENTITY pref.blur_on_esc.title      "Blur on Esc">
+<!ENTITY pref.blur_on_esc.desc       "Blur input focus from any active input element in the browser (e.g. address bar)">
 
 <!ENTITY pref.scroll_time.title     "Smooth Scroll">
 <!ENTITY pref.smooth_time.disabled  "Disable">
