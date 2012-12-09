@@ -2,11 +2,11 @@ utils             = require 'utils'
 
 CONTAINER_ID = 'VimFxHelpDialogContainer'
 
-hideHelp = (document) ->
+removeHelp = (document) ->
   if div = document.getElementById CONTAINER_ID
     div.parentNode.removeChild div
 
-showHelp = (document, commandsHelp) ->
+injectHelp = (document, commandsHelp) ->
   if document.documentElement
     if div = document.getElementById CONTAINER_ID
       div.parentNode.removeChild div
@@ -14,7 +14,7 @@ showHelp = (document, commandsHelp) ->
     div.id = CONTAINER_ID 
     div.className = 'VimFxReset'
 
-    div.appendChild parseHTML(document, helpDialogHtml(commandsHelp))
+    div.appendChild utils.parseHTML document, helpDialogHtml(commandsHelp)
 
     document.documentElement.appendChild div
 
@@ -22,13 +22,8 @@ showHelp = (document, commandsHelp) ->
       clickHandler = (event) ->
         event.stopPropagation()
         event.preventDefault()
-        hideHelp(document)
+        removeHelp(document)
       button.addEventListener 'click', clickHandler, false
-
-parseHTML = (doc, html) ->
-  parser = Cc["@mozilla.org/parserutils;1"].getService(Ci.nsIParserUtils)
-  flags = parser.SanitizerAllowStyle
-  return parser.parseFragment(html, flags, false, null, doc.documentElement)
 
 td = (text, klass='') ->
   """<td class="VimFxReset #{ klass }">#{ text }</td>"""
@@ -97,5 +92,5 @@ helpDialogHtml = (help) ->
 
 """
 
-exports.showHelp = showHelp
-exports.hideHelp = hideHelp
+exports.injectHelp = injectHelp
+exports.removeHelp = removeHelp

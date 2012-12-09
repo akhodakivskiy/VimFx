@@ -43,10 +43,9 @@ windowsListener =
             if vim.blacklisted
               return
 
-            # Push new keyStr on the stack and we don't really want to 
-            # suppress the Esc key, but we want to handle it
-            if vim.pushKey(keyStr) and keyStr != 'Esc'
-              suppressEvent event
+            if vim.handleKeyDown(event, keyStr)
+              if keyStr != 'Esc'
+                suppressEvent event
     catch err
       console.log err, 'keydown'
 
@@ -62,7 +61,8 @@ windowsListener =
           # No action on blacklisted locations
           if vim.blacklisted
             return
-          else if vim.execKeys()
+
+          if vim.handleKeyPress event
             suppressEvent event
     catch err
       console.log err, 'keypress'

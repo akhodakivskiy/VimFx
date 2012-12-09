@@ -110,6 +110,18 @@ simulateClick = (element, modifiers) ->
     # but Webkit will. Dispatching a click on an input box does not seem to focus it; we do that separately
     element.dispatchEvent(mouseEvent)
 
+focusSelection = (document) ->
+  selection = document.getSelection()
+  console.expand selection
+  for i in [0...selection.rangeCount]
+    console.log "range count", selection.rangeCount, i, selection.getRangeAt(i).startContainer
+    if element = selection.getRangeAt(i).startContainer?.parentElement
+      if isElementEditable element
+        range.startContainer.focus()
+        return true
+
+  return false
+
 # Write a string into system clipboard
 writeToClipboard = (window, text) ->
   str = Cc["@mozilla.org/supports-string;1"].createInstance(Ci.nsISupportsString);
@@ -204,6 +216,13 @@ smoothScroll = (window, dx, dy, msecs) ->
       l -= 1
       window.setTimeout fn, l * delta, x, y
 
+parseHTML = (document, html) ->
+  parser = Cc["@mozilla.org/parserutils;1"].getService(Ci.nsIParserUtils)
+  flags = parser.SanitizerAllowStyle
+  return parser.parseFragment(html, flags, false, null, document.documentElement)
+
+regexpEscape = (s) -> return s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')
+
 exports.Bucket                  = Bucket
 exports.getCurrentTabWindow     = getCurrentTabWindow
 exports.getEventWindow          = getEventWindow
@@ -213,6 +232,7 @@ exports.getEventTabBrowser      = getEventTabBrowser
 exports.getWindowId             = getWindowId
 exports.getRootWindow           = getRootWindow
 exports.isElementEditable       = isElementEditable
+exports.focusSelection          = focusSelection
 exports.getSessionStore         = getSessionStore
 
 exports.loadCss                 = loadCss
@@ -224,3 +244,5 @@ exports.writeToClipboard        = writeToClipboard
 exports.timeIt                  = timeIt
 exports.isBlacklisted           = isBlacklisted
 exports.getVersion              = getVersion
+exports.parseHTML               = parseHTML
+exports.regexpEscape            = regexpEscape 

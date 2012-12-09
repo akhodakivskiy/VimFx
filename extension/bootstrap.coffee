@@ -80,3 +80,8 @@ do (global = this) ->
     # Don't bother to clean up if the browser is shutting down
     if reason != APP_SHUTDOWN
       unload()
+
+  global.install = (data, reason) ->
+
+  global.uninstall = (data, reason) ->
+

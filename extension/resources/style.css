@@ -39,6 +39,22 @@
     float: clear !important;
 }
 
+/* Find */
+
+span#VimFxFindSpan {
+    position: fixed !important;
+    bottom: 0 !important;
+    right: 0 !important;
+    font-size: 13px !important;
+    min-width: 200px !important;
+    background-color: white !important;
+    border: solid 1px #bd6b00 !important;
+    border-radius: 3px !important;
+    padding: 2px 4px 2px 4px !important;
+}
+
+/* Markers */
+
 div.VimFxHintMarker {
     position: absolute !important;
     display: block !important;
