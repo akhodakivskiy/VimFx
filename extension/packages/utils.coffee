@@ -110,18 +110,6 @@ simulateClick = (element, modifiers) ->
     # but Webkit will. Dispatching a click on an input box does not seem to focus it; we do that separately
     element.dispatchEvent(mouseEvent)
 
-focusSelection = (document) ->
-  selection = document.getSelection()
-  console.expand selection
-  for i in [0...selection.rangeCount]
-    console.log "range count", selection.rangeCount, i, selection.getRangeAt(i).startContainer
-    if element = selection.getRangeAt(i).startContainer?.parentElement
-      if isElementEditable element
-        range.startContainer.focus()
-        return true
-
-  return false
-
 # Write a string into system clipboard
 writeToClipboard = (window, text) ->
   str = Cc["@mozilla.org/supports-string;1"].createInstance(Ci.nsISupportsString);
@@ -232,7 +220,6 @@ exports.getEventTabBrowser      = getEventTabBrowser
 exports.getWindowId             = getWindowId
 exports.getRootWindow           = getRootWindow
 exports.isElementEditable       = isElementEditable
-exports.focusSelection          = focusSelection
 exports.getSessionStore         = getSessionStore
 
 exports.loadCss                 = loadCss

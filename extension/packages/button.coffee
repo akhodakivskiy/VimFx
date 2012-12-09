@@ -149,9 +149,10 @@ createButton = (window) ->
     setPref('disabled', not getPref 'disabled')
     updateToolbarButton button
     
+    event.preventDefault()
     event.stopPropagation()
 
-  button.addEventListener 'command', onButtonCommand, false
+  button.addEventListener 'command', onButtonCommand, true
 
   menupopup = createMenupopup window
   button.appendChild menupopup
@@ -161,7 +162,7 @@ createButton = (window) ->
   vimkey.setAttribute "key", "V"
   vimkey.setAttribute "modifiers", "shift,alt"
   vimkey.setAttribute "oncommand", "void(0);"
-  vimkey.addEventListener "command", onButtonCommand, false
+  vimkey.addEventListener "command", onButtonCommand, true
 
   keyset = doc.createElement 'keyset'
   keyset.setAttribute 'id', KEYSET_ID
