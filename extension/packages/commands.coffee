@@ -305,10 +305,8 @@ commandsHelp = do (commandGroups) ->
 # Called in hints mode. Will process the char, update and hide/show markers 
 hintCharHandler = (vim, keyStr, charCode) ->
   if charCode > 0
-    key = if keyStr == 'Backspace' then keyStr else String.fromCharCode(charCode)
-
     # Get char and escape it to avoid problems with String.search
-    key = utils.regexpEscape key 
+    key = utils.regexpEscape keyStr
 
     # First do a pre match - count how many markers will match with the new character entered
     if vim.markers.reduce ((v, marker) -> v + marker.willMatch key), 0
