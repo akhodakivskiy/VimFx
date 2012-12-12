@@ -137,3 +137,8 @@ Global shortcut to enable/disable VimFx: `Shift-Alt-v`
 - Marker hints are now sorted with respect to the underlying element area. Elements with larger area get shorter hints
 - Added *mail.google.com* to the default black list
 - Various bug fixed and improvements.
+
+0.4.1 (13 Dec 2012)
+
+- Small tweaks of the find feature.
+- Bugfix for keyboard handling on non-english keyboard layouts
