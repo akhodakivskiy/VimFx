@@ -62,12 +62,15 @@ windowsListener =
           if vim.blacklisted
             return
           
+          lastKeyStr = vim.keys[vim.keys.length - 1]
+
           # Blur from any active element on Esc. Calling before `handleKeyPress` 
           # because `vim.keys` will be reset afterwards`
-          blur_on_esc = vim.keys[vim.keys.length - 1] == 'Esc' and getPref 'blur_on_esc'
+          blur_on_esc = lastKeyStr == 'Esc' and getPref 'blur_on_esc'
 
           if vim.handleKeyPress event
-            suppressEvent event
+            if lastKeyStr != 'Esc'
+              suppressEvent event
 
           # Calling after the command has been executed
           if blur_on_esc

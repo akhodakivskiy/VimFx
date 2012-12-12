@@ -63,16 +63,19 @@ class Vim
     if @mode == MODE_NORMAL or lastKeyStr == 'Esc'
       if command = findCommand @keys
         command @
-        @keys.length = 0
-        return lastKeyStr != 'Esc'
+        result = lastKeyStr != 'Esc'
     else if !keyboardEvent.ctrlKey and !keyboardEvent.metaKey
       @keys.length = 0
       if @mode == MODE_HINTS
         hintCharHandler @, lastKeyStr, keyboardEvent.charCode
-        return true
+        result = true
       else if @mode == MODE_FIND
         findCharHandler @, lastKeyStr, keyboardEvent.charCode
-        return true
+        result = true
+
+    if result then @keys.length = 0
+
+    return result
 
 findCommand = (keys) ->
   for i in [0...keys.length]

@@ -41,6 +41,9 @@
 
 /* Find */
 
+body.VimFxFindModeBody ::-moz-selection  { background-color: #2CD25E !important; }
+body.VimFxFindModeBody ::selection       { background-color: #2CD25E !important; }
+
 span#VimFxFindSpan {
     position: fixed !important;
     bottom: 0 !important;
@@ -48,7 +51,7 @@ span#VimFxFindSpan {
     font-size: 13px !important;
     min-width: 200px !important;
     background-color: white !important;
-    border: solid 1px #bd6b00 !important;
+    border: solid 2px #bd6b00 !important;
     border-radius: 3px !important;
     padding: 2px 4px 2px 4px !important;
 }
