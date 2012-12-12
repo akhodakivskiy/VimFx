@@ -16,11 +16,17 @@ removeFind = (document) ->
   if div = document.getElementById CONTAINER_ID
     document.documentElement.removeChild div
 
-setFindStr = (document, findStr) ->
-  document = document
+flashFind = (document, findStr) ->
+  window = document.defaultView
 
-  span = document.getElementById "VimFxFindSpan"
-  span.textContent = "/#{ findStr }"
+  injectFind document
+  setFindStr document, findStr
+
+  window.setTimeout (-> removeFind document), 1000
+
+setFindStr = (document, findStr) ->
+  if span = document.getElementById "VimFxFindSpan"
+    span.textContent = "/#{ findStr }"
 
 createFindContainer = (document) ->
   return utils.parseHTML document, """
@@ -47,6 +53,9 @@ find = (window, findStr, backwards=false) ->
 
   # Perform find only if query string isn't empty to avoid find dialog pop up
   if findStr.length > 0
+    # This will change the ::selection css rule
+    addClass window.document.body, "VimFxFindModeBody"
+
     # Wrap Around is broken... Therefore
     if not success = f()
       # If first search attemp has failed then 
@@ -54,10 +63,29 @@ find = (window, findStr, backwards=false) ->
       window.getSelection().removeAllRanges()
       success = f()
 
+    # For now let's rely on the fact that Fiefox doesn't update the selection
+    # if the css fule that governs it is chnaged
+    window.setTimeout (-> removeClass window.document.body, "VimFxFindModeBody"), 1000
+
   return success
+
+# Adds a class the the `element.className` trying to keep the whole class string
+# will formed (without extra spaces at the tails)
+addClass = (element, klass) ->
+  if element.className?.search klass == -1
+    if element.className 
+      element.className += " #{ klass }"
+    else
+      element.className = klass 
+
+# Remove a class from the `element.className`
+removeClass = (element, klass) ->
+  name = element.className.replace new RegExp("\\s*#{ klass }"), ""
+  element.className = name or null
 
 
 exports.injectFind = injectFind
 exports.removeFind = removeFind
+exports.flashFind  = flashFind
 exports.setFindStr = setFindStr
 exports.find       = find

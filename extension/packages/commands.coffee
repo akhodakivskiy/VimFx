@@ -207,11 +207,15 @@ command_find = (vim) ->
 
 # Search for the last pattern
 command_n = (vim) ->
-  find.find vim.window, vim.findStr, false
+  if vim.findStr.length > 0
+    if not find.find vim.window, vim.findStr, false
+      find.flashFind vim.window.document, "#{ vim.findStr } (Not Found)"
   
 # Search for the last pattern backwards
 command_N = (vim) ->
-  find.find vim.window, vim.findStr, true
+  if vim.findStr.length > 0
+    if not find.find vim.window, vim.findStr, true
+      find.flashFind vim.window.document, "#{ vim.findStr } (Not Found)"
 
 # Close the Help dialog and cancel the pending hint marker action
 command_Esc = (vim) ->
@@ -327,7 +331,7 @@ findCharHandler = (vim, keyStr, charCode) ->
     find.removeFind vim.window.document 
     vim.enterNormalMode()
 
-  if keyStr.match(/.*Return/)
+  if keyStr and keyStr.match(/.*Return/)
     return toNormalMode()
   else if keyStr == 'Backspace'
     # Delete last available character from the query string 
@@ -342,15 +346,16 @@ findCharHandler = (vim, keyStr, charCode) ->
     return
 
   # Update the interface string
-  find.setFindStr vim.window.document, vim.findStr
 
   # Clear selection to avoid jumping between matching search results
   vim.window.getSelection().removeAllRanges()
 
   # Search only if the query string isn't emply.
   # Otherwise it will pop up Find dialog
-  if vim.findStr.length > 0
-    find.find vim.window, vim.findStr, backwards
+  if find.find vim.window, vim.findStr, backwards
+    find.setFindStr vim.window.document, vim.findStr
+  else
+    find.setFindStr vim.window.document, "#{ vim.findStr } (Not Found)"
 
 
 
