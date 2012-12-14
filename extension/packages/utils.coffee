@@ -209,7 +209,7 @@ parseHTML = (document, html) ->
   flags = parser.SanitizerAllowStyle
   return parser.parseFragment(html, flags, false, null, document.documentElement)
 
-regexpEscape = (s) -> return s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')
+regexpEscape = (s) -> return s and s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')
 
 exports.Bucket                  = Bucket
 exports.getCurrentTabWindow     = getCurrentTabWindow

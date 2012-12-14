@@ -30,20 +30,6 @@ class Vim
     @mode = MODE_NORMAL
     @markers = @cb = undefined
 
-  pushKey: (keyStr, keyCode) ->
-    if _maybeCommand(@mode, @keys, keyStr, keyCode)
-      @keys.push keyStr
-      return true
-
-    return false
-
-  execKeys: (charCode) ->
-    if command = _getCommand @mode, @keys, charCode
-      lastKey = @keys[@keys.length - 1]
-      command @
-      @keys = []
-      return lastKey != 'Esc' 
-
   handleKeyDown: (keyboardEvent, keyStr) ->
     if @mode == MODE_NORMAL || keyStr == 'Esc'
       result = maybeCommand @keys.concat([keyStr])
@@ -63,7 +49,8 @@ class Vim
     if @mode == MODE_NORMAL or lastKeyStr == 'Esc'
       if command = findCommand @keys
         command @
-        result = lastKeyStr != 'Esc'
+        @keys.length = 0
+        result = true
     else if !keyboardEvent.ctrlKey and !keyboardEvent.metaKey
       @keys.length = 0
       if @mode == MODE_HINTS
@@ -72,8 +59,6 @@ class Vim
       else if @mode == MODE_FIND
         findCharHandler @, lastKeyStr, keyboardEvent.charCode
         result = true
-
-    if result then @keys.length = 0
 
     return result
 

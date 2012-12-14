@@ -13,6 +13,10 @@ suppressEvent = (event) ->
   event.preventDefault()
   event.stopPropagation()
 
+# *************************
+# NB! All this shit needs to be redone!!
+# *************************
+
 # The following listeners are installed on every top level Chrome window
 windowsListener = 
   'keydown': (event) ->
@@ -21,7 +25,7 @@ windowsListener =
       return
 
     try
-      isEditable =  utils.isElementEditable event.originalTarget
+      isEditable = utils.isElementEditable event.originalTarget
 
       { ctrlKey: ctrl, metaKey: meta, altKey: alt, shiftKey: shift } = event 
 
@@ -48,12 +52,15 @@ windowsListener =
                 suppressEvent event
     catch err
       console.log err, 'keydown'
+      console.stacktrace()
 
   'keypress': (event) ->
     if getPref 'disabled'
       return
 
     try
+      isEditable = utils.isElementEditable event.originalTarget
+
       # Try to execute keys that were accumulated so far.
       # Suppress event if there is a matching command.
       if window = utils.getCurrentTabWindow event
@@ -68,9 +75,15 @@ windowsListener =
           # because `vim.keys` will be reset afterwards`
           blur_on_esc = lastKeyStr == 'Esc' and getPref 'blur_on_esc'
 
-          if vim.handleKeyPress event
-            if lastKeyStr != 'Esc'
-              suppressEvent event
+          # Process event if there is no editable element in focus
+          # Or last key was Esc key
+          if not isEditable or lastKeyStr == 'Esc'
+            result = vim.handleKeyPress event
+
+          # If there was some processing done then suppress the eveng
+          # unless it's the Esc key
+          if result or lastKeyStr == 'Esc'
+            suppressEvent event
 
           # Calling after the command has been executed
           if blur_on_esc
@@ -78,6 +91,7 @@ windowsListener =
 
     catch err
       console.log err, 'keypress'
+      console.stacktrace()
 
   # When the top level window closes we should release all Vims that were 
   # associated with tabs in this window
