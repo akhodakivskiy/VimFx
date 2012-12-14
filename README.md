@@ -138,7 +138,7 @@ Global shortcut to enable/disable VimFx: `Shift-Alt-v`
 - Added *mail.google.com* to the default black list
 - Various bug fixed and improvements.
 
-0.4.1 (13 Dec 2012)
+0.4.1, 0.4.2 (12-14 Dec 2012)
 
 - Small tweaks of the find feature.
 - Bugfix for keyboard handling on non-english keyboard layouts

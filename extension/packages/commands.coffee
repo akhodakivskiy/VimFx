@@ -255,7 +255,7 @@ commandGroups =
     'k|c-y':    [ command_k_cy,   _('help_command_k_cy') ]
     'h':        [ command_h,      _('help_command_h') ]
     'l':        [ command_l ,     _('help_command_l') ]
-    # Can't use c-u/c-d because it's widely used for viewing sources
+    # Can't use c-u/c-d because  c-u is widely used for viewing sources
     'd':        [ command_d,      _('help_command_d') ]
     'u':        [ command_u,      _('help_command_u') ]
     'c-f':      [ command_cf,     _('help_command_cf') ]
@@ -283,7 +283,7 @@ commandGroups =
     # See key-utils.coffee for more info
     '?|>':      [ command_help,   _('help_command_help') ]
     'Esc':      [ command_Esc,    _('help_command_Esc') ]
-    
+
 # Merge groups and split command pipes into individual commands
 commands = do (commandGroups) ->
   newCommands = {}
@@ -308,12 +308,12 @@ commandsHelp = do (commandGroups) ->
 
 # Called in hints mode. Will process the char, update and hide/show markers 
 hintCharHandler = (vim, keyStr, charCode) ->
-  if charCode > 0
+  if keyStr and charCode > 0
     # Get char and escape it to avoid problems with String.search
     key = utils.regexpEscape keyStr
 
     # First do a pre match - count how many markers will match with the new character entered
-    if vim.markers.reduce ((v, marker) -> v + marker.willMatch key), 0
+    if vim.markers.reduce ((v, marker) -> v or marker.willMatch key), false
       for marker in vim.markers
         marker.matchHintChar key
 
