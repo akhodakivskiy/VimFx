@@ -5,7 +5,7 @@ hints = require 'hints'
 help  = require 'help'
 find  = require 'find'
 
-{ getPref } = require 'prefs'
+{ getPref, setPref } = require 'prefs'
 
 # Navigate to the address that is currently stored in the system clipboard
 command_p = (vim) -> 
@@ -276,10 +276,11 @@ commandGroups =
     'H':        [ command_H,      _('help_command_H') ]
     'L':        [ command_L,      _('help_command_L') ]
   'misc': 
-    '/':        [ command_find,   _('help_command_find') ]
+    # `.` is added to find command mapping to hack around Russian keyboard layout
+    '\.|/':     [ command_find,   _('help_command_find') ]
     'n':        [ command_n,      _('help_command_n') ]
     'N':        [ command_N,      _('help_command_N') ]
-    # `>` is added to help command mapping to hack around russian keyboard layout
+    # `>` is added to help command mapping to hack around Russian keyboard layout
     # See key-utils.coffee for more info
     '?|>':      [ command_help,   _('help_command_help') ]
     'Esc':      [ command_Esc,    _('help_command_Esc') ]
@@ -300,8 +301,7 @@ commandsHelp = do (commandGroups) ->
   for group, commandsList of commandGroups
     helpGroup = {}
     for keys, command of commandsList
-      key = keys.replace(/,/g, '').replace('|', ', ')
-      helpGroup[key] = command[1]
+      helpGroup[keys] = command[1]
 
     helpStrings[group] = helpGroup
   return helpStrings
@@ -358,8 +358,7 @@ findCharHandler = (vim, keyStr, charCode) ->
     find.setFindStr vim.window.document, "#{ vim.findStr } (Not Found)"
 
 
-
-exports.hintCharHandler = hintCharHandler
-exports.findCharHandler = findCharHandler
-exports.commands        = commands
-exports.commandsHelp    = commandsHelp
+exports.hintCharHandler   = hintCharHandler
+exports.findCharHandler   = findCharHandler
+exports.commands          = commands
+exports.commandsHelp      = commandsHelp

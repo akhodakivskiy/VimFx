@@ -54,7 +54,6 @@ do (global = this) ->
   { loadCss }             = require 'utils'
   { addEventListeners }   = require 'events'
   { getPref
-  , installPrefObserver 
   , transferPrefs }       = require 'prefs'
   { setButtonInstallPosition
   , addToolbarButton }    = require 'button'
@@ -74,7 +73,6 @@ do (global = this) ->
     loadCss 'style'
     wu.watchWindows addEventListeners, 'navigator:browser'
     wu.watchWindows addToolbarButton, 'navigator:browser'
-    installPrefObserver()
 
   # Firefox will call this method on shutdown/disabling
   global.shutdown = (data, reason) ->

@@ -5,7 +5,7 @@ PREF_BRANCH = "extensions.VimFx.";
 # Default values for the preference
 # All used preferences should be mentioned here becuase 
 # preference type is derived from here
-PREFS = 
+DEFAULT_PREF_VALUES = 
   addon_id:     'VimFx@akhodakivskiy.github.com'
   hint_chars:   'asdfgercvhjkl;uinm'
   disabled:     false
@@ -14,27 +14,27 @@ PREFS =
   black_list:   '*mail.google.com*'
   blur_on_esc:  true
 
-# Get Firefox preference value of type specified in `PREFS`
-getFFPref = do ->
+getPref = do ->
   branch = Services.prefs.getBranch PREF_BRANCH
   
-  return (key) ->
-    value = PREFS[key]
+  return (key, defaultValue=undefined) ->
+    type = branch.getPrefType(key)
 
-    # Return default value if the preference value hasn't been set yet
-    if branch.getPrefType(key) == branch.PREF_INVALID
-      return value;
-
-    switch typeof value 
-      when 'boolean'
+    switch type
+      when branch.PREF_BOOL
         return branch.getBoolPref key
-      when 'number'
+      when branch.PREF_INT
         return branch.getIntPref key
-      else
+      when branch.PREF_STRING
         return branch.getCharPref key
+      else
+        if defaultValue != undefined
+          return defaultValue
+        else
+          return DEFAULT_PREF_VALUES[key];
 
 # Assign and save Firefox preference value
-setFFPref = do ->
+setPref = do ->
   branch = Services.prefs.getBranch PREF_BRANCH
 
   return (key, value) ->
@@ -43,35 +43,11 @@ setFFPref = do ->
         branch.setBoolPref(key, value)
       when 'number'
         branch.setIntPref(key, value)
+      when 'string'
+        branch.setCharPref(key, value);
       else
-        branch.setCharPref(key, String(value));
+        branch.clearUserPref(key);
 
-# Set default values and update previously stored values for the preferences
-do ->
-  branch = Services.prefs.getBranch PREF_BRANCH
-  for key in Object.keys(PREFS)
-    if branch.getPrefType(key) == branch.PREF_INVALID
-      setFFPref key, PREFS[key]
-    else
-      PREFS[key] = getFFPref key
-
-# Monitor preference changes and update values in local cache - PREFS
-installPrefObserver = ->
-  branch = Services.prefs.getBranch(PREF_BRANCH)
-
-  observer = 
-    observe: (subject, topic, data) ->
-      if topic == 'nsPref:changed' and data in Object.keys(PREFS)
-        PREFS[data] = getFFPref data
-
-  branch.addObserver "", observer, false
-  unload -> branch.removeObserver "", observer
-
-# Get preference value from local cache - PREFS
-getPref = (key) -> return PREFS[key]
-
-# Set preference value
-setPref = (key, value) -> setFFPref key, value
 
 # Transfer all setting values from one branch to another
 transferPrefs = (from, to) ->
@@ -93,8 +69,26 @@ transferPrefs = (from, to) ->
 
   fromBranch.deleteBranch("")
 
+# Checks if given command is disabled in the preferences
+isCommandDisabled = (key) ->
+  return getPref("disabled_commands", "").indexOf(key) > -1
+
+# Adds command to the disabled list
+disableCommand = (key) ->
+  dc = getPref("disabled_commands", "").split("||")
+  dc.push key
+  setPref "disabled_commands", dc.join("||")
+
+# Enables command
+enableCommand = (key) ->
+  dc = getPref("disabled_commands", "").split("||")
+  while (index = dc.indexOf(key)) > -1
+    dc.splice(index, 1)
+  setPref "disabled_commands", dc.join("||")
 
 exports.getPref             = getPref
 exports.setPref             = setPref
-exports.installPrefObserver = installPrefObserver
 exports.transferPrefs       = transferPrefs
+exports.isCommandDisabled   = isCommandDisabled
+exports.disableCommand      = disableCommand
+exports.enableCommand       = enableCommand

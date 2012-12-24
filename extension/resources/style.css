@@ -95,7 +95,7 @@ div#VimFxHelpDialog {
     position:fixed !important;
     border-radius:3px !important;
     padding:15px 30px !important;
-    width:600px !important;
+    width:700px !important;
     left:50% !important;
     /* This needs to be 1/2 width to horizontally center the help dialog */
     margin-left:-330px !important;
