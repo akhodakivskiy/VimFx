@@ -71,7 +71,7 @@ transferPrefs = (from, to) ->
 
 # Checks if given command is disabled in the preferences
 isCommandDisabled = (key) ->
-  return getPref("disabled_commands", "").indexOf(key) > -1
+  return getPref("disabled_commands", "").split("||").indexOf(key) > -1
 
 # Adds command to the disabled list
 disableCommand = (key) ->

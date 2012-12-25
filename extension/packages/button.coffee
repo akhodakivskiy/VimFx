@@ -4,6 +4,8 @@
 { injectHelp } = require 'help'
 { commandsHelp } = require 'commands'
 
+utils = require 'utils'
+
 KEYSET_ID             = 'vimfx-keyset'
 BUTTON_ID             = 'vimfx-toolbar-button'
 KEY_ID                = 'vimfx-key'
@@ -149,10 +151,9 @@ createButton = (window) ->
     setPref('disabled', not getPref 'disabled')
     updateToolbarButton button
     
-    event.preventDefault()
     event.stopPropagation()
 
-  button.addEventListener 'command', onButtonCommand, true
+  button.addEventListener 'command', onButtonCommand, false
 
   menupopup = createMenupopup window
   button.appendChild menupopup
@@ -162,14 +163,13 @@ createButton = (window) ->
   vimkey.setAttribute "key", "V"
   vimkey.setAttribute "modifiers", "shift,alt"
   vimkey.setAttribute "oncommand", "void(0);"
-  vimkey.addEventListener "command", onButtonCommand, true
+  vimkey.addEventListener "command", onButtonCommand, false
 
   keyset = doc.createElement 'keyset'
   keyset.setAttribute 'id', KEYSET_ID
   keyset.appendChild(vimkey)
 
   return [button, keyset]
-
 
 addToolbarButton = (window) ->
   doc = window.document
