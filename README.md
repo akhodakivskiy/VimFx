@@ -142,3 +142,8 @@ Global shortcut to enable/disable VimFx: `Shift-Alt-v`
 
 - Small tweaks of the find feature.
 - Bugfix for keyboard handling on non-english keyboard layouts
+
+0.4.3 (27 Dec 2012)
+
+- Toolbar button bugfix
+- Added an option to disable individual commands via the help dialog
