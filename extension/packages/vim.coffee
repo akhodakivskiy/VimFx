@@ -5,7 +5,9 @@ utils = require 'utils'
 , findCharHandler
 } = require 'commands'
 
-{ getPref } = require 'prefs'
+{ getPref
+, isCommandDisabled 
+} = require 'prefs'
 
 
 MODE_NORMAL = 1
@@ -64,8 +66,10 @@ class Vim
 
 findCommand = (keys) ->
   for i in [0...keys.length]
-    if com = commands[keys.slice(i).join(',')]
-      return com
+    seq = keys.slice(i).join(',')
+    if com = commands[seq]
+      if not isCommandDisabled(seq)
+        return com
 
   return undefined
 
@@ -74,7 +78,7 @@ maybeCommand = (keys) ->
     sequence = keys.slice(i).join(',')
     for seq, com of commands
       if seq.indexOf(sequence) == 0
-        return true
+        return not isCommandDisabled(seq)
 
   return false
 
