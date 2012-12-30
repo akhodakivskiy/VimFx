@@ -1,2 +1,3 @@
 locale vimfx en locale/en/
 locale vimfx ru locale/ru/
+locale vimfx zh-CN locale/zh-CN/
