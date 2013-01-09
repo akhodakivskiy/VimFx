@@ -37,5 +37,15 @@
         <em:creator>Антон Ходаковский</em:creator>
       </Description>
     </em:localized>
+
+    <em:localized>
+      <Description>
+        <em:locale>zh-CN</em:locale>
+        <em:name>VimFx</em:name>
+        <em:description>使用 VIM 快捷键操控 Firefox</em:description>
+        <em:creator>Anton Khodakivskiy</em:creator>
+      </Description>
+    </em:localized>
+
   </Description>
 </RDF>
