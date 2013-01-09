@@ -6,10 +6,10 @@ l10n = do ->
   locale = Cc["@mozilla.org/chrome/chrome-registry;1"]
     .getService(Ci.nsIXULChromeRegistry).getSelectedLocale("global")
 
-  getStr = (aStrBundle, aKey) -> try return aStrBundle.GetStringFromName(aKey);
+  getStr = (aStrBundle, aKey) -> 
+    try return aStrBundle.GetStringFromName(aKey);
 
-  return (filename, defaultLocale) ->
-    defaultLocale ?= "en";
+  return (filename, defaultLocale="en-US") ->
 
     filePath = (locale) ->
       getResourceURI("locale/#{ locale }/#{ filename }").spec

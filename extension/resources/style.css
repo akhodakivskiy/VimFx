@@ -8,7 +8,7 @@
     cursor: auto !important;
     display: inline !important;
     float: none !important;
-    font-family: Calibri, Candara, Segoe, "Segoe UI", Optima, Arial, sans-serif; !important
+    font-family: Calibri, Candara, Segoe, "Segoe UI", Optima, Arial, sans-serif !important;
     font-size: inherit !important;
     font-style: normal !important;
     font-variant: normal !important;
@@ -36,7 +36,7 @@
     white-space: normal !important;
     width: auto !important;
     z-index: 99999999 !important;
-    float: clear !important;
+    float: none !important;
 }
 
 /* Find */
@@ -98,7 +98,7 @@ div#VimFxHelpDialog {
     width:700px !important;
     left:50% !important;
     /* This needs to be 1/2 width to horizontally center the help dialog */
-    margin-left:-330px !important;
+    margin-left:-380px !important;
     top:30px !important;
     box-shadow: rgba(1, 2, 1, 0.4) 0px 0px 6px !important;
     overflow-y: auto !important;
@@ -133,8 +133,8 @@ div#VimFxHelpDialog .VimFxTitleFx {
 div#VimFxHelpDialog .VimFxVersion {
     float: right !important;
     position: absolute !important;
-    top: 20px; !important;
-    right: 100px; !important;
+    top: 20px !important;
+    right: 100px !important;
     font-size: 12px !important;
 }
 
@@ -145,7 +145,6 @@ div#VimFxHelpDialog .VimFxClose {
     right: 20px !important;
     top: 20px !important;
     font-size: 20px !important;
-    cursor: hand !important;
     cursor: pointer !important;
 }
 
