@@ -209,6 +209,25 @@ parseHTML = (document, html) ->
   flags = parser.SanitizerAllowStyle
   return parser.parseFragment(html, flags, false, null, document.documentElement)
 
+# Uses nsIIOService to parse a string as a URL and find out if it is a URL
+isURL = (str) ->
+  try
+    url = Cc["@mozilla.org/network/io-service;1"]
+      .getService(Ci.nsIIOService)
+      .newURI(str, null, null)
+      .QueryInterface(Ci.nsIURL)
+    return true
+  catch err
+    return false
+
+# Use Firefox services to search for a given string
+browserSearchSubmission = (str) ->
+  ss = Cc["@mozilla.org/browser/search-service;1"]
+    .getService(Ci.nsIBrowserSearchService)
+
+  engine = ss.currentEngine or ss.defaultEngine
+  return engine.getSubmission(str, null)
+
 regexpEscape = (s) -> return s and s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')
 
 exports.Bucket                  = Bucket
@@ -232,4 +251,6 @@ exports.timeIt                  = timeIt
 exports.isBlacklisted           = isBlacklisted
 exports.getVersion              = getVersion
 exports.parseHTML               = parseHTML
+exports.isURL                   = isURL
+exports.browserSearchSubmission = browserSearchSubmission
 exports.regexpEscape            = regexpEscape 

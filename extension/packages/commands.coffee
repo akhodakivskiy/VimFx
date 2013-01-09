@@ -9,13 +9,25 @@ find  = require 'find'
 
 # Navigate to the address that is currently stored in the system clipboard
 command_p = (vim) -> 
-  vim.window.location.assign utils.readFromClipboard(vim.window)
+  url = utils.readFromClipboard(vim.window)
+  postData = null
+  if not utils.isURL(url) and submission = utils.browserSearchSubmission url
+    url = submission.uri.spec
+    postData = submission.postData
+
+  if chromeWindow = utils.getRootWindow vim.window
+    chromeWindow.gBrowser.loadURIWithFlags url, null, null, null, postData
 
 # Open new tab and navigate to the address that is currently stored in the system clipboard
 command_P = (vim) ->
+  url = utils.readFromClipboard(vim.window)
+  postData = null
+  if not utils.isURL(url) and submission = utils.browserSearchSubmission url
+    url = submission.uri.spec
+    postData = submission.postData
+
   if chromeWindow = utils.getRootWindow vim.window
-    if gBrowser = chromeWindow.gBrowser
-      gBrowser.selectedTab = gBrowser.addTab utils.readFromClipboard(vim.window)
+    chromeWindow.gBrowser.selectedTab = chromeWindow.gBrowser.addTab url, null, null, postData, null, false
 
 # Open new tab and focus the address bar
 command_t = (vim) ->
