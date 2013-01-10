@@ -39,6 +39,7 @@ do (global = this) ->
   global.include = include
   global.require = require
   global.getResourceURI = getResourceURI
+  global.regexpEscape = (s) -> s and s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')
 
   # Include into global scope
   include("includes/#{ name }.js", global) for name in [
@@ -53,11 +54,10 @@ do (global = this) ->
   # Requires for startup/install
   { loadCss }             = require 'utils'
   { addEventListeners }   = require 'events'
-  { getPref
-  , transferPrefs }       = require 'prefs'
+  { getPref }             = require 'prefs'
   { setButtonInstallPosition
   , addToolbarButton }    = require 'button'
-  wu                      = require 'window-utils'
+  { watchWindows }        = require 'window-utils'
 
   # Firefox will call this method on startup/enabling
   global.startup = (data, reason) ->
@@ -66,13 +66,11 @@ do (global = this) ->
       # Position the toolbar button right before the default Bookmarks button
       # If Bookmarks button is hidden - then VimFx button will be appended to the toolbar
       setButtonInstallPosition 'nav-bar', 'bookmarks-menu-button-container'
-    else if reason == ADDON_UPGRADE 
-      if data["version"] > "0.3.3"
-        transferPrefs "extension.VimFx.", "extensions.VimFx."
 
     loadCss 'style'
-    wu.watchWindows addEventListeners, 'navigator:browser'
-    wu.watchWindows addToolbarButton, 'navigator:browser'
+
+    watchWindows addEventListeners, 'navigator:browser'
+    watchWindows addToolbarButton, 'navigator:browser'
 
   # Firefox will call this method on shutdown/disabling
   global.shutdown = (data, reason) ->

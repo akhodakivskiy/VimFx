@@ -38,7 +38,7 @@ class Vim
     else if !keyboardEvent.ctrlKey and !keyboardEvent.metaKey
       if @mode == MODE_HINTS
         hintChars = getPref('hint_chars').toLowerCase()
-        result = hintChars.search(utils.regexpEscape(keyStr)) > -1
+        result = hintChars.search(regexpEscape(keyStr)) > -1
       else if @mode == MODE_FIND
         result = true
 

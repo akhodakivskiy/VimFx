@@ -228,8 +228,6 @@ browserSearchSubmission = (str) ->
   engine = ss.currentEngine or ss.defaultEngine
   return engine.getSubmission(str, null)
 
-regexpEscape = (s) -> return s and s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')
-
 exports.Bucket                  = Bucket
 exports.getCurrentTabWindow     = getCurrentTabWindow
 exports.getEventWindow          = getEventWindow
@@ -253,4 +251,3 @@ exports.getVersion              = getVersion
 exports.parseHTML               = parseHTML
 exports.isURL                   = isURL
 exports.browserSearchSubmission = browserSearchSubmission
-exports.regexpEscape            = regexpEscape 

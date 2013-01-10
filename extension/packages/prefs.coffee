@@ -49,46 +49,44 @@ setPref = do ->
         branch.clearUserPref(key);
 
 
-# Transfer all setting values from one branch to another
-transferPrefs = (from, to) ->
-  fromBranch = Services.prefs.getBranch from
-  toBranch = Services.prefs.getBranch to
+DISABLED_COMMANDS = do ->
+  str = getPref 'disabled_commands'
+  try
+    return JSON.parse str
+  catch err
+    dc = []
+    for key in str.split('||')
+      for c in key.split('|')
+        dc.push c if c
 
-  count = {}
-  vals = fromBranch.getChildList("", count)
-
-  for i in [0...count.value]
-    name = vals[i]
-    switch fromBranch.getPrefType name
-      when fromBranch.PREF_STRING 
-        toBranch.setCharPref name, fromBranch.getCharPref name
-      when fromBranch.PREF_INT 
-        toBranch.setIntPref name, fromBranch.getIntPref name
-      when fromBranch.PREF_BOOL 
-        toBranch.setBoolPref name, fromBranch.getBoolPref name
-
-  fromBranch.deleteBranch("")
-
-# Checks if given command is disabled in the preferences
-isCommandDisabled = (key) ->
-  return getPref("disabled_commands", "").split("||").indexOf(key) > -1
-
-# Adds command to the disabled list
-disableCommand = (key) ->
-  dc = getPref("disabled_commands", "").split("||")
-  dc.push key
-  setPref "disabled_commands", dc.join("||")
+    return dc
 
 # Enables command
 enableCommand = (key) ->
-  dc = getPref("disabled_commands", "").split("||")
-  while (index = dc.indexOf(key)) > -1
-    dc.splice(index, 1)
-  setPref "disabled_commands", dc.join("||")
+  for c in key.split('|')
+    while (idx = DISABLED_COMMANDS.indexOf(c)) > -1
+      DISABLED_COMMANDS.splice(idx, 1)
 
-exports.getPref             = getPref
-exports.setPref             = setPref
-exports.transferPrefs       = transferPrefs
-exports.isCommandDisabled   = isCommandDisabled
-exports.disableCommand      = disableCommand
-exports.enableCommand       = enableCommand
+  setPref 'disabled_commands', JSON.stringify DISABLED_COMMANDS
+
+# Adds command to the disabled list
+disableCommand = (key) ->
+  for c in key.split('|')
+    if DISABLED_COMMANDS.indexOf(c) == -1
+      DISABLED_COMMANDS.push c
+
+  setPref 'disabled_commands', JSON.stringify DISABLED_COMMANDS
+
+# Checks if given command is disabled in the preferences
+isCommandDisabled = (key) ->
+  for c in key.split('|')
+    if DISABLED_COMMANDS.indexOf(c) > -1
+      return true
+
+  return false
+
+exports.getPref                   = getPref
+exports.setPref                   = setPref
+exports.isCommandDisabled         = isCommandDisabled
+exports.disableCommand            = disableCommand
+exports.enableCommand             = enableCommand
