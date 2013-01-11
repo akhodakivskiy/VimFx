@@ -55,9 +55,10 @@ DISABLED_COMMANDS = do ->
     return JSON.parse str
   catch err
     dc = []
-    for key in str.split('||')
-      for c in key.split('|')
-        dc.push c if c
+    try
+      for key in str.split('||')
+        for c in key.split('|')
+          dc.push c if c
 
     return dc
 

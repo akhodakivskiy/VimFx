@@ -7,6 +7,11 @@ find  = require 'find'
 
 { getPref, setPref } = require 'prefs'
 
+# Focus the Address Bar
+command_o = (vim) ->
+  if chromeWindow = utils.getRootWindow vim.window
+    chromeWindow.focusAndSelectUrlBar()
+
 # Navigate to the address that is currently stored in the system clipboard
 command_p = (vim) -> 
   url = utils.readFromClipboard(vim.window)
@@ -252,6 +257,7 @@ command_Esc = (vim) ->
 
 commandGroups = 
   'urls':
+    'o':        [ command_o,      _('help_command_o') ]
     'p':        [ command_p,      _('help_command_p') ]
     'P':        [ command_P,      _('help_command_P') ]
     'y,f':      [ command_yf,     _('help_command_yf') ]
