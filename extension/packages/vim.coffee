@@ -18,6 +18,7 @@ class Vim
   constructor: (@window) ->
     @mode     = MODE_NORMAL
     @keys     = []
+    @lastKeyStr = null
     @markers  = undefined
     @cb       = undefined
     @findStr  = ""
@@ -42,7 +43,9 @@ class Vim
       else if @mode == MODE_FIND
         result = true
 
-    if result then @keys.push keyStr
+    if result 
+      @lastKeyStr = keyStr
+      @keys.push keyStr
 
     return result
 
