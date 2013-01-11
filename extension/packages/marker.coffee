@@ -116,7 +116,14 @@ Marker.createMarkers = (document) ->
       elements.push [e, rect]
 
   elements.sort ([e1, r1], [e2, r2]) ->
-    if r1.area < r2.area
+    # <a> links should always be on the top. E.g. not links should go down
+    e1tagName = e1.tagName.toLowerCase()
+    e2tagName = e2.tagName.toLowerCase()
+    if e1tagName == 'a' and e2tagName != 'a'
+      return 1
+    else if e1tagName != 'a' and e2tagName == 'a'
+      return -1
+    else if r1.area < r2.area
       return -1
     else if r1.area > r2.area
       return 1
