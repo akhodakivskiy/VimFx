@@ -5,7 +5,9 @@ hints = require 'hints'
 help  = require 'help'
 find  = require 'find'
 
-{ getPref, setPref } = require 'prefs'
+{ getPref
+, setPref 
+, getFirefoxPref } = require 'prefs'
 
 # Focus the Address Bar
 command_o = (vim) ->
@@ -39,7 +41,7 @@ command_t = (vim) ->
   if chromeWindow = utils.getRootWindow vim.window
     if gBrowser = chromeWindow.gBrowser
       # Get the default url for the new tab
-      newtab_url = Services.prefs.getCharPref 'browser.newtab.url'
+      newtab_url = getFirefoxPref 'browser.newtab.url'
       gBrowser.selectedTab = gBrowser.addTab newtab_url
       # Focus the address bar
       chromeWindow.focusAndSelectUrlBar()
@@ -137,6 +139,10 @@ command_J_gT = (vim) ->
 command_K_gt = (vim) ->
   if rootWindow = utils.getRootWindow vim.window
     rootWindow.gBrowser.tabContainer.advanceSelectedTab(1, true);
+
+command_gh = (vim) ->
+  homepage_url = getFirefoxPref 'browser.startup.homepage'
+  vim.window.location.assign homepage_url
 
 # Go to the first tab
 command_gH_g0 = (vim) ->
@@ -284,6 +290,7 @@ commandGroups =
     'K|g,t':    [ command_K_gt,   _('help_command_K_gt') ]
     'c-J':      [ command_cJ,     _('help_command_cJ') ]
     'c-K':      [ command_cK,     _('help_command_cK') ]
+    'g,h':      [ command_gh,     _('help_command_gh') ]
     "g,H|g,\^": [ command_gH_g0,  _('help_command_gH_g0') ]
     'g,L|g,$':  [ command_gL_g$,  _('help_command_gL_g$') ]
     'x':        [ command_x,      _('help_command_x') ]

@@ -14,28 +14,39 @@ DEFAULT_PREF_VALUES =
   black_list:   '*mail.google.com*'
   blur_on_esc:  true
 
+getBranchPref = (branch, key, defaultValue) ->
+  type = branch.getPrefType(key)
+
+  switch type
+    when branch.PREF_BOOL
+      return branch.getBoolPref key
+    when branch.PREF_INT
+      return branch.getIntPref key
+    when branch.PREF_STRING
+      return branch.getCharPref key
+    else
+      if defaultValue != undefined
+        return defaultValue
+
 getPref = do ->
-  branch = Services.prefs.getBranch PREF_BRANCH
+  prefs = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefService)
+  branch = prefs.getBranch PREF_BRANCH
   
   return (key, defaultValue=undefined) ->
-    type = branch.getPrefType(key)
+    value = getBranchPref branch, key, defaultValue
+    return if value == undefined then DEFAULT_PREF_VALUES[key] else value
 
-    switch type
-      when branch.PREF_BOOL
-        return branch.getBoolPref key
-      when branch.PREF_INT
-        return branch.getIntPref key
-      when branch.PREF_STRING
-        return branch.getCharPref key
-      else
-        if defaultValue != undefined
-          return defaultValue
-        else
-          return DEFAULT_PREF_VALUES[key];
+getFirefoxPref = do ->
+  prefs = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefService)
+  branch = prefs.getBranch ''
+  
+  return (key, defaultValue=undefined) ->
+    return getBranchPref branch, key, defaultValue
 
 # Assign and save Firefox preference value
 setPref = do ->
-  branch = Services.prefs.getBranch PREF_BRANCH
+  prefs = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefService)
+  branch = prefs.getBranch PREF_BRANCH
 
   return (key, value) ->
     switch typeof value
@@ -47,7 +58,6 @@ setPref = do ->
         branch.setCharPref(key, value);
       else
         branch.clearUserPref(key);
-
 
 DISABLED_COMMANDS = do ->
   str = getPref 'disabled_commands'
@@ -87,6 +97,7 @@ isCommandDisabled = (key) ->
   return false
 
 exports.getPref                   = getPref
+exports.getFirefoxPref            = getFirefoxPref
 exports.setPref                   = setPref
 exports.isCommandDisabled         = isCommandDisabled
 exports.disableCommand            = disableCommand
