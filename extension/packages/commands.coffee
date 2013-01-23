@@ -47,7 +47,7 @@ command_t = (vim) ->
 # Copy current URL to the clipboard
 command_yf = (vim) ->
   markers = hints.injectHints vim.window.document
-  if markers.length > 0
+  if markers?.length > 0
     # This callback will be called with the selected marker as argument
     cb = (marker) ->
       if url = marker.element.href
@@ -173,7 +173,7 @@ command_X = (vim) ->
 command_f = (vim) ->
   if document = vim.window.document
     markers = hints.injectHints document
-    if markers.length > 0
+    if markers?.length > 0
       # This callback will be called with the selected marker as argument
       cb = (marker) ->
         marker.element.focus()
@@ -184,7 +184,7 @@ command_f = (vim) ->
 # Follow links in a new Tab with hint markers
 command_F = (vim) ->
   markers = hints.injectHints vim.window.document
-  if markers.length > 0
+  if markers?.length > 0
     # This callback will be called with the selected marker as argument
     cb = (marker) ->
       marker.element.focus()

@@ -206,8 +206,8 @@ getElementRect = (element) ->
   docElem  = document.documentElement
   body     = document.body
 
-  clientTop  = docElem.clientTop  || body.clientTop  || 0;
-  clientLeft = docElem.clientLeft || body.clientLeft || 0;
+  clientTop  = docElem.clientTop  || body?.clientTop  || 0;
+  clientLeft = docElem.clientLeft || body?.clientLeft || 0;
   scrollTop  = window.pageYOffset || docElem.scrollTop;
   scrollLeft = window.pageXOffset || docElem.scrollLeft;
   

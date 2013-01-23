@@ -2,6 +2,7 @@ CONTAINER_ID  = 'VimFxHintMarkerContainer'
 
 { interfaces: Ci }  = Components
 HTMLDocument        = Ci.nsIDOMHTMLDocument
+XULDocument         = Ci.nsIDOMXULDocument
 { Marker }          = require 'marker'
 
 createHintsContainer = (document) ->
@@ -15,21 +16,23 @@ injectHints = (document) ->
   # First remove previous hints container
   removeHints document
 
-  if document instanceof HTMLDocument and document.documentElement
-    # Find and create markers
-    markers = Marker.createMarkers document
+  # For now we aren't able to handle hint markers in XUL Documents :(
+  if document instanceof HTMLDocument# or document instanceof XULDocument
+    if document.documentElement
+      # Find and create markers
+      markers = Marker.createMarkers document
 
-    container = createHintsContainer document
+      container = createHintsContainer document
 
-    # For performance use Document Fragment
-    fragment = document.createDocumentFragment()
-    for marker in markers
-      fragment.appendChild marker.markerElement
+      # For performance use Document Fragment
+      fragment = document.createDocumentFragment()
+      for marker in markers
+        fragment.appendChild marker.markerElement
 
-    container.appendChild fragment
-    document.documentElement.appendChild container
+      container.appendChild fragment
+      document.documentElement.appendChild container
 
-    return markers
+      return markers
 
 # Remove previously injected hints from the DOM
 removeHints = (document, markers) ->
