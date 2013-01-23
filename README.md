@@ -87,8 +87,8 @@ Global shortcut to enable/disable VimFx: `Shift-Alt-v`
 ### Misc
 
     /       Enter Find mode
-    n       Go ot the next Find match
-    N       Go ot the previous Find match
+    n       Go to the next Find match
+    N       Go to the previous Find match
     ?       Show Help Dialog
     Esc     Close this dialog and cancel hint markers
 
