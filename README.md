@@ -87,8 +87,8 @@ Global shortcut to enable/disable VimFx: `Shift-Alt-v`
 ### Misc
 
     /       Enter Find mode
-    n       Go ot the next Find match
-    N       Go ot the previous Find match
+    n       Go to the next Find match
+    N       Go to the previous Find match
     ?       Show Help Dialog
     Esc     Close this dialog and cancel hint markers
 
@@ -147,3 +147,14 @@ Global shortcut to enable/disable VimFx: `Shift-Alt-v`
 
 - Toolbar button bugfix
 - Added an option to disable individual commands via the help dialog
+
+0.4.4 (30 Jan 2013)
+
+- Thanks to @mozillazg and @mcomella for translation contributions.
+- Added `gh` command that will navigate to the home page.
+- Added 'o' command to focus address bar.
+- `p` and `P` will parse the contents of the clipboard. If the string in the clipboard appears to be a url then it will navigate to this url. Otherwise it will search for the string in the clipboard using currently selected search provider.
+- Now hint markers for links will stay on top of all the markers for differnt kinds of elements.
+- Esc will now alos close the focused default search bar.
+- Fixed bugs related to keyboard events handling, XUL documents, and some other issues.
+- Bug fixed where not all the commands could be disabled via the Help dialog.

@@ -5,24 +5,43 @@ hints = require 'hints'
 help  = require 'help'
 find  = require 'find'
 
-{ getPref, setPref } = require 'prefs'
+{ getPref
+, setPref 
+, getFirefoxPref } = require 'prefs'
+
+# Focus the Address Bar
+command_o = (vim) ->
+  if chromeWindow = utils.getRootWindow vim.window
+    chromeWindow.focusAndSelectUrlBar()
 
 # Navigate to the address that is currently stored in the system clipboard
 command_p = (vim) -> 
-  vim.window.location.assign utils.readFromClipboard(vim.window)
+  url = utils.readFromClipboard(vim.window)
+  postData = null
+  if not utils.isURL(url) and submission = utils.browserSearchSubmission url
+    url = submission.uri.spec
+    postData = submission.postData
+
+  if chromeWindow = utils.getRootWindow vim.window
+    chromeWindow.gBrowser.loadURIWithFlags url, null, null, null, postData
 
 # Open new tab and navigate to the address that is currently stored in the system clipboard
 command_P = (vim) ->
+  url = utils.readFromClipboard(vim.window)
+  postData = null
+  if not utils.isURL(url) and submission = utils.browserSearchSubmission url
+    url = submission.uri.spec
+    postData = submission.postData
+
   if chromeWindow = utils.getRootWindow vim.window
-    if gBrowser = chromeWindow.gBrowser
-      gBrowser.selectedTab = gBrowser.addTab utils.readFromClipboard(vim.window)
+    chromeWindow.gBrowser.selectedTab = chromeWindow.gBrowser.addTab url, null, null, postData, null, false
 
 # Open new tab and focus the address bar
 command_t = (vim) ->
   if chromeWindow = utils.getRootWindow vim.window
     if gBrowser = chromeWindow.gBrowser
       # Get the default url for the new tab
-      newtab_url = Services.prefs.getCharPref 'browser.newtab.url'
+      newtab_url = getFirefoxPref 'browser.newtab.url'
       gBrowser.selectedTab = gBrowser.addTab newtab_url
       # Focus the address bar
       chromeWindow.focusAndSelectUrlBar()
@@ -30,7 +49,7 @@ command_t = (vim) ->
 # Copy current URL to the clipboard
 command_yf = (vim) ->
   markers = hints.injectHints vim.window.document
-  if markers.length > 0
+  if markers?.length > 0
     # This callback will be called with the selected marker as argument
     cb = (marker) ->
       if url = marker.element.href
@@ -121,6 +140,10 @@ command_K_gt = (vim) ->
   if rootWindow = utils.getRootWindow vim.window
     rootWindow.gBrowser.tabContainer.advanceSelectedTab(1, true);
 
+command_gh = (vim) ->
+  homepage_url = getFirefoxPref 'browser.startup.homepage'
+  vim.window.location.assign homepage_url
+
 # Go to the first tab
 command_gH_g0 = (vim) ->
   if rootWindow = utils.getRootWindow vim.window
@@ -156,7 +179,7 @@ command_X = (vim) ->
 command_f = (vim) ->
   if document = vim.window.document
     markers = hints.injectHints document
-    if markers.length > 0
+    if markers?.length > 0
       # This callback will be called with the selected marker as argument
       cb = (marker) ->
         marker.element.focus()
@@ -167,7 +190,7 @@ command_f = (vim) ->
 # Follow links in a new Tab with hint markers
 command_F = (vim) ->
   markers = hints.injectHints vim.window.document
-  if markers.length > 0
+  if markers?.length > 0
     # This callback will be called with the selected marker as argument
     cb = (marker) ->
       marker.element.focus()
@@ -240,6 +263,7 @@ command_Esc = (vim) ->
 
 commandGroups = 
   'urls':
+    'o':        [ command_o,      _('help_command_o') ]
     'p':        [ command_p,      _('help_command_p') ]
     'P':        [ command_P,      _('help_command_P') ]
     'y,f':      [ command_yf,     _('help_command_yf') ]
@@ -266,6 +290,7 @@ commandGroups =
     'K|g,t':    [ command_K_gt,   _('help_command_K_gt') ]
     'c-J':      [ command_cJ,     _('help_command_cJ') ]
     'c-K':      [ command_cK,     _('help_command_cK') ]
+    'g,h':      [ command_gh,     _('help_command_gh') ]
     "g,H|g,\^": [ command_gH_g0,  _('help_command_gH_g0') ]
     'g,L|g,$':  [ command_gL_g$,  _('help_command_gL_g$') ]
     'x':        [ command_x,      _('help_command_x') ]
@@ -310,7 +335,7 @@ commandsHelp = do (commandGroups) ->
 hintCharHandler = (vim, keyStr, charCode) ->
   if keyStr and charCode > 0
     # Get char and escape it to avoid problems with String.search
-    key = utils.regexpEscape keyStr
+    key = regexpEscape keyStr
 
     # First do a pre match - count how many markers will match with the new character entered
     if vim.markers.reduce ((v, marker) -> v or marker.willMatch key), false

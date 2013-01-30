@@ -14,28 +14,39 @@ DEFAULT_PREF_VALUES =
   black_list:   '*mail.google.com*'
   blur_on_esc:  true
 
+getBranchPref = (branch, key, defaultValue) ->
+  type = branch.getPrefType(key)
+
+  switch type
+    when branch.PREF_BOOL
+      return branch.getBoolPref key
+    when branch.PREF_INT
+      return branch.getIntPref key
+    when branch.PREF_STRING
+      return branch.getCharPref key
+    else
+      if defaultValue != undefined
+        return defaultValue
+
 getPref = do ->
-  branch = Services.prefs.getBranch PREF_BRANCH
+  prefs = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefService)
+  branch = prefs.getBranch PREF_BRANCH
   
   return (key, defaultValue=undefined) ->
-    type = branch.getPrefType(key)
+    value = getBranchPref branch, key, defaultValue
+    return if value == undefined then DEFAULT_PREF_VALUES[key] else value
 
-    switch type
-      when branch.PREF_BOOL
-        return branch.getBoolPref key
-      when branch.PREF_INT
-        return branch.getIntPref key
-      when branch.PREF_STRING
-        return branch.getCharPref key
-      else
-        if defaultValue != undefined
-          return defaultValue
-        else
-          return DEFAULT_PREF_VALUES[key];
+getFirefoxPref = do ->
+  prefs = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefService)
+  branch = prefs.getBranch ''
+  
+  return (key, defaultValue=undefined) ->
+    return getBranchPref branch, key, defaultValue
 
 # Assign and save Firefox preference value
 setPref = do ->
-  branch = Services.prefs.getBranch PREF_BRANCH
+  prefs = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefService)
+  branch = prefs.getBranch PREF_BRANCH
 
   return (key, value) ->
     switch typeof value
@@ -48,47 +59,46 @@ setPref = do ->
       else
         branch.clearUserPref(key);
 
+DISABLED_COMMANDS = do ->
+  str = getPref 'disabled_commands'
+  try
+    return JSON.parse str
+  catch err
+    dc = []
+    try
+      for key in str.split('||')
+        for c in key.split('|')
+          dc.push c if c
 
-# Transfer all setting values from one branch to another
-transferPrefs = (from, to) ->
-  fromBranch = Services.prefs.getBranch from
-  toBranch = Services.prefs.getBranch to
-
-  count = {}
-  vals = fromBranch.getChildList("", count)
-
-  for i in [0...count.value]
-    name = vals[i]
-    switch fromBranch.getPrefType name
-      when fromBranch.PREF_STRING 
-        toBranch.setCharPref name, fromBranch.getCharPref name
-      when fromBranch.PREF_INT 
-        toBranch.setIntPref name, fromBranch.getIntPref name
-      when fromBranch.PREF_BOOL 
-        toBranch.setBoolPref name, fromBranch.getBoolPref name
-
-  fromBranch.deleteBranch("")
-
-# Checks if given command is disabled in the preferences
-isCommandDisabled = (key) ->
-  return getPref("disabled_commands", "").split("||").indexOf(key) > -1
-
-# Adds command to the disabled list
-disableCommand = (key) ->
-  dc = getPref("disabled_commands", "").split("||")
-  dc.push key
-  setPref "disabled_commands", dc.join("||")
+    return dc
 
 # Enables command
 enableCommand = (key) ->
-  dc = getPref("disabled_commands", "").split("||")
-  while (index = dc.indexOf(key)) > -1
-    dc.splice(index, 1)
-  setPref "disabled_commands", dc.join("||")
+  for c in key.split('|')
+    while (idx = DISABLED_COMMANDS.indexOf(c)) > -1
+      DISABLED_COMMANDS.splice(idx, 1)
 
-exports.getPref             = getPref
-exports.setPref             = setPref
-exports.transferPrefs       = transferPrefs
-exports.isCommandDisabled   = isCommandDisabled
-exports.disableCommand      = disableCommand
-exports.enableCommand       = enableCommand
+  setPref 'disabled_commands', JSON.stringify DISABLED_COMMANDS
+
+# Adds command to the disabled list
+disableCommand = (key) ->
+  for c in key.split('|')
+    if DISABLED_COMMANDS.indexOf(c) == -1
+      DISABLED_COMMANDS.push c
+
+  setPref 'disabled_commands', JSON.stringify DISABLED_COMMANDS
+
+# Checks if given command is disabled in the preferences
+isCommandDisabled = (key) ->
+  for c in key.split('|')
+    if DISABLED_COMMANDS.indexOf(c) > -1
+      return true
+
+  return false
+
+exports.getPref                   = getPref
+exports.getFirefoxPref            = getFirefoxPref
+exports.setPref                   = setPref
+exports.isCommandDisabled         = isCommandDisabled
+exports.disableCommand            = disableCommand
+exports.enableCommand             = enableCommand
