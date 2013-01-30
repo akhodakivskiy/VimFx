@@ -49,9 +49,8 @@ windowsListener =
             if vim.blacklisted
               return
 
-            if vim.handleKeyDown(event, keyStr)
-              if keyStr != 'Esc'
-                suppressEvent event
+            if vim.handleKeyDown(event, keyStr) and keyStr != 'Esc'
+              suppressEvent event
     catch err
       console.log err, 'keydown'
       console.stacktrace()
@@ -84,12 +83,13 @@ windowsListener =
 
           # If there was some processing done then suppress the eveng
           # unless it's the Esc key
-          if result or vim.lastKeyStr == 'Esc'
+          if result and vim.lastKeyStr != 'Esc'
             suppressEvent event
 
           # Calling after the command has been executed
           if blur_on_esc
-            event.originalTarget?.ownerDocument?.activeElement?.blur()
+            cb = -> event.originalTarget?.ownerDocument?.activeElement?.blur()
+            window.setTimeout cb, 0
 
     catch err
       console.log err, 'keypress'
