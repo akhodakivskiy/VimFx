@@ -43,6 +43,7 @@ Global shortcut to enable/disable VimFx: `Shift-Alt-v`
 
 ### URLs
 
+    o       Focus the Address Bar
     p       Navigate to the address in the clipboard
     P       Open new tab and navigate to the address in the clipboard
     yf      Copy link url to the clipboard
@@ -72,6 +73,7 @@ Global shortcut to enable/disable VimFx: `Shift-Alt-v`
     K gt    Go to the Next tab
     c-J     Move current tab to the Left
     c-K     Move current tab to the Right
+    gh      Navigate to the Home Page
     gH g0   Go to the First tab
     gL g$   Go to the Last tab
     x       Close current tab
@@ -86,10 +88,10 @@ Global shortcut to enable/disable VimFx: `Shift-Alt-v`
 
 ### Misc
 
-    /       Enter Find mode
+    .,/     Enter Find mode
     n       Go to the next Find match
     N       Go to the previous Find match
-    ?       Show Help Dialog
+    ?,>     Show Help Dialog
     Esc     Close this dialog and cancel hint markers
 
 ## Release Notes
@@ -154,7 +156,7 @@ Global shortcut to enable/disable VimFx: `Shift-Alt-v`
 - Added `gh` command that will navigate to the home page.
 - Added 'o' command to focus address bar.
 - `p` and `P` will parse the contents of the clipboard. If the string in the clipboard appears to be a url then it will navigate to this url. Otherwise it will search for the string in the clipboard using currently selected search provider.
-- Now hint markers for links will stay on top of all the markers for differnt kinds of elements.
-- Esc will now alos close the focused default search bar.
+- Now hint markers for links will stay on top of all the markers for different kinds of elements.
+- Esc will now also close the focused default search bar.
 - Fixed bugs related to keyboard events handling, XUL documents, and some other issues.
 - Bug fixed where not all the commands could be disabled via the Help dialog.
