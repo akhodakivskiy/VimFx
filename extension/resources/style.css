@@ -62,12 +62,12 @@ div.VimFxHintMarker {
     display: block !important;
     white-space: nowrap !important;
     overflow: hidden !important;
-    font-size: 11px !important;
-    padding: 1px 3px 1px 3px !important;
-    box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3) !important;
-    background-color: #ff9103 !important;
-    border: solid 1px #bd6b00 !important;
-    border-radius: 3px !important;
+    font-size: 12px !important;
+    padding: 1px 2px 0 2px !important;
+    box-shadow: 0 3px 7px 0 rgba(0, 0, 0, 0.3) !important;
+    background-color: #FFD95D !important;
+    border: solid 1px #E3BE23 !important;
+    border-radius: 2px !important;
 }
 
 div.VimFxHiddenHintMarker > span {
@@ -75,10 +75,10 @@ div.VimFxHiddenHintMarker > span {
 }
 
 div.VimFxHintMarker > span {
-    color: #303030 !important;
-    font-family: Helvetica, Arial, sans-serif !important;
+    color: #302505 !important;
+    font-family: "Helvetica Neue", "Helvetica", "Arial", "Sans" !important;
     font-weight: bold !important;
-    font-size: 11px !important;
+    font-size: 12px !important;
     text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6) !important;
 }
 
@@ -215,5 +215,5 @@ div#VimFxHelpDialog .VimFxSocial a {
 }
 
 div#VimFxHelpDialog span.VimFxDot {
-    color: #818181 !important; 
+    color: #818181 !important;
 }
