@@ -1,6 +1,6 @@
 /* Copied over from vimium project */
 .VimFxReset {
-    background: Window !important;
+    background: none !important;
     border: none !important;
     /*bottom: auto !important;*/
     box-shadow: none !important;
@@ -104,7 +104,6 @@ div#VimFxHelpDialog {
     z-index:99999998 !important;
     font-size: 15px !important;
     max-height: 80% !important;
-    border: 1px solid WindowFrame !important;
 }
 
 div#VimFxHelpDialog .VimFxTitle {
@@ -140,7 +139,7 @@ div#VimFxHelpDialog .VimFxVersion {
 
 div#VimFxHelpDialog .VimFxClose {
     float: right !important;
-    font-family: "courier new" !important;
+    font-family: "Helvetica Neue", "Helvetica", "Arial", "Sans" !important;
     position: absolute !important;
     right: 20px !important;
     top: 20px !important;
