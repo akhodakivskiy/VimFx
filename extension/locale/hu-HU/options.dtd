@@ -8,11 +8,11 @@ Helyettesítő karakterek is használhatók: *, !">
 <!ENTITY pref.scroll_step.title     "Görgetés mértéke">
 <!ENTITY pref.scroll_step.desc      "Görgetés mértéke">
 
-<!ENTITY pref.blur_on_esc.title      "Esc-re fókuszkérés"
-<!ENTITY pref.blur_on_esc.desc       "Esc lenyomására a VimFX megkapja a fókuszt, pl. az input mezőktől/címsortól"
+<!ENTITY pref.blur_on_esc.title     "Esc-re fókuszkérés"
+<!ENTITY pref.blur_on_esc.desc      "Esc lenyomására a VimFX megkapja a fókuszt, pl. az input mezőktől/címsortól"
 
 <!ENTITY pref.scroll_time.title     "Lágy görgetés">
 <!ENTITY pref.smooth_time.disabled  "Inaktív">
 <!ENTITY pref.smooth_time.fast      "Gyors">
-<!ENTITY pref.smooth_time.normal    "Átlagos">
+<!ENTITY pref.smooth_time.normal    "Normál">
 <!ENTITY pref.smooth_time.slow      "Lassú">

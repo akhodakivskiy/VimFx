@@ -47,5 +47,14 @@
       </Description>
     </em:localized>
 
+    <em:localized>
+      <Description>
+        <em:locale>hu-HU</em:locale>
+        <em:name>VimFx</em:name>
+        <em:description>Vim billenytűparancsok Firefoxhoz</em:description>
+        <em:creator>Anton Khodakivskiy</em:creator>
+      </Description>
+    </em:localized>
+
   </Description>
 </RDF>
