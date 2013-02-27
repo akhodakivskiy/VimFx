@@ -31,6 +31,15 @@
     <!-- Localization -->
     <em:localized>
       <Description>
+        <em:locale>pl</em:locale>
+        <em:name>VimFx</em:name>
+        <em:description>Skróty klawiszowe Vima w Firefoksie</em:description>
+        <em:creator>Anton Chodakowski</em:creator>
+      </Description>
+    </em:localized>
+
+    <em:localized>
+      <Description>
         <em:locale>ru</em:locale>
         <em:name>VimFx</em:name>
         <em:description>Горячие клавиши в стиле Vim</em:description>
