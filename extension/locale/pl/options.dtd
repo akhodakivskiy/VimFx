@@ -1,0 +1,18 @@
+<!ENTITY pref.hint_chars.title      "Znaki podpowiedzi">
+<!ENTITY pref.hint_chars.desc       "Domyślnie: asdfgercvhjkl;uinm">
+
+<!ENTITY pref.black_list.title      "Czarna lista">
+<!ENTITY pref.black_list.desc       "Lista adresów oddzielonych przecinkami pod którymi VimFx powinien być automatycznie wyłączony.
+Dopuszczalne wieloznaczniki: *, !">
+
+<!ENTITY pref.scroll_step.title     "Krok przewijania">
+<!ENTITY pref.scroll_step.desc      "Krok przewijania">
+
+<!ENTITY pref.blur_on_esc.title      "Escape zabiera focus">
+<!ENTITY pref.blur_on_esc.desc       "Escape zabiera focus dowolnemu aktywnemu elementowi w przeglądarce (np. paskowi adresu)">
+
+<!ENTITY pref.scroll_time.title     "Płynne przewijanie">
+<!ENTITY pref.smooth_time.disabled  "Wyłączone">
+<!ENTITY pref.smooth_time.fast      "Szybkie">
+<!ENTITY pref.smooth_time.normal    "Normalne">
+<!ENTITY pref.smooth_time.slow      "Wolne">
