@@ -31,6 +31,15 @@
     <!-- Localization -->
     <em:localized>
       <Description>
+        <em:locale>pl</em:locale>
+        <em:name>VimFx</em:name>
+        <em:description>Skróty klawiszowe Vima w Firefoksie</em:description>
+        <em:creator>Anton Chodakowski</em:creator>
+      </Description>
+    </em:localized>
+
+    <em:localized>
+      <Description>
         <em:locale>ru</em:locale>
         <em:name>VimFx</em:name>
         <em:description>Горячие клавиши в стиле Vim</em:description>
@@ -43,6 +52,15 @@
         <em:locale>zh-CN</em:locale>
         <em:name>VimFx</em:name>
         <em:description>使用 VIM 快捷键操控 Firefox</em:description>
+        <em:creator>Anton Khodakivskiy</em:creator>
+      </Description>
+    </em:localized>
+
+    <em:localized>
+      <Description>
+        <em:locale>hu-HU</em:locale>
+        <em:name>VimFx</em:name>
+        <em:description>Vim billenytűparancsok Firefoxhoz</em:description>
         <em:creator>Anton Khodakivskiy</em:creator>
       </Description>
     </em:localized>
