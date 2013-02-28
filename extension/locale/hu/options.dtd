@@ -10,6 +10,9 @@
 <!ENTITY pref.blur_on_esc.title     "Esc-re fókuszkérés">
 <!ENTITY pref.blur_on_esc.desc      "Esc lenyomására a VimFX megkapja a fókuszt, pl. az input mezőktől/címsortól">
 
+<!ENTITY pref.leave_dt_on_esc.title "Leave Developer Toolbar open on Esc">
+<!ENTITY pref.leave_dt_on_esc.desc  "Do not hide Developer Toolbar if it's visible and the Esc is pressed">
+
 <!ENTITY pref.scroll_time.title     "Lágy görgetés">
 <!ENTITY pref.smooth_time.disabled  "Inaktív">
 <!ENTITY pref.smooth_time.fast      "Gyors">
