@@ -166,7 +166,8 @@ command_L = (vim) ->
 # Close current tab
 command_x = (vim) ->
   if rootWindow = utils.getRootWindow vim.window
-    rootWindow.gBrowser.removeCurrentTab()
+    unless rootWindow.gBrowser.selectedTab.pinned
+      rootWindow.gBrowser.removeCurrentTab()
 
 # Restore last closed tab
 command_X = (vim) -> 
