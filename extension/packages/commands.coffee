@@ -9,6 +9,11 @@ find  = require 'find'
 , setPref 
 , getFirefoxPref } = require 'prefs'
 
+# Opens developer toolbar (Default shotrcut: Shift-F2)
+command_dev = (vim) ->
+  if chromeWindow = utils.getRootWindow vim.window
+    chromeWindow.DeveloperToolbar.show(true)
+
 # Focus the Address Bar
 command_o = (vim) ->
   if chromeWindow = utils.getRootWindow vim.window
@@ -262,6 +267,10 @@ command_Esc = (vim) ->
   # Finally enter normal mode
   vim.enterNormalMode()
 
+  if not getPref('leave_dt_on_esc')
+    if chromeWindow = utils.getRootWindow vim.window
+      chromeWindow.DeveloperToolbar.hide()
+
 commandGroups = 
   'urls':
     'o':        [ command_o,      _('help_command_o') ]
@@ -310,6 +319,7 @@ commandGroups =
     # See key-utils.coffee for more info
     '?|>':      [ command_help,   _('help_command_help') ]
     'Esc':      [ command_Esc,    _('help_command_Esc') ]
+    ':':        [ command_dev,    _('help_command_dev') ]
 
 # Merge groups and split command pipes into individual commands
 commands = do (commandGroups) ->

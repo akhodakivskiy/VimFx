@@ -9,9 +9,12 @@
         title="&pref.black_list.title;" desc="&pref.black_list.desc;" />
     <setting pref="extensions.VimFx.blur_on_esc" type="bool" 
         title="&pref.blur_on_esc.title;" desc="&pref.blur_on_esc.desc;" />
+    <setting pref="extensions.VimFx.leave_dt_on_esc" type="bool" 
+        title="&pref.leave_dt_on_esc.title;" desc="&pref.leave_dt_on_esc.desc;" />
     <setting pref="extensions.VimFx.scroll_step" type="integer" 
         title="&pref.scroll_step.title;" desc="&pref.scroll_step.desc;" />
-    <setting pref="extensions.VimFx.scroll_time" type="menulist" title="&pref.scroll_time.title;">
+    <setting pref="extensions.VimFx.scroll_time" type="menulist" 
+        title="&pref.scroll_time.title;">
         <menulist>
             <menupopup>
                 <menuitem value="0"     label="&pref.smooth_time.disabled;"/>

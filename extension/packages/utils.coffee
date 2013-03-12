@@ -228,6 +228,12 @@ browserSearchSubmission = (str) ->
   engine = ss.currentEngine or ss.defaultEngine
   return engine.getSubmission(str, null)
 
+# DeveloperToolbar getter
+developerToolbar = (chromeWindow) ->
+  tmp = {}
+  Cu.import("chrome://browser/content/browser.js")
+  new tmp.DeveloperToolbar(window, document.getElementById("developer-toolbar"))
+
 exports.Bucket                  = Bucket
 exports.getCurrentTabWindow     = getCurrentTabWindow
 exports.getEventWindow          = getEventWindow
@@ -251,3 +257,4 @@ exports.getVersion              = getVersion
 exports.parseHTML               = parseHTML
 exports.isURL                   = isURL
 exports.browserSearchSubmission = browserSearchSubmission
+exports.developerToolbar        = developerToolbar

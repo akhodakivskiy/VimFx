@@ -6,13 +6,14 @@ PREF_BRANCH = "extensions.VimFx.";
 # All used preferences should be mentioned here becuase 
 # preference type is derived from here
 DEFAULT_PREF_VALUES = 
-  addon_id:     'VimFx@akhodakivskiy.github.com'
-  hint_chars:   'asdfgercvhjkl;uinm'
-  disabled:     false
-  scroll_step:  60
-  scroll_time:  100
-  black_list:   '*mail.google.com*'
-  blur_on_esc:  true
+  addon_id:       'VimFx@akhodakivskiy.github.com'
+  hint_chars:     'asdfgercvhjkl;uinm'
+  disabled:       false
+  scroll_step:    60
+  scroll_time:    100
+  black_list:     '*mail.google.com*'
+  blur_on_esc:    true
+  leave_dt_on_esc: true
 
 getBranchPref = (branch, key, defaultValue) ->
   type = branch.getPrefType(key)
