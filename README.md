@@ -154,9 +154,18 @@ Global shortcut to enable/disable VimFx: `Shift-Alt-v`
 
 - Thanks to @mozillazg and @mcomella for translation contributions.
 - Added `gh` command that will navigate to the home page.
-- Added 'o' command to focus address bar.
+- Added `o` command to focus address bar.
 - `p` and `P` will parse the contents of the clipboard. If the string in the clipboard appears to be a url then it will navigate to this url. Otherwise it will search for the string in the clipboard using currently selected search provider.
 - Now hint markers for links will stay on top of all the markers for different kinds of elements.
 - Esc will now also close the focused default search bar.
 - Fixed bugs related to keyboard events handling, XUL documents, and some other issues.
 - Bug fixed where not all the commands could be disabled via the Help dialog.
+
+0.4.5 (12 Mar 2013)
+
+- `:` to open Firefox Developer Toolbar, `Esc` to close it.
+- Add Hungarian locale (@thenonameguy).
+- Add Polish locale (@grn).
+- Don't close pinned tabs when pressing x (@grn).
+- Switched to Makefile for building the extension release (@carno).
+- Mrakers CSS tweaks (@helmuthdu)
