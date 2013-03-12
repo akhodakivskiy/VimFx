@@ -13,6 +13,7 @@ find  = require 'find'
 command_dev = (vim) ->
   if chromeWindow = utils.getRootWindow vim.window
     chromeWindow.DeveloperToolbar.show(true)
+    chromeWindow.DeveloperToolbar.focus()
 
 # Focus the Address Bar
 command_o = (vim) ->

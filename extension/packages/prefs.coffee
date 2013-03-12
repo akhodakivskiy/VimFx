@@ -13,7 +13,7 @@ DEFAULT_PREF_VALUES =
   scroll_time:    100
   black_list:     '*mail.google.com*'
   blur_on_esc:    true
-  leave_dt_on_esc: true
+  leave_dt_on_esc: false
 
 getBranchPref = (branch, key, defaultValue) ->
   type = branch.getPrefType(key)
