@@ -230,22 +230,24 @@ command_help = (vim) ->
 
 # Switch into find mode
 command_find = (vim) ->
-  vim.enterFindMode()
-  vim.findStr = ""
-
   find.injectFind vim.window.document
 
 # Search for the last pattern
 command_n = (vim) ->
   if vim.findStr.length > 0
-    if not find.find vim.window, vim.findStr, false
-      find.flashFind vim.window.document, "#{ vim.findStr } (Not Found)"
+    if rootWindow = utils.getRootWindow vim.window
+      console.expand rootWindow.gBrowser.fastFind
+      rootWindow.gBrowser.fastFind.findAgain(false, false)
+    #if not find.find vim.window, vim.findStr, false
+      #find.flashFind vim.window.document, "#{ vim.findStr } (Not Found)"
   
 # Search for the last pattern backwards
 command_N = (vim) ->
   if vim.findStr.length > 0
-    if not find.find vim.window, vim.findStr, true
-      find.flashFind vim.window.document, "#{ vim.findStr } (Not Found)"
+    if rootWindow = utils.getRootWindow vim.window
+      rootWindow.gBrowser.fastFind.findAgain(true, false)
+    #if not find.find vim.window, vim.findStr, true
+      #find.flashFind vim.window.document, "#{ vim.findStr } (Not Found)"
 
 # Close the Help dialog and cancel the pending hint marker action
 command_Esc = (vim) ->
@@ -389,7 +391,8 @@ findCharHandler = (vim, keyStr, charCode) ->
 
   # Search only if the query string isn't emply.
   # Otherwise it will pop up Find dialog
-  if find.find vim.window, vim.findStr, backwards
+  rootWindow = utils.getRootWindow vim.window
+  if rootWindow?.gBrowser.fastFind.find vim.findStr, false
     find.setFindStr vim.window.document, vim.findStr
   else
     find.setFindStr vim.window.document, "#{ vim.findStr } (Not Found)"

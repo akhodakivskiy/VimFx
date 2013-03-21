@@ -43,7 +43,7 @@
 
 body.VimFxFindModeBody ::-moz-selection  { background-color: Highlight !important; }
 
-span#VimFxFindSpan {
+input#VimFxFindInput {
     position: fixed !important;
     bottom: -2px !important;
     right: 20px !important;

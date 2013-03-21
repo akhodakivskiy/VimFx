@@ -7,9 +7,10 @@ injectFind = (document) ->
   # Clean up just in case...
   removeFind document
 
-  container = createFindContainer(document)
+  [div, input] = createFindContainer(document)
 
-  document.documentElement.appendChild container
+  document.documentElement.appendChild div
+  input.focus()
 
 # Removes find controls from DOM
 removeFind = (document) ->
@@ -29,11 +30,25 @@ setFindStr = (document, findStr) ->
     span.textContent = "/#{ findStr }"
 
 createFindContainer = (document) ->
-  return utils.parseHTML document, """
-    <div class="VimFxReset" id="#{ CONTAINER_ID }">
-      <span class="VimFxReset" id="VimFxFindSpan">/</span>
-    </div>
-  """
+  div = document.createElement 'div'
+  div.className = 'VimFxReset'
+  div.id = CONTAINER_ID
+
+  input = document.createElement 'input'
+  input.type = 'text'
+  input.id = 'VimFxFindInput'
+  input.addEventListener 'input', (event) ->
+    if rootWindow = utils.getRootWindow event.target.ownerDocument.defaultView
+      if fastFind = rootWindow.gBrowser.fastFind 
+        result = fastFind.find input.value, false
+
+  input.addEventListener 'blur', (event) ->
+    console.log 'find input blur'
+
+  console.log 'creating'
+  div.appendChild input
+
+  return [ div, input ]
 
 find = (window, findStr, backwards=false) ->
   f = ->
