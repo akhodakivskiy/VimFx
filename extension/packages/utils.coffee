@@ -59,6 +59,10 @@ getRootWindow = (window) ->
                .QueryInterface(Ci.nsIInterfaceRequestor)
                .getInterface(Window); 
 
+isTextInputElement = (element) ->
+  return element instanceof HTMLInputElement or \
+         element instanceof HTMLTextAreaElement
+
 isElementEditable = (element) ->
   return element.isContentEditable or \
          element instanceof HTMLInputElement or \
@@ -228,11 +232,19 @@ browserSearchSubmission = (str) ->
   engine = ss.currentEngine or ss.defaultEngine
   return engine.getSubmission(str, null)
 
-# DeveloperToolbar getter
-developerToolbar = (chromeWindow) ->
-  tmp = {}
-  Cu.import("chrome://browser/content/browser.js")
-  new tmp.DeveloperToolbar(window, document.getElementById("developer-toolbar"))
+# Adds a class the the `element.className` trying to keep the whole class string
+# will formed (without extra spaces at the tails)
+addClass = (element, klass) ->
+  if (element.className?.search klass) == -1
+    if element.className 
+      element.className += " #{ klass }"
+    else
+      element.className = klass 
+
+# Remove a class from the `element.className`
+removeClass = (element, klass) ->
+  name = element.className.replace new RegExp("\\s*#{ klass }"), ""
+  element.className = name or null
 
 exports.Bucket                  = Bucket
 exports.getCurrentTabWindow     = getCurrentTabWindow
@@ -242,6 +254,7 @@ exports.getEventTabBrowser      = getEventTabBrowser
 
 exports.getWindowId             = getWindowId
 exports.getRootWindow           = getRootWindow
+exports.isTextInputElement      = isTextInputElement
 exports.isElementEditable       = isElementEditable
 exports.getSessionStore         = getSessionStore
 
@@ -257,4 +270,5 @@ exports.getVersion              = getVersion
 exports.parseHTML               = parseHTML
 exports.isURL                   = isURL
 exports.browserSearchSubmission = browserSearchSubmission
-exports.developerToolbar        = developerToolbar
+exports.addClass                = addClass
+exports.removeClass             = removeClass

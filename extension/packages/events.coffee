@@ -27,11 +27,15 @@ keyStrFromEvent = (event) ->
 
   return keyStr
 
+# Passthrough mode is activated when VimFx should temporarily stop processking 
+# keyboard input. For example when a context menu is whown
+passthrough = false
+
 # The following listeners are installed on every top level Chrome window
 windowsListener = 
   'keydown': (event) ->
 
-    if getPref 'disabled'
+    if passthrough or getPref 'disabled' 
       return
 
     try
@@ -57,7 +61,7 @@ windowsListener =
 
   'keypress': (event) ->
 
-    if getPref 'disabled'
+    if passthrough or getPref 'disabled'
       return
 
     try
@@ -102,6 +106,15 @@ windowsListener =
           suppressEvent event
 
         vim.lastKeyStr = null
+
+  'popupshown': (event) ->
+    if event.target.tagName in [ 'menupopup', 'panel' ]
+      passthrough = true
+
+
+  'popuphidden': (event) ->
+    if event.target.tagName in [ 'menupopup', 'panel' ]
+      passthrough = false
 
   # When the top level window closes we should release all Vims that were 
   # associated with tabs in this window

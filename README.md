@@ -47,6 +47,7 @@ Global shortcut to enable/disable VimFx: `Shift-Alt-v`
     p       Navigate to the address in the clipboard
     P       Open new tab and navigate to the address in the clipboard
     yf      Copy link url to the clipboard
+    vf      Focus element
     yy      Copy current page link to the clipboard
     r       Reload current page
     R       Reload current page and all the assets (js, css, etc.)
@@ -57,8 +58,8 @@ Global shortcut to enable/disable VimFx: `Shift-Alt-v`
 
     gg      Scroll to the Top of the page
     G       Scroll to the Bottom of the page
-    j c-e   Scroll Down
-    k c-y   Scroll Up
+    j,c-e   Scroll Down
+    k,c-y   Scroll Up
     h       Scroll Left
     l       Scroll Right
     d       Scroll half a Page Down
@@ -69,13 +70,13 @@ Global shortcut to enable/disable VimFx: `Shift-Alt-v`
 ### Tabs
 
     t       Open New Blank tab
-    J gT    Go to the Previous tab
-    K gt    Go to the Next tab
+    J,gT    Go to the Previous tab
+    K,gt    Go to the Next tab
     c-J     Move current tab to the Left
     c-K     Move current tab to the Right
     gh      Navigate to the Home Page
-    gH g0   Go to the First tab
-    gL g$   Go to the Last tab
+    gH,g0   Go to the First tab
+    gL,g$   Go to the Last tab
     x       Close current tab
     X       Restore last closed tab
 
@@ -89,6 +90,7 @@ Global shortcut to enable/disable VimFx: `Shift-Alt-v`
 ### Misc
 
     .,/     Enter Find mode
+    a.,a/   Enter Find mode to highlight all matches
     n       Go to the next Find match
     N       Go to the previous Find match
     ?,>     Show Help Dialog
@@ -169,3 +171,12 @@ Global shortcut to enable/disable VimFx: `Shift-Alt-v`
 - Don't close pinned tabs when pressing x (@grn).
 - Switched to Makefile for building the extension release (@carno).
 - Mrakers CSS tweaks (@helmuthdu)
+
+0.4.6 (27 Mar 2013)
+
+- Reimplemented find mode: CJK support, performace boost
+- `a/` or `a.` to highlight all matches of the search string on the page
+- Hint markers will now reach into iframes
+- Key handling is disabled when a popupmenu or panel are shown
+- `yf` will now also focus links and copy values from text/textarea element
+- `vf` will show hit markers to focus the underlying element
