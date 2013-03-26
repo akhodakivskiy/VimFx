@@ -41,15 +41,17 @@
 
 /* Find */
 
-body.VimFxFindModeBody ::-moz-selection  { background-color: Highlight !important; }
+input.VimFxNotFound#VimFxFindInput {
+    color: red !important;
+}
 
 input#VimFxFindInput {
     position: fixed !important;
-    bottom: -2px !important;
-    right: 20px !important;
+    bottom: 2px !important;
+    right: 2px !important;
     font-size: 13px !important;
     min-width: 200px !important;
-    background-color: white !important;
+    background: white !important;
     border: solid 1px ThreeDShadow !important;
     border-radius: 3px 3px 0 0 !important;
     padding: 4px 4px 6px !important;

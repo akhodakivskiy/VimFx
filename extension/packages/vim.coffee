@@ -2,7 +2,6 @@ utils = require 'utils'
 
 { commands
 , hintCharHandler 
-, findCharHandler
 } = require 'commands'
 
 { getPref
@@ -12,7 +11,6 @@ utils = require 'utils'
 
 MODE_NORMAL = 1
 MODE_HINTS  = 2
-MODE_FIND   = 3
 
 class Vim
   constructor: (@window) ->
@@ -22,9 +20,7 @@ class Vim
     @markers  = undefined
     @cb       = undefined
     @findStr  = ""
-
-  enterFindMode: ->
-    @mode = MODE_FIND
+    @findRng  = null
 
   enterHintsMode: (@markers, @cb) ->
     @mode = MODE_HINTS
@@ -40,8 +36,6 @@ class Vim
       if @mode == MODE_HINTS
         hintChars = getPref('hint_chars').toLowerCase()
         result = hintChars.search(regexpEscape(keyStr)) > -1
-      else if @mode == MODE_FIND
-        result = true
 
     if result 
       @lastKeyStr = keyStr
@@ -60,9 +54,6 @@ class Vim
       @keys.length = 0
       if @mode == MODE_HINTS
         hintCharHandler @, lastKeyStr, keyboardEvent.charCode
-        result = true
-      else if @mode == MODE_FIND
-        findCharHandler @, lastKeyStr, keyboardEvent.charCode
         result = true
 
     return result

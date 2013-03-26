@@ -1,33 +1,40 @@
 utils = require 'utils'
 
 CONTAINER_ID = 'VimFxFindContainer'
+DIRECTION_FORWARDS = 0
+DIRECTION_BACKWARDS = 1
 
 # Create and inserts into DOM find controls and handlers
-injectFind = (document) ->
+injectFind = (document, cb) ->
   # Clean up just in case...
   removeFind document
 
+  # Create container div insert a text input into it
   [div, input] = createFindContainer(document)
+
+  # Call back in new input
+  input.addEventListener 'input', (event) ->
+    result = cb(input.value)
+    if result
+      utils.removeClass input, 'VimFxNotFound'
+    else
+      utils.addClass input, 'VimFxNotFound'
+
+  # Call back on (Shift)-Enter with proper direction
+  input.addEventListener 'keypress', (event) ->
+    if event.keyCode == event.DOM_VK_RETURN
+      removeFind(document, false)
 
   document.documentElement.appendChild div
   input.focus()
 
 # Removes find controls from DOM
-removeFind = (document) ->
+removeFind = (document, clear = true) ->
   if div = document.getElementById CONTAINER_ID
     document.documentElement.removeChild div
 
-flashFind = (document, findStr) ->
-  window = document.defaultView
-
-  injectFind document
-  setFindStr document, findStr
-
-  window.setTimeout (-> removeFind document), 1000
-
-setFindStr = (document, findStr) ->
-  if span = document.getElementById "VimFxFindSpan"
-    span.textContent = "/#{ findStr }"
+  if clear
+    clearSelection(document.defaultView)
 
 createFindContainer = (document) ->
   div = document.createElement 'div'
@@ -36,71 +43,136 @@ createFindContainer = (document) ->
 
   input = document.createElement 'input'
   input.type = 'text'
+  input.className = 'VimFxReset'
   input.id = 'VimFxFindInput'
-  input.addEventListener 'input', (event) ->
-    if rootWindow = utils.getRootWindow event.target.ownerDocument.defaultView
-      if fastFind = rootWindow.gBrowser.fastFind 
-        result = fastFind.find input.value, false
 
-  input.addEventListener 'blur', (event) ->
-    console.log 'find input blur'
-
-  console.log 'creating'
   div.appendChild input
 
   return [ div, input ]
 
-find = (window, findStr, backwards=false) ->
-  f = ->
-    smartCase = findStr.toLowerCase() != findStr
+clearSelection = (window, selectionType = Ci.nsISelectionController.SELECTION_FIND) ->
+  for frame in window.frames
+    clearSelection(frame)
 
-    return window.find \
-      findStr,
-      smartCase,  # Smart case sensitivity
-      backwards,  # To avoid getting last search result in the beginning
-      true,       # aWrapAround - Doesn't currently work as expected
-      false,      # aWholeWord - Not implemented according to MDN
-      true,       # aSearchInFrames - Hell yea, search in frames!
-      false       # aShowDialog - No dialog please
+  if controller = getController(window)
+    controller.getSelection(selectionType).removeAllRanges()
 
+findFactory = (selectionType) ->
+  finder = Cc["@mozilla.org/embedcomp/rangefind;1"]
+              .createInstance()
+              .QueryInterface(Components.interfaces.nsIFind)
 
-  success =  false
+  return (window, findStr, findRng = null, direction = DIRECTION_FORWARDS) ->
+    # `find` will also recursively search in all frames.  # `innerFind` does the work: 
+    # searches, selects, scrolls, and optionally reaches into frames
+    innerFind = (window) ->
+      if controller = getController(window)
+        finder.findBackwards = (direction == DIRECTION_BACKWARDS)
+        finder.caseSensitive = (findStr != findStr.toLowerCase())
 
-  # Perform find only if query string isn't empty to avoid find dialog pop up
-  if findStr.length > 0
-    # This will change the ::selection css rule
-    addClass window.document.body, "VimFxFindModeBody"
+        searchRange = window.document.createRange()
+        searchRange.selectNodeContents window.document.body
 
-    # Wrap Around is broken... Therefore
-    if not success = f()
-      # If first search attemp has failed then 
-      # reset current selection and try again
-      window.getSelection().removeAllRanges()
-      success = f()
+        if findRng and findRng.commonAncestorContainer.ownerDocument == window.document
+          if finder.findBackwards
+            searchRange.setEnd(findRng.startContainer, findRng.startOffset)
+          else
+            searchRange.setStart(findRng.endContainer, findRng.endOffset)
 
-    # For now let's rely on the fact that Fiefox doesn't update the selection
-    # if the css fule that governs it is chnaged
-    window.setTimeout (-> removeClass window.document.body, "VimFxFindModeBody"), 1000
+        (startPt = searchRange.cloneRange()).collapse(true)
+        (endPt = searchRange.cloneRange()).collapse(false)
 
-  return success
+        if finder.findBackwards
+          [startPt, endPt] = [endPt, startPt]
 
-# Adds a class the the `element.className` trying to keep the whole class string
-# will formed (without extra spaces at the tails)
-addClass = (element, klass) ->
-  if element.className?.search klass == -1
-    if element.className 
-      element.className += " #{ klass }"
-    else
-      element.className = klass 
+        if range = finder.Find(findStr, searchRange, startPt, endPt)
+          controller.getSelection(selectionType).addRange(range)
+          controller.scrollSelectionIntoView(selectionType, range, 0)
+          return range
 
-# Remove a class from the `element.className`
-removeClass = (element, klass) ->
-  name = element.className.replace new RegExp("\\s*#{ klass }"), ""
-  element.className = name or null
+    clearSelection(window, selectionType)
 
+    if findStr.length > 0
+      # Get all embedded windows/frames including the passed window
+      wnds = getAllWindows window
+      # In backward searching reverse windows mode so that 
+      # it starts off the deepest iframe
+      if finder.findBackwards 
+        wnds.reverse()
 
-exports.injectFind = injectFind
-exports.removeFind = removeFind
-exports.flashFind  = flashFind
-exports.setFindStr = setFindStr
-exports.find       = find
+      # First search in the same window to which current `findRng` belongs
+      if rngWindow = findRng?.commonAncestorContainer.ownerDocument.defaultView
+        wnds = cycleToItem wnds, rngWindow
+
+      for w in wnds
+        if range = innerFind w
+          break
+
+    return if (findStr.length == 0) then true else range
+
+highlightFactory = (selectionType) ->
+  finder = Cc["@mozilla.org/embedcomp/rangefind;1"]
+              .createInstance()
+              .QueryInterface(Components.interfaces.nsIFind)
+
+  return (window, findStr) ->
+    matchesCount = 0
+    finder.findBackwards = false
+    finder.caseSensitive = (findStr != findStr.toLowerCase())
+
+    innerHighlight = (window) ->
+      if controller = getController(window)
+        searchRange = window.document.createRange()
+        searchRange.selectNodeContents window.document.body
+
+        (startPt = searchRange.cloneRange()).collapse(true)
+        (endPt = searchRange.cloneRange()).collapse(false)
+
+        selection = controller.getSelection(selectionType)
+        while (range = finder.Find(findStr, searchRange, startPt, endPt))
+          selection.addRange(range)
+          matchesCount += 1
+          (startPt = range.cloneRange()).collapse(false)
+
+      # Highlight in iframes
+      for frame in window.frames
+        innerHighlight(frame)
+
+    clearSelection(window, selectionType)
+
+    if findStr.length > 0
+      innerHighlight(window)
+
+    return if (findStr.length == 0) then true else matchesCount
+
+getController = (window) ->
+  if not window.innerWidth or not window.innerHeight
+    return null
+
+  return window.QueryInterface(Ci.nsIInterfaceRequestor)
+               .getInterface(Ci.nsIWebNavigation)
+               .QueryInterface(Ci.nsIInterfaceRequestor)
+               .getInterface(Ci.nsISelectionDisplay)
+               .QueryInterface(Ci.nsISelectionController)
+
+# Returns flat list of frmaes within provided window
+getAllWindows = (window) ->
+  result = [window]
+  for frame in window.frames
+    result = result.concat(getAllWindows(frame))
+
+  return result
+
+cycleToItem = (array, item) ->
+  if item and array.indexOf(item) != -1
+    while array[0] != item
+      array.push array.shift()
+
+  return array
+
+exports.injectFind          = injectFind
+exports.removeFind          = removeFind
+exports.find                = findFactory(Ci.nsISelectionController.SELECTION_FIND)
+exports.highlight           = highlightFactory(Ci.nsISelectionController.SELECTION_FIND)
+exports.DIRECTION_FORWARDS  = DIRECTION_FORWARDS
+exports.DIRECTION_BACKWARDS = DIRECTION_BACKWARDS
