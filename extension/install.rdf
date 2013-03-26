@@ -9,7 +9,7 @@
   <Description about="urn:mozilla:install-manifest">
     <em:id>VimFx@akhodakivskiy.github.com</em:id>
     <em:homepageURL>http://www.github.com/akhodakivskiy/VimFx</em:homepageURL>
-    <em:version>0.4.5</em:version>
+    <em:version>0.4.6</em:version>
     <em:type>2</em:type>
     <em:bootstrap>true</em:bootstrap>
     <em:optionsType>2</em:optionsType>
