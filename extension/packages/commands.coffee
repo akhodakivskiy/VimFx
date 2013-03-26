@@ -230,22 +230,28 @@ command_help = (vim) ->
 
 # Switch into find mode
 command_find = (vim) ->
-  vim.enterFindMode()
-  vim.findStr = ""
-
-  find.injectFind vim.window.document
+  find.injectFind vim.window.document, (findStr, direction) ->
+    # Reset region and find string if new find stirng has arrived
+    if vim.findStr != findStr
+      [vim.findStr, vim.findRng] = [findStr, null]
+    # Perform forward find and store found region
+    return vim.findRng = find.find vim.window, vim.findStr, vim.findRng, find.DIRECTION_FORWARDS
+    
+# Switch into find mode with highlighting
+command_find_hl = (vim) ->
+  find.injectFind vim.window.document, (findStr) ->
+    # Reset region and find string if new find stirng has arrived
+    return find.highlight vim.window, findStr
 
 # Search for the last pattern
 command_n = (vim) ->
   if vim.findStr.length > 0
-    if not find.find vim.window, vim.findStr, false
-      find.flashFind vim.window.document, "#{ vim.findStr } (Not Found)"
-  
+    vim.findRng = find.find vim.window, vim.findStr, vim.findRng, find.DIRECTION_FORWARDS
+
 # Search for the last pattern backwards
 command_N = (vim) ->
   if vim.findStr.length > 0
-    if not find.find vim.window, vim.findStr, true
-      find.flashFind vim.window.document, "#{ vim.findStr } (Not Found)"
+    vim.findRng = find.find vim.window, vim.findStr, vim.findRng, find.DIRECTION_BACKWARDS
 
 # Close the Help dialog and cancel the pending hint marker action
 command_Esc = (vim) ->
@@ -314,6 +320,7 @@ commandGroups =
   'misc': 
     # `.` is added to find command mapping to hack around Russian keyboard layout
     '\.|/':     [ command_find,   _('help_command_find') ]
+    'a,\.|a,/': [ command_find_hl,_('help_command_find_hl') ]
     'n':        [ command_n,      _('help_command_n') ]
     'N':        [ command_N,      _('help_command_N') ]
     # `>` is added to help command mapping to hack around Russian keyboard layout
@@ -360,42 +367,6 @@ hintCharHandler = (vim, keyStr, charCode) ->
           vim.enterNormalMode()
           break
 
-# Called in find mode. Will process charCode, update find, or close the 
-findCharHandler = (vim, keyStr, charCode) ->
-  backwards = false
-
-  toNormalMode = ->
-    find.removeFind vim.window.document 
-    vim.enterNormalMode()
-
-  if keyStr and keyStr.match(/.*Return/)
-    return toNormalMode()
-  else if keyStr == 'Backspace'
-    # Delete last available character from the query string 
-    if vim.findStr.length > 0
-      vim.findStr = vim.findStr.substr(0, vim.findStr.length - 1)
-    # Leave Find Mode the query string is already empty
-    else
-      return toNormalMode()
-  else if charCode > 0
-    vim.findStr += String.fromCharCode(charCode)
-  else
-    return
-
-  # Update the interface string
-
-  # Clear selection to avoid jumping between matching search results
-  vim.window.getSelection().removeAllRanges()
-
-  # Search only if the query string isn't emply.
-  # Otherwise it will pop up Find dialog
-  if find.find vim.window, vim.findStr, backwards
-    find.setFindStr vim.window.document, vim.findStr
-  else
-    find.setFindStr vim.window.document, "#{ vim.findStr } (Not Found)"
-
-
 exports.hintCharHandler   = hintCharHandler
-exports.findCharHandler   = findCharHandler
 exports.commands          = commands
 exports.commandsHelp      = commandsHelp

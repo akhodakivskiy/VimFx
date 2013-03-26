@@ -103,7 +103,7 @@ class Marker
 # for each of them The markers are then positioned on the page
 #
 # The array of markers is returned
-Marker.createMarkers = (document) ->
+Marker.createMarkers = (document, startIndex) ->
   hintChars = getPref('hint_chars').toLowerCase()
 
   set = getMarkableElements(document)
@@ -131,7 +131,7 @@ Marker.createMarkers = (document) ->
       return 0
 
   # start from the end because the list is sorted in ascending order
-  j = elements.length 
+  j = elements.length + startIndex - 1
   for [element, rect] in elements
     # Get a hint for an element
     hint = indexToHint(--j, hintChars)
