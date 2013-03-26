@@ -52,16 +52,24 @@ command_t = (vim) ->
       # Focus the address bar
       chromeWindow.focusAndSelectUrlBar()
 
-# Copy current URL to the clipboard
+# Copy element URL to the clipboard
 command_yf = (vim) ->
   markers = hints.injectHints vim.window.document
   if markers?.length > 0
-    # This callback will be called with the selected marker as argument
     cb = (marker) ->
       if url = marker.element.href
+        marker.element.focus()
         utils.writeToClipboard vim.window, url
+      else if utils.isTextInputElement marker.element
+        utils.writeToClipboard vim.window, marker.element.value
 
     vim.enterHintsMode(markers, cb)
+
+# Focus element
+command_vf = (vim) ->
+  markers = hints.injectHints vim.window.document
+  if markers?.length > 0
+    vim.enterHintsMode(markers, ((marker) -> marker.element.focus()))
 
 # Copy current URL to the clipboard
 command_yy = (vim) ->
@@ -284,6 +292,7 @@ commandGroups =
     'p':        [ command_p,      _('help_command_p') ]
     'P':        [ command_P,      _('help_command_P') ]
     'y,f':      [ command_yf,     _('help_command_yf') ]
+    'v,f':      [ command_vf,     _('help_command_vf') ]
     'y,y':      [ command_yy,     _('help_command_yy') ]
     'r':        [ command_r,      _('help_command_r') ]
     'R':        [ command_R,      _('help_command_R') ]

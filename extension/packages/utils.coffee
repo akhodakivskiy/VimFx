@@ -59,6 +59,10 @@ getRootWindow = (window) ->
                .QueryInterface(Ci.nsIInterfaceRequestor)
                .getInterface(Window); 
 
+isTextInputElement = (element) ->
+  return element instanceof HTMLInputElement or \
+         element instanceof HTMLTextAreaElement
+
 isElementEditable = (element) ->
   return element.isContentEditable or \
          element instanceof HTMLInputElement or \
@@ -250,6 +254,7 @@ exports.getEventTabBrowser      = getEventTabBrowser
 
 exports.getWindowId             = getWindowId
 exports.getRootWindow           = getRootWindow
+exports.isTextInputElement      = isTextInputElement
 exports.isElementEditable       = isElementEditable
 exports.getSessionStore         = getSessionStore
 
