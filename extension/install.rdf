@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- This Source Code Form is subject to the terms of the Mozilla Public
    - License, v. 2.0. If a copy of the MPL was not distributed with this
-   - file, You can obtain one at http://mozilla.org/MPL/2.0/. 
+   - file, You can obtain one at http://mozilla.org/MPL/2.0/.
    -->
-<RDF xmlns="http://www.w3.org/1999/02/22-rdf-syntax-ns#" 
+<RDF xmlns="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
      xmlns:em="http://www.mozilla.org/2004/em-rdf#">
 
   <Description about="urn:mozilla:install-manifest">
@@ -65,5 +65,13 @@
       </Description>
     </em:localized>
 
+    <em:localized>
+      <Description>
+        <em:locale>nl</em:locale>
+        <em:name>VimFx</em:name>
+        <em:description>Vim sneltoetsen voor Firefox</em:description>
+        <em:creator>Anton Khodakivskiy</em:creator>
+      </Description>
+    </em:localized>
   </Description>
 </RDF>
