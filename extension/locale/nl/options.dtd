@@ -1,4 +1,4 @@
-<!ENTITY pref.hint_chars.title      "Hint Chars">
+<!ENTITY pref.hint_chars.title      "Gebruikte karakters">
 <!ENTITY pref.hint_chars.desc       "Standaard: asdfgercvhjkl;uinm">
 
 <!ENTITY pref.black_list.title      "Zwarte lijst">
@@ -15,7 +15,7 @@ Speciale tekens toegestaan: *, !">
 <!ENTITY pref.leave_dt_on_esc.desc  "Laat de ontwikkelaarsbalk open als er op Esc wordt gedrukt.">
 
 <!ENTITY pref.scroll_time.title     "Soepel scrollen">
-<!ENTITY pref.smooth_time.disabled  "Uitgeschakeld">
+<!ENTITY pref.smooth_time.disabled  "Uit">
 <!ENTITY pref.smooth_time.fast      "Snel">
 <!ENTITY pref.smooth_time.normal    "Normaal">
 <!ENTITY pref.smooth_time.slow      "Langzaam">
