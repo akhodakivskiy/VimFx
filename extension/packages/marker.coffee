@@ -26,6 +26,8 @@ MARKABLE_ELEMENTS = [
   "button" 
   "select"
   "input[not(@type='hidden' or @disabled or @readonly)]"
+  "embed"
+  "object"
 ]
 
 
