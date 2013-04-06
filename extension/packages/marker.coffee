@@ -231,10 +231,10 @@ getElementRect = (element) ->
     if rect.width == 0 or rect.height == 0
       for childElement in element.children
         computedStyle = window.getComputedStyle childElement, null
-        if computedStyle.getPropertyValue 'float' != 'none' or \
-           computedStyle.getPropertyValue 'position' == 'absolute'
+        if computedStyle.getPropertyValue('float') != 'none' or \
+           computedStyle.getPropertyValue('position') == 'absolute'
 
-          childRect if childRect = getElementRect childElement
+          return childRect if childRect = getElementRect childElement
 
   return undefined
 
