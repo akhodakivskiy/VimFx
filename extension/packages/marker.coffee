@@ -230,12 +230,12 @@ getElementRect = (element) ->
   for rect in rects
     if rect.width == 0 or rect.height == 0
       for childElement in element.children
-        computedStyle = window.getComputedStyle childElement, null
-        if computedStyle.getPropertyValue('float') != 'none' or \
-           computedStyle.getPropertyValue('position') == 'absolute'
+        if computedStyle = window.getComputedStyle childElement, null
+          if computedStyle.getPropertyValue('float') != 'none' or \
+             computedStyle.getPropertyValue('position') == 'absolute'
 
-          return childRect if childRect = getElementRect childElement
+            return childRect if childRect = getElementRect childElement
 
   return undefined
 
-exports.Marker              = Marker
+exports.Marker = Marker
