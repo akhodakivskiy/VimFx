@@ -254,12 +254,12 @@ command_find_hl = (vim) ->
 # Search for the last pattern
 command_n = (vim) ->
   if vim.findStr.length > 0
-    vim.findRng = find.find vim.window, vim.findStr, vim.findRng, find.DIRECTION_FORWARDS
+    vim.findRng = find.find vim.window, vim.findStr, vim.findRng, find.DIRECTION_FORWARDS, true
 
 # Search for the last pattern backwards
 command_N = (vim) ->
   if vim.findStr.length > 0
-    vim.findRng = find.find vim.window, vim.findStr, vim.findRng, find.DIRECTION_BACKWARDS
+    vim.findRng = find.find vim.window, vim.findStr, vim.findRng, find.DIRECTION_BACKWARDS, true
 
 # Close the Help dialog and cancel the pending hint marker action
 command_Esc = (vim) ->
