@@ -26,6 +26,8 @@ MARKABLE_ELEMENTS = [
   "button" 
   "select"
   "input[not(@type='hidden' or @disabled or @readonly)]"
+  # Zooming in and out images bigger than viewport size
+  "img[contains(@class, 'decoded') and (contains(@class, 'overflowing') or contains(@class, 'shrinkToFit'))]"
 ]
 
 
