@@ -35,7 +35,7 @@ injectHints = (document) ->
         document.documentElement.appendChild container
 
         for frame in document.defaultView.frames
-          markers = markers.concat inner(frame.document, markers.length)
+          markers = markers.concat inner(frame.document, markers.length+1)
 
         return markers
 
