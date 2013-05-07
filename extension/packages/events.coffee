@@ -142,6 +142,7 @@ tabsListener =
   onLocationChange: (browser, webProgress, request, location) ->
     blacklisted = utils.isBlacklisted location.spec, getPref 'black_list'
     if vim = vimBucket.get(browser.contentWindow)
+      vim.enterNormalMode()
       vim.blacklisted = blacklisted
       if rootWindow = utils.getRootWindow vim.window
         setWindowBlacklisted rootWindow, vim.blacklisted

@@ -25,6 +25,8 @@ class Vim
   enterHintsMode: (@markers, @cb) ->
     @mode = MODE_HINTS
 
+  # TODO: This function should probably remove 
+  # hint markers (if they are present) as well
   enterNormalMode: ->
     @mode = MODE_NORMAL
     @markers = @cb = undefined
