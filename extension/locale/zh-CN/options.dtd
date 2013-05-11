@@ -9,10 +9,10 @@
 <!ENTITY pref.scroll_step.desc      "滚动步长">
 
 <!ENTITY pref.blur_on_esc.title      "Esc 键功能">
-<!ENTITY pref.blur_on_esc.desc       "当按下 Esc 键时光标将离开聚焦的浏览器输入框（比如地址栏）">
+<!ENTITY pref.blur_on_esc.desc       "当按下 Esc 键时光标将离开任何聚焦的输入框（比如地址栏）">
 
-<!ENTITY pref.leave_dt_on_esc.title "Leave Developer Toolbar open on Esc">
-<!ENTITY pref.leave_dt_on_esc.desc  "Do not hide Developer Toolbar if it's visible and the Esc is pressed">
+<!ENTITY pref.leave_dt_on_esc.title "按下 Esc 键时，光标将离开打开的开发者工具栏">
+<!ENTITY pref.leave_dt_on_esc.desc  "按下 Esc 键时，将不会隐藏打开的开发者工具栏，只是让它失去焦点">
 
 <!ENTITY pref.scroll_time.title     "平滑滚动">
 <!ENTITY pref.smooth_time.disabled  "禁用">
