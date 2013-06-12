@@ -264,6 +264,8 @@ getHintChars = do ->
     if hintChars.length < 3
       hintChars = getDefaultPref('hint_chars')
 
+    return hintChars
+
 exports.Bucket                    = Bucket
 exports.getCurrentTabWindow       = getCurrentTabWindow
 exports.getEventWindow            = getEventWindow
