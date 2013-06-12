@@ -1,6 +1,6 @@
 # Change Log
 
-0.4.7 (12 Jun 2013)
+0.4.8 (12 Jun 2013)
 
 - `embed` and `object` tags will now have their own hints
 - Bug fixes related to custom hint chars (@LordJZ)
