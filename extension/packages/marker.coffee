@@ -1,7 +1,9 @@
 { interfaces: Ci }      = Components
 XPathResult             = Ci.nsIDOMXPathResult
 
-{ getPref } = require 'prefs'
+{ getPref
+, getDefaultPref
+} = require 'prefs'
 
 # All elements that have one or more of the following properties 
 # qualify for their own marker in hints mode
@@ -106,7 +108,7 @@ class Marker
 #
 # The array of markers is returned
 Marker.createMarkers = (document, startIndex) ->
-  hintChars = getPref('hint_chars').toLowerCase()
+  hintChars = getPref('hint_chars').toLowerCase() or getDefaultPref('hint_chars')
 
   set = getMarkableElements(document)
   markers = [];
