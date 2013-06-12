@@ -5,7 +5,6 @@ utils = require 'utils'
 } = require 'commands'
 
 { getPref
-, getDefaultPref
 , isCommandDisabled 
 } = require 'prefs'
 
@@ -37,8 +36,7 @@ class Vim
       result = maybeCommand @keys.concat([keyStr])
     else if !keyboardEvent.ctrlKey and !keyboardEvent.metaKey
       if @mode == MODE_HINTS
-        hintChars = getPref('hint_chars').toLowerCase() or getDefaultPref('hint_chars')
-        result = hintChars.search(regexpEscape(keyStr)) > -1
+        result = utils.getHintChars().search(regexpEscape(keyStr)) > -1
 
     if result 
       @lastKeyStr = keyStr

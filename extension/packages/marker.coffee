@@ -1,9 +1,9 @@
 { interfaces: Ci }      = Components
 XPathResult             = Ci.nsIDOMXPathResult
 
-{ getPref
-, getDefaultPref
-} = require 'prefs'
+{ getPref } = require 'prefs'
+
+utils = require 'utils'
 
 # All elements that have one or more of the following properties 
 # qualify for their own marker in hints mode
@@ -31,7 +31,6 @@ MARKABLE_ELEMENTS = [
   "embed"
   "object"
 ]
-
 
 # Marker class wraps the markable element and provides
 # methods to manipulate the markers
@@ -108,7 +107,7 @@ class Marker
 #
 # The array of markers is returned
 Marker.createMarkers = (document, startIndex) ->
-  hintChars = getPref('hint_chars').toLowerCase() or getDefaultPref('hint_chars')
+  hintChars = utils.getHintChars()
 
   set = getMarkableElements(document)
   markers = [];
