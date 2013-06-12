@@ -45,12 +45,7 @@ command_P = (vim) ->
 # Open new tab and focus the address bar
 command_t = (vim) ->
   if chromeWindow = utils.getRootWindow vim.window
-    if gBrowser = chromeWindow.gBrowser
-      # Get the default url for the new tab
-      newtab_url = getFirefoxPref 'browser.newtab.url'
-      gBrowser.selectedTab = gBrowser.addTab newtab_url
-      # Focus the address bar
-      chromeWindow.focusAndSelectUrlBar()
+    chromeWindow.BrowserOpenTab()
 
 # Copy element URL to the clipboard
 command_yf = (vim) ->
@@ -254,12 +249,12 @@ command_find_hl = (vim) ->
 # Search for the last pattern
 command_n = (vim) ->
   if vim.findStr.length > 0
-    vim.findRng = find.find vim.window, vim.findStr, vim.findRng, find.DIRECTION_FORWARDS
+    vim.findRng = find.find vim.window, vim.findStr, vim.findRng, find.DIRECTION_FORWARDS, true
 
 # Search for the last pattern backwards
 command_N = (vim) ->
   if vim.findStr.length > 0
-    vim.findRng = find.find vim.window, vim.findStr, vim.findRng, find.DIRECTION_BACKWARDS
+    vim.findRng = find.find vim.window, vim.findStr, vim.findRng, find.DIRECTION_BACKWARDS, true
 
 # Close the Help dialog and cancel the pending hint marker action
 command_Esc = (vim) ->

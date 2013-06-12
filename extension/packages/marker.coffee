@@ -3,6 +3,8 @@ XPathResult             = Ci.nsIDOMXPathResult
 
 { getPref } = require 'prefs'
 
+utils = require 'utils'
+
 # All elements that have one or more of the following properties 
 # qualify for their own marker in hints mode
 MARKABLE_ELEMENT_PROPERTIES = [
@@ -26,8 +28,9 @@ MARKABLE_ELEMENTS = [
   "button" 
   "select"
   "input[not(@type='hidden' or @disabled or @readonly)]"
+  "embed"
+  "object"
 ]
-
 
 # Marker class wraps the markable element and provides
 # methods to manipulate the markers
@@ -104,7 +107,7 @@ class Marker
 #
 # The array of markers is returned
 Marker.createMarkers = (document, startIndex) ->
-  hintChars = getPref('hint_chars').toLowerCase()
+  hintChars = utils.getHintChars()
 
   set = getMarkableElements(document)
   markers = [];
@@ -230,12 +233,12 @@ getElementRect = (element) ->
   for rect in rects
     if rect.width == 0 or rect.height == 0
       for childElement in element.children
-        computedStyle = window.getComputedStyle childElement, null
-        if computedStyle.getPropertyValue 'float' != 'none' or \
-           computedStyle.getPropertyValue 'position' == 'absolute'
+        if computedStyle = window.getComputedStyle childElement, null
+          if computedStyle.getPropertyValue('float') != 'none' or \
+             computedStyle.getPropertyValue('position') == 'absolute'
 
-          childRect if childRect = getElementRect childElement
+            return childRect if childRect = getElementRect childElement
 
   return undefined
 
-exports.Marker              = Marker
+exports.Marker = Marker

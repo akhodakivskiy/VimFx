@@ -35,7 +35,9 @@ getPref = do ->
   
   return (key, defaultValue=undefined) ->
     value = getBranchPref branch, key, defaultValue
-    return if value == undefined then DEFAULT_PREF_VALUES[key] else value
+    return if value == undefined then getDefaultPref(key) else value
+
+getDefaultPref = (key) -> return DEFAULT_PREF_VALUES[key]
 
 getFirefoxPref = do ->
   prefs = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefService)
@@ -98,6 +100,7 @@ isCommandDisabled = (key) ->
   return false
 
 exports.getPref                   = getPref
+exports.getDefaultPref            = getDefaultPref
 exports.getFirefoxPref            = getFirefoxPref
 exports.setPref                   = setPref
 exports.isCommandDisabled         = isCommandDisabled

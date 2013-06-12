@@ -23,6 +23,7 @@ injectFind = (document, cb) ->
   # Call back on (Shift)-Enter with proper direction
   input.addEventListener 'keypress', (event) ->
     if event.keyCode == event.DOM_VK_RETURN
+      focusSelection(document, Ci.nsISelectionController.SELECTION_FIND)
       removeFind(document, false)
 
   document.documentElement.appendChild div
@@ -35,6 +36,14 @@ removeFind = (document, clear = true) ->
 
   if clear
     clearSelection(document.defaultView)
+
+focusSelection = (document, selectionType) ->
+  if controller = getController(document.defaultView)
+    if selection = controller.getSelection(selectionType)
+      if selection.rangeCount > 0
+        element = selection.getRangeAt(0).commonAncestorContainer?.parentNode
+        if element.focus
+          element.focus()
 
 createFindContainer = (document) ->
   div = document.createElement 'div'
@@ -62,7 +71,7 @@ findFactory = (selectionType) ->
               .createInstance()
               .QueryInterface(Components.interfaces.nsIFind)
 
-  return (window, findStr, findRng = null, direction = DIRECTION_FORWARDS) ->
+  return (window, findStr, findRng = null, direction = DIRECTION_FORWARDS, focus = false) ->
     # `find` will also recursively search in all frames.  # `innerFind` does the work: 
     # searches, selects, scrolls, and optionally reaches into frames
     innerFind = (window) ->
@@ -87,7 +96,10 @@ findFactory = (selectionType) ->
 
         if range = finder.Find(findStr, searchRange, startPt, endPt)
           controller.getSelection(selectionType).addRange(range)
-          controller.scrollSelectionIntoView(selectionType, range, 0)
+          controller.scrollSelectionIntoView(selectionType, range, Ci.nsISelectionController.SCROLL_CENTER_VERTICALLY)
+          if focus
+            focusSelection(window.document, selectionType)
+
           return range
 
     clearSelection(window, selectionType)

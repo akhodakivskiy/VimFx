@@ -13,7 +13,9 @@ ChromeWindow        = Ci.nsIDOMChromeWindow
 _sss  = Cc["@mozilla.org/content/style-sheet-service;1"].getService(Ci.nsIStyleSheetService)
 _clip = Cc["@mozilla.org/widget/clipboard;1"].getService(Ci.nsIClipboard)
 
-{ getPref } = require 'prefs'
+{ getPref 
+, getDefaultPref
+} = require 'prefs'
 
 class Bucket
   constructor: (@idFunc, @newFunc) ->
@@ -246,29 +248,46 @@ removeClass = (element, klass) ->
   name = element.className.replace new RegExp("\\s*#{ klass }"), ""
   element.className = name or null
 
-exports.Bucket                  = Bucket
-exports.getCurrentTabWindow     = getCurrentTabWindow
-exports.getEventWindow          = getEventWindow
-exports.getEventRootWindow      = getEventRootWindow
-exports.getEventTabBrowser      = getEventTabBrowser
+# Get hint characters, convert them to lower case and fall back
+# to default hint characters if there are less than 3 chars
+getHintChars = do ->
+  # Remove duplicate characters from string (case insensitive)
+  removeDuplicateCharacters = (str) ->
+    seen = {}
+    return str.toLowerCase()
+              .split('')
+              .filter((char) -> if seen[char] then false else (seen[char] = true))
+              .join ''
 
-exports.getWindowId             = getWindowId
-exports.getRootWindow           = getRootWindow
-exports.isTextInputElement      = isTextInputElement
-exports.isElementEditable       = isElementEditable
-exports.getSessionStore         = getSessionStore
+  return ->
+    hintChars = removeDuplicateCharacters(getPref('hint_chars'))
+    if hintChars.length < 3
+      hintChars = getDefaultPref('hint_chars')
 
-exports.loadCss                 = loadCss
+exports.Bucket                    = Bucket
+exports.getCurrentTabWindow       = getCurrentTabWindow
+exports.getEventWindow            = getEventWindow
+exports.getEventRootWindow        = getEventRootWindow
+exports.getEventTabBrowser        = getEventTabBrowser
 
-exports.simulateClick           = simulateClick
-exports.smoothScroll            = smoothScroll
-exports.readFromClipboard       = readFromClipboard
-exports.writeToClipboard        = writeToClipboard
-exports.timeIt                  = timeIt
-exports.isBlacklisted           = isBlacklisted
-exports.getVersion              = getVersion
-exports.parseHTML               = parseHTML
-exports.isURL                   = isURL
-exports.browserSearchSubmission = browserSearchSubmission
-exports.addClass                = addClass
-exports.removeClass             = removeClass
+exports.getWindowId               = getWindowId
+exports.getRootWindow             = getRootWindow
+exports.isTextInputElement        = isTextInputElement
+exports.isElementEditable         = isElementEditable
+exports.getSessionStore           = getSessionStore
+
+exports.loadCss                   = loadCss
+
+exports.simulateClick             = simulateClick
+exports.smoothScroll              = smoothScroll
+exports.readFromClipboard         = readFromClipboard
+exports.writeToClipboard          = writeToClipboard
+exports.timeIt                    = timeIt
+exports.isBlacklisted             = isBlacklisted
+exports.getVersion                = getVersion
+exports.parseHTML                 = parseHTML
+exports.isURL                     = isURL
+exports.browserSearchSubmission   = browserSearchSubmission
+exports.addClass                  = addClass
+exports.removeClass               = removeClass
+exports.getHintChars              = getHintChars 

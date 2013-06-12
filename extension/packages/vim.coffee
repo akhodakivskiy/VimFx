@@ -25,6 +25,8 @@ class Vim
   enterHintsMode: (@markers, @cb) ->
     @mode = MODE_HINTS
 
+  # TODO: This function should probably remove 
+  # hint markers (if they are present) as well
   enterNormalMode: ->
     @mode = MODE_NORMAL
     @markers = @cb = undefined
@@ -34,8 +36,7 @@ class Vim
       result = maybeCommand @keys.concat([keyStr])
     else if !keyboardEvent.ctrlKey and !keyboardEvent.metaKey
       if @mode == MODE_HINTS
-        hintChars = getPref('hint_chars').toLowerCase()
-        result = hintChars.search(regexpEscape(keyStr)) > -1
+        result = utils.getHintChars().search(regexpEscape(keyStr)) > -1
 
     if result 
       @lastKeyStr = keyStr
