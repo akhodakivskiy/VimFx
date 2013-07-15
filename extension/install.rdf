@@ -73,5 +73,14 @@
         <em:creator>Anton Khodakivskiy</em:creator>
       </Description>
     </em:localized>
+
+    <em:localized>
+      <Description>
+        <em:locale>de</em:locale>
+        <em:name>VimFx</em:name>
+        <em:description>Vim Tastenbefehle für Firefox</em:description>
+        <em:creator>Alexander Haeussler</em:creator>
+      </Description>
+    </em:localized>
   </Description>
 </RDF>
