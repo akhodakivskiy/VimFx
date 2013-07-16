@@ -1,12 +1,6 @@
 { interfaces: Ci }      = Components
 XPathResult             = Ci.nsIDOMXPathResult
 
-{ getPref } = require 'prefs'
-
-utils = require 'utils'
-
-{ addHuffmanCodeWordsTo } = require 'huffman'
-
 # All elements that have one or more of the following properties
 # qualify for their own marker in hints mode
 MARKABLE_ELEMENT_PROPERTIES = [
@@ -105,28 +99,21 @@ class Marker
 
 
 # Selects all markable elements on the page, creates markers
-# for each of them The markers are then positioned on the page
+# for each of them. The markers are then positioned on the page.
+# Note that the markers are not given any hints at this point.
 #
 # The array of markers is returned
-Marker.createMarkers = (document, startIndex) ->
-  hintChars = utils.getHintChars()
-
+Marker.createMarkers = (document) ->
   set = getMarkableElements(document)
 
-  elements = []
+  markers = []
   for i in [0...set.snapshotLength] by 1
-    e = set.snapshotItem(i)
-    if rect = getElementRect e
-      weight = rect.area
-      elements.push [weight, e, rect]
-
-  addHuffmanCodeWordsTo elements, {alphabet: hintChars}
-
-  markers = for [weight, element, rect, hint] in elements
-    marker = new Marker(element)
-    marker.setPosition rect
-    marker.setHint hint
-    marker
+    element = set.snapshotItem(i)
+    if rect = getElementRect element
+      marker = new Marker(element)
+      marker.setPosition rect
+      marker.weight = rect.area
+      markers.push marker
 
   return markers
 

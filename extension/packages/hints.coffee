@@ -1,20 +1,22 @@
 CONTAINER_ID  = 'VimFxHintMarkerContainer'
 
-{ interfaces: Ci }  = Components
-HTMLDocument        = Ci.nsIDOMHTMLDocument
-XULDocument         = Ci.nsIDOMXULDocument
-{ Marker }          = require 'marker'
+{ interfaces: Ci }        = Components
+HTMLDocument              = Ci.nsIDOMHTMLDocument
+XULDocument               = Ci.nsIDOMXULDocument
+{ Marker }                = require 'marker'
+utils                     = require 'utils'
+{ addHuffmanCodeWordsTo } = require 'huffman'
 
 createHintsContainer = (document) ->
   container = document.createElement 'div'
   container.id = CONTAINER_ID
   container.className = 'VimFxReset'
   return container
-    
+
 # Creates and injects hint markers into the DOM
 injectHints = (document) ->
 
-  inner = (document, startIndex = 1) ->
+  inner = (document) ->
     # First remove previous hints container
     removeHints document
 
@@ -22,7 +24,7 @@ injectHints = (document) ->
     if document instanceof HTMLDocument# or document instanceof XULDocument
       if document.documentElement
         # Find and create markers
-        markers = Marker.createMarkers document, startIndex
+        markers = Marker.createMarkers document
 
         container = createHintsContainer document
 
@@ -35,16 +37,25 @@ injectHints = (document) ->
         document.documentElement.appendChild container
 
         for frame in document.defaultView.frames
-          markers = markers.concat inner(frame.document, markers.length+1)
+          markers = markers.concat inner(frame.document)
 
         return markers
 
-  return inner(document)
+  markers = inner(document)
+
+  # Add hints to the markers
+  hintChars = utils.getHintChars()
+  weightsAndMarkers = markers.map (marker) -> [marker.weight, marker]
+  addHuffmanCodeWordsTo weightsAndMarkers, {alphabet: hintChars}
+  for [weight, marker, hint] in weightsAndMarkers
+    marker.setHint hint
+
+  return markers
 
 # Remove previously injected hints from the DOM
 removeHints = (document) ->
   if container = document.getElementById CONTAINER_ID
-    document.documentElement.removeChild container 
+    document.documentElement.removeChild container
 
   for frame in document.defaultView.frames
     removeHints frame.document
