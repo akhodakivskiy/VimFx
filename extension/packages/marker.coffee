@@ -5,7 +5,7 @@ XPathResult             = Ci.nsIDOMXPathResult
 
 utils = require 'utils'
 
-# All elements that have one or more of the following properties 
+# All elements that have one or more of the following properties
 # qualify for their own marker in hints mode
 MARKABLE_ELEMENT_PROPERTIES = [
   "@tabindex"
@@ -25,7 +25,7 @@ MARKABLE_ELEMENTS = [
   "iframe"
   "area[@href]"
   "textarea"
-  "button" 
+  "button"
   "select"
   "input[not(@type='hidden' or @disabled or @readonly)]"
   "embed"
@@ -68,28 +68,28 @@ class Marker
       span = document.createElement 'span'
       span.className = 'VimFxReset'
       span.textContent = char.toUpperCase()
-      
+
       fragment.appendChild span
 
     @markerElement.appendChild fragment
 
-  # Add another char to the `enteredHintString`, 
+  # Add another char to the `enteredHintString`,
   # see if it still matches `hintString`, apply classes to
-  # the distinct hint characters and show/hide marker when 
+  # the distinct hint characters and show/hide marker when
   # the entered string partially (not) matches the hint string
   matchHintChar: (char) ->
-    # Handle backspace key by removing a previously entered hint char 
+    # Handle backspace key by removing a previously entered hint char
     # and resetting its class
-    if char == 'Backspace' 
+    if char == 'Backspace'
       if @enteredHintChars.length > 0
         @enteredHintChars = @enteredHintChars.slice(0, -1)
         @markerElement.children[@enteredHintChars.length]?.className = 'VimFxReset'
     # Otherwise append hint char and change hint class
-    else 
+    else
       @markerElement.children[@enteredHintChars.length]?.className = 'VimFxReset VimFxCharMatch'
       @enteredHintChars += char.toLowerCase()
 
-    # If entered hint chars no longer partially match the hint chars 
+    # If entered hint chars no longer partially match the hint chars
     # then hide the marker. Othersie show it back
     if @hintChars.search(@enteredHintChars) == 0 then @show() else @hide()
 
@@ -110,7 +110,7 @@ Marker.createMarkers = (document, startIndex) ->
   hintChars = utils.getHintChars()
 
   set = getMarkableElements(document)
-  markers = [];
+  markers = []
 
   elements = []
   for i in [0...set.snapshotLength] by 1
@@ -145,7 +145,7 @@ Marker.createMarkers = (document, startIndex) ->
 
   return markers
 
-# Function generator that creates a function that 
+# Function generator that creates a function that
 # returns hint string for supplied numeric index.
 indexToHint = do ->
   # Helper function that returns a permutation number `i`
@@ -154,7 +154,7 @@ indexToHint = do ->
     return '' if i < 0
 
     n = chars.length
-    l = Math.floor(i / n); k = i % n;
+    l = Math.floor(i / n); k = i % n
 
     return f(l - 1, chars) + chars[k]
 
@@ -169,7 +169,7 @@ indexToHint = do ->
     n = Math.floor(i / left.length)
     m = i % left.length
     return f(n - 1, right) + left[m]
-      
+
 
 # Returns elements that qualify for hint markers in hints mode.
 # Generates and memoizes an XPath query internally
@@ -179,18 +179,18 @@ getMarkableElements = do ->
     MARKABLE_ELEMENTS,
     ["*[#{ MARKABLE_ELEMENT_PROPERTIES.join(" or ") }]"]
 
-  xpath = elements.reduce((m, rule) -> 
+  xpath = elements.reduce((m, rule) ->
     m.concat(["//#{ rule }", "//xhtml:#{ rule }"])
   , []).join(' | ')
 
   namespaceResolver = (namespace) ->
     if (namespace == "xhtml") then "http://www.w3.org/1999/xhtml" else null
 
-  # The actual function that will return the desired elements 
+  # The actual function that will return the desired elements
   return (document, resultType = XPathResult.ORDERED_NODE_SNAPSHOT_TYPE) ->
     document.evaluate xpath, document.documentElement, namespaceResolver, resultType, null
 
-# Checks if the given TextRectangle object qualifies 
+# Checks if the given TextRectangle object qualifies
 # for its own Marker with respect to the `window` object
 isRectOk = (rect, window) ->
   rect.width > 2 and rect.height > 2 and \
@@ -198,9 +198,9 @@ isRectOk = (rect, window) ->
   rect.top < window.innerHeight - 2 and \
   rect.left < window.innerWidth - 2
 
-# Will scan through `element.getClientRects()` and look for 
+# Will scan through `element.getClientRects()` and look for
 # the first visible rectange. If there are no visible rectangles, then
-# will look at the children of the markable node. 
+# will look at the children of the markable node.
 #
 # The logic has been copied over from Vimiun
 getElementRect = (element) ->
@@ -209,14 +209,14 @@ getElementRect = (element) ->
   docElem  = document.documentElement
   body     = document.body
 
-  clientTop  = docElem.clientTop  || body?.clientTop  || 0;
-  clientLeft = docElem.clientLeft || body?.clientLeft || 0;
-  scrollTop  = window.pageYOffset || docElem.scrollTop;
-  scrollLeft = window.pageXOffset || docElem.scrollLeft;
-  
+  clientTop  = docElem.clientTop  || body?.clientTop  || 0
+  clientLeft = docElem.clientLeft || body?.clientLeft || 0
+  scrollTop  = window.pageYOffset || docElem.scrollTop
+  scrollLeft = window.pageXOffset || docElem.scrollLeft
+
   clientRect = element.getBoundingClientRect()
   rects = [rect for rect in element.getClientRects()]
-  rects.push clientRect 
+  rects.push clientRect
 
   for rect in rects
     if isRectOk rect, window

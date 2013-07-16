@@ -12,7 +12,7 @@ runOnLoad = (window, callback, winType) ->
 
     # Now that the window has loaded, only handle browser windows
     if window.document.documentElement.getAttribute("windowtype") == winType
-      callback window 
+      callback window
 
   window.addEventListener "load", cb, false
 
@@ -33,7 +33,7 @@ runOnWindows = (callback, winType) ->
     # Only run the watcher immediately if the browser is completely loaded
     browserWindow = browserWindows.getNext()
     if browserWindow.document.readyState == "complete"
-      watcher(browserWindow);
+      watcher(browserWindow)
     # Wait for the window to load before continuing
     else
       runOnLoad(browserWindow, watcher, winType)

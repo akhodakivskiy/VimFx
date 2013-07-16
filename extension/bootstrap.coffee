@@ -10,7 +10,7 @@ do (global = this) ->
   baseURI = Services.io.newURI __SCRIPT_URI_SPEC__, null, null
   getResourceURI = (path) -> Services.io.newURI path, null, baseURI
 
-  loader = Cc["@mozilla.org/moz/jssubscript-loader;1"].getService(Ci.mozIJSSubScriptLoader); 
+  loader = Cc["@mozilla.org/moz/jssubscript-loader;1"].getService(Ci.mozIJSSubScriptLoader)
 
   include = (src, scope = {}) ->
     try
@@ -20,21 +20,21 @@ do (global = this) ->
       dump "Failed to load #{ src }: #{ error }\n"
 
     return scope
-  
+
 
   modules = {}
   require = (src) ->
     if modules[src]
       return modules[src]
     else
-      scope = 
+      scope =
         require: require
         include: include
         exports: {}
 
       include "packages/#{ src }.js", scope
 
-      return modules[src] = scope.exports;
+      return modules[src] = scope.exports
 
   global.include = include
   global.require = require
@@ -45,7 +45,7 @@ do (global = this) ->
   include("includes/#{ name }.js", global) for name in [
     'chrome',
     'console',
-    'unload', 
+    'unload',
   ]
 
   # Init localization `underscore` method

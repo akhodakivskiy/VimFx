@@ -6,8 +6,8 @@ l10n = do ->
   locale = Cc["@mozilla.org/chrome/chrome-registry;1"]
     .getService(Ci.nsIXULChromeRegistry).getSelectedLocale("global")
 
-  getStr = (aStrBundle, aKey) -> 
-    try return aStrBundle.GetStringFromName(aKey);
+  getStr = (aStrBundle, aKey) ->
+    try return aStrBundle.GetStringFromName(aKey)
 
   return (filename, defaultLocale="en-US") ->
 
@@ -23,19 +23,19 @@ l10n = do ->
 
     # Folder named after `defaultLocale`
     addonsDefaultBundle = Services.strings.createBundle filePath(defaultLocale)
-    
+
     # The underscore function
     l10n_underscore = (aKey, aLocale) ->
       localeBundle = null
       localeBasicBundle = null
-      
+
       # Yet another way to specify a folder
       if aLocale
         localeBundle = Services.strings.createBundle filePath(aLocale)
 
         if locale_base = aLocale.match(splitter)
           localeBasicBundle = Services.strings.createBundle filePath(locale_base[1])
-      
+
       aVal = getStr(localeBundle, aKey) \
           or getStr(localeBasicBundle, aKey) \
           or (defaultBundle && (getStr(defaultBundle, aKey) or (defaultBundle = null))) \
@@ -46,6 +46,6 @@ l10n = do ->
 
     unload Services.strings.flushBundles
 
-    return l10n_underscore 
+    return l10n_underscore
 
 exports.l10n = l10n

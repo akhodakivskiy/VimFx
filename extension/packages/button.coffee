@@ -1,4 +1,4 @@
-{ getPref 
+{ getPref
 , setPref } = require 'prefs'
 
 { injectHelp } = require 'help'
@@ -27,9 +27,9 @@ persist = (document, toolbar, buttonId, beforeId) ->
   currentset = toolbar.currentSet.split ','
   idx = if beforeId then currentset.indexOf(beforeId) else -1
   if idx != -1
-    currentset.splice(idx, 0, buttonId);
+    currentset.splice(idx, 0, buttonId)
   else
-    currentset.push(buttonId);
+    currentset.push(buttonId)
 
   toolbar.setAttribute "currentset", currentset.join ','
   document.persist toolbar.id, "currentset"
@@ -37,20 +37,20 @@ persist = (document, toolbar, buttonId, beforeId) ->
 
 restorePosition = (doc, button) ->
   $(doc, "navigator-toolbox").palette.appendChild(button)
-  
+
   for tb in $$(doc, "toolbar")
     currentset = tb.getAttribute("currentset").split ','
     idx = currentset.indexOf button.id
     if idx != -1
       toolbar = tb
       break
-  
+
   # Saved position not found, using the default one, after persisting it
   if !toolbar and pos = positions[button.id]
     [tbID, beforeId] = pos
     if toolbar = $(doc, tbID)
       [currentset, idx] = persist(doc, toolbar, button.id, beforeId)
-  
+
   if toolbar and idx != -1
     # Inserting the button before the first item in `currentset`
     # after `idx` that is present in the document
@@ -62,7 +62,7 @@ restorePosition = (doc, button) ->
     toolbar.insertItem button.id
 
 iconUrl = do ->
-  kinds = 
+  kinds =
     normal:    getResourceURI('resources/icon16.png').spec
     grey:      getResourceURI('resources/icon16-grey.png').spec
     red:       getResourceURI('resources/icon16-red.png').spec
@@ -86,11 +86,11 @@ createMenupopup = (window) ->
   hbox.appendChild blacklistButton
 
   itemPreferences = doc.createElement 'menuitem'
-  itemPreferences.id = MENU_ITEM_PREF  
+  itemPreferences.id = MENU_ITEM_PREF
   itemPreferences.setAttribute 'label', _('item_preferences')
 
   itemHelp = doc.createElement 'menuitem'
-  itemHelp.id = MENU_ITEM_HELP  
+  itemHelp.id = MENU_ITEM_HELP
   itemHelp.setAttribute 'label', _('item_help')
 
   menupopup = doc.createElement 'menupopup'
@@ -106,7 +106,7 @@ createMenupopup = (window) ->
 
   onBlacklistButtonCommand = (event) ->
     blackList = getPref 'black_list'
-    blackList += ', ' if blackList.length > 0 
+    blackList += ', ' if blackList.length > 0
     blackList += blacklistTextbox.value
 
     setPref 'black_list', blackList
@@ -145,12 +145,12 @@ createButton = (window) ->
   button.setAttribute 'label', 'VimFx'
   button.setAttribute 'class', 'toolbarbutton-1'
   #
-  # Create and install event listeners 
+  # Create and install event listeners
   onButtonCommand = (event) ->
     # Change disabled state value which is stored in Prefs
     setPref('disabled', not getPref 'disabled')
     updateToolbarButton button
-    
+
     event.stopPropagation()
 
   button.addEventListener 'command', onButtonCommand, false
@@ -181,7 +181,7 @@ addToolbarButton = (window) ->
   restorePosition doc, button
   win.appendChild keyset
 
-  unload -> 
+  unload ->
     if buttonParent = button.parentNode
       buttonParent.removeChild button
     if keysetParent = keyset.parentNode
@@ -205,5 +205,5 @@ setWindowBlacklisted = (window, blacklisted) ->
     updateToolbarButton button
 
 exports.addToolbarButton         = addToolbarButton
-exports.setWindowBlacklisted     = setWindowBlacklisted 
+exports.setWindowBlacklisted     = setWindowBlacklisted
 exports.setButtonInstallPosition = setButtonInstallPosition

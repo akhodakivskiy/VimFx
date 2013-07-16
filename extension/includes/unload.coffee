@@ -1,6 +1,6 @@
 unload = do ->
   # Initialize the array of unloaders on the first usage
-  unloaders = [];
+  unloaders = []
 
   return (callback, container) ->
 

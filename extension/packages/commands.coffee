@@ -6,7 +6,7 @@ help  = require 'help'
 find  = require 'find'
 
 { getPref
-, setPref 
+, setPref
 , getFirefoxPref } = require 'prefs'
 
 # Opens developer toolbar (Default shotrcut: Shift-F2)
@@ -21,7 +21,7 @@ command_o = (vim) ->
     chromeWindow.focusAndSelectUrlBar()
 
 # Navigate to the address that is currently stored in the system clipboard
-command_p = (vim) -> 
+command_p = (vim) ->
   url = utils.readFromClipboard(vim.window)
   postData = null
   if not utils.isURL(url) and submission = utils.browserSearchSubmission url
@@ -77,7 +77,7 @@ command_r = (vim) ->
 # Reload the page from the server
 command_R = (vim) ->
   vim.window.location.reload(true)
-  
+
 # Reload the page, possibly from cache
 command_ar = (vim) ->
   if rootWindow = utils.getRootWindow vim.window
@@ -106,19 +106,19 @@ command_G = (vim) ->
     vim.window.scrollTo(0, Math.max(document.body.scrollHeight, 100000))
 
 # Scroll down a bit
-command_j_ce = (vim) -> 
+command_j_ce = (vim) ->
   utils.smoothScroll vim.window, 0, (getPref 'scroll_step'), getPref 'scroll_time'
 
 # Scroll up a bit
-command_k_cy = (vim) -> 
+command_k_cy = (vim) ->
   utils.smoothScroll vim.window, 0, -(getPref 'scroll_step'), getPref 'scroll_time'
 
 # Scroll left a bit
-command_h = (vim) -> 
+command_h = (vim) ->
   utils.smoothScroll vim.window, -(getPref 'scroll_step'), 0, getPref 'scroll_time'
 
 # Scroll right a bit
-command_l = (vim) -> 
+command_l = (vim) ->
   utils.smoothScroll vim.window, (getPref 'scroll_step'), 0, getPref 'scroll_time'
 
 # Scroll down half a page
@@ -128,7 +128,7 @@ command_d = (vim) ->
 # Scroll up half a page
 command_u = (vim) ->
   utils.smoothScroll vim.window, 0, -vim.window.innerHeight / 2, getPref 'scroll_time'
-  
+
 # Scroll down full a page
 command_cf = (vim) ->
   step = (vim.window.innerHeight - (getPref 'scroll_step'))
@@ -142,12 +142,12 @@ command_cb = (vim) ->
 # Activate previous tab
 command_J_gT = (vim) ->
   if rootWindow = utils.getRootWindow vim.window
-    rootWindow.gBrowser.tabContainer.advanceSelectedTab(-1, true);
+    rootWindow.gBrowser.tabContainer.advanceSelectedTab(-1, true)
 
 # Activate next tab
 command_K_gt = (vim) ->
   if rootWindow = utils.getRootWindow vim.window
-    rootWindow.gBrowser.tabContainer.advanceSelectedTab(1, true);
+    rootWindow.gBrowser.tabContainer.advanceSelectedTab(1, true)
 
 command_gh = (vim) ->
   homepage_url = getFirefoxPref 'browser.startup.homepage'
@@ -156,18 +156,18 @@ command_gh = (vim) ->
 # Go to the first tab
 command_gH_g0 = (vim) ->
   if rootWindow = utils.getRootWindow vim.window
-    rootWindow.gBrowser.tabContainer.selectedIndex = 0;
+    rootWindow.gBrowser.tabContainer.selectedIndex = 0
 
 # Go to the last tab
 command_gL_g$ = (vim) ->
   if rootWindow = utils.getRootWindow vim.window
-    itemCount = rootWindow.gBrowser.tabContainer.itemCount;
-    rootWindow.gBrowser.tabContainer.selectedIndex = itemCount - 1;
+    itemCount = rootWindow.gBrowser.tabContainer.itemCount
+    rootWindow.gBrowser.tabContainer.selectedIndex = itemCount - 1
 
 # Go back in history
 command_H = (vim) ->
   vim.window.history.back()
-    
+
 # Go forward in history
 command_L = (vim) ->
   vim.window.history.forward()
@@ -179,7 +179,7 @@ command_x = (vim) ->
       rootWindow.gBrowser.removeCurrentTab()
 
 # Restore last closed tab
-command_X = (vim) -> 
+command_X = (vim) ->
   if rootWindow = utils.getRootWindow vim.window
     ss = utils.getSessionStore()
     if ss and ss.getClosedTabCount(rootWindow) > 0
@@ -196,7 +196,7 @@ command_f = (vim) ->
         utils.simulateClick marker.element
 
       vim.enterHintsMode markers, cb
-  
+
 # Follow links in a new Tab with hint markers
 command_F = (vim) ->
   markers = hints.injectHints vim.window.document
@@ -217,7 +217,7 @@ command_cJ = (vim) ->
 
       # `total` is added to deal with negative offset
       gBrowser.moveTabTo tab, (total + index - 1) % total
-  
+
 # Move current tab to the right
 command_cK = (vim) ->
   if gBrowser = utils.getRootWindow(vim.window)?.gBrowser
@@ -239,7 +239,7 @@ command_find = (vim) ->
       [vim.findStr, vim.findRng] = [findStr, null]
     # Perform forward find and store found region
     return vim.findRng = find.find vim.window, vim.findStr, vim.findRng, find.DIRECTION_FORWARDS
-    
+
 # Switch into find mode with highlighting
 command_find_hl = (vim) ->
   find.injectFind vim.window.document, (findStr) ->
@@ -259,7 +259,7 @@ command_N = (vim) ->
 # Close the Help dialog and cancel the pending hint marker action
 command_Esc = (vim) ->
   # Blur active element if it's editable. Other elements
-  # aren't blurred - we don't want to interfere with 
+  # aren't blurred - we don't want to interfere with
   # the browser too much
   activeElement = vim.window.document.activeElement
   if utils.isElementEditable activeElement
@@ -281,7 +281,7 @@ command_Esc = (vim) ->
     if chromeWindow = utils.getRootWindow vim.window
       chromeWindow.DeveloperToolbar.hide()
 
-commandGroups = 
+commandGroups =
   'urls':
     'o':        [ command_o,      _('help_command_o') ]
     'p':        [ command_p,      _('help_command_p') ]
@@ -321,7 +321,7 @@ commandGroups =
     'F':        [ command_F,      _('help_command_F') ]
     'H':        [ command_H,      _('help_command_H') ]
     'L':        [ command_L,      _('help_command_L') ]
-  'misc': 
+  'misc':
     # `.` is added to find command mapping to hack around Russian keyboard layout
     '\.|/':     [ command_find,   _('help_command_find') ]
     'a,\.|a,/': [ command_find_hl,_('help_command_find_hl') ]
@@ -354,7 +354,7 @@ commandsHelp = do (commandGroups) ->
     helpStrings[group] = helpGroup
   return helpStrings
 
-# Called in hints mode. Will process the char, update and hide/show markers 
+# Called in hints mode. Will process the char, update and hide/show markers
 hintCharHandler = (vim, keyStr, charCode) ->
   if keyStr and charCode > 0
     # Get char and escape it to avoid problems with String.search
