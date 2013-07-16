@@ -22,19 +22,19 @@ class Bucket
     @bucket = {}
 
   get: (obj) ->
-    id = @idFunc obj
+    id = @idFunc(obj)
     if container = @bucket[id]
       return container
     else
-      return @bucket[id] = @newFunc obj
+      return @bucket[id] = @newFunc(obj)
 
   forget: (obj) ->
-    delete @bucket[id] if id = @idFunc obj
+    delete @bucket[id] if id = @idFunc(obj)
 
 # Returns the `window` from the currently active tab.
 getCurrentTabWindow = (event) ->
-  if window = getEventWindow event
-    if rootWindow = getRootWindow window
+  if window = getEventWindow(event)
+    if rootWindow = getRootWindow(window)
       return rootWindow.gBrowser.selectedTab.linkedBrowser.contentWindow
 
 # Returns the window associated with the event
@@ -47,11 +47,11 @@ getEventWindow = (event) ->
       return doc.defaultView
 
 getEventRootWindow = (event) ->
-  if window = getEventWindow event
-    return getRootWindow window
+  if window = getEventWindow(event)
+    return getRootWindow(window)
 
 getEventTabBrowser = (event) ->
-  cw.gBrowser if cw = getEventRootWindow event
+  cw.gBrowser if cw = getEventRootWindow(event)
 
 getRootWindow = (window) ->
   return window.QueryInterface(Ci.nsIInterfaceRequestor)
@@ -59,7 +59,7 @@ getRootWindow = (window) ->
                .QueryInterface(Ci.nsIDocShellTreeItem)
                .rootTreeItem
                .QueryInterface(Ci.nsIInterfaceRequestor)
-               .getInterface(Window);
+               .getInterface(Window)
 
 isTextInputElement = (element) ->
   return element instanceof HTMLInputElement or \
@@ -83,10 +83,10 @@ getSessionStore = ->
   Cc["@mozilla.org/browser/sessionstore;1"].getService(Ci.nsISessionStore);
 
 # Function that returns a URI to the css file that's part of the extension
-cssUri = do () ->
+cssUri = do ->
   (name) ->
-    baseURI = Services.io.newURI __SCRIPT_URI_SPEC__, null, null
-    uri = Services.io.newURI "resources/#{ name }.css", null, baseURI
+    baseURI = Services.io.newURI(__SCRIPT_URI_SPEC__, null, null)
+    uri = Services.io.newURI("resources/#{ name }.css", null, baseURI)
     return uri
 
 # Loads the css identified by the name in the StyleSheetService as User Stylesheet
@@ -126,17 +126,17 @@ writeToClipboard = (window, text) ->
   if trans.init
     privacyContext = window.QueryInterface(Ci.nsIInterfaceRequestor)
       .getInterface(Ci.nsIWebNavigation)
-      .QueryInterface(Ci.nsILoadContext);
-    trans.init(privacyContext);
+      .QueryInterface(Ci.nsILoadContext)
+    trans.init(privacyContext)
 
   trans.addDataFlavor("text/unicode");
-  trans.setTransferData("text/unicode", str, text.length * 2);
+  trans.setTransferData("text/unicode", str, text.length * 2)
 
-  _clip.setData trans, null, Ci.nsIClipboard.kGlobalClipboard
+  _clip.setData(trans, null, Ci.nsIClipboard.kGlobalClipboard)
 
 # Write a string into system clipboard
 readFromClipboard = (window) ->
-  trans = Cc["@mozilla.org/widget/transferable;1"].createInstance(Ci.nsITransferable);
+  trans = Cc["@mozilla.org/widget/transferable;1"].createInstance(Ci.nsITransferable)
 
   if trans.init
     privacyContext = window.QueryInterface(Ci.nsIInterfaceRequestor)
@@ -146,7 +146,7 @@ readFromClipboard = (window) ->
 
   trans.addDataFlavor("text/unicode");
 
-  _clip.getData trans, Ci.nsIClipboard.kGlobalClipboard
+  _clip.getData(trans, Ci.nsIClipboard.kGlobalClipboard)
 
   str = {}
   strLength = {}
@@ -154,8 +154,8 @@ readFromClipboard = (window) ->
   trans.getTransferData("text/unicode", str, strLength)
 
   if str
-    str = str.value.QueryInterface(Ci.nsISupportsString);
-    return str.data.substring 0, strLength.value / 2
+    str = str.value.QueryInterface(Ci.nsISupportsString)
+    return str.data.substring(0, strLength.value / 2)
 
   return undefined
 
@@ -165,7 +165,7 @@ timeIt = (func, msg) ->
   result = func()
   end = new Date().getTime()
 
-  console.log msg, end - start
+  console.log(msg, end - start)
   return result
 
 # Checks if the string provided matches one of the black list entries
@@ -184,16 +184,17 @@ getVersion = do ->
 
   if version == null
     scope = {}
-    addonId = getPref 'addon_id'
-    Cu.import("resource://gre/modules/AddonManager.jsm", scope);
-    scope.AddonManager.getAddonByID addonId, ((addon) -> version = addon.version)
+    addonId = getPref('addon_id')
+    Cu.import("resource://gre/modules/AddonManager.jsm", scope)
+    scope.AddonManager.getAddonByID addonId, (addon) -> version = addon.version
 
-  -> version
+  return ->
+    return version
 
 # Simulate smooth scrolling
 smoothScroll = (window, dx, dy, msecs) ->
-  if msecs <= 0 || !Services.prefs.getBoolPref 'general.smoothScroll'
-    window.scrollBy dx, dy
+  if msecs <= 0 || !Services.prefs.getBoolPref('general.smoothScroll')
+    window.scrollBy(dx, dy)
   else
     # Callback
     fn = (_x, _y) ->
@@ -208,7 +209,7 @@ smoothScroll = (window, dx, dy, msecs) ->
       dy -= y
 
       l -= 1
-      window.setTimeout fn, l * delta, x, y
+      window.setTimeout(fn, l * delta, x, y)
 
 parseHTML = (document, html) ->
   parser = Cc["@mozilla.org/parserutils;1"].getService(Ci.nsIParserUtils)
@@ -243,7 +244,7 @@ getHintChars = do ->
     return str.toLowerCase()
               .split('')
               .filter((char) -> if seen[char] then false else (seen[char] = true))
-              .join ''
+              .join('')
 
   return ->
     hintChars = removeDuplicateCharacters(getPref('hint_chars'))

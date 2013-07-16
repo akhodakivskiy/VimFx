@@ -4,50 +4,50 @@ prefs = require 'prefs'
 CONTAINER_ID = 'VimFxHelpDialogContainer'
 
 removeHelp = (document) ->
-  if div = document.getElementById CONTAINER_ID
-    div.parentNode.removeChild div
+  if div = document.getElementById(CONTAINER_ID)
+    div.parentNode.removeChild(div)
 
 injectHelp = (document, commandsHelp) ->
   if document.documentElement
-    if div = document.getElementById CONTAINER_ID
-      div.parentNode.removeChild div
+    if div = document.getElementById(CONTAINER_ID)
+      div.parentNode.removeChild(div)
     div = document.createElement 'div'
-    div.id = CONTAINER_ID 
+    div.id = CONTAINER_ID
     div.className = 'VimFxReset'
 
-    div.appendChild utils.parseHTML document, helpDialogHtml(commandsHelp)
+    div.appendChild(utils.parseHTML(document, helpDialogHtml(commandsHelp)))
 
-    document.documentElement.appendChild div
+    document.documentElement.appendChild(div)
 
-    installCheckboxHandlers document
+    installCheckboxHandlers(document)
 
     if button = document.getElementById('VimFxClose')
       clickHandler = (event) ->
         event.stopPropagation()
         event.preventDefault()
         removeHelp(document)
-      button.addEventListener 'click', clickHandler, false
+      button.addEventListener('click', clickHandler, false)
 
 installCheckboxHandlers = (document) ->
-  cbs = document.getElementsByClassName "VimFxKeyCheckbox"
+  cbs = document.getElementsByClassName("VimFxKeyCheckbox")
   for cb in cbs
     cb.addEventListener "change", (event)->
-      key = event.target.getAttribute "data-key"
+      key = event.target.getAttribute("data-key")
 
       # Checkbox if checked => command is in use
       if event.target.checked
-        prefs.enableCommand key
-      else 
-        prefs.disableCommand key
+        prefs.enableCommand(key)
+      else
+        prefs.disableCommand(key)
 
 td = (text, klass='') ->
   """<td class="VimFxReset #{ klass }">#{ text }</td>"""
 
 tr = (key, text) ->
-  disabled = prefs.isCommandDisabled key
+  disabled = prefs.isCommandDisabled(key)
   checked = if disabled then null else "checked"
   key = """
-    #{ key.replace(/,/g, '').replace('|', ', ') } 
+    #{ key.replace(/,/g, '').replace('|', ', ') }
     <span class="VimFxReset VimFxDot">&#8729;</span>
     <input type="checkbox" class="VimFxReset VimFxKeyCheckbox" data-key="#{ key }" #{ checked }></input>
   """
@@ -67,7 +67,7 @@ section = (title, commands) ->
   #{ table(commands) }
   """
 
-helpDialogHtml = (help) -> 
+helpDialogHtml = (help) ->
   return """
   <div id="VimFxHelpDialog" class="VimFxReset">
     <div class="VimFxReset VimFxHeader">

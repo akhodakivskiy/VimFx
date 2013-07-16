@@ -20,36 +20,36 @@ getBranchPref = (branch, key, defaultValue) ->
 
   switch type
     when branch.PREF_BOOL
-      return branch.getBoolPref key
+      return branch.getBoolPref(key)
     when branch.PREF_INT
-      return branch.getIntPref key
+      return branch.getIntPref(key)
     when branch.PREF_STRING
-      return branch.getCharPref key
+      return branch.getCharPref(key)
     else
       if defaultValue != undefined
         return defaultValue
 
 getPref = do ->
   prefs = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefService)
-  branch = prefs.getBranch PREF_BRANCH
+  branch = prefs.getBranch(PREF_BRANCH)
 
   return (key, defaultValue=undefined) ->
-    value = getBranchPref branch, key, defaultValue
+    value = getBranchPref(branch, key, defaultValue)
     return if value == undefined then getDefaultPref(key) else value
 
 getDefaultPref = (key) -> return DEFAULT_PREF_VALUES[key]
 
 getFirefoxPref = do ->
   prefs = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefService)
-  branch = prefs.getBranch ''
+  branch = prefs.getBranch('')
 
   return (key, defaultValue=undefined) ->
-    return getBranchPref branch, key, defaultValue
+    return getBranchPref(branch, key, defaultValue)
 
 # Assign and save Firefox preference value
 setPref = do ->
   prefs = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefService)
-  branch = prefs.getBranch PREF_BRANCH
+  branch = prefs.getBranch(PREF_BRANCH)
 
   return (key, value) ->
     switch typeof value
@@ -63,15 +63,15 @@ setPref = do ->
         branch.clearUserPref(key)
 
 DISABLED_COMMANDS = do ->
-  str = getPref 'disabled_commands'
+  str = getPref('disabled_commands')
   try
-    return JSON.parse str
+    return JSON.parse(str)
   catch err
     dc = []
     try
       for key in str.split('||')
         for c in key.split('|')
-          dc.push c if c
+          dc.push(c) if c
 
     return dc
 
@@ -81,15 +81,15 @@ enableCommand = (key) ->
     while (idx = DISABLED_COMMANDS.indexOf(c)) > -1
       DISABLED_COMMANDS.splice(idx, 1)
 
-  setPref 'disabled_commands', JSON.stringify DISABLED_COMMANDS
+  setPref('disabled_commands', JSON.stringify DISABLED_COMMANDS)
 
 # Adds command to the disabled list
 disableCommand = (key) ->
   for c in key.split('|')
     if DISABLED_COMMANDS.indexOf(c) == -1
-      DISABLED_COMMANDS.push c
+      DISABLED_COMMANDS.push(c)
 
-  setPref 'disabled_commands', JSON.stringify DISABLED_COMMANDS
+  setPref('disabled_commands', JSON.stringify DISABLED_COMMANDS)
 
 # Checks if given command is disabled in the preferences
 isCommandDisabled = (key) ->

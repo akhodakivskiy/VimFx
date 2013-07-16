@@ -32,7 +32,7 @@ class Vim
 
   handleKeyDown: (keyboardEvent, keyStr) ->
     if @mode == MODE_NORMAL || keyStr == 'Esc'
-      result = maybeCommand @keys.concat([keyStr])
+      result = maybeCommand(@keys.concat([keyStr]))
     else if !keyboardEvent.ctrlKey and !keyboardEvent.metaKey
       if @mode == MODE_HINTS
         result = utils.getHintChars().search(regexpEscape(keyStr)) > -1
@@ -46,14 +46,14 @@ class Vim
   handleKeyPress: (keyboardEvent) ->
     lastKeyStr = if @keys.length > 0 then @keys[@keys.length - 1] else undefined
     if @mode == MODE_NORMAL or lastKeyStr == 'Esc'
-      if command = findCommand @keys
-        command @
+      if command = findCommand(@keys)
+        command(@)
         @keys.length = 0
         result = true
     else if !keyboardEvent.ctrlKey and !keyboardEvent.metaKey
       @keys.length = 0
       if @mode == MODE_HINTS
-        hintCharHandler @, lastKeyStr, keyboardEvent.charCode
+        hintCharHandler(@, lastKeyStr, keyboardEvent.charCode)
         result = true
 
     return result

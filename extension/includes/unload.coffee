@@ -12,12 +12,12 @@ unload = do ->
     # The callback is bound to the lifetime of the container if we have one
     else if container
       # Remove the unloader when the container unloads
-      container.addEventListener "unload", removeUnloader, false
+      container.addEventListener("unload", removeUnloader, false)
 
       # Wrap the callback to additionally remove the unload listener
       origCallback = callback
       callback = ->
-        container.removeEventListener "unload", removeUnloader, false
+        container.removeEventListener("unload", removeUnloader, false)
         origCallback()
 
     # Wrap the callback in a function that ignores failures
@@ -26,7 +26,7 @@ unload = do ->
 
     # Provide a way to remove the unloader
     removeUnloader = ->
-      index = unloaders.indexOf unloader
+      index = unloaders.indexOf(unloader)
       if index > -1
         unloaders.splice(index, 1)
 

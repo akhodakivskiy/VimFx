@@ -2,22 +2,22 @@
 
 { classes: Cc, interfaces: Ci, utils: Cu } = Components
 
-Cu.import "resource://gre/modules/Services.jsm"
-Cu.import "resource://gre/modules/AddonManager.jsm"
+Cu.import("resource://gre/modules/Services.jsm")
+Cu.import("resource://gre/modules/AddonManager.jsm")
 
 # Populate the global namespace with console, require, and include
 do (global = this) ->
-  baseURI = Services.io.newURI __SCRIPT_URI_SPEC__, null, null
-  getResourceURI = (path) -> Services.io.newURI path, null, baseURI
+  baseURI = Services.io.newURI(__SCRIPT_URI_SPEC__, null, null)
+  getResourceURI = (path) -> Services.io.newURI(path, null, baseURI)
 
   loader = Cc["@mozilla.org/moz/jssubscript-loader;1"].getService(Ci.mozIJSSubScriptLoader)
 
   include = (src, scope = {}) ->
     try
-      uri = getResourceURI src
-      loader.loadSubScript uri.spec, scope
+      uri = getResourceURI(src)
+      loader.loadSubScript(uri.spec, scope)
     catch error
-      dump "Failed to load #{ src }: #{ error }\n"
+      dump("Failed to load #{ src }: #{ error }\n")
 
     return scope
 
@@ -32,7 +32,7 @@ do (global = this) ->
         include: include
         exports: {}
 
-      include "packages/#{ src }.js", scope
+      include("packages/#{ src }.js", scope)
 
       return modules[src] = scope.exports
 
@@ -43,12 +43,12 @@ do (global = this) ->
 
   # Include into global scope
   include("includes/#{ name }.js", global) for name in [
-    'console',
-    'unload',
+    'console'
+    'unload'
   ]
 
   # Init localization `underscore` method
-  global._ = require('l10n').l10n "vimfx.properties"
+  global._ = require('l10n').l10n("vimfx.properties")
 
   # Requires for startup/install
   { loadCss }             = require 'utils'
@@ -66,10 +66,10 @@ do (global = this) ->
       # If Bookmarks button is hidden - then VimFx button will be appended to the toolbar
       setButtonInstallPosition 'nav-bar', 'bookmarks-menu-button-container'
 
-    loadCss 'style'
+    loadCss('style')
 
-    watchWindows addEventListeners, 'navigator:browser'
-    watchWindows addToolbarButton, 'navigator:browser'
+    watchWindows(addEventListeners, 'navigator:browser')
+    watchWindows(addToolbarButton, 'navigator:browser')
 
   # Firefox will call this method on shutdown/disabling
   global.shutdown = (data, reason) ->
