@@ -1,3 +1,5 @@
+{ classes: Cc, interfaces: Ci } = Components
+
 CONTAINER_ID = 'VimFxFindContainer'
 DIRECTION_FORWARDS = 0
 DIRECTION_BACKWARDS = 1
@@ -5,7 +7,7 @@ DIRECTION_BACKWARDS = 1
 # Create and inserts into DOM find controls and handlers
 injectFind = (document, cb) ->
   # Clean up just in case...
-  removeFind document
+  removeFind(document)
 
   # Create container div insert a text input into it
   [div, input] = createFindContainer(document)
@@ -14,9 +16,9 @@ injectFind = (document, cb) ->
   input.addEventListener 'input', (event) ->
     result = cb(input.value)
     if result
-      input.classList.remove 'VimFxNotFound'
+      input.classList.remove('VimFxNotFound')
     else
-      input.classList.add 'VimFxNotFound'
+      input.classList.add('VimFxNotFound')
 
   # Call back on (Shift)-Enter with proper direction
   input.addEventListener 'keypress', (event) ->
@@ -24,13 +26,13 @@ injectFind = (document, cb) ->
       focusSelection(document, Ci.nsISelectionController.SELECTION_FIND)
       removeFind(document, false)
 
-  document.documentElement.appendChild div
+  document.documentElement.appendChild(div)
   input.focus()
 
 # Removes find controls from DOM
 removeFind = (document, clear = true) ->
-  if div = document.getElementById CONTAINER_ID
-    document.documentElement.removeChild div
+  if div = document.getElementById(CONTAINER_ID)
+    document.documentElement.removeChild(div)
 
   if clear
     clearSelection(document.defaultView)
@@ -44,18 +46,18 @@ focusSelection = (document, selectionType) ->
           element.focus()
 
 createFindContainer = (document) ->
-  div = document.createElement 'div'
+  div = document.createElement('div')
   div.className = 'VimFxReset'
   div.id = CONTAINER_ID
 
-  input = document.createElement 'input'
+  input = document.createElement('input')
   input.type = 'text'
   input.className = 'VimFxReset'
   input.id = 'VimFxFindInput'
 
-  div.appendChild input
+  div.appendChild(input)
 
-  return [ div, input ]
+  return [div, input]
 
 clearSelection = (window, selectionType = Ci.nsISelectionController.SELECTION_FIND) ->
   for frame in window.frames
@@ -65,7 +67,7 @@ clearSelection = (window, selectionType = Ci.nsISelectionController.SELECTION_FI
     controller.getSelection(selectionType).removeAllRanges()
 
 findFactory = (selectionType) ->
-  finder = Cc["@mozilla.org/embedcomp/rangefind;1"]
+  finder = Cc['@mozilla.org/embedcomp/rangefind;1']
               .createInstance()
               .QueryInterface(Components.interfaces.nsIFind)
 
@@ -78,7 +80,7 @@ findFactory = (selectionType) ->
         finder.caseSensitive = (findStr != findStr.toLowerCase())
 
         searchRange = window.document.createRange()
-        searchRange.selectNodeContents window.document.body
+        searchRange.selectNodeContents(window.document.body)
 
         if findRng and findRng.commonAncestorContainer.ownerDocument == window.document
           if finder.findBackwards
@@ -104,7 +106,7 @@ findFactory = (selectionType) ->
 
     if findStr.length > 0
       # Get all embedded windows/frames including the passed window
-      wnds = getAllWindows window
+      wnds = getAllWindows(window)
       # In backward searching reverse windows mode so that
       # it starts off the deepest iframe
       if finder.findBackwards
@@ -112,16 +114,16 @@ findFactory = (selectionType) ->
 
       # First search in the same window to which current `findRng` belongs
       if rngWindow = findRng?.commonAncestorContainer.ownerDocument.defaultView
-        wnds = cycleToItem wnds, rngWindow
+        wnds = cycleToItem(wnds, rngWindow)
 
       for w in wnds
-        if range = innerFind w
+        if range = innerFind(w)
           break
 
-    return if (findStr.length == 0) then true else range
+    return if findStr.length == 0 then true else range
 
 highlightFactory = (selectionType) ->
-  finder = Cc["@mozilla.org/embedcomp/rangefind;1"]
+  finder = Cc['@mozilla.org/embedcomp/rangefind;1']
               .createInstance()
               .QueryInterface(Components.interfaces.nsIFind)
 
@@ -133,13 +135,13 @@ highlightFactory = (selectionType) ->
     innerHighlight = (window) ->
       if controller = getController(window)
         searchRange = window.document.createRange()
-        searchRange.selectNodeContents window.document.body
+        searchRange.selectNodeContents(window.document.body)
 
         (startPt = searchRange.cloneRange()).collapse(true)
         (endPt = searchRange.cloneRange()).collapse(false)
 
         selection = controller.getSelection(selectionType)
-        while (range = finder.Find(findStr, searchRange, startPt, endPt))
+        while range = finder.Find(findStr, searchRange, startPt, endPt)
           selection.addRange(range)
           matchesCount += 1
           (startPt = range.cloneRange()).collapse(false)
@@ -153,7 +155,7 @@ highlightFactory = (selectionType) ->
     if findStr.length > 0
       innerHighlight(window)
 
-    return if (findStr.length == 0) then true else matchesCount
+    return if findStr.length == 0 then true else matchesCount
 
 getController = (window) ->
   if not window.innerWidth or not window.innerHeight

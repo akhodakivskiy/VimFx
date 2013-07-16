@@ -3,18 +3,18 @@
 KE = Ci.nsIDOMKeyEvent
 
 # Extract keyChar from keyCode taking into account the shift modifier
-keyCharFromCode = (keyCode, shiftKey=false) ->
+keyCharFromCode = (keyCode, shiftKey = false) ->
   keyChar = undefined
   if keyCode >= KE.DOM_VK_A and keyCode <= KE.DOM_VK_Z
     keyChar = String.fromCharCode(keyCode)
-    if shiftKey 
+    if shiftKey
       keyChar = keyChar.toUpperCase()
     else
       keyChar = keyChar.toLowerCase()
   else
     fn = (code, codeWithShift, char, charWithShift) ->
       if keyCode == code
-        return if shiftKey then charWithShift else char 
+        return if shiftKey then charWithShift else char
       else if keyCode == codeWithShift
         return charWithShift
 
@@ -40,8 +40,8 @@ keyCharFromCode = (keyCode, shiftKey=false) ->
       [ KE.DOM_VK_CLOSE_BRACKET,  KE.DOM_VK_CLOSE_CURLY_BRACKET,  ']',  '}' ],
       [ KE.DOM_VK_SEMICOLON,      KE.DOM_VK_COLON,                ';',  ':' ],
       [ KE.DOM_VK_QUOTE,          KE.DOM_VK_DOUBLEQUOTE,          "'",  '"' ],
-      [ KE.DOM_VK_BACK_QUOTE,     KE.DOM_VK_TILDE,                "`",  '~' ],
-      [ KE.DOM_VK_BACK_SLASH,     KE.DOM_VK_PIPE,                 "\\", '|' ],
+      [ KE.DOM_VK_BACK_QUOTE,     KE.DOM_VK_TILDE,                '`',  '~' ],
+      [ KE.DOM_VK_BACK_SLASH,     KE.DOM_VK_PIPE,                 '\\', '|' ],
       [ KE.DOM_VK_COMMA,          KE.DOM_VK_LESS_THAN,            ',',  '<' ],
       [ KE.DOM_VK_PERIOD,         KE.DOM_VK_GREATER_THAN,         '.',  '>' ],
       [ KE.DOM_VK_SLASH,          KE.DOM_VK_QUESTION_MARK,        '/',  '?' ],
@@ -50,14 +50,14 @@ keyCharFromCode = (keyCode, shiftKey=false) ->
     ]
 
     for opt in options
-      if char = fn.apply(undefined, opt)
+      if char = fn(opt...)
         keyChar = char
         break
 
   return keyChar
 
 # Format keyChar that arrives during `keypress` into keyStr
-applyModifiers = (keyChar, ctrlKey=false, altKey=false, metaKey=false) ->
+applyModifiers = (keyChar, ctrlKey = false, altKey = false, metaKey = false) ->
   if not keyChar
     return keyChar
 
