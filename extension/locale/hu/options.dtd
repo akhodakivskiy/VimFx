@@ -1,5 +1,5 @@
 <!ENTITY pref.hint_chars.title      "Segéd karakterek">
-<!ENTITY pref.hint_chars.desc       "Alapértelmezett: asdfgercvhjkl;uinm">
+<!ENTITY pref.hint_chars.desc       "Alapértelmezett: fjdksla;ghrueiwovncm">
 
 <!ENTITY pref.black_list.title      "Fekete lista">
 <!ENTITY pref.black_list.desc       "Vesszővel elválasztott URL-ek, ahol a VimFX inaktív legyen. Helyettesítő karakterek is használhatók: *, !">
