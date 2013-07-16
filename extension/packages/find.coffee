@@ -1,5 +1,3 @@
-utils = require 'utils'
-
 CONTAINER_ID = 'VimFxFindContainer'
 DIRECTION_FORWARDS = 0
 DIRECTION_BACKWARDS = 1
@@ -16,9 +14,9 @@ injectFind = (document, cb) ->
   input.addEventListener 'input', (event) ->
     result = cb(input.value)
     if result
-      utils.removeClass input, 'VimFxNotFound'
+      input.classList.remove 'VimFxNotFound'
     else
-      utils.addClass input, 'VimFxNotFound'
+      input.classList.add 'VimFxNotFound'
 
   # Call back on (Shift)-Enter with proper direction
   input.addEventListener 'keypress', (event) ->
@@ -72,7 +70,7 @@ findFactory = (selectionType) ->
               .QueryInterface(Components.interfaces.nsIFind)
 
   return (window, findStr, findRng = null, direction = DIRECTION_FORWARDS, focus = false) ->
-    # `find` will also recursively search in all frames.  # `innerFind` does the work: 
+    # `find` will also recursively search in all frames.  # `innerFind` does the work:
     # searches, selects, scrolls, and optionally reaches into frames
     innerFind = (window) ->
       if controller = getController(window)
@@ -107,9 +105,9 @@ findFactory = (selectionType) ->
     if findStr.length > 0
       # Get all embedded windows/frames including the passed window
       wnds = getAllWindows window
-      # In backward searching reverse windows mode so that 
+      # In backward searching reverse windows mode so that
       # it starts off the deepest iframe
-      if finder.findBackwards 
+      if finder.findBackwards
         wnds.reverse()
 
       # First search in the same window to which current `findRng` belongs
