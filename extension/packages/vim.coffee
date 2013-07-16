@@ -1,31 +1,30 @@
 utils = require 'utils'
 
 { commands
-, hintCharHandler 
+, hintCharHandler
 } = require 'commands'
 
 { getPref
-, isCommandDisabled 
+, isCommandDisabled
 } = require 'prefs'
-
 
 MODE_NORMAL = 1
 MODE_HINTS  = 2
 
 class Vim
   constructor: (@window) ->
-    @mode     = MODE_NORMAL
-    @keys     = []
+    @mode       = MODE_NORMAL
+    @keys       = []
     @lastKeyStr = null
-    @markers  = undefined
-    @cb       = undefined
-    @findStr  = ""
-    @findRng  = null
+    @markers    = undefined
+    @cb         = undefined
+    @findStr    = ""
+    @findRng    = null
 
   enterHintsMode: (@markers, @cb) ->
     @mode = MODE_HINTS
 
-  # TODO: This function should probably remove 
+  # TODO: This function should probably remove
   # hint markers (if they are present) as well
   enterNormalMode: ->
     @mode = MODE_NORMAL
@@ -38,7 +37,7 @@ class Vim
       if @mode == MODE_HINTS
         result = utils.getHintChars().search(regexpEscape(keyStr)) > -1
 
-    if result 
+    if result
       @lastKeyStr = keyStr
       @keys.push keyStr
 

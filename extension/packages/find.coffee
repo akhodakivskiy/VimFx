@@ -1,3 +1,5 @@
+{ classes: Cc, interfaces: Ci } = Components
+
 CONTAINER_ID = 'VimFxFindContainer'
 DIRECTION_FORWARDS = 0
 DIRECTION_BACKWARDS = 1

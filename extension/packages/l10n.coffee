@@ -1,3 +1,5 @@
+{ classes: Cc, interfaces: Ci } = Components
+
 # Generates the underscore function
 l10n = do ->
   splitter = /(\w+)-\w+/

@@ -1,3 +1,5 @@
+{ classes: Cc, interfaces: Ci } = Components
+
 console = do ->
   cs = Cc["@mozilla.org/consoleservice;1"].getService(Ci.nsIConsoleService)
 

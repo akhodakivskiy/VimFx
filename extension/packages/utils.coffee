@@ -1,4 +1,8 @@
-{ interfaces: Ci, classes: Cc, utils: Cu } = Components
+{ getPref
+, getDefaultPref
+} = require 'prefs'
+
+{ classes: Cc, interfaces: Ci, utils: Cu } = Components
 
 HTMLInputElement    = Ci.nsIDOMHTMLInputElement
 HTMLTextAreaElement = Ci.nsIDOMHTMLTextAreaElement
@@ -12,10 +16,6 @@ ChromeWindow        = Ci.nsIDOMChromeWindow
 
 _sss  = Cc["@mozilla.org/content/style-sheet-service;1"].getService(Ci.nsIStyleSheetService)
 _clip = Cc["@mozilla.org/widget/clipboard;1"].getService(Ci.nsIClipboard)
-
-{ getPref
-, getDefaultPref
-} = require 'prefs'
 
 class Bucket
   constructor: (@idFunc, @newFunc) ->
@@ -133,7 +133,7 @@ writeToClipboard = (window, text) ->
   trans.setTransferData("text/unicode", str, text.length * 2);
 
   _clip.setData trans, null, Ci.nsIClipboard.kGlobalClipboard
-  #
+
 # Write a string into system clipboard
 readFromClipboard = (window) ->
   trans = Cc["@mozilla.org/widget/transferable;1"].createInstance(Ci.nsITransferable);
@@ -252,28 +252,28 @@ getHintChars = do ->
 
     return hintChars
 
-exports.Bucket                    = Bucket
-exports.getCurrentTabWindow       = getCurrentTabWindow
-exports.getEventWindow            = getEventWindow
-exports.getEventRootWindow        = getEventRootWindow
-exports.getEventTabBrowser        = getEventTabBrowser
+exports.Bucket                  = Bucket
+exports.getCurrentTabWindow     = getCurrentTabWindow
+exports.getEventWindow          = getEventWindow
+exports.getEventRootWindow      = getEventRootWindow
+exports.getEventTabBrowser      = getEventTabBrowser
 
-exports.getWindowId               = getWindowId
-exports.getRootWindow             = getRootWindow
-exports.isTextInputElement        = isTextInputElement
-exports.isElementEditable         = isElementEditable
-exports.getSessionStore           = getSessionStore
+exports.getWindowId             = getWindowId
+exports.getRootWindow           = getRootWindow
+exports.isTextInputElement      = isTextInputElement
+exports.isElementEditable       = isElementEditable
+exports.getSessionStore         = getSessionStore
 
-exports.loadCss                   = loadCss
+exports.loadCss                 = loadCss
 
-exports.simulateClick             = simulateClick
-exports.smoothScroll              = smoothScroll
-exports.readFromClipboard         = readFromClipboard
-exports.writeToClipboard          = writeToClipboard
-exports.timeIt                    = timeIt
-exports.isBlacklisted             = isBlacklisted
-exports.getVersion                = getVersion
-exports.parseHTML                 = parseHTML
-exports.isURL                     = isURL
-exports.browserSearchSubmission   = browserSearchSubmission
-exports.getHintChars              = getHintChars
+exports.simulateClick           = simulateClick
+exports.smoothScroll            = smoothScroll
+exports.readFromClipboard       = readFromClipboard
+exports.writeToClipboard        = writeToClipboard
+exports.timeIt                  = timeIt
+exports.isBlacklisted           = isBlacklisted
+exports.getVersion              = getVersion
+exports.parseHTML               = parseHTML
+exports.isURL                   = isURL
+exports.browserSearchSubmission = browserSearchSubmission
+exports.getHintChars            = getHintChars

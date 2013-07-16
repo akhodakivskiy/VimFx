@@ -1,9 +1,9 @@
-{ interfaces: Ci }      = Components
-XPathResult             = Ci.nsIDOMXPathResult
-
 { getPref } = require 'prefs'
+utils       = require 'utils'
 
-utils = require 'utils'
+{ interfaces: Ci } = Components
+
+XPathResult        = Ci.nsIDOMXPathResult
 
 # All elements that have one or more of the following properties
 # qualify for their own marker in hints mode
@@ -225,7 +225,7 @@ getElementRect = (element) ->
         left:   rect.left + scrollLeft - clientLeft
         width:  rect.width
         height: rect.height
-        area: clientRect.width * clientRect.height
+        area:   clientRect.width * clientRect.height
       }
 
   # If the element has 0 dimentions then check what's inside.

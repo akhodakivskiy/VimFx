@@ -1,5 +1,3 @@
-{ classes: Cc, interfaces: Ci, utils: Cu } = Components
-
 utils = require 'utils'
 hints = require 'hints'
 help  = require 'help'
@@ -8,6 +6,8 @@ find  = require 'find'
 { getPref
 , setPref
 , getFirefoxPref } = require 'prefs'
+
+{ classes: Cc, interfaces: Ci, utils: Cu } = Components
 
 # Opens developer toolbar (Default shotrcut: Shift-F2)
 command_dev = (vim) ->
@@ -371,6 +371,6 @@ hintCharHandler = (vim, keyStr, charCode) ->
           vim.enterNormalMode()
           break
 
-exports.hintCharHandler   = hintCharHandler
-exports.commands          = commands
-exports.commandsHelp      = commandsHelp
+exports.hintCharHandler = hintCharHandler
+exports.commands        = commands
+exports.commandsHelp    = commandsHelp

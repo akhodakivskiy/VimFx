@@ -1,10 +1,8 @@
 { getPref
-, setPref } = require 'prefs'
-
-{ injectHelp } = require 'help'
+, setPref }      = require 'prefs'
+{ injectHelp }   = require 'help'
 { commandsHelp } = require 'commands'
-
-utils = require 'utils'
+utils            = require 'utils'
 
 KEYSET_ID             = 'vimfx-keyset'
 BUTTON_ID             = 'vimfx-toolbar-button'
@@ -144,7 +142,7 @@ createButton = (window) ->
   button.setAttribute 'type', 'menu-button'
   button.setAttribute 'label', 'VimFx'
   button.setAttribute 'class', 'toolbarbutton-1'
-  #
+
   # Create and install event listeners
   onButtonCommand = (event) ->
     # Change disabled state value which is stored in Prefs

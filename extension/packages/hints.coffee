@@ -1,16 +1,18 @@
-CONTAINER_ID  = 'VimFxHintMarkerContainer'
+{ Marker }   = require 'marker'
 
-{ interfaces: Ci }  = Components
-HTMLDocument        = Ci.nsIDOMHTMLDocument
-XULDocument         = Ci.nsIDOMXULDocument
-{ Marker }          = require 'marker'
+{ interfaces: Ci } = Components
+
+HTMLDocument = Ci.nsIDOMHTMLDocument
+XULDocument  = Ci.nsIDOMXULDocument
+
+CONTAINER_ID = 'VimFxHintMarkerContainer'
 
 createHintsContainer = (document) ->
   container = document.createElement 'div'
   container.id = CONTAINER_ID
   container.className = 'VimFxReset'
   return container
-    
+
 # Creates and injects hint markers into the DOM
 injectHints = (document) ->
 
@@ -44,11 +46,11 @@ injectHints = (document) ->
 # Remove previously injected hints from the DOM
 removeHints = (document) ->
   if container = document.getElementById CONTAINER_ID
-    document.documentElement.removeChild container 
+    document.documentElement.removeChild container
 
   for frame in document.defaultView.frames
     removeHints frame.document
 
 
-exports.injectHints     = injectHints
-exports.removeHints     = removeHints
+exports.injectHints = injectHints
+exports.removeHints = removeHints

@@ -1,6 +1,6 @@
 "use strict"
 
-{ utils: Cu, classes: Cc, interfaces: Ci } = Components
+{ classes: Cc, interfaces: Ci, utils: Cu } = Components
 
 Cu.import "resource://gre/modules/Services.jsm"
 Cu.import "resource://gre/modules/AddonManager.jsm"
@@ -43,7 +43,6 @@ do (global = this) ->
 
   # Include into global scope
   include("includes/#{ name }.js", global) for name in [
-    'chrome',
     'console',
     'unload',
   ]
@@ -81,4 +80,3 @@ do (global = this) ->
   global.install = (data, reason) ->
 
   global.uninstall = (data, reason) ->
-
