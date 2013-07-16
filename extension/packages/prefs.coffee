@@ -3,11 +3,11 @@
 PREF_BRANCH = "extensions.VimFx.";
 
 # Default values for the preference
-# All used preferences should be mentioned here becuase 
+# All used preferences should be mentioned here becuase
 # preference type is derived from here
-DEFAULT_PREF_VALUES = 
+DEFAULT_PREF_VALUES =
   addon_id:       'VimFx@akhodakivskiy.github.com'
-  hint_chars:     'asdfgercvhjkl;uinm'
+  hint_chars:     'fjdksla;ghrueiwovncm'
   disabled:       false
   scroll_step:    60
   scroll_time:    100
@@ -32,7 +32,7 @@ getBranchPref = (branch, key, defaultValue) ->
 getPref = do ->
   prefs = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefService)
   branch = prefs.getBranch PREF_BRANCH
-  
+
   return (key, defaultValue=undefined) ->
     value = getBranchPref branch, key, defaultValue
     return if value == undefined then getDefaultPref(key) else value
@@ -42,7 +42,7 @@ getDefaultPref = (key) -> return DEFAULT_PREF_VALUES[key]
 getFirefoxPref = do ->
   prefs = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefService)
   branch = prefs.getBranch ''
-  
+
   return (key, defaultValue=undefined) ->
     return getBranchPref branch, key, defaultValue
 
