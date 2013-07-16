@@ -57,7 +57,7 @@ createFindContainer = (document) ->
 
   div.appendChild(input)
 
-  return [ div, input ]
+  return [div, input]
 
 clearSelection = (window, selectionType = Ci.nsISelectionController.SELECTION_FIND) ->
   for frame in window.frames
@@ -67,7 +67,7 @@ clearSelection = (window, selectionType = Ci.nsISelectionController.SELECTION_FI
     controller.getSelection(selectionType).removeAllRanges()
 
 findFactory = (selectionType) ->
-  finder = Cc["@mozilla.org/embedcomp/rangefind;1"]
+  finder = Cc['@mozilla.org/embedcomp/rangefind;1']
               .createInstance()
               .QueryInterface(Components.interfaces.nsIFind)
 
@@ -123,7 +123,7 @@ findFactory = (selectionType) ->
     return if findStr.length == 0 then true else range
 
 highlightFactory = (selectionType) ->
-  finder = Cc["@mozilla.org/embedcomp/rangefind;1"]
+  finder = Cc['@mozilla.org/embedcomp/rangefind;1']
               .createInstance()
               .QueryInterface(Components.interfaces.nsIFind)
 

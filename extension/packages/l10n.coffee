@@ -5,13 +5,13 @@ l10n = do ->
   splitter = /(\w+)-\w+/
 
   # Current locale
-  locale = Cc["@mozilla.org/chrome/chrome-registry;1"]
-    .getService(Ci.nsIXULChromeRegistry).getSelectedLocale("global")
+  locale = Cc['@mozilla.org/chrome/chrome-registry;1']
+    .getService(Ci.nsIXULChromeRegistry).getSelectedLocale('global')
 
   getStr = (aStrBundle, aKey) ->
     try return aStrBundle.GetStringFromName(aKey)
 
-  return (filename, defaultLocale="en-US") ->
+  return (filename, defaultLocale = 'en-US') ->
 
     filePath = (locale) ->
       getResourceURI("locale/#{ locale }/#{ filename }").spec

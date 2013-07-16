@@ -1,16 +1,16 @@
 { classes: Cc, interfaces: Ci } = Components
 
 console = do ->
-  cs = Cc["@mozilla.org/consoleservice;1"].getService(Ci.nsIConsoleService)
+  cs = Cc['@mozilla.org/consoleservice;1'].getService(Ci.nsIConsoleService)
 
   stringify = (arg) ->
     try
       return String(arg)
     catch error
-      return "<toString() error>"
+      return '<toString() error>'
 
   message = (level, args) ->
-    str = "VimFx - #{ level }: #{ Array.map(args, stringify).join(" ") }\n"
+    str = "VimFx - #{ level }: #{ Array.map(args, stringify).join(' ') }\n"
     dump(str)
     cs.logStringMessage(str)
 
@@ -27,7 +27,7 @@ console = do ->
     st2 = (f) ->
       if f
         name = f.toString().split('(')[0]
-        args = Array.map(f.arguments, stringify).join(", ")
+        args = Array.map(f.arguments, stringify).join(', ')
         return st2(f.caller)
           .concat(["#{ name } ( #{ args } )"])
       else

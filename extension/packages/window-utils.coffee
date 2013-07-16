@@ -8,13 +8,13 @@
 runOnLoad = (window, callback, winType) ->
   # Listen for one load event before checking the window type
   cb = ->
-    window.removeEventListener("load", arguments.callee, false)
+    window.removeEventListener('load', arguments.callee, false)
 
     # Now that the window has loaded, only handle browser windows
-    if window.document.documentElement.getAttribute("windowtype") == winType
+    if window.document.documentElement.getAttribute('windowtype') == winType
       callback(window)
 
-  window.addEventListener("load", cb, false)
+  window.addEventListener('load', cb, false)
 
 #
 # Add functionality to existing browser windows
@@ -32,7 +32,7 @@ runOnWindows = (callback, winType) ->
   while browserWindows.hasMoreElements()
     # Only run the watcher immediately if the browser is completely loaded
     browserWindow = browserWindows.getNext()
-    if browserWindow.document.readyState == "complete"
+    if browserWindow.document.readyState == 'complete'
       watcher(browserWindow)
     # Wait for the window to load before continuing
     else
@@ -54,7 +54,7 @@ watchWindows = (callback, winType) ->
 
   # Watch for new browser windows opening then wait for it to load
   windowWatcher = (subject, topic) ->
-    if topic == "domwindowopened"
+    if topic == 'domwindowopened'
       runOnLoad(subject, watcher, winType)
 
   Services.ww.registerNotification(windowWatcher)

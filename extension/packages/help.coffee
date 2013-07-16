@@ -29,10 +29,10 @@ injectHelp = (document, commandsHelp) ->
       button.addEventListener('click', clickHandler, false)
 
 installCheckboxHandlers = (document) ->
-  cbs = document.getElementsByClassName("VimFxKeyCheckbox")
+  cbs = document.getElementsByClassName('VimFxKeyCheckbox')
   for cb in cbs
-    cb.addEventListener "change", (event)->
-      key = event.target.getAttribute("data-key")
+    cb.addEventListener 'change', (event)->
+      key = event.target.getAttribute('data-key')
 
       # Checkbox if checked => command is in use
       if event.target.checked
@@ -45,7 +45,7 @@ td = (text, klass='') ->
 
 tr = (key, text) ->
   disabled = prefs.isCommandDisabled(key)
-  checked = if disabled then null else "checked"
+  checked = if disabled then null else 'checked'
   key = """
     #{ key.replace(/,/g, '').replace('|', ', ') }
     <span class="VimFxReset VimFxDot">&#8729;</span>

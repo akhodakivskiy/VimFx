@@ -1,6 +1,6 @@
 { classes: Cc, interfaces: Ci } = Components
 
-PREF_BRANCH = "extensions.VimFx."
+PREF_BRANCH = 'extensions.VimFx.'
 
 # Default values for the preference
 # All used preferences should be mentioned here becuase
@@ -30,25 +30,25 @@ getBranchPref = (branch, key, defaultValue) ->
         return defaultValue
 
 getPref = do ->
-  prefs = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefService)
+  prefs = Cc['@mozilla.org/preferences-service;1'].getService(Ci.nsIPrefService)
   branch = prefs.getBranch(PREF_BRANCH)
 
-  return (key, defaultValue=undefined) ->
+  return (key, defaultValue = undefined) ->
     value = getBranchPref(branch, key, defaultValue)
     return if value == undefined then getDefaultPref(key) else value
 
 getDefaultPref = (key) -> return DEFAULT_PREF_VALUES[key]
 
 getFirefoxPref = do ->
-  prefs = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefService)
+  prefs = Cc['@mozilla.org/preferences-service;1'].getService(Ci.nsIPrefService)
   branch = prefs.getBranch('')
 
-  return (key, defaultValue=undefined) ->
+  return (key, defaultValue = undefined) ->
     return getBranchPref(branch, key, defaultValue)
 
 # Assign and save Firefox preference value
 setPref = do ->
-  prefs = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefService)
+  prefs = Cc['@mozilla.org/preferences-service;1'].getService(Ci.nsIPrefService)
   branch = prefs.getBranch(PREF_BRANCH)
 
   return (key, value) ->

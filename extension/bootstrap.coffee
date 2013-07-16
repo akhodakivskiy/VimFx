@@ -1,16 +1,16 @@
-"use strict"
+'use strict'
 
 { classes: Cc, interfaces: Ci, utils: Cu } = Components
 
-Cu.import("resource://gre/modules/Services.jsm")
-Cu.import("resource://gre/modules/AddonManager.jsm")
+Cu.import('resource://gre/modules/Services.jsm')
+Cu.import('resource://gre/modules/AddonManager.jsm')
 
 # Populate the global namespace with console, require, and include
 do (global = this) ->
   baseURI = Services.io.newURI(__SCRIPT_URI_SPEC__, null, null)
   getResourceURI = (path) -> Services.io.newURI(path, null, baseURI)
 
-  loader = Cc["@mozilla.org/moz/jssubscript-loader;1"].getService(Ci.mozIJSSubScriptLoader)
+  loader = Cc['@mozilla.org/moz/jssubscript-loader;1'].getService(Ci.mozIJSSubScriptLoader)
 
   include = (src, scope = {}) ->
     try
@@ -48,7 +48,7 @@ do (global = this) ->
   ]
 
   # Init localization `underscore` method
-  global._ = require('l10n').l10n("vimfx.properties")
+  global._ = require('l10n').l10n('vimfx.properties')
 
   # Requires for startup/install
   { loadCss }             = require 'utils'

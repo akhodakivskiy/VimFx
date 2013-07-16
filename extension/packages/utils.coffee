@@ -14,8 +14,8 @@ HTMLElement         = Ci.nsIDOMHTMLElement
 Window              = Ci.nsIDOMWindow
 ChromeWindow        = Ci.nsIDOMChromeWindow
 
-_sss  = Cc["@mozilla.org/content/style-sheet-service;1"].getService(Ci.nsIStyleSheetService)
-_clip = Cc["@mozilla.org/widget/clipboard;1"].getService(Ci.nsIClipboard)
+_sss  = Cc['@mozilla.org/content/style-sheet-service;1'].getService(Ci.nsIStyleSheetService)
+_clip = Cc['@mozilla.org/widget/clipboard;1'].getService(Ci.nsIClipboard)
 
 class Bucket
   constructor: (@idFunc, @newFunc) ->
@@ -80,7 +80,7 @@ getWindowId = (window) ->
                .outerWindowID
 
 getSessionStore = ->
-  Cc["@mozilla.org/browser/sessionstore;1"].getService(Ci.nsISessionStore);
+  Cc['@mozilla.org/browser/sessionstore;1'].getService(Ci.nsISessionStore);
 
 # Function that returns a URI to the css file that's part of the extension
 cssUri = do ->
@@ -107,9 +107,9 @@ simulateClick = (element, modifiers) ->
   window = document.defaultView
   modifiers ||= {}
 
-  eventSequence = ["mouseover", "mousedown", "mouseup", "click"]
+  eventSequence = ['mouseover', 'mousedown', 'mouseup', 'click']
   for event in eventSequence
-    mouseEvent = document.createEvent("MouseEvents")
+    mouseEvent = document.createEvent('MouseEvents')
     mouseEvent.initMouseEvent(event, true, true, window, 1, 0, 0, 0, 0, modifiers.ctrlKey, false, false,
         modifiers.metaKey, 0, null)
     # Debugging note: Firefox will not execute the element's default action if we dispatch this click event,
@@ -118,10 +118,10 @@ simulateClick = (element, modifiers) ->
 
 # Write a string into system clipboard
 writeToClipboard = (window, text) ->
-  str = Cc["@mozilla.org/supports-string;1"].createInstance(Ci.nsISupportsString);
+  str = Cc['@mozilla.org/supports-string;1'].createInstance(Ci.nsISupportsString);
   str.data = text
 
-  trans = Cc["@mozilla.org/widget/transferable;1"].createInstance(Ci.nsITransferable);
+  trans = Cc['@mozilla.org/widget/transferable;1'].createInstance(Ci.nsITransferable);
 
   if trans.init
     privacyContext = window.QueryInterface(Ci.nsIInterfaceRequestor)
@@ -129,14 +129,14 @@ writeToClipboard = (window, text) ->
       .QueryInterface(Ci.nsILoadContext)
     trans.init(privacyContext)
 
-  trans.addDataFlavor("text/unicode");
-  trans.setTransferData("text/unicode", str, text.length * 2)
+  trans.addDataFlavor('text/unicode');
+  trans.setTransferData('text/unicode', str, text.length * 2)
 
   _clip.setData(trans, null, Ci.nsIClipboard.kGlobalClipboard)
 
 # Write a string into system clipboard
 readFromClipboard = (window) ->
-  trans = Cc["@mozilla.org/widget/transferable;1"].createInstance(Ci.nsITransferable)
+  trans = Cc['@mozilla.org/widget/transferable;1'].createInstance(Ci.nsITransferable)
 
   if trans.init
     privacyContext = window.QueryInterface(Ci.nsIInterfaceRequestor)
@@ -144,14 +144,14 @@ readFromClipboard = (window) ->
       .QueryInterface(Ci.nsILoadContext);
     trans.init(privacyContext);
 
-  trans.addDataFlavor("text/unicode");
+  trans.addDataFlavor('text/unicode');
 
   _clip.getData(trans, Ci.nsIClipboard.kGlobalClipboard)
 
   str = {}
   strLength = {}
 
-  trans.getTransferData("text/unicode", str, strLength)
+  trans.getTransferData('text/unicode', str, strLength)
 
   if str
     str = str.value.QueryInterface(Ci.nsISupportsString)
@@ -173,7 +173,7 @@ timeIt = (func, msg) ->
 isBlacklisted = (str, blackList) ->
   for rule in blackList.split(/[\s,]+/)
     rule = rule.replace(/\*/g, '.*').replace(/\!/g, '.')
-    if str.match new RegExp("^#{ rule }$")
+    if str.match ///^#{ rule }$///
       return true
 
   return false
@@ -185,7 +185,7 @@ getVersion = do ->
   if version == null
     scope = {}
     addonId = getPref('addon_id')
-    Cu.import("resource://gre/modules/AddonManager.jsm", scope)
+    Cu.import('resource://gre/modules/AddonManager.jsm', scope)
     scope.AddonManager.getAddonByID addonId, (addon) -> version = addon.version
 
   return ->
@@ -212,14 +212,14 @@ smoothScroll = (window, dx, dy, msecs) ->
       window.setTimeout(fn, l * delta, x, y)
 
 parseHTML = (document, html) ->
-  parser = Cc["@mozilla.org/parserutils;1"].getService(Ci.nsIParserUtils)
+  parser = Cc['@mozilla.org/parserutils;1'].getService(Ci.nsIParserUtils)
   flags = parser.SanitizerAllowStyle
   return parser.parseFragment(html, flags, false, null, document.documentElement)
 
 # Uses nsIIOService to parse a string as a URL and find out if it is a URL
 isURL = (str) ->
   try
-    url = Cc["@mozilla.org/network/io-service;1"]
+    url = Cc['@mozilla.org/network/io-service;1']
       .getService(Ci.nsIIOService)
       .newURI(str, null, null)
       .QueryInterface(Ci.nsIURL)
@@ -229,7 +229,7 @@ isURL = (str) ->
 
 # Use Firefox services to search for a given string
 browserSearchSubmission = (str) ->
-  ss = Cc["@mozilla.org/browser/search-service;1"]
+  ss = Cc['@mozilla.org/browser/search-service;1']
     .getService(Ci.nsIBrowserSearchService)
 
   engine = ss.currentEngine or ss.defaultEngine

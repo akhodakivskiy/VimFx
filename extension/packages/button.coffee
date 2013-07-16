@@ -29,15 +29,15 @@ persist = (document, toolbar, buttonId, beforeId) ->
   else
     currentset.push(buttonId)
 
-  toolbar.setAttribute("currentset", currentset.join(','))
-  document.persist(toolbar.id, "currentset")
+  toolbar.setAttribute('currentset', currentset.join(','))
+  document.persist(toolbar.id, 'currentset')
   return [currentset, idx]
 
 restorePosition = (doc, button) ->
-  $(doc, "navigator-toolbox").palette.appendChild(button)
+  $(doc, 'navigator-toolbox').palette.appendChild(button)
 
-  for tb in $$(doc, "toolbar")
-    currentset = tb.getAttribute("currentset").split(',')
+  for tb in $$(doc, 'toolbar')
+    currentset = tb.getAttribute('currentset').split(',')
     idx = currentset.indexOf(button.id)
     if idx != -1
       toolbar = tb
@@ -157,11 +157,11 @@ createButton = (window) ->
   button.appendChild(menupopup)
 
   vimkey = doc.createElement('key')
-  vimkey.setAttribute("id", KEY_ID)
-  vimkey.setAttribute("key", "V")
-  vimkey.setAttribute("modifiers", "shift,alt")
-  vimkey.setAttribute("oncommand", "void(0);")
-  vimkey.addEventListener("command", onButtonCommand, false)
+  vimkey.setAttribute('id', KEY_ID)
+  vimkey.setAttribute('key', 'V')
+  vimkey.setAttribute('modifiers', 'shift,alt')
+  vimkey.setAttribute('oncommand', 'void(0);')
+  vimkey.addEventListener('command', onButtonCommand, false)
 
   keyset = doc.createElement('keyset')
   keyset.setAttribute('id', KEYSET_ID)
@@ -184,7 +184,7 @@ addToolbarButton = (window) ->
       buttonParent.removeChild(button)
     if keysetParent = keyset.parentNode
       keysetParent.removeChild(keyset)
-    $(doc, "navigator-toolbox").palette.removeChild(button)
+    $(doc, 'navigator-toolbox').palette.removeChild(button)
 
 updateToolbarButton = (button) ->
   if getPref('disabled')

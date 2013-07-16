@@ -312,7 +312,7 @@ commandGroups =
     'c-J':      [ command_cJ,     _('help_command_cJ') ]
     'c-K':      [ command_cK,     _('help_command_cK') ]
     'g,h':      [ command_gh,     _('help_command_gh') ]
-    "g,H|g,\^": [ command_gH_g0,  _('help_command_gH_g0') ]
+    'g,H|g,\^': [ command_gH_g0,  _('help_command_gH_g0') ]
     'g,L|g,$':  [ command_gL_g$,  _('help_command_gL_g$') ]
     'x':        [ command_x,      _('help_command_x') ]
     'X':        [ command_X,      _('help_command_X') ]

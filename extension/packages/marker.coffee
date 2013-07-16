@@ -82,7 +82,7 @@ class Marker
     # and resetting its class
     if char == 'Backspace'
       if @enteredHintChars.length > 0
-        @enteredHintChars = @enteredHintChars.slice(0, -1)
+        @enteredHintChars = @enteredHintChars[0...-1]
         @markerElement.children[@enteredHintChars.length]?.className = 'VimFxReset'
     # Otherwise append hint char and change hint class
     else
@@ -177,14 +177,14 @@ getMarkableElements = do ->
   # Some preparations done on startup
   elements = Array.concat \
     MARKABLE_ELEMENTS,
-    ["*[#{ MARKABLE_ELEMENT_PROPERTIES.join(" or ") }]"]
+    ["*[#{ MARKABLE_ELEMENT_PROPERTIES.join(' or ') }]"]
 
   xpath = elements.reduce((m, rule) ->
     m.concat(["//#{ rule }", "//xhtml:#{ rule }"])
   , []).join(' | ')
 
   namespaceResolver = (namespace) ->
-    if namespace == "xhtml" then "http://www.w3.org/1999/xhtml" else null
+    if namespace == 'xhtml' then 'http://www.w3.org/1999/xhtml' else null
 
   # The actual function that will return the desired elements
   return (document, resultType = XPathResult.ORDERED_NODE_SNAPSHOT_TYPE) ->

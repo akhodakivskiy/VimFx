@@ -18,7 +18,7 @@ class Vim
     @lastKeyStr = null
     @markers    = undefined
     @cb         = undefined
-    @findStr    = ""
+    @findStr    = ''
     @findRng    = null
 
   enterHintsMode: (@markers, @cb) ->
@@ -60,7 +60,7 @@ class Vim
 
 findCommand = (keys) ->
   for i in [0...keys.length]
-    seq = keys.slice(i).join(',')
+    seq = keys[i..].join(',')
     if com = commands[seq]
       if not isCommandDisabled(seq)
         return com
@@ -69,7 +69,7 @@ findCommand = (keys) ->
 
 maybeCommand = (keys) ->
   for i in [0...keys.length]
-    sequence = keys.slice(i).join(',')
+    sequence = keys[i..].join(',')
     for seq, com of commands
       if seq.indexOf(sequence) == 0
         return not isCommandDisabled(seq)
