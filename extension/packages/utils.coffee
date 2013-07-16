@@ -13,7 +13,7 @@ ChromeWindow        = Ci.nsIDOMChromeWindow
 _sss  = Cc["@mozilla.org/content/style-sheet-service;1"].getService(Ci.nsIStyleSheetService)
 _clip = Cc["@mozilla.org/widget/clipboard;1"].getService(Ci.nsIClipboard)
 
-{ getPref 
+{ getPref
 , getDefaultPref
 } = require 'prefs'
 
@@ -41,16 +41,16 @@ getCurrentTabWindow = (event) ->
 getEventWindow = (event) ->
   if event.originalTarget instanceof Window
     return event.originalTarget
-  else 
+  else
     doc = event.originalTarget.ownerDocument or event.originalTarget
     if doc instanceof HTMLDocument or doc instanceof XULDocument
-      return doc.defaultView 
+      return doc.defaultView
 
 getEventRootWindow = (event) ->
   if window = getEventWindow event
     return getRootWindow window
 
-getEventTabBrowser = (event) -> 
+getEventTabBrowser = (event) ->
   cw.gBrowser if cw = getEventRootWindow event
 
 getRootWindow = (window) ->
@@ -59,7 +59,7 @@ getRootWindow = (window) ->
                .QueryInterface(Ci.nsIDocShellTreeItem)
                .rootTreeItem
                .QueryInterface(Ci.nsIInterfaceRequestor)
-               .getInterface(Window); 
+               .getInterface(Window);
 
 isTextInputElement = (element) ->
   return element instanceof HTMLInputElement or \
@@ -97,7 +97,7 @@ loadCss = (name) ->
   if !_sss.sheetRegistered(uri, _sss.AGENT_SHEET)
     _sss.loadAndRegisterSheet(uri, _sss.AGENT_SHEET)
 
-  unload -> 
+  unload ->
     _sss.unregisterSheet(uri, _sss.AGENT_SHEET)
 
 # Simulate mouse click with full chain of event
@@ -138,7 +138,7 @@ writeToClipboard = (window, text) ->
 readFromClipboard = (window) ->
   trans = Cc["@mozilla.org/widget/transferable;1"].createInstance(Ci.nsITransferable);
 
-  if trans.init 
+  if trans.init
     privacyContext = window.QueryInterface(Ci.nsIInterfaceRequestor)
       .getInterface(Ci.nsIWebNavigation)
       .QueryInterface(Ci.nsILoadContext);
@@ -172,7 +172,7 @@ timeIt = (func, msg) ->
 # `blackList`: comma/space separated list of URLs with wildcards (* and !)
 isBlacklisted = (str, blackList) ->
   for rule in blackList.split(/[\s,]+/)
-    rule = rule.replace(/\*/g, '.*').replace(/\!/g, '.') 
+    rule = rule.replace(/\*/g, '.*').replace(/\!/g, '.')
     if str.match new RegExp("^#{ rule }$")
       return true
 
@@ -196,7 +196,7 @@ smoothScroll = (window, dx, dy, msecs) ->
     window.scrollBy dx, dy
   else
     # Callback
-    fn = (_x, _y) -> 
+    fn = (_x, _y) ->
       window.scrollBy(_x, _y)
     # Number of steps
     delta = 10
@@ -238,10 +238,10 @@ browserSearchSubmission = (str) ->
 # will formed (without extra spaces at the tails)
 addClass = (element, klass) ->
   if (element.className?.search klass) == -1
-    if element.className 
+    if element.className
       element.className += " #{ klass }"
     else
-      element.className = klass 
+      element.className = klass
 
 # Remove a class from the `element.className`
 removeClass = (element, klass) ->
@@ -261,7 +261,7 @@ getHintChars = do ->
 
   return ->
     hintChars = removeDuplicateCharacters(getPref('hint_chars'))
-    if hintChars.length < 3
+    if hintChars.length < 2
       hintChars = getDefaultPref('hint_chars')
 
     return hintChars
@@ -292,4 +292,4 @@ exports.isURL                     = isURL
 exports.browserSearchSubmission   = browserSearchSubmission
 exports.addClass                  = addClass
 exports.removeClass               = removeClass
-exports.getHintChars              = getHintChars 
+exports.getHintChars              = getHintChars

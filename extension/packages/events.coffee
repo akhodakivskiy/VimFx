@@ -19,7 +19,7 @@ suppressEvent = (event) ->
 
 keyStrFromEvent = (event) ->
 
-  { ctrlKey: ctrl, metaKey: meta, altKey: alt, shiftKey: shift } = event 
+  { ctrlKey: ctrl, metaKey: meta, altKey: alt, shiftKey: shift } = event
 
   if !meta and !alt
     if keyChar = keyUtils.keyCharFromCode(event.keyCode, shift)
@@ -27,24 +27,24 @@ keyStrFromEvent = (event) ->
 
   return keyStr
 
-# Passthrough mode is activated when VimFx should temporarily stop processking 
+# Passthrough mode is activated when VimFx should temporarily stop processking
 # keyboard input. For example when a context menu is whown
 passthrough = false
 
 # The following listeners are installed on every top level Chrome window
-windowsListener = 
+windowsListener =
   'keydown': (event) ->
 
-    if passthrough or getPref 'disabled' 
+    if passthrough or getPref 'disabled'
       return
 
     try
       isEditable = utils.isElementEditable event.originalTarget
 
-      keyStr = keyStrFromEvent(event) 
+      keyStr = keyStrFromEvent(event)
 
       # We only handle the key if it's recognized by `keyCharFromCode`
-      # and if there is no focused editable element # or if it's the *Esc* key, 
+      # and if there is no focused editable element # or if it's the *Esc* key,
       # which will remove the focus from the currently focused element
       if keyStr and (not isEditable or keyStr == 'Esc')
         if window = utils.getCurrentTabWindow event
@@ -75,8 +75,8 @@ windowsListener =
           # No action on blacklisted locations
           if vim.blacklisted
             return
-          
-          # Blur from any active element on Esc. Calling before `handleKeyPress` 
+
+          # Blur from any active element on Esc. Calling before `handleKeyPress`
           # because `vim.keys` will be reset afterwards`
           blur_on_esc = vim.lastKeyStr == 'Esc' and getPref 'blur_on_esc'
 
@@ -116,7 +116,7 @@ windowsListener =
     if event.target.tagName in [ 'menupopup', 'panel' ]
       passthrough = false
 
-  # When the top level window closes we should release all Vims that were 
+  # When the top level window closes we should release all Vims that were
   # associated with tabs in this window
   'DOMWindowClose': (event) ->
     if gBrowser = event.originalTarget.gBrowser
@@ -138,7 +138,7 @@ windowsListener =
 # This listener works on individual tabs within Chrome Window
 # User for: listening for location changes and disabling the extension
 # on black listed urls
-tabsListener = 
+tabsListener =
   onLocationChange: (browser, webProgress, request, location) ->
     blacklisted = utils.isBlacklisted location.spec, getPref 'black_list'
     if vim = vimBucket.get(browser.contentWindow)
@@ -158,7 +158,7 @@ addEventListeners = (window) ->
     for name, listener of windowsListener
       window.removeEventListener name, listener, true
 
-  unload -> 
+  unload ->
     removeEventListeners window
     window.gBrowser.removeTabsProgressListener tabsListener
 
