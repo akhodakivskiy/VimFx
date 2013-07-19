@@ -96,34 +96,27 @@ Global shortcut to enable/disable VimFx: `Shift-Alt-v`
     ?,>     Show Help Dialog
     Esc     Close this dialog and cancel hint markers
 
-## Contributing
+## Contributing and Reporting Issues
 
-tl;dr: Pull request to the **develop** branch!
+tl;dr: Pull request to the **develop** branch! Report in English!
 
 1. Fork.
-
 2. Clone.
-
 3. Checkout the **develop** branch: `git checkout develop`
-
 4. Create a new branch (using develop as base): `git checkout -b myTopicBranch`
-
    Using develop (and not master) as base makes it easier to pull request to develop when you're done.
-
 5. Code! Try to follow the style of the rest of the code. There are no written rules (yet?).
-
 6. Push your branch to your fork on GitHub.
-
 7. Pull request to the **develop** branch.
 
-Tips:
+## sm::WillTips:
 
 - Compile the .coffee files with the **`--bare`** option! Otherwise you will get errors.
-
 - Run `coffee -cbw .` from the root of the project to automatically compile on changes.
-
 - Put a file called exactly `VimFx@akhodakivskiy.github.com` in the extensions/ folder of a Firefox
   profile, containing the absolute path to the extension/ folder in the project. Then you just need
   to restart Firefox (use some add-on!) after each change. More details in [this MDN article][mdn-extdevenv].
+- Only create tickets for issues and feature requests in English. Otherwise duplicate 
+  tickets in different languages will pile up.
 
 [mdn-extdevenv]: https://developer.mozilla.org/en-US/docs/Setting_up_extension_development_environment#Firefox_extension_proxy_file
