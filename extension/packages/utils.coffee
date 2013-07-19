@@ -186,7 +186,7 @@ getVersion = do ->
     scope = {}
     addonId = getPref('addon_id')
     Cu.import('resource://gre/modules/AddonManager.jsm', scope)
-    scope.AddonManager.getAddonByID addonId, (addon) -> version = addon.version
+    scope.AddonManager.getAddonByID(addonId, (addon) -> version = addon.version)
 
   return ->
     return version

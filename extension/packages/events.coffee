@@ -7,7 +7,7 @@ keyUtils                 = require 'key-utils'
 
 { interfaces: Ci } = Components
 
-vimBucket = new utils.Bucket utils.getWindowId, (obj) -> new Vim obj
+vimBucket = new utils.Bucket(utils.getWindowId, (obj) -> new Vim(obj))
 
 suppressEvent = (event) ->
   event.preventDefault()
