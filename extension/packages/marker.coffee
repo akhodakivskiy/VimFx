@@ -111,9 +111,9 @@ Marker.createMarkers = (document) ->
     element = set.snapshotItem(i)
     if rect = getElementRect element
       marker = new Marker(element)
-      marker.setPosition rect
+      marker.setPosition(rect)
       marker.weight = rect.area
-      markers.push marker
+      markers.push(marker)
 
   return markers
 

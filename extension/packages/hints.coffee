@@ -45,10 +45,10 @@ injectHints = (document) ->
 
   # Add hints to the markers
   hintChars = utils.getHintChars()
-  weightsAndMarkers = markers.map (marker) -> [marker.weight, marker]
-  addHuffmanCodeWordsTo weightsAndMarkers, {alphabet: hintChars}
+  weightsAndMarkers = markers.map((marker) -> [marker.weight, marker])
+  addHuffmanCodeWordsTo(weightsAndMarkers, {alphabet: hintChars})
   for [weight, marker, hint] in weightsAndMarkers
-    marker.setHint hint
+    marker.setHint(hint)
 
   return markers
 
