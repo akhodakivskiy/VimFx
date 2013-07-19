@@ -1,8 +1,13 @@
 # VimFx - Vim keyboard shortcuts for Firefox
 
-*Extension AMO page*: https://addons.mozilla.org/en-US/firefox/addon/vimfx/
+*Extension AMO page*: https://addons.mozilla.org/en-US/firefox/addon/vimfx.
 
-*Contribute your localization! See `locale` folder*
+Contribute your localization! See `locale` folder.
+
+Read [Contributing and Reporting Issues section](#contributing-and-reporting-issues) for tips.
+> Tl;dr: Pull request to the **develop** branch! Issues in **English**!
+
+## Overview
 
 [VimFx](https://addons.mozilla.org/en-US/firefox/addon/vimfx/)
 is a [Mozilla Firefox](https://www.mozilla.org/en-US/firefox/fx/#desktop)
@@ -23,10 +28,6 @@ and it was exactly what I needed in terms of added functionality. That's why I d
 to develop similar extension for Firefox.
 
 VimFx will be nice to your browser and to your habits. Promise.
-
-## Credits
-
-
 
 ## Key Features
 
@@ -98,8 +99,6 @@ Global shortcut to enable/disable VimFx: `Shift-Alt-v`
 
 ## Contributing and Reporting Issues
 
-tl;dr: Pull request to the **develop** branch! Report in English!
-
 1. Fork.
 2. Clone.
 3. Checkout the **develop** branch: `git checkout develop`
@@ -109,7 +108,7 @@ tl;dr: Pull request to the **develop** branch! Report in English!
 6. Push your branch to your fork on GitHub.
 7. Pull request to the **develop** branch.
 
-## sm::WillTips:
+### Tips:
 
 - Compile the .coffee files with the **`--bare`** option! Otherwise you will get errors.
 - Run `coffee -cbw .` from the root of the project to automatically compile on changes.
