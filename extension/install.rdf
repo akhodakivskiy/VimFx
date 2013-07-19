@@ -73,6 +73,15 @@
         <em:creator>Alexander Haeussler</em:creator>
       </Description>
     </em:localized>
-
+	
+	<em:localized>
+      <Description>
+        <em:locale>el-GR</em:locale>
+        <em:name>VimFx</em:name>
+        <em:description>Συντομεύσεις Πληκτρολογίου του Vim για Firefox</em:description>
+        <em:creator>Theodore Keloglou</em:creator>
+      </Description>
+    </em:localized>
+	
   </Description>
 </RDF>
