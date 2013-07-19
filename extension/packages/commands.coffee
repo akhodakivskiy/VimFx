@@ -64,7 +64,7 @@ command_yf = (vim) ->
 command_vf = (vim) ->
   markers = hints.injectHints(vim.window.document)
   if markers?.length > 0
-    vim.enterHintsMode markers, (marker) -> marker.element.focus()
+    vim.enterHintsMode(markers, (marker) -> marker.element.focus())
 
 # Copy current URL to the clipboard
 command_yy = (vim) ->
@@ -361,7 +361,7 @@ hintCharHandler = (vim, keyStr, charCode) ->
     key = regexpEscape(keyStr)
 
     # First do a pre match - count how many markers will match with the new character entered
-    if vim.markers.reduce ((v, marker) -> v or marker.willMatch key), false
+    if vim.markers.reduce(((v, marker) -> v or marker.willMatch(key)), false)
       for marker in vim.markers
         marker.matchHintChar(key)
 

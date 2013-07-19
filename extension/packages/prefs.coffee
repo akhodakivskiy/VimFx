@@ -81,7 +81,7 @@ enableCommand = (key) ->
     while (idx = DISABLED_COMMANDS.indexOf(c)) > -1
       DISABLED_COMMANDS.splice(idx, 1)
 
-  setPref('disabled_commands', JSON.stringify DISABLED_COMMANDS)
+  setPref('disabled_commands', JSON.stringify(DISABLED_COMMANDS))
 
 # Adds command to the disabled list
 disableCommand = (key) ->
@@ -89,7 +89,7 @@ disableCommand = (key) ->
     if DISABLED_COMMANDS.indexOf(c) == -1
       DISABLED_COMMANDS.push(c)
 
-  setPref('disabled_commands', JSON.stringify DISABLED_COMMANDS)
+  setPref('disabled_commands', JSON.stringify(DISABLED_COMMANDS))
 
 # Checks if given command is disabled in the preferences
 isCommandDisabled = (key) ->
