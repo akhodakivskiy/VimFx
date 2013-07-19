@@ -2,8 +2,6 @@
 
 *Extension AMO page*: https://addons.mozilla.org/en-US/firefox/addon/vimfx/
 
-*Contribute your localization! See `locale` folder*
-
 [VimFx](https://addons.mozilla.org/en-US/firefox/addon/vimfx/) 
 is a [Mozilla Firefox](https://www.mozilla.org/en-US/firefox/fx/#desktop) 
 extension which introduces Vim-style keyboard shortcuts for browsing and navigation, 
@@ -13,6 +11,12 @@ VimFx was inspired by [Vimperator](http://www.vimperator.org/)
 and designed after [Vimium](http://vimium.github.com/) for 
 [Google Chrome](https://www.google.com/intl/en/chrome/browser/) preserving the shortcuts and behavior.
 If your are used to Vimium then it will be easy to get started with VimFx.
+
+## Reporting Issues and Contributing
+
+- Please submit bug reports and feature requests in *English*.
+- Please submit cotribution pull requests for `develop` branch only. Pull requests for `master` will be closed. Thank you!
+- Contribute your localization! See `locale` folder.
 
 ## Why VimFx was created
 
