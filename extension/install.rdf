@@ -54,7 +54,7 @@
 
     <em:localized>
       <Description>
-        <em:locale>hu-HU</em:locale>
+        <em:locale>hu</em:locale>
         <em:description>Vim billenytűparancsok Firefoxhoz</em:description>
       </Description>
     </em:localized>

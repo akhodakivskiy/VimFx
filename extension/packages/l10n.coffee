@@ -1,12 +1,13 @@
 { classes: Cc, interfaces: Ci } = Components
 
+{ getFirefoxPref } = require 'prefs'
+
 # Generates the underscore function
 l10n = do ->
   splitter = /(\w+)-\w+/
 
   # Current locale
-  locale = Cc['@mozilla.org/chrome/chrome-registry;1']
-    .getService(Ci.nsIXULChromeRegistry).getSelectedLocale('global')
+  locale = getFirefoxPref('general.useragent.locale')
 
   getStr = (aStrBundle, aKey) ->
     try return aStrBundle.GetStringFromName(aKey)
@@ -16,11 +17,11 @@ l10n = do ->
     filePath = (locale) ->
       getResourceURI("locale/#{ locale }/#{ filename }").spec
 
-    # Folder in the format `en-US`
+    # Folder in the format `en-US`, e.g. locale/en-US/vimfx.properties
     defaultBundle = Services.strings.createBundle(filePath(locale))
 
     if locale_base = locale.match(splitter)
-      # Folder in the basic format: `en`
+      # Folder in the basic format: `en`, e.g. locale/en/vimfx.properties
       defaultBasicBundle = Services.strings.createBundle(filePath(locale_base[1]))
 
     # Folder named after `defaultLocale`
@@ -31,10 +32,11 @@ l10n = do ->
       localeBundle = null
       localeBasicBundle = null
 
-      # Yet another way to specify a folder
+      # Yet another way to specify a folder: both `en` or `en-US` are possible here
       if aLocale
         localeBundle = Services.strings.createBundle(filePath(aLocale))
 
+        # And locale version without the region, e.g. `en`
         if locale_base = aLocale.match(splitter)
           localeBasicBundle = Services.strings.createBundle(filePath(locale_base[1]))
 
