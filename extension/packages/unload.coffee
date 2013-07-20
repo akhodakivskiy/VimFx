@@ -31,3 +31,5 @@ unload = do ->
         unloaders.splice(index, 1)
 
     return removeUnloader
+
+exports.unload = unload

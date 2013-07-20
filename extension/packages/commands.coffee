@@ -3,6 +3,7 @@ hints = require 'hints'
 help  = require 'help'
 find  = require 'find'
 
+{ _ } = require 'l10n'
 { getPref
 , setPref
 , getFirefoxPref } = require 'prefs'
@@ -358,7 +359,7 @@ commandsHelp = do (commandGroups) ->
 hintCharHandler = (vim, keyStr, charCode) ->
   if keyStr and charCode > 0
     # Get char and escape it to avoid problems with String.search
-    key = regexpEscape(keyStr)
+    key = utils.regexpEscape(keyStr)
 
     # First do a pre match - count how many markers will match with the new character entered
     if vim.markers.reduce(((v, marker) -> v or marker.willMatch(key)), false)

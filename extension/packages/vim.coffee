@@ -35,7 +35,7 @@ class Vim
       result = maybeCommand(@keys.concat([keyStr]))
     else if !keyboardEvent.ctrlKey and !keyboardEvent.metaKey
       if @mode == MODE_HINTS
-        result = utils.getHintChars().search(regexpEscape(keyStr)) > -1
+        result = utils.getHintChars().search(utils.regexpEscape(keyStr)) > -1
 
     if result
       @lastKeyStr = keyStr

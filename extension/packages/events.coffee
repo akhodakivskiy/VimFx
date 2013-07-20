@@ -4,6 +4,8 @@ keyUtils                 = require 'key-utils'
 { Vim }                  = require 'vim'
 { getPref }              = require 'prefs'
 { setWindowBlacklisted } = require 'button'
+{ unload }               = require 'unload'
+{ console }              = require 'console'
 
 { interfaces: Ci } = Components
 
