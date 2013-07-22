@@ -3,48 +3,44 @@
 { classes: Cc, interfaces: Ci, utils: Cu } = Components
 
 Cu.import('resource://gre/modules/Services.jsm')
-Cu.import('resource://gre/modules/AddonManager.jsm')
 
 # Populate the global namespace with console, require, and include
 do (global = this) ->
   loader = Cc['@mozilla.org/moz/jssubscript-loader;1'].getService(Ci.mozIJSSubScriptLoader)
   baseURI = Services.io.newURI(__SCRIPT_URI_SPEC__, null, null)
 
-  include = (src, scope) ->
-    try
-      path = Services.io.newURI(src, null, baseURI).spec
-      loader.loadSubScript(path, scope)
-    catch error
-      dump("Failed to load #{ src }: #{ error }\n")
+  # Loaded packages cache 
+  packages = {}
 
-    return scope
-
-
-  modules = {}
-  require = (src) ->
-    if modules[src]
-      return modules[src]
-    else
+  # Load and cache package
+  require = (name) ->
+    if packages[name] is undefined
       scope =
         require: require
         exports: {}
+      try
+        path = Services.io.newURI("packages/#{ name }.js", null, baseURI).spec
+        loader.loadSubScript(path, scope)
+        packages[name] = scope.exports
+      catch error
+        dump("Failed to load #{ name }: #{ error }\n")
 
-      include("packages/#{ src }.js", scope)
+    return packages[name]
 
-      return modules[src] = scope.exports
-
+  # Unload all packages
   release = ->
-    for path, scope in modules
+    for path, scope in packages
       for name, value in scope
         scope[name] = null
-    modules = {}
+    packages = {}
 
   # Firefox will call this method on startup/enabling
   global.startup = (data, reason) ->
     # Requires for startup/install
     { loadCss }             = require 'utils'
     { addEventListeners }   = require 'events'
-    { getPref }             = require 'prefs'
+    { getPref 
+    , initPrefValues }      = require 'prefs'
     { setButtonInstallPosition
     , addToolbarButton }    = require 'button'
     { watchWindows }        = require 'window-utils'
@@ -54,6 +50,9 @@ do (global = this) ->
       # Position the toolbar button right before the default Bookmarks button
       # If Bookmarks button is hidden - then VimFx button will be appended to the toolbar
       setButtonInstallPosition 'nav-bar', 'bookmarks-menu-button-container'
+
+    # Write default preference values on install
+    initPrefValues()
 
     loadCss('style')
 

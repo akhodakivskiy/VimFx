@@ -29,6 +29,13 @@ getBranchPref = (branch, key, defaultValue) ->
       if defaultValue != undefined
         return defaultValue
 
+isPrefSet = do ->
+  prefs = Cc['@mozilla.org/preferences-service;1'].getService(Ci.nsIPrefService)
+  branch = prefs.getBranch(PREF_BRANCH)
+
+  return (key) ->
+    branch.prefHasUserValue(key)
+
 getPref = do ->
   prefs = Cc['@mozilla.org/preferences-service;1'].getService(Ci.nsIPrefService)
   branch = prefs.getBranch(PREF_BRANCH)
@@ -99,6 +106,12 @@ isCommandDisabled = (key) ->
 
   return false
 
+initPrefValues = ->
+  for key, value of DEFAULT_PREF_VALUES 
+    if not isPrefSet(key)
+      setPref(key, value)
+
+exports.isPrefSet         = isPrefSet
 exports.getPref           = getPref
 exports.getDefaultPref    = getDefaultPref
 exports.getFirefoxPref    = getFirefoxPref
@@ -106,3 +119,4 @@ exports.setPref           = setPref
 exports.isCommandDisabled = isCommandDisabled
 exports.disableCommand    = disableCommand
 exports.enableCommand     = enableCommand
+exports.initPrefValues    = initPrefValues
