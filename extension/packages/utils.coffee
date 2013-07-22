@@ -16,7 +16,6 @@ HTMLElement         = Ci.nsIDOMHTMLElement
 Window              = Ci.nsIDOMWindow
 ChromeWindow        = Ci.nsIDOMChromeWindow
 
-_sss  = Cc['@mozilla.org/content/style-sheet-service;1'].getService(Ci.nsIStyleSheetService)
 _clip = Cc['@mozilla.org/widget/clipboard;1'].getService(Ci.nsIClipboard)
 
 class Bucket
@@ -94,13 +93,15 @@ cssUri = do ->
 # Loads the css identified by the name in the StyleSheetService as User Stylesheet
 # The stylesheet is then appended to every document, but it can be overwritten by
 # any user css
-loadCss = (name) ->
-  uri = cssUri(name)
-  if !_sss.sheetRegistered(uri, _sss.AGENT_SHEET)
-    _sss.loadAndRegisterSheet(uri, _sss.AGENT_SHEET)
+loadCss = do ->
+  sss = Cc['@mozilla.org/content/style-sheet-service;1'].getService(Ci.nsIStyleSheetService)
+  return (name) ->
+    uri = cssUri(name)
+    if !sss.sheetRegistered(uri, sss.AUTHOR_SHEET)
+      sss.loadAndRegisterSheet(uri, sss.AUTHOR_SHEET)
 
-  unload ->
-    _sss.unregisterSheet(uri, _sss.AGENT_SHEET)
+    unload ->
+      sss.unregisterSheet(uri, sss.AUTHOR_SHEET)
 
 # Simulate mouse click with full chain of event
 # Copied from Vimium codebase
