@@ -4,8 +4,13 @@ CONTAINER_ID = 'VimFxFindContainer'
 DIRECTION_FORWARDS = 0
 DIRECTION_BACKWARDS = 1
 
+{ console } = require 'console'
+
 # Create and inserts into DOM find controls and handlers
 injectFind = (document, cb) ->
+  # First get starting range - it might begin where last search ended
+  startFindRng = getStartFindRng(document.defaultView)
+
   # Clean up just in case...
   removeFind(document)
 
@@ -14,7 +19,7 @@ injectFind = (document, cb) ->
 
   # Call back in new input
   input.addEventListener 'input', (event) ->
-    result = cb(input.value)
+    result = cb(input.value, startFindRng)
     if result
       input.classList.remove('VimFxNotFound')
     else
@@ -37,12 +42,25 @@ removeFind = (document, clear = true) ->
   if clear
     clearSelection(document.defaultView)
 
+getStartFindRng = (window) ->
+  controller = getController(window)
+  for selectionType in [Ci.nsISelectionController.SELECTION_NORMAL, Ci.nsISelectionController.SELECTION_FIND]
+    selection = controller.getSelection(selectionType)
+    if selection.rangeCount > 0
+      rng = selection.getRangeAt(0)
+      if rng.collapsed
+        rng.selectNode(rng.commonAncestorContainer)
+      if rng.commonAncestorContainer != window.document
+        return rng
+
+
 focusSelection = (document, selectionType) ->
   if controller = getController(document.defaultView)
     if selection = controller.getSelection(selectionType)
       if selection.rangeCount > 0
+        # commonAncestorContainer is a Text node, we need to get the tag that wraps it
         element = selection.getRangeAt(0).commonAncestorContainer?.parentNode
-        if element.focus
+        if element != document and element.focus
           element.focus()
 
 createFindContainer = (document) ->

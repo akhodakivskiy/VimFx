@@ -12,14 +12,20 @@ MODE_NORMAL = 1
 MODE_HINTS  = 2
 
 class Vim
+  @findStr = ''
+
   constructor: (@window) ->
     @mode       = MODE_NORMAL
     @keys       = []
     @lastKeyStr = null
     @markers    = undefined
     @cb         = undefined
-    @findStr    = ''
     @findRng    = null
+
+    Object.defineProperty(this, 'findStr', 
+      get: -> return Vim.findStr
+      set: (value) -> Vim.findStr = value
+    )
 
   enterHintsMode: (@markers, @cb) ->
     @mode = MODE_HINTS

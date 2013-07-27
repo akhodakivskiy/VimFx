@@ -8,6 +8,8 @@ find  = require 'find'
 , setPref
 , getFirefoxPref } = require 'prefs'
 
+{ console } = require 'console'
+
 { classes: Cc, interfaces: Ci, utils: Cu } = Components
 
 # Opens developer toolbar (Default shotrcut: Shift-F2)
@@ -151,8 +153,9 @@ command_K_gt = (vim) ->
     rootWindow.gBrowser.tabContainer.advanceSelectedTab(1, true)
 
 command_gh = (vim) ->
-  homepage_url = getFirefoxPref('browser.startup.homepage')
-  vim.window.location.assign(homepage_url)
+  url = getFirefoxPref('browser.startup.homepage')
+  if chromeWindow = utils.getRootWindow(vim.window)
+    chromeWindow.gBrowser.loadURIWithFlags(url, null, null, null, null)
 
 # Go to the first tab
 command_gH_g0 = (vim) ->
@@ -234,10 +237,10 @@ command_help = (vim) ->
 
 # Switch into find mode
 command_find = (vim) ->
-  find.injectFind vim.window.document, (findStr, direction) ->
+  find.injectFind vim.window.document, (findStr, startFindRng) ->
     # Reset region and find string if new find stirng has arrived
     if vim.findStr != findStr
-      [vim.findStr, vim.findRng] = [findStr, null]
+      [vim.findStr, vim.findRng] = [findStr, startFindRng]
     # Perform forward find and store found region
     return vim.findRng = find.find(vim.window, vim.findStr, vim.findRng, find.DIRECTION_FORWARDS)
 
