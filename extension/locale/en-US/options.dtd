@@ -5,17 +5,11 @@
 <!ENTITY pref.black_list.desc       "Comma separated list of URL where VimFx should be automatically disabled. 
 Wildcards allowed: *, !">
 
-<!ENTITY pref.scroll_step.title     "Scroll Step">
-<!ENTITY pref.scroll_step.desc      "Scroll Step">
+<!ENTITY pref.scroll_step_lines.title "Scroll Step">
+<!ENTITY pref.scroll_step_lines.desc  "Scroll Step">
 
 <!ENTITY pref.blur_on_esc.title     "Blur on Esc">
 <!ENTITY pref.blur_on_esc.desc      "Blur input focus from any active input element in the browser (e.g. address bar)">
 
 <!ENTITY pref.leave_dt_on_esc.title "Leave Developer Toolbar open on Esc">
 <!ENTITY pref.leave_dt_on_esc.desc  "Do not hide Developer Toolbar if it's visible and the Esc is pressed">
-
-<!ENTITY pref.scroll_time.title     "Smooth Scroll">
-<!ENTITY pref.smooth_time.disabled  "Disable">
-<!ENTITY pref.smooth_time.fast      "Fast">
-<!ENTITY pref.smooth_time.normal    "Normal">
-<!ENTITY pref.smooth_time.slow      "Slow">

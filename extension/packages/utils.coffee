@@ -119,6 +119,26 @@ simulateClick = (element, modifiers) ->
     # but Webkit will. Dispatching a click on an input box does not seem to focus it; we do that separately
     element.dispatchEvent(mouseEvent)
 
+WHEEL_MODE_PIXEL = Ci.nsIDOMWheelEvent.DOM_DELTA_PIXEL 
+WHEEL_MODE_LINE = Ci.nsIDOMWheelEvent.DOM_DELTA_LINE 
+WHEEL_MODE_PAGE = Ci.nsIDOMWheelEvent.DOM_DELTA_PAGE 
+    
+# Simulate mouse scroll event by specific offsets given
+# that mouse cursor is at specified position
+simulateWheel = (window, deltaX, deltaY, mode = WHEEL_MODE_PIXEL) ->
+  windowUtils = window.QueryInterface(Ci.nsIInterfaceRequestor)
+                      .getInterface(Ci.nsIDOMWindowUtils)
+
+  [pX, pY] = [window.innerWidth / 2, window.innerHeight / 2]
+  windowUtils.sendWheelEvent(
+    pX, pY,             # Window offset (x, y) in pixels
+    deltaX, deltaY, 0,  # Deltas (x, y, z)
+    mode,               # Mode (pixel, line, page)
+    0,                  # Key Modifiers
+    0, 0,               # Line or Page deltas (x, y)
+    0                   # Options
+  )
+
 # Write a string into system clipboard
 writeToClipboard = (window, text) ->
   str = Cc['@mozilla.org/supports-string;1'].createInstance(Ci.nsISupportsString);
@@ -194,26 +214,6 @@ getVersion = do ->
   return ->
     return version
 
-# Simulate smooth scrolling
-smoothScroll = (window, dx, dy, msecs) ->
-  if msecs <= 0 || !Services.prefs.getBoolPref('general.smoothScroll')
-    window.scrollBy(dx, dy)
-  else
-    # Callback
-    fn = (_x, _y) ->
-      window.scrollBy(_x, _y)
-    # Number of steps
-    delta = 10
-    l = Math.round(msecs / delta)
-    while l > 0
-      x = Math.round(dx / l)
-      y = Math.round(dy / l)
-      dx -= x
-      dy -= y
-
-      l -= 1
-      window.setTimeout(fn, l * delta, x, y)
-
 parseHTML = (document, html) ->
   parser = Cc['@mozilla.org/parserutils;1'].getService(Ci.nsIParserUtils)
   flags = parser.SanitizerAllowStyle
@@ -279,7 +279,10 @@ exports.getSessionStore         = getSessionStore
 exports.loadCss                 = loadCss
 
 exports.simulateClick           = simulateClick
-exports.smoothScroll            = smoothScroll
+exports.simulateWheel           = simulateWheel
+exports.WHEEL_MODE_PIXEL        = WHEEL_MODE_PIXEL
+exports.WHEEL_MODE_LINE         = WHEEL_MODE_LINE
+exports.WHEEL_MODE_PAGE         = WHEEL_MODE_PAGE
 exports.readFromClipboard       = readFromClipboard
 exports.writeToClipboard        = writeToClipboard
 exports.timeIt                  = timeIt
