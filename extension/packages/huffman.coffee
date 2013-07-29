@@ -14,6 +14,12 @@ exports.addHuffmanCodeWordsTo = (originalElements, {alphabet}) ->
   if alphabet.length < 2
     throw new Error('`alphabet` must consist of at least 2 characters.')
 
+  # The algorithm is so optimized, that it does not even produce a code word if there is only one
+  # element! We still need a code word even if there is only one link, though.
+  if originalElements.length is 1
+    originalElements[0].push(alphabet[0])
+    return null
+
   elements = ({ index, weight } for [weight], index in originalElements)
 
   numBranches = alphabet.length

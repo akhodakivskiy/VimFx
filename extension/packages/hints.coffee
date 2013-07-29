@@ -1,4 +1,4 @@
-utils                      = require 'utils'
+utils                     = require 'utils'
 { Marker }                = require 'marker'
 { addHuffmanCodeWordsTo } = require 'huffman'
 
