@@ -58,8 +58,7 @@ windowsListener =
             if vim.handleKeyDown(event, keyStr) and keyStr != 'Esc'
               suppressEvent event
     catch err
-      console.log(err, 'keydown')
-      console.stacktrace()
+      console.log(err, 'keydown', err.stack)
 
   keypress: (event) ->
 
@@ -98,8 +97,7 @@ windowsListener =
             window.setTimeout(cb, 0)
 
     catch err
-      console.log(err, 'keypress')
-      console.stacktrace()
+      console.log(err, 'keypress', err.stack)
 
   keyup: (event) ->
     if window = utils.getCurrentTabWindow event

@@ -97,6 +97,16 @@ command_aR = (vim) ->
         window = tabs.getItemAtIndex(i).linkedBrowser.contentWindow
         window.location.reload(true)
 
+command_s = (vim) ->
+  vim.window.stop()
+
+command_as = (vim) ->
+  if rootWindow = utils.getRootWindow(vim.window)
+    if tabs = rootWindow.gBrowser.tabContainer
+      for i in [0...tabs.itemCount]
+        window = tabs.getItemAtIndex(i).linkedBrowser.contentWindow
+        window.stop()
+
 # Scroll to the top of the page
 command_gg = (vim) ->
   for i in [0...1000]
@@ -294,6 +304,8 @@ commandGroups =
     'R':        [ command_R,      _('help_command_R') ]
     'a,r':      [ command_ar,     _('help_command_ar') ]
     'a,R':      [ command_aR,     _('help_command_aR') ]
+    's':        [ command_s,      _('help_command_s') ]
+    'a,s':      [ command_as,     _('help_command_as') ]
   'nav':
     'g,g':      [ command_gg ,    _('help_command_gg') ]
     'G':        [ command_G,      _('help_command_G') ]

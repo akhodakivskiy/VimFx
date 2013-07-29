@@ -12,10 +12,14 @@ do (global = this) ->
   # Loaded packages cache 
   packages = {}
 
+  # To be loaded in a bit
+  console = null
+
   # Load and cache package
   require = (name) ->
     if packages[name] is undefined
       scope =
+        console: console
         require: require
         exports: {}
       try
@@ -26,6 +30,9 @@ do (global = this) ->
         dump("Failed to load #{ name }: #{ error }\n")
 
     return packages[name]
+
+  # Load up console that is defined above
+  { console } = require 'console'
 
   # Unload all packages
   release = ->
