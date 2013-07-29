@@ -48,7 +48,7 @@ for the most relevant list.
 
 Global shortcut to enable/disable VimFx: `Shift-Alt-v`
 
-### URLs
+### Dealing with URLs
 
     o       Focus the Address Bar
     p       Navigate to the address in the clipboard
@@ -60,8 +60,10 @@ Global shortcut to enable/disable VimFx: `Shift-Alt-v`
     R       Reload current page and all the assets (js, css, etc.)
     ar      Reload pages in all tabs
     aR      Reload pages in all tabs including assets (js, css, img)
+    s       Stop loading current page
+    as      Stop loading pages in all tabs
 
-### Navigating
+### Navigating the Page
 
     gg      Scroll to the Top of the page
     G       Scroll to the Bottom of the page
@@ -74,7 +76,7 @@ Global shortcut to enable/disable VimFx: `Shift-Alt-v`
     c-f     Scroll full Page Down
     c-b     Scroll full Page Up
 
-### Tabs
+### Working with Tabs
 
     t       Open New Blank tab
     J,gT    Go to the Previous tab
@@ -102,6 +104,7 @@ Global shortcut to enable/disable VimFx: `Shift-Alt-v`
     N       Go to the previous Find match
     ?,>     Show Help Dialog
     Esc     Close this dialog and cancel hint markers
+    :       Open Developer Toolbar
 
 ## Contributing and Reporting Issues
 
