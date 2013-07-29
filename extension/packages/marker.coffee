@@ -16,6 +16,7 @@ MARKABLE_ELEMENT_PROPERTIES = [
   "@role='link'"
   "@role='button'"
   "contains(@class, 'button')"
+  "contains(@class, 'js-new-tweets-bar')"
   "@contenteditable='' or translate(@contenteditable, 'TRUE', 'true')='true'"
 ]
 
