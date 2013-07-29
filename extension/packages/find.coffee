@@ -4,6 +4,8 @@ CONTAINER_ID = 'VimFxFindContainer'
 DIRECTION_FORWARDS = 0
 DIRECTION_BACKWARDS = 1
 
+HTMLDocument = Ci.nsIDOMHTMLDocument
+
 { console } = require 'console'
 
 # Create and inserts into DOM find controls and handlers
