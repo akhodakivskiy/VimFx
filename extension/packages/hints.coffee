@@ -41,7 +41,7 @@ injectHints = (document) ->
         for frame in document.defaultView.frames
           markers = markers.concat(inner(frame.document))
 
-        return markers
+    return markers or []
 
   markers = inner(document)
 
