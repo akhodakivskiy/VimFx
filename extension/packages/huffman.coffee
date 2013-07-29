@@ -4,7 +4,7 @@
 # larger the weight, the shorter the code word. The code words will use the `{alphabet}` provided.
 # Note that the function modifies the `originalElements` array and returns `null`.
 exports.addHuffmanCodeWordsTo = (originalElements, {alphabet}) ->
-  if typeof(alphabet) isnt 'string'
+  if typeof(alphabet) != 'string'
     throw new TypeError('`alphabet` must be a string.')
 
   nonUnique = /([\s\S])[\s\S]*\1/.exec(alphabet)
@@ -14,9 +14,9 @@ exports.addHuffmanCodeWordsTo = (originalElements, {alphabet}) ->
   if alphabet.length < 2
     throw new Error('`alphabet` must consist of at least 2 characters.')
 
-  # The algorithm is so optimized, that it does not even produce a code word if there is only one
-  # element! We still need a code word even if there is only one link, though.
-  if originalElements.length is 1
+  # The algorithm is so optimized, that it does not even produce a code word at all if there is only
+  # one element! We still need a code word even if there is only one link, though.
+  if originalElements.length == 1
     originalElements[0].push(alphabet[0])
     return null
 
@@ -52,13 +52,13 @@ exports.addHuffmanCodeWordsTo = (originalElements, {alphabet}) ->
       sum.children.unshift(lowestWeight)
     elements.push(sum)
 
-  root = elements[0] # `elements.length is 1` by now.
+  root = elements[0] # `elements.length == 1` by now.
 
-  # Create the code words by walking the tree.
+  # Create the code words by walking the tree. Store them on `originalElements`.
   do walk = (node = root, codeWord = '') ->
     if node.children
       for childNode, index in node.children
         walk(childNode, codeWord + alphabet[index])
     else
-      originalElements[node.index].push(codeWord)  unless node.weight is 0
-    null
+      originalElements[node.index].push(codeWord)  unless node.weight == 0
+    return null
