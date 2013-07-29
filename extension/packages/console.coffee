@@ -43,3 +43,5 @@ console = do ->
     expand: -> message('expand', Array.map(arguments, expand))
     stacktrace: -> message('stacktrace', stacktrace())
   }
+
+exports.console = console

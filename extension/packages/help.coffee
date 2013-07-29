@@ -1,5 +1,6 @@
 utils = require 'utils'
 prefs = require 'prefs'
+{ _ } = require 'l10n'
 
 CONTAINER_ID = 'VimFxHelpDialogContainer'
 

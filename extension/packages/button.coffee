@@ -3,6 +3,8 @@
 { injectHelp }   = require 'help'
 { commandsHelp } = require 'commands'
 utils            = require 'utils'
+{ unload }       = require 'unload'
+{ _ }            = require 'l10n'
 
 KEYSET_ID             = 'vimfx-keyset'
 BUTTON_ID             = 'vimfx-toolbar-button'
@@ -61,10 +63,10 @@ restorePosition = (doc, button) ->
 
 iconUrl = do ->
   kinds =
-    normal:    getResourceURI('resources/icon16.png').spec
-    grey:      getResourceURI('resources/icon16-grey.png').spec
-    red:       getResourceURI('resources/icon16-red.png').spec
-    blacklist: getResourceURI('resources/icon16-blacklist.png').spec
+    normal:    utils.getResourceURI('resources/icon16.png').spec
+    grey:      utils.getResourceURI('resources/icon16-grey.png').spec
+    red:       utils.getResourceURI('resources/icon16-red.png').spec
+    blacklist: utils.getResourceURI('resources/icon16-blacklist.png').spec
 
   return (kind) -> "url(#{ kinds[kind] })"
 

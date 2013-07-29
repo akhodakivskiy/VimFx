@@ -1,0 +1,15 @@
+<!ENTITY pref.hint_chars.title      "Χαρακτήρες Δεικτών">
+<!ENTITY pref.hint_chars.desc       "Προεπιλογή: asdfgercvhjkl;uinm">
+
+<!ENTITY pref.black_list.title      "Μαύρη Λίστα">
+<!ENTITY pref.black_list.desc       "Διευθύνσης διαχωρισμένες με κόμματα στις οποίες το VimFX θα είναι αυτόματα απενεργοποιημένο. 
+Wildcards allowed: *, !">
+
+<!ENTITY pref.scroll_step_lines.title "Βήμα Κύλισης">
+<!ENTITY pref.scroll_step_lines.desc  "Βήμα Κύλισης">
+
+<!ENTITY pref.blur_on_esc.title     "Θόλωμα στο Esc">
+<!ENTITY pref.blur_on_esc.desc      "Θόλωσε την εστίαση εισόδου οποιουδήποτε ενεργού στοιχείου εισόδου στον περιηγητή (π.χ. γραμμή διευθύνσεων)">
+
+<!ENTITY pref.leave_dt_on_esc.title "Άφηνε τη Developer Toolbar ανοιχτή στο Esc">
+<!ENTITY pref.leave_dt_on_esc.desc  "Μην κρύβεις τη Developer Toolbar αν είναι ορατή και το Esc πατηθεί">

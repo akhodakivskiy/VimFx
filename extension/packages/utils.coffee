@@ -1,3 +1,5 @@
+{ unload } = require 'unload'
+{ console } = require 'console'
 { getPref
 , getDefaultPref
 } = require 'prefs'
@@ -14,7 +16,6 @@ HTMLElement         = Ci.nsIDOMHTMLElement
 Window              = Ci.nsIDOMWindow
 ChromeWindow        = Ci.nsIDOMChromeWindow
 
-_sss  = Cc['@mozilla.org/content/style-sheet-service;1'].getService(Ci.nsIStyleSheetService)
 _clip = Cc['@mozilla.org/widget/clipboard;1'].getService(Ci.nsIClipboard)
 
 class Bucket
@@ -92,13 +93,15 @@ cssUri = do ->
 # Loads the css identified by the name in the StyleSheetService as User Stylesheet
 # The stylesheet is then appended to every document, but it can be overwritten by
 # any user css
-loadCss = (name) ->
-  uri = cssUri(name)
-  if !_sss.sheetRegistered(uri, _sss.AGENT_SHEET)
-    _sss.loadAndRegisterSheet(uri, _sss.AGENT_SHEET)
+loadCss = do ->
+  sss = Cc['@mozilla.org/content/style-sheet-service;1'].getService(Ci.nsIStyleSheetService)
+  return (name) ->
+    uri = cssUri(name)
+    if !sss.sheetRegistered(uri, sss.AUTHOR_SHEET)
+      sss.loadAndRegisterSheet(uri, sss.AUTHOR_SHEET)
 
-  unload ->
-    _sss.unregisterSheet(uri, _sss.AGENT_SHEET)
+    unload ->
+      sss.unregisterSheet(uri, sss.AUTHOR_SHEET)
 
 # Simulate mouse click with full chain of event
 # Copied from Vimium codebase
@@ -115,6 +118,26 @@ simulateClick = (element, modifiers) ->
     # Debugging note: Firefox will not execute the element's default action if we dispatch this click event,
     # but Webkit will. Dispatching a click on an input box does not seem to focus it; we do that separately
     element.dispatchEvent(mouseEvent)
+
+WHEEL_MODE_PIXEL = Ci.nsIDOMWheelEvent.DOM_DELTA_PIXEL 
+WHEEL_MODE_LINE = Ci.nsIDOMWheelEvent.DOM_DELTA_LINE 
+WHEEL_MODE_PAGE = Ci.nsIDOMWheelEvent.DOM_DELTA_PAGE 
+    
+# Simulate mouse scroll event by specific offsets given
+# that mouse cursor is at specified position
+simulateWheel = (window, deltaX, deltaY, mode = WHEEL_MODE_PIXEL) ->
+  windowUtils = window.QueryInterface(Ci.nsIInterfaceRequestor)
+                      .getInterface(Ci.nsIDOMWindowUtils)
+
+  [pX, pY] = [window.innerWidth / 2, window.innerHeight / 2]
+  windowUtils.sendWheelEvent(
+    pX, pY,             # Window offset (x, y) in pixels
+    deltaX, deltaY, 0,  # Deltas (x, y, z)
+    mode,               # Mode (pixel, line, page)
+    0,                  # Key Modifiers
+    0, 0,               # Line or Page deltas (x, y)
+    0                   # Options
+  )
 
 # Write a string into system clipboard
 writeToClipboard = (window, text) ->
@@ -186,30 +209,10 @@ getVersion = do ->
     scope = {}
     addonId = getPref('addon_id')
     Cu.import('resource://gre/modules/AddonManager.jsm', scope)
-    scope.AddonManager.getAddonByID addonId, (addon) -> version = addon.version
+    scope.AddonManager.getAddonByID(addonId, (addon) -> version = addon.version)
 
   return ->
     return version
-
-# Simulate smooth scrolling
-smoothScroll = (window, dx, dy, msecs) ->
-  if msecs <= 0 || !Services.prefs.getBoolPref('general.smoothScroll')
-    window.scrollBy(dx, dy)
-  else
-    # Callback
-    fn = (_x, _y) ->
-      window.scrollBy(_x, _y)
-    # Number of steps
-    delta = 10
-    l = Math.round(msecs / delta)
-    while l > 0
-      x = Math.round(dx / l)
-      y = Math.round(dy / l)
-      dx -= x
-      dy -= y
-
-      l -= 1
-      window.setTimeout(fn, l * delta, x, y)
 
 parseHTML = (document, html) ->
   parser = Cc['@mozilla.org/parserutils;1'].getService(Ci.nsIParserUtils)
@@ -253,6 +256,14 @@ getHintChars = do ->
 
     return hintChars
 
+# Return URI to some file in the extension packaged as resource
+getResourceURI = do ->
+  baseURI = Services.io.newURI(__SCRIPT_URI_SPEC__, null, null)
+  return (path) -> Services.io.newURI(path, null, baseURI)
+
+# Escape string to render it usable in regular expressions
+regexpEscape = (s) -> s and s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')
+
 exports.Bucket                  = Bucket
 exports.getCurrentTabWindow     = getCurrentTabWindow
 exports.getEventWindow          = getEventWindow
@@ -268,7 +279,10 @@ exports.getSessionStore         = getSessionStore
 exports.loadCss                 = loadCss
 
 exports.simulateClick           = simulateClick
-exports.smoothScroll            = smoothScroll
+exports.simulateWheel           = simulateWheel
+exports.WHEEL_MODE_PIXEL        = WHEEL_MODE_PIXEL
+exports.WHEEL_MODE_LINE         = WHEEL_MODE_LINE
+exports.WHEEL_MODE_PAGE         = WHEEL_MODE_PAGE
 exports.readFromClipboard       = readFromClipboard
 exports.writeToClipboard        = writeToClipboard
 exports.timeIt                  = timeIt
@@ -278,3 +292,5 @@ exports.parseHTML               = parseHTML
 exports.isURL                   = isURL
 exports.browserSearchSubmission = browserSearchSubmission
 exports.getHintChars            = getHintChars
+exports.getResourceURI          = getResourceURI
+exports.regexpEscape            = regexpEscape

@@ -1,3 +1,4 @@
+{ unload } = require 'unload'
 #
 # Waits for a browser window to finish loading before running the callback
 #

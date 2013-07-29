@@ -5,17 +5,11 @@
 <!ENTITY pref.black_list.desc       "Lista adresów oddzielonych przecinkami pod którymi VimFx powinien być automatycznie wyłączony.
 Dopuszczalne wieloznaczniki: *, !">
 
-<!ENTITY pref.scroll_step.title     "Krok przewijania">
-<!ENTITY pref.scroll_step.desc      "Krok przewijania">
+<!ENTITY pref.scroll_step_liens.title   "Krok przewijania">
+<!ENTITY pref.scroll_step_lines.desc    "Krok przewijania">
 
 <!ENTITY pref.blur_on_esc.title      "Escape zabiera focus">
 <!ENTITY pref.blur_on_esc.desc       "Escape zabiera focus dowolnemu aktywnemu elementowi w przeglądarce (np. paskowi adresu)">
 
-<!ENTITY pref.leave_dt_on_esc.title "Leave Developer Toolbar open on Esc">
-<!ENTITY pref.leave_dt_on_esc.desc  "Do not hide Developer Toolbar if it's visible and the Esc is pressed">
-
-<!ENTITY pref.scroll_time.title     "Płynne przewijanie">
-<!ENTITY pref.smooth_time.disabled  "Wyłączone">
-<!ENTITY pref.smooth_time.fast      "Szybkie">
-<!ENTITY pref.smooth_time.normal    "Normalne">
-<!ENTITY pref.smooth_time.slow      "Wolne">
+<!ENTITY pref.leave_dt_on_esc.title "Escape nie zamyka paska programisty">
+<!ENTITY pref.leave_dt_on_esc.desc  "Pasek programisty nie zostanie zamknięty jeśli jest widoczny i wciśnięto Escape">

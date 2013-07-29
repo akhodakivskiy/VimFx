@@ -12,14 +12,20 @@ MODE_NORMAL = 1
 MODE_HINTS  = 2
 
 class Vim
+  @findStr = ''
+
   constructor: (@window) ->
     @mode       = MODE_NORMAL
     @keys       = []
     @lastKeyStr = null
     @markers    = undefined
     @cb         = undefined
-    @findStr    = ''
     @findRng    = null
+
+    Object.defineProperty(this, 'findStr', 
+      get: -> return Vim.findStr
+      set: (value) -> Vim.findStr = value
+    )
 
   enterHintsMode: (@markers, @cb) ->
     @mode = MODE_HINTS
@@ -35,7 +41,7 @@ class Vim
       result = maybeCommand(@keys.concat([keyStr]))
     else if !keyboardEvent.ctrlKey and !keyboardEvent.metaKey
       if @mode == MODE_HINTS
-        result = utils.getHintChars().search(regexpEscape(keyStr)) > -1
+        result = utils.getHintChars().search(utils.regexpEscape(keyStr)) > -1
 
     if result
       @lastKeyStr = keyStr

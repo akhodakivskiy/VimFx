@@ -11,17 +11,6 @@
         title="&pref.blur_on_esc.title;" desc="&pref.blur_on_esc.desc;" />
     <setting pref="extensions.VimFx.leave_dt_on_esc" type="bool" 
         title="&pref.leave_dt_on_esc.title;" desc="&pref.leave_dt_on_esc.desc;" />
-    <setting pref="extensions.VimFx.scroll_step" type="integer" 
-        title="&pref.scroll_step.title;" desc="&pref.scroll_step.desc;" />
-    <setting pref="extensions.VimFx.scroll_time" type="menulist" 
-        title="&pref.scroll_time.title;">
-        <menulist>
-            <menupopup>
-                <menuitem value="0"     label="&pref.smooth_time.disabled;"/>
-                <menuitem value="100"   label="&pref.smooth_time.fast;"/>
-                <menuitem value="200"   label="&pref.smooth_time.normal;"/>
-                <menuitem value="400"   label="&pref.smooth_time.slow;"/>
-            </menupopup>
-        </menulist>
-    </setting>
+    <setting pref="extensions.VimFx.scroll_step_lines" type="integer" 
+        title="&pref.scroll_step_lines.title;" desc="&pref.scroll_step_lines.desc;" />
 </vbox>

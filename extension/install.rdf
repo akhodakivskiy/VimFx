@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- This Source Code Form is subject to the terms of the Mozilla Public
    - License, v. 2.0. If a copy of the MPL was not distributed with this
-   - file, You can obtain one at http://mozilla.org/MPL/2.0/. 
+   - file, You can obtain one at http://mozilla.org/MPL/2.0/.
    -->
-<RDF xmlns="http://www.w3.org/1999/02/22-rdf-syntax-ns#" 
+<RDF xmlns="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
      xmlns:em="http://www.mozilla.org/2004/em-rdf#">
 
   <Description about="urn:mozilla:install-manifest">
@@ -32,7 +32,6 @@
     <em:localized>
       <Description>
         <em:locale>pl</em:locale>
-        <em:name>VimFx</em:name>
         <em:description>Skróty klawiszowe Vima w Firefoksie</em:description>
         <em:creator>Anton Chodakowski</em:creator>
       </Description>
@@ -41,7 +40,6 @@
     <em:localized>
       <Description>
         <em:locale>ru</em:locale>
-        <em:name>VimFx</em:name>
         <em:description>Горячие клавиши в стиле Vim</em:description>
         <em:creator>Антон Ходаковский</em:creator>
       </Description>
@@ -50,29 +48,36 @@
     <em:localized>
       <Description>
         <em:locale>zh-CN</em:locale>
-        <em:name>VimFx</em:name>
         <em:description>使用 VIM 快捷键操控 Firefox</em:description>
-        <em:creator>Anton Khodakivskiy</em:creator>
       </Description>
     </em:localized>
 
     <em:localized>
       <Description>
-        <em:locale>hu-HU</em:locale>
-        <em:name>VimFx</em:name>
+        <em:locale>hu</em:locale>
         <em:description>Vim billenytűparancsok Firefoxhoz</em:description>
-        <em:creator>Anton Khodakivskiy</em:creator>
       </Description>
     </em:localized>
 
     <em:localized>
       <Description>
         <em:locale>de</em:locale>
-        <em:name>VimFx</em:name>
         <em:description>Vim Tastenbefehle fürFirefox</em:description>
-        <em:creator>Alexander Haeussler</em:creator>
       </Description>
     </em:localized>
-
+	
+	<em:localized>
+      <Description>
+        <em:locale>el-GR</em:locale>
+        <em:description>Συντομεύσεις Πληκτρολογίου του Vim για Firefox</em:description>
+      </Description>
+    </em:localized>
+	
+    <em:localized>
+      <Description>
+        <em:locale>nl</em:locale>
+        <em:description>Vim sneltoetsen voor Firefox</em:description>
+      </Description>
+    </em:localized>
   </Description>
 </RDF>

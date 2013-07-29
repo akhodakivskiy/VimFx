@@ -3,9 +3,12 @@ hints = require 'hints'
 help  = require 'help'
 find  = require 'find'
 
+{ _ } = require 'l10n'
 { getPref
 , setPref
 , getFirefoxPref } = require 'prefs'
+
+{ console } = require 'console'
 
 { classes: Cc, interfaces: Ci, utils: Cu } = Components
 
@@ -64,7 +67,7 @@ command_yf = (vim) ->
 command_vf = (vim) ->
   markers = hints.injectHints(vim.window.document)
   if markers?.length > 0
-    vim.enterHintsMode markers, (marker) -> marker.element.focus()
+    vim.enterHintsMode(markers, (marker) -> marker.element.focus())
 
 # Copy current URL to the clipboard
 command_yy = (vim) ->
@@ -96,48 +99,45 @@ command_aR = (vim) ->
 
 # Scroll to the top of the page
 command_gg = (vim) ->
-  vim.window.scrollTo(0, 0)
+  for i in [0...1000]
+    utils.simulateWheel(vim.window, 0, -1, utils.WHEEL_MODE_PAGE)
 
 # Scroll to the bottom of the page
 command_G = (vim) ->
-  if document = vim.window.document
-    # Workaround the pages where body isn't the scrollable element.
-    # In this case we try to scroll 100k pixels
-    vim.window.scrollTo(0, Math.max(document.body.scrollHeight, 100000))
+  for i in [0...1000]
+    utils.simulateWheel(vim.window, 0, 1, utils.WHEEL_MODE_PAGE)
 
 # Scroll down a bit
 command_j_ce = (vim) ->
-  utils.smoothScroll(vim.window, 0, getPref('scroll_step'), getPref('scroll_time'))
+  utils.simulateWheel(vim.window, 0, getPref('scroll_step_lines'), utils.WHEEL_MODE_LINE)
 
 # Scroll up a bit
 command_k_cy = (vim) ->
-  utils.smoothScroll(vim.window, 0, -getPref('scroll_step'), getPref('scroll_time'))
+  utils.simulateWheel(vim.window, 0, -getPref('scroll_step_lines'), utils.WHEEL_MODE_LINE)
 
 # Scroll left a bit
 command_h = (vim) ->
-  utils.smoothScroll(vim.window, -getPref('scroll_step'), 0, getPref('scroll_time'))
+  utils.simulateWheel(vim.window, -getPref('scroll_step_lines'), 0, utils.WHEEL_MODE_LINE)
 
 # Scroll right a bit
 command_l = (vim) ->
-  utils.smoothScroll(vim.window, getPref('scroll_step'), 0, getPref('scroll_time'))
+  utils.simulateWheel(vim.window, getPref('scroll_step_lines'), 0, utils.WHEEL_MODE_LINE)
 
 # Scroll down half a page
 command_d = (vim) ->
-  utils.smoothScroll(vim.window, 0, vim.window.innerHeight / 2, getPref('scroll_time'))
+  utils.simulateWheel(vim.window, 0, 0.5, utils.WHEEL_MODE_PAGE)
 
 # Scroll up half a page
 command_u = (vim) ->
-  utils.smoothScroll(vim.window, 0, -vim.window.innerHeight / 2, getPref('scroll_time'))
+  utils.simulateWheel(vim.window, 0, -0.5, utils.WHEEL_MODE_PAGE)
 
 # Scroll down full a page
 command_cf = (vim) ->
-  step = (vim.window.innerHeight - getPref('scroll_step'))
-  utils.smoothScroll(vim.window, 0, step, getPref('scroll_time'))
+  utils.simulateWheel(vim.window, 0, 1, utils.WHEEL_MODE_PAGE)
 
 # Scroll up full a page
 command_cb = (vim) ->
-  step = -(vim.window.innerHeight - getPref('scroll_step'))
-  utils.smoothScroll(vim.window, 0, step, getPref('scroll_time'))
+  utils.simulateWheel(vim.window, 0, -1, utils.WHEEL_MODE_PAGE)
 
 # Activate previous tab
 command_J_gT = (vim) ->
@@ -150,8 +150,9 @@ command_K_gt = (vim) ->
     rootWindow.gBrowser.tabContainer.advanceSelectedTab(1, true)
 
 command_gh = (vim) ->
-  homepage_url = getFirefoxPref('browser.startup.homepage')
-  vim.window.location.assign(homepage_url)
+  url = getFirefoxPref('browser.startup.homepage')
+  if chromeWindow = utils.getRootWindow(vim.window)
+    chromeWindow.gBrowser.loadURIWithFlags(url, null, null, null, null)
 
 # Go to the first tab
 command_gH_g0 = (vim) ->
@@ -233,10 +234,10 @@ command_help = (vim) ->
 
 # Switch into find mode
 command_find = (vim) ->
-  find.injectFind vim.window.document, (findStr, direction) ->
+  find.injectFind vim.window.document, (findStr, startFindRng) ->
     # Reset region and find string if new find stirng has arrived
     if vim.findStr != findStr
-      [vim.findStr, vim.findRng] = [findStr, null]
+      [vim.findStr, vim.findRng] = [findStr, startFindRng]
     # Perform forward find and store found region
     return vim.findRng = find.find(vim.window, vim.findStr, vim.findRng, find.DIRECTION_FORWARDS)
 
@@ -358,10 +359,10 @@ commandsHelp = do (commandGroups) ->
 hintCharHandler = (vim, keyStr, charCode) ->
   if keyStr and charCode > 0
     # Get char and escape it to avoid problems with String.search
-    key = regexpEscape(keyStr)
+    key = utils.regexpEscape(keyStr)
 
     # First do a pre match - count how many markers will match with the new character entered
-    if vim.markers.reduce ((v, marker) -> v or marker.willMatch key), false
+    if vim.markers.reduce(((v, marker) -> v or marker.willMatch(key)), false)
       for marker in vim.markers
         marker.matchHintChar(key)
 

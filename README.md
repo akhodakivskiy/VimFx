@@ -1,32 +1,39 @@
 # VimFx - Vim keyboard shortcuts for Firefox
 
-*Extension AMO page*: https://addons.mozilla.org/en-US/firefox/addon/vimfx/
+*Extension AMO page*: https://addons.mozilla.org/en-US/firefox/addon/vimfx.
 
-*Contribute your localization! See `locale` folder*
+Contribute your localization! See `locale` folder.
 
-[VimFx](https://addons.mozilla.org/en-US/firefox/addon/vimfx/) 
-is a [Mozilla Firefox](https://www.mozilla.org/en-US/firefox/fx/#desktop) 
-extension which introduces Vim-style keyboard shortcuts for browsing and navigation, 
+Read [Contributing and Reporting Issues section](#contributing-and-reporting-issues) for tips.
+> Tl;dr: Pull request to the **develop** branch! Issues in **English**!
+
+## Overview
+
+[VimFx](https://addons.mozilla.org/en-US/firefox/addon/vimfx/)
+is a [Mozilla Firefox](https://www.mozilla.org/en-US/firefox/fx/#desktop)
+extension which introduces Vim-style keyboard shortcuts for browsing and navigation,
 significantly reducing the use of mouse, and allowing your hands to rest on the home row.
 
-VimFx was inspired by [Vimperator](http://www.vimperator.org/) 
-and designed after [Vimium](http://vimium.github.com/) for 
+VimFx was inspired by [Vimperator](http://www.vimperator.org/)
+and designed after [Vimium](http://vimium.github.com/) for
 [Google Chrome](https://www.google.com/intl/en/chrome/browser/) preserving the shortcuts and behavior.
 If your are used to Vimium then it will be easy to get started with VimFx.
 
+## Reporting Issues and Contributing
+
+- Please submit bug reports and feature requests in *English*.
+- Please submit cotribution pull requests for `develop` branch only. Pull requests for `master` will be closed. Thank you!
+- Contribute your localization! See `locale` folder.
+
 ## Why VimFx was created
 
-Even before Vimium there was Vimperator for Firefox.  In my opinion the problem 
-with Vimperator is that it has too many features and aggressively changes 
+Even before Vimium there was Vimperator for Firefox.  In my opinion the problem
+with Vimperator is that it has too many features and aggressively changes
 the default Firefox appearance and behavior. Vimium was developed for Google Chrome
-and it was exactly what I needed in terms of added functionality. That's why I decided 
+and it was exactly what I needed in terms of added functionality. That's why I decided
 to develop similar extension for Firefox.
 
 VimFx will be nice to your browser and to your habits. Promise.
-
-## Credits
-
-  
 
 ## Key Features
 
@@ -36,7 +43,7 @@ VimFx will be nice to your browser and to your habits. Promise.
 
 ## Shortcuts
 
-Might not be up to date. Please refer to the Help dialog withing the extension 
+Might not be up to date. Please refer to the Help dialog withing the extension
 for the most relevant list.
 
 Global shortcut to enable/disable VimFx: `Shift-Alt-v`
@@ -95,3 +102,26 @@ Global shortcut to enable/disable VimFx: `Shift-Alt-v`
     N       Go to the previous Find match
     ?,>     Show Help Dialog
     Esc     Close this dialog and cancel hint markers
+
+## Contributing and Reporting Issues
+
+1. Fork.
+2. Clone.
+3. Checkout the **develop** branch: `git checkout develop`
+4. Create a new branch (using develop as base): `git checkout -b myTopicBranch`
+   Using develop (and not master) as base makes it easier to pull request to develop when you're done.
+5. Code! Try to follow the style of the rest of the code. There are no written rules (yet?).
+6. Push your branch to your fork on GitHub.
+7. Pull request to the **develop** branch.
+
+### Tips:
+
+- Compile the .coffee files with the **`--bare`** option! Otherwise you will get errors.
+- Run `coffee -cbw .` from the root of the project to automatically compile on changes.
+- Put a file called exactly `VimFx@akhodakivskiy.github.com` in the extensions/ folder of a Firefox
+  profile, containing the absolute path to the extension/ folder in the project. Then you just need
+  to restart Firefox (use some add-on!) after each change. More details in [this MDN article][mdn-extdevenv].
+- Only create tickets for issues and feature requests in English. Otherwise duplicate 
+  tickets in different languages will pile up.
+
+[mdn-extdevenv]: https://developer.mozilla.org/en-US/docs/Setting_up_extension_development_environment#Firefox_extension_proxy_file

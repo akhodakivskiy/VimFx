@@ -4,10 +4,12 @@ keyUtils                 = require 'key-utils'
 { Vim }                  = require 'vim'
 { getPref }              = require 'prefs'
 { setWindowBlacklisted } = require 'button'
+{ unload }               = require 'unload'
+{ console }              = require 'console'
 
 { interfaces: Ci } = Components
 
-vimBucket = new utils.Bucket utils.getWindowId, (obj) -> new Vim obj
+vimBucket = new utils.Bucket(utils.getWindowId, (obj) -> new Vim(obj))
 
 suppressEvent = (event) ->
   event.preventDefault()
