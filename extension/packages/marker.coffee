@@ -62,7 +62,7 @@ class Marker
     document = @element.ownerDocument
 
     while @markerElement.hasChildNodes()
-      @markerElement.removeChild(@markedElement.firstChild)
+      @markerElement.removeChild(@markerElement.firstChild)
 
     fragment = document.createDocumentFragment()
     for char in @hintChars
