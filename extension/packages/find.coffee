@@ -8,6 +8,10 @@ DIRECTION_BACKWARDS = 1
 
 # Create and inserts into DOM find controls and handlers
 injectFind = (document, cb) ->
+  # Find only works on HTML documents, not XUL documents
+  if document not instanceof HTMLDocument
+    return
+
   # First get starting range - it might begin where last search ended
   startFindRng = getStartFindRng(document.defaultView)
 
