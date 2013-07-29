@@ -5,7 +5,6 @@ keyUtils                 = require 'key-utils'
 { getPref }              = require 'prefs'
 { setWindowBlacklisted } = require 'button'
 { unload }               = require 'unload'
-{ console }              = require 'console'
 
 { interfaces: Ci } = Components
 
@@ -57,6 +56,7 @@ windowsListener =
 
             if vim.handleKeyDown(event, keyStr) and keyStr != 'Esc'
               suppressEvent event
+
     catch err
       console.log(err, 'keydown', err.stack)
 

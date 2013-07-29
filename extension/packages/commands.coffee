@@ -8,8 +8,6 @@ find  = require 'find'
 , setPref
 , getFirefoxPref } = require 'prefs'
 
-{ console } = require 'console'
-
 { classes: Cc, interfaces: Ci, utils: Cu } = Components
 
 # Opens developer toolbar (Default shotrcut: Shift-F2)

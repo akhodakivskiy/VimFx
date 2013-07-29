@@ -4,8 +4,6 @@ CONTAINER_ID = 'VimFxFindContainer'
 DIRECTION_FORWARDS = 0
 DIRECTION_BACKWARDS = 1
 
-{ console } = require 'console'
-
 # Create and inserts into DOM find controls and handlers
 injectFind = (document, cb) ->
   # Find only works on HTML documents, not XUL documents
