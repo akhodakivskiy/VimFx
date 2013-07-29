@@ -119,11 +119,11 @@ command_G = (vim) ->
 
 # Scroll down a bit
 command_j_ce = (vim) ->
-  utils.simulateWheel(vim.window, 0, getPref('scroll_step_lines'), utils.WHEEL_MODE_PIXEL)
+  utils.simulateWheel(vim.window, 0, getPref('scroll_step_lines'), utils.WHEEL_MODE_LINE)
 
 # Scroll up a bit
 command_k_cy = (vim) ->
-  utils.simulateWheel(vim.window, 0, -getPref('scroll_step_lines'), utils.WHEEL_MODE_PIXEL)
+  utils.simulateWheel(vim.window, 0, -getPref('scroll_step_lines'), utils.WHEEL_MODE_LINE)
 
 # Scroll left a bit
 command_h = (vim) ->
