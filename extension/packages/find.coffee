@@ -92,7 +92,7 @@ findFactory = (selectionType) ->
               .QueryInterface(Components.interfaces.nsIFind)
 
   return (window, findStr, findRng = null, direction = DIRECTION_FORWARDS, focus = false) ->
-    # `find` will also recursively search in all frames.  # `innerFind` does the work:
+    # `find` will also recursively search in all frames. `innerFind` does the work:
     # searches, selects, scrolls, and optionally reaches into frames
     innerFind = (window) ->
       if controller = getController(window)
