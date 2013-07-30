@@ -24,11 +24,11 @@ console = do ->
       return arg
 
   return {
-    log: -> message('log', arguments)
-    info: -> message('info', arguments)
-    error: -> message('error', arguments)
+    log:     -> message('log',     arguments)
+    info:    -> message('info',    arguments)
+    error:   -> message('error',   arguments)
     warning: -> message('warning', arguments)
-    expand: -> message('expand', Array.map(arguments, expand))
+    expand:  -> message('expand',  Array.map(arguments, expand))
   }
 
 exports.console = console
