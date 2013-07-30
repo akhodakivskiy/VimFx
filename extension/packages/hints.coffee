@@ -86,7 +86,7 @@ injectMarkers = (document) ->
           marker.setPosition(rect)
           fragment.appendChild(marker.markerElement)
 
-          marker.weight = rect.area
+          marker.weight = rect.area * marker.calcBloomRating()
 
           markers.push(marker)
 
@@ -148,13 +148,12 @@ getElementRect = (element) ->
   clientRect = element.getBoundingClientRect()
 
   if isRectOk(clientRect, window)
-    areaRatio = if (element instanceof HTMLAnchorElement) then 100 else 1
     return {
       top:    clientRect.top  + scrollTop  - clientTop
       left:   clientRect.left + scrollLeft - clientLeft
       width:  clientRect.width
       height: clientRect.height
-      area:   areaRatio * (clientRect.width * clientRect.height)
+      area:   clientRect.width * clientRect.height
     }
 
   # If the rect has 0 dimensions, then check what's inside.
