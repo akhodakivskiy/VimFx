@@ -6,8 +6,6 @@ DIRECTION_BACKWARDS = 1
 
 HTMLDocument = Ci.nsIDOMHTMLDocument
 
-{ console } = require 'console'
-
 # Create and inserts into DOM find controls and handlers
 injectFind = (document, cb) ->
   # Find only works on HTML documents, not XUL documents
@@ -96,7 +94,7 @@ findFactory = (selectionType) ->
               .QueryInterface(Components.interfaces.nsIFind)
 
   return (window, findStr, findRng = null, direction = DIRECTION_FORWARDS, focus = false) ->
-    # `find` will also recursively search in all frames.  # `innerFind` does the work:
+    # `find` will also recursively search in all frames. `innerFind` does the work:
     # searches, selects, scrolls, and optionally reaches into frames
     innerFind = (window) ->
       if controller = getController(window)

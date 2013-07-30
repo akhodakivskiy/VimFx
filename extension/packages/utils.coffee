@@ -1,5 +1,4 @@
 { unload } = require 'unload'
-{ console } = require 'console'
 { getPref
 , getDefaultPref
 } = require 'prefs'
@@ -119,10 +118,10 @@ simulateClick = (element, modifiers) ->
     # but Webkit will. Dispatching a click on an input box does not seem to focus it; we do that separately
     element.dispatchEvent(mouseEvent)
 
-WHEEL_MODE_PIXEL = Ci.nsIDOMWheelEvent.DOM_DELTA_PIXEL 
-WHEEL_MODE_LINE = Ci.nsIDOMWheelEvent.DOM_DELTA_LINE 
-WHEEL_MODE_PAGE = Ci.nsIDOMWheelEvent.DOM_DELTA_PAGE 
-    
+WHEEL_MODE_PIXEL = Ci.nsIDOMWheelEvent.DOM_DELTA_PIXEL
+WHEEL_MODE_LINE = Ci.nsIDOMWheelEvent.DOM_DELTA_LINE
+WHEEL_MODE_PAGE = Ci.nsIDOMWheelEvent.DOM_DELTA_PAGE
+
 # Simulate mouse scroll event by specific offsets given
 # that mouse cursor is at specified position
 simulateWheel = (window, deltaX, deltaY, mode = WHEEL_MODE_PIXEL) ->

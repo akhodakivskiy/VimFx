@@ -8,8 +8,6 @@ find  = require 'find'
 , setPref
 , getFirefoxPref } = require 'prefs'
 
-{ console } = require 'console'
-
 { classes: Cc, interfaces: Ci, utils: Cu } = Components
 
 # Opens developer toolbar (Default shotrcut: Shift-F2)
@@ -53,7 +51,7 @@ command_t = (vim) ->
 # Copy element URL to the clipboard
 command_yf = (vim) ->
   markers = hints.injectHints(vim.window.document)
-  if markers?.length > 0
+  if markers.length > 0
     cb = (marker) ->
       if url = marker.element.href
         marker.element.focus()
@@ -66,7 +64,7 @@ command_yf = (vim) ->
 # Focus element
 command_vf = (vim) ->
   markers = hints.injectHints(vim.window.document)
-  if markers?.length > 0
+  if markers.length > 0
     vim.enterHintsMode(markers, (marker) -> marker.element.focus())
 
 # Copy current URL to the clipboard
@@ -200,7 +198,7 @@ command_X = (vim) ->
 command_f = (vim) ->
   if document = vim.window.document
     markers = hints.injectHints(document)
-    if markers?.length > 0
+    if markers.length > 0
       # This callback will be called with the selected marker as argument
       cb = (marker) ->
         marker.element.focus()
@@ -211,7 +209,7 @@ command_f = (vim) ->
 # Follow links in a new Tab with hint markers
 command_F = (vim) ->
   markers = hints.injectHints(vim.window.document)
-  if markers?.length > 0
+  if markers.length > 0
     # This callback will be called with the selected marker as argument
     cb = (marker) ->
       marker.element.focus()
