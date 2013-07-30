@@ -1,6 +1,8 @@
 # VimFx - Vim keyboard shortcuts for Firefox
 
-*Extension AMO page*: https://addons.mozilla.org/en-US/firefox/addon/vimfx.
+**Extension AMO page**: https://addons.mozilla.org/en-US/firefox/addon/vimfx.
+
+**Mailing list**: [vimfx@librelist.com](mailto:vimfx@librelist.com?subject=Subscribe) (just send an email to subscribe)
 
 Contribute your localization! See `locale` folder.
 
