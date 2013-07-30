@@ -251,7 +251,7 @@ getHintChars = do ->
 
   return ->
     hintChars = removeDuplicateCharacters(getPref('hint_chars'))
-    if hintChars.length < 3
+    if hintChars.length < 2
       hintChars = getDefaultPref('hint_chars')
 
     return hintChars
