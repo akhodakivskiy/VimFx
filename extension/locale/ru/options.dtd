@@ -1,8 +1,8 @@
 <!ENTITY pref.hint_chars.title      "Символы на маркерах">
-<!ENTITY pref.hint_chars.desc       "По умолчанию: asdfgercvhjkl;uinm">
+<!ENTITY pref.hint_chars.desc       "По умолчанию: fjdksla;ghrueiwovncm">
 
 <!ENTITY pref.black_list.title      "Стоп список">
-<!ENTITY pref.black_list.desc       "Список адесов, разделенных запятой, на которых VimFx не активен. 
+<!ENTITY pref.black_list.desc       "Список адесов, разделенных запятой, на которых VimFx не активен.
 Разрешены одстановки: *, !">
 
 <!ENTITY pref.scroll_step_lines.title   "Шаг прокрутки страницы">

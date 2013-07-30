@@ -377,6 +377,8 @@ hintCharHandler = (vim, keyStr, charCode) ->
         marker.matchHintChar(key)
 
         if marker.isMatched()
+          # Add element features to the bloom filter
+          marker.reward() 
           vim.cb(marker)
           hints.removeHints(vim.window.document)
           vim.enterNormalMode()
