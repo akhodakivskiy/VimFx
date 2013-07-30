@@ -5,9 +5,10 @@ utils                     = require 'utils'
 
 { interfaces: Ci } = Components
 
-HTMLDocument = Ci.nsIDOMHTMLDocument
-XULDocument  = Ci.nsIDOMXULDocument
-XPathResult  = Ci.nsIDOMXPathResult
+HTMLDocument      = Ci.nsIDOMHTMLDocument
+XULDocument       = Ci.nsIDOMXULDocument
+XPathResult       = Ci.nsIDOMXPathResult
+HTMLAnchorElement = Ci.nsIDOMHTMLAnchorElement
 
 CONTAINER_ID = 'VimFxHintMarkerContainer'
 
@@ -147,12 +148,13 @@ getElementRect = (element) ->
   clientRect = element.getBoundingClientRect()
 
   if isRectOk(clientRect, window)
+    areaRatio = if (element instanceof HTMLAnchorElement) then 100 else 1
     return {
       top:    clientRect.top  + scrollTop  - clientTop
       left:   clientRect.left + scrollLeft - clientLeft
       width:  clientRect.width
       height: clientRect.height
-      area:   clientRect.width * clientRect.height
+      area:   areaRatio * (clientRect.width * clientRect.height)
     }
 
   # If the rect has 0 dimensions, then check what's inside.
