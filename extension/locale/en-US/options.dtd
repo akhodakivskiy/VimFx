@@ -13,3 +13,7 @@ Wildcards allowed: *, !">
 
 <!ENTITY pref.leave_dt_on_esc.title "Leave Developer Toolbar open on Esc">
 <!ENTITY pref.leave_dt_on_esc.desc  "Do not hide Developer Toolbar if it's visible and the Esc is pressed">
+
+<!ENTITY pref.hints_bloom_on.title "Hints bloom filtering">
+<!ENTITY pref.hints_bloom_on.desc  "Make hints shorter by applying bloom filter to the elements under the hint markers">
+

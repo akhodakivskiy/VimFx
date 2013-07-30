@@ -1,7 +1,13 @@
-{ SerializableBloomFilter } = require 'bloomfilter'
+{ SerializableBloomFilter 
+, DummyBloomFilter } = require 'bloomfilter'
+
+{ getPref } = require 'prefs'
 
 HTMLDocument      = Ci.nsIDOMHTMLDocument
 HTMLAnchorElement = Ci.nsIDOMHTMLAnchorElement
+
+realBloomFilter = new SerializableBloomFilter('hints_bloom_data', 256 * 32, 16)
+dummyBloomFilter = new DummyBloomFilter()
 
 # Marker class wraps the markable element and provides
 # methods to manipulate the markers
@@ -12,6 +18,9 @@ class Marker
     window = document.defaultView
     @markerElement = document.createElement('div')
     @markerElement.className = 'VimFxReset VimFxHintMarker'
+
+    Object.defineProperty(this, 'bloomFilter', get: -> 
+      if getPref('hints_bloom_on') then realBloomFilter else dummyBloomFilter)
 
   # Shows the marker
   show: -> @markerElement.className = 'VimFxReset VimFxHintMarker'
@@ -100,15 +109,13 @@ class Marker
   calcBloomRating: ->
     rating = 1
     for feature, weight of @extractBloomFeatures()
-      rating += if Marker.bloomFilter.test(feature) then weight else 0
+      rating += if @bloomFilter.test(feature) then weight else 0
 
     return rating
 
   reward: ->
     for feature, weight of @extractBloomFeatures()
-      Marker.bloomFilter.add(feature)
-    Marker.bloomFilter.save()
-
-Marker.bloomFilter = new SerializableBloomFilter('hint_bloom_data', 256 * 32, 16)
+      @bloomFilter.add(feature)
+    @bloomFilter.save()
 
 exports.Marker = Marker

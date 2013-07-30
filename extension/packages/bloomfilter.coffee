@@ -137,6 +137,13 @@
 })(typeof exports !== "undefined" ? exports : this);
 `
 
+class DummyBloomFilter
+  save: ->
+  add: ->
+  test: ->
+  size: ->
+  popcnt: ->
+
 class SerializableBloomFilter extends exports.BloomFilter
   constructor: (@prefName, m, k) ->
     if data = getPref(@prefName)
@@ -149,4 +156,5 @@ class SerializableBloomFilter extends exports.BloomFilter
     setPref(@prefName, data)
 
 
-exports.SerializableBloomFilter = SerializableBloomFilter 
+exports.SerializableBloomFilter = SerializableBloomFilter
+exports.DummyBloomFilter = DummyBloomFilter
