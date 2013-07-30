@@ -33,6 +33,9 @@ keyStrFromEvent = (event) ->
 # keyboard input. For example when a context menu is whown
 passthrough = false
 
+logError = (err, eventName) ->
+  console.log("#{ err } (in #{ eventName })\n#{ err.stack.replace(/@(?:.+->)+ /g, '@') }")
+
 # The following listeners are installed on every top level Chrome window
 windowsListener =
   keydown: (event) ->
@@ -58,7 +61,7 @@ windowsListener =
             if vim.handleKeyDown(event, keyStr) and keyStr != 'Esc'
               suppressEvent event
     catch err
-      console.log(err, 'keydown', err.stack)
+      logError(err, 'keydown')
 
   keypress: (event) ->
 
@@ -97,7 +100,7 @@ windowsListener =
             window.setTimeout(cb, 0)
 
     catch err
-      console.log(err, 'keypress', err.stack)
+      logError(err, 'keypress')
 
   keyup: (event) ->
     if window = utils.getCurrentTabWindow event
