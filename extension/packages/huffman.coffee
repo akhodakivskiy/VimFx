@@ -47,23 +47,27 @@ exports.addHuffmanCodeWordsTo = (originalElements, options = {}) ->
   # Solving for `padding` in (2) gives:
   padding = 1 + (numBranches - 1) * numBranchPoints - numElements
 
+  # Sort the elements after their weights, in descending order, so that the last ones will be the
+  # ones with lowest weight.
+  elements.sort((a, b) -> b.weight - a.weight)
+
   # Pad with zero-weights to be able to form a `numBranches`-ary tree.
   for i in [0...padding] by 1
     elements.push({weight: 0})
 
   # Construct the Huffman tree.
   for i in [0...numBranchPoints] by 1
-    # Sort the elements after their weights, in descending order, so that the last ones will be the
-    # ones with lowest weight.
-    elements.sort((a, b) -> b.weight - a.weight)
-
     # Replace `numBranches` of the lightest weights with their sum.
     sum = {weight: 0, children: []}
     for i in [0...numBranches] by 1
       lowestWeight = elements.pop()
       sum.weight += lowestWeight.weight
       sum.children.unshift(lowestWeight)
-    elements.push(sum)
+
+    # Find the index to insert the sum so that the sorting is maintained. That is faster than
+    # sorting the elements in each iteration.
+    break for element, index in elements by -1 when sum.weight >= element.weight
+    elements.splice(index + 1, 0, sum)
 
   root = elements[0] # `elements.length == 1` by now.
 
