@@ -18,13 +18,11 @@ createHintsContainer = (document) ->
 # Creates and injects hint markers into the DOM
 injectHints = (document) ->
   markers = getMarkers(document)
-
-  # Add hints to the markers
   hintChars = utils.getHintChars()
-  weightsAndMarkers = ([marker.weight, marker] for marker in markers)
-  addHuffmanCodeWordsTo(weightsAndMarkers, {alphabet: hintChars})
-  for [weight, marker, hint] in weightsAndMarkers
-    marker.setHint(hint)
+
+  addHuffmanCodeWordsTo markers,
+    alphabet: hintChars
+    setCodeWord: (marker, hint, index) -> marker.setHint(hint)
 
   return markers
 

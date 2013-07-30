@@ -1,50 +1,63 @@
-# `originalElements` should be an array of arrays. The first item of each sub-array should be a
-# _weight_, which is a positive number. The sub-arrays may then contain whatever data that should be
-# associated with the weight and the _code word_ which will be appended to each sub-array. The
-# larger the weight, the shorter the code word. The code words will use the `{alphabet}` provided.
-# Note that the function modifies the `originalElements` array and returns `null`.
-exports.addHuffmanCodeWordsTo = (originalElements, {alphabet}) ->
+# `originalElements` should be an array of objects. Each object is expected to have a property (see
+# the `options` argument) which represents the _weight_ of the object, which is a positive number.
+# Each object will be given a _code word_ (see the `options` argument). The larger the weight, the
+# shorter the code word. A weight of 0 means that the element should not get a code word at all. The
+# code words will use the `options.alphabet` provided. Note that the function modifies the
+# `originalElements` array (see the `options` argument) and returns `undefined`.
+exports.addHuffmanCodeWordsTo = (originalElements, options = {}) ->
+  weightProperty   = options.weightProperty   or 'weight'
+  codeWordProperty = options.codeWordProperty or 'codeWord'
+  setCodeWord      = options.setCodeWord      or (element, codeWord, index) ->
+                                                   element[codeWordProperty] = codeWord
+  { alphabet } = options
+
   if typeof(alphabet) != 'string'
-    throw new TypeError('`alphabet` must be a string.')
+    throw new TypeError('`options.alphabet` must be provided and be a string.')
 
   nonUnique = /([\s\S])[\s\S]*\1/.exec(alphabet)
   if nonUnique
-    throw new Error("`alphabet` must consist of unique letters. Found '#{nonUnique[1]}' more than once.")
+    throw new Error("`options.alphabet` must consist of unique letters. Found '#{nonUnique[1]}' more than once.")
 
   if alphabet.length < 2
-    throw new Error('`alphabet` must consist of at least 2 characters.')
+    throw new Error('`options.alphabet` must consist of at least 2 characters.')
 
-  # The algorithm is so optimized, that it does not even produce a code word at all if there is only
-  # one element! We still need a code word even if there is only one link, though.
+
+  # The algorithm is so optimized, that it does not produce a code word at all if there is only one
+  # element! We still need a code word even if there is only one link, though.
   if originalElements.length == 1
-    originalElements[0].push(alphabet[0])
-    return null
+    setCodeWord(originalElements[0], alphabet[0], 0)
+    return
 
-  elements = ({ index, weight } for [weight], index in originalElements)
+
+  elements = ({weight: obj[weightProperty], index} for obj, index in originalElements)
 
   numBranches = alphabet.length
   numElements = elements.length
-  # A `numBranches`-ary tree can be formed by `1 + (numBranches - 1) * n` elements (there needs to
-  # be 1 element left, and each parent node replaces `numBranches` other nodes). `n` is the number
-  # of points where the tree branches. If numElements does not exist in mentioned set, we have to
-  # pad it to the nearest larger such number. Thus, we need to find an `n` such that `1 +
-  # (numBranches - 1) * n >= numElements`. Solving for `n = numBranchPoints` gives:
+
+  # The Huffman algorithm needs to create a `numBranches`-ary tree (one branch for each character in
+  # the `alphabet`). Such a tree can be formed by `1 + (numBranches - 1) * n` elements: There is the
+  # root of the tree (`1`), and each branching adds `numBranches` elements to the total number or
+  # elements, but replaces itself (`numBranches - 1`). `n` is the number of points where the tree
+  # branches. In order to create the tree using `numElements` elements, we need to find an `n` such
+  # that `1 + (numBranches - 1) * n >= numElements` (1), and then pad `numElements`, such that `1 +
+  # (numBranches - 1) * n == numElements + padding` (2).
+  #
+  # Solving for `n = numBranchPoints` in (1) gives:
   numBranchPoints = Math.ceil((numElements - 1) / (numBranches - 1))
-  # It is required that `(numElements + padding) - (numBranches - 1) * numBranchPoints == 1` (see
-  # above). Otherwise we cannot form a `numBranches`-ary tree. Solving for `padding` gives:
+  # Solving for `padding` in (2) gives:
   padding = 1 + (numBranches - 1) * numBranchPoints - numElements
 
-  # Pad with zero-weights to be able to form a `numBranches` tree.
+  # Pad with zero-weights to be able to form a `numBranches`-ary tree.
   for i in [0...padding] by 1
     elements.push({weight: 0})
 
   # Construct the Huffman tree.
   for i in [0...numBranchPoints] by 1
-    # Sort the weights in descending order, so that the last ones will be the ones with lowest
-    # weight.
+    # Sort the elements after their weights, in descending order, so that the last ones will be the
+    # ones with lowest weight.
     elements.sort((a, b) -> b.weight - a.weight)
 
-    # Replace `numBranches` weights with their sum.
+    # Replace `numBranches` of the lightest weights with their sum.
     sum = {weight: 0, children: []}
     for i in [0...numBranches] by 1
       lowestWeight = elements.pop()
@@ -54,11 +67,11 @@ exports.addHuffmanCodeWordsTo = (originalElements, {alphabet}) ->
 
   root = elements[0] # `elements.length == 1` by now.
 
-  # Create the code words by walking the tree. Store them on `originalElements`.
+  # Create the code words by walking the tree. Store them using `setCodeWord`.
   do walk = (node = root, codeWord = '') ->
     if node.children
       for childNode, index in node.children
         walk(childNode, codeWord + alphabet[index])
     else
-      originalElements[node.index].push(codeWord)  unless node.weight == 0
-    return null
+      setCodeWord(originalElements[node.index], codeWord, node.index)  unless node.weight == 0
+    return
