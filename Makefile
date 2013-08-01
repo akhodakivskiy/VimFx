@@ -16,10 +16,13 @@ zip_files += $(subst extension/,,$(js_files))
 all: clean gen zip
 	$(V)echo "Done dev"
 
-release: clean gen zip
-	$(V)echo -n $(js_files) | xargs -d' ' -I{} \
-		uglifyjs {} --screw-ie8 -cmo {}
+release: clean gen min zip
 	$(V)echo "Done release"
+
+min: $(js_files:.js=.min.js)
+
+%.min.js: %.js
+	uglifyjs $< --screw-ie8 -c -m -o $<
 
 zip: $(plugin_archive)
 
