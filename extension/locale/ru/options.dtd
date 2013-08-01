@@ -13,3 +13,6 @@
 
 <!ENTITY pref.leave_dt_on_esc.title "Оставлять Панель Разработки открытой при нажатии Esc">
 <!ENTITY pref.leave_dt_on_esc.desc  "Не закрывать Панель Разработки, если она открыта в момени нажатия Esc">
+
+<!ENTITY pref.hints_bloom_on.title "Умное распределение маркеров">
+<!ENTITY pref.hints_bloom_on.desc  "Назначать короткие маркеры ссылкам и элементам, которые часто используются">

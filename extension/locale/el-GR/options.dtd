@@ -13,3 +13,6 @@ Wildcards allowed: *, !">
 
 <!ENTITY pref.leave_dt_on_esc.title "Άφηνε τη Developer Toolbar ανοιχτή στο Esc">
 <!ENTITY pref.leave_dt_on_esc.desc  "Μην κρύβεις τη Developer Toolbar αν είναι ορατή και το Esc πατηθεί">
+
+<!ENTITY pref.hints_bloom_on.title "Smart hint assignment (needs translation)">
+<!ENTITY pref.hints_bloom_on.desc  "Assign shorter hints to the links that users visit most often (needs translation)">
