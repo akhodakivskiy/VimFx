@@ -1,5 +1,5 @@
 .DEFAULT: all
-.PHONY: clean gen zip
+.PHONY: clean gen zip release
 
 V=@
 
@@ -14,7 +14,12 @@ zip_files = chrome.manifest icon.png install.rdf options.xul resources locale
 zip_files += $(subst extension/,,$(js_files))
 
 all: clean gen zip
-	$(V)echo "Done"
+	$(V)echo "Done dev"
+
+release: clean gen zip
+	$(V)echo -n $(js_files) | xargs -d' ' -I{} \
+		uglifyjs {} --screw-ie8 -cmo {}
+	$(V)echo "Done release"
 
 zip: $(plugin_archive)
 
