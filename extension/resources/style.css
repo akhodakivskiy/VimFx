@@ -45,6 +45,23 @@ input.VimFxNotFound#VimFxFindInput {
     color: red;
 }
 
+a.VimFxKeyLink {
+    display: inline;
+    background: #777;
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    font-weight: bold;
+    border-radius: 3px;
+    text-shadow: 1px 1px #666;
+    font-size: 75%; 
+    padding: 2px 3px;
+    margin: 0px 3px;
+}
+a.VimFxKeyLink:hover {
+    background-position: 0 -50px;
+}
+
 input#VimFxFindInput {
     position: fixed;
     bottom: 2px;
@@ -192,7 +209,8 @@ div#VimFxHelpDialog td.VimFxReset {
 }
 
 div#VimFxHelpDialog td.VimFxSequence {
-    min-width:50px;
+    white-space: nowrap;
+    min-width:60px;
     text-align: right;
     padding-right:5px;
     font-weight:bold;

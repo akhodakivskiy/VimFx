@@ -88,7 +88,7 @@ command_reload_all = (vim) ->
         window.location.reload(false)
 
 # Reload the page from the server
-command_reload_all_foce = (vim) ->
+command_reload_all_force = (vim) ->
   if rootWindow = utils.getRootWindow(vim.window)
     if tabs = rootWindow.gBrowser.tabContainer
       for i in [0...tabs.itemCount]
@@ -238,7 +238,7 @@ command_tab_move_right = (vim) ->
 
 # Display the Help Dialog
 command_help = (vim) ->
-  help.injectHelp(vim.window.document, commandsHelp)
+  help.injectHelp(vim.window.document, commands)
 
 # Switch into find mode
 command_find = (vim) ->
@@ -290,80 +290,86 @@ command_Esc = (vim) ->
     if chromeWindow = utils.getRootWindow(vim.window)
       chromeWindow.DeveloperToolbar.hide()
 
-commandGroups =
-  'urls':
-    'o':        [ command_focus,                  _('help_command_focus') ]
-    'p':        [ command_paste,                  _('help_command_paste') ]
-    'P':        [ command_paste_tab,              _('help_command_paste_tab') ]
-    'y,f':      [ command_marker_yank,            _('help_command_marker_yank') ]
-    'v,f':      [ command_marker_focus,           _('help_command_marker_focus') ]
-    'y,y':      [ command_yank,                   _('help_command_yank') ]
-    'r':        [ command_reload,                 _('help_command_reload') ]
-    'R':        [ command_reload_force,           _('help_command_reload_force') ]
-    'a,r':      [ command_reload_all,             _('help_command_reload_all') ]
-    'a,R':      [ command_reload_all_foce,        _('help_command_reload_all_foce') ]
-    's':        [ command_stop,                   _('help_command_stop') ]
-    'a,s':      [ command_stop_all,               _('help_command_stop_all') ]
-  'nav':
-    'g,g':      [ command_scroll_to_top ,         _('help_command_scroll_to_top') ]
-    'G':        [ command_scroll_to_bottom,       _('help_command_scroll_to_bottom') ]
-    'j|c-e':    [ command_scroll_down,            _('help_command_scroll_down') ]
-    'k|c-y':    [ command_scroll_up,              _('help_command_scroll_up') ]
-    'h':        [ command_scroll_left,            _('help_command_scroll_left') ]
-    'l':        [ command_scroll_right ,          _('help_command_scroll_right') ]
-    # Can't use c-u/c-d because  c-u is widely used for viewing sources
-    'd':        [ command_scroll_half_page_down,  _('help_command_scroll_half_page_down') ]
-    'u':        [ command_scroll_half_page_up,    _('help_command_scroll_half_page_up') ]
-    'c-f':      [ command_scroll_page_down,       _('help_command_scroll_page_down') ]
-    'c-b':      [ command_scroll_page_up,         _('help_command_scroll_page_up') ]
-  'tabs':
-    't':        [ command_open_tab,               _('help_command_open_tab') ]
-    'J|g,T':    [ command_tab_prev,               _('help_command_tab_prev') ]
-    'K|g,t':    [ command_tab_next,               _('help_command_tab_next') ]
-    'c-J':      [ command_tab_move_left,          _('help_command_tab_move_left') ]
-    'c-K':      [ command_tab_move_right,         _('help_command_tab_move_right') ]
-    'g,h':      [ command_home,                   _('help_command_home') ]
-    'g,H|g,\^': [ command_tab_first,              _('help_command_tab_first') ]
-    'g,L|g,$':  [ command_tab_last,               _('help_command_tab_last') ]
-    'x':        [ command_close_tab,              _('help_command_close_tab') ]
-    'X':        [ command_reload_tab,             _('help_command_reload_tab') ]
-  'browse':
-    'f':        [ command_follow,                 _('help_command_follow') ]
-    'F':        [ command_follow_in_tab,          _('help_command_follow_in_tab') ]
-    'H':        [ command_back,                   _('help_command_back') ]
-    'L':        [ command_forward,                _('help_command_forward') ]
-  'misc':
-    # `.` is added to find command mapping to hack around Russian keyboard layout
-    '\.|/':     [ command_find,                   _('help_command_find') ]
-    'a,\.|a,/': [ command_find_hl,                _('help_command_find_hl') ]
-    'n':        [ command_find_next,              _('help_command_find_next') ]
-    'N':        [ command_find_prev,              _('help_command_find_prev') ]
-    # `>` is added to help command mapping to hack around Russian keyboard layout
-    # See key-utils.coffee for more info
-    '?|>':      [ command_help,                   _('help_command_help') ]
-    'Esc':      [ command_Esc,                    _('help_command_Esc') ]
-    ':':        [ command_dev,                    _('help_command_dev') ]
+class Command
+  constructor: (@group, @name, @func, @keys) ->
+    @defaultKeys = @keys
+    try
+      @keys = JSON.parse(getPref(@prefName('keys')))
+    catch err
+      @keys = @defaultKeys
+  
+  # Check if this command may match given string if more chars are added
+  mayMatch: (value) -> 
+    return @keys.reduce(((m, v) -> m or v.indexOf(value) == 0), false)
 
-# Merge groups and split command pipes into individual commands
-commands = do (commandGroups) ->
-  newCommands = {}
-  for group, commandsList of commandGroups
-    for keys, command of commandsList
-      for key in keys.split('|')
-        newCommands[key] = command[0]
+  # Check is this command matches given string
+  match: (value) ->
+    return @keys.reduce(((m, v) -> m or v == value), false)
 
-  return newCommands
+  # Name of the preference for a given property
+  prefName: (value) -> "commands.#{ @name }.#{ value }"
 
-# Extract the help text from the commands preserving groups formation
-commandsHelp = do (commandGroups) ->
-  helpStrings = {}
-  for group, commandsList of commandGroups
-    helpGroup = {}
-    for keys, command of commandsList
-      helpGroup[keys] = command[1]
+  assign: (value) ->
+    @keys = value or @defaultKeys
+    setPref(@prefName('keys'), value and JSON.stringify(value))
 
-    helpStrings[group] = helpGroup
-  return helpStrings
+  enabled: (value) ->
+    if value is undefined
+      return getPref(@prefName('enabled'), true)
+    else
+      setPref(@prefName('enabled'), !!value)
+
+  help: -> _("help_command_#{ @name }")
+
+commands = [
+  new Command('urls',   'focus',                  command_focus,                  ['o'])
+  new Command('urls',   'paste',                  command_paste,                  ['p'])
+  new Command('urls',   'paste_tab',              command_paste_tab,              ['P'])
+  new Command('urls',   'marker_yank',            command_marker_yank,            ['y,f'])
+  new Command('urls',   'marker_focus',           command_marker_focus,           ['v,f'])
+  new Command('urls',   'yank',                   command_yank,                   ['y,y'])
+  new Command('urls',   'reload',                 command_reload,                 ['r'])
+  new Command('urls',   'reload_force',           command_reload_force,           ['R'])
+  new Command('urls',   'reload_all',             command_reload_all,             ['a,r'])
+  new Command('urls',   'reload_all_force',       command_reload_all_force,       ['a,R'])
+  new Command('urls',   'stop',                   command_stop,                   ['s'])
+  new Command('urls',   'stop_all',               command_stop_all,               ['a,s'])
+
+  new Command('nav',    'scroll_to_top',          command_scroll_to_top ,         ['g,g'])
+  new Command('nav',    'scroll_to_bottom',       command_scroll_to_bottom,       ['G'])
+  new Command('nav',    'scroll_down',            command_scroll_down,            ['j', 'c-e'])
+  new Command('nav',    'scroll_up',              command_scroll_up,              ['k', 'c-y'])
+  new Command('nav',    'scroll_left',            command_scroll_left,            ['h'])
+  new Command('nav',    'scroll_right ',          command_scroll_right ,          ['l'])
+  new Command('nav',    'scroll_half_page_down',  command_scroll_half_page_down,  ['d'])
+  new Command('nav',    'scroll_half_page_up',    command_scroll_half_page_up,    ['u'])
+  new Command('nav',    'scroll_page_down',       command_scroll_page_down,       ['c-f'])
+  new Command('nav',    'scroll_page_up',         command_scroll_page_up,         ['c-b'])
+
+  new Command('tabs',   'open_tab',               command_open_tab,               ['t'])
+  new Command('tabs',   'tab_prev',               command_tab_prev,               ['J', 'g,T'])
+  new Command('tabs',   'tab_next',               command_tab_next,               ['K', 'g,t'])
+  new Command('tabs',   'tab_move_left',          command_tab_move_left,          ['c-J'])
+  new Command('tabs',   'tab_move_right',         command_tab_move_right,         ['c-K'])
+  new Command('tabs',   'home',                   command_home,                   ['g,h'])
+  new Command('tabs',   'tab_first',              command_tab_first,              ['g,H', 'g,\^'])
+  new Command('tabs',   'tab_last',               command_tab_last,               ['g,L', 'g,$'])
+  new Command('tabs',   'close_tab',              command_close_tab,              ['x'])
+  new Command('tabs',   'reload_tab',             command_reload_tab,             ['X'])
+
+  new Command('browse', 'follow',                 command_follow,                 ['f'])
+  new Command('browse', 'follow_in_tab',          command_follow_in_tab,          ['F'])
+  new Command('browse', 'back',                   command_back,                   ['H'])
+  new Command('browse', 'forward',                command_forward,                ['L'])
+  
+  new Command('misc',   'find',                   command_find,                   ['\.', '/'])
+  new Command('misc',   'find_hl',                command_find_hl,                ['a,\.', 'a,/'])
+  new Command('misc',   'find_next',              command_find_next,              ['n'])
+  new Command('misc',   'find_prev',              command_find_prev,              ['N'])
+  new Command('misc',   'help',                   command_help,                   ['?', '>'])
+  new Command('misc',   'Esc',                    command_Esc,                    ['Esc'])
+  new Command('misc',   'dev',                    command_dev,                    [':'])
+]
 
 # Called in hints mode. Will process the char, update and hide/show markers
 hintCharHandler = (vim, keyStr, charCode) ->
@@ -384,6 +390,22 @@ hintCharHandler = (vim, keyStr, charCode) ->
           vim.enterNormalMode()
           break
 
+findCommand = (keys) ->
+  for i in [0...keys.length]
+    str = keys[i..].join(',')
+    for cmd in commands
+      for key in cmd.keys
+        if key == str and cmd.enabled()
+          return cmd
+
+maybeCommand = (keys) ->
+  for i in [0...keys.length]
+    str = keys[i..].join(',')
+    for cmd in commands
+      for key in cmd.keys
+        if key.indexOf(str) == 0 and cmd.enabled()
+          return true
+
 exports.hintCharHandler = hintCharHandler
-exports.commands        = commands
-exports.commandsHelp    = commandsHelp
+exports.findCommand     = findCommand
+exports.maybeCommand    = maybeCommand

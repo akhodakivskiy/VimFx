@@ -25,6 +25,7 @@ do (global = this) ->
         packages[name] = scope.exports
       catch error
         dump("Failed to load #{ name }: #{ error }\n")
+        dump(error.stack)
 
     return packages[name]
 
