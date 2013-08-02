@@ -20,9 +20,18 @@ release: clean gen min zip
 	$(V)echo "Done release"
 
 min: $(js_files:.js=.min.js)
+	$(V)echo "Minifing js files…"
 
 %.min.js: %.js
 	uglifyjs $< --screw-ie8 -c -m -o $<
+
+lint: clean gen check
+
+check: $(coffee_files:.coffee=.lint.coffee)
+	$(V)echo "Running coffeescript lint…"
+
+%.lint.coffee: %.coffee
+	coffeelint -f lint-config.json $<
 
 zip: $(plugin_archive)
 
