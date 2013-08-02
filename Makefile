@@ -1,5 +1,5 @@
 .DEFAULT: all
-.PHONY: clean gen zip release
+.PHONY: clean lint release
 
 V=@
 
@@ -19,19 +19,17 @@ all: clean gen zip
 release: clean gen min zip
 	$(V)echo "Done release"
 
-min: $(js_files:.js=.min.js)
+min: say-min $(js_files:.js=.min.js)
+
+say-min:
 	$(V)echo "Minifing js files…"
 
 %.min.js: %.js
-	uglifyjs $< --screw-ie8 -c -m -o $<
+	$(V)uglifyjs $< --screw-ie8 -c -m -o $<
 
-lint: clean gen check
-
-check: $(coffee_files:.coffee=.lint.coffee)
+lint:
 	$(V)echo "Running coffeescript lint…"
-
-%.lint.coffee: %.coffee
-	coffeelint -f lint-config.json $<
+	$(V)coffeelint -f lint-config.json $(coffee_files)
 
 zip: $(plugin_archive)
 
