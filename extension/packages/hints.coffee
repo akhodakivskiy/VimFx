@@ -116,11 +116,8 @@ getMarkableElements = do ->
     "*[#{ MARKABLE_ELEMENT_PROPERTIES.join(' or ') }]"
   ]
 
-  reduce = (m, rule) ->
-      m.concat(["//#{ rule }", "//xhtml:#{ rule }"])
-  xpath = elements
-    .reduce(reduce, [])
-    .join(' | ')
+  reduce = (m, rule) -> m.concat(["//#{ rule }", "//xhtml:#{ rule }"])
+  xpath = elements.reduce(reduce, []).join(' | ')
 
   namespaceResolver = (namespace) ->
     if namespace == 'xhtml' then 'http://www.w3.org/1999/xhtml' else null

@@ -299,7 +299,7 @@ class Command
       @keys = @defaultKeys
   
   # Check if this command may match given string if more chars are added
-  mayMatch: (value) -> 
+  mayMatch: (value) ->
     return @keys.reduce(((m, v) -> m or v.indexOf(value) == 0), false)
 
   # Check is this command matches given string
@@ -384,7 +384,7 @@ hintCharHandler = (vim, keyStr, charCode) ->
 
         if marker.isMatched()
           # Add element features to the bloom filter
-          marker.reward() 
+          marker.reward()
           vim.cb(marker)
           hints.removeHints(vim.window.document)
           vim.enterNormalMode()

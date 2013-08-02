@@ -7,8 +7,7 @@
 exports.addHuffmanCodeWordsTo = (originalElements, options = {}) ->
   weightProperty   = options.weightProperty   or 'weight'
   codeWordProperty = options.codeWordProperty or 'codeWord'
-  setCodeWord      = options.setCodeWord      or (element, codeWord, index) ->
-                                                   element[codeWordProperty] = codeWord
+  setCodeWord      = options.setCodeWord      or (element, codeWord, index) -> element[codeWordProperty] = codeWord
   { alphabet } = options
 
   if typeof(alphabet) != 'string'

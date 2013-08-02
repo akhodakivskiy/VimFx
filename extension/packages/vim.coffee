@@ -20,7 +20,7 @@ class Vim
     @cb         = undefined
     @findRng    = null
 
-    Object.defineProperty(this, 'findStr', 
+    Object.defineProperty(this, 'findStr',
       get: -> return Vim.findStr
       set: (value) -> Vim.findStr = value
     )

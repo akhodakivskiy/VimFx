@@ -1,4 +1,4 @@
-{ getPref 
+{ getPref
 , setPref } = require 'prefs'
 
 `

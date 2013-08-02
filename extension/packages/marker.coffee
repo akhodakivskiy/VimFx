@@ -1,4 +1,4 @@
-{ SerializableBloomFilter 
+{ SerializableBloomFilter
 , DummyBloomFilter } = require 'bloomfilter'
 
 { getPref } = require 'prefs'
@@ -19,7 +19,7 @@ class Marker
     @markerElement = document.createElement('div')
     @markerElement.className = 'VimFxReset VimFxHintMarker'
 
-    Object.defineProperty(this, 'bloomFilter', get: -> 
+    Object.defineProperty(this, 'bloomFilter', get: ->
       if getPref('hints_bloom_on') then realBloomFilter else dummyBloomFilter)
 
   # Shows the marker
