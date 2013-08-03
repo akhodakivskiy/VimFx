@@ -1,3 +1,14 @@
+{ SerializableBloomFilter
+, DummyBloomFilter } = require 'bloomfilter'
+
+{ getPref } = require 'prefs'
+
+HTMLDocument      = Ci.nsIDOMHTMLDocument
+HTMLAnchorElement = Ci.nsIDOMHTMLAnchorElement
+
+realBloomFilter = new SerializableBloomFilter('hints_bloom_data', 256 * 32, 16)
+dummyBloomFilter = new DummyBloomFilter()
+
 # Marker class wraps the markable element and provides
 # methods to manipulate the markers
 class Marker
@@ -7,6 +18,9 @@ class Marker
     window = document.defaultView
     @markerElement = document.createElement('div')
     @markerElement.className = 'VimFxReset VimFxHintMarker'
+
+    Object.defineProperty(this, 'bloomFilter', get: ->
+      if getPref('hints_bloom_on') then realBloomFilter else dummyBloomFilter)
 
   # Shows the marker
   show: -> @markerElement.className = 'VimFxReset VimFxHintMarker'
@@ -66,5 +80,42 @@ class Marker
   isMatched: ->
     return @hintChars == @enteredHintChars
 
+  # Returns string features of the element that can be used in the bloom filter
+  # in order to add relevance to the hint marker
+  extractBloomFeatures: ->
+    features = {}
+
+    # Class name of an element (walks up the node tree to find first element with at least one class)
+    suffix = ''
+    el = @element
+    while el.classList?.length == 0 and not el instanceof HTMLDocument
+      suffix = "#{ suffix } #{ el.tagName }"
+      el = el.parentNode
+    for className in el.classList
+      features["#{ el.tagName }.#{ className }#{ suffix }"] = 10
+
+    # Element id
+    if @element.id
+      features["#{ el.tagName }.#{ @element.id }"] = 5
+
+    if @element instanceof HTMLAnchorElement
+      features["a"] = 20 # Reward links no matter what
+      features["#{ el.tagName }.#{ @element.href }"] = 60
+      features["#{ el.tagName }.#{ @element.title }"] = 40
+
+    return features
+
+  # Returns rating of all present bloom features (plus 1)
+  calcBloomRating: ->
+    rating = 1
+    for feature, weight of @extractBloomFeatures()
+      rating += if @bloomFilter.test(feature) then weight else 0
+
+    return rating
+
+  reward: ->
+    for feature, weight of @extractBloomFeatures()
+      @bloomFilter.add(feature)
+    @bloomFilter.save()
 
 exports.Marker = Marker

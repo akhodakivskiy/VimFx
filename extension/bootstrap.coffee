@@ -9,7 +9,7 @@ do (global = this) ->
   loader = Cc['@mozilla.org/moz/jssubscript-loader;1'].getService(Ci.mozIJSSubScriptLoader)
   baseURI = Services.io.newURI(__SCRIPT_URI_SPEC__, null, null)
 
-  # Loaded packages cache 
+  # Loaded packages cache
   packages = {}
 
   # To be loaded in a bit
@@ -18,16 +18,14 @@ do (global = this) ->
   # Load and cache package
   require = (name) ->
     if packages[name] is undefined
-      scope =
-        console: console
-        require: require
-        exports: {}
+      scope = { console, require, exports: {} }
       try
         path = Services.io.newURI("packages/#{ name }.js", null, baseURI).spec
         loader.loadSubScript(path, scope)
         packages[name] = scope.exports
       catch error
         dump("Failed to load #{ name }: #{ error }\n")
+        dump(error.stack)
 
     return packages[name]
 
@@ -46,7 +44,7 @@ do (global = this) ->
     # Requires for startup/install
     { loadCss }             = require 'utils'
     { addEventListeners }   = require 'events'
-    { getPref 
+    { getPref
     , initPrefValues }      = require 'prefs'
     { setButtonInstallPosition
     , addToolbarButton }    = require 'button'
@@ -56,7 +54,7 @@ do (global = this) ->
     if reason == ADDON_INSTALL
       # Position the toolbar button right before the default Bookmarks button
       # If Bookmarks button is hidden - then VimFx button will be appended to the toolbar
-      setButtonInstallPosition 'nav-bar', 'bookmarks-menu-button-container'
+      setButtonInstallPosition('nav-bar', 'bookmarks-menu-button-container')
 
     # Write default preference values on install
     initPrefValues()

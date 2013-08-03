@@ -13,3 +13,6 @@
 
 <!ENTITY pref.leave_dt_on_esc.title "按下 Esc 键时，光标将离开打开的开发者工具栏">
 <!ENTITY pref.leave_dt_on_esc.desc  "按下 Esc 键时，将不会隐藏打开的开发者工具栏，只是让它失去焦点">
+
+<!ENTITY pref.hints_bloom_on.title "Smart hint assignment (needs translation)">
+<!ENTITY pref.hints_bloom_on.desc  "Assign shorter hints to the links that users visit most often (needs translation)">

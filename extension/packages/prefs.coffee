@@ -1,18 +1,23 @@
 { classes: Cc, interfaces: Ci } = Components
 
+{ unload } = require 'unload'
+
 PREF_BRANCH = 'extensions.VimFx.'
 
 # Default values for the preference
 # All used preferences should be mentioned here becuase
 # preference type is derived from here
 DEFAULT_PREF_VALUES =
-  addon_id:          'VimFx@akhodakivskiy.github.com'
-  hint_chars:        'fjdksla;ghrueiwovncm'
-  disabled:          false
-  scroll_step_lines: 6
-  black_list:        '*mail.google.com*'
-  blur_on_esc:       true
-  leave_dt_on_esc:   false
+  addon_id:           'VimFx@akhodakivskiy.github.com'
+  hint_chars:         'fjdksla;ghrueiwovncm'
+  disabled:           false
+  scroll_step_lines:  6
+  black_list:         '*mail.google.com*'
+  blur_on_esc:        true
+  leave_dt_on_esc:    false
+  hints_bloom_data:   ''
+  hints_bloom_on:     true
+
 
 getBranchPref = (branch, key, defaultValue) ->
   type = branch.getPrefType(key)
@@ -68,43 +73,6 @@ setPref = do ->
       else
         branch.clearUserPref(key)
 
-DISABLED_COMMANDS = do ->
-  str = getPref('disabled_commands')
-  try
-    return JSON.parse(str)
-  catch err
-    dc = []
-    try
-      for key in str.split('||')
-        for c in key.split('|')
-          dc.push(c) if c
-
-    return dc
-
-# Enables command
-enableCommand = (key) ->
-  for c in key.split('|')
-    while (idx = DISABLED_COMMANDS.indexOf(c)) > -1
-      DISABLED_COMMANDS.splice(idx, 1)
-
-  setPref('disabled_commands', JSON.stringify(DISABLED_COMMANDS))
-
-# Adds command to the disabled list
-disableCommand = (key) ->
-  for c in key.split('|')
-    if DISABLED_COMMANDS.indexOf(c) == -1
-      DISABLED_COMMANDS.push(c)
-
-  setPref('disabled_commands', JSON.stringify(DISABLED_COMMANDS))
-
-# Checks if given command is disabled in the preferences
-isCommandDisabled = (key) ->
-  for c in key.split('|')
-    if DISABLED_COMMANDS.indexOf(c) > -1
-      return true
-
-  return false
-
 initPrefValues = ->
   for key, value of DEFAULT_PREF_VALUES
     if not isPrefSet(key)
@@ -115,7 +83,4 @@ exports.getPref           = getPref
 exports.getDefaultPref    = getDefaultPref
 exports.getFirefoxPref    = getFirefoxPref
 exports.setPref           = setPref
-exports.isCommandDisabled = isCommandDisabled
-exports.disableCommand    = disableCommand
-exports.enableCommand     = enableCommand
 exports.initPrefValues    = initPrefValues

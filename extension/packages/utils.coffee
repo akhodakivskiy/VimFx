@@ -1,5 +1,4 @@
 { unload } = require 'unload'
-{ console } = require 'console'
 { getPref
 , getDefaultPref
 } = require 'prefs'
@@ -81,7 +80,7 @@ getWindowId = (window) ->
                .outerWindowID
 
 getSessionStore = ->
-  Cc['@mozilla.org/browser/sessionstore;1'].getService(Ci.nsISessionStore);
+  Cc['@mozilla.org/browser/sessionstore;1'].getService(Ci.nsISessionStore)
 
 # Function that returns a URI to the css file that's part of the extension
 cssUri = do ->
@@ -119,10 +118,10 @@ simulateClick = (element, modifiers) ->
     # but Webkit will. Dispatching a click on an input box does not seem to focus it; we do that separately
     element.dispatchEvent(mouseEvent)
 
-WHEEL_MODE_PIXEL = Ci.nsIDOMWheelEvent.DOM_DELTA_PIXEL 
-WHEEL_MODE_LINE = Ci.nsIDOMWheelEvent.DOM_DELTA_LINE 
-WHEEL_MODE_PAGE = Ci.nsIDOMWheelEvent.DOM_DELTA_PAGE 
-    
+WHEEL_MODE_PIXEL = Ci.nsIDOMWheelEvent.DOM_DELTA_PIXEL
+WHEEL_MODE_LINE = Ci.nsIDOMWheelEvent.DOM_DELTA_LINE
+WHEEL_MODE_PAGE = Ci.nsIDOMWheelEvent.DOM_DELTA_PAGE
+
 # Simulate mouse scroll event by specific offsets given
 # that mouse cursor is at specified position
 simulateWheel = (window, deltaX, deltaY, mode = WHEEL_MODE_PIXEL) ->
@@ -141,10 +140,10 @@ simulateWheel = (window, deltaX, deltaY, mode = WHEEL_MODE_PIXEL) ->
 
 # Write a string into system clipboard
 writeToClipboard = (window, text) ->
-  str = Cc['@mozilla.org/supports-string;1'].createInstance(Ci.nsISupportsString);
+  str = Cc['@mozilla.org/supports-string;1'].createInstance(Ci.nsISupportsString)
   str.data = text
 
-  trans = Cc['@mozilla.org/widget/transferable;1'].createInstance(Ci.nsITransferable);
+  trans = Cc['@mozilla.org/widget/transferable;1'].createInstance(Ci.nsITransferable)
 
   if trans.init
     privacyContext = window.QueryInterface(Ci.nsIInterfaceRequestor)
@@ -152,7 +151,7 @@ writeToClipboard = (window, text) ->
       .QueryInterface(Ci.nsILoadContext)
     trans.init(privacyContext)
 
-  trans.addDataFlavor('text/unicode');
+  trans.addDataFlavor('text/unicode')
   trans.setTransferData('text/unicode', str, text.length * 2)
 
   _clip.setData(trans, null, Ci.nsIClipboard.kGlobalClipboard)
@@ -164,10 +163,10 @@ readFromClipboard = (window) ->
   if trans.init
     privacyContext = window.QueryInterface(Ci.nsIInterfaceRequestor)
       .getInterface(Ci.nsIWebNavigation)
-      .QueryInterface(Ci.nsILoadContext);
-    trans.init(privacyContext);
+      .QueryInterface(Ci.nsILoadContext)
+    trans.init(privacyContext)
 
-  trans.addDataFlavor('text/unicode');
+  trans.addDataFlavor('text/unicode')
 
   _clip.getData(trans, Ci.nsIClipboard.kGlobalClipboard)
 

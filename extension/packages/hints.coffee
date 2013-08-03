@@ -5,9 +5,10 @@ utils                     = require 'utils'
 
 { interfaces: Ci } = Components
 
-HTMLDocument = Ci.nsIDOMHTMLDocument
-XULDocument  = Ci.nsIDOMXULDocument
-XPathResult  = Ci.nsIDOMXPathResult
+HTMLDocument      = Ci.nsIDOMHTMLDocument
+XULDocument       = Ci.nsIDOMXULDocument
+XPathResult       = Ci.nsIDOMXPathResult
+HTMLAnchorElement = Ci.nsIDOMHTMLAnchorElement
 
 CONTAINER_ID = 'VimFxHintMarkerContainer'
 
@@ -83,7 +84,7 @@ injectMarkers = (document) ->
           marker.setPosition(rect)
           fragment.appendChild(marker.markerElement)
 
-          marker.weight = rect.area
+          marker.weight = rect.area * marker.calcBloomRating()
 
           markers.push(marker)
 
@@ -113,11 +114,8 @@ getMarkableElements = do ->
     "*[#{ MARKABLE_ELEMENT_PROPERTIES.join(' or ') }]"
   ]
 
-  reduce = (m, rule) ->
-      m.concat(["//#{ rule }", "//xhtml:#{ rule }"])
-  xpath = elements
-    .reduce(reduce, [])
-    .join(' | ')
+  reduce = (m, rule) -> m.concat(["//#{ rule }", "//xhtml:#{ rule }"])
+  xpath = elements.reduce(reduce, []).join(' | ')
 
   namespaceResolver = (namespace) ->
     if namespace == 'xhtml' then 'http://www.w3.org/1999/xhtml' else null

@@ -13,4 +13,6 @@
         title="&pref.leave_dt_on_esc.title;" desc="&pref.leave_dt_on_esc.desc;" />
     <setting pref="extensions.VimFx.scroll_step_lines" type="integer" 
         title="&pref.scroll_step_lines.title;" desc="&pref.scroll_step_lines.desc;" />
+    <setting pref="extensions.VimFx.hints_bloom_on" type="bool" 
+        title="&pref.hints_bloom_on.title;" desc="&pref.hints_bloom_on.desc;" />
 </vbox>

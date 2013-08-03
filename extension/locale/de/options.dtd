@@ -12,3 +12,6 @@
 
 <!ENTITY pref.leave_dt_on_esc.title "Entwickler-Werkzeuge bei Esc geöffnet lassen">
 <!ENTITY pref.leave_dt_on_esc.desc  "Beim Drücken von Esc Entwickler-Werkzeuge nicht verstecken, falls geöffnet">
+
+<!ENTITY pref.hints_bloom_on.title "Smart hint assignment (needs translation)">
+<!ENTITY pref.hints_bloom_on.desc  "Assign shorter hints to the links that users visit most often (needs translation)">

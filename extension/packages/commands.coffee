@@ -8,8 +8,6 @@ find  = require 'find'
 , setPref
 , getFirefoxPref } = require 'prefs'
 
-{ console } = require 'console'
-
 { classes: Cc, interfaces: Ci, utils: Cu } = Components
 
 # Opens developer toolbar (Default shotrcut: Shift-F2)
@@ -19,12 +17,12 @@ command_dev = (vim) ->
     chromeWindow.DeveloperToolbar.focus()
 
 # Focus the Address Bar
-command_o = (vim) ->
+command_focus = (vim) ->
   if chromeWindow = utils.getRootWindow(vim.window)
     chromeWindow.focusAndSelectUrlBar()
 
 # Navigate to the address that is currently stored in the system clipboard
-command_p = (vim) ->
+command_paste = (vim) ->
   url = utils.readFromClipboard(vim.window)
   postData = null
   if not utils.isURL(url) and submission = utils.browserSearchSubmission(url)
@@ -35,7 +33,7 @@ command_p = (vim) ->
     chromeWindow.gBrowser.loadURIWithFlags(url, null, null, null, postData)
 
 # Open new tab and navigate to the address that is currently stored in the system clipboard
-command_P = (vim) ->
+command_paste_tab = (vim) ->
   url = utils.readFromClipboard(vim.window)
   postData = null
   if not utils.isURL(url) and submission = utils.browserSearchSubmission(url)
@@ -46,14 +44,14 @@ command_P = (vim) ->
     chromeWindow.gBrowser.selectedTab = chromeWindow.gBrowser.addTab(url, null, null, postData, null, false)
 
 # Open new tab and focus the address bar
-command_t = (vim) ->
+command_open_tab = (vim) ->
   if chromeWindow = utils.getRootWindow(vim.window)
     chromeWindow.BrowserOpenTab()
 
 # Copy element URL to the clipboard
-command_yf = (vim) ->
+command_marker_yank = (vim) ->
   markers = hints.injectHints(vim.window.document)
-  if markers?.length > 0
+  if markers.length > 0
     cb = (marker) ->
       if url = marker.element.href
         marker.element.focus()
@@ -64,25 +62,25 @@ command_yf = (vim) ->
     vim.enterHintsMode(markers, cb)
 
 # Focus element
-command_vf = (vim) ->
+command_marker_focus = (vim) ->
   markers = hints.injectHints(vim.window.document)
-  if markers?.length > 0
+  if markers.length > 0
     vim.enterHintsMode(markers, (marker) -> marker.element.focus())
 
 # Copy current URL to the clipboard
-command_yy = (vim) ->
+command_yank = (vim) ->
   utils.writeToClipboard(vim.window, vim.window.location.toString())
 
 # Reload the page, possibly from cache
-command_r = (vim) ->
+command_reload = (vim) ->
   vim.window.location.reload(false)
 
 # Reload the page from the server
-command_R = (vim) ->
+command_reload_force = (vim) ->
   vim.window.location.reload(true)
 
 # Reload the page, possibly from cache
-command_ar = (vim) ->
+command_reload_all = (vim) ->
   if rootWindow = utils.getRootWindow(vim.window)
     if tabs = rootWindow.gBrowser.tabContainer
       for i in [0...tabs.itemCount]
@@ -90,17 +88,17 @@ command_ar = (vim) ->
         window.location.reload(false)
 
 # Reload the page from the server
-command_aR = (vim) ->
+command_reload_all_force = (vim) ->
   if rootWindow = utils.getRootWindow(vim.window)
     if tabs = rootWindow.gBrowser.tabContainer
       for i in [0...tabs.itemCount]
         window = tabs.getItemAtIndex(i).linkedBrowser.contentWindow
         window.location.reload(true)
 
-command_s = (vim) ->
+command_stop = (vim) ->
   vim.window.stop()
 
-command_as = (vim) ->
+command_stop_all = (vim) ->
   if rootWindow = utils.getRootWindow(vim.window)
     if tabs = rootWindow.gBrowser.tabContainer
       for i in [0...tabs.itemCount]
@@ -108,99 +106,99 @@ command_as = (vim) ->
         window.stop()
 
 # Scroll to the top of the page
-command_gg = (vim) ->
+command_scroll_to_top = (vim) ->
   for i in [0...1000]
     utils.simulateWheel(vim.window, 0, -1, utils.WHEEL_MODE_PAGE)
 
 # Scroll to the bottom of the page
-command_G = (vim) ->
+command_scroll_to_bottom = (vim) ->
   for i in [0...1000]
     utils.simulateWheel(vim.window, 0, 1, utils.WHEEL_MODE_PAGE)
 
 # Scroll down a bit
-command_j_ce = (vim) ->
+command_scroll_down = (vim) ->
   utils.simulateWheel(vim.window, 0, getPref('scroll_step_lines'), utils.WHEEL_MODE_LINE)
 
 # Scroll up a bit
-command_k_cy = (vim) ->
+command_scroll_up = (vim) ->
   utils.simulateWheel(vim.window, 0, -getPref('scroll_step_lines'), utils.WHEEL_MODE_LINE)
 
 # Scroll left a bit
-command_h = (vim) ->
+command_scroll_left = (vim) ->
   utils.simulateWheel(vim.window, -getPref('scroll_step_lines'), 0, utils.WHEEL_MODE_LINE)
 
 # Scroll right a bit
-command_l = (vim) ->
+command_scroll_right = (vim) ->
   utils.simulateWheel(vim.window, getPref('scroll_step_lines'), 0, utils.WHEEL_MODE_LINE)
 
 # Scroll down half a page
-command_d = (vim) ->
+command_scroll_half_page_down = (vim) ->
   utils.simulateWheel(vim.window, 0, 0.5, utils.WHEEL_MODE_PAGE)
 
 # Scroll up half a page
-command_u = (vim) ->
+command_scroll_half_page_up = (vim) ->
   utils.simulateWheel(vim.window, 0, -0.5, utils.WHEEL_MODE_PAGE)
 
 # Scroll down full a page
-command_cf = (vim) ->
+command_scroll_page_down = (vim) ->
   utils.simulateWheel(vim.window, 0, 1, utils.WHEEL_MODE_PAGE)
 
 # Scroll up full a page
-command_cb = (vim) ->
+command_scroll_page_up = (vim) ->
   utils.simulateWheel(vim.window, 0, -1, utils.WHEEL_MODE_PAGE)
 
 # Activate previous tab
-command_J_gT = (vim) ->
+command_tab_prev = (vim) ->
   if rootWindow = utils.getRootWindow(vim.window)
     rootWindow.gBrowser.tabContainer.advanceSelectedTab(-1, true)
 
 # Activate next tab
-command_K_gt = (vim) ->
+command_tab_next = (vim) ->
   if rootWindow = utils.getRootWindow(vim.window)
     rootWindow.gBrowser.tabContainer.advanceSelectedTab(1, true)
 
-command_gh = (vim) ->
+command_home = (vim) ->
   url = getFirefoxPref('browser.startup.homepage')
   if chromeWindow = utils.getRootWindow(vim.window)
     chromeWindow.gBrowser.loadURIWithFlags(url, null, null, null, null)
 
 # Go to the first tab
-command_gH_g0 = (vim) ->
+command_tab_first = (vim) ->
   if rootWindow = utils.getRootWindow(vim.window)
     rootWindow.gBrowser.tabContainer.selectedIndex = 0
 
 # Go to the last tab
-command_gL_g$ = (vim) ->
+command_tab_last = (vim) ->
   if rootWindow = utils.getRootWindow(vim.window)
     itemCount = rootWindow.gBrowser.tabContainer.itemCount
     rootWindow.gBrowser.tabContainer.selectedIndex = itemCount - 1
 
 # Go back in history
-command_H = (vim) ->
+command_back = (vim) ->
   vim.window.history.back()
 
 # Go forward in history
-command_L = (vim) ->
+command_forward = (vim) ->
   vim.window.history.forward()
 
 # Close current tab
-command_x = (vim) ->
+command_close_tab = (vim) ->
   if rootWindow = utils.getRootWindow(vim.window)
     unless rootWindow.gBrowser.selectedTab.pinned
       rootWindow.gBrowser.removeCurrentTab()
 
 # Restore last closed tab
-command_X = (vim) ->
+command_reload_tab = (vim) ->
   if rootWindow = utils.getRootWindow(vim.window)
     ss = utils.getSessionStore()
     if ss and ss.getClosedTabCount(rootWindow) > 0
       ss.undoCloseTab(rootWindow, 0)
 
 # Follow links with hint markers
-command_f = (vim) ->
+command_follow = (vim) ->
   if document = vim.window.document
     markers = hints.injectHints(document)
-    if markers?.length > 0
+    if markers.length > 0
       # This callback will be called with the selected marker as argument
       cb = (marker) ->
         marker.element.focus()
@@ -209,9 +207,9 @@ command_f = (vim) ->
       vim.enterHintsMode(markers, cb)
 
 # Follow links in a new Tab with hint markers
-command_F = (vim) ->
+command_follow_in_tab = (vim) ->
   markers = hints.injectHints(vim.window.document)
-  if markers?.length > 0
+  if markers.length > 0
     # This callback will be called with the selected marker as argument
     cb = (marker) ->
       marker.element.focus()
@@ -220,7 +218,7 @@ command_F = (vim) ->
     vim.enterHintsMode(markers, cb)
 
 # Move current tab to the left
-command_cJ = (vim) ->
+command_tab_move_left = (vim) ->
   if gBrowser = utils.getRootWindow(vim.window)?.gBrowser
     if tab = gBrowser.selectedTab
       index = gBrowser.tabContainer.selectedIndex
@@ -230,7 +228,7 @@ command_cJ = (vim) ->
       gBrowser.moveTabTo(tab, (total + index - 1) % total)
 
 # Move current tab to the right
-command_cK = (vim) ->
+command_tab_move_right = (vim) ->
   if gBrowser = utils.getRootWindow(vim.window)?.gBrowser
     if tab = gBrowser.selectedTab
       index = gBrowser.tabContainer.selectedIndex
@@ -240,7 +238,7 @@ command_cK = (vim) ->
 
 # Display the Help Dialog
 command_help = (vim) ->
-  help.injectHelp(vim.window.document, commandsHelp)
+  help.injectHelp(vim.window.document, commands)
 
 # Switch into find mode
 command_find = (vim) ->
@@ -258,12 +256,12 @@ command_find_hl = (vim) ->
     return find.highlight(vim.window, findStr)
 
 # Search for the last pattern
-command_n = (vim) ->
+command_find_next = (vim) ->
   if vim.findStr.length > 0
     vim.findRng = find.find(vim.window, vim.findStr, vim.findRng, find.DIRECTION_FORWARDS, true)
 
 # Search for the last pattern backwards
-command_N = (vim) ->
+command_find_prev = (vim) ->
   if vim.findStr.length > 0
     vim.findRng = find.find(vim.window, vim.findStr, vim.findRng, find.DIRECTION_BACKWARDS, true)
 
@@ -292,80 +290,86 @@ command_Esc = (vim) ->
     if chromeWindow = utils.getRootWindow(vim.window)
       chromeWindow.DeveloperToolbar.hide()
 
-commandGroups =
-  'urls':
-    'o':        [ command_o,      _('help_command_o') ]
-    'p':        [ command_p,      _('help_command_p') ]
-    'P':        [ command_P,      _('help_command_P') ]
-    'y,f':      [ command_yf,     _('help_command_yf') ]
-    'v,f':      [ command_vf,     _('help_command_vf') ]
-    'y,y':      [ command_yy,     _('help_command_yy') ]
-    'r':        [ command_r,      _('help_command_r') ]
-    'R':        [ command_R,      _('help_command_R') ]
-    'a,r':      [ command_ar,     _('help_command_ar') ]
-    'a,R':      [ command_aR,     _('help_command_aR') ]
-    's':        [ command_s,      _('help_command_s') ]
-    'a,s':      [ command_as,     _('help_command_as') ]
-  'nav':
-    'g,g':      [ command_gg ,    _('help_command_gg') ]
-    'G':        [ command_G,      _('help_command_G') ]
-    'j|c-e':    [ command_j_ce,   _('help_command_j_ce') ]
-    'k|c-y':    [ command_k_cy,   _('help_command_k_cy') ]
-    'h':        [ command_h,      _('help_command_h') ]
-    'l':        [ command_l ,     _('help_command_l') ]
-    # Can't use c-u/c-d because  c-u is widely used for viewing sources
-    'd':        [ command_d,      _('help_command_d') ]
-    'u':        [ command_u,      _('help_command_u') ]
-    'c-f':      [ command_cf,     _('help_command_cf') ]
-    'c-b':      [ command_cb,     _('help_command_cb') ]
-  'tabs':
-    't':        [ command_t,      _('help_command_t') ]
-    'J|g,T':    [ command_J_gT,   _('help_command_J_gT') ]
-    'K|g,t':    [ command_K_gt,   _('help_command_K_gt') ]
-    'c-J':      [ command_cJ,     _('help_command_cJ') ]
-    'c-K':      [ command_cK,     _('help_command_cK') ]
-    'g,h':      [ command_gh,     _('help_command_gh') ]
-    'g,H|g,\^': [ command_gH_g0,  _('help_command_gH_g0') ]
-    'g,L|g,$':  [ command_gL_g$,  _('help_command_gL_g$') ]
-    'x':        [ command_x,      _('help_command_x') ]
-    'X':        [ command_X,      _('help_command_X') ]
-  'browse':
-    'f':        [ command_f,      _('help_command_f') ]
-    'F':        [ command_F,      _('help_command_F') ]
-    'H':        [ command_H,      _('help_command_H') ]
-    'L':        [ command_L,      _('help_command_L') ]
-  'misc':
-    # `.` is added to find command mapping to hack around Russian keyboard layout
-    '\.|/':     [ command_find,   _('help_command_find') ]
-    'a,\.|a,/': [ command_find_hl,_('help_command_find_hl') ]
-    'n':        [ command_n,      _('help_command_n') ]
-    'N':        [ command_N,      _('help_command_N') ]
-    # `>` is added to help command mapping to hack around Russian keyboard layout
-    # See key-utils.coffee for more info
-    '?|>':      [ command_help,   _('help_command_help') ]
-    'Esc':      [ command_Esc,    _('help_command_Esc') ]
-    ':':        [ command_dev,    _('help_command_dev') ]
+class Command
+  constructor: (@group, @name, @func, @keys) ->
+    @defaultKeys = @keys
+    try
+      @keys = JSON.parse(getPref(@prefName('keys')))
+    catch err
+      @keys = @defaultKeys
+  
+  # Check if this command may match given string if more chars are added
+  mayMatch: (value) ->
+    return @keys.reduce(((m, v) -> m or v.indexOf(value) == 0), false)
 
-# Merge groups and split command pipes into individual commands
-commands = do (commandGroups) ->
-  newCommands = {}
-  for group, commandsList of commandGroups
-    for keys, command of commandsList
-      for key in keys.split('|')
-        newCommands[key] = command[0]
+  # Check is this command matches given string
+  match: (value) ->
+    return @keys.reduce(((m, v) -> m or v == value), false)
 
-  return newCommands
+  # Name of the preference for a given property
+  prefName: (value) -> "commands.#{ @name }.#{ value }"
 
-# Extract the help text from the commands preserving groups formation
-commandsHelp = do (commandGroups) ->
-  helpStrings = {}
-  for group, commandsList of commandGroups
-    helpGroup = {}
-    for keys, command of commandsList
-      helpGroup[keys] = command[1]
+  assign: (value) ->
+    @keys = value or @defaultKeys
+    setPref(@prefName('keys'), value and JSON.stringify(value))
 
-    helpStrings[group] = helpGroup
-  return helpStrings
+  enabled: (value) ->
+    if value is undefined
+      return getPref(@prefName('enabled'), true)
+    else
+      setPref(@prefName('enabled'), !!value)
+
+  help: -> _("help_command_#{ @name }")
+
+commands = [
+  new Command('urls',   'focus',                  command_focus,                  ['o'])
+  new Command('urls',   'paste',                  command_paste,                  ['p'])
+  new Command('urls',   'paste_tab',              command_paste_tab,              ['P'])
+  new Command('urls',   'marker_yank',            command_marker_yank,            ['y,f'])
+  new Command('urls',   'marker_focus',           command_marker_focus,           ['v,f'])
+  new Command('urls',   'yank',                   command_yank,                   ['y,y'])
+  new Command('urls',   'reload',                 command_reload,                 ['r'])
+  new Command('urls',   'reload_force',           command_reload_force,           ['R'])
+  new Command('urls',   'reload_all',             command_reload_all,             ['a,r'])
+  new Command('urls',   'reload_all_force',       command_reload_all_force,       ['a,R'])
+  new Command('urls',   'stop',                   command_stop,                   ['s'])
+  new Command('urls',   'stop_all',               command_stop_all,               ['a,s'])
+
+  new Command('nav',    'scroll_to_top',          command_scroll_to_top ,         ['g,g'])
+  new Command('nav',    'scroll_to_bottom',       command_scroll_to_bottom,       ['G'])
+  new Command('nav',    'scroll_down',            command_scroll_down,            ['j', 'c-e'])
+  new Command('nav',    'scroll_up',              command_scroll_up,              ['k', 'c-y'])
+  new Command('nav',    'scroll_left',            command_scroll_left,            ['h'])
+  new Command('nav',    'scroll_right ',          command_scroll_right ,          ['l'])
+  new Command('nav',    'scroll_half_page_down',  command_scroll_half_page_down,  ['d'])
+  new Command('nav',    'scroll_half_page_up',    command_scroll_half_page_up,    ['u'])
+  new Command('nav',    'scroll_page_down',       command_scroll_page_down,       ['c-f'])
+  new Command('nav',    'scroll_page_up',         command_scroll_page_up,         ['c-b'])
+
+  new Command('tabs',   'open_tab',               command_open_tab,               ['t'])
+  new Command('tabs',   'tab_prev',               command_tab_prev,               ['J', 'g,T'])
+  new Command('tabs',   'tab_next',               command_tab_next,               ['K', 'g,t'])
+  new Command('tabs',   'tab_move_left',          command_tab_move_left,          ['c-J'])
+  new Command('tabs',   'tab_move_right',         command_tab_move_right,         ['c-K'])
+  new Command('tabs',   'home',                   command_home,                   ['g,h'])
+  new Command('tabs',   'tab_first',              command_tab_first,              ['g,H', 'g,\^'])
+  new Command('tabs',   'tab_last',               command_tab_last,               ['g,L', 'g,$'])
+  new Command('tabs',   'close_tab',              command_close_tab,              ['x'])
+  new Command('tabs',   'reload_tab',             command_reload_tab,             ['X'])
+
+  new Command('browse', 'follow',                 command_follow,                 ['f'])
+  new Command('browse', 'follow_in_tab',          command_follow_in_tab,          ['F'])
+  new Command('browse', 'back',                   command_back,                   ['H'])
+  new Command('browse', 'forward',                command_forward,                ['L'])
+  
+  new Command('misc',   'find',                   command_find,                   ['\.', '/'])
+  new Command('misc',   'find_hl',                command_find_hl,                ['a,\.', 'a,/'])
+  new Command('misc',   'find_next',              command_find_next,              ['n'])
+  new Command('misc',   'find_prev',              command_find_prev,              ['N'])
+  new Command('misc',   'help',                   command_help,                   ['?', '>'])
+  new Command('misc',   'Esc',                    command_Esc,                    ['Esc'])
+  new Command('misc',   'dev',                    command_dev,                    [':'])
+]
 
 # Called in hints mode. Will process the char, update and hide/show markers
 hintCharHandler = (vim, keyStr, charCode) ->
@@ -379,11 +383,29 @@ hintCharHandler = (vim, keyStr, charCode) ->
         marker.matchHintChar(key)
 
         if marker.isMatched()
+          # Add element features to the bloom filter
+          marker.reward()
           vim.cb(marker)
           hints.removeHints(vim.window.document)
           vim.enterNormalMode()
           break
 
+findCommand = (keys) ->
+  for i in [0...keys.length]
+    str = keys[i..].join(',')
+    for cmd in commands
+      for key in cmd.keys
+        if key == str and cmd.enabled()
+          return cmd
+
+maybeCommand = (keys) ->
+  for i in [0...keys.length]
+    str = keys[i..].join(',')
+    for cmd in commands
+      for key in cmd.keys
+        if key.indexOf(str) == 0 and cmd.enabled()
+          return true
+
 exports.hintCharHandler = hintCharHandler
-exports.commands        = commands
-exports.commandsHelp    = commandsHelp
+exports.findCommand     = findCommand
+exports.maybeCommand    = maybeCommand

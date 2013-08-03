@@ -13,3 +13,6 @@ Speciale tekens toegestaan: *, !">
 
 <!ENTITY pref.leave_dt_on_esc.title "Laat ontwikkelaarswerkbalk open bij Esc.">
 <!ENTITY pref.leave_dt_on_esc.desc  "Laat de ontwikkelaarsbalk open als er op Esc wordt gedrukt.">
+
+<!ENTITY pref.hints_bloom_on.title "Smart hint assignment (needs translation)">
+<!ENTITY pref.hints_bloom_on.desc  "Assign shorter hints to the links that users visit most often (needs translation)">
