@@ -8,7 +8,6 @@ utils                     = require 'utils'
 HTMLDocument      = Ci.nsIDOMHTMLDocument
 XULDocument       = Ci.nsIDOMXULDocument
 XPathResult       = Ci.nsIDOMXPathResult
-HTMLAnchorElement = Ci.nsIDOMHTMLAnchorElement
 
 CONTAINER_ID = 'VimFxHintMarkerContainer'
 
