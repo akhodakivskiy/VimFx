@@ -66,7 +66,7 @@ exports.addHuffmanCodeWordsTo = (originalElements, options = {}) ->
 
     # Find the index to insert the sum so that the sorting is maintained. That is faster than
     # sorting the elements in each iteration.
-    break for element, index in elements by -1 when sum.weight >= element.weight
+    break for element, index in elements by -1 when sum.weight <= element.weight
     elements.splice(index + 1, 0, sum)
 
   root = elements[0] # `elements.length == 1` by now.
