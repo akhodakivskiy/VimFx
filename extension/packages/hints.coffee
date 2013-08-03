@@ -54,9 +54,7 @@ injectHints = (document) ->
   markers = injectMarkers(document)
   hintChars = utils.getHintChars()
 
-  addHuffmanCodeWordsTo markers,
-    alphabet: hintChars
-    setCodeWord: (marker, hint, index) -> marker.setHint(hint)
+  addHuffmanCodeWordsTo(markers, {alphabet: hintChars}, (marker, hint) -> marker.setHint(hint))
 
   return markers
 

@@ -1,35 +1,34 @@
-# `originalElements` should be an array of objects. Each object is expected to have a property (see
-# the `options` argument) which represents the _weight_ of the object, which is a positive number.
-# Each object will be given a _code word_ (see the `options` argument). The larger the weight, the
-# shorter the code word. A weight of 0 means that the element should not get a code word at all. The
-# code words will use the `options.alphabet` provided. Note that the function modifies the
-# `originalElements` array (see the `options` argument) and returns `undefined`.
-exports.addHuffmanCodeWordsTo = (originalElements, options = {}) ->
-  weightProperty   = options.weightProperty   or 'weight'
-  codeWordProperty = options.codeWordProperty or 'codeWord'
-  setCodeWord      = options.setCodeWord      or (element, codeWord, index) ->
-                                                   element[codeWordProperty] = codeWord
-  { alphabet } = options
-
-  if typeof(alphabet) != 'string'
-    throw new TypeError('`options.alphabet` must be provided and be a string.')
+# `originalElements` should be an array of objects. Each object is expected to have a `weight`
+# property which represents the _weight_ of the object, which is a positive number. Each object will
+# be given a _code word_. The larger the weight, the shorter the code word. A weight of 0 means that
+# the element should not get a code word at all. The code words will use the `alphabet` provided.
+# The functions runs `callback(element, codeWord)` for each object in `originalElements` and returns
+# `undefined`.
+exports.addHuffmanCodeWordsTo = (originalElements, {alphabet}, callback) ->
+  unless typeof(alphabet) == 'string'
+    throw new TypeError('`alphabet` must be provided and be a string.')
 
   nonUnique = /([\s\S])[\s\S]*\1/.exec(alphabet)
   if nonUnique
-    throw new Error("`options.alphabet` must consist of unique letters. Found '#{nonUnique[1]}' more than once.")
+    throw new Error("`alphabet` must consist of unique letters. Found '#{nonUnique[1]}' more than once.")
 
   if alphabet.length < 2
-    throw new Error('`options.alphabet` must consist of at least 2 characters.')
+    throw new Error('`alphabet` must consist of at least 2 characters.')
+
+  unless typeof(callback) == "function"
+    throw new TypeError "`callback` must be provided and be a function."
+
+
+  # Shallow working copy.
+  elements = originalElements[..]
 
 
   # The algorithm is so optimized, that it does not produce a code word at all if there is only one
   # element! We still need a code word even if there is only one link, though.
-  if originalElements.length == 1
-    setCodeWord(originalElements[0], alphabet[0], 0)
+  if elements.length == 1
+    callback(elements[0], alphabet[0])
     return
 
-
-  elements = ({weight: obj[weightProperty], index} for obj, index in originalElements)
 
   numBranches = alphabet.length
   numElements = elements.length
@@ -58,7 +57,7 @@ exports.addHuffmanCodeWordsTo = (originalElements, options = {}) ->
   # Construct the Huffman tree.
   for i in [0...numBranchPoints] by 1
     # Replace `numBranches` of the lightest weights with their sum.
-    sum = {weight: 0, children: []}
+    sum = new BranchingPoint
     for i in [0...numBranches] by 1
       lowestWeight = elements.pop()
       sum.weight += lowestWeight.weight
@@ -71,11 +70,17 @@ exports.addHuffmanCodeWordsTo = (originalElements, options = {}) ->
 
   root = elements[0] # `elements.length == 1` by now.
 
-  # Create the code words by walking the tree. Store them using `setCodeWord`.
+  # Create the code words by walking the tree. Store them using `callback`.
   do walk = (node = root, codeWord = '') ->
-    if node.children
+    if node instanceof BranchingPoint
       for childNode, index in node.children
         walk(childNode, codeWord + alphabet[index])
     else
-      setCodeWord(originalElements[node.index], codeWord, node.index)  unless node.weight == 0
+      callback(node, codeWord)  unless node.weight == 0
     return
+
+
+class BranchingPoint
+  constructor: ->
+    @weight = 0
+    @children = []
