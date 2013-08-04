@@ -8,7 +8,6 @@ utils                     = require 'utils'
 HTMLDocument      = Ci.nsIDOMHTMLDocument
 XULDocument       = Ci.nsIDOMXULDocument
 XPathResult       = Ci.nsIDOMXPathResult
-HTMLAnchorElement = Ci.nsIDOMHTMLAnchorElement
 
 CONTAINER_ID = 'VimFxHintMarkerContainer'
 
@@ -55,9 +54,7 @@ injectHints = (document) ->
   markers = injectMarkers(document)
   hintChars = utils.getHintChars()
 
-  addHuffmanCodeWordsTo markers,
-    alphabet: hintChars
-    setCodeWord: (marker, hint, index) -> marker.setHint(hint)
+  addHuffmanCodeWordsTo(markers, {alphabet: hintChars}, (marker, hint) -> marker.setHint(hint))
 
   return markers
 

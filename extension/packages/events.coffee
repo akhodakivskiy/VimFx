@@ -33,7 +33,7 @@ keyStrFromEvent = (event) ->
 passthrough = false
 
 logError = (err, eventName) ->
-  console.log("#{ err } (in #{ eventName })\n#{ err.stack.replace(/@(?:.+->)+ /g, '@') }")
+  console.log("#{ err } (in #{ eventName })\n#{ err.stack.replace(/@.+-> /g, '@') }")
 
 # The following listeners are installed on every top level Chrome window
 windowsListener =
