@@ -88,7 +88,7 @@ class Marker
     # Class name of an element (walks up the node tree to find first element with at least one class)
     suffix = ''
     el = @element
-    while el.classList?.length == 0 and not el instanceof HTMLDocument
+    while el.classList?.length == 0 and el not instanceof HTMLDocument
       suffix = "#{ suffix } #{ el.tagName }"
       el = el.parentNode
     for className in el.classList

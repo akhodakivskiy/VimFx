@@ -6,6 +6,7 @@ find  = require 'find'
 { _ } = require 'l10n'
 { getPref
 , setPref
+, isPrefSet
 , getFirefoxPref } = require 'prefs'
 
 { classes: Cc, interfaces: Ci, utils: Cu } = Components
@@ -188,7 +189,7 @@ command_close_tab = (vim) ->
       rootWindow.gBrowser.removeCurrentTab()
 
 # Restore last closed tab
-command_reload_tab = (vim) ->
+command_restore_tab = (vim) ->
   if rootWindow = utils.getRootWindow(vim.window)
     ss = utils.getSessionStore()
     if ss and ss.getClosedTabCount(rootWindow) > 0
@@ -291,12 +292,12 @@ command_Esc = (vim) ->
       chromeWindow.DeveloperToolbar.hide()
 
 class Command
-  constructor: (@group, @name, @func, @keys) ->
-    @defaultKeys = @keys
-    try
-      @keys = JSON.parse(getPref(@prefName('keys')))
-    catch err
-      @keys = @defaultKeys
+  constructor: (@group, @name, @func, keys) ->
+    @defaultKeys = keys
+    if isPrefSet(@prefName('keys'))
+      try @keyValues = JSON.parse(getPref(@prefName('keys')))
+    else
+      @keyValues = keys
   
   # Check if this command may match given string if more chars are added
   mayMatch: (value) ->
@@ -319,6 +320,13 @@ class Command
     else
       setPref(@prefName('enabled'), !!value)
 
+  keys: (value) ->
+    if value is undefined
+      return @keyValues
+    else
+      @keyValues = value or @defaultKeyValues
+      setPref(@prefName('keys'), value and JSON.stringify(value))
+
   help: -> _("help_command_#{ @name }")
 
 commands = [
@@ -340,7 +348,7 @@ commands = [
   new Command('nav',    'scroll_down',            command_scroll_down,            ['j', 'c-e'])
   new Command('nav',    'scroll_up',              command_scroll_up,              ['k', 'c-y'])
   new Command('nav',    'scroll_left',            command_scroll_left,            ['h'])
-  new Command('nav',    'scroll_right ',          command_scroll_right ,          ['l'])
+  new Command('nav',    'scroll_right',           command_scroll_right ,          ['l'])
   new Command('nav',    'scroll_half_page_down',  command_scroll_half_page_down,  ['d'])
   new Command('nav',    'scroll_half_page_up',    command_scroll_half_page_up,    ['u'])
   new Command('nav',    'scroll_page_down',       command_scroll_page_down,       ['c-f'])
@@ -355,18 +363,18 @@ commands = [
   new Command('tabs',   'tab_first',              command_tab_first,              ['g,H', 'g,\^'])
   new Command('tabs',   'tab_last',               command_tab_last,               ['g,L', 'g,$'])
   new Command('tabs',   'close_tab',              command_close_tab,              ['x'])
-  new Command('tabs',   'reload_tab',             command_reload_tab,             ['X'])
+  new Command('tabs',   'restore_tab',            command_restore_tab,            ['X'])
 
   new Command('browse', 'follow',                 command_follow,                 ['f'])
   new Command('browse', 'follow_in_tab',          command_follow_in_tab,          ['F'])
   new Command('browse', 'back',                   command_back,                   ['H'])
   new Command('browse', 'forward',                command_forward,                ['L'])
   
-  new Command('misc',   'find',                   command_find,                   ['\.', '/'])
-  new Command('misc',   'find_hl',                command_find_hl,                ['a,\.', 'a,/'])
+  new Command('misc',   'find',                   command_find,                   ['/'])
+  new Command('misc',   'find_hl',                command_find_hl,                ['a,/'])
   new Command('misc',   'find_next',              command_find_next,              ['n'])
   new Command('misc',   'find_prev',              command_find_prev,              ['N'])
-  new Command('misc',   'help',                   command_help,                   ['?', '>'])
+  new Command('misc',   'help',                   command_help,                   ['?'])
   new Command('misc',   'Esc',                    command_Esc,                    ['Esc'])
   new Command('misc',   'dev',                    command_dev,                    [':'])
 ]
@@ -394,7 +402,7 @@ findCommand = (keys) ->
   for i in [0...keys.length]
     str = keys[i..].join(',')
     for cmd in commands
-      for key in cmd.keys
+      for key in cmd.keys()
         if key == str and cmd.enabled()
           return cmd
 
@@ -402,7 +410,7 @@ maybeCommand = (keys) ->
   for i in [0...keys.length]
     str = keys[i..].join(',')
     for cmd in commands
-      for key in cmd.keys
+      for key in cmd.keys()
         if key.indexOf(str) == 0 and cmd.enabled()
           return true
 

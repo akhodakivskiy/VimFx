@@ -45,6 +45,14 @@ input.VimFxNotFound#VimFxFindInput {
     color: red;
 }
 
+div.VimFxKeySequence {
+    max-width:70px;
+    text-align: right;
+    font-weight:bold;
+    color:#2f508e;
+    white-space: nowrap;
+}
+
 a.VimFxKeyLink {
     display: inline;
     background: #777;
@@ -56,10 +64,19 @@ a.VimFxKeyLink {
     text-shadow: 1px 1px #666;
     font-size: 75%; 
     padding: 2px 3px;
-    margin: 0px 3px;
 }
+
 a.VimFxKeyLink:hover {
-    background-position: 0 -50px;
+    outline: 3px solid #c55500; 
+    -moz-outline-radius: 6px;
+    background: #c55500;
+    border-radius: 0px;
+    text-decoration: none;
+}
+
+a.VimFxAddShortcutLink {
+    color: #c55500;
+    cursor: pointer;
 }
 
 input#VimFxFindInput {
@@ -193,7 +210,7 @@ div#VimFxHelpDialog .VimFxSectionTitle {
 
 div#VimFxHelpDialog table.VimFxReset {
     display: table;
-    table-layout: auto;
+    table-layout: fixed;
 }
 
 div#VimFxHelpDialog tr.VimFxReset {
@@ -206,15 +223,6 @@ div#VimFxHelpDialog td.VimFxReset {
     padding-bottom: 4px;
     line-height: 15px;
 
-}
-
-div#VimFxHelpDialog td.VimFxSequence {
-    white-space: nowrap;
-    min-width:60px;
-    text-align: right;
-    padding-right:5px;
-    font-weight:bold;
-    color:#2f508e;
 }
 
 div#VimFxHelpDialog .VimFxSocial {

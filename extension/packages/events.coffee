@@ -1,6 +1,5 @@
 utils                    = require 'utils'
 keyUtils                 = require 'key-utils'
-{ getCommand }           = require 'commands'
 { Vim }                  = require 'vim'
 { getPref }              = require 'prefs'
 { setWindowBlacklisted } = require 'button'
