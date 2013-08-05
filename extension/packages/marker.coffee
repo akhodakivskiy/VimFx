@@ -91,8 +91,9 @@ class Marker
     while el.classList?.length == 0 and el not instanceof HTMLDocument
       suffix = "#{ suffix } #{ el.tagName }"
       el = el.parentNode
-    for className in el.classList
-      features["#{ el.tagName }.#{ className }#{ suffix }"] = 10
+    if el and el.classList
+      for className in el.classList
+        features["#{ el.tagName }.#{ className }#{ suffix }"] = 10
 
     # Element id
     if @element.id
