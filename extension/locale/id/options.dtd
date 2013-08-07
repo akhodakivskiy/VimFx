@@ -1,12 +1,12 @@
 <!ENTITY pref.hint_chars.title      "Karakter petunjuk">
-<!ENTITY pref.hint_chars.desc       "Default: asdfgercvhjkl;uinm">
+<!ENTITY pref.hint_chars.desc       "Default: fjdksla;ghrueiwovncm">
 
 <!ENTITY pref.black_list.title      "Daftar Larangan">
 <!ENTITY pref.black_list.desc       "Daftar terpisah koma dari URL dimana VimFx harus nonaktif otomatis. 
 Wildcard dibolehkan: *, !">
 
-<!ENTITY pref.scroll_step.title     "Langkah Gulung">
-<!ENTITY pref.scroll_step.desc      "Langkah Gulung">
+<!ENTITY pref.scroll_step_lines.title     "Langkah Gulung">
+<!ENTITY pref.scroll_step_lines.desc      "Langkah Gulung">
 
 <!ENTITY pref.blur_on_esc.title     "Blur pada Esc">
 <!ENTITY pref.blur_on_esc.desc      "Blur fokus masukan dari elemen masukan aktif manapun dalam Peramban (contoh: bar alamat)">
@@ -14,8 +14,6 @@ Wildcard dibolehkan: *, !">
 <!ENTITY pref.leave_dt_on_esc.title "Biarkan Toolbar Pengembang terbuka pada Esc">
 <!ENTITY pref.leave_dt_on_esc.desc  "Jangan sembunyikan Toolbar Pengembang jika tampak dan Esc ditekan">
 
-<!ENTITY pref.scroll_time.title     "Gulung Halus">
-<!ENTITY pref.smooth_time.disabled  "Nonaktif">
-<!ENTITY pref.smooth_time.fast      "Cepat">
-<!ENTITY pref.smooth_time.normal    "Normal">
-<!ENTITY pref.smooth_time.slow      "Lambat">
+<!ENTITY pref.hints_bloom_on.title "Penempatan petunjuk cerdas">
+<!ENTITY pref.hints_bloom_on.desc  "Menempatkan petunjuk lebih pendek untuk pranala yang sering dikunjungi">
+
