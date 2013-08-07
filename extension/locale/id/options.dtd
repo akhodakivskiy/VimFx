@@ -9,7 +9,7 @@ Wildcard dibolehkan: *, !">
 <!ENTITY pref.scroll_step.desc      "Langkah Gulung">
 
 <!ENTITY pref.blur_on_esc.title     "Blur pada Esc">
-<!ENTITY pref.blur_on_esc.desc      "Blur fokus masukan dari elemen masukan aktif manapun dalam peramban (contoh: bar alamat)">
+<!ENTITY pref.blur_on_esc.desc      "Blur fokus masukan dari elemen masukan aktif manapun dalam Peramban (contoh: bar alamat)">
 
 <!ENTITY pref.leave_dt_on_esc.title "Biarkan Toolbar Pengembang terbuka pada Esc">
 <!ENTITY pref.leave_dt_on_esc.desc  "Jangan sembunyikan Toolbar Pengembang jika tampak dan Esc ditekan">
