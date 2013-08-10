@@ -1,54 +1,179 @@
-CONTAINER_ID  = 'VimFxHintMarkerContainer'
+utils                     = require 'utils'
+{ getPref }               = require 'prefs'
+{ Marker }                = require 'marker'
+{ addHuffmanCodeWordsTo } = require 'huffman'
 
-{ interfaces: Ci }  = Components
-HTMLDocument        = Ci.nsIDOMHTMLDocument
-XULDocument         = Ci.nsIDOMXULDocument
-{ Marker }          = require 'marker'
+{ interfaces: Ci } = Components
 
-createHintsContainer = (document) ->
-  container = document.createElement 'div'
-  container.id = CONTAINER_ID
-  container.className = 'VimFxReset'
-  return container
-    
-# Creates and injects hint markers into the DOM
-injectHints = (document) ->
+HTMLDocument      = Ci.nsIDOMHTMLDocument
+XULDocument       = Ci.nsIDOMXULDocument
+XPathResult       = Ci.nsIDOMXPathResult
 
-  inner = (document, startIndex = 1) ->
-    # First remove previous hints container
-    removeHints document
+CONTAINER_ID = 'VimFxHintMarkerContainer'
 
-    # For now we aren't able to handle hint markers in XUL Documents :(
-    if document instanceof HTMLDocument# or document instanceof XULDocument
-      if document.documentElement
-        # Find and create markers
-        markers = Marker.createMarkers document, startIndex
+# All the following elements qualify for their own marker in hints mode
+MARKABLE_ELEMENTS = [
+  "a"
+  "iframe"
+  "area[@href]"
+  "textarea"
+  "button"
+  "select"
+  "input[not(@type='hidden' or @disabled or @readonly)]"
+  "embed"
+  "object"
+]
 
-        container = createHintsContainer document
+# All elements that have one or more of the following properties
+# qualify for their own marker in hints mode
+MARKABLE_ELEMENT_PROPERTIES = [
+  "@tabindex"
+  "@onclick"
+  "@onmousedown"
+  "@onmouseup"
+  "@oncommand"
+  "@role='link'"
+  "@role='button'"
+  "contains(@class, 'button')"
+  "contains(@class, 'js-new-tweets-bar')"
+  "@contenteditable='' or translate(@contenteditable, 'TRUE', 'true')='true'"
+  # Zooming in and out images bigger than viewport size
+  "img[contains(@class, 'decoded') and (contains(@class, 'overflowing') or contains(@class, 'shrinkToFit'))]"
+]
 
-        # For performance use Document Fragment
-        fragment = document.createDocumentFragment()
-        for marker in markers
-          fragment.appendChild marker.markerElement
-
-        container.appendChild fragment
-        document.documentElement.appendChild container
-
-        for frame in document.defaultView.frames
-          markers = markers.concat inner(frame.document, markers.length)
-
-        return markers
-
-  return inner(document)
 
 # Remove previously injected hints from the DOM
 removeHints = (document) ->
-  if container = document.getElementById CONTAINER_ID
-    document.documentElement.removeChild container 
+  if container = document.getElementById(CONTAINER_ID)
+    document.documentElement.removeChild(container)
 
   for frame in document.defaultView.frames
-    removeHints frame.document
+    removeHints(frame.document)
 
 
-exports.injectHints     = injectHints
-exports.removeHints     = removeHints
+# Like `injectMarkers`, but also sets hints for the markers
+injectHints = (document) ->
+  markers = injectMarkers(document)
+  hintChars = utils.getHintChars()
+
+  addHuffmanCodeWordsTo(markers, {alphabet: hintChars}, (marker, hint) -> marker.setHint(hint))
+
+  return markers
+
+
+# Creates and injects markers into the DOM
+injectMarkers = (document) ->
+  # First remove previous hints container
+  removeHints(document)
+
+  # For now we aren't able to handle hint markers in XUL Documents :(
+  if document instanceof HTMLDocument# or document instanceof XULDocument
+    if document.documentElement
+      # For performance use Document Fragment
+      fragment = document.createDocumentFragment()
+
+      # Select all markable elements in the document, create markers
+      # for each of them, and position them on the page.
+      # Note that the markers are not given hints.
+      set = getMarkableElements(document)
+      markers = []
+      for i in [0...set.snapshotLength] by 1
+        element = set.snapshotItem(i)
+        if rect = getElementRect(element)
+          marker = new Marker(element)
+
+          marker.setPosition(rect)
+          fragment.appendChild(marker.markerElement)
+
+          marker.weight = rect.area * marker.calcBloomRating()
+
+          markers.push(marker)
+
+      container = createHintsContainer(document)
+      container.appendChild(fragment)
+      document.documentElement.appendChild(container)
+
+      for frame in document.defaultView.frames
+        markers = markers.concat(injectMarkers(frame.document))
+
+  return markers or []
+
+
+createHintsContainer = (document) ->
+  container = document.createElement('div')
+  container.id = CONTAINER_ID
+  container.className = 'VimFxReset'
+  return container
+
+
+# Returns elements that qualify for hint markers in hints mode.
+# Generates and memoizes an XPath query internally
+getMarkableElements = do ->
+  # Some preparations done on startup
+  elements = [
+    MARKABLE_ELEMENTS...
+    "*[#{ MARKABLE_ELEMENT_PROPERTIES.join(' or ') }]"
+  ]
+
+  reduce = (m, rule) -> m.concat(["//#{ rule }", "//xhtml:#{ rule }"])
+  xpath = elements.reduce(reduce, []).join(' | ')
+
+  namespaceResolver = (namespace) ->
+    if namespace == 'xhtml' then 'http://www.w3.org/1999/xhtml' else null
+
+  # The actual function that will return the desired elements
+  return (document, resultType = XPathResult.ORDERED_NODE_SNAPSHOT_TYPE) ->
+    return document.evaluate(xpath, document.documentElement, namespaceResolver, resultType, null)
+
+
+# Uses `element.getBoundingClientRect()`. If that does not return a visible rectange, then looks at
+# the children of the markable node.
+#
+# The logic has been copied over from Vimiun originally.
+getElementRect = (element) ->
+  document = element.ownerDocument
+  window   = document.defaultView
+  docElem  = document.documentElement
+  body     = document.body
+
+  clientTop  = docElem.clientTop  or body?.clientTop  or 0
+  clientLeft = docElem.clientLeft or body?.clientLeft or 0
+  scrollTop  = window.pageYOffset or docElem.scrollTop
+  scrollLeft = window.pageXOffset or docElem.scrollLeft
+
+  clientRect = element.getBoundingClientRect()
+
+  if isRectOk(clientRect, window)
+    return {
+      top:    clientRect.top  + scrollTop  - clientTop
+      left:   clientRect.left + scrollLeft - clientLeft
+      width:  clientRect.width
+      height: clientRect.height
+      area:   clientRect.width * clientRect.height
+    }
+
+  # If the rect has 0 dimensions, then check what's inside.
+  # Floated or absolutely positioned elements are of particular interest.
+  if clientRect.width is 0 or clientRect.height is 0
+    for childElement in element.children
+      if computedStyle = window.getComputedStyle(childElement, null)
+        if computedStyle.getPropertyValue('float') != 'none' or \
+           computedStyle.getPropertyValue('position') == 'absolute'
+
+          return getElementRect(childElement)
+
+  return
+
+
+# Checks if the given TextRectangle object qualifies
+# for its own Marker with respect to the `window` object
+isRectOk = (rect, window) ->
+  minimum = 2
+  rect.width >  minimum and rect.height >  minimum and \
+  rect.top   > -minimum and rect.left   > -minimum and \
+  rect.top   <  window.innerHeight - minimum and \
+  rect.left  <  window.innerWidth  - minimum
+
+
+exports.injectHints = injectHints
+exports.removeHints = removeHints

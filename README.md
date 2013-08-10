@@ -1,32 +1,41 @@
 # VimFx - Vim keyboard shortcuts for Firefox
 
-*Extension AMO page*: https://addons.mozilla.org/en-US/firefox/addon/vimfx/
+**Extension AMO page**: https://addons.mozilla.org/en-US/firefox/addon/vimfx.
 
-*Contribute your localization! See `locale` folder*
+**Mailing list**: [vimfx@librelist.com](mailto:vimfx@librelist.com?subject=Subscribe) (just send an email to subscribe)
 
-[VimFx](https://addons.mozilla.org/en-US/firefox/addon/vimfx/) 
-is a [Mozilla Firefox](https://www.mozilla.org/en-US/firefox/fx/#desktop) 
-extension which introduces Vim-style keyboard shortcuts for browsing and navigation, 
+Contribute your localization! See `locale` folder.
+
+Read [Contributing and Reporting Issues section](#contributing-and-reporting-issues) for tips.
+> Tl;dr: Pull request to the **develop** branch! Issues in **English**!
+
+## Overview
+
+[VimFx](https://addons.mozilla.org/en-US/firefox/addon/vimfx/)
+is a [Mozilla Firefox](https://www.mozilla.org/en-US/firefox/fx/#desktop)
+extension which introduces Vim-style keyboard shortcuts for browsing and navigation,
 significantly reducing the use of mouse, and allowing your hands to rest on the home row.
 
-VimFx was inspired by [Vimperator](http://www.vimperator.org/) 
-and designed after [Vimium](http://vimium.github.com/) for 
+VimFx was inspired by [Vimperator](http://www.vimperator.org/)
+and designed after [Vimium](http://vimium.github.com/) for
 [Google Chrome](https://www.google.com/intl/en/chrome/browser/) preserving the shortcuts and behavior.
 If your are used to Vimium then it will be easy to get started with VimFx.
 
+## Reporting Issues and Contributing
+
+- Please submit bug reports and feature requests in *English*.
+- Please submit cotribution pull requests for `develop` branch only. Pull requests for `master` will be closed. Thank you!
+- Contribute your localization! See `locale` folder.
+
 ## Why VimFx was created
 
-Even before Vimium there was Vimperator for Firefox.  In my opinion the problem 
-with Vimperator is that it has too many features and aggressively changes 
+Even before Vimium there was Vimperator for Firefox.  In my opinion the problem
+with Vimperator is that it has too many features and aggressively changes
 the default Firefox appearance and behavior. Vimium was developed for Google Chrome
-and it was exactly what I needed in terms of added functionality. That's why I decided 
+and it was exactly what I needed in terms of added functionality. That's why I decided
 to develop similar extension for Firefox.
 
 VimFx will be nice to your browser and to your habits. Promise.
-
-## Credits
-
-  
 
 ## Key Features
 
@@ -36,12 +45,12 @@ VimFx will be nice to your browser and to your habits. Promise.
 
 ## Shortcuts
 
-Might not be up to date. Please refer to the Help dialog withing the extension 
+Might not be up to date. Please refer to the Help dialog withing the extension
 for the most relevant list.
 
 Global shortcut to enable/disable VimFx: `Shift-Alt-v`
 
-### URLs
+### Dealing with URLs
 
     o       Focus the Address Bar
     p       Navigate to the address in the clipboard
@@ -53,8 +62,10 @@ Global shortcut to enable/disable VimFx: `Shift-Alt-v`
     R       Reload current page and all the assets (js, css, etc.)
     ar      Reload pages in all tabs
     aR      Reload pages in all tabs including assets (js, css, img)
+    s       Stop loading current page
+    as      Stop loading pages in all tabs
 
-### Navigating
+### Navigating the Page
 
     gg      Scroll to the Top of the page
     G       Scroll to the Bottom of the page
@@ -67,7 +78,7 @@ Global shortcut to enable/disable VimFx: `Shift-Alt-v`
     c-f     Scroll full Page Down
     c-b     Scroll full Page Up
 
-### Tabs
+### Working with Tabs
 
     t       Open New Blank tab
     J,gT    Go to the Previous tab
@@ -95,88 +106,27 @@ Global shortcut to enable/disable VimFx: `Shift-Alt-v`
     N       Go to the previous Find match
     ?,>     Show Help Dialog
     Esc     Close this dialog and cancel hint markers
+    :       Open Developer Toolbar
 
-## Release Notes
+## Contributing and Reporting Issues
 
-0.1 (26 Oct 2012)
+1. Fork.
+2. Clone.
+3. Checkout the **develop** branch: `git checkout develop`
+4. Create a new branch (using develop as base): `git checkout -b myTopicBranch`
+   Using develop (and not master) as base makes it easier to pull request to develop when you're done.
+5. Code! Try to follow the style of the rest of the code. There are no written rules (yet?).
+6. Push your branch to your fork on GitHub.
+7. Pull request to the **develop** branch.
 
-- Initial Release
+### Tips:
 
-0.1.1 (27 Oct 2012)
+- Compile the .coffee files with the **`--bare`** option! Otherwise you will get errors.
+- Run `coffee -cbw .` from the root of the project to automatically compile on changes.
+- Put a file called exactly `VimFx@akhodakivskiy.github.com` in the extensions/ folder of a Firefox
+  profile, containing the absolute path to the extension/ folder in the project. Then you just need
+  to restart Firefox (use some add-on!) after each change. More details in [this MDN article][mdn-extdevenv].
+- Only create tickets for issues and feature requests in English. Otherwise duplicate 
+  tickets in different languages will pile up.
 
-- Just to deal with AMO - no changes
-
-0.2 (5 Nov 2012)
-
-- document.designMode='on' is now honored. Will also provide hint markers for iframes on the page.
-- Bug fixed where it would completely reset the toolbar while installing the toolbar button.
-- Bug fixed where it's not possible to change the text in the blaclisting textbox
-- Changed u/d to scroll half a page, added c-f/c-b to scroll full page
-- Added tab movement commands: c-J and c-K.
-- Invisible markers bug fixed.
-- Global hotkey to disable the commands (equal to the toolbar button click): Alt-Shift V
-- ^u and ^d are removed from the command list. ^u is commonly used to show the page source code
-- Opening new tab with now focuses the Address Bar
-- Other small bugs nailed down.
-
-0.3 (19 Nov 2012)
-
-- Fixed [Desktop](https://addons.mozilla.org/en-us/firefox/addon/desktop/) extension compatibility problem
-- Removed c-b/c-f for now. c-f is a standard search hotkey. Will put c-f back when proper Vim-like search with / is implemented
-- Scrolling with G will now reach the bottom of the page
-- Implemented localization, currently there is only Russian localization. Community is welcome
-  [to contribute your localizations](https://github.com/akhodakivskiy/VimFx/tree/master/extension/locale)! 
-- Implemented simple smooth scolling
-
-0.3.2, 0.3.2, 0.3.3 (20-21 Nov 2012)
-
-- Hotfixes for the build script to include localization related files and folders
-
-0.4 (9 Dec 2012)
-
-- Implemented find with `/` and `n/N`
-- Added `ar` and `aR` commands to reload pages in all open tabs.
-- Added a preference that enables bluring from any element that has input focus in the browser on Esc keydown (on by default)
-- Fixed bug where markers and help dialog would blow up some of the pages.
-- Marker hints are now sorted with respect to the underlying element area. Elements with larger area get shorter hints
-- Added *mail.google.com* to the default black list
-- Various bug fixed and improvements.
-
-0.4.1, 0.4.2 (12-14 Dec 2012)
-
-- Small tweaks of the find feature.
-- Bugfix for keyboard handling on non-english keyboard layouts
-
-0.4.3 (27 Dec 2012)
-
-- Toolbar button bugfix
-- Added an option to disable individual commands via the help dialog
-
-0.4.4 (30 Jan 2013)
-
-- Thanks to @mozillazg and @mcomella for translation contributions.
-- Added `gh` command that will navigate to the home page.
-- Added `o` command to focus address bar.
-- `p` and `P` will parse the contents of the clipboard. If the string in the clipboard appears to be a url then it will navigate to this url. Otherwise it will search for the string in the clipboard using currently selected search provider.
-- Now hint markers for links will stay on top of all the markers for different kinds of elements.
-- Esc will now also close the focused default search bar.
-- Fixed bugs related to keyboard events handling, XUL documents, and some other issues.
-- Bug fixed where not all the commands could be disabled via the Help dialog.
-
-0.4.5 (12 Mar 2013)
-
-- `:` to open Firefox Developer Toolbar, `Esc` to close it.
-- Add Hungarian locale (@thenonameguy).
-- Add Polish locale (@grn).
-- Don't close pinned tabs when pressing x (@grn).
-- Switched to Makefile for building the extension release (@carno).
-- Mrakers CSS tweaks (@helmuthdu)
-
-0.4.6 (27 Mar 2013)
-
-- Reimplemented find mode: CJK support, performace boost
-- `a/` or `a.` to highlight all matches of the search string on the page
-- Hint markers will now reach into iframes
-- Key handling is disabled when a popupmenu or panel are shown
-- `yf` will now also focus links and copy values from text/textarea element
-- `vf` will show hit markers to focus the underlying element
+[mdn-extdevenv]: https://developer.mozilla.org/en-US/docs/Setting_up_extension_development_environment#Firefox_extension_proxy_file

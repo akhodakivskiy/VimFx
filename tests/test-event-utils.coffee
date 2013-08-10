@@ -2,7 +2,7 @@
 
 setupModule = (module) ->
    module.controller = mozmill.getBrowserController()
-  
+
 testWindowEventTracker = () ->
 
   count = 0
@@ -11,7 +11,7 @@ testWindowEventTracker = () ->
 
   tracker.start()
 
-  controller.rootElement.keypress("k");
+  controller.rootElement.keypress("k")
 
   expect.equal count, 1, 'WindowEventTracker keypress failed'
 
