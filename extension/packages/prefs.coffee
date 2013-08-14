@@ -9,7 +9,7 @@ PREF_BRANCH = 'extensions.VimFx.'
 # preference type is derived from here
 DEFAULT_PREF_VALUES =
   addon_id:           'VimFx@akhodakivskiy.github.com'
-  hint_chars:         'fjdksla;ghrueiwovncm'
+  hint_chars:         'fjdkslaghrueiwovncm' # preferably use letters only
   disabled:           false
   scroll_step_lines:  6
   black_list:         '*mail.google.com*'

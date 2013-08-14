@@ -380,8 +380,8 @@ commands = [
 ]
 
 # Called in hints mode. Will process the char, update and hide/show markers
-hintCharHandler = (vim, keyStr, charCode) ->
-  if keyStr and charCode > 0
+hintCharHandler = (vim, keyStr) ->
+  if keyStr
     # Get char and escape it to avoid problems with String.search
     key = utils.regexpEscape(keyStr)
 

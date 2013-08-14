@@ -37,7 +37,6 @@ logError = (err, eventName) ->
 # The following listeners are installed on every top level Chrome window
 windowsListener =
   keydown: (event) ->
-
     if passthrough or getPref('disabled')
       return
 
@@ -47,23 +46,26 @@ windowsListener =
       keyStr = keyStrFromEvent(event)
 
       # We only handle the key if it's recognized by `keyCharFromCode`
-      # and if there is no focused editable element # or if it's the *Esc* key,
+      # and if there is no focused editable element or if it's the *Esc* key,
       # which will remove the focus from the currently focused element
       if keyStr and (not isEditable or keyStr == 'Esc')
         if window = utils.getCurrentTabWindow(event)
           if vim = vimBucket.get(window)
-            # No action if blacklisted
             if vim.blacklisted
               return
 
-            if vim.handleKeyDown(event, keyStr) and keyStr != 'Esc'
-              suppressEvent event
+            if vim.handleKeyDown(event, keyStr)
+              suppressEvent(event)
+
+            # Also blur active element if preferencess allow (for XUL controls)
+            if keyStr == 'Esc' and getPref('blur_on_esc')
+              cb = -> event.originalTarget?.ownerDocument?.activeElement?.blur()
+              window.setTimeout(cb, 0)
 
     catch err
       logError(err, 'keydown')
 
   keypress: (event) ->
-
     if passthrough or getPref('disabled')
       return
 
@@ -74,40 +76,23 @@ windowsListener =
       # Suppress event if there is a matching command.
       if window = utils.getCurrentTabWindow(event)
         if vim = vimBucket.get(window)
-
-          # No action on blacklisted locations
           if vim.blacklisted
             return
 
-          # Blur from any active element on Esc. Calling before `handleKeyPress`
-          # because `vim.keys` will be reset afterwards`
-          blur_on_esc = vim.lastKeyStr == 'Esc' and getPref('blur_on_esc')
-
-          # Process event if there is no editable element in focus
-          # Or last key was Esc key
-          if not isEditable or vim.lastKeyStr == 'Esc'
-            result = vim.handleKeyPress(event)
-
-          # If there was some processing done then suppress the eveng
-          # unless it's the Esc key
-          if result and vim.lastKeyStr != 'Esc'
+          if vim.handleKeyPress(event)
             suppressEvent(event)
-
-          # Calling after the command has been executed
-          if blur_on_esc
-            cb = -> event.originalTarget?.ownerDocument?.activeElement?.blur()
-            window.setTimeout(cb, 0)
 
     catch err
       logError(err, 'keypress')
 
   keyup: (event) ->
+    if passthrough or getPref('disabled')
+      return
+
     if window = utils.getCurrentTabWindow event
       if vim = vimBucket.get(window)
-        if vim.lastKeyStr and vim.lastKeyStr != 'Esc'
+        if vim.handleKeyUp(event)
           suppressEvent(event)
-
-        vim.lastKeyStr = null
 
   popupshown: (event) ->
     if event.target.tagName in [ 'menupopup', 'panel' ]
