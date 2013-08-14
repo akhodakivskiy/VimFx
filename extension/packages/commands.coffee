@@ -21,6 +21,12 @@ command_dev = (vim) ->
 command_focus = (vim) ->
   if chromeWindow = utils.getRootWindow(vim.window)
     chromeWindow.focusAndSelectUrlBar()
+    #
+# Focus the Search Bar
+command_focus_search = (vim) ->
+  if chromeWindow = utils.getRootWindow(vim.window)
+    if searchBar = chromeWindow.document.getElementById("searchbar")
+      searchBar.select()
 
 # Navigate to the address that is currently stored in the system clipboard
 command_paste = (vim) ->
@@ -331,6 +337,7 @@ class Command
 
 commands = [
   new Command('urls',   'focus',                  command_focus,                  ['o'])
+  new Command('urls',   'focus_search',           command_focus_search,           ['O'])
   new Command('urls',   'paste',                  command_paste,                  ['p'])
   new Command('urls',   'paste_tab',              command_paste_tab,              ['P'])
   new Command('urls',   'marker_yank',            command_marker_yank,            ['y,f'])
