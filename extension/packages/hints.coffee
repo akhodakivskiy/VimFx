@@ -134,6 +134,14 @@ getElementRect = (element) ->
   docElem  = document.documentElement
   body     = document.body
 
+  # Prune elements that aren't visible on the page
+  computedStyle = window.getComputedStyle(element, null)
+  if computedStyle
+    if computedStyle.getPropertyValue('visibility') != 'visible' or \
+       computedStyle.getPropertyValue('display') == 'none' or \
+       computedStyle.getPropertyValue('opacity') == '0'
+      return
+
   clientTop  = docElem.clientTop  or body?.clientTop  or 0
   clientLeft = docElem.clientLeft or body?.clientLeft or 0
   scrollTop  = window.pageYOffset or docElem.scrollTop
