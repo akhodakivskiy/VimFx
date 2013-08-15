@@ -79,5 +79,12 @@
         <em:description>Vim sneltoetsen voor Firefox</em:description>
       </Description>
     </em:localized>
+
+    <em:localized>
+      <Description>
+        <em:locale>id</em:locale>
+        <em:description>Shortcut keyboard Vim untuk Firefox</em:description>
+      </Description>
+    </em:localized>
   </Description>
 </RDF>
