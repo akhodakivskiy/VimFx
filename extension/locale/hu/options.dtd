@@ -1,20 +1,17 @@
 <!ENTITY pref.hint_chars.title      "Segéd karakterek">
-<!ENTITY pref.hint_chars.desc       "Alapértelmezett: asdfgercvhjkl;uinm">
+<!ENTITY pref.hint_chars.desc       "Alapértelmezett: fjdksla;ghrueiwovncm">
 
 <!ENTITY pref.black_list.title      "Fekete lista">
 <!ENTITY pref.black_list.desc       "Vesszővel elválasztott URL-ek, ahol a VimFX inaktív legyen. Helyettesítő karakterek is használhatók: *, !">
 
-<!ENTITY pref.scroll_step.title     "Görgetés mértéke">
-<!ENTITY pref.scroll_step.desc      "Görgetés mértéke">
+<!ENTITY pref.scroll_step_lines.title   "Görgetés mértéke">
+<!ENTITY pref.scroll_step_lines.desc    "Görgetés mértéke">
 
 <!ENTITY pref.blur_on_esc.title     "Esc-re fókuszkérés">
 <!ENTITY pref.blur_on_esc.desc      "Esc lenyomására a VimFX megkapja a fókuszt, pl. az input mezőktől/címsortól">
 
-<!ENTITY pref.leave_dt_on_esc.title "Leave Developer Toolbar open on Esc">
-<!ENTITY pref.leave_dt_on_esc.desc  "Do not hide Developer Toolbar if it's visible and the Esc is pressed">
+<!ENTITY pref.leave_dt_on_esc.title "Leave Developer Toolbar open on Esc (needs translation)">
+<!ENTITY pref.leave_dt_on_esc.desc  "Do not hide Developer Toolbar if it's visible and the Esc is pressed (needs translation)">
 
-<!ENTITY pref.scroll_time.title     "Lágy görgetés">
-<!ENTITY pref.smooth_time.disabled  "Inaktív">
-<!ENTITY pref.smooth_time.fast      "Gyors">
-<!ENTITY pref.smooth_time.normal    "Normál">
-<!ENTITY pref.smooth_time.slow      "Lassú">
+<!ENTITY pref.hints_bloom_on.title "Smart hint assignment (needs translation)">
+<!ENTITY pref.hints_bloom_on.desc  "Assign shorter hints to the links that users visit most often (needs translation)">

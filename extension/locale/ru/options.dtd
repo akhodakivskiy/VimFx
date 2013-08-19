@@ -1,12 +1,12 @@
 <!ENTITY pref.hint_chars.title      "Символы на маркерах">
-<!ENTITY pref.hint_chars.desc       "По умолчанию: asdfgercvhjkl;uinm">
+<!ENTITY pref.hint_chars.desc       "По умолчанию: fjdksla;ghrueiwovncm">
 
 <!ENTITY pref.black_list.title      "Стоп список">
-<!ENTITY pref.black_list.desc       "Список адесов, разделенных запятой, на которых VimFx не активен. 
+<!ENTITY pref.black_list.desc       "Список адесов, разделенных запятой, на которых VimFx не активен.
 Разрешены одстановки: *, !">
 
-<!ENTITY pref.scroll_step.title     "Шаг прокрутки страницы">
-<!ENTITY pref.scroll_step.desc      "По умолчанию: 60">
+<!ENTITY pref.scroll_step_lines.title   "Шаг прокрутки страницы">
+<!ENTITY pref.scroll_step_lines.desc    "По умолчанию: 6">
 
 <!ENTITY pref.blur_on_esc.title      "Esc - Убрать фокус">
 <!ENTITY pref.blur_on_esc.desc       "Убрать фокус из текущего поля ввода (напр. адресно строки) при нажатии Esc">
@@ -14,9 +14,5 @@
 <!ENTITY pref.leave_dt_on_esc.title "Оставлять Панель Разработки открытой при нажатии Esc">
 <!ENTITY pref.leave_dt_on_esc.desc  "Не закрывать Панель Разработки, если она открыта в момени нажатия Esc">
 
-<!ENTITY pref.scroll_time.title     "Плавная прокрутка">
-<!ENTITY pref.smooth_time.disabled  "Отключена">
-<!ENTITY pref.smooth_time.fast      "Быстрая">
-<!ENTITY pref.smooth_time.normal    "Нормальная">
-<!ENTITY pref.smooth_time.slow      "Медленная">
-
+<!ENTITY pref.hints_bloom_on.title "Умное распределение маркеров">
+<!ENTITY pref.hints_bloom_on.desc  "Назначать короткие маркеры ссылкам и элементам, которые часто используются">

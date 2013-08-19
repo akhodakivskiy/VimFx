@@ -1,5 +1,5 @@
 .DEFAULT: all
-.PHONY: clean gen zip
+.PHONY: clean lint release
 
 V=@
 
@@ -7,7 +7,6 @@ plugin_archive := VimFx.xpi
 
 coffee_files = extension/bootstrap.coffee
 coffee_files += $(wildcard extension/packages/*.coffee)
-coffee_files += $(wildcard extension/includes/*.coffee)
 
 js_files = $(coffee_files:.coffee=.js)
 
@@ -15,7 +14,22 @@ zip_files = chrome.manifest icon.png install.rdf options.xul resources locale
 zip_files += $(subst extension/,,$(js_files))
 
 all: clean gen zip
-	$(V)echo "Done"
+	$(V)echo "Done dev"
+
+release: clean gen min zip
+	$(V)echo "Done release"
+
+min: say-min $(js_files:.js=.min.js)
+
+say-min:
+	$(V)echo "Minifing js files…"
+
+%.min.js: %.js
+	$(V)uglifyjs $< --screw-ie8 -c -m -o $<
+
+lint:
+	$(V)echo "Running coffeescript lint…"
+	$(V)coffeelint -f lint-config.json $(coffee_files)
 
 zip: $(plugin_archive)
 

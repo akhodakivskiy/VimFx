@@ -3,4 +3,6 @@ locale vimfx pl locale/pl/
 locale vimfx ru locale/ru/
 locale vimfx zh-CN locale/zh-CN/
 locale vimfx hu locale/hu/
+locale vimfx de locale/de/
+locale vimfx el-GR locale/el-GR/
 locale vimfx nl locale/nl/

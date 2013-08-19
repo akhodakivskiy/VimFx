@@ -1,5 +1,7 @@
 # VimFx - Vim keyboard shortcuts for Firefox
 
+![VimFx Logo](https://raw.github.com/akhodakivskiy/VimFx/develop/icon-large.png)
+
 **Extension AMO page**: https://addons.mozilla.org/en-US/firefox/addon/vimfx.
 
 **Mailing list**: [vimfx@librelist.com](mailto:vimfx@librelist.com?subject=Subscribe) (just send an email to subscribe)
@@ -20,6 +22,12 @@ VimFx was inspired by [Vimperator](http://www.vimperator.org/)
 and designed after [Vimium](http://vimium.github.com/) for
 [Google Chrome](https://www.google.com/intl/en/chrome/browser/) preserving the shortcuts and behavior.
 If your are used to Vimium then it will be easy to get started with VimFx.
+
+## Reporting Issues and Contributing
+
+- Please submit bug reports and feature requests in *English*.
+- Please submit cotribution pull requests for `develop` branch only. Pull requests for `master` will be closed. Thank you!
+- Contribute your localization! See `locale` folder.
 
 ## Why VimFx was created
 
@@ -44,7 +52,7 @@ for the most relevant list.
 
 Global shortcut to enable/disable VimFx: `Shift-Alt-v`
 
-### URLs
+### Dealing with URLs
 
     o       Focus the Address Bar
     p       Navigate to the address in the clipboard
@@ -56,8 +64,10 @@ Global shortcut to enable/disable VimFx: `Shift-Alt-v`
     R       Reload current page and all the assets (js, css, etc.)
     ar      Reload pages in all tabs
     aR      Reload pages in all tabs including assets (js, css, img)
+    s       Stop loading current page
+    as      Stop loading pages in all tabs
 
-### Navigating
+### Navigating the Page
 
     gg      Scroll to the Top of the page
     G       Scroll to the Bottom of the page
@@ -70,7 +80,7 @@ Global shortcut to enable/disable VimFx: `Shift-Alt-v`
     c-f     Scroll full Page Down
     c-b     Scroll full Page Up
 
-### Tabs
+### Working with Tabs
 
     t       Open New Blank tab
     J,gT    Go to the Previous tab
@@ -98,6 +108,7 @@ Global shortcut to enable/disable VimFx: `Shift-Alt-v`
     N       Go to the previous Find match
     ?,>     Show Help Dialog
     Esc     Close this dialog and cancel hint markers
+    :       Open Developer Toolbar
 
 ## Contributing and Reporting Issues
 

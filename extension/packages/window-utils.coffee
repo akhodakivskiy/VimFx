@@ -1,3 +1,4 @@
+{ unload } = require 'unload'
 #
 # Waits for a browser window to finish loading before running the callback
 #
@@ -8,13 +9,13 @@
 runOnLoad = (window, callback, winType) ->
   # Listen for one load event before checking the window type
   cb = ->
-    window.removeEventListener "load", arguments.callee, false
+    window.removeEventListener('load', arguments.callee, false)
 
     # Now that the window has loaded, only handle browser windows
-    if window.document.documentElement.getAttribute("windowtype") == winType
-      callback window 
+    if window.document.documentElement.getAttribute('windowtype') == winType
+      callback(window)
 
-  window.addEventListener "load", cb, false
+  window.addEventListener('load', cb, false)
 
 #
 # Add functionality to existing browser windows
@@ -32,8 +33,8 @@ runOnWindows = (callback, winType) ->
   while browserWindows.hasMoreElements()
     # Only run the watcher immediately if the browser is completely loaded
     browserWindow = browserWindows.getNext()
-    if browserWindow.document.readyState == "complete"
-      watcher(browserWindow);
+    if browserWindow.document.readyState == 'complete'
+      watcher(browserWindow)
     # Wait for the window to load before continuing
     else
       runOnLoad(browserWindow, watcher, winType)
@@ -50,18 +51,18 @@ watchWindows = (callback, winType) ->
   watcher = (window) -> try callback(window)
 
   # Add functionality to existing windows
-  runOnWindows callback, winType
+  runOnWindows(callback, winType)
 
   # Watch for new browser windows opening then wait for it to load
   windowWatcher = (subject, topic) ->
-    if topic == "domwindowopened"
-      runOnLoad subject, watcher, winType
+    if topic == 'domwindowopened'
+      runOnLoad(subject, watcher, winType)
 
-  Services.ww.registerNotification windowWatcher
+  Services.ww.registerNotification(windowWatcher)
 
   # Make sure to stop watching for windows if we're unloading
   unload -> Services.ww.unregisterNotification(windowWatcher)
 
-exports.runOnLoad     = runOnLoad
-exports.runOnWindows  = runOnWindows
-exports.watchWindows  = watchWindows
+exports.runOnLoad    = runOnLoad
+exports.runOnWindows = runOnWindows
+exports.watchWindows = watchWindows
