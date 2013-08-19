@@ -1,5 +1,19 @@
 # Change Log
 
+0.5 (Aug 19 2013)
+
+- Added command to focus search bar: `O`
+- Added commands to stop loading current page and all pages: `s` and `as`
+- Invisible elements will not get hint markers
+- Compatibility with Firefox 25
+- Simple shortcut customization with UI in Help dialog
+- Use huffman coding algorithm for hint markers generation which results in shorter links
+- Implemented Bloom filters to achieve shorter hints for those shortcuts that are used often
+- Reimplemented scrolling - now works with pages wihere window is not scrollable
+- Find disabled on non HTML documents
+- Find string is now global for all windows.
+- Fixed logic of locale discovery. Now we rely on general.useragent.locale Firefox preference for current locale
+
 0.4.8 (12 Jun 2013)
 
 - `embed` and `object` tags will now have their own hints
