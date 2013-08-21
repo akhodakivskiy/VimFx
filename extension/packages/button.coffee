@@ -1,7 +1,7 @@
 { getPref
 , setPref }      = require 'prefs'
 { injectHelp }   = require 'help'
-{ commandsHelp } = require 'commands'
+{ commands }     = require 'commands'
 utils            = require 'utils'
 { unload }       = require 'unload'
 { _ }            = require 'l10n'
@@ -125,7 +125,7 @@ createMenupopup = (window) ->
 
   onHelpCommand = (event) ->
     if tabWindow = window.gBrowser.selectedTab.linkedBrowser.contentWindow
-      injectHelp(tabWindow.document, commandsHelp)
+      injectHelp(tabWindow.document, commands)
 
     event.stopPropagation()
 

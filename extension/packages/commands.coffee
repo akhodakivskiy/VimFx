@@ -424,3 +424,4 @@ maybeCommand = (keys) ->
 exports.hintCharHandler = hintCharHandler
 exports.findCommand     = findCommand
 exports.maybeCommand    = maybeCommand
+exports.commands        = commands

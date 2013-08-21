@@ -1,248 +1,247 @@
 /* Copied over from vimium project */
 .VimFxReset {
-    background: none;
-    border: none;
-    /*bottom: auto;*/
-    box-shadow: none;
-    color: WindowText;
-    cursor: auto;
-    display: inline;
-    float: none;
-    font-family: "Helvetica Neue", "Helvetica", "Arial", "Sans";
-    font-size: inherit;
-    font-style: normal;
-    font-variant: normal;
-    font-weight: normal;
-    height: auto;
-    /*left: auto;*/
-    letter-spacing: 0;
-    line-height: 100%;
-    margin: 0;
-    max-height: none;
-    max-width: none;
-    min-height: 0;
-    min-width: 0;
-    opacity: 1;
-    padding: 0;
-    position: static;
-    /*right: auto;*/
-    text-align: left;
-    text-decoration: none;
-    text-indent: 0;
-    text-shadow: none;
-    text-transform: none;
-    /*top: auto;*/
-    vertical-align: baseline;
-    white-space: normal;
-    width: auto;
-    z-index: 99999999;
-    float: none;
+    background: none !important;
+    border: none !important;
+    /*bottom: auto !important;*/
+    box-shadow: none !important;
+    color: WindowText !important;
+    cursor: auto !important;
+    display: inline !important;
+    float: none !important;
+    font-family: "Helvetica Neue", "Helvetica", "Arial", "Sans" !important;
+    font-size: inherit !important;
+    font-style: normal !important;
+    font-variant: normal !important;
+    font-weight: normal !important;
+    height: auto !important;
+    /*left: auto !important;*/
+    letter-spacing: 0 !important;
+    line-height: 100% !important;
+    margin: 0 !important;
+    max-height: none !important;
+    max-width: none !important;
+    min-height: 0 !important;
+    min-width: 0 !important;
+    opacity: 1 !important;
+    padding: 0 !important;
+    position: static !important;
+    /*right: auto !important;*/
+    text-align: left !important;
+    text-decoration: none !important;
+    text-indent: 0 !important;
+    text-shadow: none !important;
+    text-transform: none !important;
+    /*top: auto !important;*/
+    vertical-align: baseline !important;
+    white-space: normal !important;
+    width: auto !important;
+    z-index: 99999999 !important;
+    float: none !important;
 }
 
 /* Find */
 
 input.VimFxNotFound#VimFxFindInput {
-    color: red;
+    color: red !important;
 }
 
 div.VimFxKeySequence {
-    max-width:70px;
-    text-align: right;
-    font-weight:bold;
-    color:#2f508e;
-    white-space: nowrap;
+    max-width:70px !important;
+    text-align: right !important;
+    font-weight:bold !important;
+    color:#2f508e !important;
+    white-space: nowrap !important;
 }
 
 a.VimFxKeyLink {
-    display: inline;
-    background: #777;
-    border: none;
-    color: #fff;
-    cursor: pointer;
-    font-weight: bold;
-    border-radius: 3px;
-    text-shadow: 1px 1px #666;
-    font-size: 75%; 
-    padding: 2px 3px;
+    display: inline !important;
+    background: #777 !important;
+    border: none !important;
+    color: #fff !important;
+    cursor: pointer !important;
+    font-weight: bold !important;
+    border-radius: 3px !important;
+    text-shadow: 1px 1px #666 !important;
+    font-size: 75% !important; 
+    padding: 2px 3px !important;
 }
 
 a.VimFxKeyLink:hover {
-    outline: 3px solid #c55500; 
-    -moz-outline-radius: 6px;
-    background: #c55500;
-    border-radius: 0px;
-    text-decoration: none;
+    outline: 3px solid #c55500 !important; 
+    -moz-outline-radius: 6px !important;
+    background: #c55500 !important;
+    border-radius: 0px !important;
+    text-decoration: none !important;
 }
 
 a.VimFxAddShortcutLink {
-    color: #c55500;
-    cursor: pointer;
-    margin-left: 2px;
+    color: #c55500 !important;
+    cursor: pointer !important;
+    margin-left: 2px !important;
 }
 
 input#VimFxFindInput {
-    position: fixed;
-    bottom: 2px;
-    right: 2px;
-    font-size: 13px;
-    min-width: 200px;
-    background: white;
-    border: solid 1px ThreeDShadow;
-    border-radius: 3px 3px 0 0;
-    padding: 4px 4px 6px;
+    position: fixed !important;
+    bottom: 2px !important;
+    right: 2px !important;
+    font-size: 13px !important;
+    min-width: 200px !important;
+    background: white !important;
+    border: solid 1px ThreeDShadow !important;
+    border-radius: 3px 3px 0 0 !important;
+    padding: 4px 4px 6px !important;
 }
 
 /* Markers */
 
 div.VimFxHintMarker {
-    position: absolute;
-    display: block;
-    white-space: nowrap;
-    overflow: hidden;
-    font-size: 12px;
-    padding: 1px 2px 0 2px;
-    box-shadow: 0 3px 7px 0 rgba(0, 0, 0, 0.3);
-    background-color: #FFD76E;
-    border: solid 1px #E1BA53;
-    border-radius: 2px;
+    position: absolute !important;
+    display: block !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    font-size: 12px !important;
+    padding: 1px 2px 0 2px !important;
+    box-shadow: 0 3px 7px 0 rgba(0, 0, 0, 0.3) !important;
+    background-color: #FFD76E !important;
+    border: solid 1px #E1BA53 !important;
+    border-radius: 2px !important;
 }
 
 div.VimFxHiddenHintMarker > span {
-    display: none;
+    display: none !important;
 }
 
 div.VimFxHintMarker > span {
-    color: #302505;
-    font-family: "Helvetica Neue", "Helvetica", "Arial", "Sans";
-    font-weight: bold;
-    font-size: 12px;
-    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
+    color: #302505 !important;
+    font-family: "Helvetica Neue", "Helvetica", "Arial", "Sans" !important;
+    font-weight: bold !important;
+    font-size: 12px !important;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6) !important;
 }
 
 div.VimFxHintMarker > span.VimFxCharMatch {
-    color: #ffa22a;
+    color: #ffa22a !important;
 }
 
 /* Help Dialog */
 
 div#VimFxHelpDialog {
-    opacity:0.92;
-    background-color: Window;
-    position:fixed;
-    border-radius:3px;
-    padding:15px 30px;
-    width:700px;
-    left:50%;
+    opacity:0.92 !important;
+    background-color: Window !important;
+    position:fixed !important;
+    border-radius:3px !important;
+    padding:15px 30px !important;
+    width:700px !important;
+    left:50% !important;
     /* This needs to be 1/2 width to horizontally center the help dialog */
-    margin-left:-380px;
-    top:30px;
-    box-shadow: rgba(1, 2, 1, 0.4) 0px 0px 6px;
-    overflow-y: auto;
-    z-index:99999998;
-    font-size: 15px;
-    max-height: 80%;
+    margin-left:-380px !important;
+    top:30px !important;
+    box-shadow: rgba(1, 2, 1, 0.4) 0px 0px 6px !important;
+    overflow-y: auto !important;
+    z-index:99999998 !important;
+    font-size: 15px !important;
+    max-height: 80% !important;
 }
 
 div#VimFxHelpDialog .VimFxTitle {
-    font-size: 30px;
-    line-height: 130%;
-    display: block;
-    float: left;
+    font-size: 30px !important;
+    line-height: 130% !important;
+    display: block !important;
+    float: left !important;
 }
 
 div#VimFxHelpDialog .VimFxClearFix {
-    clear: both;
-    float: none;
-    display: block;
-    visibility: hidden;
-    height: 0;
+    clear: both !important;
+    float: none !important;
+    display: block !important;
+    visibility: hidden !important;
+    height: 0 !important;
 }
 
 div#VimFxHelpDialog .VimFxTitleVim {
-    color: darkgreen;
+    color: darkgreen !important;
 }
 
 div#VimFxHelpDialog .VimFxTitleFx {
-    color: darkred;
+    color: darkred !important;
 }
 
 div#VimFxHelpDialog .VimFxVersion {
-    float: right;
-    position: absolute;
-    top: 20px;
-    right: 100px;
-    font-size: 12px;
+    float: right !important;
+    position: absolute !important;
+    top: 20px !important;
+    right: 100px !important;
+    font-size: 12px !important;
 }
 
 div#VimFxHelpDialog .VimFxClose {
-    float: right;
-    font-family: "Helvetica Neue", "Helvetica", "Arial", "Sans";
-    position: absolute;
-    right: 20px;
-    top: 20px;
-    font-size: 20px;
-    cursor: pointer;
+    float: right !important;
+    font-family: "Helvetica Neue", "Helvetica", "Arial", "Sans" !important;
+    position: absolute !important;
+    right: 20px !important;
+    top: 20px !important;
+    font-size: 20px !important;
+    cursor: pointer !important;
 }
 
 div#VimFxHelpDialog .VimFxSocial {
-    float: left;
+    float: left !important;
 }
 
 div#VimFxHelpDialog .VimFxColumn {
-    width: 46%;
-    margin: 0 0 0 8%;
-    float: left;
-
-    margin-bottom: 10px;
+    width: 46% !important;
+    margin: 0 0 0 8% !important;
+    float: left !important;
+    margin-bottom: 10px !important;
 }
 
-div#VimFxHelpDialog .VimFxColumn:first-child
-{    margin: 0;}
+div#VimFxHelpDialog .VimFxColumn:first-child {    
+    margin: 0 !important;
+}
 
 div#VimFxHelpDialog .VimFxSectionTitle {
-    display: block;
-    font-size: 15px;
-    font-weight: bold;
-    line-height: 140%;
-    text-transform: uppercase;
-    margin: 30px 0 10px 0;
+    display: block !important;
+    font-size: 15px !important;
+    font-weight: bold !important;
+    line-height: 140% !important;
+    text-transform: uppercase !important;
+    margin: 30px 0 10px 0 !important;
 
 }
 
 div#VimFxHelpDialog table.VimFxReset {
-    display: table;
-    table-layout: fixed;
+    display: table !important;
+    table-layout: fixed !important;
 }
 
 div#VimFxHelpDialog tr.VimFxReset {
-    display: table-row;
+    display: table-row !important;
 }
 
 div#VimFxHelpDialog td.VimFxReset {
-    display: table-cell;
-    padding-top: 2px;
-    padding-bottom: 4px;
-    line-height: 15px;
-
+    display: table-cell !important;
+    padding-top: 2px !important;
+    padding-bottom: 4px !important;
+    line-height: 15px !important;
 }
 
 div#VimFxHelpDialog .VimFxSocial {
-    margin: 30px 0 0 0;
-    font-size: 12px;
+    margin: 30px 0 0 0 !important;
+    font-size: 12px !important;
 }
 
 div#VimFxHelpDialog .VimFxSocial p {
-    display: block;
-    line-height: 150%;
-    margin: 0 0 5px 0;
+    display: block !important;
+    line-height: 150% !important;
+    margin: 0 0 5px 0 !important;
 }
 
 div#VimFxHelpDialog .VimFxSocial a {
-    text-decoration: underline;
-    color: darkblue;
-    cursor: pointer;
+    text-decoration: underline !important;
+    color: darkblue !important;
+    cursor: pointer !important;
 }
 
 div#VimFxHelpDialog span.VimFxDot {
-    color: #818181;
+    color: #818181 !important;
 }

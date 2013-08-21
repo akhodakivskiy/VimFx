@@ -1,5 +1,10 @@
 # Change Log
 
+0.5.1 (Aug 21 2013)
+
+- Fixed regression with stylesheets
+- Updated icon
+
 0.5 (Aug 19 2013)
 
 - Added command to focus search bar: `O`
