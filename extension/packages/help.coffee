@@ -35,7 +35,7 @@ installHandlers = (document, commands) ->
   promptService = Cc["@mozilla.org/embedcomp/prompt-service;1"].getService(Ci.nsIPromptService);
 
   changeHandler = (event) ->
-    name = event.target.getAttribute('data-name')
+    { name } = event.target.dataset
     cmd = commands.reduce(((m, v) -> if (v.name == name) then v else m), null)
     cmd.enabled(event.target.checked)
 
@@ -45,8 +45,7 @@ installHandlers = (document, commands) ->
   removeHandler = (event) ->
     event.preventDefault()
     event.stopPropagation()
-    key = event.target.getAttribute('data-key')
-    name = event.target.getAttribute('data-command')
+    { command: name, key } = event.target.dataset
     if cmd = commands.reduce(((m, v) -> if (v.name == name) then v else m), null)
       title = _('help_remove_shortcut_title')
       text = _('help_remove_shortcut_text')
@@ -54,29 +53,66 @@ installHandlers = (document, commands) ->
         cmd.keys(cmd.keys().filter((a) -> a != key))
         event.target.parentNode.removeChild(event.target)
 
-  for a in document.getElementsByClassName('VimFxKeyLink')
-    a.addEventListener('click', removeHandler)
+  editHandler = (event) ->
+    { command: name, key } = event.target.dataset
+    # Spaces are not allowed (might have been pasted in for example)
+    valueDisplay = event.target.value.replace(/\ /g, '')
+    value = (valueDisplay.match(/(?:[ac]-)?./g) or []).join(',')
+
+    if value == key
+      return
+
+    if cmd = commands.reduce(((m, v) -> if (v.name == name) then v else m), null)
+      keys = cmd.keys()
+      pos = keys.indexOf(key)
+      if value is ''
+        keys.splice(pos, 1)
+        event.target.parentNode.removeChild(event.target)
+      else
+        if pos == -1
+          keys.push(value)
+        else
+          keys[pos] = value
+        event.target.value = valueDisplay
+        event.target.dataset.key = value
+        autoResize(event.target)
+      cmd.keys(keys)
+
+  autoResize = (element)->
+    element.style.width = "#{ element.value.length + 0.3 }ch"
+  resizingHandler = (event) ->
+    autoResize(event.target)
+  blurOnEnter = (event) ->
+    enter = 13
+    if event.keyCode == enter
+      event.target.blur()
+  filterChars = (event) ->
+    space = 32
+    disallowedChars = [space]
+    if event.keyCode in disallowedChars
+      event.preventDefault()
+
+  prepareInput = (input) ->
+    input.addEventListener('input', resizingHandler)
+    input.addEventListener('blur', editHandler)
+    input.addEventListener('keydown', blurOnEnter)
+    input.addEventListener('keydown', filterChars)
+    autoResize(input)
+
+  for input in document.getElementsByClassName('VimFxKeyLink')
+    prepareInput(input)
 
   addHandler = (event) ->
     event.preventDefault()
     event.stopPropagation()
-    name = event.target.getAttribute('data-command')
+    name = event.target.dataset.command
     if cmd = commands.reduce(((m, v) -> if (v.name == name) then v else m), null)
-      title = _('help_add_shortcut_title')
-      text = _('help_add_shortcut_text')
-      value = { value: null }
-      check = { value: null }
-      if promptService.prompt(document.defaultView, title, text, value, null, check)
-        if commands.filter((c) => c.keys().indexOf(value.value) != -1).length > 0
-          textError = _('help_add_shortcut_text_already_exists')
-          promptService.alert(document.defaultView, title, textError)
-        else
-          cmd.keys(cmd.keys().concat(value.value))
-          for div in document.getElementsByClassName('VimFxKeySequence')
-            if div.getAttribute('data-command') == cmd.name
-              node = utils.parseHTML(document, hint(cmd, value.value))
-              node.querySelector('a').addEventListener('click', removeHandler)
-              div.appendChild(node)
+      div = document.querySelector(".VimFxKeySequence[data-command='#{name}']")
+      node = utils.parseHTML(document, hint(cmd, ''))
+      input = node.querySelector('input')
+      prepareInput(input)
+      div.appendChild(node)
+      input.focus()
 
   for a in document.getElementsByClassName('VimFxAddShortcutLink')
     a.addEventListener('click', addHandler, false)
@@ -86,8 +122,8 @@ td = (text, klass='') ->
 
 hint = (cmd, key) ->
   keyDisplay = key.replace(/,/g, '')
-  """<a href="#" class="VimFxReset VimFxKeyLink" title="#{ _('help_remove_shortcut') }"
-          data-command="#{ cmd.name }" data-key="#{ key }">#{ keyDisplay }</a>"""
+  """<input type="text" class="VimFxReset VimFxKeyLink"
+          data-command="#{ cmd.name }" data-key="#{ key }" value="#{ keyDisplay }" />"""
 
 tr = (cmd) ->
   checked = if cmd.enabled() then 'checked' else null
