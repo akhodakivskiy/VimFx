@@ -44,8 +44,7 @@ installHandlers = (document, commands) ->
 
   editHandler = (event) ->
     { command: name, key } = event.target.dataset
-    # Spaces are not allowed (might have been pasted in for example)
-    valueDisplay = event.target.value.replace(/\ /g, '')
+    valueDisplay = event.target.value
     value = (valueDisplay.match(/(?:[ac]-)?./g) or []).join(',')
 
     if value == key
@@ -70,17 +69,17 @@ installHandlers = (document, commands) ->
   # NOTE: _Live_ list!
   keyLinks = document.getElementsByClassName('VimFxKeyLink')
 
-  checkConflicts = (input) ->
+  checkConflicts = (baseInput) ->
     allOk = true
-    if input.value != ''
-      for foo in keyLinks when foo != input and foo.value != ''
-        if foo.value.startsWith(input.value) or input.value.startsWith(foo.value)
+    if baseInput.value != ''
+      for input in keyLinks when input != baseInput and input.value != ''
+        if input.value.startsWith(baseInput.value) or baseInput.value.startsWith(input.value)
           allOk = false
-          foo.classList.add('VimFxKeyConflict')
+          input.classList.add('VimFxKeyConflict')
     if allOk
-      input.classList.remove('VimFxKeyConflict')
+      baseInput.classList.remove('VimFxKeyConflict')
     else
-      input.classList.add('VimFxKeyConflict')
+      baseInput.classList.add('VimFxKeyConflict')
 
   conflictsHandler = (event) ->
     # NOTE: `.getElementsByClassName` cannot be used, since it returns a _live_ list
@@ -92,23 +91,30 @@ installHandlers = (document, commands) ->
   autoResize = (element)->
     # `0.3` is simply to make the element look better.
     element.style.width = "#{ element.value.length + 0.3 }ch"
+
   resizingHandler = (event) ->
     autoResize(event.target)
+
   blurOnEnter = (event) ->
     enter = 13
     if event.keyCode == enter
       event.target.blur()
-  filterChars = (event) ->
-    space = 32
-    disallowedChars = [space]
-    if event.keyCode in disallowedChars
-      event.preventDefault()
+
+  filterChars = do ->
+    disallowedChars = /[ ]/g
+    return (event) ->
+      { value } = event.target
+      match = value.match(disallowedChars)
+      if match
+        { selectionStart, selectionEnd } = event.target
+        event.target.value = value.replace(disallowedChars, '')
+        event.target.setSelectionRange(selectionStart - match.length, selectionEnd - match.length)
 
   prepareInput = (input) ->
+    input.addEventListener('input', filterChars)
     input.addEventListener('input', resizingHandler)
     input.addEventListener('blur', editHandler)
     input.addEventListener('keydown', blurOnEnter)
-    input.addEventListener('keydown', filterChars)
     input.addEventListener('input', conflictsHandler)
     autoResize(input)
     checkConflicts(input)
