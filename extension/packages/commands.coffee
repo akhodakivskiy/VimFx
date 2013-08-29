@@ -280,19 +280,22 @@ command_Esc = (vim) ->
   activeElement = vim.window.document.activeElement
   if utils.isElementEditable(activeElement)
     activeElement.blur()
+    blurred = true
 
   #Remove Find input
-  find.removeFind(vim.window.document)
+  removedFind = find.removeFind(vim.window.document)
 
   # Remove hints
-  hints.removeHints(vim.window.document)
+  removedHints = hints.removeHints(vim.window.document)
 
   # Hide help dialog
-  help.removeHelp(vim.window.document)
+  if not (blurred or removedFind or removedHints)
+    help.removeHelp(vim.window.document)
 
   # Finally enter normal mode
   vim.enterNormalMode()
 
+  # Close developer toolbar
   if not getPref('leave_dt_on_esc')
     if chromeWindow = utils.getRootWindow(vim.window)
       chromeWindow.DeveloperToolbar.hide()
