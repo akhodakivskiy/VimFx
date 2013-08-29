@@ -47,9 +47,6 @@ installHandlers = (document, commands) ->
     valueDisplay = event.target.value
     value = (valueDisplay.match(/(?:[ac]-)?./g) or []).join(',')
 
-    if value == key
-      return
-
     if cmd = commands.reduce(((m, v) -> if (v.name == name) then v else m), null)
       keys = cmd.keys()
       pos = keys.indexOf(key)
