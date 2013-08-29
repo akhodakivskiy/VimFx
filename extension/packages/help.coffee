@@ -5,6 +5,7 @@ prefs = require 'prefs'
 { classes: Cc, interfaces: Ci, utils: Cu } = Components
 
 CONTAINER_ID = 'VimFxHelpDialogContainer'
+MODIFIER = /[ac]-./g
 
 removeHelp = (document) ->
   if div = document.getElementById(CONTAINER_ID)
@@ -42,41 +43,46 @@ installHandlers = (document, commands) ->
   for cb in document.getElementsByClassName('VimFxKeyCheckbox')
     cb.addEventListener('change', changeHandler)
 
-  editHandler = (event) ->
-    { command: name, key } = event.target.dataset
-    valueDisplay = event.target.value
-    value = (valueDisplay.match(/(?:[ac]-)?./g) or []).join(',')
+  editHandler = do ->
+    token = /// #{ MODIFIER.source } | .  ///g
+    return (event) ->
+      { command: name, key } = event.target.dataset
+      valueDisplay = event.target.value
+      value = (valueDisplay.match(token) or []).join(',')
 
-    if cmd = commands.reduce(((m, v) -> if (v.name == name) then v else m), null)
-      keys = cmd.keys()
-      pos = keys.indexOf(key)
-      if value is ''
-        keys.splice(pos, 1)
-        event.target.parentNode.removeChild(event.target)
-      else
-        if pos == -1
-          keys.push(value)
+      if cmd = commands.reduce(((m, v) -> if (v.name == name) then v else m), null)
+        keys = cmd.keys()
+        pos = keys.indexOf(key)
+        if value is ''
+          keys.splice(pos, 1)
+          event.target.parentNode.removeChild(event.target)
         else
-          keys[pos] = value
-        event.target.value = valueDisplay
-        event.target.dataset.key = value
-        autoResize(event.target)
-      cmd.keys(keys)
+          if pos == -1
+            keys.push(value)
+          else
+            keys[pos] = value
+          event.target.value = valueDisplay
+          event.target.dataset.key = value
+          autoResize(event.target)
+        cmd.keys(keys)
 
-  # NOTE: _Live_ list!
-  keyLinks = document.getElementsByClassName('VimFxKeyLink')
+  checkConflicts = do ->
+    keyLinks = document.getElementsByClassName('VimFxKeyLink') # NOTE: _Live_ list!
+    escapeModifiers = (value) -> return value.replace(MODIFIER, ' $&')
 
-  checkConflicts = (baseInput) ->
-    allOk = true
-    if baseInput.value != ''
-      for input in keyLinks when input != baseInput and input.value != ''
-        if input.value.startsWith(baseInput.value) or baseInput.value.startsWith(input.value)
-          allOk = false
-          input.classList.add('VimFxKeyConflict')
-    if allOk
-      baseInput.classList.remove('VimFxKeyConflict')
-    else
-      baseInput.classList.add('VimFxKeyConflict')
+    return (baseInput) ->
+      allOk = true
+      if baseInput.value != ''
+        baseValue = escapeModifiers(baseInput.value)
+        for input in keyLinks when input != baseInput and input.value != ''
+          value = escapeModifiers(input.value)
+          if value.startsWith(baseValue) or baseValue.startsWith(value)
+            allOk = false
+            input.classList.add('VimFxKeyConflict')
+      if allOk
+        baseInput.classList.remove('VimFxKeyConflict')
+      else
+        baseInput.classList.add('VimFxKeyConflict')
 
   conflictsHandler = (event) ->
     # NOTE: `.getElementsByClassName` cannot be used, since it returns a _live_ list
@@ -116,8 +122,8 @@ installHandlers = (document, commands) ->
     autoResize(input)
     checkConflicts(input)
 
-  for inputSafe in keyLinks
-    prepareInput(inputSafe)
+  for input in document.getElementsByClassName('VimFxKeyLink')
+    prepareInput(input)
 
   addHandler = (event) ->
     event.preventDefault()
