@@ -45,7 +45,7 @@ input.VimFxNotFound#VimFxFindInput {
     color: red !important;
 }
 
-div.VimFxKeySequence {
+.VimFxKeySequence {
     max-width:70px !important;
     text-align: right !important;
     font-weight:bold !important;
@@ -54,7 +54,9 @@ div.VimFxKeySequence {
 }
 
 .VimFxKeyLink {
-    display: inline !important;
+    float: right !important;
+    margin-right: 4px !important;
+    margin-top: 4px !important;
     background: #777 !important;
     border: none !important;
     color: #fff !important;
@@ -227,8 +229,9 @@ div#VimFxHelpDialog tr.VimFxReset {
 
 div#VimFxHelpDialog td.VimFxReset {
     display: table-cell !important;
-    padding-top: 2px !important;
-    padding-bottom: 4px !important;
+    /*padding-top: 2px !important;*/
+    /*padding-bottom: 4px !important;*/
+    vertical-align: middle !important;
     line-height: 15px !important;
 }
 

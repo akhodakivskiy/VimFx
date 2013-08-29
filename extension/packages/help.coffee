@@ -127,11 +127,11 @@ installHandlers = (document, commands) ->
     event.stopPropagation()
     name = event.target.dataset.command
     if cmd = commands.reduce(((m, v) -> if (v.name == name) then v else m), null)
-      div = document.querySelector(".VimFxKeySequence[data-command='#{name}']")
+      parent = document.querySelector("tr[data-command='#{name}'] .VimFxKeySequence")
       node = utils.parseHTML(document, hint(cmd, ''))
       input = node.querySelector('input')
       prepareInput(input)
-      div.appendChild(node)
+      parent.appendChild(node)
       input.focus()
 
   for a in document.getElementsByClassName('VimFxAddShortcutLink')
@@ -142,16 +142,12 @@ td = (text, klass='') ->
 
 hint = (cmd, key) ->
   keyDisplay = key.replace(/,/g, '')
-  """<input type="text" class="VimFxReset VimFxKeyLink"
+  """<input type="text" class="VimFxReset VimFxKeyLink" maxlength="10"
           data-command="#{ cmd.name }" data-key="#{ key }" value="#{ keyDisplay }" />"""
 
 tr = (cmd) ->
   checked = if cmd.enabled() then 'checked' else null
-  hints = """
-    <div class="VimFxKeySequence" data-command="#{ cmd.name }">
-      #{ (hint(cmd, key) for key in cmd.keys()).join('\n') }
-    </div>
-  """
+  hints = (hint(cmd, key) for key in cmd.keys()).join('\n')
   dot = """<span class="VimFxReset VimFxDot">&#8729;</span>"""
   cb = """<input type="checkbox" class="VimFxReset VimFxKeyCheckbox" data-name="#{ cmd.name }" #{ checked }></input>"""
   a = """#{ cmd.help() }"""
@@ -161,8 +157,8 @@ tr = (cmd) ->
   """
 
   return """
-    <tr class="VimFxReset">
-        #{ td(hints) }
+    <tr class="VimFxReset" data-command="#{ cmd.name }">
+        #{ td(hints, 'VimFxKeySequence') }
         #{ td(add) }
         #{ td(dot) }
         #{ td(cb) }
