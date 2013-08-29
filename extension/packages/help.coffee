@@ -42,17 +42,6 @@ installHandlers = (document, commands) ->
   for cb in document.getElementsByClassName('VimFxKeyCheckbox')
     cb.addEventListener('change', changeHandler)
 
-  removeHandler = (event) ->
-    event.preventDefault()
-    event.stopPropagation()
-    { command: name, key } = event.target.dataset
-    if cmd = commands.reduce(((m, v) -> if (v.name == name) then v else m), null)
-      title = _('help_remove_shortcut_title')
-      text = _('help_remove_shortcut_text')
-      if promptService.confirm(document.defaultView, title, text)
-        cmd.keys(cmd.keys().filter((a) -> a != key))
-        event.target.parentNode.removeChild(event.target)
-
   editHandler = (event) ->
     { command: name, key } = event.target.dataset
     # Spaces are not allowed (might have been pasted in for example)
@@ -78,7 +67,30 @@ installHandlers = (document, commands) ->
         autoResize(event.target)
       cmd.keys(keys)
 
+  # NOTE: _Live_ list!
+  keyLinks = document.getElementsByClassName('VimFxKeyLink')
+
+  checkConflicts = (input) ->
+    allOk = true
+    if input.value != ''
+      for foo in keyLinks when foo != input and foo.value != ''
+        if foo.value.startsWith(input.value) or input.value.startsWith(foo.value)
+          allOk = false
+          foo.classList.add('VimFxKeyConflict')
+    if allOk
+      input.classList.remove('VimFxKeyConflict')
+    else
+      input.classList.add('VimFxKeyConflict')
+
+  conflictsHandler = (event) ->
+    # NOTE: `.getElementsByClassName` cannot be used, since it returns a _live_ list
+    # and `checkConflicts` might alter it.
+    for input in document.querySelectorAll('.VimFxKeyConflict')
+      checkConflicts(input)
+    checkConflicts(event.target)
+
   autoResize = (element)->
+    # `0.3` is simply to make the element look better.
     element.style.width = "#{ element.value.length + 0.3 }ch"
   resizingHandler = (event) ->
     autoResize(event.target)
@@ -97,10 +109,12 @@ installHandlers = (document, commands) ->
     input.addEventListener('blur', editHandler)
     input.addEventListener('keydown', blurOnEnter)
     input.addEventListener('keydown', filterChars)
+    input.addEventListener('input', conflictsHandler)
     autoResize(input)
+    checkConflicts(input)
 
-  for input in document.getElementsByClassName('VimFxKeyLink')
-    prepareInput(input)
+  for inputSafe in keyLinks
+    prepareInput(inputSafe)
 
   addHandler = (event) ->
     event.preventDefault()
@@ -137,7 +151,7 @@ tr = (cmd) ->
   a = """#{ cmd.help() }"""
   add = """
     <a href="#" data-command="#{ cmd.name }"
-        class="VimFxReset VimFxAddShortcutLink" title="#{ _('help_add_shortcut') }">&#8862;</a>
+        class="VimFxReset VimFxAddShortcutLink">&#8862;</a>
   """
 
   return """

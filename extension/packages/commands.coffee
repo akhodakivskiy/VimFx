@@ -304,7 +304,7 @@ class Command
       try @keyValues = JSON.parse(getPref(@prefName('keys')))
     else
       @keyValues = keys
-  
+
   # Check if this command may match given string if more chars are added
   mayMatch: (value) ->
     return @keys.reduce(((m, v) -> m or v.indexOf(value) == 0), false)
@@ -376,7 +376,7 @@ commands = [
   new Command('browse', 'follow_in_tab',          command_follow_in_tab,          ['F'])
   new Command('browse', 'back',                   command_back,                   ['H'])
   new Command('browse', 'forward',                command_forward,                ['L'])
-  
+
   new Command('misc',   'find',                   command_find,                   ['/'])
   new Command('misc',   'find_hl',                command_find_hl,                ['a,/'])
   new Command('misc',   'find_next',              command_find_next,              ['n'])

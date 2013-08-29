@@ -77,6 +77,10 @@ div.VimFxKeySequence {
     text-decoration: none !important;
 }
 
+.VimFxKeyLink.VimFxKeyConflict {
+    background: red !important;
+}
+
 a.VimFxAddShortcutLink {
     color: #c55500 !important;
     cursor: pointer !important;
