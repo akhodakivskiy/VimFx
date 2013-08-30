@@ -5,7 +5,6 @@ prefs = require 'prefs'
 { classes: Cc, interfaces: Ci, utils: Cu } = Components
 
 CONTAINER_ID = 'VimFxHelpDialogContainer'
-MODIFIER = /[ac]-./g
 
 removeHelp = (document) ->
   if div = document.getElementById(CONTAINER_ID)
@@ -32,13 +31,6 @@ injectHelp = (document, commands) ->
         removeHelp(document)
       button.addEventListener('click', clickHandler, false)
 
-getValueDisplay = (value) ->
-  return \
-    if /^.(?:,.)*$/.test(value)
-      [ value.split('').filter((char, index) -> return index % 2 == 0).join(''), false ]
-    else
-      [ value, true ]
-
 installHandlers = (document, commands) ->
   promptService = Cc["@mozilla.org/embedcomp/prompt-service;1"].getService(Ci.nsIPromptService);
 
@@ -50,21 +42,9 @@ installHandlers = (document, commands) ->
   for cb in document.getElementsByClassName('VimFxKeyCheckbox')
     cb.addEventListener('change', changeHandler)
 
-  focusHandler = (event) ->
-    if event.target.classList.contains('VimFxKeyLiteral')
-      return
-    { selectionStart } = event.target
-    event.target.value = event.target.dataset.key
-    autoResize(event.target)
-    event.target.selectionStart = event.target.selectionEnd = Math.max(selectionStart * 2 - 1, 0)
-    event.target.classList.add('VimFxKeyLiteral')
-
   editHandler = (event) ->
     { command: name, key } = event.target.dataset
-    value = event.target.value.replace(/,$/, '')
-    [ valueDisplay, literal ] = getValueDisplay(value)
-    if not literal
-      event.target.classList.remove('VimFxKeyLiteral')
+    value = event.target.value.trim()
 
     if cmd = commands.reduce(((m, v) -> if (v.name == name) then v else m), null)
       keys = cmd.keys()
@@ -77,35 +57,23 @@ installHandlers = (document, commands) ->
           keys.push(value)
         else
           keys[pos] = value
-        event.target.value = valueDisplay
+        event.target.value = value
         event.target.dataset.key = value
         autoResize(event.target)
       cmd.keys(keys)
 
   checkConflicts = do ->
     keyLinks = document.getElementsByClassName('VimFxKeyLink') # NOTE: _Live_ list!
-    getValue = (input) ->
-      value =
-        if document.activeElement == input
-          input.value
-        else
-          input.dataset.key
-      return value
-    token = /,(?:[acm]-)?.[^,]*/g
     startsWith = (a, b) ->
-      aParts = (",#{a}").match(token)
-      bParts = (",#{b}").match(token)
+      aParts = a.trim().split(/\s+/)
+      bParts = b.trim().split(/\s+/)
       return bParts.every((part, index) -> return part == aParts[index])
 
     return (baseInput) ->
       allOk = true
-      baseValue = getValue(baseInput)
-      if baseValue != ''
-        for input in keyLinks when input != baseInput
-          value = getValue(input)
-          if value == ''
-            continue
-          if startsWith(value, baseValue) or startsWith(baseValue, value)
+      if baseInput.value != ''
+        for input in keyLinks when input != baseInput and input.value != ''
+          if startsWith(input.value, baseInput.value) or startsWith(baseInput.value, input.value)
             allOk = false
             input.classList.add('VimFxKeyConflict')
       if allOk
@@ -121,7 +89,7 @@ installHandlers = (document, commands) ->
     checkConflicts(event.target)
 
   autoResize = (element)->
-    # `0.3` is simply to make the element look better.
+    # `0.3` is simply to make the element look better
     element.style.width = "#{ element.value.length + 0.3 }ch"
 
   resizingHandler = (event) ->
@@ -133,17 +101,16 @@ installHandlers = (document, commands) ->
       event.target.blur()
 
   filterChars = do ->
-    disallowedChars = /[ ]/g
+    disallowedChars = /\ (?= )/g
     return (event) ->
       { value } = event.target
-      match = value.match(disallowedChars)
-      if match
+      newValue = value.replace(disallowedChars, '')
+      if newValue != value
         { selectionStart } = event.target
-        event.target.value = value.replace(disallowedChars, '')
-        event.target.selectionStart = event.target.selectionEnd = selectionStart - match.length
+        event.target.value = newValue
+        event.target.selectionStart = event.target.selectionEnd = selectionStart - (value.length - newValue.length)
 
   prepareInput = (input) ->
-    input.addEventListener('focus', focusHandler)
     input.addEventListener('input', filterChars)
     input.addEventListener('input', resizingHandler)
     input.addEventListener('blur', editHandler)
@@ -174,9 +141,8 @@ td = (text, klass='') ->
   """<td class="VimFxReset #{ klass }">#{ text }</td>"""
 
 hint = (cmd, key) ->
-  [ keyDisplay, literal ] = getValueDisplay(key)
-  """<input type="text" class="VimFxReset VimFxKeyLink #{ if literal then 'VimFxKeyLiteral' else '' }" maxlength="10"
-          data-command="#{ cmd.name }" data-key="#{ key }" value="#{ keyDisplay }" />"""
+  """<input type="text" class="VimFxReset VimFxKeyLink" maxlength="10"
+          data-command="#{ cmd.name }" data-key="#{ key }" value="#{ key }" />"""
 
 tr = (cmd) ->
   checked = if cmd.enabled() then 'checked' else null
