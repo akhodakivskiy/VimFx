@@ -83,6 +83,10 @@ input.VimFxNotFound#VimFxFindInput {
     background: red !important;
 }
 
+.VimFxKeyLink.VimFxKeyLiteral {
+    font-style: italic !important;
+}
+
 a.VimFxAddShortcutLink {
     color: #c55500 !important;
     cursor: pointer !important;
