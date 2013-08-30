@@ -1,9 +1,9 @@
 <!ENTITY pref.hint_chars.title      "Χαρακτήρες Δεικτών">
-<!ENTITY pref.hint_chars.desc       "Προεπιλογή: asdfgercvhjkl;uinm">
+<!ENTITY pref.hint_chars.desc       "Προεπιλογή: fjdkslaghrueiwovncm">
 
 <!ENTITY pref.black_list.title      "Μαύρη Λίστα">
-<!ENTITY pref.black_list.desc       "Διευθύνσης διαχωρισμένες με κόμματα στις οποίες το VimFX θα είναι αυτόματα απενεργοποιημένο. 
-Wildcards allowed: *, !">
+<!ENTITY pref.black_list.desc       "Διευθύνσης διαχωρισμένες με κόμματα στις οποίες το VimFX θα είναι αυτόματα απενεργοποιημένο.
+Wildcards allowed: *, !. Προεπιλογή: *mail.google.com*">
 
 <!ENTITY pref.scroll_step_lines.title "Βήμα Κύλισης">
 <!ENTITY pref.scroll_step_lines.desc  "Βήμα Κύλισης">

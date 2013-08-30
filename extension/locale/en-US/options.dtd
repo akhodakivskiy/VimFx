@@ -1,9 +1,9 @@
 <!ENTITY pref.hint_chars.title      "Hint Chars">
-<!ENTITY pref.hint_chars.desc       "Default: fjdksla;ghrueiwovncm">
+<!ENTITY pref.hint_chars.desc       "Default: fjdkslaghrueiwovncm">
 
 <!ENTITY pref.black_list.title      "Black List">
 <!ENTITY pref.black_list.desc       "Comma separated list of URL where VimFx should be automatically disabled.
-Wildcards allowed: *, !">
+Wildcards allowed: *, !. Default: *mail.google.com*">
 
 <!ENTITY pref.scroll_step_lines.title "Scroll Step">
 <!ENTITY pref.scroll_step_lines.desc  "Scroll Step">

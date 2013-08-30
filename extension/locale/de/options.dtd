@@ -1,8 +1,8 @@
 <!ENTITY pref.hint_chars.title      "Zeichen für Hinweise">
-<!ENTITY pref.hint_chars.desc       "Voreinstellung: asdfgercvhjkl;uinm">
+<!ENTITY pref.hint_chars.desc       "Voreinstellung: fjdkslaghrueiwovncm">
 
 <!ENTITY pref.black_list.title      "Schwarze Liste">
-<!ENTITY pref.black_list.desc       "Durch Komma getrennte Liste von URLs für die VimFx automatisch deaktiviert werden soll. Erlaubte Wildcard-Zeichen: *, !">
+<!ENTITY pref.black_list.desc       "Durch Komma getrennte Liste von URLs für die VimFx automatisch deaktiviert werden soll. Erlaubte Wildcard-Zeichen: *, !. Voreinstellung: *mail.google.com*">
 
 <!ENTITY pref.scroll_step_lines.title     "Scroll-Schrittweite">
 <!ENTITY pref.scroll_step_lines.desc      "Scroll-Schrittweite">
