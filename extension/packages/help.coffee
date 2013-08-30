@@ -12,67 +12,158 @@ removeHelp = (document) ->
 
 injectHelp = (document, commands) ->
   if document.documentElement
-    if div = document.getElementById(CONTAINER_ID)
-      div.parentNode.removeChild(div)
-    div = document.createElement 'div'
-    div.id = CONTAINER_ID
-    div.className = 'VimFxReset'
+    removeHelp(document)
+    container = utils.parseHTML(document, helpDialogHtml(commands) )
+    installHandlers(document, container.querySelector('*'), commands)
+    document.documentElement.appendChild(container)
 
-    div.appendChild(utils.parseHTML(document, helpDialogHtml(commands)))
 
-    document.documentElement.appendChild(div)
+helpDialogHtml = (commands) ->
+  return """
+    <div id="#{ CONTAINER_ID }" class="VimFxReset">
+      <div id="VimFxHelpDialog" class="VimFxReset">
+        <div class="VimFxReset VimFxHeader">
+          <div class="VimFxReset VimFxTitle">
+            <span class="VimFxReset VimFxTitleVim">Vim</span><span class="VimFxReset VimFxTitleFx">Fx</span>
+            <span class="VimFxReset">#{ _('help') }</span>
+          </div>
+          <span class="VimFxReset VimFxVersion">#{ _('help_version') } #{ utils.getVersion() }</span>
+          <a class="VimFxReset VimFxClose" id="VimFxClose" href="#">&#10006;</a>
+          <div class="VimFxReset VimFxClearFix"></div>
+        </div>
 
-    installHandlers(document, commands)
+        <div class="VimFxReset VimFxBody">
+          <div class="VimFxReset VimFxColumn">
+            #{ section('urls',   commands) }
+            #{ section('nav',    commands) }
+          </div>
+          <div class="VimFxReset VimFxColumn">
+            #{ section('tabs',   commands) }
+            #{ section('browse', commands) }
+            #{ section('misc',   commands) }
+          </div>
+          <div class="VimFxReset VimFxClearFix"></div>
+        </div>
 
-    if button = document.getElementById('VimFxClose')
-      clickHandler = (event) ->
-        event.stopPropagation()
-        event.preventDefault()
-        removeHelp(document)
-      button.addEventListener('click', clickHandler, false)
+        <div class="VimFxReset VimFxFooter">
+          <div class="VimFxReset VimFxSocial">
+            <p class="VimFxReset">
+              #{ _('help_found_bug') }
+              <a class="VimFxReset" target="_blank" href="https://github.com/akhodakivskiy/VimFx/issues">
+                #{ _('help_report_bug') }
+              </a>
+            </p>
+            <p class="VimFxReset">
+              #{ _('help_enjoying') }
+              <a class="VimFxReset" target="_blank" href="https://addons.mozilla.org/en-US/firefox/addon/vimfx/">
+                #{ _('help_feedback') }
+              </a>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+    """
 
-installHandlers = (document, commands) ->
-  promptService = Cc["@mozilla.org/embedcomp/prompt-service;1"].getService(Ci.nsIPromptService);
+section = (name, commands) ->
+  return """
+    <div class="VimFxReset VimFxSectionTitle">#{ _("help_section_#{name}") }</div>
+    #{ table(commands.filter((command) -> command.group == name)) }
+    """
 
-  changeHandler = (event) ->
-    { name } = event.target.dataset
-    cmd = commands.reduce(((m, v) -> if (v.name == name) then v else m), null)
-    cmd.enabled(event.target.checked)
+table = (commands) ->
+  return """
+    <table class="VimFxReset">
+      #{ (tr(command) for command in commands).join('') }
+    </table>
+    """
 
-  for cb in document.getElementsByClassName('VimFxKeyCheckbox')
-    cb.addEventListener('change', changeHandler)
+tr = (command) ->
+  enabled = if command.enabled() then 'checked' else ''
+  hints = (hint(command, key) for key in command.keys()).join('\n')
+  addButton = """
+    <button data-command="#{ command.name }"
+        class="VimFxReset VimFxAddShortcut">&#8862;</button>
+    """
+  dot = """<span class="VimFxReset VimFxDot">&#8729;</span>"""
+  checkbox = """
+    <input type="checkbox" class="VimFxReset VimFxKeyCheckbox"
+      data-name="#{ command.name }" #{ enabled }></input>
+    """
+  description = command.help()
 
-  editHandler = (event) ->
-    { command: name, key } = event.target.dataset
-    value = event.target.value.trim()
+  return """
+    <tr class="VimFxReset" data-command="#{ command.name }">
+        #{ td(hints, 'VimFxKeySequence') }
+        #{ td(addButton) }
+        #{ td(dot) }
+        #{ td(checkbox) }
+        #{ td(description) }
+    </tr>
+    """
 
-    if cmd = commands.reduce(((m, v) -> if (v.name == name) then v else m), null)
-      keys = cmd.keys()
-      pos = keys.indexOf(key)
-      if value is ''
-        keys.splice(pos, 1)
-        event.target.parentNode.removeChild(event.target)
+td = (text, klass='') ->
+  return """<td class="VimFxReset #{ klass }">#{ text }</td>"""
+
+hint = (command, key) ->
+  return """
+    <input type="text" class="VimFxReset VimFxKey" maxlength="10"
+      data-command="#{ command.name }" data-key="#{ key }" value="#{ key }" />
+    """
+
+
+installHandlers = (document, container, commands) ->
+  delegate = utils.delegate.bind(undefined, document)
+
+  getCommand = (name) ->
+    break for command in commands when command.name == name
+    return command
+
+
+  closeHelp = (event) ->
+    event.stopPropagation()
+    event.preventDefault()
+    removeHelp(document)
+  container.querySelector('#VimFxClose').addEventListener('click', closeHelp, false)
+
+  checkboxHandler = (checkbox, event) ->
+    { name } = checkbox.dataset
+    command = getCommand(name)
+    command.enabled(checkbox.checked)
+
+  delegate('change', 'VimFxKeyCheckbox', checkboxHandler)
+
+
+  editHandler = (input, event) ->
+    { command: name, key } = input.dataset
+    value = input.value.trim()
+
+    command = getCommand(name)
+    keys = command.keys()
+    pos = keys.indexOf(key)
+    if value is ''
+      keys.splice(pos, 1)
+      input.parentNode.removeChild(input)
+    else
+      if pos == -1
+        keys.push(value)
       else
-        if pos == -1
-          keys.push(value)
-        else
-          keys[pos] = value
-        event.target.value = value
-        event.target.dataset.key = value
-        autoResize(event.target)
-      cmd.keys(keys)
+        keys[pos] = value
+      input.value = input.dataset.key = value
+      autoResize(input)
+    command.keys(keys)
 
   checkConflicts = do ->
-    keyLinks = document.getElementsByClassName('VimFxKeyLink') # NOTE: _Live_ list!
+    keys = container.getElementsByClassName('VimFxKey') # NOTE: _Live_ list!
     startsWith = (a, b) ->
       aParts = a.trim().split(/\s+/)
       bParts = b.trim().split(/\s+/)
-      return bParts.every((part, index) -> return part == aParts[index])
+      return bParts.every((part, index) -> part == aParts[index])
 
     return (baseInput) ->
       allOk = true
       if baseInput.value != ''
-        for input in keyLinks when input != baseInput and input.value != ''
+        for input in keys when input != baseInput and input.value != ''
           if startsWith(input.value, baseInput.value) or startsWith(baseInput.value, input.value)
             allOk = false
             input.classList.add('VimFxKeyConflict')
@@ -81,147 +172,57 @@ installHandlers = (document, commands) ->
       else
         baseInput.classList.add('VimFxKeyConflict')
 
-  conflictsHandler = (event) ->
+  conflictsHandler = (targetInput, event) ->
     # NOTE: `.getElementsByClassName` cannot be used, since it returns a _live_ list
-    # and `checkConflicts` might alter it.
-    for input in document.querySelectorAll('.VimFxKeyConflict')
+    # and `checkConflicts` might alter it
+    for input in container.querySelectorAll('.VimFxKeyConflict')
       checkConflicts(input)
-    checkConflicts(event.target)
+    checkConflicts(targetInput)
 
   autoResize = (element)->
     # `0.3` is simply to make the element look better
     element.style.width = "#{ element.value.length + 0.3 }ch"
 
-  resizingHandler = (event) ->
-    autoResize(event.target)
-
-  blurOnEnter = (event) ->
+  blurOnEnter = (input, event) ->
     enter = 13
     if event.keyCode == enter
-      event.target.blur()
+      input.blur()
 
   filterChars = do ->
     disallowedChars = /\ (?= )/g
-    return (event) ->
-      { value } = event.target
+    return (input, event) ->
+      { value } = input
       newValue = value.replace(disallowedChars, '')
       if newValue != value
-        { selectionStart } = event.target
-        event.target.value = newValue
-        event.target.selectionStart = event.target.selectionEnd = selectionStart - (value.length - newValue.length)
+        { selectionStart } = input
+        input.value = newValue
+        input.selectionStart = input.selectionEnd = selectionStart - (value.length - newValue.length)
 
-  prepareInput = (input) ->
-    input.addEventListener('input', filterChars)
-    input.addEventListener('input', resizingHandler)
-    input.addEventListener('blur', editHandler)
-    input.addEventListener('keydown', blurOnEnter)
-    input.addEventListener('input', conflictsHandler)
+  delegate('input',   'VimFxKey', filterChars)
+  delegate('input',   'VimFxKey', autoResize)
+  delegate('blur',    'VimFxKey', editHandler)
+  delegate('keydown', 'VimFxKey', blurOnEnter)
+  delegate('input',   'VimFxKey', conflictsHandler)
+
+  for input in container.getElementsByClassName('VimFxKey')
     autoResize(input)
     checkConflicts(input)
 
-  for input in document.getElementsByClassName('VimFxKeyLink')
-    prepareInput(input)
 
-  addHandler = (event) ->
+  addHandler = (addButton, event) ->
     event.preventDefault()
     event.stopPropagation()
-    name = event.target.dataset.command
-    if cmd = commands.reduce(((m, v) -> if (v.name == name) then v else m), null)
-      parent = document.querySelector("tr[data-command='#{name}'] .VimFxKeySequence")
-      node = utils.parseHTML(document, hint(cmd, ''))
-      input = node.querySelector('input')
-      prepareInput(input)
-      parent.appendChild(node)
-      input.focus()
+    name = addButton.dataset.command
+    command = getCommand(name)
+    parent = container.querySelector("tr[data-command='#{name}'] .VimFxKeySequence")
+    node = utils.parseHTML(document, hint(command, ''))
+    input = node.querySelector('*')
+    autoResize(input)
+    parent.appendChild(node)
+    input.focus()
 
-  for a in document.getElementsByClassName('VimFxAddShortcutLink')
-    a.addEventListener('click', addHandler, false)
+  delegate('click', 'VimFxAddShortcut', addHandler)
 
-td = (text, klass='') ->
-  """<td class="VimFxReset #{ klass }">#{ text }</td>"""
-
-hint = (cmd, key) ->
-  """<input type="text" class="VimFxReset VimFxKeyLink" maxlength="10"
-          data-command="#{ cmd.name }" data-key="#{ key }" value="#{ key }" />"""
-
-tr = (cmd) ->
-  checked = if cmd.enabled() then 'checked' else null
-  hints = (hint(cmd, key) for key in cmd.keys()).join('\n')
-  dot = """<span class="VimFxReset VimFxDot">&#8729;</span>"""
-  cb = """<input type="checkbox" class="VimFxReset VimFxKeyCheckbox" data-name="#{ cmd.name }" #{ checked }></input>"""
-  a = """#{ cmd.help() }"""
-  add = """
-    <a href="#" data-command="#{ cmd.name }"
-        class="VimFxReset VimFxAddShortcutLink">&#8862;</a>
-  """
-
-  return """
-    <tr class="VimFxReset" data-command="#{ cmd.name }">
-        #{ td(hints, 'VimFxKeySequence') }
-        #{ td(add) }
-        #{ td(dot) }
-        #{ td(cb) }
-        #{ td(a) }
-    </tr>
-  """
-
-table = (commands) ->
-  """
-  <table class="VimFxReset">
-    #{ (tr(cmd) for cmd in commands).join('') }
-  </table>
-  """
-
-section = (title, commands) ->
-  """
-  <div class="VimFxReset VimFxSectionTitle">#{ title }</div>
-  #{ table(commands) }
-  """
-
-helpDialogHtml = (commands) ->
-  return """
-  <div id="VimFxHelpDialog" class="VimFxReset">
-    <div class="VimFxReset VimFxHeader">
-      <div class="VimFxReset VimFxTitle">
-        <span class="VimFxReset VimFxTitleVim">Vim</span><span class="VimFxReset VimFxTitleFx">Fx</span>
-        <span class="VimFxReset">#{ _('help') }</span>
-      </div>
-      <span class="VimFxReset VimFxVersion">#{ _('help_version') } #{ utils.getVersion() }</span>
-      <a class="VimFxReset VimFxClose" id="VimFxClose" href="#">&#10006;</a>
-      <div class="VimFxReset VimFxClearFix"></div>
-    </div>
-
-    <div class="VimFxReset VimFxBody">
-      <div class="VimFxReset VimFxColumn">
-        #{ section(_('help_section_urls'),    commands.filter((a) -> a.group == 'urls')) }
-        #{ section(_('help_section_nav'),     commands.filter((a) -> a.group == 'nav')) }
-      </div>
-      <div class="VimFxReset VimFxColumn">
-        #{ section(_('help_section_tabs'),    commands.filter((a) -> a.group == 'tabs')) }
-        #{ section(_('help_section_browse'),  commands.filter((a) -> a.group == 'browse')) }
-        #{ section(_('help_section_misc'),    commands.filter((a) -> a.group == 'misc')) }
-      </div>
-      <div class="VimFxReset VimFxClearFix"></div>
-    </div>
-
-    <div class="VimFxReset VimFxFooter">
-      <div class="VimFxReset VimFxSocial">
-        <p class="VimFxReset">
-          #{ _('help_found_bug') }
-          <a class="VimFxReset" target="_blank" href="https://github.com/akhodakivskiy/VimFx/issues">
-            #{ _('help_report_bug') }
-          </a>
-        </p>
-        <p class="VimFxReset">
-          #{ _('help_enjoying') }
-          <a class="VimFxReset" target="_blank" href="https://addons.mozilla.org/en-US/firefox/addon/vimfx/">
-            #{ _('help_feedback') }
-          </a>
-        </p>
-      </div>
-    </div>
-  </div>
-  """
 
 exports.injectHelp = injectHelp
 exports.removeHelp = removeHelp

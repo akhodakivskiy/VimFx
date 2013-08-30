@@ -45,50 +45,6 @@ input.VimFxNotFound#VimFxFindInput {
     color: red !important;
 }
 
-.VimFxKeySequence {
-    max-width:70px !important;
-    text-align: right !important;
-    font-weight:bold !important;
-    color:#2f508e !important;
-    white-space: nowrap !important;
-}
-
-.VimFxKeyLink {
-    float: right !important;
-    margin-right: 4px !important;
-    margin-top: 4px !important;
-    background: #777 !important;
-    border: none !important;
-    color: #fff !important;
-    cursor: text !important;
-    font-weight: bold !important;
-    border-radius: 3px !important;
-    text-shadow: 1px 1px #666 !important;
-    font-size: 75% !important;
-    padding: 2px 3px !important;
-    font-family: Consolas, "Andale Mono WT", "Andale Mono", "Lucida Console", "Lucida Sans Typewriter", "DejaVu Sans Mono", "Bitstream Vera Sans Mono", "Liberation Mono", "Nimbus Mono L", Monaco, "Courier New", Courier, monospace !important; /* http://www.sitepoint.com/eight-definitive-font-stacks-2/ */
-    font-size-adjust: 0.491 !important; /* http://www.cs.tut.fi/~jkorpela/x-height.html */
-}
-
-.VimFxKeyLink:hover,
-.VimFxKeyLink:focus {
-    outline: 3px solid #c55500 !important;
-    -moz-outline-radius: 6px !important;
-    background: #c55500 !important;
-    border-radius: 0px !important;
-    text-decoration: none !important;
-}
-
-.VimFxKeyLink.VimFxKeyConflict {
-    background: red !important;
-}
-
-a.VimFxAddShortcutLink {
-    color: #c55500 !important;
-    cursor: pointer !important;
-    margin-left: 2px !important;
-}
-
 input#VimFxFindInput {
     position: fixed !important;
     bottom: 2px !important;
@@ -134,7 +90,7 @@ div.VimFxHintMarker > span.VimFxCharMatch {
 
 /* Help Dialog */
 
-div#VimFxHelpDialog {
+#VimFxHelpDialog {
     opacity:0.92 !important;
     background-color: Window !important;
     position:fixed !important;
@@ -152,14 +108,14 @@ div#VimFxHelpDialog {
     max-height: 80% !important;
 }
 
-div#VimFxHelpDialog .VimFxTitle {
+#VimFxHelpDialog .VimFxTitle {
     font-size: 30px !important;
     line-height: 130% !important;
     display: block !important;
     float: left !important;
 }
 
-div#VimFxHelpDialog .VimFxClearFix {
+#VimFxHelpDialog .VimFxClearFix {
     clear: both !important;
     float: none !important;
     display: block !important;
@@ -167,15 +123,15 @@ div#VimFxHelpDialog .VimFxClearFix {
     height: 0 !important;
 }
 
-div#VimFxHelpDialog .VimFxTitleVim {
+#VimFxHelpDialog .VimFxTitleVim {
     color: darkgreen !important;
 }
 
-div#VimFxHelpDialog .VimFxTitleFx {
+#VimFxHelpDialog .VimFxTitleFx {
     color: darkred !important;
 }
 
-div#VimFxHelpDialog .VimFxVersion {
+#VimFxHelpDialog .VimFxVersion {
     float: right !important;
     position: absolute !important;
     top: 20px !important;
@@ -183,7 +139,7 @@ div#VimFxHelpDialog .VimFxVersion {
     font-size: 12px !important;
 }
 
-div#VimFxHelpDialog .VimFxClose {
+#VimFxHelpDialog .VimFxClose {
     float: right !important;
     font-family: "Helvetica Neue", "Helvetica", "Arial", "Sans" !important;
     position: absolute !important;
@@ -193,22 +149,22 @@ div#VimFxHelpDialog .VimFxClose {
     cursor: pointer !important;
 }
 
-div#VimFxHelpDialog .VimFxSocial {
+#VimFxHelpDialog .VimFxSocial {
     float: left !important;
 }
 
-div#VimFxHelpDialog .VimFxColumn {
+#VimFxHelpDialog .VimFxColumn {
     width: 46% !important;
     margin: 0 0 0 8% !important;
     float: left !important;
     margin-bottom: 10px !important;
 }
 
-div#VimFxHelpDialog .VimFxColumn:first-child {
+#VimFxHelpDialog .VimFxColumn:first-child {
     margin: 0 !important;
 }
 
-div#VimFxHelpDialog .VimFxSectionTitle {
+#VimFxHelpDialog .VimFxSectionTitle {
     display: block !important;
     font-size: 15px !important;
     font-weight: bold !important;
@@ -218,16 +174,16 @@ div#VimFxHelpDialog .VimFxSectionTitle {
 
 }
 
-div#VimFxHelpDialog table.VimFxReset {
+#VimFxHelpDialog table.VimFxReset {
     display: table !important;
     table-layout: fixed !important;
 }
 
-div#VimFxHelpDialog tr.VimFxReset {
+#VimFxHelpDialog tr.VimFxReset {
     display: table-row !important;
 }
 
-div#VimFxHelpDialog td.VimFxReset {
+#VimFxHelpDialog td.VimFxReset {
     display: table-cell !important;
     /*padding-top: 2px !important;*/
     /*padding-bottom: 4px !important;*/
@@ -235,23 +191,67 @@ div#VimFxHelpDialog td.VimFxReset {
     line-height: 15px !important;
 }
 
-div#VimFxHelpDialog .VimFxSocial {
+#VimFxHelpDialog .VimFxSocial {
     margin: 30px 0 0 0 !important;
     font-size: 12px !important;
 }
 
-div#VimFxHelpDialog .VimFxSocial p {
+#VimFxHelpDialog .VimFxSocial p {
     display: block !important;
     line-height: 150% !important;
     margin: 0 0 5px 0 !important;
 }
 
-div#VimFxHelpDialog .VimFxSocial a {
+#VimFxHelpDialog .VimFxSocial a {
     text-decoration: underline !important;
     color: darkblue !important;
     cursor: pointer !important;
 }
 
-div#VimFxHelpDialog span.VimFxDot {
+#VimFxHelpDialog .VimFxDot {
     color: #818181 !important;
+}
+
+#VimFxHelpDialog .VimFxKeySequence {
+    max-width:70px !important;
+    text-align: right !important;
+    font-weight:bold !important;
+    color:#2f508e !important;
+    white-space: nowrap !important;
+}
+
+#VimFxHelpDialog .VimFxKey {
+    float: right !important;
+    margin-right: 4px !important;
+    margin-top: 4px !important;
+    background: #777 !important;
+    border: none !important;
+    color: #fff !important;
+    cursor: text !important;
+    font-weight: bold !important;
+    border-radius: 3px !important;
+    text-shadow: 1px 1px #666 !important;
+    font-size: 75% !important;
+    padding: 2px 3px !important;
+    font-family: Consolas, "Andale Mono WT", "Andale Mono", "Lucida Console", "Lucida Sans Typewriter", "DejaVu Sans Mono", "Bitstream Vera Sans Mono", "Liberation Mono", "Nimbus Mono L", Monaco, "Courier New", Courier, monospace !important; /* http://www.sitepoint.com/eight-definitive-font-stacks-2/ */
+    font-size-adjust: 0.491 !important; /* http://www.cs.tut.fi/~jkorpela/x-height.html */
+}
+
+#VimFxHelpDialog .VimFxKey:hover,
+#VimFxHelpDialog .VimFxKey:focus {
+    outline: 3px solid #c55500 !important;
+    -moz-outline-radius: 6px !important;
+    background: #c55500 !important;
+    border-radius: 0px !important;
+    text-decoration: none !important;
+}
+
+#VimFxHelpDialog .VimFxKey.VimFxKeyConflict {
+    background: red !important;
+}
+
+#VimFxHelpDialog .VimFxAddShortcut {
+    color: #c55500 !important;
+    cursor: pointer !important;
+    margin-left: 2px !important;
 }

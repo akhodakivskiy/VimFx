@@ -218,6 +218,14 @@ parseHTML = (document, html) ->
   flags = parser.SanitizerAllowStyle
   return parser.parseFragment(html, flags, false, null, document.documentElement)
 
+delegate = (element, eventName, className, fn) ->
+  handler = (event) ->
+    { target } = event
+    # console.expand {element, eventName, className, fn, target, classList: target.classList}
+    return unless target.classList?.contains(className)
+    fn(target, event)
+  element.addEventListener(eventName, handler, true)
+
 # Uses nsIIOService to parse a string as a URL and find out if it is a URL
 isURL = (str) ->
   try
@@ -288,6 +296,7 @@ exports.timeIt                  = timeIt
 exports.isBlacklisted           = isBlacklisted
 exports.getVersion              = getVersion
 exports.parseHTML               = parseHTML
+exports.delegate                = delegate
 exports.isURL                   = isURL
 exports.browserSearchSubmission = browserSearchSubmission
 exports.getHintChars            = getHintChars
