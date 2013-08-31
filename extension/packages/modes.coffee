@@ -2,7 +2,7 @@ utils = require 'utils'
 hints = require 'hints'
 
 mode_hints =
-  enter: (vim, storage, markers, cb) ->
+  enter: (vim, storage, [ markers, cb ]) ->
     storage.markers = markers
     storage.cb = cb
 
@@ -10,6 +10,10 @@ mode_hints =
     if utils.getHintChars().search(utils.regexpEscape(keyStr)) > -1
       @hintCharHandler(vim, storage, keyStr)
       return true
+
+  onEnterNormalMode: (vim, storage) ->
+    hints.removeHints(vim.window.document)
+    storage.markers = storage.cb = undefined
 
   # Processes the char, updates and hides/shows markers
   hintCharHandler: (vim, storage, keyStr) ->
@@ -30,10 +34,6 @@ mode_hints =
             cb(marker)
             vim.enterNormalMode()
             break
-
-  onEnterNormalMode: (vim, storage) ->
-    hints.removeHints(vim.window.document)
-    storage.markers = storage.cb = undefined
 
 modes =
   hints: mode_hints

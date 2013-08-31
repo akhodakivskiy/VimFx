@@ -17,9 +17,11 @@ class Vim
     for name of @modes
       @storage.modes[name] = {}
 
-  enterMode: (mode, args...) ->
+  enterMode: (mode, args) ->
+    # Note: `args` is an array of arguments to be passed to the mode's `enter` method. We cannot use
+    # `args...`, since that destroys the `this` context for the mode's `enter` method.
     @mode = mode
-    @modes[mode].enter(this, @storage.modes[mode], args...)
+    @modes[mode].enter(this, @storage.modes[mode], args)
 
   enterNormalMode: ->
     for name, mode of @modes
