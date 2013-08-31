@@ -34,7 +34,7 @@
     /*top: auto !important;*/
     vertical-align: baseline !important;
     white-space: normal !important;
-    /*width: auto !important;*/
+    width: auto !important;
     z-index: 99999999 !important;
     float: none !important;
 }

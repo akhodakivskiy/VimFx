@@ -181,7 +181,7 @@ installHandlers = (document, container, commands) ->
 
   autoResize = (element)->
     # `0.3` is simply to make the element look better
-    element.style.width = "#{ element.value.length + 0.3 }ch"
+    element.style.setProperty('width', "#{ element.value.length + 0.3 }ch", 'important')
 
   blurOnEnter = (input, event) ->
     enter = 13
