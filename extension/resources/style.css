@@ -62,12 +62,12 @@ a.VimFxKeyLink {
     font-weight: bold !important;
     border-radius: 3px !important;
     text-shadow: 1px 1px #666 !important;
-    font-size: 75% !important; 
+    font-size: 75% !important;
     padding: 2px 3px !important;
 }
 
 a.VimFxKeyLink:hover {
-    outline: 3px solid #c55500 !important; 
+    outline: 3px solid #c55500 !important;
     -moz-outline-radius: 6px !important;
     background: #c55500 !important;
     border-radius: 0px !important;
@@ -184,10 +184,6 @@ div#VimFxHelpDialog .VimFxClose {
     cursor: pointer !important;
 }
 
-div#VimFxHelpDialog .VimFxSocial {
-    float: left !important;
-}
-
 div#VimFxHelpDialog .VimFxColumn {
     width: 46% !important;
     margin: 0 0 0 8% !important;
@@ -195,7 +191,7 @@ div#VimFxHelpDialog .VimFxColumn {
     margin-bottom: 10px !important;
 }
 
-div#VimFxHelpDialog .VimFxColumn:first-child {    
+div#VimFxHelpDialog .VimFxColumn:first-child {
     margin: 0 !important;
 }
 
@@ -225,18 +221,19 @@ div#VimFxHelpDialog td.VimFxReset {
     line-height: 15px !important;
 }
 
-div#VimFxHelpDialog .VimFxSocial {
-    margin: 30px 0 0 0 !important;
+div#VimFxHelpDialog .VimFxFooter {
+    float: left !important;
+    margin-top: 30px !important;
     font-size: 12px !important;
 }
 
-div#VimFxHelpDialog .VimFxSocial p {
+div#VimFxHelpDialog .VimFxFooter p {
     display: block !important;
     line-height: 150% !important;
-    margin: 0 0 5px 0 !important;
+    margin-bottom: 5px !important;
 }
 
-div#VimFxHelpDialog .VimFxSocial a {
+div#VimFxHelpDialog .VimFxFooter a {
     text-decoration: underline !important;
     color: darkblue !important;
     cursor: pointer !important;

@@ -80,7 +80,7 @@ injectMarkers = (document) ->
         if rect = getElementRect(element)
           marker = new Marker(element)
 
-          marker.setPosition(rect)
+          marker.setPosition(rect.top, rect.left)
           fragment.appendChild(marker.markerElement)
 
           marker.weight = rect.area * marker.calcBloomRating()

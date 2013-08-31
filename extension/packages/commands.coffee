@@ -304,7 +304,7 @@ class Command
       try @keyValues = JSON.parse(getPref(@prefName('keys')))
     else
       @keyValues = keys
-  
+
   # Check if this command may match given string if more chars are added
   mayMatch: (value) ->
     return @keys.reduce(((m, v) -> m or v.indexOf(value) == 0), false)
@@ -376,7 +376,7 @@ commands = [
   new Command('browse', 'follow_in_tab',          command_follow_in_tab,          ['F'])
   new Command('browse', 'back',                   command_back,                   ['H'])
   new Command('browse', 'forward',                command_forward,                ['L'])
-  
+
   new Command('misc',   'find',                   command_find,                   ['/'])
   new Command('misc',   'find_hl',                command_find_hl,                ['a,/'])
   new Command('misc',   'find_next',              command_find_next,              ['n'])
@@ -389,6 +389,10 @@ commands = [
 # Called in hints mode. Will process the char, update and hide/show markers
 hintCharHandler = (vim, keyStr) ->
   if keyStr
+    if keyStr == 'Space'
+      rotateOverlappingMarkers(vim.markers)
+      return
+
     # Get char and escape it to avoid problems with String.search
     key = utils.regexpEscape(keyStr)
 
@@ -420,6 +424,58 @@ maybeCommand = (keys) ->
       for key in cmd.keys()
         if key.indexOf(str) == 0 and cmd.enabled()
           return true
+
+# Finds all stacks of markers that overlap each other (by using `getStackFromIndex`) (#1), and
+# rotates their `z-index`:es (#2), thus alternating which markers are visible.
+rotateOverlappingMarkers = (originalMarkers) ->
+  # Shallow working copy. This is necessary since `markers` will be mutated and eventually empty.
+  markers = originalMarkers[..]
+
+  # (#1)
+  markers.sort(getStackFromIndex.sort)
+  stacks = (getStackFromIndex(markers, 0) while markers.length > 0)
+
+  # (#2)
+  # Stacks of length 1 don't participate in any overlapping, and can therefore be skipped.
+  for stack in stacks when stack.length > 1
+    firstZIndex = stack[0].markerElement.style.zIndex
+    for marker, index in stack
+      nextMarker = stack[index+1]
+      nextZIndex = nextMarker?.markerElement.style.zIndex ? firstZIndex
+      marker.markerElement.style.setProperty('z-index', nextZIndex, 'important')
+
+  null
+
+# Get an array containing the marker M at `index` and all markers after `index` that overlap M, or
+# are overlapped by M, if any, which is called a "stack". All markers in the returned stack are
+# spliced out from `markers`, thus mutating it. `markers` must be sorted by `getStackFromIndex.sort`
+getStackFromIndex = (markers, index) ->
+  stack = []
+  [ marker ] = markers.splice(index, 1)
+  if marker
+    stack.push(marker)
+
+    { top, left } = marker.position
+    { offsetHeight: height, offsetWidth: width } = marker.markerElement
+    while index < markers.length
+      nextMarker = markers[index]
+
+      cannotOverlapVertically = (nextMarker.position.top > top + height )
+      break if cannotOverlapVertically # Since the `markers` are sorted, no more markers can overlap
+
+      overlapsHorizontally = (left <= nextMarker.position.left <= left + width)
+      if overlapsHorizontally # and vertically, implicitly
+        # Also get all markers overlapping this one
+        stack = stack.concat(getStackFromIndex(markers, index))
+      else
+        # Continue the search
+        index++
+
+  return stack
+
+# Sorts markers after their top position, and then after their left position, ascending.
+getStackFromIndex.sort = (a, b) ->
+  return a.position.top - b.position.top or a.position.left - b.position.left
 
 exports.hintCharHandler = hintCharHandler
 exports.findCommand     = findCommand
