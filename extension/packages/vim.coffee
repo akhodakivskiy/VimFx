@@ -1,67 +1,78 @@
-utils = require 'utils'
-
-commands = require 'commands'
-
-{ getPref
-, isCommandDisabled
-} = require 'prefs'
-
-MODE_NORMAL = 1
-MODE_HINTS  = 2
+MODE_NORMAL = {}
 
 class Vim
-  @findStr = ''
-
-  constructor: (@window) ->
+  constructor: ({ @window, @commands, @modes, @esc }) ->
     @mode       = MODE_NORMAL
     @keys       = []
     @lastKeyStr = null
-    @markers    = undefined
-    @cb         = undefined
-    @findRng    = null
     @suppress   = false
 
-    Object.defineProperty(this, 'findStr',
-      get: -> return Vim.findStr
-      set: (value) -> Vim.findStr = value
-    )
+    @storage =
+      commands: {}
+      modes: {}
 
-  enterHintsMode: (@markers, @cb) ->
-    @mode = MODE_HINTS
+    for { name } in @commands
+      @storage.commands[name] = {}
 
-  # TODO: This function should probably remove
-  # hint markers (if they are present) as well
+    for name of @modes
+      @storage.modes[name] = {}
+
+  enterMode: (mode, args...) ->
+    @mode = mode
+    @modes[mode].enter(this, @storage.modes[mode], args...)
+
   enterNormalMode: ->
+    for name, mode of @modes
+      mode.onEnterNormalMode?(this, @storage.modes[name])
     @mode = MODE_NORMAL
-    @markers = @cb = undefined
 
   handleKeyDown: (event, keyStr) ->
     @suppress = true
-    if @mode == MODE_NORMAL || keyStr == 'Esc'
+    if @mode == MODE_NORMAL or keyStr == @esc
       @keys.push(keyStr)
       @lastKeyStr = keyStr
-      if command = commands.findCommand(@keys)
-        command.func(@)
-        return command.name != 'Esc'
-      else if commands.maybeCommand(@keys)
+      if command = @findCommand(@keys)
+        command.func(this, @storage.commands[command.name])
+        return command.name != @esc
+      else if @maybeCommand(@keys)
         return true
       else
         @keys.length = 0
-    else if @mode == MODE_HINTS and not (event.ctrlKey or event.metaKey)
-      if utils.getHintChars().search(utils.regexpEscape(keyStr)) > -1
-        commands.hintCharHandler(@, keyStr)
-        return true
+    else if not (event.ctrlKey or event.metaKey)
+      @modes[@mode].handleKeyDown(this, @storage.modes[@mode], event, keyStr)
 
     @suppress = false
     @keys.length = 0
     return false
 
-  handleKeyPress: (event, keyStr) ->
-    return @lastKeyStr != 'Esc' and @suppress
+  handleKeyPress: (event) ->
+    return @lastKeyStr != @esc and @suppress
 
   handleKeyUp: (event) ->
-    sup = @suppress
+    suppress = @suppress
     @suppress = false
-    return @lastKeyStr != 'Esc' and sup
+    return @lastKeyStr != @esc and suppress
+
+  findCommand: (keys) ->
+    for i in [0...keys.length]
+      str = keys[i..].join(',')
+      for command in @commands
+        for key in command.keys()
+          if key == str and command.enabled()
+            return command
+
+  maybeCommand: (keys) ->
+    for i in [0...keys.length]
+      str = keys[i..].join(',')
+      for command in @commands
+        for key in command.keys()
+          if key.indexOf(str) == 0 and command.enabled()
+            return true
+
+# What is minimally required for a command
+class Vim.Command
+  constructor: (@keyValues, @name) ->
+  keys: -> return @keyValues
+  enabled: -> return true
 
 exports.Vim = Vim
