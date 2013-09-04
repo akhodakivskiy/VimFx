@@ -44,9 +44,12 @@ MARKABLE_ELEMENT_PROPERTIES = [
 removeHints = (document) ->
   if container = document.getElementById(CONTAINER_ID)
     document.documentElement.removeChild(container)
+    removedHints = true
 
   for frame in document.defaultView.frames
-    removeHints(frame.document)
+    removedHintsInFrame = removeHints(frame.document)
+
+  return removedHints or removedHintsInFrame
 
 
 # Like `injectMarkers`, but also sets hints for the markers

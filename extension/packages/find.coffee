@@ -42,9 +42,12 @@ injectFind = (document, cb) ->
 removeFind = (document, clear = true) ->
   if div = document.getElementById(CONTAINER_ID)
     document.documentElement.removeChild(div)
+    removedFind = true
 
   if clear
     clearSelection(document.defaultView)
+
+  return removedFind
 
 getStartFindRng = (window) ->
   controller = getController(window)

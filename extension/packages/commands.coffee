@@ -280,19 +280,22 @@ command_Esc = (vim) ->
   activeElement = vim.window.document.activeElement
   if utils.isElementEditable(activeElement)
     activeElement.blur()
+    blurred = true
 
   #Remove Find input
-  find.removeFind(vim.window.document)
+  removedFind = find.removeFind(vim.window.document)
 
   # Remove hints
-  hints.removeHints(vim.window.document)
+  removedHints = hints.removeHints(vim.window.document)
 
   # Hide help dialog
-  help.removeHelp(vim.window.document)
+  if not (blurred or removedFind or removedHints)
+    help.removeHelp(vim.window.document)
 
   # Finally enter normal mode
   vim.enterNormalMode()
 
+  # Close developer toolbar
   if not getPref('leave_dt_on_esc')
     if chromeWindow = utils.getRootWindow(vim.window)
       chromeWindow.DeveloperToolbar.hide()
@@ -304,7 +307,7 @@ class Command
       try @keyValues = JSON.parse(getPref(@prefName('keys')))
     else
       @keyValues = keys
-  
+
   # Check if this command may match given string if more chars are added
   mayMatch: (value) ->
     return @keys.reduce(((m, v) -> m or v.indexOf(value) == 0), false)
@@ -340,17 +343,17 @@ commands = [
   new Command('urls',   'focus_search',           command_focus_search,           ['O'])
   new Command('urls',   'paste',                  command_paste,                  ['p'])
   new Command('urls',   'paste_tab',              command_paste_tab,              ['P'])
-  new Command('urls',   'marker_yank',            command_marker_yank,            ['y,f'])
-  new Command('urls',   'marker_focus',           command_marker_focus,           ['v,f'])
-  new Command('urls',   'yank',                   command_yank,                   ['y,y'])
+  new Command('urls',   'marker_yank',            command_marker_yank,            ['y f'])
+  new Command('urls',   'marker_focus',           command_marker_focus,           ['v f'])
+  new Command('urls',   'yank',                   command_yank,                   ['y y'])
   new Command('urls',   'reload',                 command_reload,                 ['r'])
   new Command('urls',   'reload_force',           command_reload_force,           ['R'])
-  new Command('urls',   'reload_all',             command_reload_all,             ['a,r'])
-  new Command('urls',   'reload_all_force',       command_reload_all_force,       ['a,R'])
+  new Command('urls',   'reload_all',             command_reload_all,             ['a r'])
+  new Command('urls',   'reload_all_force',       command_reload_all_force,       ['a R'])
   new Command('urls',   'stop',                   command_stop,                   ['s'])
-  new Command('urls',   'stop_all',               command_stop_all,               ['a,s'])
+  new Command('urls',   'stop_all',               command_stop_all,               ['a s'])
 
-  new Command('nav',    'scroll_to_top',          command_scroll_to_top ,         ['g,g'])
+  new Command('nav',    'scroll_to_top',          command_scroll_to_top ,         ['g g'])
   new Command('nav',    'scroll_to_bottom',       command_scroll_to_bottom,       ['G'])
   new Command('nav',    'scroll_down',            command_scroll_down,            ['j', 'c-e'])
   new Command('nav',    'scroll_up',              command_scroll_up,              ['k', 'c-y'])
@@ -362,13 +365,13 @@ commands = [
   new Command('nav',    'scroll_page_up',         command_scroll_page_up,         ['c-b'])
 
   new Command('tabs',   'open_tab',               command_open_tab,               ['t'])
-  new Command('tabs',   'tab_prev',               command_tab_prev,               ['J', 'g,T'])
-  new Command('tabs',   'tab_next',               command_tab_next,               ['K', 'g,t'])
+  new Command('tabs',   'tab_prev',               command_tab_prev,               ['J', 'g T'])
+  new Command('tabs',   'tab_next',               command_tab_next,               ['K', 'g t'])
   new Command('tabs',   'tab_move_left',          command_tab_move_left,          ['c-J'])
   new Command('tabs',   'tab_move_right',         command_tab_move_right,         ['c-K'])
-  new Command('tabs',   'home',                   command_home,                   ['g,h'])
-  new Command('tabs',   'tab_first',              command_tab_first,              ['g,H', 'g,\^'])
-  new Command('tabs',   'tab_last',               command_tab_last,               ['g,L', 'g,$'])
+  new Command('tabs',   'home',                   command_home,                   ['g h'])
+  new Command('tabs',   'tab_first',              command_tab_first,              ['g H', 'g \^'])
+  new Command('tabs',   'tab_last',               command_tab_last,               ['g L', 'g $'])
   new Command('tabs',   'close_tab',              command_close_tab,              ['x'])
   new Command('tabs',   'restore_tab',            command_restore_tab,            ['X'])
 
@@ -376,9 +379,9 @@ commands = [
   new Command('browse', 'follow_in_tab',          command_follow_in_tab,          ['F'])
   new Command('browse', 'back',                   command_back,                   ['H'])
   new Command('browse', 'forward',                command_forward,                ['L'])
-  
+
   new Command('misc',   'find',                   command_find,                   ['/'])
-  new Command('misc',   'find_hl',                command_find_hl,                ['a,/'])
+  new Command('misc',   'find_hl',                command_find_hl,                ['a /'])
   new Command('misc',   'find_next',              command_find_next,              ['n'])
   new Command('misc',   'find_prev',              command_find_prev,              ['N'])
   new Command('misc',   'help',                   command_help,                   ['?'])
@@ -407,7 +410,7 @@ hintCharHandler = (vim, keyStr) ->
 
 findCommand = (keys) ->
   for i in [0...keys.length]
-    str = keys[i..].join(',')
+    str = keys[i..].join(' ')
     for cmd in commands
       for key in cmd.keys()
         if key == str and cmd.enabled()
@@ -415,7 +418,7 @@ findCommand = (keys) ->
 
 maybeCommand = (keys) ->
   for i in [0...keys.length]
-    str = keys[i..].join(',')
+    str = keys[i..].join(' ')
     for cmd in commands
       for key in cmd.keys()
         if key.indexOf(str) == 0 and cmd.enabled()
