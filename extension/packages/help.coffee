@@ -113,7 +113,7 @@ hint = (command, key) ->
 
 
 installHandlers = (document, container, commands) ->
-  delegate = utils.delegate.bind(undefined, document)
+  delegate = utils.delegate.bind(undefined, container)
 
   getCommand = (name) ->
     break for command in commands when command.name == name

@@ -34,7 +34,7 @@
     /*top: auto !important;*/
     vertical-align: baseline !important;
     white-space: normal !important;
-    width: auto !important;
+    /*width: auto !important;*/
     z-index: 99999999 !important;
     float: none !important;
 }
@@ -235,6 +235,7 @@ div.VimFxHintMarker > span.VimFxCharMatch {
     padding: 2px 3px !important;
     font-family: Consolas, "Andale Mono WT", "Andale Mono", "Lucida Console", "Lucida Sans Typewriter", "DejaVu Sans Mono", "Bitstream Vera Sans Mono", "Liberation Mono", "Nimbus Mono L", Monaco, "Courier New", Courier, monospace !important; /* http://www.sitepoint.com/eight-definitive-font-stacks-2/ */
     font-size-adjust: 0.491 !important; /* http://www.cs.tut.fi/~jkorpela/x-height.html */
+    -moz-appearance: none !important;
 }
 
 #VimFxHelpDialog .VimFxKey:hover,
@@ -254,4 +255,5 @@ div.VimFxHintMarker > span.VimFxCharMatch {
     color: #c55500 !important;
     cursor: pointer !important;
     margin-left: 2px !important;
+    -moz-appearance: none !important;
 }
