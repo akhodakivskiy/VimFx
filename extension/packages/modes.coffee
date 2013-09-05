@@ -2,9 +2,13 @@ utils = require 'utils'
 hints = require 'hints'
 
 mode_hints =
-  enter: (vim, storage, [ markers, cb ]) ->
+  enter: (vim, storage, [ callback ]) ->
+    markers = hints.injectHints(vim.window.document)
+    if markers.length == 0
+      vim.enterNormalMode()
+      return
     storage.markers = markers
-    storage.cb = cb
+    storage.callback = callback
 
   handleKeyDown: (vim, storage, event, keyStr) ->
     if utils.getHintChars().search(utils.regexpEscape(keyStr)) > -1
@@ -13,7 +17,7 @@ mode_hints =
 
   onEnterNormalMode: (vim, storage) ->
     hints.removeHints(vim.window.document)
-    storage.markers = storage.cb = undefined
+    storage.markers = storage.callback = undefined
 
   # Processes the char, updates and hides/shows markers
   hintCharHandler: (vim, storage, keyStr) ->
@@ -21,7 +25,7 @@ mode_hints =
       # Get char and escape it to avoid problems with String.search
       key = utils.regexpEscape(keyStr)
 
-      { markers, cb } = storage
+      { markers, callback } = storage
 
       # First do a pre match - count how many markers will match with the new character entered
       if markers.reduce(((v, marker) -> v or marker.willMatch(key)), false)
@@ -31,7 +35,7 @@ mode_hints =
           if marker.isMatched()
             # Add element features to the bloom filter
             marker.reward()
-            cb(marker)
+            callback(marker)
             vim.enterNormalMode()
             break
 

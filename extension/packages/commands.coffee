@@ -57,22 +57,20 @@ command_open_tab = (vim) ->
 
 # Copy element URL to the clipboard
 command_marker_yank = (vim) ->
-  markers = hints.injectHints(vim.window.document)
-  if markers.length > 0
-    cb = (marker) ->
-      if url = marker.element.href
-        marker.element.focus()
-        utils.writeToClipboard(vim.window, url)
-      else if utils.isTextInputElement(marker.element)
-        utils.writeToClipboard(vim.window, marker.element.value)
+  callback = (marker) ->
+    if url = marker.element.href
+      marker.element.focus()
+      utils.writeToClipboard(vim.window, url)
+    else if utils.isTextInputElement(marker.element)
+      utils.writeToClipboard(vim.window, marker.element.value)
 
-    vim.enterMode('hints', [markers, cb])
+  vim.enterMode('hints', [callback])
 
 # Focus element
 command_marker_focus = (vim) ->
-  markers = hints.injectHints(vim.window.document)
-  if markers.length > 0
-    vim.enterMode('hints', [markers, (marker) -> marker.element.focus()])
+  callback = (marker) -> marker.element.focus()
+
+  vim.enterMode('hints', [callback])
 
 # Copy current URL to the clipboard
 command_yank = (vim) ->
@@ -203,26 +201,19 @@ command_restore_tab = (vim) ->
 
 # Follow links with hint markers
 command_follow = (vim) ->
-  if document = vim.window.document
-    markers = hints.injectHints(document)
-    if markers.length > 0
-      # This callback will be called with the selected marker as argument
-      cb = (marker) ->
-        marker.element.focus()
-        utils.simulateClick(marker.element)
+  callback = (marker) ->
+    marker.element.focus()
+    utils.simulateClick(marker.element)
 
-      vim.enterMode('hints', [markers, cb])
+  vim.enterMode('hints', [callback])
 
 # Follow links in a new Tab with hint markers
 command_follow_in_tab = (vim) ->
-  markers = hints.injectHints(vim.window.document)
-  if markers.length > 0
-    # This callback will be called with the selected marker as argument
-    cb = (marker) ->
-      marker.element.focus()
-      utils.simulateClick(marker.element, { metaKey: true, ctrlKey: true })
+  callback = (marker) ->
+    marker.element.focus()
+    utils.simulateClick(marker.element, { metaKey: true, ctrlKey: true })
 
-    vim.enterMode('hints', [markers, cb])
+  vim.enterMode('hints', [callback])
 
 # Move current tab to the left
 command_tab_move_left = (vim) ->
