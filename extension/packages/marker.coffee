@@ -6,11 +6,18 @@
 HTMLDocument      = Ci.nsIDOMHTMLDocument
 HTMLAnchorElement = Ci.nsIDOMHTMLAnchorElement
 
+Z_INDEX_START = 99999999 # The highest `z-index` used in style.css
+_zIndex = Z_INDEX_START
+# Each marker will get a `z-index` of `_zIndex++`. In theory, `z-index` can be infinitely large. In
+# practice, Firefox uses a 32-bit signed integer to store it, so the maximum value is 2147483647
+# (http://www.puidokas.com/max-z-index/). However, we do not need to worry about hitting the limit,
+# since the user would have to browse through a bit more than 2 billion links in a single Firefox
+# session before that happens.
+
 realBloomFilter = new SerializableBloomFilter('hints_bloom_data', 256 * 32, 16)
 dummyBloomFilter = new DummyBloomFilter()
 
-# Marker class wraps the markable element and provides
-# methods to manipulate the markers
+# Wraps the markable element and provides methods to manipulate the markers
 class Marker
   # Creates the marker DOM node
   constructor: (@element) ->
@@ -19,21 +26,35 @@ class Marker
     @markerElement = document.createElement('div')
     @markerElement.className = 'VimFxReset VimFxHintMarker'
 
-    Object.defineProperty(this, 'bloomFilter', get: ->
-      if getPref('hints_bloom_on') then realBloomFilter else dummyBloomFilter)
+    Object.defineProperty this, 'bloomFilter',
+      get: -> if getPref('hints_bloom_on') then realBloomFilter else dummyBloomFilter
 
-  # Shows the marker
-  show: -> @markerElement.className = 'VimFxReset VimFxHintMarker'
+  show: -> @setVisibility(true)
+  hide: -> @setVisibility(false)
+  setVisibility: (visible) ->
+    method = if visible then 'remove' else 'add'
+    @markerElement.classList[method]('VimFxHiddenHintMarker')
 
-  # Hides the marker
-  hide: -> @markerElement.className = 'VimFxReset VimFxHiddenHintMarker'
+  setPosition: (top, left) ->
+    # The positioning is absulute
+    @markerElement.style.top  = "#{ top }px"
+    @markerElement.style.left = "#{ left }px"
 
-  # Positions the marker on the page. The positioning is absulute
-  setPosition: (rect) ->
-    @markerElement.style.left = rect.left + 'px'
-    @markerElement.style.top  = rect.top  + 'px'
+    # For quick access
+    @position = {top, left}
 
-  # Assigns hint string to the marker
+    # Each marker gets a unique `z-index`, so that it can be determined if a marker overlaps another.
+    @markerElement.style.setProperty('z-index', _zIndex++, 'important')
+
+  # To be called when the marker has been both assigned a hint and inserted into the DOM, and thus
+  # gotten a height and width.
+  completePosition: ->
+    {
+      position: { top, left }
+      markerElement: { offsetHeight: height, offsetWidth: width }
+    } = this
+    @position = {top, bottom: top + height, left, right: left + width, height, width}
+
   setHint: (@hintChars) ->
     # Hint chars that have been matched so far
     @enteredHintChars = ''
@@ -52,31 +73,27 @@ class Marker
 
     @markerElement.appendChild(fragment)
 
-  # Add another char to the `enteredHintString`,
-  # see if it still matches `hintString`, apply classes to
-  # the distinct hint characters and show/hide marker when
-  # the entered string partially (not) matches the hint string
+    @completePosition()
+
   matchHintChar: (char) ->
-    # Handle backspace key by removing a previously entered hint char
-    # and resetting its class
-    if char == 'Backspace'
-      if @enteredHintChars.length > 0
-        @enteredHintChars = @enteredHintChars[0...-1]
-        @markerElement.children[@enteredHintChars.length]?.className = 'VimFxReset'
-    # Otherwise append hint char and change hint class
+    @updateEnteredHintChars(char)
+
+  deleteHintChar: ->
+    @updateEnteredHintChars(false)
+
+  updateEnteredHintChars: (char) ->
+    if char == false
+      method = 'remove'
+      @enteredHintChars = @enteredHintChars[...-1]
+      offset = 0
     else
-      @markerElement.children[@enteredHintChars.length]?.className = 'VimFxReset VimFxCharMatch'
+      method = 'add'
       @enteredHintChars += char.toLowerCase()
+      offset = -1
 
-    # If entered hint chars no longer partially match the hint chars
-    # then hide the marker. Othersie show it back
-    if @hintChars.search(@enteredHintChars) == 0 then @show() else @hide()
+    @markerElement.children[@enteredHintChars.length + offset]?.classList[method]('VimFxCharMatch')
+    if @hintChars.startsWith(@enteredHintChars) then @show() else @hide()
 
-  # Checks if the marker will be matched if the next character entered is `char`
-  willMatch: (char) ->
-    char == 'Backspace' or @hintChars.search(@enteredHintChars + char.toLowerCase()) == 0
-
-  # Checks if enterd hint chars completely match the hint chars
   isMatched: ->
     return @hintChars == @enteredHintChars
 
@@ -89,13 +106,12 @@ class Marker
     suffix = ''
     el = @element
     while el.classList?.length == 0 and el not instanceof HTMLDocument
-      suffix = "#{ suffix } #{ el.tagName }"
+      suffix += " #{ el.tagName }"
       el = el.parentNode
-    if el and el.classList
+    if el?.classList?
       for className in el.classList
         features["#{ el.tagName }.#{ className }#{ suffix }"] = 10
 
-    # Element id
     if @element.id
       features["#{ el.tagName }.#{ @element.id }"] = 5
 

@@ -96,11 +96,14 @@ loadCss = do ->
   sss = Cc['@mozilla.org/content/style-sheet-service;1'].getService(Ci.nsIStyleSheetService)
   return (name) ->
     uri = cssUri(name)
-    if !sss.sheetRegistered(uri, sss.AUTHOR_SHEET)
-      sss.loadAndRegisterSheet(uri, sss.AUTHOR_SHEET)
+    # `AGENT_SHEET` is used to override userContent.css and Stylish. Custom website themes installed
+    # by users often make the hint markers unreadable, for example. Just using `!important` in the
+    # CSS is not enough.
+    if !sss.sheetRegistered(uri, sss.AGENT_SHEET)
+      sss.loadAndRegisterSheet(uri, sss.AGENT_SHEET)
 
     unload ->
-      sss.unregisterSheet(uri, sss.AUTHOR_SHEET)
+      sss.unregisterSheet(uri, sss.AGENT_SHEET)
 
 # Simulate mouse click with full chain of event
 # Copied from Vimium codebase

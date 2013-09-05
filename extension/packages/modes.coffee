@@ -10,34 +10,90 @@ mode_hints =
     storage.markers = markers
     storage.callback = callback
 
+  # Processes the char, updates and hides/shows markers
   handleKeyDown: (vim, storage, event, keyStr) ->
-    if utils.getHintChars().search(utils.regexpEscape(keyStr)) > -1
-      @hintCharHandler(vim, storage, keyStr)
-      return true
+    { markers, callback } = storage
+
+    switch keyStr
+      when 'Space'
+        @rotateOverlappingMarkers(markers, true)
+      when 'Shift-Space'
+        @rotateOverlappingMarkers(markers, false)
+
+      when 'Backspace'
+        for marker in markers
+          marker.deleteHintChar(keyStr)
+
+      else
+        return false if keyStr not in utils.getHintChars()
+        for marker in markers
+          marker.matchHintChar(keyStr)
+
+          if marker.isMatched()
+            marker.reward() # Add element features to the bloom filter
+            callback(marker)
+            vim.enterNormalMode()
+            break
+
+    return true
 
   onEnterNormalMode: (vim, storage) ->
     hints.removeHints(vim.window.document)
     storage.markers = storage.callback = undefined
 
-  # Processes the char, updates and hides/shows markers
-  hintCharHandler: (vim, storage, keyStr) ->
-    if keyStr
-      # Get char and escape it to avoid problems with String.search
-      key = utils.regexpEscape(keyStr)
+  # Finds all stacks of markers that overlap each other (by using `getStackFor`) (#1), and rotates
+  # their `z-index`:es (#2), thus alternating which markers are visible.
+  rotateOverlappingMarkers: (originalMarkers, forward) ->
+    # Shallow working copy. This is necessary since `markers` will be mutated and eventually empty.
+    markers = originalMarkers[..]
 
-      { markers, callback } = storage
+    # (#1)
+    stacks = (@getStackFor(markers.pop(), markers) while markers.length > 0)
 
-      # First do a pre match - count how many markers will match with the new character entered
-      if markers.reduce(((v, marker) -> v or marker.willMatch(key)), false)
-        for marker in markers
-          marker.matchHintChar(key)
+    # (#2)
+    # Stacks of length 1 don't participate in any overlapping, and can therefore be skipped.
+    for stack in stacks when stack.length > 1
+      # This sort is not required, but makes the rotation more predictable.
+      stack.sort((a, b) -> a.markerElement.style.zIndex - b.markerElement.style.zIndex)
 
-          if marker.isMatched()
-            # Add element features to the bloom filter
-            marker.reward()
-            callback(marker)
-            vim.enterNormalMode()
-            break
+      # Array of z indices
+      indexStack = (m.markerElement.style.zIndex for m in stack)
+      # Shift the array of indices one item forward or back
+      if forward
+        indexStack.unshift(indexStack.pop())
+      else
+        indexStack.push(indexStack.shift())
+
+      for marker, index in stack
+        marker.markerElement.style.setProperty('z-index', indexStack[index], 'important')
+
+    return
+
+  # Get an array containing `marker` and all markers that overlap `marker`, if any, which is called a
+  # "stack". All markers in the returned stack are spliced out from `markers`, thus mutating it.
+  getStackFor: (marker, markers) ->
+    stack = [marker]
+
+    { top, bottom, left, right } = marker.position
+
+    index = 0
+    while index < markers.length
+      nextMarker = markers[index]
+
+      { top: nextTop, bottom: nextBottom, left: nextLeft, right: nextRight } = nextMarker.position
+      overlapsVertically   = (nextBottom >= top  and nextTop  <= bottom)
+      overlapsHorizontally = (nextRight  >= left and nextLeft <= right)
+
+      if overlapsVertically and overlapsHorizontally
+        # Also get all markers overlapping this one
+        markers.splice(index, 1)
+        stack = stack.concat(@getStackFor(nextMarker, markers))
+      else
+        # Continue the search
+        index++
+
+    return stack
+
 
 modes =
   hints: mode_hints

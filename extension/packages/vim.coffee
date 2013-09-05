@@ -41,7 +41,7 @@ class Vim
       else
         @keys.length = 0
     else if not (event.ctrlKey or event.metaKey)
-      @modes[@mode].handleKeyDown(this, @storage.modes[@mode], event, keyStr)
+      return @modes[@mode].handleKeyDown(this, @storage.modes[@mode], event, keyStr)
 
     @suppress = false
     @keys.length = 0
