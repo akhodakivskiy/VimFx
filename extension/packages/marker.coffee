@@ -6,7 +6,7 @@
 HTMLDocument      = Ci.nsIDOMHTMLDocument
 HTMLAnchorElement = Ci.nsIDOMHTMLAnchorElement
 
-Z_INDEX_START = 99999999 # As set by style.css for the class `.VimFxReset`
+Z_INDEX_START = 99999999 # The highest `z-index` used in style.css
 _zIndex = Z_INDEX_START
 # Each marker will get a `z-index` of `_zIndex++`. In theory, `z-index` can be infinitely large. In
 # practice, Firefox uses a 32-bit signed integer to store it, so the maximum value is 2147483647
@@ -43,6 +43,15 @@ class Marker
     # Each marker gets a unique `z-index`, so that it can be determined if a marker overlaps another.
     @markerElement.style.setProperty('z-index', _zIndex++, 'important')
 
+  # To be called when the marker has been both assigned a hint and inserted into the DOM, and thus
+  # gotten a height and width.
+  completePosition: ->
+    {
+      position: { top, left }
+      markerElement: { offsetHeight: height, offsetWidth: width }
+    } = this
+    @position = {top, bottom: top + height, left, right: left + width, height, width}
+
   setHint: (@hintChars) ->
     # Hint chars that have been matched so far
     @enteredHintChars = ''
@@ -60,6 +69,8 @@ class Marker
       fragment.appendChild(span)
 
     @markerElement.appendChild(fragment)
+
+    @completePosition()
 
   # Add another char to the `enteredHintString`,
   # see if it still matches `hintString`, apply classes to
