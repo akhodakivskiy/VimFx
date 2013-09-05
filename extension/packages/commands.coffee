@@ -425,19 +425,20 @@ maybeCommand = (keys) ->
         if key.indexOf(str) == 0 and cmd.enabled()
           return true
 
-# Finds all stacks of markers that overlap each other (by using `getStackFromIndex`) (#1), and
-# rotates their `z-index`:es (#2), thus alternating which markers are visible.
+# Finds all stacks of markers that overlap each other (by using `getStackFor`) (#1), and rotates
+# their `z-index`:es (#2), thus alternating which markers are visible.
 rotateOverlappingMarkers = (originalMarkers) ->
   # Shallow working copy. This is necessary since `markers` will be mutated and eventually empty.
   markers = originalMarkers[..]
 
   # (#1)
-  markers.sort(getStackFromIndex.sort)
-  stacks = (getStackFromIndex(markers, 0) while markers.length > 0)
+  stacks = (getStackFor(markers.pop(), markers) while markers.length > 0)
 
   # (#2)
   # Stacks of length 1 don't participate in any overlapping, and can therefore be skipped.
   for stack in stacks when stack.length > 1
+    # This sort is not required, but makes the rotation more predictable.
+    stack.sort((a, b) -> a.markerElement.style.zIndex - b.markerElement.style.zIndex)
     firstZIndex = stack[0].markerElement.style.zIndex
     for marker, index in stack
       nextMarker = stack[index+1]
@@ -446,36 +447,30 @@ rotateOverlappingMarkers = (originalMarkers) ->
 
   null
 
-# Get an array containing the marker M at `index` and all markers after `index` that overlap M, or
-# are overlapped by M, if any, which is called a "stack". All markers in the returned stack are
-# spliced out from `markers`, thus mutating it. `markers` must be sorted by `getStackFromIndex.sort`
-getStackFromIndex = (markers, index) ->
-  stack = []
-  [ marker ] = markers.splice(index, 1)
-  if marker
-    stack.push(marker)
+# Get an array containing `marker` and all markers that overlap `marker`, if any, which is called a
+# "stack". All markers in the returned stack are spliced out from `markers`, thus mutating it.
+getStackFor = (marker, markers) ->
+  stack = [marker]
 
-    { top, left } = marker.position
-    { offsetHeight: height, offsetWidth: width } = marker.markerElement
-    while index < markers.length
-      nextMarker = markers[index]
+  { top, bottom, left, right } = marker.position
 
-      cannotOverlapVertically = (nextMarker.position.top > top + height )
-      break if cannotOverlapVertically # Since the `markers` are sorted, no more markers can overlap
+  index = 0
+  while index < markers.length
+    nextMarker = markers[index]
 
-      overlapsHorizontally = (left <= nextMarker.position.left <= left + width)
-      if overlapsHorizontally # and vertically, implicitly
-        # Also get all markers overlapping this one
-        stack = stack.concat(getStackFromIndex(markers, index))
-      else
-        # Continue the search
-        index++
+    { top: nextTop, bottom: nextBottom, left: nextLeft, right: nextRight } = nextMarker.position
+    overlapsVertically   = (nextBottom >= top  and nextTop  <= bottom)
+    overlapsHorizontally = (nextRight  >= left and nextLeft <= right)
+
+    if overlapsVertically and overlapsHorizontally
+      # Also get all markers overlapping this one
+      markers.splice(index, 1)
+      stack = stack.concat(getStackFor(nextMarker, markers))
+    else
+      # Continue the search
+      index++
 
   return stack
-
-# Sorts markers after their top position, and then after their left position, ascending.
-getStackFromIndex.sort = (a, b) ->
-  return a.position.top - b.position.top or a.position.left - b.position.left
 
 exports.hintCharHandler = hintCharHandler
 exports.findCommand     = findCommand
