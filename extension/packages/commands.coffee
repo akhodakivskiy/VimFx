@@ -388,11 +388,11 @@ commands = [
 
 # Called in hints mode. Will process the char, update and hide/show markers
 hintCharHandler = (vim, keyStr) ->
-  if keyStr
-    if keyStr == 'Space'
-      rotateOverlappingMarkers(vim.markers)
-      return
-
+  if keyStr == 'Space'
+    rotateOverlappingMarkers(vim.markers, true)
+  else if keyStr == 'Shift-Space'
+    rotateOverlappingMarkers(vim.markers, false)
+  else if keyStr
     # Get char and escape it to avoid problems with String.search
     key = utils.regexpEscape(keyStr)
 
@@ -427,7 +427,7 @@ maybeCommand = (keys) ->
 
 # Finds all stacks of markers that overlap each other (by using `getStackFor`) (#1), and rotates
 # their `z-index`:es (#2), thus alternating which markers are visible.
-rotateOverlappingMarkers = (originalMarkers) ->
+rotateOverlappingMarkers = (originalMarkers, forward) ->
   # Shallow working copy. This is necessary since `markers` will be mutated and eventually empty.
   markers = originalMarkers[..]
 
@@ -439,13 +439,17 @@ rotateOverlappingMarkers = (originalMarkers) ->
   for stack in stacks when stack.length > 1
     # This sort is not required, but makes the rotation more predictable.
     stack.sort((a, b) -> a.markerElement.style.zIndex - b.markerElement.style.zIndex)
-    firstZIndex = stack[0].markerElement.style.zIndex
-    for marker, index in stack
-      nextMarker = stack[index+1]
-      nextZIndex = nextMarker?.markerElement.style.zIndex ? firstZIndex
-      marker.markerElement.style.setProperty('z-index', nextZIndex, 'important')
 
-  null
+    # Array of z indices
+    indexStack = (m.markerElement.style.zIndex for m in stack)
+    # Shift the array of indices one item forward or back
+    if forward
+      indexStack.unshift(indexStack.pop())
+    else
+      indexStack.push(indexStack.shift())
+
+    for marker, index in stack
+      marker.markerElement.style.setProperty('z-index', indexStack[index], 'important')
 
 # Get an array containing `marker` and all markers that overlap `marker`, if any, which is called a
 # "stack". All markers in the returned stack are spliced out from `markers`, thus mutating it.

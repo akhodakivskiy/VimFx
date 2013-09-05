@@ -48,7 +48,8 @@ class Vim
       else
         @keys.length = 0
     else if @mode == MODE_HINTS and not (event.ctrlKey or event.metaKey)
-      if utils.getHintChars().search(utils.regexpEscape(keyStr)) > -1 or keyStr in ['Space', 'Backspace']
+      specialKeys = ['Shift-Space', 'Space', 'Backspace']
+      if utils.getHintChars().search(utils.regexpEscape(keyStr)) > -1 or keyStr in specialKeys
         commands.hintCharHandler(@, keyStr)
         return true
 
