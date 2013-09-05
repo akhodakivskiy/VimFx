@@ -154,20 +154,19 @@ helpDialogHtml = (commands) ->
     </div>
 
     <div class="VimFxReset VimFxFooter">
-      <div class="VimFxReset VimFxSocial">
-        <p class="VimFxReset">
-          #{ _('help_found_bug') }
-          <a class="VimFxReset" target="_blank" href="https://github.com/akhodakivskiy/VimFx/issues">
-            #{ _('help_report_bug') }
-          </a>
-        </p>
-        <p class="VimFxReset">
-          #{ _('help_enjoying') }
-          <a class="VimFxReset" target="_blank" href="https://addons.mozilla.org/en-US/firefox/addon/vimfx/">
-            #{ _('help_feedback') }
-          </a>
-        </p>
-      </div>
+      <p class="VimFxReset">#{ _('help_overlapping_hints') }</p>
+      <p class="VimFxReset">
+        #{ _('help_found_bug') }
+        <a class="VimFxReset" target="_blank" href="https://github.com/akhodakivskiy/VimFx/issues">
+          #{ _('help_report_bug') }
+        </a>
+      </p>
+      <p class="VimFxReset">
+        #{ _('help_enjoying') }
+        <a class="VimFxReset" target="_blank" href="https://addons.mozilla.org/en-US/firefox/addon/vimfx/">
+          #{ _('help_feedback') }
+        </a>
+      </p>
     </div>
   </div>
   """
