@@ -388,14 +388,11 @@ commands = [
 
 # Called in hints mode. Will process the char, update and hide/show markers
 hintCharHandler = (vim, keyStr) ->
-  if keyStr
-    if keyStr == 'Space'
-      rotateOverlappingMarkers(vim.markers, true)
-      return
-    else if keyStr == 'Shift-Space'
-      rotateOverlappingMarkers(vim.markers, false)
-      return
-
+  if keyStr == 'Space'
+    rotateOverlappingMarkers(vim.markers, true)
+  else if keyStr == 'Shift-Space'
+    rotateOverlappingMarkers(vim.markers, false)
+  else if keyStr
     # Get char and escape it to avoid problems with String.search
     key = utils.regexpEscape(keyStr)
 
