@@ -263,9 +263,6 @@ getResourceURI = do ->
   baseURI = Services.io.newURI(__SCRIPT_URI_SPEC__, null, null)
   return (path) -> Services.io.newURI(path, null, baseURI)
 
-# Escape string to render it usable in regular expressions
-regexpEscape = (s) -> s and s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')
-
 exports.Bucket                  = Bucket
 exports.getCurrentTabWindow     = getCurrentTabWindow
 exports.getEventWindow          = getEventWindow
@@ -295,4 +292,3 @@ exports.isURL                   = isURL
 exports.browserSearchSubmission = browserSearchSubmission
 exports.getHintChars            = getHintChars
 exports.getResourceURI          = getResourceURI
-exports.regexpEscape            = regexpEscape

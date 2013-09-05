@@ -28,20 +28,18 @@ class Vim
       mode.onEnterNormalMode?(this, @storage.modes[name])
     @mode = MODE_NORMAL
 
-  handleKeyDown: (event, keyStr) ->
+  handleKeyDown: (event, @lastKeyStr) ->
     @suppress = true
-    if @mode == MODE_NORMAL or keyStr == @esc
-      @keys.push(keyStr)
-      @lastKeyStr = keyStr
-      if command = @findCommand(@keys)
-        command.func(this, @storage.commands[command.name])
-        return command.name != @esc
-      else if @maybeCommand(@keys)
-        return true
-      else
-        @keys.length = 0
-    else if not (event.ctrlKey or event.metaKey)
-      return @modes[@mode].handleKeyDown(this, @storage.modes[@mode], event, keyStr)
+    @keys.push(@lastKeyStr)
+    if @mode == MODE_NORMAL or @lastKeyStr == @esc
+      { match, exact, command, index } = @searchForCommand(@keys, @commands)
+      if match
+        @keys = @keys[index..]
+        command.func(this, @storage.commands[command.name])  if exact
+        return @lastKeyStr != @esc
+    else
+      ok = @modes[@mode].handleKeyDown(this, @storage.modes[@mode], event)
+      return true if ok
 
     @suppress = false
     @keys.length = 0
@@ -55,21 +53,16 @@ class Vim
     @suppress = false
     return @lastKeyStr != @esc and suppress
 
-  findCommand: (keys) ->
-    for i in [0...keys.length]
-      str = keys[i..].join(',')
-      for command in @commands
+  # Intentionally taking `keys` and `commands` as parameters (instead of simply using `@keys` and
+  # `@commands`), so that the method can be reused by custom modes.
+  searchForCommand: (keys, commands) ->
+    for index in [0...keys.length] by 1
+      str = keys[index..].join(',')
+      for command in commands
         for key in command.keys()
-          if key == str and command.enabled()
-            return command
-
-  maybeCommand: (keys) ->
-    for i in [0...keys.length]
-      str = keys[i..].join(',')
-      for command in @commands
-        for key in command.keys()
-          if key.indexOf(str) == 0 and command.enabled()
-            return true
+          if key.startsWith(str) and command.enabled()
+            return {match: true, exact: (key == str), command, index}
+    return {match: false}
 
 # What is minimally required for a command
 class Vim.Command
