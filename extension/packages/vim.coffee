@@ -4,8 +4,6 @@ class Vim
   constructor: ({ @window, @commands, @modes, @esc }) ->
     @mode       = MODE_NORMAL
     @keys       = []
-    @lastKeyStr = null
-    @suppress   = false
 
     @storage =
       commands: {}
@@ -18,56 +16,56 @@ class Vim
       @storage.modes[name] = {}
 
   enterMode: (mode, args) ->
-    # Note: `args` is an array of arguments to be passed to the mode's `enter` method. We cannot use
-    # `args...`, since that destroys the `this` context for the mode's `enter` method.
+    # Note: `args` is an array of arguments to be passed to the mode's `onEnter` method. We cannot
+    # use `args...`, since that destroys the `this` context for the mode's `onEnter` method.
     @mode = mode
-    @modes[mode].enter(this, @storage.modes[mode], args)
+    @modes[mode].onEnter?(this, @storage.modes[mode], args)
 
   enterNormalMode: ->
     for name, mode of @modes
       mode.onEnterNormalMode?(this, @storage.modes[name])
     @mode = MODE_NORMAL
 
-  handleKeyDown: (event, @lastKeyStr) ->
-    @suppress = true
-    @keys.push(@lastKeyStr)
-    if @mode == MODE_NORMAL or @lastKeyStr == @esc
-      { match, exact, command, index } = @searchForCommand(@keys, @commands)
+  onInput: (keyStr, event) ->
+    @keys.push(keyStr)
+
+    if @mode == MODE_NORMAL
+      { match, exact, command, index } = @searchForCommand(@commands)
+
       if match
-        @keys = @keys[index..]
-        command.func(this, @storage.commands[command.name])  if exact
-        return @lastKeyStr != @esc
+        if exact then command.func(this, @storage.commands[command.name], event)
+        return true
+      else
+        return false
+
     else
-      ok = @modes[@mode].handleKeyDown(this, @storage.modes[@mode], event)
-      return true if ok
+      if keyStr == @esc
+        @enterNormalMode()
+        return true
+      else
+        return @modes[@mode].onInput?(this, @storage.modes[@mode], keyStr, event)
 
-    @suppress = false
-    @keys.length = 0
-    return false
-
-  handleKeyPress: (event) ->
-    return @lastKeyStr != @esc and @suppress
-
-  handleKeyUp: (event) ->
-    suppress = @suppress
-    @suppress = false
-    return @lastKeyStr != @esc and suppress
-
-  # Intentionally taking `keys` and `commands` as parameters (instead of simply using `@keys` and
-  # `@commands`), so that the method can be reused by custom modes.
-  searchForCommand: (keys, commands) ->
-    for index in [0...keys.length] by 1
-      str = keys[index..].join(',')
+  # Intentionally taking `commands` as a parameter (instead of simply using `@commands`), so that
+  # the method can be reused by custom modes.
+  searchForCommand: (commands) ->
+    for index in [0...@keys.length] by 1
+      str = @keys[index..].join(',')
       for command in commands
         for key in command.keys()
           if key.startsWith(str) and command.enabled()
-            return {match: true, exact: (key == str), command, index}
+            @keys = @keys[index..]
+            return {match: true, exact: (key == str), command}
+
+    @keys.length = 0
     return {match: false}
+
+Vim.MODE_NORMAL = MODE_NORMAL
 
 # What is minimally required for a command
 class Vim.Command
-  constructor: (@keyValues, @name) ->
-  keys: -> return @keyValues
+  constructor: (@name) ->
+  keys: -> return ['key1', 'key2', 'keyN']
   enabled: -> return true
+  func: (vim, storage, event) ->
 
 exports.Vim = Vim

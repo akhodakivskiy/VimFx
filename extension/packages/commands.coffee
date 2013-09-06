@@ -1,8 +1,6 @@
 utils = require 'utils'
-hints = require 'hints'
 help  = require 'help'
 find  = require 'find'
-
 { _ } = require 'l10n'
 { getPref
 , setPref
@@ -11,7 +9,7 @@ find  = require 'find'
 
 { classes: Cc, interfaces: Ci, utils: Cu } = Components
 
-# Opens developer toolbar (Default shotrcut: Shift-F2)
+# Open developer toolbar (Default shotrcut: Shift-F2)
 command_dev = (vim) ->
   if chromeWindow = utils.getRootWindow vim.window
     chromeWindow.DeveloperToolbar.show(true)
@@ -265,26 +263,22 @@ command_find_prev = (vim, storage) ->
   if find.findStr.length > 0
     storage.findRng = find.find(vim.window, find.findStr, storage.findRng, find.DIRECTION_BACKWARDS, true)
 
-# Close the Help dialog and cancel the pending hint marker action
-command_Esc = (vim) ->
-  # Blur active element if it's editable. Other elements
-  # aren't blurred - we don't want to interfere with
-  # the browser too much
-  activeElement = vim.window.document.activeElement
+command_Esc = (vim, storage, event) ->
+  # Only blur editable elements, in order not to interfere with the browser too much. TODO: Is that
+  # really needed? What if a website has made more elements focusable -- shouldn't those also be
+  # blurred?
+  { activeElement } = vim.window.document
   if utils.isElementEditable(activeElement)
     activeElement.blur()
 
-  #Remove Find input
+  # Also blur active XUL control if preferencess allow
+  if getPref('blur_on_esc')
+    callback = -> event.originalTarget?.ownerDocument?.activeElement?.blur()
+    vim.window.setTimeout(callback, 0)
+
   find.removeFind(vim.window.document)
 
-  # Remove hints
-  hints.removeHints(vim.window.document)
-
-  # Hide help dialog
   help.removeHelp(vim.window.document)
-
-  # Finally enter normal mode
-  vim.enterNormalMode()
 
   if not getPref('leave_dt_on_esc')
     if chromeWindow = utils.getRootWindow(vim.window)
@@ -299,20 +293,8 @@ class Command
     else
       @keyValues = keys
 
-  # Check if this command may match given string if more chars are added
-  mayMatch: (value) ->
-    return @keys.reduce(((m, v) -> m or v.indexOf(value) == 0), false)
-
-  # Check is this command matches given string
-  match: (value) ->
-    return @keys.reduce(((m, v) -> m or v == value), false)
-
   # Name of the preference for a given property
   prefName: (value) -> "commands.#{ @name }.#{ value }"
-
-  assign: (value) ->
-    @keys = value or @defaultKeys
-    setPref(@prefName('keys'), value and JSON.stringify(value))
 
   enabled: (value) ->
     if value is undefined

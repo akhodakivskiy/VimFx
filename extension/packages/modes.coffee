@@ -2,19 +2,19 @@ utils = require 'utils'
 hints = require 'hints'
 
 mode_hints =
-  enter: (vim, storage, [ callback ]) ->
+  onEnter: (vim, storage, [ callback ]) ->
     markers = hints.injectHints(vim.window.document)
     if markers.length == 0
       vim.enterNormalMode()
       return
-    storage.markers = markers
+    storage.markers  = markers
     storage.callback = callback
 
   # Processes the char, updates and hides/shows markers
-  handleKeyDown: (vim, storage, event) ->
+  onInput: (vim, storage, keyStr, event) ->
     { markers, callback } = storage
 
-    switch vim.lastKeyStr
+    switch keyStr
       when 'Space'
         @rotateOverlappingMarkers(markers, true)
       when 'Shift-Space'
@@ -25,9 +25,9 @@ mode_hints =
           marker.deleteHintChar()
 
       else
-        return false if vim.lastKeyStr not in utils.getHintChars() or event.ctrlKey or event.metaKey
+        return false if keyStr not in utils.getHintChars() or event.ctrlKey or event.metaKey
         for marker in markers
-          marker.matchHintChar(vim.lastKeyStr)
+          marker.matchHintChar(keyStr)
 
           if marker.isMatched()
             marker.reward() # Add element features to the bloom filter

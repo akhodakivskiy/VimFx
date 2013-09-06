@@ -33,9 +33,9 @@ class Bucket
 
 # Returns the `window` from the currently active tab.
 getCurrentTabWindow = (event) ->
-  if window = getEventWindow(event)
-    if rootWindow = getRootWindow(window)
-      return rootWindow.gBrowser.selectedTab.linkedBrowser.contentWindow
+  return unless window = getEventWindow(event)
+  return unless rootWindow = getRootWindow(window)
+  return rootWindow.gBrowser.selectedTab.linkedBrowser.contentWindow
 
 # Returns the window associated with the event
 getEventWindow = (event) ->
@@ -47,19 +47,21 @@ getEventWindow = (event) ->
       return doc.defaultView
 
 getEventRootWindow = (event) ->
-  if window = getEventWindow(event)
-    return getRootWindow(window)
+  return unless window = getEventWindow(event)
+  return getRootWindow(window)
 
 getEventTabBrowser = (event) ->
-  cw.gBrowser if cw = getEventRootWindow(event)
+  return unless rootWindow = getEventRootWindow(event)
+  return rootWindow.gBrowser
 
 getRootWindow = (window) ->
-  return window.QueryInterface(Ci.nsIInterfaceRequestor)
-               .getInterface(Ci.nsIWebNavigation)
-               .QueryInterface(Ci.nsIDocShellTreeItem)
-               .rootTreeItem
-               .QueryInterface(Ci.nsIInterfaceRequestor)
-               .getInterface(Window)
+  return window
+    .QueryInterface(Ci.nsIInterfaceRequestor)
+    .getInterface(Ci.nsIWebNavigation)
+    .QueryInterface(Ci.nsIDocShellTreeItem)
+    .rootTreeItem
+    .QueryInterface(Ci.nsIInterfaceRequestor)
+    .getInterface(Window)
 
 isTextInputElement = (element) ->
   return element instanceof HTMLInputElement or \
@@ -75,9 +77,10 @@ isElementEditable = (element) ->
          element.ownerDocument?.designMode?.toLowerCase() == 'on'
 
 getWindowId = (window) ->
-  return window.QueryInterface(Components.interfaces.nsIInterfaceRequestor)
-               .getInterface(Components.interfaces.nsIDOMWindowUtils)
-               .outerWindowID
+  return window
+    .QueryInterface(Components.interfaces.nsIInterfaceRequestor)
+    .getInterface(Components.interfaces.nsIDOMWindowUtils)
+    .outerWindowID
 
 getSessionStore = ->
   Cc['@mozilla.org/browser/sessionstore;1'].getService(Ci.nsISessionStore)
@@ -107,10 +110,9 @@ loadCss = do ->
 
 # Simulate mouse click with full chain of event
 # Copied from Vimium codebase
-simulateClick = (element, modifiers) ->
+simulateClick = (element, modifiers = {}) ->
   document = element.ownerDocument
   window = document.defaultView
-  modifiers ||= {}
 
   eventSequence = ['mouseover', 'mousedown', 'mouseup', 'click']
   for event in eventSequence
@@ -128,8 +130,9 @@ WHEEL_MODE_PAGE = Ci.nsIDOMWheelEvent.DOM_DELTA_PAGE
 # Simulate mouse scroll event by specific offsets given
 # that mouse cursor is at specified position
 simulateWheel = (window, deltaX, deltaY, mode = WHEEL_MODE_PIXEL) ->
-  windowUtils = window.QueryInterface(Ci.nsIInterfaceRequestor)
-                      .getInterface(Ci.nsIDOMWindowUtils)
+  windowUtils = window
+    .QueryInterface(Ci.nsIInterfaceRequestor)
+    .getInterface(Ci.nsIDOMWindowUtils)
 
   [pX, pY] = [window.innerWidth / 2, window.innerHeight / 2]
   windowUtils.sendWheelEvent(
@@ -149,7 +152,8 @@ writeToClipboard = (window, text) ->
   trans = Cc['@mozilla.org/widget/transferable;1'].createInstance(Ci.nsITransferable)
 
   if trans.init
-    privacyContext = window.QueryInterface(Ci.nsIInterfaceRequestor)
+    privacyContext = window
+      .QueryInterface(Ci.nsIInterfaceRequestor)
       .getInterface(Ci.nsIWebNavigation)
       .QueryInterface(Ci.nsILoadContext)
     trans.init(privacyContext)
@@ -164,7 +168,8 @@ readFromClipboard = (window) ->
   trans = Cc['@mozilla.org/widget/transferable;1'].createInstance(Ci.nsITransferable)
 
   if trans.init
-    privacyContext = window.QueryInterface(Ci.nsIInterfaceRequestor)
+    privacyContext = window
+      .QueryInterface(Ci.nsIInterfaceRequestor)
       .getInterface(Ci.nsIWebNavigation)
       .QueryInterface(Ci.nsILoadContext)
     trans.init(privacyContext)
@@ -246,10 +251,11 @@ getHintChars = do ->
   # Remove duplicate characters from string (case insensitive)
   removeDuplicateCharacters = (str) ->
     seen = {}
-    return str.toLowerCase()
-              .split('')
-              .filter((char) -> if seen[char] then false else (seen[char] = true))
-              .join('')
+    return str
+      .toLowerCase()
+      .split('')
+      .filter((char) -> if seen[char] then false else (seen[char] = true))
+      .join('')
 
   return ->
     hintChars = removeDuplicateCharacters(getPref('hint_chars'))
@@ -261,7 +267,7 @@ getHintChars = do ->
 # Return URI to some file in the extension packaged as resource
 getResourceURI = do ->
   baseURI = Services.io.newURI(__SCRIPT_URI_SPEC__, null, null)
-  return (path) -> Services.io.newURI(path, null, baseURI)
+  return (path) -> return Services.io.newURI(path, null, baseURI)
 
 exports.Bucket                  = Bucket
 exports.getCurrentTabWindow     = getCurrentTabWindow
