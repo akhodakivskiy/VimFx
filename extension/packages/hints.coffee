@@ -51,25 +51,43 @@ removeHints = (document) ->
 
 # Like `injectMarkers`, but also sets hints for the markers
 injectHints = (document) ->
-  markers = injectMarkers(document)
+  markers = createMarkers(document)
   hintChars = utils.getHintChars()
 
   addHuffmanCodeWordsTo(markers, {alphabet: hintChars}, (marker, hint) -> marker.setHint(hint))
 
+  removeHints(document)
+  insertHints(markers)
+
   return markers
+
+insertHints = (markers) ->
+  docFrags = []
+
+  getFrag = (document) ->
+    for [doc, frag] in docFrags
+      if document == doc
+        return frag
+
+  for marker in markers
+    doc = marker.element.ownerDocument
+    if not getFrag(doc)
+      docFrags.push([doc, doc.createDocumentFragment()])
+      
+    frag = getFrag(doc)
+    frag.appendChild(marker.markerElement)
+
+  for [doc, frag] in docFrags
+    container = createHintsContainer(doc)
+    container.appendChild(frag)
+    doc.documentElement.appendChild(container)
 
 
 # Creates and injects markers into the DOM
-injectMarkers = (document) ->
-  # First remove previous hints container
-  removeHints(document)
-
+createMarkers = (document) ->
   # For now we aren't able to handle hint markers in XUL Documents :(
   if document instanceof HTMLDocument# or document instanceof XULDocument
     if document.documentElement
-      # For performance use Document Fragment
-      fragment = document.createDocumentFragment()
-
       # Select all markable elements in the document, create markers
       # for each of them, and position them on the page.
       # Note that the markers are not given hints.
@@ -79,20 +97,13 @@ injectMarkers = (document) ->
         element = set.snapshotItem(i)
         if rect = getElementRect(element)
           marker = new Marker(element)
-
           marker.setPosition(rect.top, rect.left)
-          fragment.appendChild(marker.markerElement)
-
           marker.weight = rect.area * marker.calcBloomRating()
 
           markers.push(marker)
 
-      container = createHintsContainer(document)
-      container.appendChild(fragment)
-      document.documentElement.appendChild(container)
-
       for frame in document.defaultView.frames
-        markers = markers.concat(injectMarkers(frame.document))
+        markers = markers.concat(createMarkers(frame.document))
 
   return markers or []
 
