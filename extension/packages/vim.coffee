@@ -22,8 +22,8 @@ class Vim
     @modes[mode].onEnter?(this, @storage.modes[mode], args)
 
   enterNormalMode: ->
-    for name, mode of @modes
-      mode.onEnterNormalMode?(this, @storage.modes[name])
+    return if @mode == MODE_NORMAL
+    @modes[@mode].onEnterNormalMode?(this, @storage.modes[@mode])
     @mode = MODE_NORMAL
 
   onInput: (keyStr, event) ->
