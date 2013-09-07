@@ -189,7 +189,7 @@ rotateOverlappingMarkers = (originalMarkers, forward) ->
   markers = originalMarkers[..]
 
   # (#1)
-  stacks = (@getStackFor(markers.pop(), markers) while markers.length > 0)
+  stacks = (getStackFor(markers.pop(), markers) while markers.length > 0)
 
   # (#2)
   # Stacks of length 1 don't participate in any overlapping, and can therefore be skipped.
@@ -228,7 +228,7 @@ getStackFor = (marker, markers) ->
     if overlapsVertically and overlapsHorizontally
       # Also get all markers overlapping this one
       markers.splice(index, 1)
-      stack = stack.concat(@getStackFor(nextMarker, markers))
+      stack = stack.concat(getStackFor(nextMarker, markers))
     else
       # Continue the search
       index++
