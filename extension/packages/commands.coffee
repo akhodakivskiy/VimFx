@@ -201,7 +201,8 @@ helper_follow = ({ inTab, multiple }, vim) ->
   callback = (matchedMarker, markers) ->
     matchedMarker.element.focus()
     utils.simulateClick(matchedMarker.element, {metaKey: inTab, ctrlKey: inTab})
-    if multiple
+    isEditable = utils.isElementEditable(matchedMarker.element)
+    if multiple and not isEditable
       # By not resetting immediately one is able to see the last char being matched, which gives
       # some nice visual feedback that you've typed the right char.
       vim.window.setTimeout((-> marker.reset() for marker in markers), 100)
