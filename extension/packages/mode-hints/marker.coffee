@@ -1,5 +1,5 @@
 { SerializableBloomFilter
-, DummyBloomFilter } = require 'bloomfilter'
+, DummyBloomFilter } = require 'mode-hints/bloomfilter'
 
 { getPref } = require 'prefs'
 
