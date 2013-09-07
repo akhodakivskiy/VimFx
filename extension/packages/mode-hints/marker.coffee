@@ -73,8 +73,6 @@ class Marker
 
     @markerElement.appendChild(fragment)
 
-    @completePosition()
-
   matchHintChar: (char) ->
     @updateEnteredHintChars(char)
 
