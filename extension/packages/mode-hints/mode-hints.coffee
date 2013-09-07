@@ -31,8 +31,8 @@ exports.mode_hints =
 
           if marker.isMatched()
             marker.reward() # Add element features to the bloom filter
-            callback(marker)
-            vim.enterNormalMode()
+            dontEnterNormalMode = callback(marker, markers)
+            vim.enterNormalMode()  unless dontEnterNormalMode
             break
 
     return true

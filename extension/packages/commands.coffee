@@ -197,21 +197,26 @@ command_restore_tab = (vim) ->
     if ss and ss.getClosedTabCount(rootWindow) > 0
       ss.undoCloseTab(rootWindow, 0)
 
-# Follow links with hint markers
-command_follow = (vim) ->
-  callback = (marker) ->
-    marker.element.focus()
-    utils.simulateClick(marker.element)
+helper_follow = ({ inTab, multiple }, vim) ->
+  callback = (matchedMarker, markers) ->
+    matchedMarker.element.focus()
+    utils.simulateClick(matchedMarker.element, {metaKey: inTab, ctrlKey: inTab})
+    if multiple
+      # By not resetting immediately one is able to see the last char being matched, which gives
+      # some nice visual feedback that you've typed the right char.
+      vim.window.setTimeout((-> marker.reset() for marker in markers), 100)
+      return true
 
   vim.enterMode('hints', [callback])
+
+# Follow links with hint markers
+command_follow = helper_follow.bind(undefined, {inTab: false})
 
 # Follow links in a new Tab with hint markers
-command_follow_in_tab = (vim) ->
-  callback = (marker) ->
-    marker.element.focus()
-    utils.simulateClick(marker.element, { metaKey: true, ctrlKey: true })
+command_follow_in_tab = helper_follow.bind(undefined, {inTab: true})
 
-  vim.enterMode('hints', [callback])
+# Follow multiple links with hint markers
+command_follow_multiple = helper_follow.bind(undefined, {inTab: true, multiple: true})
 
 # Move current tab to the left
 command_tab_move_left = (vim) ->
@@ -350,6 +355,7 @@ commands = [
 
   new Command('browse', 'follow',                 command_follow,                 ['f'])
   new Command('browse', 'follow_in_tab',          command_follow_in_tab,          ['F'])
+  new Command('browse', 'follow_multiple',        command_follow_multiple,        ['a,f'])
   new Command('browse', 'back',                   command_back,                   ['H'])
   new Command('browse', 'forward',                command_forward,                ['L'])
 

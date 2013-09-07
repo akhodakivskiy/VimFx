@@ -97,6 +97,10 @@ class Marker
   isMatched: ->
     return @hintChars == @enteredHintChars
 
+  reset: ->
+    @setHint(@hintChars)
+    @show()
+
   # Returns string features of the element that can be used in the bloom filter
   # in order to add relevance to the hint marker
   extractBloomFeatures: ->
