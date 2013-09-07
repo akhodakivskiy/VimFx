@@ -40,7 +40,6 @@ checkPassthrough = (event) ->
       when 'popuphidden' then false
 
 suppress = false
-keyStr = undefined
 keyListener = (event) ->
   try
     return if passthrough or getPref('disabled')
