@@ -1,9 +1,9 @@
 <!ENTITY pref.hint_chars.title      "Karakter petunjuk">
-<!ENTITY pref.hint_chars.desc       "Default: fjdksla;ghrueiwovncm">
+<!ENTITY pref.hint_chars.desc       "Default: fjdkslaghrueiwovncm">
 
 <!ENTITY pref.black_list.title      "Daftar Larangan">
-<!ENTITY pref.black_list.desc       "Daftar terpisah koma dari URL dimana VimFx harus nonaktif otomatis. 
-Wildcard dibolehkan: *, !">
+<!ENTITY pref.black_list.desc       "Daftar terpisah koma dari URL dimana VimFx harus nonaktif otomatis.
+Wildcard dibolehkan: *, !. Default: *mail.google.com*">
 
 <!ENTITY pref.scroll_step_lines.title     "Langkah Gulung">
 <!ENTITY pref.scroll_step_lines.desc      "Langkah Gulung">

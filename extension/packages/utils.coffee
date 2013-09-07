@@ -242,21 +242,21 @@ browserSearchSubmission = (str) ->
 
 # Get hint characters, convert them to lower case and fall back
 # to default hint characters if there are less than 3 chars
-getHintChars = do ->
-  # Remove duplicate characters from string (case insensitive)
-  removeDuplicateCharacters = (str) ->
-    seen = {}
-    return str.toLowerCase()
-              .split('')
-              .filter((char) -> if seen[char] then false else (seen[char] = true))
-              .join('')
+getHintChars = ->
+  hintChars = removeDuplicateCharacters(getPref('hint_chars'))
+  if hintChars.length < 2
+    hintChars = getDefaultPref('hint_chars')
 
-  return ->
-    hintChars = removeDuplicateCharacters(getPref('hint_chars'))
-    if hintChars.length < 2
-      hintChars = getDefaultPref('hint_chars')
+  return hintChars
 
-    return hintChars
+# Remove duplicate characters from string (case insensitive)
+removeDuplicateCharacters = (str) ->
+  seen = {}
+  return str
+    .toLowerCase()
+    .split('')
+    .filter((char) -> if seen[char] then false else (seen[char] = true))
+    .join('')
 
 # Return URI to some file in the extension packaged as resource
 getResourceURI = do ->
@@ -266,33 +266,34 @@ getResourceURI = do ->
 # Escape string to render it usable in regular expressions
 regexpEscape = (s) -> s and s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')
 
-exports.Bucket                  = Bucket
-exports.getCurrentTabWindow     = getCurrentTabWindow
-exports.getEventWindow          = getEventWindow
-exports.getEventRootWindow      = getEventRootWindow
-exports.getEventTabBrowser      = getEventTabBrowser
+exports.Bucket                    = Bucket
+exports.getCurrentTabWindow       = getCurrentTabWindow
+exports.getEventWindow            = getEventWindow
+exports.getEventRootWindow        = getEventRootWindow
+exports.getEventTabBrowser        = getEventTabBrowser
 
-exports.getWindowId             = getWindowId
-exports.getRootWindow           = getRootWindow
-exports.isTextInputElement      = isTextInputElement
-exports.isElementEditable       = isElementEditable
-exports.getSessionStore         = getSessionStore
+exports.getWindowId               = getWindowId
+exports.getRootWindow             = getRootWindow
+exports.isTextInputElement        = isTextInputElement
+exports.isElementEditable         = isElementEditable
+exports.getSessionStore           = getSessionStore
 
-exports.loadCss                 = loadCss
+exports.loadCss                   = loadCss
 
-exports.simulateClick           = simulateClick
-exports.simulateWheel           = simulateWheel
-exports.WHEEL_MODE_PIXEL        = WHEEL_MODE_PIXEL
-exports.WHEEL_MODE_LINE         = WHEEL_MODE_LINE
-exports.WHEEL_MODE_PAGE         = WHEEL_MODE_PAGE
-exports.readFromClipboard       = readFromClipboard
-exports.writeToClipboard        = writeToClipboard
-exports.timeIt                  = timeIt
-exports.isBlacklisted           = isBlacklisted
-exports.getVersion              = getVersion
-exports.parseHTML               = parseHTML
-exports.isURL                   = isURL
-exports.browserSearchSubmission = browserSearchSubmission
-exports.getHintChars            = getHintChars
-exports.getResourceURI          = getResourceURI
-exports.regexpEscape            = regexpEscape
+exports.simulateClick             = simulateClick
+exports.simulateWheel             = simulateWheel
+exports.WHEEL_MODE_PIXEL          = WHEEL_MODE_PIXEL
+exports.WHEEL_MODE_LINE           = WHEEL_MODE_LINE
+exports.WHEEL_MODE_PAGE           = WHEEL_MODE_PAGE
+exports.readFromClipboard         = readFromClipboard
+exports.writeToClipboard          = writeToClipboard
+exports.timeIt                    = timeIt
+exports.isBlacklisted             = isBlacklisted
+exports.getVersion                = getVersion
+exports.parseHTML                 = parseHTML
+exports.isURL                     = isURL
+exports.browserSearchSubmission   = browserSearchSubmission
+exports.getHintChars              = getHintChars
+exports.removeDuplicateCharacters = removeDuplicateCharacters
+exports.getResourceURI            = getResourceURI
+exports.regexpEscape              = regexpEscape
