@@ -189,21 +189,29 @@ addToolbarButton = (window) ->
     $(doc, 'navigator-toolbox').palette.removeChild(button)
 
 updateToolbarButton = (button) ->
-  if getPref('disabled')
-    button.style.listStyleImage = iconUrl('grey')
-    button.setAttribute('tooltiptext', _('button_tooltip_disabled'))
-  else if button['VimFx_blacklisted']
-    button.style.listStyleImage = iconUrl('red')
-    button.setAttribute('tooltiptext', _('button_tooltip_blacklisted'))
-  else
-    button.style.listStyleImage = iconUrl('normal')
-    button.setAttribute('tooltiptext', _('button_tooltip_enabled'))
+  switch
+    when getPref('disabled')
+      button.style.listStyleImage = iconUrl('grey')
+      button.setAttribute('tooltiptext', _('button_tooltip_disabled'))
+    when button['VimFx_blacklisted']
+      button.style.listStyleImage = iconUrl('red')
+      button.setAttribute('tooltiptext', _('button_tooltip_blacklisted'))
+    when button['VimFx_insertMode']
+      button.style.listStyleImage = iconUrl('grey')
+      button.setAttribute('tooltiptext', _('button_tooltip_insertMode'))
+    else
+      button.style.listStyleImage = iconUrl('normal')
+      button.setAttribute('tooltiptext', _('button_tooltip_enabled'))
 
-setWindowBlacklisted = (window, blacklisted) ->
-  if button = $(window.document, BUTTON_ID)
-    button['VimFx_blacklisted'] = blacklisted
-    updateToolbarButton(button)
+setWindow = (property, window, value) ->
+  return unless button = $(window.document, BUTTON_ID)
+  button[property] = value
+  updateToolbarButton(button)
+
+setWindowBlacklisted = setWindow.bind(undefined, 'VimFx_blacklisted')
+setWindowInsertMode  = setWindow.bind(undefined, 'VimFx_insertMode')
 
 exports.addToolbarButton         = addToolbarButton
 exports.setWindowBlacklisted     = setWindowBlacklisted
+exports.setWindowInsertMode      = setWindowInsertMode
 exports.setButtonInstallPosition = setButtonInstallPosition

@@ -268,13 +268,11 @@ command_find_prev = (vim, storage) ->
   if find.findStr.length > 0
     storage.findRng = find.find(vim.window, find.findStr, storage.findRng, find.DIRECTION_BACKWARDS, true)
 
+command_insert_mode = (vim) ->
+  vim.enterMode('insert')
+
 command_Esc = (vim, storage, event) ->
-  # Only blur editable elements, in order not to interfere with the browser too much. TODO: Is that
-  # really needed? What if a website has made more elements focusable -- shouldn't those also be
-  # blurred?
-  { activeElement } = vim.window.document
-  if utils.isElementEditable(activeElement)
-    activeElement.blur()
+  utils.blurActiveElement(vim.window)
 
   # Also blur active XUL control if preferencess allow
   if getPref('blur_on_esc')
@@ -363,6 +361,7 @@ commands = [
   new Command('misc',   'find_hl',                command_find_hl,                ['a,/'])
   new Command('misc',   'find_next',              command_find_next,              ['n'])
   new Command('misc',   'find_prev',              command_find_prev,              ['N'])
+  new Command('misc',   'insert_mode',            command_insert_mode,            ['i'])
   new Command('misc',   'help',                   command_help,                   ['?'])
   new Command('misc',   'Esc',                    command_Esc,                    ['Esc'])
   new Command('misc',   'dev',                    command_dev,                    [':'])

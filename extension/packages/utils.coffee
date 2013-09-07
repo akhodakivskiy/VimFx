@@ -76,6 +76,14 @@ isElementEditable = (element) ->
          element.getAttribute('contenteditable')?.toLowerCase() == 'true' or \
          element.ownerDocument?.designMode?.toLowerCase() == 'on'
 
+blurActiveElement = (window) ->
+  # Only blur editable elements, in order not to interfere with the browser too much. TODO: Is that
+  # really needed? What if a website has made more elements focusable -- shouldn't those also be
+  # blurred?
+  { activeElement } = window.document
+  if isElementEditable(activeElement)
+    activeElement.blur()
+
 getWindowId = (window) ->
   return window
     .QueryInterface(Components.interfaces.nsIInterfaceRequestor)
@@ -279,6 +287,7 @@ exports.getWindowId             = getWindowId
 exports.getRootWindow           = getRootWindow
 exports.isTextInputElement      = isTextInputElement
 exports.isElementEditable       = isElementEditable
+exports.blurActiveElement       = blurActiveElement
 exports.getSessionStore         = getSessionStore
 
 exports.loadCss                 = loadCss
