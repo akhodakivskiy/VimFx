@@ -31,7 +31,7 @@ class Vim
     @keys.push(keyStr)
 
     if @mode == MODE_NORMAL
-      { match, exact, command, index } = @searchForCommand(@commands)
+      { match, exact, command } = @searchForCommand(@commands)
 
       if match
         if exact then command.func(this, @storage.commands[command.name], event)

@@ -10,7 +10,6 @@ exports.mode_hints =
     storage.markers  = markers
     storage.callback = callback
 
-  # Processes the char, updates and hides/shows markers
   onInput: (vim, storage, keyStr, event) ->
     { markers, callback } = storage
 

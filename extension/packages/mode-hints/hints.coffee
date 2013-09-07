@@ -212,8 +212,8 @@ rotateOverlappingMarkers = (originalMarkers, forward) ->
     # This sort is not required, but makes the rotation more predictable.
     stack.sort((a, b) -> a.markerElement.style.zIndex - b.markerElement.style.zIndex)
 
-    # Array of z indices
-    indexStack = (m.markerElement.style.zIndex for m in stack)
+    # Array of z-indices
+    indexStack = (marker.markerElement.style.zIndex for marker in stack)
     # Shift the array of indices one item forward or back
     if forward
       indexStack.unshift(indexStack.pop())
