@@ -19,7 +19,7 @@ MARKABLE_ELEMENTS = [
   "textarea"
   "button"
   "select"
-  "input[not(@type='hidden' or @disabled or @readonly)]"
+  "input[not(@type='hidden' or @disabled)]"
   "embed"
   "object"
 ]
