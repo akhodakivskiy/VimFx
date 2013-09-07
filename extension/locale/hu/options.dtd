@@ -1,8 +1,8 @@
 <!ENTITY pref.hint_chars.title      "Segéd karakterek">
-<!ENTITY pref.hint_chars.desc       "Alapértelmezett: fjdksla;ghrueiwovncm">
+<!ENTITY pref.hint_chars.desc       "Alapértelmezett: fjdkslaghrueiwovncm">
 
 <!ENTITY pref.black_list.title      "Fekete lista">
-<!ENTITY pref.black_list.desc       "Vesszővel elválasztott URL-ek, ahol a VimFX inaktív legyen. Helyettesítő karakterek is használhatók: *, !">
+<!ENTITY pref.black_list.desc       "Vesszővel elválasztott URL-ek, ahol a VimFX inaktív legyen. Helyettesítő karakterek is használhatók: *, !. Alapértelmezett: *mail.google.com*">
 
 <!ENTITY pref.scroll_step_lines.title   "Görgetés mértéke">
 <!ENTITY pref.scroll_step_lines.desc    "Görgetés mértéke">

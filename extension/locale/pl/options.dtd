@@ -1,9 +1,9 @@
 <!ENTITY pref.hint_chars.title      "Znaki podpowiedzi">
-<!ENTITY pref.hint_chars.desc       "Domyślnie: fjdksla;ghrueiwovncm">
+<!ENTITY pref.hint_chars.desc       "Domyślnie: fjdkslaghrueiwovncm">
 
 <!ENTITY pref.black_list.title      "Czarna lista">
 <!ENTITY pref.black_list.desc       "Lista adresów oddzielonych przecinkami pod którymi VimFx powinien być automatycznie wyłączony.
-Dopuszczalne wieloznaczniki: *, !">
+Dopuszczalne wieloznaczniki: *, !. Domyślnie: *mail.google.com*">
 
 <!ENTITY pref.scroll_step_liens.title   "Krok przewijania">
 <!ENTITY pref.scroll_step_lines.desc    "Krok przewijania">

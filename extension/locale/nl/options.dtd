@@ -1,9 +1,9 @@
 <!ENTITY pref.hint_chars.title      "Gebruikte karakters">
-<!ENTITY pref.hint_chars.desc       "Standaard: asdfgercvhjkl;uinm">
+<!ENTITY pref.hint_chars.desc       "Standaard: fjdkslaghrueiwovncm">
 
 <!ENTITY pref.black_list.title      "Zwarte lijst">
 <!ENTITY pref.black_list.desc       "Door komma's gescheiden lijst van adressen waarop VimFx automatisch uitgeschakeld moet worden.
-Speciale tekens toegestaan: *, !">
+Speciale tekens toegestaan: *, !. Standaard: *mail.google.com*">
 
 <!ENTITY pref.scroll_step_lines.title   "Scrollstapgrootte">
 <!ENTITY pref.scroll_step_lines.desc    "Scrollstapgrootte">
