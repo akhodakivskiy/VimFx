@@ -25,6 +25,7 @@ class Vim
     return if @mode == MODE_NORMAL
     @modes[@mode].onEnterNormalMode?(this, @storage.modes[@mode])
     @mode = MODE_NORMAL
+    @keys.length = 0
 
   onInput: (keyStr, event) ->
     @keys.push(keyStr)
