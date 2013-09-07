@@ -13,3 +13,6 @@ Dopuszczalne wieloznaczniki: *, !">
 
 <!ENTITY pref.leave_dt_on_esc.title "Escape nie zamyka paska programisty">
 <!ENTITY pref.leave_dt_on_esc.desc  "Pasek programisty nie zostanie zamknięty jeśli jest widoczny i wciśnięto Escape">
+
+<!ENTITY pref.hints_bloom_on.title "Smart hint assignment">
+<!ENTITY pref.hints_bloom_on.desc  "Assign shorter hints to the links that users visit most often">
