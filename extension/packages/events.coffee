@@ -105,12 +105,15 @@ windowsListeners =
 
 # This listener works on individual tabs within Chrome Window
 tabsListener =
-  # Listenfor location changes, disable the extension on blacklisted urls, and make sure that we
-  # start out in normal mode
+  # Listenfor location changes and disable the extension on blacklisted urls
   onLocationChange: (browser, webProgress, request, location) ->
     return unless vim = vimBucket.get(browser.contentWindow)
 
-    vim.enterNormalMode()
+    # If the location changes when in hints mode (for example because the reload button has been
+    # clicked), we're going to end up in hints mode without any markers. So switch back to normal
+    # mode in that case.
+    if vim.mode == 'hints'
+      vim.enterNormalMode()
 
     blacklisted = utils.isBlacklisted(location.spec, getPref('black_list'))
     vim.blacklisted = blacklisted
