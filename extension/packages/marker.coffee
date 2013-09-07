@@ -70,8 +70,6 @@ class Marker
 
     @markerElement.appendChild(fragment)
 
-    @completePosition()
-
   # Add another char to the `enteredHintString`,
   # see if it still matches `hintString`, apply classes to
   # the distinct hint characters and show/hide marker when
