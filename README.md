@@ -43,14 +43,14 @@ VimFx will be nice to your browser and to your habits. Promise.
 
 - Concise shortcuts for most commonly performed actions
 - Follow and access controls on the page using hint markers
-- Easy access to the Help page which describes all available shortcuts (press ?)
+- Easy access to the keyboard shortcuts dialog, which describes and lets you customize all available shortcuts (press ?)
 
 ## Shortcuts
 
-Might not be up to date. Please refer to the Help dialog withing the extension
-for the most relevant list.
+This is a text representation of the keyboard shortcuts dialog within the extension. Might not be up to date.
+Press ? or use the toolbar button to open the dialog, which helps you remember the shortcuts, and lets you customize them.
 
-Global shortcut to enable/disable VimFx: `Shift-Alt-v`
+Global shortcut to enable/disable VimFx: `shift-alt-v`
 
 ### Dealing with URLs
 
@@ -106,9 +106,11 @@ Global shortcut to enable/disable VimFx: `Shift-Alt-v`
     a.,a/   Enter Find mode to highlight all matches
     n       Go to the next Find match
     N       Go to the previous Find match
-    ?,>     Show Help Dialog
+    ?,>     Show this dialog
     Esc     Close this dialog and cancel hint markers
     :       Open Developer Toolbar
+
+Can't see a link hint, because it's overlapped by another? Try pressing space or shift-space!
 
 ## Contributing and Reporting Issues
 
@@ -128,7 +130,7 @@ Global shortcut to enable/disable VimFx: `Shift-Alt-v`
 - Put a file called exactly `VimFx@akhodakivskiy.github.com` in the extensions/ folder of a Firefox
   profile, containing the absolute path to the extension/ folder in the project. Then you just need
   to restart Firefox (use some add-on!) after each change. More details in [this MDN article][mdn-extdevenv].
-- Only create tickets for issues and feature requests in English. Otherwise duplicate 
+- Only create tickets for issues and feature requests in English. Otherwise duplicate
   tickets in different languages will pile up.
 
 [mdn-extdevenv]: https://developer.mozilla.org/en-US/docs/Setting_up_extension_development_environment#Firefox_extension_proxy_file
