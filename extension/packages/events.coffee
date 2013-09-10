@@ -127,7 +127,7 @@ windowsListener =
 # on black listed urls
 tabsListener =
   onLocationChange: (browser, webProgress, request, location) ->
-    blacklisted = utils.isBlacklisted(location.spec, getPref('black_list'))
+    blacklisted = utils.isBlacklisted(location.spec)
     if vim = vimBucket.get(browser.contentWindow)
       vim.enterNormalMode()
       vim.blacklisted = blacklisted

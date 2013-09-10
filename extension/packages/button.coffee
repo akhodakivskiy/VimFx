@@ -61,26 +61,19 @@ restorePosition = (doc, button) ->
 
     toolbar.insertItem(button.id)
 
-iconUrl = do ->
-  kinds =
-    normal:    utils.getResourceURI('resources/icon16.png').spec
-    grey:      utils.getResourceURI('resources/icon16-grey.png').spec
-    red:       utils.getResourceURI('resources/icon16-red.png').spec
-    blacklist: utils.getResourceURI('resources/icon16-blacklist.png').spec
-
-  return (kind) -> "url(#{ kinds[kind] })"
+iconUrl = (kind) ->
+  url = utils.getResourceURI("resources/icon16-#{kind}.png").spec
+  return "url(#{ url })"
 
 
-createMenupopup = (window) ->
+createMenupopup = (window, button) ->
   doc = window.document
 
   blacklistTextbox = doc.createElement('textbox')
   blacklistTextbox.id = TEXTBOX_BLACKLIST_ID
   blacklistButton = doc.createElement('toolbarbutton')
   blacklistButton.id = BUTTON_BLACKLIST_ID
-  blacklistButton.setAttribute('tooltiptext', _('item_blacklist_button_tooltip'))
   blacklistButton.setAttribute('class', 'toolbarbutton-1')
-  blacklistButton.style.listStyleImage = iconUrl('blacklist')
   hbox = doc.createElement('hbox')
   hbox.appendChild(blacklistTextbox)
   hbox.appendChild(blacklistButton)
@@ -101,15 +94,26 @@ createMenupopup = (window) ->
   menupopup.appendChild(itemHelp)
 
   onPopupShowing = (event) ->
-    if tabWindow = window.gBrowser.selectedTab.linkedBrowser.contentWindow
-      blacklistTextbox.value = "*#{ tabWindow.location.host }*"
+    return unless tabWindow = window.gBrowser.selectedTab.linkedBrowser.contentWindow
+
+    { blacklisted, matchedRule } = button['VimFx_blacklisted'] or {}
+    if blacklisted
+      blacklistTextbox.value = matchedRule
+      blacklistButton.setAttribute('tooltiptext', _('item_blacklist_button_inverse_tooltip'))
+      blacklistButton.style.listStyleImage = iconUrl('blacklist_inverse')
+    else
+      # In `about:` pages, the `host` property is an empty string. Fall back to the whole URL
+      blacklistTextbox.value = "*#{ tabWindow.location.host or tabWindow.location }*"
+      blacklistButton.setAttribute('tooltiptext', _('item_blacklist_button_tooltip'))
+      blacklistButton.style.listStyleImage = iconUrl('blacklist')
 
   onBlacklistButtonCommand = (event) ->
-    blackList = getPref('black_list')
-    blackList += ', ' if blackList.length > 0
-    blackList += blacklistTextbox.value
+    { blacklisted, matchedRule } = button['VimFx_blacklisted'] or {}
+    if blacklisted
+      utils.updateBlacklist({remove: matchedRule})
+    else
+      utils.updateBlacklist({add: blacklistTextbox.value})
 
-    setPref('black_list', blackList)
     menupopup.hidePopup()
 
     if tabWindow = window.gBrowser.selectedTab.linkedBrowser.contentWindow
@@ -134,6 +138,7 @@ createMenupopup = (window) ->
   itemPreferences.addEventListener  'command',      onPreferencesCommand,     false
   itemHelp.addEventListener         'command',      onHelpCommand,            false
 
+  button.appendChild(menupopup)
   return menupopup
 
 createButton = (window) ->
@@ -155,8 +160,7 @@ createButton = (window) ->
 
   button.addEventListener('command', onButtonCommand, false)
 
-  menupopup = createMenupopup(window)
-  button.appendChild(menupopup)
+  createMenupopup(window, button)
 
   vimkey = doc.createElement('key')
   vimkey.setAttribute('id', KEY_ID)

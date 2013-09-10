@@ -1,5 +1,6 @@
 { unload } = require 'unload'
 { getPref
+, setPref
 , getDefaultPref
 } = require 'prefs'
 
@@ -194,14 +195,37 @@ timeIt = (func, msg) ->
   return result
 
 # Checks if the string provided matches one of the black list entries
-# `blackList`: comma/space separated list of URLs with wildcards (* and !)
-isBlacklisted = (str, blackList) ->
-  for rule in blackList.split(/[\s,]+/)
-    rule = rule.replace(/\*/g, '.*').replace(/\!/g, '.')
-    if str.match ///^#{ rule }$///
-      return true
+isBlacklisted = (str) ->
+  for rule in getBlacklist()
+    # Wildcards: * and !
+    regexifiedRule = rule.replace(/\*/g, '.*').replace(/!/g, '.')
+    if str.match(///^#{ regexifiedRule }$///)
+      return {blacklisted: true, matchedRule: rule}
 
   return false
+
+getBlacklist = ->
+  # Comma/space separated list
+  return getPref('black_list').split(/[\s,]+/)
+
+setBlacklist = (blacklist) ->
+  setPref('black_list', blacklist.join(', '))
+
+updateBlacklist = ({ add, remove} = {}) ->
+  blacklist = getBlacklist()
+
+  if add
+    blacklist.push(add)
+
+  # Remove duplicates and empty rules
+  seen = {}
+  blacklist = blacklist
+    .filter((rule) -> if seen[rule] or rule == '' then false else (seen[rule] = true))
+
+  if remove and remove in blacklist
+    blacklist.splice(blacklist.indexOf(remove), 1)
+
+  setBlacklist(blacklist)
 
 # Gets VimFx verions. AddonManager only provides async API to access addon data, so it's a bit tricky...
 getVersion = do ->
@@ -288,7 +312,12 @@ exports.WHEEL_MODE_PAGE           = WHEEL_MODE_PAGE
 exports.readFromClipboard         = readFromClipboard
 exports.writeToClipboard          = writeToClipboard
 exports.timeIt                    = timeIt
+
 exports.isBlacklisted             = isBlacklisted
+exports.getBlacklist              = getBlacklist
+exports.setBlacklist              = setBlacklist
+exports.updateBlacklist           = updateBlacklist
+
 exports.getVersion                = getVersion
 exports.parseHTML                 = parseHTML
 exports.isURL                     = isURL
