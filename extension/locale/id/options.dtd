@@ -17,3 +17,5 @@ Wildcard dibolehkan: *, !. Default: *mail.google.com*">
 <!ENTITY pref.hints_bloom_on.title "Penempatan petunjuk cerdas">
 <!ENTITY pref.hints_bloom_on.desc  "Menempatkan petunjuk lebih pendek untuk pranala yang sering dikunjungi">
 
+<!ENTITY customizeButton.title "Keyboard Shortcuts">
+<!ENTITY customizeButton.label "Customize">
