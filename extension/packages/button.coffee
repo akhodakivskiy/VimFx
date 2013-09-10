@@ -91,7 +91,7 @@ createMenupopup = (window) ->
 
   itemHelp = doc.createElement('menuitem')
   itemHelp.id = MENU_ITEM_HELP
-  itemHelp.setAttribute('label', _('item_help'))
+  itemHelp.setAttribute('label', _('help_title'))
 
   menupopup = doc.createElement('menupopup')
   menupopup.id = MENUPOPUP_ID

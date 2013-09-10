@@ -16,3 +16,6 @@
 
 <!ENTITY pref.hints_bloom_on.title "Умное распределение маркеров">
 <!ENTITY pref.hints_bloom_on.desc  "Назначать короткие маркеры ссылкам и элементам, которые часто используются">
+
+<!ENTITY customizeButton.title "Keyboard Shortcuts">
+<!ENTITY customizeButton.label "Customize">

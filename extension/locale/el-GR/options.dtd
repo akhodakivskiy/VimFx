@@ -16,3 +16,6 @@ Wildcards allowed: *, !. Προεπιλογή: *mail.google.com*">
 
 <!ENTITY pref.hints_bloom_on.title "Έξυπνη ανάθεση υποδείξεων">
 <!ENTITY pref.hints_bloom_on.desc  "Ανάθεσε μικρότερες υποδείξεις στους συνδέσμους που οι χρήστες επισκέπτονται συχνότερα">
+
+<!ENTITY customizeButton.title "Keyboard Shortcuts">
+<!ENTITY customizeButton.label "Customize">

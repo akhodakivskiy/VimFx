@@ -1,16 +1,25 @@
 { removeDuplicateCharacters } = require 'utils'
-{ unload }  = require 'unload'
-{ getPref } = require 'prefs'
+{ unload }   = require 'unload'
+{ getPref }  = require 'prefs'
+help         = require 'help'
+{ commands } = require 'commands'
 
 observer =
   observe: (document, topic, addon) ->
     return unless addon == getPref('addon_id')
+
     hintCharsInput = document.querySelector('setting[pref="extensions.VimFx.hint_chars"]')
+
+    customizeButton = document.getElementById('customizeButton')
+    injectHelp = help.injectHelp.bind(undefined, document, commands)
+
     switch topic
       when 'addon-options-displayed'
         hintCharsInput.addEventListener('change', filterChars, false)
+        customizeButton.addEventListener('command', injectHelp, false)
       when 'addon-options-hidden'
         hintCharsInput.removeEventListener('change', filterChars, false)
+        customizeButton.removeEventListener('command', injectHelp, false)
 
 filterChars = (event) ->
   input = event.target

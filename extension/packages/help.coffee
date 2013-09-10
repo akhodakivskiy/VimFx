@@ -1,26 +1,32 @@
-utils = require 'utils'
-prefs = require 'prefs'
-{ _ } = require 'l10n'
+utils        = require 'utils'
+prefs        = require 'prefs'
+{ _ }        = require 'l10n'
 
 { classes: Cc, interfaces: Ci, utils: Cu } = Components
+
+XULDocument  = Ci.nsIDOMXULDocument
 
 CONTAINER_ID = 'VimFxHelpDialogContainer'
 
 removeHelp = (document) ->
-  if div = document.getElementById(CONTAINER_ID)
-    div.parentNode.removeChild(div)
+  document.getElementById(CONTAINER_ID)?.remove()
 
 injectHelp = (document, commands) ->
   if document.documentElement
-    if div = document.getElementById(CONTAINER_ID)
-      div.parentNode.removeChild(div)
-    div = document.createElement 'div'
-    div.id = CONTAINER_ID
-    div.className = 'VimFxReset'
+    removeHelp(document)
 
-    div.appendChild(utils.parseHTML(document, helpDialogHtml(commands)))
+    if document instanceof XULDocument
+      container = document.createElement('box')
+      # The `.VimFxReset` class is not needed in XUL documents. Instead it actullay causes layout
+      # problems there!
+    else
+      container = document.createElement('div')
+      container.className = 'VimFxReset'
+    container.id = CONTAINER_ID
 
-    document.documentElement.appendChild(div)
+    container.appendChild(utils.parseHTML(document, helpDialogHtml(commands)))
+
+    document.documentElement.appendChild(container)
 
     installHandlers(document, commands)
 
@@ -133,7 +139,7 @@ helpDialogHtml = (commands) ->
     <div class="VimFxReset VimFxHeader">
       <div class="VimFxReset VimFxTitle">
         <span class="VimFxReset VimFxTitleVim">Vim</span><span class="VimFxReset VimFxTitleFx">Fx</span>
-        <span class="VimFxReset">#{ _('help') }</span>
+        <span class="VimFxReset">#{ _('help_title') }</span>
       </div>
       <span class="VimFxReset VimFxVersion">#{ _('help_version') } #{ utils.getVersion() }</span>
       <a class="VimFxReset VimFxClose" id="VimFxClose" href="#">&#10006;</a>
