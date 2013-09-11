@@ -32,13 +32,6 @@ class Bucket
   forget: (obj) ->
     delete @bucket[id] if id = @idFunc(obj)
 
-# Returns the `window` from the currently active tab.
-getCurrentTabWindow = (event) ->
-  if window = getEventWindow(event)
-    if rootWindow = getRootWindow(window)
-      return rootWindow.gBrowser.selectedTab.linkedBrowser.contentWindow
-
-# Returns the window associated with the event
 getEventWindow = (event) ->
   if event.originalTarget instanceof Window
     return event.originalTarget
@@ -48,11 +41,12 @@ getEventWindow = (event) ->
       return doc.defaultView
 
 getEventRootWindow = (event) ->
-  if window = getEventWindow(event)
-    return getRootWindow(window)
+  return unless window = getEventWindow(event)
+  return getRootWindow(window)
 
-getEventTabBrowser = (event) ->
-  cw.gBrowser if cw = getEventRootWindow(event)
+getEventCurrentTabWindow = (event) ->
+  return unless rootWindow = getEventRootWindow(event)
+  return getCurrentTabWindow(rootWindow)
 
 getRootWindow = (window) ->
   return window.QueryInterface(Ci.nsIInterfaceRequestor)
@@ -61,6 +55,9 @@ getRootWindow = (window) ->
                .rootTreeItem
                .QueryInterface(Ci.nsIInterfaceRequestor)
                .getInterface(Window)
+
+getCurrentTabWindow = (window) ->
+  return window.gBrowser.selectedTab.linkedBrowser.contentWindow
 
 isTextInputElement = (element) ->
   return element instanceof HTMLInputElement or \
@@ -194,15 +191,19 @@ timeIt = (func, msg) ->
   console.log(msg, end - start)
   return result
 
-# Checks if the string provided matches one of the black list entries
 isBlacklisted = (str) ->
+  matchingRule = getMatchingBlacklistRule(str)
+  return if matchingRule? then true else false
+
+# Returns the first rule in the blacklist that matches the provided string
+getMatchingBlacklistRule = (str) ->
   for rule in getBlacklist()
     # Wildcards: * and !
     regexifiedRule = rule.replace(/\*/g, '.*').replace(/!/g, '.')
     if str.match(///^#{ regexifiedRule }$///)
-      return {blacklisted: true, matchedRule: rule}
+      return rule
 
-  return false
+  return null
 
 getBlacklist = ->
   # Comma/space separated list
@@ -217,10 +218,8 @@ updateBlacklist = ({ add, remove} = {}) ->
   if add
     blacklist.push(add)
 
-  # Remove duplicates and empty rules
-  seen = {}
-  blacklist = blacklist
-    .filter((rule) -> if seen[rule] or rule == '' then false else (seen[rule] = true))
+  blacklist = blacklist.filter((rule) -> rule != '')
+  blacklist = removeDuplicates(blacklist)
 
   if remove and remove in blacklist
     blacklist.splice(blacklist.indexOf(remove), 1)
@@ -275,12 +274,7 @@ getHintChars = ->
 
 # Remove duplicate characters from string (case insensitive)
 removeDuplicateCharacters = (str) ->
-  seen = {}
-  return str
-    .toLowerCase()
-    .split('')
-    .filter((char) -> if seen[char] then false else (seen[char] = true))
-    .join('')
+  return removeDuplicates( str.toLowerCase().split('') ).join('')
 
 # Return URI to some file in the extension packaged as resource
 getResourceURI = do ->
@@ -290,14 +284,18 @@ getResourceURI = do ->
 # Escape string to render it usable in regular expressions
 regexpEscape = (s) -> s and s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')
 
+removeDuplicates = (array) ->
+  seen = {}
+  return array.filter((item) -> if seen[item] then false else (seen[item] = true))
+
 exports.Bucket                    = Bucket
-exports.getCurrentTabWindow       = getCurrentTabWindow
 exports.getEventWindow            = getEventWindow
 exports.getEventRootWindow        = getEventRootWindow
-exports.getEventTabBrowser        = getEventTabBrowser
+exports.getEventCurrentTabWindow  = getEventCurrentTabWindow
+exports.getRootWindow             = getRootWindow
+exports.getCurrentTabWindow       = getCurrentTabWindow
 
 exports.getWindowId               = getWindowId
-exports.getRootWindow             = getRootWindow
 exports.isTextInputElement        = isTextInputElement
 exports.isElementEditable         = isElementEditable
 exports.getSessionStore           = getSessionStore
@@ -313,9 +311,8 @@ exports.readFromClipboard         = readFromClipboard
 exports.writeToClipboard          = writeToClipboard
 exports.timeIt                    = timeIt
 
+exports.getMatchingBlacklistRule  = getMatchingBlacklistRule
 exports.isBlacklisted             = isBlacklisted
-exports.getBlacklist              = getBlacklist
-exports.setBlacklist              = setBlacklist
 exports.updateBlacklist           = updateBlacklist
 
 exports.getVersion                = getVersion
