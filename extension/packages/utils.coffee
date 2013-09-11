@@ -192,37 +192,42 @@ timeIt = (func, msg) ->
   return result
 
 isBlacklisted = (str) ->
-  matchingRule = getMatchingBlacklistRule(str)
-  return if matchingRule? then true else false
+  matchingRules = getMatchingBlacklistRules(str)
+  return (matchingRules.length != 0)
 
-# Returns the first rule in the blacklist that matches the provided string
-getMatchingBlacklistRule = (str) ->
+# Returns all rules in the blacklist that match the provided string
+getMatchingBlacklistRules = (str) ->
+  matchingRules = []
   for rule in getBlacklist()
     # Wildcards: * and !
-    regexifiedRule = rule.replace(/\*/g, '.*').replace(/!/g, '.')
+    regexifiedRule = regexpEscape(rule).replace(/\\\*/g, '.*').replace(/!/g, '.')
     if str.match(///^#{ regexifiedRule }$///)
-      return rule
+      matchingRules.push(rule)
 
-  return null
+  return matchingRules
 
 getBlacklist = ->
-  # Comma/space separated list
-  return getPref('black_list').split(/[\s,]+/)
+  return splitBlacklistString(getPref('black_list'))
 
 setBlacklist = (blacklist) ->
   setPref('black_list', blacklist.join(', '))
+
+splitBlacklistString = (str) ->
+  # Comma/space separated list
+  return str.split(/[\s,]+/)
 
 updateBlacklist = ({ add, remove} = {}) ->
   blacklist = getBlacklist()
 
   if add
-    blacklist.push(add)
+    blacklist.push(splitBlacklistString(add)...)
 
   blacklist = blacklist.filter((rule) -> rule != '')
   blacklist = removeDuplicates(blacklist)
 
-  if remove and remove in blacklist
-    blacklist.splice(blacklist.indexOf(remove), 1)
+  if remove
+    for rule in splitBlacklistString(remove) when rule in blacklist
+      blacklist.splice(blacklist.indexOf(rule), 1)
 
   setBlacklist(blacklist)
 
@@ -311,7 +316,7 @@ exports.readFromClipboard         = readFromClipboard
 exports.writeToClipboard          = writeToClipboard
 exports.timeIt                    = timeIt
 
-exports.getMatchingBlacklistRule  = getMatchingBlacklistRule
+exports.getMatchingBlacklistRules  = getMatchingBlacklistRules
 exports.isBlacklisted             = isBlacklisted
 exports.updateBlacklist           = updateBlacklist
 

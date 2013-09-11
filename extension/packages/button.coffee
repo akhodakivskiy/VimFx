@@ -112,8 +112,8 @@ createMenupopup = (window, button) ->
     return unless tabWindow = utils.getCurrentTabWindow(window)
 
     if button.VimFx.blacklisted
-      matchedRule = utils.getMatchingBlacklistRule(tabWindow.location.href)
-      blacklistTextbox.value = matchedRule
+      matchingRules = utils.getMatchingBlacklistRules(tabWindow.location.href)
+      blacklistTextbox.value = matchingRules.join(', ')
       blacklistTextbox.setAttribute('readonly', true)
       blacklistButton.setAttribute('tooltiptext', _('item_blacklist_button_inverse_tooltip'))
       blacklistButton.style.listStyleImage = iconUrl('blacklist_inverse')
