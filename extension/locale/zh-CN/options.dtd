@@ -17,5 +17,5 @@
 <!ENTITY pref.hints_bloom_on.title "智能分配提示符">
 <!ENTITY pref.hints_bloom_on.desc  "为最常访问的链接分配更短的提示符">
 
-<!ENTITY customizeButton.title "Keyboard Shortcuts">
-<!ENTITY customizeButton.label "Customize">
+<!ENTITY customizeButton.title "键盘快捷键">
+<!ENTITY customizeButton.label "自定义">
