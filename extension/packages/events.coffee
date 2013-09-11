@@ -2,8 +2,8 @@ utils                    = require 'utils'
 keyUtils                 = require 'key-utils'
 { Vim }                  = require 'vim'
 { getPref }              = require 'prefs'
-{ setWindowBlacklisted } = require 'button'
-{ unload }               = require 'unload'
+{ updateToolbarButton } = require 'button'
+{ unload }              = require 'unload'
 
 { interfaces: Ci } = Components
 
@@ -49,7 +49,7 @@ windowsListener =
       # and if there is no focused editable element or if it's the *Esc* key,
       # which will remove the focus from the currently focused element
       if keyStr and (not isEditable or keyStr == 'Esc')
-        if window = utils.getCurrentTabWindow(event)
+        if window = utils.getEventCurrentTabWindow(event)
           if vim = vimBucket.get(window)
             if vim.blacklisted
               return
@@ -74,7 +74,7 @@ windowsListener =
 
       # Try to execute keys that were accumulated so far.
       # Suppress event if there is a matching command.
-      if window = utils.getCurrentTabWindow(event)
+      if window = utils.getEventCurrentTabWindow(event)
         if vim = vimBucket.get(window)
           if vim.blacklisted
             return
@@ -89,7 +89,7 @@ windowsListener =
     if passthrough or getPref('disabled')
       return
 
-    if window = utils.getCurrentTabWindow event
+    if window = utils.getEventCurrentTabWindow(event)
       if vim = vimBucket.get(window)
         if vim.handleKeyUp(event)
           suppressEvent(event)
@@ -106,33 +106,34 @@ windowsListener =
   # When the top level window closes we should release all Vims that were
   # associated with tabs in this window
   DOMWindowClose: (event) ->
-    if gBrowser = event.originalTarget.gBrowser
-      for tab in gBrowser.tabs
-        if browser = gBrowser.getBrowserForTab(tab)
-          vimBucket.forget(browser.contentWindow)
+    return unless { gBrowser } = event.originalTarget
+    for tab in gBrowser.tabs
+      if browser = gBrowser.getBrowserForTab(tab)
+        vimBucket.forget(browser.contentWindow)
 
   TabClose: (event) ->
-    if gBrowser = utils.getEventTabBrowser(event)
-      if browser = gBrowser.getBrowserForTab(event.originalTarget)
-        vimBucket.forget(browser.contentWindow)
+    return unless { gBrowser } = utils.getEventRootWindow(event) ? {}
+    return unless browser = gBrowser.getBrowserForTab(event.originalTarget)
+    vimBucket.forget(browser.contentWindow)
 
   # Update the toolbar button icon to reflect the blacklisted state
   TabSelect: (event) ->
-    if vim = vimBucket.get(event.originalTarget?.linkedBrowser?.contentDocument?.defaultView)
-      if rootWindow = utils.getRootWindow(vim.window)
-        setWindowBlacklisted(rootWindow, vim.blacklisted)
+    return unless vim = vimBucket.get(event.originalTarget?.linkedBrowser?.contentDocument?.defaultView)
+    return unless rootWindow = utils.getRootWindow(vim.window)
+    updateToolbarButton(rootWindow, {blacklisted: vim.blacklisted})
 
 # This listener works on individual tabs within Chrome Window
 # User for: listening for location changes and disabling the extension
 # on black listed urls
 tabsListener =
   onLocationChange: (browser, webProgress, request, location) ->
-    blacklisted = utils.isBlacklisted(location.spec, getPref('black_list'))
-    if vim = vimBucket.get(browser.contentWindow)
-      vim.enterNormalMode()
-      vim.blacklisted = blacklisted
-      if rootWindow = utils.getRootWindow(vim.window)
-        setWindowBlacklisted(rootWindow, vim.blacklisted)
+    return unless vim = vimBucket.get(browser.contentWindow)
+
+    vim.enterNormalMode()
+
+    return unless rootWindow = utils.getRootWindow(vim.window)
+    vim.blacklisted = utils.isBlacklisted(location.spec)
+    updateToolbarButton(rootWindow, {blacklisted: vim.blacklisted})
 
 addEventListeners = (window) ->
   for name, listener of windowsListener
