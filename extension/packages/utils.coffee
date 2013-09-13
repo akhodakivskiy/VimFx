@@ -1,5 +1,6 @@
 { unload } = require 'unload'
 { getPref
+, setPref
 , getDefaultPref
 } = require 'prefs'
 
@@ -31,13 +32,6 @@ class Bucket
   forget: (obj) ->
     delete @bucket[id] if id = @idFunc(obj)
 
-# Returns the `window` from the currently active tab.
-getCurrentTabWindow = (event) ->
-  if window = getEventWindow(event)
-    if rootWindow = getRootWindow(window)
-      return rootWindow.gBrowser.selectedTab.linkedBrowser.contentWindow
-
-# Returns the window associated with the event
 getEventWindow = (event) ->
   if event.originalTarget instanceof Window
     return event.originalTarget
@@ -47,11 +41,12 @@ getEventWindow = (event) ->
       return doc.defaultView
 
 getEventRootWindow = (event) ->
-  if window = getEventWindow(event)
-    return getRootWindow(window)
+  return unless window = getEventWindow(event)
+  return getRootWindow(window)
 
-getEventTabBrowser = (event) ->
-  cw.gBrowser if cw = getEventRootWindow(event)
+getEventCurrentTabWindow = (event) ->
+  return unless rootWindow = getEventRootWindow(event)
+  return getCurrentTabWindow(rootWindow)
 
 getRootWindow = (window) ->
   return window.QueryInterface(Ci.nsIInterfaceRequestor)
@@ -60,6 +55,9 @@ getRootWindow = (window) ->
                .rootTreeItem
                .QueryInterface(Ci.nsIInterfaceRequestor)
                .getInterface(Window)
+
+getCurrentTabWindow = (window) ->
+  return window.gBrowser.selectedTab.linkedBrowser.contentWindow
 
 isTextInputElement = (element) ->
   return element instanceof HTMLInputElement or \
@@ -193,15 +191,45 @@ timeIt = (func, msg) ->
   console.log(msg, end - start)
   return result
 
-# Checks if the string provided matches one of the black list entries
-# `blackList`: comma/space separated list of URLs with wildcards (* and !)
-isBlacklisted = (str, blackList) ->
-  for rule in blackList.split(/[\s,]+/)
-    rule = rule.replace(/\*/g, '.*').replace(/\!/g, '.')
-    if str.match ///^#{ rule }$///
-      return true
+isBlacklisted = (str) ->
+  matchingRules = getMatchingBlacklistRules(str)
+  return (matchingRules.length != 0)
 
-  return false
+# Returns all rules in the blacklist that match the provided string
+getMatchingBlacklistRules = (str) ->
+  matchingRules = []
+  for rule in getBlacklist()
+    # Wildcards: * and !
+    regexifiedRule = regexpEscape(rule).replace(/\\\*/g, '.*').replace(/!/g, '.')
+    if str.match(///^#{ regexifiedRule }$///)
+      matchingRules.push(rule)
+
+  return matchingRules
+
+getBlacklist = ->
+  return splitBlacklistString(getPref('black_list'))
+
+setBlacklist = (blacklist) ->
+  setPref('black_list', blacklist.join(', '))
+
+splitBlacklistString = (str) ->
+  # Comma/space separated list
+  return str.split(/[\s,]+/)
+
+updateBlacklist = ({ add, remove} = {}) ->
+  blacklist = getBlacklist()
+
+  if add
+    blacklist.push(splitBlacklistString(add)...)
+
+  blacklist = blacklist.filter((rule) -> rule != '')
+  blacklist = removeDuplicates(blacklist)
+
+  if remove
+    for rule in splitBlacklistString(remove) when rule in blacklist
+      blacklist.splice(blacklist.indexOf(rule), 1)
+
+  setBlacklist(blacklist)
 
 # Gets VimFx verions. AddonManager only provides async API to access addon data, so it's a bit tricky...
 getVersion = do ->
@@ -251,12 +279,7 @@ getHintChars = ->
 
 # Remove duplicate characters from string (case insensitive)
 removeDuplicateCharacters = (str) ->
-  seen = {}
-  return str
-    .toLowerCase()
-    .split('')
-    .filter((char) -> if seen[char] then false else (seen[char] = true))
-    .join('')
+  return removeDuplicates( str.toLowerCase().split('') ).join('')
 
 # Return URI to some file in the extension packaged as resource
 getResourceURI = do ->
@@ -266,14 +289,18 @@ getResourceURI = do ->
 # Escape string to render it usable in regular expressions
 regexpEscape = (s) -> s and s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')
 
+removeDuplicates = (array) ->
+  seen = {}
+  return array.filter((item) -> if seen[item] then false else (seen[item] = true))
+
 exports.Bucket                    = Bucket
-exports.getCurrentTabWindow       = getCurrentTabWindow
 exports.getEventWindow            = getEventWindow
 exports.getEventRootWindow        = getEventRootWindow
-exports.getEventTabBrowser        = getEventTabBrowser
+exports.getEventCurrentTabWindow  = getEventCurrentTabWindow
+exports.getRootWindow             = getRootWindow
+exports.getCurrentTabWindow       = getCurrentTabWindow
 
 exports.getWindowId               = getWindowId
-exports.getRootWindow             = getRootWindow
 exports.isTextInputElement        = isTextInputElement
 exports.isElementEditable         = isElementEditable
 exports.getSessionStore           = getSessionStore
@@ -288,7 +315,11 @@ exports.WHEEL_MODE_PAGE           = WHEEL_MODE_PAGE
 exports.readFromClipboard         = readFromClipboard
 exports.writeToClipboard          = writeToClipboard
 exports.timeIt                    = timeIt
+
+exports.getMatchingBlacklistRules  = getMatchingBlacklistRules
 exports.isBlacklisted             = isBlacklisted
+exports.updateBlacklist           = updateBlacklist
+
 exports.getVersion                = getVersion
 exports.parseHTML                 = parseHTML
 exports.isURL                     = isURL
