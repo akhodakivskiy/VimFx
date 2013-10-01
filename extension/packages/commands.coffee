@@ -364,8 +364,10 @@ commands = [
   new Command('misc',   'find_prev',              command_find_prev,              ['N'])
   new Command('misc',   'insert_mode',            command_insert_mode,            ['i'])
   new Command('misc',   'help',                   command_help,                   ['?'])
+  escapeCommand =
   new Command('misc',   'Esc',                    command_Esc,                    ['Esc'])
   new Command('misc',   'dev',                    command_dev,                    [':'])
 ]
 
-exports.commands = commands
+exports.commands      = commands
+exports.escapeCommand = escapeCommand

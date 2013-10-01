@@ -1,7 +1,7 @@
 MODE_NORMAL = {}
 
 class Vim
-  constructor: ({ @window, @commands, @modes, @esc }) ->
+  constructor: ({ @window, @commands, @modes, @escapeCommand }) ->
     @mode       = MODE_NORMAL
     @keys       = []
 
@@ -16,8 +16,7 @@ class Vim
       @storage.modes[name] = {}
 
   enterMode: (mode, args) ->
-    # Note: `args` is an array of arguments to be passed to the mode's `onEnter` method. We cannot
-    # use `args...`, since that destroys the `this` context for the mode's `onEnter` method.
+    # `args` is an array of arguments to be passed to the mode's `onEnter` method
     @mode = mode
     @modes[mode].onEnter?(this, @storage.modes[mode], args)
 
@@ -27,38 +26,49 @@ class Vim
     @mode = MODE_NORMAL
     @keys.length = 0
 
-  onInput: (keyStr, event) ->
+  onInput: (keyStr, event, options = {}) ->
     @keys.push(keyStr)
 
+    esc = @searchForMatchingCommand([@escapeCommand]).exact
+
+    if options.autoInsertMode and not esc
+      return false
+
     if @mode == MODE_NORMAL
-      { match, exact, command } = @searchForCommand(@commands)
+      if esc
+        return @runCommand(@escapeCommand, event)
+
+      { match, exact, command, index } = @searchForMatchingCommand(@commands)
 
       if match
-        if exact then command.func(this, @storage.commands[command.name], event)
+        @keys = @keys[index..]
+        if exact then @runCommand(command, event)
         return true
       else
+        @keys.length = 0
         return false
 
     else
-      if keyStr == @esc
+      if esc
         @enterNormalMode()
         return true
       else
         return @modes[@mode].onInput?(this, @storage.modes[@mode], keyStr, event)
 
   # Intentionally taking `commands` as a parameter (instead of simply using `@commands`), so that
-  # the method can be reused by custom modes.
-  searchForCommand: (commands) ->
+  # the method can be reused by custom modes (and by escape handling).
+  searchForMatchingCommand: (commands) ->
     for index in [0...@keys.length] by 1
       str = @keys[index..].join(',')
       for command in commands
         for key in command.keys()
           if key.startsWith(str) and command.enabled()
-            @keys = @keys[index..]
-            return {match: true, exact: (key == str), command}
+            return {match: true, exact: (key == str), command, index}
 
-    @keys.length = 0
     return {match: false}
+
+  runCommand: (command, event) ->
+    command.func(this, @storage.commands[command.name], event)
 
 Vim.MODE_NORMAL = MODE_NORMAL
 

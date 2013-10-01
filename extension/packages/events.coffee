@@ -4,7 +4,8 @@ keyUtils                = require 'key-utils'
 { getPref }             = require 'prefs'
 { updateToolbarButton } = require 'button'
 { unload }              = require 'unload'
-{ commands }            = require 'commands'
+{ commands
+, escapeCommand }       = require 'commands'
 { modes }               = require 'modes'
 
 { interfaces: Ci } = Components
@@ -16,8 +17,7 @@ keyUtils                = require 'key-utils'
 # google causes its search bar to be focused.
 NEVER_SUPPRESS_IN_NORMAL_MODE = ['Esc']
 
-# TODO: Should 'Esc' be configurable?
-newFunc = (window) -> new Vim({window, commands, modes, esc: 'Esc'})
+newFunc = (window) -> new Vim({window, commands, modes, escapeCommand})
 vimBucket = new utils.Bucket(utils.getWindowId, newFunc)
 
 keyStrFromEvent = (event) ->
@@ -52,17 +52,15 @@ keyListener = (event) ->
 
       return unless keyStr = keyStrFromEvent(event)
 
+      # This check must be done before `vim.onInput()` below, since that call might change the mode.
+      # We are interested in the mode at the beginning of the events, not whatever it might be
+      # afterwards.
+      suppressException = (vim.mode == Vim.MODE_NORMAL and keyStr in NEVER_SUPPRESS_IN_NORMAL_MODE)
       isEditable = utils.isElementEditable(event.originalTarget)
-      unless isEditable and keyStr != vim.esc
 
-        # This check must be done before `vim.onInput()` below, since that call might change the
-        # mode. We are interested in the mode at the beginning of the events, not whatever it might
-        # be afterwards.
-        suppressException = (vim.mode == Vim.MODE_NORMAL and keyStr in NEVER_SUPPRESS_IN_NORMAL_MODE)
-
-        suppress = vim.onInput(keyStr, event)
-        if suppressException
-          suppress = false
+      suppress = vim.onInput(keyStr, event, {autoInsertMode: isEditable})
+      if suppressException
+        suppress = false
 
     if suppress
       event.preventDefault()
