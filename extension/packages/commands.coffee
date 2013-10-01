@@ -275,18 +275,16 @@ command_insert_mode = (vim) ->
 command_Esc = (vim, storage, event) ->
   utils.blurActiveElement(vim.window)
 
-  # Also blur active XUL control if preferencess allow
-  if getPref('blur_on_esc')
-    callback = -> event.originalTarget?.ownerDocument?.activeElement?.blur()
-    vim.window.setTimeout(callback, 0)
+  # Blur active XUL control
+  callback = -> event.originalTarget?.ownerDocument?.activeElement?.blur()
+  vim.window.setTimeout(callback, 0)
 
   find.removeFind(vim.window.document)
 
   help.removeHelp(vim.window.document)
 
-  if not getPref('leave_dt_on_esc')
-    if chromeWindow = utils.getRootWindow(vim.window)
-      chromeWindow.DeveloperToolbar.hide()
+  if rootWindow = utils.getRootWindow(vim.window)
+    rootWindow.DeveloperToolbar.hide()
 
 
 class Command
