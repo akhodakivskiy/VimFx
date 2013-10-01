@@ -106,8 +106,9 @@ Global shortcut to enable/disable VimFx: `shift-alt-v`
     a.,a/   Enter Find mode to highlight all matches
     n       Go to the next Find match
     N       Go to the previous Find match
+    i       Enter insert mode: Ignore all commands
     ?,>     Show this dialog
-    Esc     Close this dialog and cancel hint markers
+    Esc     Enter normal mode (remove hint markers, exit insert mode) or blur/close active element
     :       Open Developer Toolbar
 
 Can't see a link hint, because it's overlapped by another? Try pressing space or shift-space!
