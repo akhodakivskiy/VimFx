@@ -94,7 +94,7 @@ input#VimFxFindInput {
 
 /* Markers */
 
-div.VimFxHintMarker {
+.VimFxHintMarker {
     position: absolute !important;
     display: block !important;
     white-space: nowrap !important;
@@ -107,11 +107,7 @@ div.VimFxHintMarker {
     border-radius: 2px !important;
 }
 
-div.VimFxHiddenHintMarker > span {
-    display: none !important;
-}
-
-div.VimFxHintMarker > span {
+.VimFxHintMarker > span {
     color: #302505 !important;
     font-family: "Helvetica Neue", "Helvetica", "Arial", "Sans" !important;
     font-weight: bold !important;
@@ -119,8 +115,12 @@ div.VimFxHintMarker > span {
     text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6) !important;
 }
 
-div.VimFxHintMarker > span.VimFxCharMatch {
+.VimFxHintMarker > span.VimFxCharMatch {
     color: #ffa22a !important;
+}
+
+.VimFxHintMarker.VimFxHiddenHintMarker {
+    display: none !important;
 }
 
 /* Help Dialog */

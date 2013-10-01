@@ -7,12 +7,6 @@
 <!ENTITY pref.scroll_step_lines.title   "Görgetés mértéke">
 <!ENTITY pref.scroll_step_lines.desc    "Görgetés mértéke">
 
-<!ENTITY pref.blur_on_esc.title     "Esc-re fókuszkérés">
-<!ENTITY pref.blur_on_esc.desc      "Esc lenyomására a VimFX megkapja a fókuszt, pl. az input mezőktől/címsortól">
-
-<!ENTITY pref.leave_dt_on_esc.title "Leave Developer Toolbar open on Esc (needs translation)">
-<!ENTITY pref.leave_dt_on_esc.desc  "Do not hide Developer Toolbar if it's visible and the Esc is pressed (needs translation)">
-
 <!ENTITY pref.hints_bloom_on.title "Smart hint assignment (needs translation)">
 <!ENTITY pref.hints_bloom_on.desc  "Assign shorter hints to the links that users visit most often (needs translation)">
 

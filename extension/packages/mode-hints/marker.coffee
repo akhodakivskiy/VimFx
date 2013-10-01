@@ -1,5 +1,5 @@
 { SerializableBloomFilter
-, DummyBloomFilter } = require 'bloomfilter'
+, DummyBloomFilter } = require 'mode-hints/bloomfilter'
 
 { getPref } = require 'prefs'
 
@@ -29,13 +29,16 @@ class Marker
     Object.defineProperty this, 'bloomFilter',
       get: -> if getPref('hints_bloom_on') then realBloomFilter else dummyBloomFilter
 
-  show: -> @markerElement.className = 'VimFxReset VimFxHintMarker'
-  hide: -> @markerElement.className = 'VimFxReset VimFxHiddenHintMarker'
+  show: -> @setVisibility(true)
+  hide: -> @setVisibility(false)
+  setVisibility: (visible) ->
+    method = if visible then 'remove' else 'add'
+    @markerElement.classList[method]('VimFxHiddenHintMarker')
 
   setPosition: (top, left) ->
     # The positioning is absulute
-    @markerElement.style.top  = top  + 'px'
-    @markerElement.style.left = left + 'px'
+    @markerElement.style.top  = "#{ top }px"
+    @markerElement.style.left = "#{ left }px"
 
     # For quick access
     @position = {top, left}
@@ -70,31 +73,31 @@ class Marker
 
     @markerElement.appendChild(fragment)
 
-  # Add another char to the `enteredHintString`,
-  # see if it still matches `hintString`, apply classes to
-  # the distinct hint characters and show/hide marker when
-  # the entered string partially (not) matches the hint string.
   matchHintChar: (char) ->
-    if char == 'Backspace'
-      # Handle backspace key by removing a previously entered hint char and resetting its class
-      if @enteredHintChars.length > 0
-        @enteredHintChars = @enteredHintChars[0...-1]
-        @markerElement.children[@enteredHintChars.length]?.className = 'VimFxReset'
+    @updateEnteredHintChars(char)
+
+  deleteHintChar: ->
+    @updateEnteredHintChars(false)
+
+  updateEnteredHintChars: (char) ->
+    if char == false
+      method = 'remove'
+      @enteredHintChars = @enteredHintChars[...-1]
+      offset = 0
     else
-      # Otherwise append hint char and change hint class
-      @markerElement.children[@enteredHintChars.length]?.className = 'VimFxReset VimFxCharMatch'
+      method = 'add'
       @enteredHintChars += char.toLowerCase()
+      offset = -1
 
-    # If entered hint chars no longer partially match the hint chars then hide the marker,
-    # otherwise show it back
-    if @hintChars.search(@enteredHintChars) == 0 then @show() else @hide()
-
-  # Checks if the marker will be matched if the next character entered is `char`
-  willMatch: (char) ->
-    char == 'Backspace' or @hintChars.search(@enteredHintChars + char.toLowerCase()) == 0
+    @markerElement.children[@enteredHintChars.length + offset]?.classList[method]('VimFxCharMatch')
+    if @hintChars.startsWith(@enteredHintChars) then @show() else @hide()
 
   isMatched: ->
     return @hintChars == @enteredHintChars
+
+  reset: ->
+    @setHint(@hintChars)
+    @show()
 
   # Returns string features of the element that can be used in the bloom filter
   # in order to add relevance to the hint marker
@@ -105,13 +108,12 @@ class Marker
     suffix = ''
     el = @element
     while el.classList?.length == 0 and el not instanceof HTMLDocument
-      suffix = "#{ suffix } #{ el.tagName }"
+      suffix += " #{ el.tagName }"
       el = el.parentNode
-    if el and el.classList
+    if el?.classList?
       for className in el.classList
         features["#{ el.tagName }.#{ className }#{ suffix }"] = 10
 
-    # Element id
     if @element.id
       features["#{ el.tagName }.#{ @element.id }"] = 5
 

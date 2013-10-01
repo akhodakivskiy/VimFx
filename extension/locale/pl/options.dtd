@@ -8,12 +8,6 @@ Dopuszczalne wieloznaczniki: *, !. Domyślnie: *mail.google.com*">
 <!ENTITY pref.scroll_step_liens.title   "Krok przewijania">
 <!ENTITY pref.scroll_step_lines.desc    "Krok przewijania">
 
-<!ENTITY pref.blur_on_esc.title      "Escape zabiera focus">
-<!ENTITY pref.blur_on_esc.desc       "Escape zabiera focus dowolnemu aktywnemu elementowi w przeglądarce (np. paskowi adresu)">
-
-<!ENTITY pref.leave_dt_on_esc.title "Escape nie zamyka paska programisty">
-<!ENTITY pref.leave_dt_on_esc.desc  "Pasek programisty nie zostanie zamknięty jeśli jest widoczny i wciśnięto Escape">
-
 <!ENTITY pref.hints_bloom_on.title "Smart hint assignment">
 <!ENTITY pref.hints_bloom_on.desc  "Assign shorter hints to the links that users visit most often">
 

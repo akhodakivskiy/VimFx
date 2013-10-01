@@ -1,68 +1,82 @@
-utils = require 'utils'
-
-commands = require 'commands'
-
-{ getPref
-, isCommandDisabled
-} = require 'prefs'
-
-MODE_NORMAL = 1
-MODE_HINTS  = 2
+MODE_NORMAL = {}
 
 class Vim
-  @findStr = ''
-
-  constructor: (@window) ->
+  constructor: ({ @window, @commands, @modes, @escapeCommand }) ->
     @mode       = MODE_NORMAL
     @keys       = []
-    @lastKeyStr = null
-    @markers    = undefined
-    @cb         = undefined
-    @findRng    = null
-    @suppress   = false
 
-    Object.defineProperty(this, 'findStr',
-      get: -> return Vim.findStr
-      set: (value) -> Vim.findStr = value
-    )
+    @storage =
+      commands: {}
+      modes: {}
 
-  enterHintsMode: (@markers, @cb) ->
-    @mode = MODE_HINTS
+    for { name } in @commands
+      @storage.commands[name] = {}
 
-  # TODO: This function should probably remove
-  # hint markers (if they are present) as well
+    for name of @modes
+      @storage.modes[name] = {}
+
+  enterMode: (mode, args) ->
+    # `args` is an array of arguments to be passed to the mode's `onEnter` method
+    @mode = mode
+    @modes[mode].onEnter?(this, @storage.modes[mode], args)
+
   enterNormalMode: ->
+    return if @mode == MODE_NORMAL
+    @modes[@mode].onEnterNormalMode?(this, @storage.modes[@mode])
     @mode = MODE_NORMAL
-    @markers = @cb = undefined
+    @keys.length = 0
 
-  handleKeyDown: (event, keyStr) ->
-    @suppress = true
-    if @mode == MODE_NORMAL || keyStr == 'Esc'
-      @keys.push(keyStr)
-      @lastKeyStr = keyStr
-      if command = commands.findCommand(@keys)
-        command.func(@)
-        return command.name != 'Esc'
-      else if commands.maybeCommand(@keys)
+  onInput: (keyStr, event, options = {}) ->
+    @keys.push(keyStr)
+
+    esc = @searchForMatchingCommand([@escapeCommand]).exact
+
+    if options.autoInsertMode and not esc
+      return false
+
+    if @mode == MODE_NORMAL
+      if esc
+        return @runCommand(@escapeCommand, event)
+
+      { match, exact, command, index } = @searchForMatchingCommand(@commands)
+
+      if match
+        @keys = @keys[index..]
+        if exact then @runCommand(command, event)
         return true
       else
         @keys.length = 0
-    else if @mode == MODE_HINTS and not (event.ctrlKey or event.metaKey)
-      specialKeys = ['Shift-Space', 'Space', 'Backspace']
-      if utils.getHintChars().search(utils.regexpEscape(keyStr)) > -1 or keyStr in specialKeys
-        commands.hintCharHandler(@, keyStr)
+        return false
+
+    else
+      if esc
+        @enterNormalMode()
         return true
+      else
+        return @modes[@mode].onInput?(this, @storage.modes[@mode], keyStr, event)
 
-    @suppress = false
-    @keys.length = 0
-    return false
+  # Intentionally taking `commands` as a parameter (instead of simply using `@commands`), so that
+  # the method can be reused by custom modes (and by escape handling).
+  searchForMatchingCommand: (commands) ->
+    for index in [0...@keys.length] by 1
+      str = @keys[index..].join(',')
+      for command in commands
+        for key in command.keys()
+          if key.startsWith(str) and command.enabled()
+            return {match: true, exact: (key == str), command, index}
 
-  handleKeyPress: (event, keyStr) ->
-    return @lastKeyStr != 'Esc' and @suppress
+    return {match: false}
 
-  handleKeyUp: (event) ->
-    sup = @suppress
-    @suppress = false
-    return @lastKeyStr != 'Esc' and sup
+  runCommand: (command, event) ->
+    command.func(this, @storage.commands[command.name], event)
+
+Vim.MODE_NORMAL = MODE_NORMAL
+
+# What is minimally required for a command
+class Vim.Command
+  constructor: (@name) ->
+  keys: -> return ['key1', 'key2', 'keyN']
+  enabled: -> return true
+  func: (vim, storage, event) ->
 
 exports.Vim = Vim

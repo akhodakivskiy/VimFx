@@ -1,153 +1,131 @@
-utils                    = require 'utils'
-keyUtils                 = require 'key-utils'
-{ Vim }                  = require 'vim'
-{ getPref }              = require 'prefs'
+utils                   = require 'utils'
+keyUtils                = require 'key-utils'
+{ Vim }                 = require 'vim'
+{ getPref }             = require 'prefs'
 { updateToolbarButton } = require 'button'
 { unload }              = require 'unload'
+{ commands
+, escapeCommand }       = require 'commands'
+{ modes }               = require 'modes'
 
 { interfaces: Ci } = Components
 
-vimBucket = new utils.Bucket(utils.getWindowId, (obj) -> new Vim(obj))
+# Not suppressing Esc allows for stopping the loading of the page as well as closing many custom
+# dialogs (and perhaps other things -- Esc is a very commonly used key). There are two reasons we
+# might suppress it in other modes. If some custom dialog of a website is open, we should be able to
+# cancel hint markers on it without closing it. Secondly, otherwise cancelling hint markers on
+# google causes its search bar to be focused.
+NEVER_SUPPRESS_IN_NORMAL_MODE = ['Esc']
 
-suppressEvent = (event) ->
-  event.preventDefault()
-  event.stopPropagation()
-
-# *************************
-# NB! TODO! All this shit needs to be redone!!
-# *************************
+newFunc = (window) -> new Vim({window, commands, modes, escapeCommand})
+vimBucket = new utils.Bucket(utils.getWindowId, newFunc)
 
 keyStrFromEvent = (event) ->
-
   { ctrlKey: ctrl, metaKey: meta, altKey: alt, shiftKey: shift } = event
 
   if !meta and !alt
-    if keyChar = keyUtils.keyCharFromCode(event.keyCode, shift)
-      keyStr = keyUtils.applyModifiers(keyChar, ctrl, alt, meta)
+    return unless keyChar = keyUtils.keyCharFromCode(event.keyCode, shift)
+    keyStr = keyUtils.applyModifiers(keyChar, ctrl, alt, meta)
+    return keyStr
 
-  return keyStr
+  return null
 
-# Passthrough mode is activated when VimFx should temporarily stop processking
-# keyboard input. For example when a context menu is whown
+# Passthrough mode is activated when VimFx should temporarily stop processing keyboard input, for
+# example when a menu is shown.
 passthrough = false
+checkPassthrough = (event) ->
+  if event.target.nodeName in ['menupopup', 'panel']
+    passthrough = switch event.type
+      when 'popupshown'  then true
+      when 'popuphidden' then false
 
-logError = (err, eventName) ->
-  console.log("#{ err } (in #{ eventName })\n#{ err.stack.replace(/@.+-> /g, '@') }")
+suppress = false
+keyListener = (event) ->
+  try
+    return if passthrough or getPref('disabled')
+    return unless window = utils.getEventCurrentTabWindow(event)
+    return unless vim = vimBucket.get(window)
+    return if vim.blacklisted
+
+    if event.type == 'keydown'
+      suppress = false
+
+      return unless keyStr = keyStrFromEvent(event)
+
+      # This check must be done before `vim.onInput()` below, since that call might change the mode.
+      # We are interested in the mode at the beginning of the events, not whatever it might be
+      # afterwards.
+      suppressException = (vim.mode == Vim.MODE_NORMAL and keyStr in NEVER_SUPPRESS_IN_NORMAL_MODE)
+      isEditable = utils.isElementEditable(event.originalTarget)
+
+      suppress = vim.onInput(keyStr, event, {autoInsertMode: isEditable})
+      if suppressException
+        suppress = false
+
+    if suppress
+      event.preventDefault()
+      event.stopPropagation()
+
+  catch error
+    console.log("#{ error } (in #{ event.type })\n#{ error.stack.replace(/@.+-> /g, '@') }")
+
+removeVimFromTab = (tab, gBrowser) ->
+  return unless browser = gBrowser.getBrowserForTab(tab)
+  vimBucket.forget(browser.contentWindow)
 
 # The following listeners are installed on every top level Chrome window
-windowsListener =
-  keydown: (event) ->
-    if passthrough or getPref('disabled')
-      return
-
-    try
-      isEditable = utils.isElementEditable(event.originalTarget)
-
-      keyStr = keyStrFromEvent(event)
-
-      # We only handle the key if it's recognized by `keyCharFromCode`
-      # and if there is no focused editable element or if it's the *Esc* key,
-      # which will remove the focus from the currently focused element
-      if keyStr and (not isEditable or keyStr == 'Esc')
-        if window = utils.getEventCurrentTabWindow(event)
-          if vim = vimBucket.get(window)
-            if vim.blacklisted
-              return
-
-            if vim.handleKeyDown(event, keyStr)
-              suppressEvent(event)
-
-            # Also blur active element if preferencess allow (for XUL controls)
-            if keyStr == 'Esc' and getPref('blur_on_esc')
-              cb = -> event.originalTarget?.ownerDocument?.activeElement?.blur()
-              window.setTimeout(cb, 0)
-
-    catch err
-      logError(err, 'keydown')
-
-  keypress: (event) ->
-    if passthrough or getPref('disabled')
-      return
-
-    try
-      isEditable = utils.isElementEditable(event.originalTarget)
-
-      # Try to execute keys that were accumulated so far.
-      # Suppress event if there is a matching command.
-      if window = utils.getEventCurrentTabWindow(event)
-        if vim = vimBucket.get(window)
-          if vim.blacklisted
-            return
-
-          if vim.handleKeyPress(event)
-            suppressEvent(event)
-
-    catch err
-      logError(err, 'keypress')
-
-  keyup: (event) ->
-    if passthrough or getPref('disabled')
-      return
-
-    if window = utils.getEventCurrentTabWindow(event)
-      if vim = vimBucket.get(window)
-        if vim.handleKeyUp(event)
-          suppressEvent(event)
-
-  popupshown: (event) ->
-    if event.target.tagName in [ 'menupopup', 'panel' ]
-      passthrough = true
-
-
-  popuphidden: (event) ->
-    if event.target.tagName in [ 'menupopup', 'panel' ]
-      passthrough = false
+windowsListeners =
+  keydown:     keyListener
+  keypress:    keyListener
+  keyup:       keyListener
+  popupshown:  checkPassthrough
+  popuphidden: checkPassthrough
 
   # When the top level window closes we should release all Vims that were
   # associated with tabs in this window
   DOMWindowClose: (event) ->
     return unless { gBrowser } = event.originalTarget
     for tab in gBrowser.tabs
-      if browser = gBrowser.getBrowserForTab(tab)
-        vimBucket.forget(browser.contentWindow)
+      removeVimFromTab(tab, gBrowser)
 
   TabClose: (event) ->
     return unless { gBrowser } = utils.getEventRootWindow(event) ? {}
-    return unless browser = gBrowser.getBrowserForTab(event.originalTarget)
-    vimBucket.forget(browser.contentWindow)
+    tab = event.originalTarget
+    removeVimFromTab(tab, gBrowser)
 
   # Update the toolbar button icon to reflect the blacklisted state
   TabSelect: (event) ->
-    return unless vim = vimBucket.get(event.originalTarget?.linkedBrowser?.contentDocument?.defaultView)
-    return unless rootWindow = utils.getRootWindow(vim.window)
+    return unless window = event.originalTarget?.linkedBrowser?.contentDocument?.defaultView
+    return unless vim = vimBucket.get(window)
+    return unless rootWindow = utils.getRootWindow(window)
     updateToolbarButton(rootWindow, {blacklisted: vim.blacklisted})
 
 # This listener works on individual tabs within Chrome Window
-# User for: listening for location changes and disabling the extension
-# on black listed urls
 tabsListener =
+  # Listenfor location changes and disable the extension on blacklisted urls
   onLocationChange: (browser, webProgress, request, location) ->
     return unless vim = vimBucket.get(browser.contentWindow)
 
-    vim.enterNormalMode()
+    # If the location changes when in hints mode (for example because the reload button has been
+    # clicked), we're going to end up in hints mode without any markers. So switch back to normal
+    # mode in that case.
+    if vim.mode == 'hints'
+      vim.enterNormalMode()
 
     return unless rootWindow = utils.getRootWindow(vim.window)
     vim.blacklisted = utils.isBlacklisted(location.spec)
     updateToolbarButton(rootWindow, {blacklisted: vim.blacklisted})
 
 addEventListeners = (window) ->
-  for name, listener of windowsListener
+  for name, listener of windowsListeners
     window.addEventListener(name, listener, true)
 
-  # Install onLocationChange listener
   window.gBrowser.addTabsProgressListener(tabsListener)
 
-  removeEventListeners = ->
-    for name, listener of windowsListener
+  unload ->
+    for name, listener of windowsListeners
       window.removeEventListener(name, listener, true)
 
-  unload ->
-    removeEventListeners(window)
     window.gBrowser.removeTabsProgressListener(tabsListener)
 
 exports.addEventListeners = addEventListeners
