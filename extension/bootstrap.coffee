@@ -48,6 +48,7 @@ do (global = this) ->
     , initPrefValues }      = require 'prefs'
     { setButtonInstallPosition
     , addToolbarButton }    = require 'button'
+    options                 = require 'options'
     { watchWindows }        = require 'window-utils'
     { unload }              = require 'unload'
 
@@ -60,6 +61,8 @@ do (global = this) ->
     initPrefValues()
 
     loadCss('style')
+
+    options.observe()
 
     watchWindows(addEventListeners, 'navigator:browser')
     watchWindows(addToolbarButton, 'navigator:browser')

@@ -1,5 +1,6 @@
 { unload } = require 'unload'
 { getPref
+, setPref
 , getDefaultPref
 } = require 'prefs'
 
@@ -31,13 +32,6 @@ class Bucket
   forget: (obj) ->
     delete @bucket[id] if id = @idFunc(obj)
 
-# Returns the `window` from the currently active tab.
-getCurrentTabWindow = (event) ->
-  return unless window = getEventWindow(event)
-  return unless rootWindow = getRootWindow(window)
-  return rootWindow.gBrowser.selectedTab.linkedBrowser.contentWindow
-
-# Returns the window associated with the event
 getEventWindow = (event) ->
   if event.originalTarget instanceof Window
     return event.originalTarget
@@ -50,9 +44,9 @@ getEventRootWindow = (event) ->
   return unless window = getEventWindow(event)
   return getRootWindow(window)
 
-getEventTabBrowser = (event) ->
+getEventCurrentTabWindow = (event) ->
   return unless rootWindow = getEventRootWindow(event)
-  return rootWindow.gBrowser
+  return getCurrentTabWindow(rootWindow)
 
 getRootWindow = (window) ->
   return window
@@ -62,6 +56,17 @@ getRootWindow = (window) ->
     .rootTreeItem
     .QueryInterface(Ci.nsIInterfaceRequestor)
     .getInterface(Window)
+
+getCurrentTabWindow = (window) ->
+  return window.gBrowser.selectedTab.linkedBrowser.contentWindow
+
+blurActiveElement = (window) ->
+  # Only blur editable elements, in order not to interfere with the browser too much. TODO: Is that
+  # really needed? What if a website has made more elements focusable -- shouldn't those also be
+  # blurred?
+  { activeElement } = window.document
+  if isElementEditable(activeElement)
+    activeElement.blur()
 
 isTextInputElement = (element) ->
   return element instanceof HTMLInputElement or \
@@ -75,14 +80,6 @@ isElementEditable = (element) ->
          element.getAttribute('g_editable') == 'true' or \
          element.getAttribute('contenteditable')?.toLowerCase() == 'true' or \
          element.ownerDocument?.designMode?.toLowerCase() == 'on'
-
-blurActiveElement = (window) ->
-  # Only blur editable elements, in order not to interfere with the browser too much. TODO: Is that
-  # really needed? What if a website has made more elements focusable -- shouldn't those also be
-  # blurred?
-  { activeElement } = window.document
-  if isElementEditable(activeElement)
-    activeElement.blur()
 
 getWindowId = (window) ->
   return window
@@ -206,15 +203,45 @@ timeIt = (func, msg) ->
   console.log(msg, end - start)
   return result
 
-# Checks if the string provided matches one of the black list entries
-# `blackList`: comma/space separated list of URLs with wildcards (* and !)
-isBlacklisted = (str, blackList) ->
-  for rule in blackList.split(/[\s,]+/)
-    rule = rule.replace(/\*/g, '.*').replace(/\!/g, '.')
-    if str.match ///^#{ rule }$///
-      return true
+isBlacklisted = (str) ->
+  matchingRules = getMatchingBlacklistRules(str)
+  return (matchingRules.length != 0)
 
-  return false
+# Returns all rules in the blacklist that match the provided string
+getMatchingBlacklistRules = (str) ->
+  matchingRules = []
+  for rule in getBlacklist()
+    # Wildcards: * and !
+    regexifiedRule = regexpEscape(rule).replace(/\\\*/g, '.*').replace(/!/g, '.')
+    if str.match(///^#{ regexifiedRule }$///)
+      matchingRules.push(rule)
+
+  return matchingRules
+
+getBlacklist = ->
+  return splitBlacklistString(getPref('black_list'))
+
+setBlacklist = (blacklist) ->
+  setPref('black_list', blacklist.join(', '))
+
+splitBlacklistString = (str) ->
+  # Comma/space separated list
+  return str.split(/[\s,]+/)
+
+updateBlacklist = ({ add, remove} = {}) ->
+  blacklist = getBlacklist()
+
+  if add
+    blacklist.push(splitBlacklistString(add)...)
+
+  blacklist = blacklist.filter((rule) -> rule != '')
+  blacklist = removeDuplicates(blacklist)
+
+  if remove
+    for rule in splitBlacklistString(remove) when rule in blacklist
+      blacklist.splice(blacklist.indexOf(rule), 1)
+
+  setBlacklist(blacklist)
 
 # Gets VimFx verions. AddonManager only provides async API to access addon data, so it's a bit tricky...
 getVersion = do ->
@@ -255,55 +282,61 @@ browserSearchSubmission = (str) ->
 
 # Get hint characters, convert them to lower case and fall back
 # to default hint characters if there are less than 3 chars
-getHintChars = do ->
-  # Remove duplicate characters from string (case insensitive)
-  removeDuplicateCharacters = (str) ->
-    seen = {}
-    return str
-      .toLowerCase()
-      .split('')
-      .filter((char) -> if seen[char] then false else (seen[char] = true))
-      .join('')
+getHintChars = ->
+  hintChars = removeDuplicateCharacters(getPref('hint_chars'))
+  if hintChars.length < 2
+    hintChars = getDefaultPref('hint_chars')
 
-  return ->
-    hintChars = removeDuplicateCharacters(getPref('hint_chars'))
-    if hintChars.length < 2
-      hintChars = getDefaultPref('hint_chars')
+  return hintChars
 
-    return hintChars
+# Remove duplicate characters from string (case insensitive)
+removeDuplicateCharacters = (str) ->
+  return removeDuplicates( str.toLowerCase().split('') ).join('')
 
 # Return URI to some file in the extension packaged as resource
 getResourceURI = do ->
   baseURI = Services.io.newURI(__SCRIPT_URI_SPEC__, null, null)
   return (path) -> return Services.io.newURI(path, null, baseURI)
 
-exports.Bucket                  = Bucket
-exports.getCurrentTabWindow     = getCurrentTabWindow
-exports.getEventWindow          = getEventWindow
-exports.getEventRootWindow      = getEventRootWindow
-exports.getEventTabBrowser      = getEventTabBrowser
+# Escape string to render it usable in regular expressions
+regexpEscape = (s) -> s and s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')
 
-exports.getWindowId             = getWindowId
-exports.getRootWindow           = getRootWindow
-exports.isTextInputElement      = isTextInputElement
-exports.isElementEditable       = isElementEditable
-exports.blurActiveElement       = blurActiveElement
-exports.getSessionStore         = getSessionStore
+removeDuplicates = (array) ->
+  seen = {}
+  return array.filter((item) -> if seen[item] then false else (seen[item] = true))
 
-exports.loadCss                 = loadCss
+exports.Bucket                    = Bucket
+exports.getEventWindow            = getEventWindow
+exports.getEventRootWindow        = getEventRootWindow
+exports.getEventCurrentTabWindow  = getEventCurrentTabWindow
+exports.getRootWindow             = getRootWindow
+exports.getCurrentTabWindow       = getCurrentTabWindow
 
-exports.simulateClick           = simulateClick
-exports.simulateWheel           = simulateWheel
-exports.WHEEL_MODE_PIXEL        = WHEEL_MODE_PIXEL
-exports.WHEEL_MODE_LINE         = WHEEL_MODE_LINE
-exports.WHEEL_MODE_PAGE         = WHEEL_MODE_PAGE
-exports.readFromClipboard       = readFromClipboard
-exports.writeToClipboard        = writeToClipboard
-exports.timeIt                  = timeIt
-exports.isBlacklisted           = isBlacklisted
-exports.getVersion              = getVersion
-exports.parseHTML               = parseHTML
-exports.isURL                   = isURL
-exports.browserSearchSubmission = browserSearchSubmission
-exports.getHintChars            = getHintChars
-exports.getResourceURI          = getResourceURI
+exports.getWindowId               = getWindowId
+exports.blurActiveElement         = blurActiveElement
+exports.isTextInputElement        = isTextInputElement
+exports.isElementEditable         = isElementEditable
+exports.getSessionStore           = getSessionStore
+
+exports.loadCss                   = loadCss
+
+exports.simulateClick             = simulateClick
+exports.simulateWheel             = simulateWheel
+exports.WHEEL_MODE_PIXEL          = WHEEL_MODE_PIXEL
+exports.WHEEL_MODE_LINE           = WHEEL_MODE_LINE
+exports.WHEEL_MODE_PAGE           = WHEEL_MODE_PAGE
+exports.readFromClipboard         = readFromClipboard
+exports.writeToClipboard          = writeToClipboard
+exports.timeIt                    = timeIt
+
+exports.getMatchingBlacklistRules = getMatchingBlacklistRules
+exports.isBlacklisted             = isBlacklisted
+exports.updateBlacklist           = updateBlacklist
+
+exports.getVersion                = getVersion
+exports.parseHTML                 = parseHTML
+exports.isURL                     = isURL
+exports.browserSearchSubmission   = browserSearchSubmission
+exports.getHintChars              = getHintChars
+exports.removeDuplicateCharacters = removeDuplicateCharacters
+exports.getResourceURI            = getResourceURI

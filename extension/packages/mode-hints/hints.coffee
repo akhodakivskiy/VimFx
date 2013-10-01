@@ -5,9 +5,9 @@ utils                     = require 'utils'
 
 { interfaces: Ci } = Components
 
-HTMLDocument      = Ci.nsIDOMHTMLDocument
-XULDocument       = Ci.nsIDOMXULDocument
-XPathResult       = Ci.nsIDOMXPathResult
+HTMLDocument = Ci.nsIDOMHTMLDocument
+XULDocument  = Ci.nsIDOMXULDocument
+XPathResult  = Ci.nsIDOMXPathResult
 
 CONTAINER_ID = 'VimFxHintMarkerContainer'
 
@@ -19,7 +19,7 @@ MARKABLE_ELEMENTS = [
   "textarea"
   "button"
   "select"
-  "input[not(@type='hidden' or @disabled or @readonly)]"
+  "input[not(@type='hidden' or @disabled)]"
   "embed"
   "object"
 ]

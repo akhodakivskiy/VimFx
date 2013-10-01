@@ -1,9 +1,9 @@
 <!ENTITY pref.hint_chars.title      "提示符（Hint Chars）">
-<!ENTITY pref.hint_chars.desc       "默认：fjdksla;ghrueiwovncm">
+<!ENTITY pref.hint_chars.desc       "默认：fjdkslaghrueiwovncm">
 
 <!ENTITY pref.black_list.title      "黑名单">
 <!ENTITY pref.black_list.desc       "当访问列表中的 URL（逗号分隔）时，VimFx 将被自动禁用。
-允许的通配符：*, !">
+允许的通配符：*, !. 默认：*mail.google.com*">
 
 <!ENTITY pref.scroll_step_lines.title   "滚动步长">
 <!ENTITY pref.scroll_step_lines.desc    "滚动步长">
@@ -16,3 +16,6 @@
 
 <!ENTITY pref.hints_bloom_on.title "智能分配提示符">
 <!ENTITY pref.hints_bloom_on.desc  "为最常访问的链接分配更短的提示符">
+
+<!ENTITY customizeButton.title "键盘快捷键">
+<!ENTITY customizeButton.label "自定义">

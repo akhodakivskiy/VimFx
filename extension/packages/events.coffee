@@ -1,11 +1,11 @@
-utils                    = require 'utils'
-keyUtils                 = require 'key-utils'
-{ Vim }                  = require 'vim'
-{ getPref }              = require 'prefs'
-{ setWindowBlacklisted } = require 'button'
-{ unload }               = require 'unload'
-{ commands }             = require 'commands'
-{ modes }                = require 'modes'
+utils                   = require 'utils'
+keyUtils                = require 'key-utils'
+{ Vim }                 = require 'vim'
+{ getPref }             = require 'prefs'
+{ updateToolbarButton } = require 'button'
+{ unload }              = require 'unload'
+{ commands }            = require 'commands'
+{ modes }               = require 'modes'
 
 { interfaces: Ci } = Components
 
@@ -43,7 +43,7 @@ suppress = false
 keyListener = (event) ->
   try
     return if passthrough or getPref('disabled')
-    return unless window = utils.getCurrentTabWindow(event)
+    return unless window = utils.getEventCurrentTabWindow(event)
     return unless vim = vimBucket.get(window)
     return if vim.blacklisted
 
@@ -91,7 +91,7 @@ windowsListeners =
       removeVimFromTab(tab, gBrowser)
 
   TabClose: (event) ->
-    return unless gBrowser = utils.getEventTabBrowser(event)
+    return unless { gBrowser } = utils.getEventRootWindow(event) ? {}
     tab = event.originalTarget
     removeVimFromTab(tab, gBrowser)
 
@@ -100,8 +100,7 @@ windowsListeners =
     return unless window = event.originalTarget?.linkedBrowser?.contentDocument?.defaultView
     return unless vim = vimBucket.get(window)
     return unless rootWindow = utils.getRootWindow(window)
-    setWindowBlacklisted(rootWindow, vim.blacklisted)
-
+    updateToolbarButton(rootWindow, {blacklisted: vim.blacklisted})
 
 # This listener works on individual tabs within Chrome Window
 tabsListener =
@@ -115,10 +114,9 @@ tabsListener =
     if vim.mode == 'hints'
       vim.enterNormalMode()
 
-    blacklisted = utils.isBlacklisted(location.spec, getPref('black_list'))
-    vim.blacklisted = blacklisted
     return unless rootWindow = utils.getRootWindow(vim.window)
-    setWindowBlacklisted(rootWindow, blacklisted)
+    vim.blacklisted = utils.isBlacklisted(location.spec)
+    updateToolbarButton(rootWindow, {blacklisted: vim.blacklisted})
 
 addEventListeners = (window) ->
   for name, listener of windowsListeners
