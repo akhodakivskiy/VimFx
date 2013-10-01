@@ -73,6 +73,10 @@ removeVimFromTab = (tab, gBrowser) ->
   return unless browser = gBrowser.getBrowserForTab(tab)
   vimBucket.forget(browser.contentWindow)
 
+updateButton = (vim) ->
+  return unless rootWindow = utils.getRootWindow(vim.window)
+  updateToolbarButton(rootWindow, {blacklisted: vim.blacklisted, insertMode: vim.mode == 'insert'})
+
 # The following listeners are installed on every top level Chrome window
 windowsListeners =
   keydown:     keyListener
@@ -97,8 +101,7 @@ windowsListeners =
   TabSelect: (event) ->
     return unless window = event.originalTarget?.linkedBrowser?.contentDocument?.defaultView
     return unless vim = vimBucket.get(window)
-    return unless rootWindow = utils.getRootWindow(window)
-    updateToolbarButton(rootWindow, {blacklisted: vim.blacklisted})
+    updateButton(vim)
 
 # This listener works on individual tabs within Chrome Window
 tabsListener =
@@ -112,9 +115,8 @@ tabsListener =
     if vim.mode == 'hints'
       vim.enterNormalMode()
 
-    return unless rootWindow = utils.getRootWindow(vim.window)
     vim.blacklisted = utils.isBlacklisted(location.spec)
-    updateToolbarButton(rootWindow, {blacklisted: vim.blacklisted})
+    updateButton(vim)
 
 addEventListeners = (window) ->
   for name, listener of windowsListeners
