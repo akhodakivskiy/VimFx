@@ -16,12 +16,16 @@ class Vim
       modes[@mode]?.onEnter(@, @storage[@mode], args)
 
   onInput: (keyStr, event, options = {}) ->
-    if options.autoInsertMode
+    esc = searchForMatchingCommand([keyStr], [escapeCommand]).esc
+
+    if options.autoInsertMode and not esc
       return false
 
-    modes[@mode]?.onInput(@, @storage[@mode], keyStr, event)
+    result = modes[@mode]?.onInput(@, @storage[@mode], keyStr, event)
 
-    if searchForMatchingCommand([keyStr], [escapeCommand]).esc
+    if esc
       @enterMode('normal')
+
+    return result
 
 exports.Vim = Vim

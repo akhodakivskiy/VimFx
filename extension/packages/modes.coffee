@@ -21,7 +21,7 @@ modes['normal'] =
       commandStorage = storage.commands[command.name] ?= {}
       command.func(vim, commandStorage, event)
 
-    { match, exact, command, index } = searchForMatchingCommand(storage.keys)
+    { esc, match, exact, command, index } = searchForMatchingCommand(storage.keys)
 
     if match
       storage.keys = storage.keys[index..]
