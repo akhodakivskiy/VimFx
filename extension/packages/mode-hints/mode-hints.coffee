@@ -1,14 +1,22 @@
 utils = require 'utils'
 hints = require 'mode-hints/hints'
 
+{ commands
+, searchForMatchingCommand 
+} = require 'commands'
+
 exports.mode_hints =
   onEnter: (vim, storage, [ callback ]) ->
     markers = hints.injectHints(vim.window.document)
     if markers.length == 0
-      vim.enterNormalMode()
+      vim.enterMode('normal')
       return
     storage.markers  = markers
     storage.callback = callback
+
+  onLeave: (vim, storage) ->
+    hints.removeHints(vim.window.document)
+    storage.markers = storage.callback = undefined
 
   onInput: (vim, storage, keyStr, event) ->
     { markers, callback } = storage
@@ -31,11 +39,7 @@ exports.mode_hints =
           if marker.isMatched()
             marker.reward() # Add element features to the bloom filter
             dontEnterNormalMode = callback(marker, markers)
-            vim.enterNormalMode()  unless dontEnterNormalMode
+            vim.enterMode('normal') unless dontEnterNormalMode
             break
 
     return true
-
-  onEnterNormalMode: (vim, storage) ->
-    hints.removeHints(vim.window.document)
-    storage.markers = storage.callback = undefined

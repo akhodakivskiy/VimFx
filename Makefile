@@ -6,7 +6,7 @@ V=@
 plugin_archive := VimFx.xpi
 
 coffee_files = extension/bootstrap.coffee
-coffee_files += $(wildcard extension/packages/*.coffee)
+coffee_files += $(shell find extension/packages -type f -name '*.coffee')
 
 js_files = $(coffee_files:.coffee=.js)
 

@@ -4,9 +4,6 @@ keyUtils                = require 'key-utils'
 { getPref }             = require 'prefs'
 { updateToolbarButton } = require 'button'
 { unload }              = require 'unload'
-{ commands
-, escapeCommand }       = require 'commands'
-{ modes }               = require 'modes'
 
 { interfaces: Ci } = Components
 
@@ -15,9 +12,8 @@ keyUtils                = require 'key-utils'
 # might suppress it in other modes. If some custom dialog of a website is open, we should be able to
 # cancel hint markers on it without closing it. Secondly, otherwise cancelling hint markers on
 # google causes its search bar to be focused.
-NEVER_SUPPRESS_IN_NORMAL_MODE = ['Esc']
 
-newFunc = (window) -> new Vim({window, commands, modes, escapeCommand})
+newFunc = (window) -> new Vim(window)
 vimBucket = new utils.Bucket(utils.getWindowId, newFunc)
 
 keyStrFromEvent = (event) ->
@@ -55,12 +51,9 @@ keyListener = (event) ->
       # This check must be done before `vim.onInput()` below, since that call might change the mode.
       # We are interested in the mode at the beginning of the events, not whatever it might be
       # afterwards.
-      suppressException = (vim.mode == Vim.MODE_NORMAL and keyStr in NEVER_SUPPRESS_IN_NORMAL_MODE)
       isEditable = utils.isElementEditable(event.originalTarget)
 
       suppress = vim.onInput(keyStr, event, {autoInsertMode: isEditable})
-      if suppressException
-        suppress = false
 
     if suppress
       event.preventDefault()
@@ -113,7 +106,7 @@ tabsListener =
     # clicked), we're going to end up in hints mode without any markers. So switch back to normal
     # mode in that case.
     if vim.mode == 'hints'
-      vim.enterNormalMode()
+      vim.enterMode('normal')
 
     vim.blacklisted = utils.isBlacklisted(location.spec)
     updateButton(vim)
