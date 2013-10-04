@@ -220,7 +220,6 @@ iconUrl = (kind) ->
   url = utils.getResourceURI("resources/icon16-#{ kind }.png").spec
   return "url(#{ url })"
 
-exports.addToolbarButton         = addToolbarButton
 exports.setButtonInstallPosition = setButtonInstallPosition
 exports.addToolbarButton         = addToolbarButton
 exports.updateToolbarButton      = updateToolbarButton
