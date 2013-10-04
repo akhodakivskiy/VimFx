@@ -3,7 +3,7 @@
 
 <!ENTITY pref.black_list.title      "Μαύρη Λίστα">
 <!ENTITY pref.black_list.desc       "Διευθύνσης διαχωρισμένες με κόμματα στις οποίες το VimFX θα είναι αυτόματα απενεργοποιημένο.
-Wildcards allowed: *, !. Προεπιλογή: *mail.google.com*">
+Επιτρέπονται χαρακτήρες μπαλαντέρ: *, !. Προεπιλογή: *mail.google.com*">
 
 <!ENTITY pref.scroll_step_lines.title "Βήμα Κύλισης">
 <!ENTITY pref.scroll_step_lines.desc  "Βήμα Κύλισης">
@@ -11,5 +11,5 @@ Wildcards allowed: *, !. Προεπιλογή: *mail.google.com*">
 <!ENTITY pref.hints_bloom_on.title "Έξυπνη ανάθεση υποδείξεων">
 <!ENTITY pref.hints_bloom_on.desc  "Ανάθεσε μικρότερες υποδείξεις στους συνδέσμους που οι χρήστες επισκέπτονται συχνότερα">
 
-<!ENTITY customizeButton.title "Keyboard Shortcuts">
-<!ENTITY customizeButton.label "Customize">
+<!ENTITY customizeButton.title "Συντομεύσεις Πληκτρολογίου">
+<!ENTITY customizeButton.label "Προσαρμογή">
