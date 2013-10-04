@@ -17,16 +17,17 @@ modes['normal'] =
   onInput: (vim, storage, keyStr, event) ->
     storage.keys.push(keyStr)
 
-    { esc, match, exact, command, index } = searchForMatchingCommand(storage.keys)
+    { esc, match, exact, command } = searchForMatchingCommand(storage.keys)
 
     if match
-      storage.keys.splice(index)
       if exact
         commandStorage = storage.commands[command.name] ?= {}
         command.func(vim, commandStorage, event)
+        storage.keys.length = 0
       return not esc
     else
       storage.keys.length = 0
+
 
 
 modes['insert'] =
