@@ -368,7 +368,7 @@ commands = [
   new Command('misc',   'Esc',                    command_Esc,                    ['Esc'])
 ]
   
-searchForMatchingCommand = (keys = []) ->
+searchForMatchingCommand = (keys) ->
   for index in [0...keys.length] by 1
     str = keys[index..].join(',')
     for command in commands
