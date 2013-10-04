@@ -367,19 +367,19 @@ commands = [
   escapeCommand =
   new Command('misc',   'Esc',                    command_Esc,                    ['Esc'])
 ]
-  
+
 searchForMatchingCommand = (keys) ->
   for index in [0...keys.length] by 1
     str = keys[index..].join(',')
     for command in commands
       for key in command.keys()
         if key.startsWith(str) and command.enabled()
-          return { match: true, exact: (key == str), command }
+          return {match: true, exact: (key == str), command}
 
   return {match: false}
 
 isEscCommandKey = (keyStr) -> keyStr in escapeCommand.keys()
 
 exports.commands                  = commands
-exports.searchForMatchingCommand  = searchForMatchingCommand 
-exports.isEscCommandKey           = isEscCommandKey 
+exports.searchForMatchingCommand  = searchForMatchingCommand
+exports.isEscCommandKey           = isEscCommandKey
