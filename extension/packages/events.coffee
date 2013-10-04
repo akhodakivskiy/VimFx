@@ -41,11 +41,7 @@ keyListener = (event) ->
 
       return unless keyStr = keyStrFromEvent(event)
 
-      isEditable = utils.isElementEditable(event.originalTarget)
-
-      suppress = vim.onInput(keyStr, event, {autoInsertMode: isEditable})
-      if vim.mode == 'normal' and keyStr == 'Esc'
-        suppress = false
+      suppress = vim.onInput(keyStr, event)
 
     if suppress
       event.preventDefault()

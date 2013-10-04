@@ -1,3 +1,4 @@
+utils               = require 'utils'
 { modes }           = require 'modes'
 { isEscCommandKey } = require 'commands'
 
@@ -19,10 +20,19 @@ class Vim
 
       modes[@mode].onEnter(@, @storage[@mode] ?= {}, args)
 
-  onInput: (keyStr, event, options = {}) ->
-    if options.autoInsertMode and not isEscCommandKey(keyStr)
+  onInput: (keyStr, event) ->
+    isEditable = utils.isElementEditable(event.originalTarget)
+
+    if isEditable and not isEscCommandKey(keyStr)
       return false
 
-    return modes[@mode]?.onInput(@, @storage[@mode], keyStr, event)
+    oldMode = @mode
+
+    suppress = modes[@mode]?.onInput(@, @storage[@mode], keyStr, event)
+
+    if oldMode == 'normal' and keyStr == 'Esc'
+      return false
+    else
+      return suppress
 
 exports.Vim = Vim
