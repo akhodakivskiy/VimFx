@@ -1,12 +1,12 @@
-utils                         = require 'utils'
-{ mode_hints }                = require 'mode-hints/mode-hints'
-{ updateToolbarButton }       = require 'button'
+utils                   = require 'utils'
+{ mode_hints }          = require 'mode-hints/mode-hints'
+{ updateToolbarButton } = require 'button'
 { searchForMatchingCommand
-, isEscCommandKey }  = require 'commands'
+, isEscCommandKey }     = require 'commands'
 
 modes = {}
 
-modes['normal'] = 
+modes['normal'] =
   onEnter: (vim, storage, args) ->
     storage.keys ?= []
     storage.commands ?= {}
