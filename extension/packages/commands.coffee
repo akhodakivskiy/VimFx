@@ -374,7 +374,7 @@ searchForMatchingCommand = (keys = []) ->
     for command in commands
       for key in command.keys()
         if key.startsWith(str) and command.enabled()
-          return { esc: (command == escapeCommand), match: true, exact: (key == str), command }
+          return { match: true, exact: (key == str), command }
 
   return {match: false}
 
