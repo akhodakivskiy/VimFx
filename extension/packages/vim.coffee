@@ -1,82 +1,47 @@
-MODE_NORMAL = {}
+utils               = require 'utils'
+{ modes }           = require 'modes'
+{ isEscCommandKey } = require 'commands'
 
 class Vim
-  constructor: ({ @window, @commands, @modes, @escapeCommand }) ->
-    @mode       = MODE_NORMAL
-    @keys       = []
-
-    @storage =
-      commands: {}
-      modes: {}
-
-    for { name } in @commands
-      @storage.commands[name] = {}
-
-    for name of @modes
-      @storage.modes[name] = {}
+  constructor: (@window) ->
+    @storage = {}
+    @enterMode('normal')
 
   enterMode: (mode, args) ->
     # `args` is an array of arguments to be passed to the mode's `onEnter` method
-    @mode = mode
-    @modes[mode].onEnter?(this, @storage.modes[mode], args)
+    if mode not of modes
+      throw new Error("Not a valid VimFx mode to enter: #{ mode }")
 
-  enterNormalMode: ->
-    return if @mode == MODE_NORMAL
-    @modes[@mode].onEnterNormalMode?(this, @storage.modes[@mode])
-    @mode = MODE_NORMAL
-    @keys.length = 0
+    if @mode != mode
+      if @mode of modes
+        modes[@mode].onLeave(@, @storage[@mode], args)
 
-  onInput: (keyStr, event, options = {}) ->
-    @keys.push(keyStr)
+      @mode = mode
 
-    esc = @searchForMatchingCommand([@escapeCommand]).exact
+      modes[@mode].onEnter(@, @storage[@mode] ?= {}, args)
 
-    if options.autoInsertMode and not esc
+  onInput: (keyStr, event) ->
+    isEditable = utils.isElementEditable(event.originalTarget)
+
+    if isEditable and not isEscCommandKey(keyStr)
       return false
 
-    if @mode == MODE_NORMAL
-      if esc
-        return @runCommand(@escapeCommand, event)
+    oldMode = @mode
 
-      { match, exact, command, index } = @searchForMatchingCommand(@commands)
+    suppress = modes[@mode]?.onInput(@, @storage[@mode], keyStr, event)
 
-      if match
-        @keys = @keys[index..]
-        if exact then @runCommand(command, event)
-        return true
-      else
-        @keys.length = 0
-        return false
-
+    # Esc key is not suppressed, and passed to the browser in `normal` mode.
+    # Here we compare against the mode that was active before the key was processed 
+    # because processing the command may change the mode.
+    #
+    # Not suppressing Esc allows for stopping the loading of the page as well as closing many custom
+    # dialogs (and perhaps other things -- Esc is a very commonly used key). There are two reasons we
+    # might suppress it in other modes. If some custom dialog of a website is open, we should be able to
+    # cancel hint markers on it without closing it. Secondly, otherwise cancelling hint markers on
+    # google causes its search bar to be focused.
+    if oldMode == 'normal' and keyStr == 'Esc'
+      return false
     else
-      if esc
-        @enterNormalMode()
-        return true
-      else
-        return @modes[@mode].onInput?(this, @storage.modes[@mode], keyStr, event)
-
-  # Intentionally taking `commands` as a parameter (instead of simply using `@commands`), so that
-  # the method can be reused by custom modes (and by escape handling).
-  searchForMatchingCommand: (commands) ->
-    for index in [0...@keys.length] by 1
-      str = @keys[index..].join(',')
-      for command in commands
-        for key in command.keys()
-          if key.startsWith(str) and command.enabled()
-            return {match: true, exact: (key == str), command, index}
-
-    return {match: false}
-
-  runCommand: (command, event) ->
-    command.func(this, @storage.commands[command.name], event)
-
-Vim.MODE_NORMAL = MODE_NORMAL
-
-# What is minimally required for a command
-class Vim.Command
-  constructor: (@name) ->
-  keys: -> return ['key1', 'key2', 'keyN']
-  enabled: -> return true
-  func: (vim, storage, event) ->
+      return suppress
 
 exports.Vim = Vim

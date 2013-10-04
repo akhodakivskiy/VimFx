@@ -362,10 +362,24 @@ commands = [
   new Command('misc',   'find_prev',              command_find_prev,              ['N'])
   new Command('misc',   'insert_mode',            command_insert_mode,            ['i'])
   new Command('misc',   'help',                   command_help,                   ['?'])
+  new Command('misc',   'dev',                    command_dev,                    [':'])
+
   escapeCommand =
   new Command('misc',   'Esc',                    command_Esc,                    ['Esc'])
-  new Command('misc',   'dev',                    command_dev,                    [':'])
 ]
+  
+searchForMatchingCommand = (keys) ->
+  for index in [0...keys.length] by 1
+    str = keys[index..].join(',')
+    for command in commands
+      for key in command.keys()
+        if key.startsWith(str) and command.enabled()
+          return { match: true, exact: (key == str), command }
 
-exports.commands      = commands
-exports.escapeCommand = escapeCommand
+  return {match: false}
+
+isEscCommandKey = (keyStr) -> keyStr in escapeCommand.keys()
+
+exports.commands                  = commands
+exports.searchForMatchingCommand  = searchForMatchingCommand 
+exports.isEscCommandKey           = isEscCommandKey 

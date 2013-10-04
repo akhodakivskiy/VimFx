@@ -4,21 +4,10 @@ keyUtils                = require 'key-utils'
 { getPref }             = require 'prefs'
 { updateToolbarButton } = require 'button'
 { unload }              = require 'unload'
-{ commands
-, escapeCommand }       = require 'commands'
-{ modes }               = require 'modes'
 
 { interfaces: Ci } = Components
 
-# Not suppressing Esc allows for stopping the loading of the page as well as closing many custom
-# dialogs (and perhaps other things -- Esc is a very commonly used key). There are two reasons we
-# might suppress it in other modes. If some custom dialog of a website is open, we should be able to
-# cancel hint markers on it without closing it. Secondly, otherwise cancelling hint markers on
-# google causes its search bar to be focused.
-NEVER_SUPPRESS_IN_NORMAL_MODE = ['Esc']
-
-newFunc = (window) -> new Vim({window, commands, modes, escapeCommand})
-vimBucket = new utils.Bucket(utils.getWindowId, newFunc)
+vimBucket = new utils.Bucket(utils.getWindowId, (w) -> new Vim(w))
 
 keyStrFromEvent = (event) ->
   { ctrlKey: ctrl, metaKey: meta, altKey: alt, shiftKey: shift } = event
@@ -52,15 +41,7 @@ keyListener = (event) ->
 
       return unless keyStr = keyStrFromEvent(event)
 
-      # This check must be done before `vim.onInput()` below, since that call might change the mode.
-      # We are interested in the mode at the beginning of the events, not whatever it might be
-      # afterwards.
-      suppressException = (vim.mode == Vim.MODE_NORMAL and keyStr in NEVER_SUPPRESS_IN_NORMAL_MODE)
-      isEditable = utils.isElementEditable(event.originalTarget)
-
-      suppress = vim.onInput(keyStr, event, {autoInsertMode: isEditable})
-      if suppressException
-        suppress = false
+      suppress = vim.onInput(keyStr, event)
 
     if suppress
       event.preventDefault()
@@ -113,7 +94,7 @@ tabsListener =
     # clicked), we're going to end up in hints mode without any markers. So switch back to normal
     # mode in that case.
     if vim.mode == 'hints'
-      vim.enterNormalMode()
+      vim.enterMode('normal')
 
     vim.blacklisted = utils.isBlacklisted(location.spec)
     updateButton(vim)
