@@ -1,8 +1,8 @@
 utils                         = require 'utils'
 { mode_hints }                = require 'mode-hints/mode-hints'
 { updateToolbarButton }       = require 'button'
-{ commands
-, searchForMatchingCommand }  = require 'commands'
+{ searchForMatchingCommand
+, isEscCommandKey }  = require 'commands'
 
 modes = {}
 
@@ -17,17 +17,14 @@ modes['normal'] =
   onInput: (vim, storage, keyStr, event) ->
     storage.keys.push(keyStr)
 
-    runCommand = (command) ->
-      commandStorage = storage.commands[command.name] ?= {}
-      command.func(vim, commandStorage, event)
-
     { esc, match, exact, command, index } = searchForMatchingCommand(storage.keys)
 
     if match
-      storage.keys = storage.keys[index..]
+      storage.keys.splice(index)
       if exact
-        runCommand(command)
-      return keyStr != 'Esc'
+        commandStorage = storage.commands[command.name] ?= {}
+        command.func(vim, commandStorage, event)
+      return not esc
     else
       storage.keys.length = 0
 
@@ -41,6 +38,9 @@ modes['insert'] =
     updateToolbarButton(rootWindow, {insertMode: false})
     utils.blurActiveElement(vim.window)
   onInput: (vim, storage, keyStr) ->
+    if isEscCommandKey(keyStr)
+      vim.enterMode('normal')
+      return true
 
 modes['hints'] = mode_hints
 

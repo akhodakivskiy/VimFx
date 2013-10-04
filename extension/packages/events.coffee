@@ -7,14 +7,7 @@ keyUtils                = require 'key-utils'
 
 { interfaces: Ci } = Components
 
-# Not suppressing Esc allows for stopping the loading of the page as well as closing many custom
-# dialogs (and perhaps other things -- Esc is a very commonly used key). There are two reasons we
-# might suppress it in other modes. If some custom dialog of a website is open, we should be able to
-# cancel hint markers on it without closing it. Secondly, otherwise cancelling hint markers on
-# google causes its search bar to be focused.
-
-newFunc = (window) -> new Vim(window)
-vimBucket = new utils.Bucket(utils.getWindowId, newFunc)
+vimBucket = new utils.Bucket(utils.getWindowId, (w) -> new Vim(w))
 
 keyStrFromEvent = (event) ->
   { ctrlKey: ctrl, metaKey: meta, altKey: alt, shiftKey: shift } = event
@@ -48,9 +41,6 @@ keyListener = (event) ->
 
       return unless keyStr = keyStrFromEvent(event)
 
-      # This check must be done before `vim.onInput()` below, since that call might change the mode.
-      # We are interested in the mode at the beginning of the events, not whatever it might be
-      # afterwards.
       isEditable = utils.isElementEditable(event.originalTarget)
 
       suppress = vim.onInput(keyStr, event, {autoInsertMode: isEditable})

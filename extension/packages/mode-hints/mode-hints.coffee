@@ -1,24 +1,26 @@
 utils = require 'utils'
 hints = require 'mode-hints/hints'
 
-{ commands
-, searchForMatchingCommand 
-} = require 'commands'
+{ isEscCommandKey } = require 'commands'
 
 exports.mode_hints =
   onEnter: (vim, storage, [ callback ]) ->
     markers = hints.injectHints(vim.window.document)
     if markers.length == 0
       vim.enterMode('normal')
-      return
-    storage.markers  = markers
-    storage.callback = callback
+    else
+      storage.markers  = markers
+      storage.callback = callback
 
   onLeave: (vim, storage) ->
     hints.removeHints(vim.window.document)
     storage.markers = storage.callback = undefined
 
   onInput: (vim, storage, keyStr, event) ->
+    if isEscCommandKey(keyStr)
+      vim.enterMode('normal')
+      return true
+
     { markers, callback } = storage
 
     switch keyStr

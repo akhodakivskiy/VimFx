@@ -1,6 +1,5 @@
-{ escapeCommand
-, searchForMatchingCommand } = require 'commands'
-{ modes }                    = require 'modes'
+{ modes }           = require 'modes'
+{ isEscCommandKey } = require 'commands'
 
 class Vim
   constructor: (@window) ->
@@ -16,16 +15,9 @@ class Vim
       modes[@mode]?.onEnter(@, @storage[@mode], args)
 
   onInput: (keyStr, event, options = {}) ->
-    esc = searchForMatchingCommand([keyStr], [escapeCommand]).esc
-
-    if options.autoInsertMode and not esc
+    if options.autoInsertMode and not isEscCommandKey(keyStr)
       return false
 
-    result = modes[@mode]?.onInput(@, @storage[@mode], keyStr, event)
-
-    if esc
-      @enterMode('normal')
-
-    return result
+    return modes[@mode]?.onInput(@, @storage[@mode], keyStr, event)
 
 exports.Vim = Vim
