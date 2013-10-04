@@ -196,17 +196,20 @@ persist = (document, toolbar, buttonId, beforeId) ->
   document.persist(toolbar.id, 'currentset')
   return [currentset, idx]
 
-updateToolbarButton = (window, { disabled, blacklisted }) ->
+updateToolbarButton = (window, { disabled, blacklisted, insertMode }) ->
   return unless button = $(window.document, BUTTON_ID)
 
   button.VimFx.disabled    = disabled     if disabled?
   button.VimFx.blacklisted = blacklisted  if blacklisted?
+  button.VimFx.insertMode  = insertMode   if insertMode?
 
   [ icon, tooltip ] = switch
     when button.VimFx.disabled
       ['grey', 'disabled']
     when button.VimFx.blacklisted
       ['red', 'blacklisted']
+    when button.VimFx.insertMode
+      ['grey', 'insertMode']
     else
       ['normal', 'enabled']
 
@@ -217,7 +220,7 @@ iconUrl = (kind) ->
   url = utils.getResourceURI("resources/icon16-#{ kind }.png").spec
   return "url(#{ url })"
 
-
+exports.addToolbarButton         = addToolbarButton
 exports.setButtonInstallPosition = setButtonInstallPosition
 exports.addToolbarButton         = addToolbarButton
 exports.updateToolbarButton      = updateToolbarButton

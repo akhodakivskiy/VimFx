@@ -8,12 +8,6 @@ Wildcard dibolehkan: *, !. Default: *mail.google.com*">
 <!ENTITY pref.scroll_step_lines.title     "Langkah Gulung">
 <!ENTITY pref.scroll_step_lines.desc      "Langkah Gulung">
 
-<!ENTITY pref.blur_on_esc.title     "Blur pada Esc">
-<!ENTITY pref.blur_on_esc.desc      "Blur fokus masukan dari elemen masukan aktif manapun dalam Peramban (contoh: bar alamat)">
-
-<!ENTITY pref.leave_dt_on_esc.title "Biarkan Toolbar Pengembang terbuka pada Esc">
-<!ENTITY pref.leave_dt_on_esc.desc  "Jangan sembunyikan Toolbar Pengembang jika tampak dan Esc ditekan">
-
 <!ENTITY pref.hints_bloom_on.title "Penempatan petunjuk cerdas">
 <!ENTITY pref.hints_bloom_on.desc  "Menempatkan petunjuk lebih pendek untuk pranala yang sering dikunjungi">
 

@@ -49,15 +49,24 @@ getEventCurrentTabWindow = (event) ->
   return getCurrentTabWindow(rootWindow)
 
 getRootWindow = (window) ->
-  return window.QueryInterface(Ci.nsIInterfaceRequestor)
-               .getInterface(Ci.nsIWebNavigation)
-               .QueryInterface(Ci.nsIDocShellTreeItem)
-               .rootTreeItem
-               .QueryInterface(Ci.nsIInterfaceRequestor)
-               .getInterface(Window)
+  return window
+    .QueryInterface(Ci.nsIInterfaceRequestor)
+    .getInterface(Ci.nsIWebNavigation)
+    .QueryInterface(Ci.nsIDocShellTreeItem)
+    .rootTreeItem
+    .QueryInterface(Ci.nsIInterfaceRequestor)
+    .getInterface(Window)
 
 getCurrentTabWindow = (window) ->
   return window.gBrowser.selectedTab.linkedBrowser.contentWindow
+
+blurActiveElement = (window) ->
+  # Only blur editable elements, in order not to interfere with the browser too much. TODO: Is that
+  # really needed? What if a website has made more elements focusable -- shouldn't those also be
+  # blurred?
+  { activeElement } = window.document
+  if isElementEditable(activeElement)
+    activeElement.blur()
 
 isTextInputElement = (element) ->
   return element instanceof HTMLInputElement or \
@@ -73,9 +82,10 @@ isElementEditable = (element) ->
          element.ownerDocument?.designMode?.toLowerCase() == 'on'
 
 getWindowId = (window) ->
-  return window.QueryInterface(Components.interfaces.nsIInterfaceRequestor)
-               .getInterface(Components.interfaces.nsIDOMWindowUtils)
-               .outerWindowID
+  return window
+    .QueryInterface(Components.interfaces.nsIInterfaceRequestor)
+    .getInterface(Components.interfaces.nsIDOMWindowUtils)
+    .outerWindowID
 
 getSessionStore = ->
   Cc['@mozilla.org/browser/sessionstore;1'].getService(Ci.nsISessionStore)
@@ -105,10 +115,9 @@ loadCss = do ->
 
 # Simulate mouse click with full chain of event
 # Copied from Vimium codebase
-simulateClick = (element, modifiers) ->
+simulateClick = (element, modifiers = {}) ->
   document = element.ownerDocument
   window = document.defaultView
-  modifiers ||= {}
 
   eventSequence = ['mouseover', 'mousedown', 'mouseup', 'click']
   for event in eventSequence
@@ -126,8 +135,9 @@ WHEEL_MODE_PAGE = Ci.nsIDOMWheelEvent.DOM_DELTA_PAGE
 # Simulate mouse scroll event by specific offsets given
 # that mouse cursor is at specified position
 simulateWheel = (window, deltaX, deltaY, mode = WHEEL_MODE_PIXEL) ->
-  windowUtils = window.QueryInterface(Ci.nsIInterfaceRequestor)
-                      .getInterface(Ci.nsIDOMWindowUtils)
+  windowUtils = window
+    .QueryInterface(Ci.nsIInterfaceRequestor)
+    .getInterface(Ci.nsIDOMWindowUtils)
 
   [pX, pY] = [window.innerWidth / 2, window.innerHeight / 2]
   windowUtils.sendWheelEvent(
@@ -147,7 +157,8 @@ writeToClipboard = (window, text) ->
   trans = Cc['@mozilla.org/widget/transferable;1'].createInstance(Ci.nsITransferable)
 
   if trans.init
-    privacyContext = window.QueryInterface(Ci.nsIInterfaceRequestor)
+    privacyContext = window
+      .QueryInterface(Ci.nsIInterfaceRequestor)
       .getInterface(Ci.nsIWebNavigation)
       .QueryInterface(Ci.nsILoadContext)
     trans.init(privacyContext)
@@ -162,7 +173,8 @@ readFromClipboard = (window) ->
   trans = Cc['@mozilla.org/widget/transferable;1'].createInstance(Ci.nsITransferable)
 
   if trans.init
-    privacyContext = window.QueryInterface(Ci.nsIInterfaceRequestor)
+    privacyContext = window
+      .QueryInterface(Ci.nsIInterfaceRequestor)
       .getInterface(Ci.nsIWebNavigation)
       .QueryInterface(Ci.nsILoadContext)
     trans.init(privacyContext)
@@ -284,7 +296,7 @@ removeDuplicateCharacters = (str) ->
 # Return URI to some file in the extension packaged as resource
 getResourceURI = do ->
   baseURI = Services.io.newURI(__SCRIPT_URI_SPEC__, null, null)
-  return (path) -> Services.io.newURI(path, null, baseURI)
+  return (path) -> return Services.io.newURI(path, null, baseURI)
 
 # Escape string to render it usable in regular expressions
 regexpEscape = (s) -> s and s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')
@@ -301,6 +313,7 @@ exports.getRootWindow             = getRootWindow
 exports.getCurrentTabWindow       = getCurrentTabWindow
 
 exports.getWindowId               = getWindowId
+exports.blurActiveElement         = blurActiveElement
 exports.isTextInputElement        = isTextInputElement
 exports.isElementEditable         = isElementEditable
 exports.getSessionStore           = getSessionStore
@@ -316,7 +329,7 @@ exports.readFromClipboard         = readFromClipboard
 exports.writeToClipboard          = writeToClipboard
 exports.timeIt                    = timeIt
 
-exports.getMatchingBlacklistRules  = getMatchingBlacklistRules
+exports.getMatchingBlacklistRules = getMatchingBlacklistRules
 exports.isBlacklisted             = isBlacklisted
 exports.updateBlacklist           = updateBlacklist
 
@@ -327,4 +340,3 @@ exports.browserSearchSubmission   = browserSearchSubmission
 exports.getHintChars              = getHintChars
 exports.removeDuplicateCharacters = removeDuplicateCharacters
 exports.getResourceURI            = getResourceURI
-exports.regexpEscape              = regexpEscape
