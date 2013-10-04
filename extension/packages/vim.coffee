@@ -30,6 +30,9 @@ class Vim
 
     suppress = modes[@mode]?.onInput(@, @storage[@mode], keyStr, event)
 
+    # Esc key is not suppressed, and passed to the browser in `normal` mode.
+    # Here we compare against the mode that was active before the key was processed 
+    # because processing the command may change the mode.
     if oldMode == 'normal' and keyStr == 'Esc'
       return false
     else
