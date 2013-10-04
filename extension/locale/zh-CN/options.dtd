@@ -8,12 +8,6 @@
 <!ENTITY pref.scroll_step_lines.title   "滚动步长">
 <!ENTITY pref.scroll_step_lines.desc    "滚动步长">
 
-<!ENTITY pref.blur_on_esc.title      "Esc 键功能">
-<!ENTITY pref.blur_on_esc.desc       "当按下 Esc 键时光标将离开任何聚焦的输入框（比如地址栏）">
-
-<!ENTITY pref.leave_dt_on_esc.title "按下 Esc 键时，光标将离开打开的开发者工具栏">
-<!ENTITY pref.leave_dt_on_esc.desc  "按下 Esc 键时，将不会隐藏打开的开发者工具栏，只是让它失去焦点">
-
 <!ENTITY pref.hints_bloom_on.title "智能分配提示符">
 <!ENTITY pref.hints_bloom_on.desc  "为最常访问的链接分配更短的提示符">
 

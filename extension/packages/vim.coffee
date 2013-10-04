@@ -1,68 +1,47 @@
-utils = require 'utils'
-
-commands = require 'commands'
-
-{ getPref
-, isCommandDisabled
-} = require 'prefs'
-
-MODE_NORMAL = 1
-MODE_HINTS  = 2
+utils               = require 'utils'
+{ modes }           = require 'modes'
+{ isEscCommandKey } = require 'commands'
 
 class Vim
-  @findStr = ''
-
   constructor: (@window) ->
-    @mode       = MODE_NORMAL
-    @keys       = []
-    @lastKeyStr = null
-    @markers    = undefined
-    @cb         = undefined
-    @findRng    = null
-    @suppress   = false
+    @storage = {}
+    @enterMode('normal')
 
-    Object.defineProperty(this, 'findStr',
-      get: -> return Vim.findStr
-      set: (value) -> Vim.findStr = value
-    )
+  enterMode: (mode, args) ->
+    # `args` is an array of arguments to be passed to the mode's `onEnter` method
+    if mode not of modes
+      throw new Error("Not a valid VimFx mode to enter: #{ mode }")
 
-  enterHintsMode: (@markers, @cb) ->
-    @mode = MODE_HINTS
+    if @mode != mode
+      if @mode of modes
+        modes[@mode].onLeave(@, @storage[@mode], args)
 
-  # TODO: This function should probably remove
-  # hint markers (if they are present) as well
-  enterNormalMode: ->
-    @mode = MODE_NORMAL
-    @markers = @cb = undefined
+      @mode = mode
 
-  handleKeyDown: (event, keyStr) ->
-    @suppress = true
-    if @mode == MODE_NORMAL || keyStr == 'Esc'
-      @keys.push(keyStr)
-      @lastKeyStr = keyStr
-      if command = commands.findCommand(@keys)
-        command.func(@)
-        return command.name != 'Esc'
-      else if commands.maybeCommand(@keys)
-        return true
-      else
-        @keys.length = 0
-    else if @mode == MODE_HINTS and not (event.ctrlKey or event.metaKey)
-      specialKeys = ['Shift-Space', 'Space', 'Backspace']
-      if utils.getHintChars().search(utils.regexpEscape(keyStr)) > -1 or keyStr in specialKeys
-        commands.hintCharHandler(@, keyStr)
-        return true
+      modes[@mode].onEnter(@, @storage[@mode] ?= {}, args)
 
-    @suppress = false
-    @keys.length = 0
-    return false
+  onInput: (keyStr, event) ->
+    isEditable = utils.isElementEditable(event.originalTarget)
 
-  handleKeyPress: (event, keyStr) ->
-    return @lastKeyStr != 'Esc' and @suppress
+    if isEditable and not isEscCommandKey(keyStr)
+      return false
 
-  handleKeyUp: (event) ->
-    sup = @suppress
-    @suppress = false
-    return @lastKeyStr != 'Esc' and sup
+    oldMode = @mode
+
+    suppress = modes[@mode]?.onInput(@, @storage[@mode], keyStr, event)
+
+    # Esc key is not suppressed, and passed to the browser in `normal` mode.
+    # Here we compare against the mode that was active before the key was processed 
+    # because processing the command may change the mode.
+    #
+    # Not suppressing Esc allows for stopping the loading of the page as well as closing many custom
+    # dialogs (and perhaps other things -- Esc is a very commonly used key). There are two reasons we
+    # might suppress it in other modes. If some custom dialog of a website is open, we should be able to
+    # cancel hint markers on it without closing it. Secondly, otherwise cancelling hint markers on
+    # google causes its search bar to be focused.
+    if oldMode == 'normal' and keyStr == 'Esc'
+      return false
+    else
+      return suppress
 
 exports.Vim = Vim
