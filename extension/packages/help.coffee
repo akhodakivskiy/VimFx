@@ -38,7 +38,7 @@ injectHelp = (document, commands) ->
       button.addEventListener('click', clickHandler, false)
 
 installHandlers = (document, commands) ->
-  promptService = Cc["@mozilla.org/embedcomp/prompt-service;1"].getService(Ci.nsIPromptService);
+  promptService = Cc["@mozilla.org/embedcomp/prompt-service;1"].getService(Ci.nsIPromptService)
 
   changeHandler = (event) ->
     name = event.target.getAttribute('data-name')
