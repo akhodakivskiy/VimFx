@@ -1,18 +1,15 @@
 <!ENTITY pref.hint_chars.title      "Χαρακτήρες Δεικτών">
-<!ENTITY pref.hint_chars.desc       "Προεπιλογή: asdfgercvhjkl;uinm">
+<!ENTITY pref.hint_chars.desc       "Προεπιλογή: fjdkslaghrueiwovncm">
 
 <!ENTITY pref.black_list.title      "Μαύρη Λίστα">
-<!ENTITY pref.black_list.desc       "Διευθύνσης διαχωρισμένες με κόμματα στις οποίες το VimFX θα είναι αυτόματα απενεργοποιημένο. 
-Wildcards allowed: *, !">
+<!ENTITY pref.black_list.desc       "Διευθύνσης διαχωρισμένες με κόμματα στις οποίες το VimFX θα είναι αυτόματα απενεργοποιημένο.
+Επιτρέπονται χαρακτήρες μπαλαντέρ: *, !. Προεπιλογή: *mail.google.com*">
 
 <!ENTITY pref.scroll_step_lines.title "Βήμα Κύλισης">
 <!ENTITY pref.scroll_step_lines.desc  "Βήμα Κύλισης">
 
-<!ENTITY pref.blur_on_esc.title     "Θόλωμα στο Esc">
-<!ENTITY pref.blur_on_esc.desc      "Θόλωσε την εστίαση εισόδου οποιουδήποτε ενεργού στοιχείου εισόδου στον περιηγητή (π.χ. γραμμή διευθύνσεων)">
+<!ENTITY pref.hints_bloom_on.title "Έξυπνη ανάθεση υποδείξεων">
+<!ENTITY pref.hints_bloom_on.desc  "Ανάθεσε μικρότερες υποδείξεις στους συνδέσμους που οι χρήστες επισκέπτονται συχνότερα">
 
-<!ENTITY pref.leave_dt_on_esc.title "Άφηνε τη Developer Toolbar ανοιχτή στο Esc">
-<!ENTITY pref.leave_dt_on_esc.desc  "Μην κρύβεις τη Developer Toolbar αν είναι ορατή και το Esc πατηθεί">
-
-<!ENTITY pref.hints_bloom_on.title "Smart hint assignment (needs translation)">
-<!ENTITY pref.hints_bloom_on.desc  "Assign shorter hints to the links that users visit most often (needs translation)">
+<!ENTITY customizeButton.title "Συντομεύσεις Πληκτρολογίου">
+<!ENTITY customizeButton.label "Προσαρμογή">

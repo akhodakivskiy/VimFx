@@ -1,15 +1,15 @@
 <!ENTITY pref.hint_chars.title      "Znaki podpowiedzi">
-<!ENTITY pref.hint_chars.desc       "Domyślnie: fjdksla;ghrueiwovncm">
+<!ENTITY pref.hint_chars.desc       "Domyślnie: fjdkslaghrueiwovncm">
 
 <!ENTITY pref.black_list.title      "Czarna lista">
 <!ENTITY pref.black_list.desc       "Lista adresów oddzielonych przecinkami pod którymi VimFx powinien być automatycznie wyłączony.
-Dopuszczalne wieloznaczniki: *, !">
+Dopuszczalne wieloznaczniki: *, !. Domyślnie: *mail.google.com*">
 
 <!ENTITY pref.scroll_step_liens.title   "Krok przewijania">
 <!ENTITY pref.scroll_step_lines.desc    "Krok przewijania">
 
-<!ENTITY pref.blur_on_esc.title      "Escape zabiera focus">
-<!ENTITY pref.blur_on_esc.desc       "Escape zabiera focus dowolnemu aktywnemu elementowi w przeglądarce (np. paskowi adresu)">
+<!ENTITY pref.hints_bloom_on.title "Smart hint assignment">
+<!ENTITY pref.hints_bloom_on.desc  "Assign shorter hints to the links that users visit most often">
 
-<!ENTITY pref.leave_dt_on_esc.title "Escape nie zamyka paska programisty">
-<!ENTITY pref.leave_dt_on_esc.desc  "Pasek programisty nie zostanie zamknięty jeśli jest widoczny i wciśnięto Escape">
+<!ENTITY customizeButton.title "Keyboard Shortcuts">
+<!ENTITY customizeButton.label "Customize">

@@ -1,26 +1,32 @@
-utils = require 'utils'
-prefs = require 'prefs'
-{ _ } = require 'l10n'
+utils        = require 'utils'
+prefs        = require 'prefs'
+{ _ }        = require 'l10n'
 
 { classes: Cc, interfaces: Ci, utils: Cu } = Components
+
+XULDocument  = Ci.nsIDOMXULDocument
 
 CONTAINER_ID = 'VimFxHelpDialogContainer'
 
 removeHelp = (document) ->
-  if div = document.getElementById(CONTAINER_ID)
-    div.parentNode.removeChild(div)
+  document.getElementById(CONTAINER_ID)?.remove()
 
 injectHelp = (document, commands) ->
   if document.documentElement
-    if div = document.getElementById(CONTAINER_ID)
-      div.parentNode.removeChild(div)
-    div = document.createElement 'div'
-    div.id = CONTAINER_ID
-    div.className = 'VimFxReset'
+    removeHelp(document)
 
-    div.appendChild(utils.parseHTML(document, helpDialogHtml(commands)))
+    if document instanceof XULDocument
+      container = document.createElement('box')
+      # The `.VimFxReset` class is not needed in XUL documents. Instead it actullay causes layout
+      # problems there!
+    else
+      container = document.createElement('div')
+      container.className = 'VimFxReset'
+    container.id = CONTAINER_ID
 
-    document.documentElement.appendChild(div)
+    container.appendChild(utils.parseHTML(document, helpDialogHtml(commands)))
+
+    document.documentElement.appendChild(container)
 
     installHandlers(document, commands)
 
@@ -32,7 +38,7 @@ injectHelp = (document, commands) ->
       button.addEventListener('click', clickHandler, false)
 
 installHandlers = (document, commands) ->
-  promptService = Cc["@mozilla.org/embedcomp/prompt-service;1"].getService(Ci.nsIPromptService);
+  promptService = Cc["@mozilla.org/embedcomp/prompt-service;1"].getService(Ci.nsIPromptService)
 
   changeHandler = (event) ->
     name = event.target.getAttribute('data-name')
@@ -67,16 +73,25 @@ installHandlers = (document, commands) ->
       value = { value: null }
       check = { value: null }
       if promptService.prompt(document.defaultView, title, text, value, null, check)
-        if commands.filter((c) => c.keys().indexOf(value.value) != -1).length > 0
-          textError = _('help_add_shortcut_text_already_exists')
-          promptService.alert(document.defaultView, title, textError)
-        else
+        conflict_cmd = commands.filter((c) => c.keys().indexOf(value.value) != -1)
+        if conflict_cmd.length < 1 || overwriteCmd(conflict_cmd[0], value.value)
           cmd.keys(cmd.keys().concat(value.value))
           for div in document.getElementsByClassName('VimFxKeySequence')
             if div.getAttribute('data-command') == cmd.name
               node = utils.parseHTML(document, hint(cmd, value.value))
               node.querySelector('a').addEventListener('click', removeHandler)
               div.appendChild(node)
+
+  overwriteCmd = (cmd, key) ->
+    title = _('help_add_shortcut_title')
+    text = _('help_add_shortcut_text_overwrite', null, key, cmd.help())
+    if promptService.confirm(document.defaultView, title, text)
+      cmd.keys(cmd.keys().filter((a) -> a != key))
+      dom = document.querySelectorAll("a[data-key='#{key}']")
+      dom[0].parentNode.removeChild(dom[0]) if dom.length > 0
+      return true
+    else
+      return false
 
   for a in document.getElementsByClassName('VimFxAddShortcutLink')
     a.addEventListener('click', addHandler, false)
@@ -133,7 +148,7 @@ helpDialogHtml = (commands) ->
     <div class="VimFxReset VimFxHeader">
       <div class="VimFxReset VimFxTitle">
         <span class="VimFxReset VimFxTitleVim">Vim</span><span class="VimFxReset VimFxTitleFx">Fx</span>
-        <span class="VimFxReset">#{ _('help') }</span>
+        <span class="VimFxReset">#{ _('help_title') }</span>
       </div>
       <span class="VimFxReset VimFxVersion">#{ _('help_version') } #{ utils.getVersion() }</span>
       <a class="VimFxReset VimFxClose" id="VimFxClose" href="#">&#10006;</a>
@@ -154,20 +169,19 @@ helpDialogHtml = (commands) ->
     </div>
 
     <div class="VimFxReset VimFxFooter">
-      <div class="VimFxReset VimFxSocial">
-        <p class="VimFxReset">
-          #{ _('help_found_bug') }
-          <a class="VimFxReset" target="_blank" href="https://github.com/akhodakivskiy/VimFx/issues">
-            #{ _('help_report_bug') }
-          </a>
-        </p>
-        <p class="VimFxReset">
-          #{ _('help_enjoying') }
-          <a class="VimFxReset" target="_blank" href="https://addons.mozilla.org/en-US/firefox/addon/vimfx/">
-            #{ _('help_feedback') }
-          </a>
-        </p>
-      </div>
+      <p class="VimFxReset">#{ _('help_overlapping_hints') }</p>
+      <p class="VimFxReset">
+        #{ _('help_found_bug') }
+        <a class="VimFxReset" target="_blank" href="https://github.com/akhodakivskiy/VimFx/issues">
+          #{ _('help_report_bug') }
+        </a>
+      </p>
+      <p class="VimFxReset">
+        #{ _('help_enjoying') }
+        <a class="VimFxReset" target="_blank" href="https://addons.mozilla.org/en-US/firefox/addon/vimfx/">
+          #{ _('help_feedback') }
+        </a>
+      </p>
     </div>
   </div>
   """

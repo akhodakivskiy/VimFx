@@ -3,16 +3,15 @@
 <!DOCTYPE mydialog SYSTEM "chrome://vimfx/locale/options.dtd">
 
 <vbox xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
-    <setting pref="extensions.VimFx.hint_chars" type="string" 
+    <setting pref="extensions.VimFx.hint_chars" type="string"
         title="&pref.hint_chars.title;" desc="&pref.hint_chars.desc;" />
-    <setting pref="extensions.VimFx.black_list" type="string" 
+    <setting pref="extensions.VimFx.black_list" type="string"
         title="&pref.black_list.title;" desc="&pref.black_list.desc;" />
-    <setting pref="extensions.VimFx.blur_on_esc" type="bool" 
-        title="&pref.blur_on_esc.title;" desc="&pref.blur_on_esc.desc;" />
-    <setting pref="extensions.VimFx.leave_dt_on_esc" type="bool" 
-        title="&pref.leave_dt_on_esc.title;" desc="&pref.leave_dt_on_esc.desc;" />
-    <setting pref="extensions.VimFx.scroll_step_lines" type="integer" 
+    <setting pref="extensions.VimFx.scroll_step_lines" type="integer"
         title="&pref.scroll_step_lines.title;" desc="&pref.scroll_step_lines.desc;" />
-    <setting pref="extensions.VimFx.hints_bloom_on" type="bool" 
+    <setting pref="extensions.VimFx.hints_bloom_on" type="bool"
         title="&pref.hints_bloom_on.title;" desc="&pref.hints_bloom_on.desc;" />
+    <setting title="&customizeButton.title;" type="control">
+        <button id="customizeButton" label="&customizeButton.label;" />
+    </setting>
 </vbox>
