@@ -74,16 +74,24 @@ installHandlers = (document, commands) ->
       check = { value: null }
       if promptService.prompt(document.defaultView, title, text, value, null, check)
         conflict_cmd = commands.filter((c) => c.keys().indexOf(value.value) != -1)
-        if conflict_cmd.length > 0
-          textError = _('help_add_shortcut_text_already_used_by', null, value.value, conflict_cmd[0].help())
-          promptService.alert(document.defaultView, title, textError)
-        else
+        if conflict_cmd.length < 1 || overwriteCmd(conflict_cmd[0], value.value)
           cmd.keys(cmd.keys().concat(value.value))
           for div in document.getElementsByClassName('VimFxKeySequence')
             if div.getAttribute('data-command') == cmd.name
               node = utils.parseHTML(document, hint(cmd, value.value))
               node.querySelector('a').addEventListener('click', removeHandler)
               div.appendChild(node)
+
+  overwriteCmd = (cmd, key) ->
+    title = _('help_add_shortcut_title')
+    text = _('help_add_shortcut_text_overwrite', null, key, cmd.help())
+    if promptService.confirm(document.defaultView, title, text)
+      cmd.keys(cmd.keys().filter((a) -> a != key))
+      dom = document.querySelectorAll("a[data-key='#{key}']")
+      dom[0].parentNode.removeChild(dom[0]) if dom.length > 0
+      return true
+    else
+      return false
 
   for a in document.getElementsByClassName('VimFxAddShortcutLink')
     a.addEventListener('click', addHandler, false)
