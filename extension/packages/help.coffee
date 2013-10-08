@@ -73,8 +73,9 @@ installHandlers = (document, commands) ->
       value = { value: null }
       check = { value: null }
       if promptService.prompt(document.defaultView, title, text, value, null, check)
-        if commands.filter((c) => c.keys().indexOf(value.value) != -1).length > 0
-          textError = _('help_add_shortcut_text_already_exists')
+        conflict_cmd = commands.filter((c) => c.keys().indexOf(value.value) != -1)
+        if conflict_cmd.length > 0
+          textError = _('help_add_shortcut_text_already_used_by', null, value.value, conflict_cmd[0].help())
           promptService.alert(document.defaultView, title, textError)
         else
           cmd.keys(cmd.keys().concat(value.value))
