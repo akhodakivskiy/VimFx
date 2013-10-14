@@ -142,6 +142,9 @@ helpDialogHtml = (commands) ->
       <span class="VimFxReset VimFxVersion">#{ _('help_version') } #{ utils.getVersion() }</span>
       <a class="VimFxReset VimFxClose" id="VimFxClose" href="#">&#10006;</a>
       <div class="VimFxReset VimFxClearFix"></div>
+      <p class="VimFxReset">Did you know that you can add/remove shortucts in this dialog?</p>
+      <div class="VimFxReset VimFxClearFix"></div>
+      <p class="VimFxReset">Click the shortcut to remove it, and click &#8862; to add new shortcut!</p>
     </div>
 
     <div class="VimFxReset VimFxBody">
