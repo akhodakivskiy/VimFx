@@ -13,8 +13,6 @@ DEFAULT_PREF_VALUES =
   disabled:           false
   scroll_step_lines:  6
   black_list:         '*mail.google.com*'
-  blur_on_esc:        true
-  leave_dt_on_esc:    false
   hints_bloom_data:   ''
   hints_bloom_on:     true
 

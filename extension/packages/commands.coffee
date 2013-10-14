@@ -1,8 +1,6 @@
 utils = require 'utils'
-hints = require 'hints'
 help  = require 'help'
 find  = require 'find'
-
 { _ } = require 'l10n'
 { getPref
 , setPref
@@ -11,7 +9,7 @@ find  = require 'find'
 
 { classes: Cc, interfaces: Ci, utils: Cu } = Components
 
-# Opens developer toolbar (Default shotrcut: Shift-F2)
+# Open developer toolbar (Default shotrcut: Shift-F2)
 command_dev = (vim) ->
   if chromeWindow = utils.getRootWindow vim.window
     chromeWindow.DeveloperToolbar.show(true)
@@ -21,7 +19,7 @@ command_dev = (vim) ->
 command_focus = (vim) ->
   if chromeWindow = utils.getRootWindow(vim.window)
     chromeWindow.focusAndSelectUrlBar()
-    #
+
 # Focus the Search Bar
 command_focus_search = (vim) ->
   if chromeWindow = utils.getRootWindow(vim.window)
@@ -57,22 +55,20 @@ command_open_tab = (vim) ->
 
 # Copy element URL to the clipboard
 command_marker_yank = (vim) ->
-  markers = hints.injectHints(vim.window.document)
-  if markers.length > 0
-    cb = (marker) ->
-      if url = marker.element.href
-        marker.element.focus()
-        utils.writeToClipboard(vim.window, url)
-      else if utils.isTextInputElement(marker.element)
-        utils.writeToClipboard(vim.window, marker.element.value)
+  callback = (marker) ->
+    if url = marker.element.href
+      marker.element.focus()
+      utils.writeToClipboard(vim.window, url)
+    else if utils.isTextInputElement(marker.element)
+      utils.writeToClipboard(vim.window, marker.element.value)
 
-    vim.enterHintsMode(markers, cb)
+  vim.enterMode('hints', [callback])
 
 # Focus element
 command_marker_focus = (vim) ->
-  markers = hints.injectHints(vim.window.document)
-  if markers.length > 0
-    vim.enterHintsMode(markers, (marker) -> marker.element.focus())
+  callback = (marker) -> marker.element.focus()
+
+  vim.enterMode('hints', [callback])
 
 # Copy current URL to the clipboard
 command_yank = (vim) ->
@@ -201,28 +197,27 @@ command_restore_tab = (vim) ->
     if ss and ss.getClosedTabCount(rootWindow) > 0
       ss.undoCloseTab(rootWindow, 0)
 
-# Follow links with hint markers
-command_follow = (vim) ->
-  if document = vim.window.document
-    markers = hints.injectHints(document)
-    if markers.length > 0
-      # This callback will be called with the selected marker as argument
-      cb = (marker) ->
-        marker.element.focus()
-        utils.simulateClick(marker.element)
+helper_follow = ({ inTab, multiple }, vim) ->
+  callback = (matchedMarker, markers) ->
+    matchedMarker.element.focus()
+    utils.simulateClick(matchedMarker.element, {metaKey: inTab, ctrlKey: inTab})
+    isEditable = utils.isElementEditable(matchedMarker.element)
+    if multiple and not isEditable
+      # By not resetting immediately one is able to see the last char being matched, which gives
+      # some nice visual feedback that you've typed the right char.
+      vim.window.setTimeout((-> marker.reset() for marker in markers), 100)
+      return true
 
-      vim.enterHintsMode(markers, cb)
+  vim.enterMode('hints', [callback])
+
+# Follow links with hint markers
+command_follow = helper_follow.bind(undefined, {inTab: false})
 
 # Follow links in a new Tab with hint markers
-command_follow_in_tab = (vim) ->
-  markers = hints.injectHints(vim.window.document)
-  if markers.length > 0
-    # This callback will be called with the selected marker as argument
-    cb = (marker) ->
-      marker.element.focus()
-      utils.simulateClick(marker.element, { metaKey: true, ctrlKey: true })
+command_follow_in_tab = helper_follow.bind(undefined, {inTab: true})
 
-    vim.enterHintsMode(markers, cb)
+# Follow multiple links with hint markers
+command_follow_multiple = helper_follow.bind(undefined, {inTab: true, multiple: true})
 
 # Move current tab to the left
 command_tab_move_left = (vim) ->
@@ -247,55 +242,50 @@ command_tab_move_right = (vim) ->
 command_help = (vim) ->
   help.injectHelp(vim.window.document, commands)
 
+find.findStr = ''
+
 # Switch into find mode
-command_find = (vim) ->
+command_find = (vim, storage) ->
   find.injectFind vim.window.document, (findStr, startFindRng) ->
     # Reset region and find string if new find stirng has arrived
-    if vim.findStr != findStr
-      [vim.findStr, vim.findRng] = [findStr, startFindRng]
+    if find.findStr != findStr
+      [find.findStr, storage.findRng] = [findStr, startFindRng]
     # Perform forward find and store found region
-    return vim.findRng = find.find(vim.window, vim.findStr, vim.findRng, find.DIRECTION_FORWARDS)
+    return storage.findRng = find.find(vim.window, find.findStr, storage.findRng, find.DIRECTION_FORWARDS)
 
 # Switch into find mode with highlighting
-command_find_hl = (vim) ->
+command_find_hl = (vim, storage) ->
   find.injectFind vim.window.document, (findStr) ->
     # Reset region and find string if new find stirng has arrived
     return find.highlight(vim.window, findStr)
 
 # Search for the last pattern
-command_find_next = (vim) ->
-  if vim.findStr.length > 0
-    vim.findRng = find.find(vim.window, vim.findStr, vim.findRng, find.DIRECTION_FORWARDS, true)
+command_find_next = (vim, storage) ->
+  if find.findStr.length > 0
+    storage.findRng = find.find(vim.window, find.findStr, storage.findRng, find.DIRECTION_FORWARDS, true)
 
 # Search for the last pattern backwards
-command_find_prev = (vim) ->
-  if vim.findStr.length > 0
-    vim.findRng = find.find(vim.window, vim.findStr, vim.findRng, find.DIRECTION_BACKWARDS, true)
+command_find_prev = (vim, storage) ->
+  if find.findStr.length > 0
+    storage.findRng = find.find(vim.window, find.findStr, storage.findRng, find.DIRECTION_BACKWARDS, true)
 
-# Close the Help dialog and cancel the pending hint marker action
-command_Esc = (vim) ->
-  # Blur active element if it's editable. Other elements
-  # aren't blurred - we don't want to interfere with
-  # the browser too much
-  activeElement = vim.window.document.activeElement
-  if utils.isElementEditable(activeElement)
-    activeElement.blur()
+command_insert_mode = (vim) ->
+  vim.enterMode('insert')
 
-  #Remove Find input
+command_Esc = (vim, storage, event) ->
+  utils.blurActiveElement(vim.window)
+
+  # Blur active XUL control
+  callback = -> event.originalTarget?.ownerDocument?.activeElement?.blur()
+  vim.window.setTimeout(callback, 0)
+
   find.removeFind(vim.window.document)
 
-  # Remove hints
-  hints.removeHints(vim.window.document)
-
-  # Hide help dialog
   help.removeHelp(vim.window.document)
 
-  # Finally enter normal mode
-  vim.enterNormalMode()
+  if rootWindow = utils.getRootWindow(vim.window)
+    rootWindow.DeveloperToolbar.hide()
 
-  if not getPref('leave_dt_on_esc')
-    if chromeWindow = utils.getRootWindow(vim.window)
-      chromeWindow.DeveloperToolbar.hide()
 
 class Command
   constructor: (@group, @name, @func, keys) ->
@@ -304,27 +294,9 @@ class Command
       try @keyValues = JSON.parse(getPref(@prefName('keys')))
     else
       @keyValues = keys
-  
-  # Check if this command may match given string if more chars are added
-  mayMatch: (value) ->
-    return @keys.reduce(((m, v) -> m or v.indexOf(value) == 0), false)
-
-  # Check is this command matches given string
-  match: (value) ->
-    return @keys.reduce(((m, v) -> m or v == value), false)
 
   # Name of the preference for a given property
   prefName: (value) -> "commands.#{ @name }.#{ value }"
-
-  assign: (value) ->
-    @keys = value or @defaultKeys
-    setPref(@prefName('keys'), value and JSON.stringify(value))
-
-  enabled: (value) ->
-    if value is undefined
-      return getPref(@prefName('enabled'), true)
-    else
-      setPref(@prefName('enabled'), !!value)
 
   keys: (value) ->
     if value is undefined
@@ -374,54 +346,34 @@ commands = [
 
   new Command('browse', 'follow',                 command_follow,                 ['f'])
   new Command('browse', 'follow_in_tab',          command_follow_in_tab,          ['F'])
+  new Command('browse', 'follow_multiple',        command_follow_multiple,        ['a,f'])
   new Command('browse', 'back',                   command_back,                   ['H'])
   new Command('browse', 'forward',                command_forward,                ['L'])
-  
+
   new Command('misc',   'find',                   command_find,                   ['/'])
   new Command('misc',   'find_hl',                command_find_hl,                ['a,/'])
   new Command('misc',   'find_next',              command_find_next,              ['n'])
   new Command('misc',   'find_prev',              command_find_prev,              ['N'])
+  new Command('misc',   'insert_mode',            command_insert_mode,            ['i'])
   new Command('misc',   'help',                   command_help,                   ['?'])
-  new Command('misc',   'Esc',                    command_Esc,                    ['Esc'])
   new Command('misc',   'dev',                    command_dev,                    [':'])
+
+  escapeCommand =
+  new Command('misc',   'Esc',                    command_Esc,                    ['Esc'])
 ]
 
-# Called in hints mode. Will process the char, update and hide/show markers
-hintCharHandler = (vim, keyStr) ->
-  if keyStr
-    # Get char and escape it to avoid problems with String.search
-    key = utils.regexpEscape(keyStr)
+searchForMatchingCommand = (keys) ->
+  for index in [0...keys.length] by 1
+    str = keys[index..].join(',')
+    for command in commands
+      for key in command.keys()
+        if key.startsWith(str)
+          return {match: true, exact: (key == str), command}
 
-    # First do a pre match - count how many markers will match with the new character entered
-    if vim.markers.reduce(((v, marker) -> v or marker.willMatch(key)), false)
-      for marker in vim.markers
-        marker.matchHintChar(key)
+  return {match: false}
 
-        if marker.isMatched()
-          # Add element features to the bloom filter
-          marker.reward()
-          vim.cb(marker)
-          hints.removeHints(vim.window.document)
-          vim.enterNormalMode()
-          break
+isEscCommandKey = (keyStr) -> keyStr in escapeCommand.keys()
 
-findCommand = (keys) ->
-  for i in [0...keys.length]
-    str = keys[i..].join(',')
-    for cmd in commands
-      for key in cmd.keys()
-        if key == str and cmd.enabled()
-          return cmd
-
-maybeCommand = (keys) ->
-  for i in [0...keys.length]
-    str = keys[i..].join(',')
-    for cmd in commands
-      for key in cmd.keys()
-        if key.indexOf(str) == 0 and cmd.enabled()
-          return true
-
-exports.hintCharHandler = hintCharHandler
-exports.findCommand     = findCommand
-exports.maybeCommand    = maybeCommand
-exports.commands        = commands
+exports.commands                  = commands
+exports.searchForMatchingCommand  = searchForMatchingCommand
+exports.isEscCommandKey           = isEscCommandKey
