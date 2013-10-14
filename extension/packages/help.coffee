@@ -40,14 +40,6 @@ injectHelp = (document, commands) ->
 installHandlers = (document, commands) ->
   promptService = Cc["@mozilla.org/embedcomp/prompt-service;1"].getService(Ci.nsIPromptService)
 
-  changeHandler = (event) ->
-    name = event.target.getAttribute('data-name')
-    cmd = commands.reduce(((m, v) -> if (v.name == name) then v else m), null)
-    cmd.enabled(event.target.checked)
-
-  for cb in document.getElementsByClassName('VimFxKeyCheckbox')
-    cb.addEventListener('change', changeHandler)
-
   removeHandler = (event) ->
     event.preventDefault()
     event.stopPropagation()
@@ -105,14 +97,12 @@ hint = (cmd, key) ->
           data-command="#{ cmd.name }" data-key="#{ key }">#{ keyDisplay }</a>"""
 
 tr = (cmd) ->
-  checked = if cmd.enabled() then 'checked' else null
   hints = """
     <div class="VimFxKeySequence" data-command="#{ cmd.name }">
       #{ (hint(cmd, key) for key in cmd.keys()).join('\n') }
     </div>
   """
   dot = """<span class="VimFxReset VimFxDot">&#8729;</span>"""
-  cb = """<input type="checkbox" class="VimFxReset VimFxKeyCheckbox" data-name="#{ cmd.name }" #{ checked }></input>"""
   a = """#{ cmd.help() }"""
   add = """
     <a href="#" data-command="#{ cmd.name }"
@@ -124,7 +114,6 @@ tr = (cmd) ->
         #{ td(hints) }
         #{ td(add) }
         #{ td(dot) }
-        #{ td(cb) }
         #{ td(a) }
     </tr>
   """

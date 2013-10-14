@@ -298,12 +298,6 @@ class Command
   # Name of the preference for a given property
   prefName: (value) -> "commands.#{ @name }.#{ value }"
 
-  enabled: (value) ->
-    if value is undefined
-      return getPref(@prefName('enabled'), true)
-    else
-      setPref(@prefName('enabled'), !!value)
-
   keys: (value) ->
     if value is undefined
       return @keyValues
@@ -373,7 +367,7 @@ searchForMatchingCommand = (keys) ->
     str = keys[index..].join(',')
     for command in commands
       for key in command.keys()
-        if key.startsWith(str) and command.enabled()
+        if key.startsWith(str)
           return {match: true, exact: (key == str), command}
 
   return {match: false}
