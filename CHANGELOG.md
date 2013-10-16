@@ -1,5 +1,11 @@
 # Change Log
 
+0.5.3 (Oct 16 2013)
+
+- Lots of refactoring
+- Insert mode (`i` command)
+- Hint marker rotation with `space` while in hints mode
+
 0.5.1 (Aug 21 2013)
 
 - Fixed regression with stylesheets
