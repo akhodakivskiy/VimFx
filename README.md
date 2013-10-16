@@ -55,6 +55,7 @@ Global shortcut to enable/disable VimFx: `shift-alt-v`
 ### Dealing with URLs
 
     o       Focus the Address Bar
+    O       Focus the Search Bar
     p       Navigate to the address in the clipboard
     P       Open new tab and navigate to the address in the clipboard
     yf      Copy link url to the clipboard
