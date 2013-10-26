@@ -16,12 +16,11 @@ injectHelp = (document, commands) ->
     removeHelp(document)
 
     if document instanceof XULDocument
-      container = document.createElement('box')
+      container = utils.createElement(document, 'box')
       # The `.VimFxReset` class is not needed in XUL documents. Instead it actullay causes layout
       # problems there!
     else
-      container = document.createElement('div')
-      container.className = 'VimFxReset'
+      container = utils.createElement(document, 'div', class: 'VimFxReset')
     container.id = CONTAINER_ID
 
     container.appendChild(utils.parseHTML(document, helpDialogHtml(commands)))
@@ -50,7 +49,7 @@ installHandlers = (document, commands) ->
       text = _('help_remove_shortcut_text')
       if promptService.confirm(document.defaultView, title, text)
         cmd.keys(cmd.keys().filter((a) -> a != key))
-        event.target.parentNode.removeChild(event.target)
+        event.target.remove()
 
   for a in document.getElementsByClassName('VimFxKeyLink')
     a.addEventListener('click', removeHandler)
@@ -80,7 +79,7 @@ installHandlers = (document, commands) ->
     if promptService.confirm(document.defaultView, title, text)
       cmd.keys(cmd.keys().filter((a) -> a != key))
       dom = document.querySelectorAll("a[data-key='#{key}']")
-      dom[0].parentNode.removeChild(dom[0]) if dom.length > 0
+      dom[0].remove() if dom.length > 0
       return true
     else
       return false

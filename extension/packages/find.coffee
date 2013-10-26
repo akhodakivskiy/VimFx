@@ -1,3 +1,5 @@
+{ createElement } = require 'utils'
+
 { classes: Cc, interfaces: Ci } = Components
 
 CONTAINER_ID = 'VimFxFindContainer'
@@ -18,16 +20,14 @@ injectFind = (document, cb) ->
   # Clean up just in case...
   removeFind(document)
 
-  # Create container div insert a text input into it
-  [div, input] = createFindContainer(document)
+  # Create container and insert a text input into it
+  [container, input] = createFindContainer(document)
 
   # Call back in new input
   input.addEventListener 'input', (event) ->
     result = cb(input.value, startFindRng)
-    if result
-      input.classList.remove('VimFxNotFound')
-    else
-      input.classList.add('VimFxNotFound')
+    method = if result then 'remove' else 'add'
+    input.classList[method]('VimFxNotFound')
 
   # Call back on (Shift)-Enter with proper direction
   input.addEventListener 'keypress', (event) ->
@@ -35,13 +35,12 @@ injectFind = (document, cb) ->
       focusSelection(document, Ci.nsISelectionController.SELECTION_FIND)
       removeFind(document, false)
 
-  document.documentElement.appendChild(div)
+  document.documentElement.appendChild(container)
   input.focus()
 
 # Removes find controls from DOM
 removeFind = (document, clear = true) ->
-  if div = document.getElementById(CONTAINER_ID)
-    document.documentElement.removeChild(div)
+  document.getElementById(CONTAINER_ID)?.remove()
 
   if clear
     clearSelection(document.defaultView)
@@ -68,18 +67,18 @@ focusSelection = (document, selectionType) ->
           element.focus()
 
 createFindContainer = (document) ->
-  div = document.createElement('div')
-  div.className = 'VimFxReset'
-  div.id = CONTAINER_ID
+  container = createElement document, 'div',
+    id: CONTAINER_ID
+    className: 'VimFxReset'
 
-  input = document.createElement('input')
-  input.type = 'text'
-  input.className = 'VimFxReset'
-  input.id = 'VimFxFindInput'
+  input = createElement document, 'input',
+    type: 'text'
+    id: 'VimFxFindInput'
+    className: 'VimFxReset'
 
-  div.appendChild(input)
+  container.appendChild(input)
 
-  return [div, input]
+  return [container, input]
 
 clearSelection = (window, selectionType = Ci.nsISelectionController.SELECTION_FIND) ->
   for frame in window.frames
@@ -200,7 +199,7 @@ getAllWindows = (window) ->
 cycleToItem = (array, item) ->
   if item and array.indexOf(item) != -1
     while array[0] != item
-      array.push array.shift()
+      array.push(array.shift())
 
   return array
 

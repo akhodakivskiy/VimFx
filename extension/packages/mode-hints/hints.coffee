@@ -42,14 +42,12 @@ MARKABLE_ELEMENT_PROPERTIES = [
 
 # Remove previously injected hints from the DOM
 removeHints = (document) ->
-  if container = document.getElementById(CONTAINER_ID)
-    document.documentElement.removeChild(container)
+  document.getElementById(CONTAINER_ID)?.remove()
 
   for frame in document.defaultView.frames
     removeHints(frame.document)
 
 
-# Like `insertHints`, but also sets hints for the markers
 injectHints = (document) ->
   markers = createMarkers(document)
   hintChars = utils.getHintChars()

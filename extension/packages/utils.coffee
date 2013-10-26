@@ -261,6 +261,22 @@ parseHTML = (document, html) ->
   flags = parser.SanitizerAllowStyle
   return parser.parseFragment(html, flags, false, null, document.documentElement)
 
+createElement = (document, type, attributes = {}) ->
+  element = document.createElement(type)
+
+  specialCases =
+    class: 'className'
+    text:  'textContent'
+
+  for attribute, value of attributes
+    if attribute of specialCases
+      property = specialCases[attribute]
+      element[property] = value
+    else
+      element.setAttribute(attribute, value)
+
+  return element
+
 # Uses nsIIOService to parse a string as a URL and find out if it is a URL
 isURL = (str) ->
   try
@@ -335,6 +351,7 @@ exports.updateBlacklist           = updateBlacklist
 
 exports.getVersion                = getVersion
 exports.parseHTML                 = parseHTML
+exports.createElement             = createElement
 exports.isURL                     = isURL
 exports.browserSearchSubmission   = browserSearchSubmission
 exports.getHintChars              = getHintChars

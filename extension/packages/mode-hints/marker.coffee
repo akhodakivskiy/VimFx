@@ -1,3 +1,4 @@
+{ createElement }    = require 'utils'
 { SerializableBloomFilter
 , DummyBloomFilter } = require 'mode-hints/bloomfilter'
 
@@ -23,8 +24,7 @@ class Marker
   constructor: (@element) ->
     document = @element.ownerDocument
     window = document.defaultView
-    @markerElement = document.createElement('div')
-    @markerElement.className = 'VimFxReset VimFxHintMarker'
+    @markerElement = createElement(document, 'div', class: 'VimFxReset VimFxHintMarker')
 
     Object.defineProperty this, 'bloomFilter',
       get: -> if getPref('hints_bloom_on') then realBloomFilter else dummyBloomFilter
@@ -62,14 +62,12 @@ class Marker
     document = @element.ownerDocument
 
     while @markerElement.hasChildNodes()
-      @markerElement.removeChild(@markerElement.firstChild)
+      @markerElement.firstChild.remove()
 
     fragment = document.createDocumentFragment()
     for char in @hintChars
-      span = document.createElement('span')
-      span.className = 'VimFxReset'
-      span.textContent = char.toUpperCase()
-      fragment.appendChild(span)
+      charContainer = createElement(document, 'span', class: 'VimFxReset', text: char.toUpperCase())
+      fragment.appendChild(charContainer)
 
     @markerElement.appendChild(fragment)
 
