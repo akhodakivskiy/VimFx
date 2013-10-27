@@ -275,6 +275,9 @@ createElement = (document, type, attributes = {}) ->
     else
       element.setAttribute(attribute, value)
 
+  if document instanceof HTMLDocument
+    element.classList.add('VimFxReset')
+
   return element
 
 # Uses nsIIOService to parse a string as a URL and find out if it is a URL

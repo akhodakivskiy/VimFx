@@ -111,9 +111,7 @@ createMarkers = (document) ->
 
 
 createHintsContainer = (document) ->
-  container = document.createElement('div')
-  container.id = CONTAINER_ID
-  container.className = 'VimFxReset'
+  container = utils.createElement(document, 'div', id: CONTAINER_ID)
   return container
 
 

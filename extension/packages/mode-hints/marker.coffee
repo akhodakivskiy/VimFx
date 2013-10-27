@@ -24,7 +24,7 @@ class Marker
   constructor: (@element) ->
     document = @element.ownerDocument
     window = document.defaultView
-    @markerElement = createElement(document, 'div', class: 'VimFxReset VimFxHintMarker')
+    @markerElement = createElement(document, 'div', class: 'VimFxHintMarker')
 
     Object.defineProperty this, 'bloomFilter',
       get: -> if getPref('hints_bloom_on') then realBloomFilter else dummyBloomFilter
@@ -66,7 +66,7 @@ class Marker
 
     fragment = document.createDocumentFragment()
     for char in @hintChars
-      charContainer = createElement(document, 'span', class: 'VimFxReset', text: char.toUpperCase())
+      charContainer = createElement(document, 'span', text: char.toUpperCase())
       fragment.appendChild(charContainer)
 
     @markerElement.appendChild(fragment)
