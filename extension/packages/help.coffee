@@ -15,14 +15,8 @@ injectHelp = (document, commands) ->
   if document.documentElement
     removeHelp(document)
 
-    if document instanceof XULDocument
-      container = utils.createElement(document, 'box')
-      # The `.VimFxReset` class is not needed in XUL documents. Instead it actullay causes layout
-      # problems there!
-      container.classList.remove('VimFxReset')
-    else
-      container = utils.createElement(document, 'div')
-    container.id = CONTAINER_ID
+    type = if document instanceof XULDocument then 'box' else 'div'
+    container = utils.createElement(document, type, id: CONTAINER_ID)
 
     container.appendChild(utils.parseHTML(document, helpDialogHtml(commands)))
     for element in container.getElementsByTagName('*')
