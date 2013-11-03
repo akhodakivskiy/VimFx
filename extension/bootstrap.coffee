@@ -12,13 +12,10 @@ do (global = this) ->
   # Loaded packages cache
   packages = {}
 
-  # To be loaded in a bit
-  console = null
-
   # Load and cache package
   require = (name) ->
     if packages[name] is undefined
-      scope = { console, require, exports: {} }
+      scope = { require, exports: {} }
       try
         path = Services.io.newURI("packages/#{ name }.js", null, baseURI).spec
         loader.loadSubScript(path, scope)
@@ -29,15 +26,15 @@ do (global = this) ->
 
     return packages[name]
 
-  # Load up console that is defined above
-  { console } = require 'console'
-
   # Unload all packages
   release = ->
     for path, scope in packages
       for name, value in scope
         scope[name] = null
     packages = {}
+
+  # Load native console API
+  Cu.import("resource://gre/modules/devtools/Console.jsm")
 
   # Firefox will call this method on startup/enabling
   global.startup = (data, reason) ->
