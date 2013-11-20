@@ -24,6 +24,10 @@ keyCharFromCode = (keyCode, shiftKey = false) ->
       [ KE.DOM_VK_SPACE,          KE.DOM_VK_SPACE,      'Space',     'Shift-Space'      ],
       [ KE.DOM_VK_TAB,            KE.DOM_VK_TAB,        'Tab',       'Shift-Tab'        ],
       [ KE.DOM_VK_RETURN,         KE.DOM_VK_RETURN,     'Return',    'Shift-Return'     ],
+      [ KE.DOM_VK_LEFT,           KE.DOM_VK_LEFT,       'Left',      'Shift-Left'       ],
+      [ KE.DOM_VK_RIGHT,          KE.DOM_VK_RIGHT,      'Right',     'Shift-Right'      ],
+      [ KE.DOM_VK_UP,             KE.DOM_VK_UP,         'Up',        'Shift-Up'         ],
+      [ KE.DOM_VK_DOWN,           KE.DOM_VK_DOWN,       'Down',      'Shift-Down'       ],
 
       [ KE.DOM_VK_1,              KE.DOM_VK_EXCLAMATION,          '1',  '!' ],
       [ KE.DOM_VK_2,              KE.DOM_VK_AT,                   '2',  '@' ],
