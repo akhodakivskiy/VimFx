@@ -1,3 +1,4 @@
+{ getPref } = require 'prefs'
 utils = require 'utils'
 hints = require 'mode-hints/hints'
 
@@ -34,6 +35,8 @@ exports.mode_hints =
           marker.deleteHintChar()
 
       else
+        if getPref('hint_chars_ignore_case')
+          keyStr = keyStr.toUpperCase()
         return false if keyStr not in utils.getHintChars() or event.ctrlKey or event.metaKey
         for marker in markers
           marker.matchHintChar(keyStr)

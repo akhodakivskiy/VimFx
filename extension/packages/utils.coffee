@@ -281,17 +281,21 @@ browserSearchSubmission = (str) ->
   return engine.getSubmission(str, null)
 
 # Get hint characters, convert them to lower case and fall back
-# to default hint characters if there are less than 3 chars
+# to default hint characters if there are less than 2 chars
 getHintChars = ->
-  hintChars = removeDuplicateCharacters(getPref('hint_chars'))
+  hintChars = getPref('hint_chars')
+  if getPref('hint_chars_ignore_case')
+    hintChars = hintChars.toUpperCase()
+  hintChars = removeDuplicateCharacters(hintChars)
+
   if hintChars.length < 2
     hintChars = getDefaultPref('hint_chars')
 
   return hintChars
 
-# Remove duplicate characters from string (case insensitive)
+# Remove duplicate characters from string
 removeDuplicateCharacters = (str) ->
-  return removeDuplicates( str.toLowerCase().split('') ).join('')
+  return removeDuplicates( str.split('') ).join('')
 
 # Return URI to some file in the extension packaged as resource
 getResourceURI = do ->

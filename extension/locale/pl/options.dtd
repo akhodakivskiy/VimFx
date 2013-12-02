@@ -1,12 +1,15 @@
-<!ENTITY pref.hint_chars.title      "Znaki podpowiedzi">
-<!ENTITY pref.hint_chars.desc       "Domyślnie: fjdkslaghrueiwovncm">
+<!ENTITY pref.hint_chars.title "Znaki podpowiedzi">
+<!ENTITY pref.hint_chars.desc  "Domyślnie: FJDKSLAGHRUEIWOVNCM">
 
-<!ENTITY pref.black_list.title      "Czarna lista">
-<!ENTITY pref.black_list.desc       "Lista adresów oddzielonych przecinkami pod którymi VimFx powinien być automatycznie wyłączony.
+<!ENTITY pref.hint_chars_ignore_case.title "Hint Chars Ignore Case">
+<!ENTITY pref.hint_chars_ignore_case.desc  "Treat lowercase and uppercase letters as the same char">
+
+<!ENTITY pref.black_list.title "Czarna lista">
+<!ENTITY pref.black_list.desc  "Lista adresów oddzielonych przecinkami pod którymi VimFx powinien być automatycznie wyłączony.
 Dopuszczalne wieloznaczniki: *, !. Domyślnie: *mail.google.com*">
 
-<!ENTITY pref.scroll_step_liens.title   "Krok przewijania">
-<!ENTITY pref.scroll_step_lines.desc    "Krok przewijania">
+<!ENTITY pref.scroll_step_liens.title "Krok przewijania">
+<!ENTITY pref.scroll_step_lines.desc  "Krok przewijania">
 
 <!ENTITY pref.hints_bloom_on.title "Smart hint assignment">
 <!ENTITY pref.hints_bloom_on.desc  "Assign shorter hints to the links that users visit most often">

@@ -1,12 +1,15 @@
-<!ENTITY pref.hint_chars.title      "Karakter petunjuk">
-<!ENTITY pref.hint_chars.desc       "Default: fjdkslaghrueiwovncm">
+<!ENTITY pref.hint_chars.title "Karakter petunjuk">
+<!ENTITY pref.hint_chars.desc  "Default: FJDKSLAGHRUEIWOVNCM">
 
-<!ENTITY pref.black_list.title      "Daftar Larangan">
-<!ENTITY pref.black_list.desc       "Daftar terpisah koma dari URL dimana VimFx harus nonaktif otomatis.
+<!ENTITY pref.hint_chars_ignore_case.title "Hint Chars Ignore Case">
+<!ENTITY pref.hint_chars_ignore_case.desc  "Treat lowercase and uppercase letters as the same char">
+
+<!ENTITY pref.black_list.title "Daftar Larangan">
+<!ENTITY pref.black_list.desc  "Daftar terpisah koma dari URL dimana VimFx harus nonaktif otomatis.
 Wildcard dibolehkan: *, !. Default: *mail.google.com*">
 
-<!ENTITY pref.scroll_step_lines.title     "Langkah Gulung">
-<!ENTITY pref.scroll_step_lines.desc      "Langkah Gulung">
+<!ENTITY pref.scroll_step_lines.title "Langkah Gulung">
+<!ENTITY pref.scroll_step_lines.desc  "Langkah Gulung">
 
 <!ENTITY pref.hints_bloom_on.title "Penempatan petunjuk cerdas">
 <!ENTITY pref.hints_bloom_on.desc  "Menempatkan petunjuk lebih pendek untuk pranala yang sering dikunjungi">

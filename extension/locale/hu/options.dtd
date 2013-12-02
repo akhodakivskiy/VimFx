@@ -1,11 +1,14 @@
-<!ENTITY pref.hint_chars.title      "Segéd karakterek">
-<!ENTITY pref.hint_chars.desc       "Alapértelmezett: fjdkslaghrueiwovncm">
+<!ENTITY pref.hint_chars.title "Segéd karakterek">
+<!ENTITY pref.hint_chars.desc  "Alapértelmezett: FJDKSLAGHRUEIWOVNCM">
 
-<!ENTITY pref.black_list.title      "Fekete lista">
-<!ENTITY pref.black_list.desc       "Vesszővel elválasztott URL-ek, ahol a VimFX inaktív legyen. Helyettesítő karakterek is használhatók: *, !. Alapértelmezett: *mail.google.com*">
+<!ENTITY pref.hint_chars_ignore_case.title "Hint Chars Ignore Case">
+<!ENTITY pref.hint_chars_ignore_case.desc  "Treat lowercase and uppercase letters as the same char">
 
-<!ENTITY pref.scroll_step_lines.title   "Görgetés mértéke">
-<!ENTITY pref.scroll_step_lines.desc    "Görgetés mértéke">
+<!ENTITY pref.black_list.title "Fekete lista">
+<!ENTITY pref.black_list.desc  "Vesszővel elválasztott URL-ek, ahol a VimFX inaktív legyen. Helyettesítő karakterek is használhatók: *, !. Alapértelmezett: *mail.google.com*">
+
+<!ENTITY pref.scroll_step_lines.title "Görgetés mértéke">
+<!ENTITY pref.scroll_step_lines.desc  "Görgetés mértéke">
 
 <!ENTITY pref.hints_bloom_on.title "Smart hint assignment (needs translation)">
 <!ENTITY pref.hints_bloom_on.desc  "Assign shorter hints to the links that users visit most often (needs translation)">
