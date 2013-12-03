@@ -13,6 +13,9 @@ observer =
     hintCharsInput = document.querySelector('setting[pref="extensions.VimFx.hint_chars"]')
     blacklistInput = document.querySelector('setting[pref="extensions.VimFx.black_list"]')
 
+    prevPatternsInput = document.querySelector('setting[pref="extensions.VimFx.prev_patterns"]')
+    nextPatternsInput = document.querySelector('setting[pref="extensions.VimFx.next_patterns"]')
+
     customizeButton = document.getElementById('customizeButton')
     injectHelp = help.injectHelp.bind(undefined, document, commands)
 
@@ -20,11 +23,15 @@ observer =
       when 'addon-options-displayed'
         hintCharsInput.addEventListener('change', filterChars, false)
         blacklistInput.addEventListener('change', validateBlacklist, false)
+        prevPatternsInput.addEventListener('change', validatePatterns, false)
+        nextPatternsInput.addEventListener('change', validatePatterns, false)
         customizeButton.addEventListener('command', injectHelp, false)
 
       when 'addon-options-hidden'
         hintCharsInput.removeEventListener('change', filterChars, false)
         blacklistInput.removeEventListener('change', validateBlacklist, false)
+        prevPatternsInput.addEventListener('change', validatePatterns, false)
+        nextPatternsInput.addEventListener('change', validatePatterns, false)
         customizeButton.removeEventListener('command', injectHelp, false)
 
 filterChars = (event) ->
@@ -35,6 +42,11 @@ filterChars = (event) ->
 validateBlacklist = (event) ->
   input = event.target
   utils.updateBlacklist()
+
+validatePatterns = (event) ->
+  input = event.target
+  # TODO implements filter empty and duplicate items
+  input.valueToPreference()
 
 observe = ->
   Services.obs.addObserver(observer, 'addon-options-displayed', false)

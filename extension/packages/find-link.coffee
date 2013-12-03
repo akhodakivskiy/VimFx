@@ -59,12 +59,11 @@ findLinkPattern = (document, patterns) ->
   # favor shorter links, and ignore those that are more than one word longer than the shortest link
   candidateLinks =
     candidateLinks.sort((a, b) ->
-        if (a.wordCount == b.wordCount)
-          a.originalIndex - b.originalIndex
-        else
-          a.wordCount - b.wordCount
-      ).filter((a) ->
-        a.wordCount <= candidateLinks[0].wordCount + 1)
+      if (a.wordCount == b.wordCount)
+        a.originalIndex - b.originalIndex
+      else
+        a.wordCount - b.wordCount
+    ).filter((a) -> a.wordCount <= candidateLinks[0].wordCount + 1)
 
   for pattern in patterns
     exactWordRegex =
@@ -114,7 +113,7 @@ isVisibleElement = (element) ->
   if (computedStyle.getPropertyValue('visibility') != 'visible' ||
         computedStyle.getPropertyValue('display') == 'none' ||
         computedStyle.getPropertyValue('opacity') == '0')
-      return false
+    return false
 
   # element that has 0 dimension
   clientRect = element.getBoundingClientRect()
@@ -126,10 +125,10 @@ isVisibleElement = (element) ->
 
 # Determine the link has a pattern matched
 isElementMatchPattern = (element, patterns) ->
-    for pattern in patterns
-      if (element.textContent.toLowerCase().indexOf(pattern) != -1)
-        return true
-    false
+  for pattern in patterns
+    if (element.textContent.toLowerCase().indexOf(pattern) != -1)
+      return true
+  false
 
 
 exports.find = find

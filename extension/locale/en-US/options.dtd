@@ -5,6 +5,14 @@
 <!ENTITY pref.black_list.desc       "Comma separated list of URL where VimFx should be automatically disabled.
 Wildcards allowed: *, !. Default: *mail.google.com*">
 
+<!ENTITY pref.prev_patterns.title   "Previous Page Patterns">
+<!ENTITY pref.prev_patterns.desc    "Comma separated list of patterns that VimFx used to match the link to previous page.
+Default: prev,previous,back">
+
+<!ENTITY pref.next_patterns.title   "Next Page Patterns">
+<!ENTITY pref.next_patterns.desc    "Comma separated list of patterns that VimFx used to match the link to next page.
+Default: next,more">
+
 <!ENTITY pref.scroll_step_lines.title "Scroll Step">
 <!ENTITY pref.scroll_step_lines.desc  "Scroll Step">
 

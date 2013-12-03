@@ -7,6 +7,10 @@
         title="&pref.hint_chars.title;" desc="&pref.hint_chars.desc;" />
     <setting pref="extensions.VimFx.black_list" type="string"
         title="&pref.black_list.title;" desc="&pref.black_list.desc;" />
+    <setting pref="extensions.VimFx.prev_patterns" type="string"
+        title="&pref.prev_patterns.title;" desc="&pref.prev_patterns.desc;" />
+    <setting pref="extensions.VimFx.next_patterns" type="string"
+        title="&pref.next_patterns.title;" desc="&pref.next_patterns.desc;" />
     <setting pref="extensions.VimFx.scroll_step_lines" type="integer"
         title="&pref.scroll_step_lines.title;" desc="&pref.scroll_step_lines.desc;" />
     <setting pref="extensions.VimFx.hints_bloom_on" type="bool"
