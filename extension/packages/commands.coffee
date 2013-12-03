@@ -220,31 +220,17 @@ command_follow_in_tab = helper_follow.bind(undefined, {inTab: true})
 # Follow multiple links with hint markers
 command_follow_multiple = helper_follow.bind(undefined, {inTab: true, multiple: true})
 
-# TODO : move these patterns to settings
-#
-# NOTE : If a page contains both a single angle-bracket link and a double angle-bracket link, then in
-# most cases the single bracket link will be "prev/next page" and the double bracket link will be
-# "first/last page", so we put the single bracket first in the pattern string so that it gets searched
-# for first.
-#
-# "\bprev\b,\bprevious\b,\bback\b,<,←,«,≪,<<"
-previousPatterns = "prev,previous,back,<,\u2190,\xab,\u226a,<<"
-# "\bnext\b,\bmore\b,>,→,»,≫,>>"
-nextPatterns = "next,more,>,\u2192,\xbb,\u226b,>>"
+helper_follow_link = ({ type, inTab }, vim) ->
+  pattern = getPref("#{ type }_patterns") || ""
+  strings = pattern.split(",").filter( (s) -> s.trim().length )
+  link = find_link.find(vim.window.document, type, strings)
+  utils.simulateClick(link, {metaKey: inTab, ctrlKey: inTab}) if link
 
 # Follow previous page
-command_follow_prev = (vim) ->
-  #previousPatterns = getPref('previous_link_patterns') || ""
-  previousStrings = previousPatterns.split(",").filter( (s) -> s.trim().length )
-  link = find_link.find vim.window.document, "prev", previousStrings
-  utils.simulateClick(link, {metaKey: false, ctrlKey: false}) if link
+command_follow_prev = helper_follow_link.bind(undefined, { type: "prev", inTab: false })
 
 # Follow next page
-command_follow_next = (vim) ->
-  #nextPatterns = getPref('next_link_patterns') || ""
-  nextStrings = nextPatterns.split(",").filter( (s) -> s.trim().length )
-  link = find_link.find vim.window.document, "next", nextStrings
-  utils.simulateClick(link, {metaKey: false, ctrlKey: false}) if link
+command_follow_next = helper_follow_link.bind(undefined, { type: "next", inTab: false })
 
 # Move current tab to the left
 command_tab_move_left = (vim) ->

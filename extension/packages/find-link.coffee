@@ -47,14 +47,10 @@ findLinkPattern = (document, patterns) ->
         isElementMatchPattern(link, patterns))
       candidateLinks.push(link)
 
-  console.log(candidateLinks)
-
   return if (candidateLinks.length == 0)
 
   for link in candidateLinks
     link.wordCount = link.textContent.trim().split(/\s+/).length
-
-  console.log(candidateLinks)
 
   # We can use this trick to ensure that Array.sort is stable. We need this property to retain the reverse
   # in-page order of the links.
@@ -62,13 +58,13 @@ findLinkPattern = (document, patterns) ->
 
   # favor shorter links, and ignore those that are more than one word longer than the shortest link
   candidateLinks =
-    candidateLinks
-      .sort((a, b) ->
-        if (a.wordCount == b.wordCount) then a.originalIndex - b.originalIndex else a.wordCount - b.wordCount
-      )
-      .filter((a) -> a.wordCount <= candidateLinks[0].wordCount + 1)
-
-  console.log(candidateLinks)
+    candidateLinks.sort((a, b) ->
+        if (a.wordCount == b.wordCount)
+          a.originalIndex - b.originalIndex
+        else
+          a.wordCount - b.wordCount
+      ).filter((a) ->
+        a.wordCount <= candidateLinks[0].wordCount + 1)
 
   for pattern in patterns
     exactWordRegex =
@@ -112,21 +108,20 @@ getLinkElements = do ->
 isVisibleElement = (element) ->
   document = element.ownerDocument
   window   = document.defaultView
-  docElem  = document.documentElement
-  body     = document.body
 
   # element that isn't visible on the page
   computedStyle = window.getComputedStyle(element, null)
-  if (computedStyle && (computedStyle.getPropertyValue('visibility') != 'visible' ||
-       computedStyle.getPropertyValue('display') == 'none' ||
-       computedStyle.getPropertyValue('opacity') == '0'))
+  if (computedStyle.getPropertyValue('visibility') != 'visible' ||
+        computedStyle.getPropertyValue('display') == 'none' ||
+        computedStyle.getPropertyValue('opacity') == '0')
       return false
+
   # element that has 0 dimension
   clientRect = element.getBoundingClientRect()
   if (clientRect.width == 0 || clientRect.height == 0)
     return false
 
-  return true
+  true
 
 
 # Determine the link has a pattern matched
