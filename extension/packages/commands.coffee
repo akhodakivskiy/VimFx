@@ -1,7 +1,8 @@
-utils = require 'utils'
-help  = require 'help'
-find  = require 'find'
-{ _ } = require 'l10n'
+utils     = require 'utils'
+help      = require 'help'
+find      = require 'find'
+find_link = require 'find-link'
+{ _ }     = require 'l10n'
 { getPref
 , setPref
 , isPrefSet
@@ -219,6 +220,32 @@ command_follow_in_tab = helper_follow.bind(undefined, {inTab: true})
 # Follow multiple links with hint markers
 command_follow_multiple = helper_follow.bind(undefined, {inTab: true, multiple: true})
 
+# TODO : move these patterns to settings
+#
+# NOTE : If a page contains both a single angle-bracket link and a double angle-bracket link, then in
+# most cases the single bracket link will be "prev/next page" and the double bracket link will be
+# "first/last page", so we put the single bracket first in the pattern string so that it gets searched
+# for first.
+#
+# "\bprev\b,\bprevious\b,\bback\b,<,←,«,≪,<<"
+previousPatterns = "prev,previous,back,<,\u2190,\xab,\u226a,<<"
+# "\bnext\b,\bmore\b,>,→,»,≫,>>"
+nextPatterns = "next,more,>,\u2192,\xbb,\u226b,>>"
+
+# Follow previous page
+command_follow_prev = (vim) ->
+  #previousPatterns = getPref('previous_link_patterns') || ""
+  previousStrings = previousPatterns.split(",").filter( (s) -> s.trim().length )
+  link = find_link.find vim.window.document, "prev", previousStrings
+  utils.simulateClick(link, {metaKey: false, ctrlKey: false}) if link
+
+# Follow next page
+command_follow_next = (vim) ->
+  #nextPatterns = getPref('next_link_patterns') || ""
+  nextStrings = nextPatterns.split(",").filter( (s) -> s.trim().length )
+  link = find_link.find vim.window.document, "next", nextStrings
+  utils.simulateClick(link, {metaKey: false, ctrlKey: false}) if link
+
 # Move current tab to the left
 command_tab_move_left = (vim) ->
   if gBrowser = utils.getRootWindow(vim.window)?.gBrowser
@@ -347,6 +374,8 @@ commands = [
   new Command('browse', 'follow',                 command_follow,                 ['f'])
   new Command('browse', 'follow_in_tab',          command_follow_in_tab,          ['F'])
   new Command('browse', 'follow_multiple',        command_follow_multiple,        ['a,f'])
+  new Command('browse', 'follow_previous',        command_follow_prev,            ['['])
+  new Command('browse', 'follow_next',            command_follow_next,            [']'])
   new Command('browse', 'back',                   command_back,                   ['H'])
   new Command('browse', 'forward',                command_forward,                ['L'])
 
