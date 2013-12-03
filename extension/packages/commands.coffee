@@ -4,6 +4,7 @@ find      = require 'find'
 find_link = require 'find-link'
 { _ }     = require 'l10n'
 { getPref
+, getComplexPref
 , setPref
 , isPrefSet
 , getFirefoxPref } = require 'prefs'
@@ -221,7 +222,7 @@ command_follow_in_tab = helper_follow.bind(undefined, {inTab: true})
 command_follow_multiple = helper_follow.bind(undefined, {inTab: true, multiple: true})
 
 helper_follow_link = ({ type, inTab }, vim) ->
-  pattern = getPref("#{ type }_patterns") || ""
+  pattern = getComplexPref("#{ type }_patterns") || ""
   strings = pattern.split(",").filter( (s) -> s.trim().length )
   link = find_link.find(vim.window.document, type, strings)
   utils.simulateClick(link, {metaKey: inTab, ctrlKey: inTab}) if link

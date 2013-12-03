@@ -48,6 +48,15 @@ getPref = do ->
     value = getBranchPref(branch, key, defaultValue)
     return if value == undefined then getDefaultPref(key) else value
 
+# Unicode String
+getComplexPref = do ->
+  prefs = Cc['@mozilla.org/preferences-service;1'].getService(Ci.nsIPrefService)
+  branch = prefs.getBranch(PREF_BRANCH)
+
+  return (key, defaultValue = undefined) ->
+    value = branch.getComplexValue(key, Components.interfaces.nsISupportsString).data
+    return if value == undefined then getDefaultPref(key) else value
+
 getDefaultPref = (key) -> return DEFAULT_PREF_VALUES[key]
 
 getFirefoxPref = do ->
@@ -80,6 +89,7 @@ initPrefValues = ->
 
 exports.isPrefSet         = isPrefSet
 exports.getPref           = getPref
+exports.getComplexPref    = getComplexPref
 exports.getDefaultPref    = getDefaultPref
 exports.getFirefoxPref    = getFirefoxPref
 exports.setPref           = setPref
