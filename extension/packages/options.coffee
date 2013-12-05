@@ -45,7 +45,10 @@ validateBlacklist = (event) ->
 
 validatePatterns = (event) ->
   input = event.target
-  # TODO implements filter empty and duplicate items
+  input.value = input.value.split(',')
+                    .map((pattern) -> pattern.trim())
+                    .filter((pattern) -> pattern != '')
+                    .join(',')
   input.valueToPreference()
 
 observe = ->
