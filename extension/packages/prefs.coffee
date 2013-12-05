@@ -8,13 +8,14 @@ PREF_BRANCH = 'extensions.VimFx.'
 # All used preferences should be mentioned here becuase
 # preference type is derived from here
 DEFAULT_PREF_VALUES =
-  addon_id:           'VimFx@akhodakivskiy.github.com'
-  hint_chars:         'fjdkslaghrueiwovncm' # preferably use letters only
-  disabled:           false
-  scroll_step_lines:  6
-  black_list:         '*mail.google.com*'
-  hints_bloom_data:   ''
-  hints_bloom_on:     true
+  addon_id:               'VimFx@akhodakivskiy.github.com'
+  hint_chars:             'FJDKSLAGHRUEIWOVNCM' # preferably use letters only
+  hint_chars_ignore_case: true
+  disabled:               false
+  scroll_step_lines:      6
+  black_list:             '*mail.google.com*'
+  hints_bloom_data:       ''
+  hints_bloom_on:         true
 
 
 getBranchPref = (branch, key, defaultValue) ->

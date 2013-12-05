@@ -5,6 +5,8 @@
 <vbox xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
     <setting pref="extensions.VimFx.hint_chars" type="string"
         title="&pref.hint_chars.title;" desc="&pref.hint_chars.desc;" />
+    <setting pref="extensions.VimFx.hint_chars_ignore_case" type="bool"
+        title="&pref.hint_chars_ignore_case.title;" desc="&pref.hint_chars_ignore_case.desc;" />
     <setting pref="extensions.VimFx.black_list" type="string"
         title="&pref.black_list.title;" desc="&pref.black_list.desc;" />
     <setting pref="extensions.VimFx.scroll_step_lines" type="integer"

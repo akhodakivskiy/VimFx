@@ -2,6 +2,7 @@
 , DummyBloomFilter } = require 'mode-hints/bloomfilter'
 
 { getPref } = require 'prefs'
+utils       = require 'utils'
 
 HTMLDocument      = Ci.nsIDOMHTMLDocument
 HTMLAnchorElement = Ci.nsIDOMHTMLAnchorElement
@@ -68,7 +69,7 @@ class Marker
     for char in @hintChars
       span = document.createElement('span')
       span.className = 'VimFxReset'
-      span.textContent = char.toUpperCase()
+      span.textContent = char
       fragment.appendChild(span)
 
     @markerElement.appendChild(fragment)
@@ -86,7 +87,7 @@ class Marker
       offset = 0
     else
       method = 'add'
-      @enteredHintChars += char.toLowerCase()
+      @enteredHintChars += char
       offset = -1
 
     @markerElement.children[@enteredHintChars.length + offset]?.classList[method]('VimFxCharMatch')
