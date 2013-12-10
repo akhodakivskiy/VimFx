@@ -43,11 +43,15 @@ modes['insert'] =
       return true
 
 modes['find'] =
-  onEnter: (vim) ->
+  onEnter: (vim, storage, args) ->
     if findBar = utils.getRootWindow(vim.window)?.gBrowser.getFindBar()
       findBar.open()
       findBar._findField.focus()
       findBar._findField.select()
+
+      if findBar.getElement("highlight").checked != !!args?.highlight
+        findBar.getElement("highlight").click()
+
   onLeave: (vim) ->
     if findBar = utils.getRootWindow(vim.window)?.gBrowser.getFindBar()
       findBar.close()

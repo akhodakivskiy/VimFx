@@ -247,7 +247,7 @@ command_find = (vim, storage) ->
 
 # Switch into find mode with highlighting
 command_find_hl = (vim, storage) ->
-  vim.enterMode('find')
+  vim.enterMode('find', { highlight: true })
 
 # Search for the last pattern
 command_find_next = (vim, storage) ->
