@@ -2,7 +2,8 @@ utils                   = require 'utils'
 { mode_hints }          = require 'mode-hints/mode-hints'
 { updateToolbarButton } = require 'button'
 { searchForMatchingCommand
-, isEscCommandKey }     = require 'commands'
+, isEscCommandKey 
+, isReturnCommandKey }  = require 'commands'
 
 modes = {}
 
@@ -38,6 +39,20 @@ modes['insert'] =
     utils.blurActiveElement(vim.window)
   onInput: (vim, storage, keyStr) ->
     if isEscCommandKey(keyStr)
+      vim.enterMode('normal')
+      return true
+
+modes['find'] =
+  onEnter: (vim) ->
+    if findBar = utils.getRootWindow(vim.window)?.gBrowser.getFindBar()
+      findBar.open()
+      findBar._findField.focus()
+      findBar._findField.select()
+  onLeave: (vim) ->
+    if findBar = utils.getRootWindow(vim.window)?.gBrowser.getFindBar()
+      findBar.close()
+  onInput: (vim, storage, keyStr) ->
+    if isEscCommandKey(keyStr) or isReturnCommandKey(keyStr) > -1
       vim.enterMode('normal')
       return true
 

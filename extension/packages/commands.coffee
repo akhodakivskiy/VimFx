@@ -1,6 +1,5 @@
 utils = require 'utils'
 help  = require 'help'
-find  = require 'find'
 { _ } = require 'l10n'
 { getPref
 , setPref
@@ -242,32 +241,25 @@ command_tab_move_right = (vim) ->
 command_help = (vim) ->
   help.injectHelp(vim.window.document, commands)
 
-find.findStr = ''
-
 # Switch into find mode
 command_find = (vim, storage) ->
-  find.injectFind vim.window.document, (findStr, startFindRng) ->
-    # Reset region and find string if new find stirng has arrived
-    if find.findStr != findStr
-      [find.findStr, storage.findRng] = [findStr, startFindRng]
-    # Perform forward find and store found region
-    return storage.findRng = find.find(vim.window, find.findStr, storage.findRng, find.DIRECTION_FORWARDS)
+  vim.enterMode('find')
 
 # Switch into find mode with highlighting
 command_find_hl = (vim, storage) ->
-  find.injectFind vim.window.document, (findStr) ->
-    # Reset region and find string if new find stirng has arrived
-    return find.highlight(vim.window, findStr)
+  vim.enterMode('find')
 
 # Search for the last pattern
 command_find_next = (vim, storage) ->
-  if find.findStr.length > 0
-    storage.findRng = find.find(vim.window, find.findStr, storage.findRng, find.DIRECTION_FORWARDS, true)
+  if findBar = utils.getRootWindow(vim.window).gBrowser.getFindBar()
+    if findBar._findField.value.length > 0
+      findBar.onFindAgainCommand(false)
 
 # Search for the last pattern backwards
 command_find_prev = (vim, storage) ->
-  if find.findStr.length > 0
-    storage.findRng = find.find(vim.window, find.findStr, storage.findRng, find.DIRECTION_BACKWARDS, true)
+  if findBar = utils.getRootWindow(vim.window).gBrowser.getFindBar()
+    if findBar._findField.value.length > 0
+      findBar.onFindAgainCommand(true)
 
 command_insert_mode = (vim) ->
   vim.enterMode('insert')
@@ -279,12 +271,13 @@ command_Esc = (vim, storage, event) ->
   callback = -> event.originalTarget?.ownerDocument?.activeElement?.blur()
   vim.window.setTimeout(callback, 0)
 
-  find.removeFind(vim.window.document)
-
   help.removeHelp(vim.window.document)
 
   if rootWindow = utils.getRootWindow(vim.window)
     rootWindow.DeveloperToolbar.hide()
+
+  if findBar = utils.getRootWindow(vim.window).gBrowser.getFindBar()
+    findBar.close()
 
 
 class Command
@@ -374,6 +367,9 @@ searchForMatchingCommand = (keys) ->
 
 isEscCommandKey = (keyStr) -> keyStr in escapeCommand.keys()
 
+isReturnCommandKey = (keyStr) -> keyStr.search('Return') > -1
+
 exports.commands                  = commands
 exports.searchForMatchingCommand  = searchForMatchingCommand
 exports.isEscCommandKey           = isEscCommandKey
+exports.isReturnCommandKey        = isReturnCommandKey

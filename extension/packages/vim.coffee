@@ -1,6 +1,7 @@
-utils               = require 'utils'
-{ modes }           = require 'modes'
-{ isEscCommandKey } = require 'commands'
+utils                   = require 'utils'
+{ modes }               = require 'modes'
+{ isEscCommandKey 
+, isReturnCommandKey }  = require 'commands'
 
 class Vim
   constructor: (@window) ->
@@ -23,7 +24,7 @@ class Vim
   onInput: (keyStr, event) ->
     isEditable = utils.isElementEditable(event.originalTarget)
 
-    if isEditable and not isEscCommandKey(keyStr)
+    if isEditable and not (isEscCommandKey(keyStr) or isReturnCommandKey(keyStr))
       return false
 
     oldMode = @mode
