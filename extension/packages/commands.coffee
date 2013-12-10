@@ -243,7 +243,7 @@ command_help = (vim) ->
 
 # Switch into find mode
 command_find = (vim, storage) ->
-  vim.enterMode('find')
+  vim.enterMode('find', { highlight: false })
 
 # Switch into find mode with highlighting
 command_find_hl = (vim, storage) ->
