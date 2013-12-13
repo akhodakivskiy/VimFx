@@ -367,7 +367,7 @@ searchForMatchingCommand = (keys) ->
 
 isEscCommandKey = (keyStr) -> keyStr in escapeCommand.keys()
 
-isReturnCommandKey = (keyStr) -> keyStr.search('Return') > -1
+isReturnCommandKey = (keyStr) -> keyStr.contains('Return')
 
 exports.commands                  = commands
 exports.searchForMatchingCommand  = searchForMatchingCommand

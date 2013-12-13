@@ -56,7 +56,7 @@ modes['find'] =
     if findBar = utils.getRootWindow(vim.window)?.gBrowser.getFindBar()
       findBar.close()
   onInput: (vim, storage, keyStr) ->
-    if isEscCommandKey(keyStr) or isReturnCommandKey(keyStr) > -1
+    if isEscCommandKey(keyStr) or isReturnCommandKey(keyStr)
       vim.enterMode('normal')
       return true
 
