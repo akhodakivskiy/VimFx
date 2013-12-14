@@ -61,13 +61,13 @@ command_marker_yank = (vim) ->
     else if utils.isTextInputElement(marker.element)
       utils.writeToClipboard(vim.window, marker.element.value)
 
-  vim.enterMode('hints', [callback])
+  vim.enterMode('hints', callback)
 
 # Focus element
 command_marker_focus = (vim) ->
   callback = (marker) -> marker.element.focus()
 
-  vim.enterMode('hints', [callback])
+  vim.enterMode('hints', callback)
 
 # Copy current URL to the clipboard
 command_yank = (vim) ->
@@ -207,7 +207,7 @@ helper_follow = ({ inTab, multiple }, vim) ->
       vim.window.setTimeout((-> marker.reset() for marker in markers), 100)
       return true
 
-  vim.enterMode('hints', [callback])
+  vim.enterMode('hints', callback)
 
 # Follow links with hint markers
 command_follow = helper_follow.bind(undefined, {inTab: false})

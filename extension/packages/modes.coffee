@@ -4,16 +4,16 @@ utils                   = require 'utils'
 { searchForMatchingCommand
 , isEscCommandKey
 , isReturnCommandKey
-, findStorage }  = require 'commands'
+, findStorage }         = require 'commands'
 
 modes = {}
 
 modes['normal'] =
-  onEnter: (vim, storage, args) ->
+  onEnter: (vim, storage) ->
     storage.keys ?= []
     storage.commands ?= {}
 
-  onLeave: (vim, storage, args) ->
+  onLeave: (vim, storage) ->
     storage.keys.length = 0
 
   onInput: (vim, storage, keyStr, event) ->
@@ -44,7 +44,7 @@ modes['insert'] =
       return true
 
 modes['find'] =
-  onEnter: (vim, storage, args) ->
+  onEnter: (vim, storage, options) ->
     return unless findBar = utils.getRootWindow(vim.window)?.gBrowser.getFindBar()
 
     findBar.open()
@@ -52,7 +52,7 @@ modes['find'] =
     findBar._findField.select()
 
     return unless highlightButton = findBar.getElement("highlight")
-    return unless highlightButton.checked != args.highlight
+    return unless highlightButton.checked != options.highlight
     highlightButton.click()
 
   onLeave: (vim) ->
