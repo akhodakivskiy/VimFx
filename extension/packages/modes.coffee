@@ -45,19 +45,23 @@ modes['insert'] =
 
 modes['find'] =
   onEnter: (vim, storage, args) ->
-    if findBar = utils.getRootWindow(vim.window)?.gBrowser.getFindBar()
-      findBar.open()
-      findBar._findField.focus()
-      findBar._findField.select()
+    return unless findBar = utils.getRootWindow(vim.window)?.gBrowser.getFindBar()
 
-      if findBar.getElement("highlight").checked != !!args?.highlight
-        findBar.getElement("highlight").click()
+    findBar.open()
+    findBar._findField.focus()
+    findBar._findField.select()
+
+    return unless highlightButton = findBar.getElement("highlight")
+    return unless highlightButton.checked != args.highlight
+    highlightButton.click()
 
   onLeave: (vim) ->
-    if findBar = utils.getRootWindow(vim.window)?.gBrowser.getFindBar()
-      findStorage.lastSearchString = findBar._findField.value
-      findBar.close()
+    return unless findBar = utils.getRootWindow(vim.window)?.gBrowser.getFindBar()
+    findStorage.lastSearchString = findBar._findField.value
+    findBar.close()
+
   onInput: (vim, storage, keyStr) ->
+    return unless findBar = utils.getRootWindow(vim.window)?.gBrowser.getFindBar()
     if isEscCommandKey(keyStr) or isReturnCommandKey(keyStr)
       vim.enterMode('normal')
       return true
