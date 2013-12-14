@@ -65,6 +65,8 @@ modes['find'] =
     if isEscCommandKey(keyStr) or isReturnCommandKey(keyStr)
       vim.enterMode('normal')
       return true
+    else
+      findBar._findField.focus()
 
 modes['hints'] = mode_hints
 
