@@ -66,7 +66,8 @@ class Marker
 
     fragment = document.createDocumentFragment()
     for char in @hintChars
-      charContainer = createElement(document, 'span', text: char.toUpperCase())
+      charContainer = createElement(document, 'span')
+      charContainer.textContent = char.toUpperCase()
       fragment.appendChild(charContainer)
 
     @markerElement.appendChild(fragment)

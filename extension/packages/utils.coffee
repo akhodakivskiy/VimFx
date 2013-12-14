@@ -264,16 +264,8 @@ parseHTML = (document, html) ->
 createElement = (document, type, attributes = {}) ->
   element = document.createElement(type)
 
-  specialCases =
-    class: 'className'
-    text:  'textContent'
-
   for attribute, value of attributes
-    if attribute of specialCases
-      property = specialCases[attribute]
-      element[property] = value
-    else
-      element.setAttribute(attribute, value)
+    element.setAttribute(attribute, value)
 
   if document instanceof HTMLDocument
     element.classList.add('VimFxReset')
