@@ -277,11 +277,11 @@ command_Esc = (vim, storage, event) ->
 
   help.removeHelp(vim.window.document)
 
-  if rootWindow = utils.getRootWindow(vim.window)
-    rootWindow.DeveloperToolbar.hide()
+  return unless rootWindow = utils.getRootWindow(vim.window)
 
-  if findBar = utils.getRootWindow(vim.window).gBrowser.getFindBar()
-    findBar.close()
+  rootWindow.DeveloperToolbar.hide()
+
+  rootWindow.gBrowser.getFindBar()?.close()
 
 
 class Command
