@@ -241,6 +241,8 @@ command_tab_move_right = (vim) ->
 command_help = (vim) ->
   help.injectHelp(vim.window.document, commands)
 
+findStorage = { lastSearchString: '' }
+
 # Switch into find mode
 command_find = (vim, storage) ->
   vim.enterMode('find', { highlight: false })
@@ -252,13 +254,15 @@ command_find_hl = (vim, storage) ->
 # Search for the last pattern
 command_find_next = (vim, storage) ->
   if findBar = utils.getRootWindow(vim.window).gBrowser.getFindBar()
-    if findBar._findField.value.length > 0
+    if findStorage.lastSearchString.length > 0
+      findBar._findField.value = findStorage.lastSearchString
       findBar.onFindAgainCommand(false)
 
 # Search for the last pattern backwards
 command_find_prev = (vim, storage) ->
   if findBar = utils.getRootWindow(vim.window).gBrowser.getFindBar()
-    if findBar._findField.value.length > 0
+    if findStorage.lastSearchString.length > 0
+      findBar._findField.value = findStorage.lastSearchString
       findBar.onFindAgainCommand(true)
 
 command_insert_mode = (vim) ->
@@ -373,3 +377,4 @@ exports.commands                  = commands
 exports.searchForMatchingCommand  = searchForMatchingCommand
 exports.isEscCommandKey           = isEscCommandKey
 exports.isReturnCommandKey        = isReturnCommandKey
+exports.findStorage               = findStorage

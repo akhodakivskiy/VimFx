@@ -2,8 +2,9 @@ utils                   = require 'utils'
 { mode_hints }          = require 'mode-hints/mode-hints'
 { updateToolbarButton } = require 'button'
 { searchForMatchingCommand
-, isEscCommandKey 
-, isReturnCommandKey }  = require 'commands'
+, isEscCommandKey
+, isReturnCommandKey
+, findStorage }  = require 'commands'
 
 modes = {}
 
@@ -54,6 +55,7 @@ modes['find'] =
 
   onLeave: (vim) ->
     if findBar = utils.getRootWindow(vim.window)?.gBrowser.getFindBar()
+      findStorage.lastSearchString = findBar._findField.value
       findBar.close()
   onInput: (vim, storage, keyStr) ->
     if isEscCommandKey(keyStr) or isReturnCommandKey(keyStr)
