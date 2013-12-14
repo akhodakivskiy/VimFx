@@ -16,7 +16,7 @@ injectHelp = (document, commands) ->
     removeHelp(document)
 
     type = if document instanceof XULDocument then 'box' else 'div'
-    container = utils.createElement(document, type, id: CONTAINER_ID)
+    container = utils.createElement(document, type, {id: CONTAINER_ID})
 
     container.appendChild(utils.parseHTML(document, helpDialogHtml(commands)))
     for element in container.getElementsByTagName('*')

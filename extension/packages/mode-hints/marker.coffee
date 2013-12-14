@@ -24,7 +24,7 @@ class Marker
   constructor: (@element) ->
     document = @element.ownerDocument
     window = document.defaultView
-    @markerElement = createElement(document, 'div', class: 'VimFxHintMarker')
+    @markerElement = createElement(document, 'div', {class: 'VimFxHintMarker'})
 
     Object.defineProperty this, 'bloomFilter',
       get: -> if getPref('hints_bloom_on') then realBloomFilter else dummyBloomFilter

@@ -111,7 +111,7 @@ createMarkers = (document) ->
 
 
 createHintsContainer = (document) ->
-  container = utils.createElement(document, 'div', id: CONTAINER_ID)
+  container = utils.createElement(document, 'div', {id: CONTAINER_ID})
   return container
 
 

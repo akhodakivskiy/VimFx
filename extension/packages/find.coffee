@@ -67,12 +67,9 @@ focusSelection = (document, selectionType) ->
           element.focus()
 
 createFindContainer = (document) ->
-  container = createElement document, 'div',
-    id: CONTAINER_ID
+  container = createElement(document, 'div', {id: CONTAINER_ID})
 
-  input = createElement document, 'input',
-    type: 'text'
-    id: 'VimFxFindInput'
+  input = createElement(document, 'input', {type: 'text', id: 'VimFxFindInput'})
 
   container.appendChild(input)
 

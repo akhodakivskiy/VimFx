@@ -49,11 +49,12 @@ addToolbarButton = (window) ->
 createButton = (window) ->
   document = window.document
 
-  button = utils.createElement document, 'toolbarbutton',
+  button = utils.createElement(document, 'toolbarbutton', {
     id: BUTTON_ID
     type: 'menu-button'
     label: 'VimFx'
     class: 'toolbarbutton-1'
+  })
 
   onButtonCommand = (event) ->
     disabled = not getPref('disabled')
@@ -66,15 +67,15 @@ createButton = (window) ->
 
   createMenupopup(window, button)
 
-  vimkey = utils.createElement document, 'key',
+  vimkey = utils.createElement(document, 'key', {
     id: KEY_ID
     key: 'V'
     modifiers: 'shift,alt'
     oncommand: 'void(0);'
+  })
   vimkey.addEventListener('command', onButtonCommand, false)
 
-  keyset = utils.createElement document, 'keyset',
-    id: KEYSET_ID
+  keyset = utils.createElement(document, 'keyset', {id: KEYSET_ID})
   keyset.appendChild(vimkey)
 
   return [button, keyset]
@@ -82,26 +83,31 @@ createButton = (window) ->
 createMenupopup = (window, button) ->
   document = window.document
 
-  blacklistTextbox = utils.createElement document, 'textbox',
+  blacklistTextbox = utils.createElement(document, 'textbox', {
     id: TEXTBOX_BLACKLIST_ID
-  blacklistButton  = utils.createElement document, 'toolbarbutton',
+  })
+  blacklistButton  = utils.createElement(document, 'toolbarbutton', {
     id: BUTTON_BLACKLIST_ID
     class: 'toolbarbutton-1'
+  })
   blacklistControls = utils.createElement(document, 'hbox')
   blacklistControls.appendChild(blacklistTextbox)
   blacklistControls.appendChild(blacklistButton)
 
-  itemPreferences = utils.createElement document, 'menuitem',
+  itemPreferences = utils.createElement(document, 'menuitem', {
     id: MENU_ITEM_PREF
     label: _('item_preferences')
+  })
 
-  itemHelp = utils.createElement document, 'menuitem',
+  itemHelp = utils.createElement(document, 'menuitem', {
     id: MENU_ITEM_HELP
     label: _('help_title')
+  })
 
-  menupopup = utils.createElement document, 'menupopup',
+  menupopup = utils.createElement(document, 'menupopup', {
     id: MENUPOPUP_ID
     ignorekeys: true
+  })
   menupopup.appendChild(blacklistControls)
   menupopup.appendChild(itemPreferences)
   menupopup.appendChild(itemHelp)
