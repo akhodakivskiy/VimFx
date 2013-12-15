@@ -47,7 +47,7 @@ modes['find'] =
   onEnter: (vim, storage, options) ->
     return unless findBar = utils.getRootWindow(vim.window)?.gBrowser.getFindBar()
 
-    findBar.open()
+    findBar.onFindCommand()
     findBar._findField.focus()
     findBar._findField.select()
 
