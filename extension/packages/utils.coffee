@@ -281,7 +281,7 @@ browserSearchSubmission = (str) ->
   return engine.getSubmission(str, null)
 
 # Get hint characters, convert them to lower case and fall back
-# to default hint characters if there are less than 3 chars
+# to default hint characters if there are less than 2 chars
 getHintChars = ->
   hintChars = removeDuplicateCharacters(getPref('hint_chars'))
   if hintChars.length < 2
