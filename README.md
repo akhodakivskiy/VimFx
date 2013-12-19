@@ -101,8 +101,6 @@ Global shortcut to enable/disable VimFx: `shift-alt-v`
     af      Follow multiple links on the current page
     [       Follow the Previous page link on the current page
     ]       Follow the Next page link on the current page
-    {       Follow the Previous page link on the current page in a new tab
-    }       Follow the Next page link on the current page in a new tab
     H       Go Back in history
     L       Go Forward in history
 
