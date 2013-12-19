@@ -1,7 +1,4 @@
-{ interfaces: Ci } = Components
-
-HTMLDocument = Ci.nsIDOMHTMLDocument
-XPathResult  = Ci.nsIDOMXPathResult
+utils = require 'utils'
 
 # All the following elements qualify as a link
 LINK_ELEMENTS = [
@@ -61,23 +58,14 @@ findLinkMatchPattern = (document, patterns) ->
   return null
 
 # Returns elements that qualify as links
-# Generates and memoizes an XPath query internally
 getLinkElements = do ->
-  # Some preparations done on startup
   elements = [
     LINK_ELEMENTS...
     "*[#{ LINK_ELEMENT_PROPERTIES.join(' or ') }]"
   ]
 
-  reduce = (m, rule) -> m.concat(["//#{ rule }", "//xhtml:#{ rule }"])
-  xpath = elements.reduce(reduce, []).join(' | ')
+  utils.getDomElements(elements)
 
-  namespaceResolver = (namespace) ->
-    if namespace == 'xhtml' then 'http://www.w3.org/1999/xhtml' else null
-
-  # The actual function that will return the desired elements
-  return (document, resultType = XPathResult.ORDERED_NODE_SNAPSHOT_TYPE) ->
-    return document.evaluate(xpath, document.documentElement, namespaceResolver, resultType, null)
 
 # Determine if the link is visible
 isVisibleElement = (element) ->
