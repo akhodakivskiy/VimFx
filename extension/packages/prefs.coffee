@@ -10,8 +10,8 @@ PREF_BRANCH = 'extensions.VimFx.'
 DEFAULT_PREF_VALUES =
   addon_id:           'VimFx@akhodakivskiy.github.com'
   hint_chars:         'fjdkslaghrueiwovncm' # preferably use letters only
-  prev_patterns:      'prev,previous,back,<,\xab,<<'
-  next_patterns:      'next,more,>,\xbb,>>'
+  prev_patterns:      'prev,previous,back,older,<,\xab,<<'
+  next_patterns:      'next,more,newer,>,\xbb,>>'
   disabled:           false
   scroll_step_lines:  6
   black_list:         '*mail.google.com*'

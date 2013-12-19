@@ -28,7 +28,7 @@ findLinkRef = (document, value) ->
   for tag in relTags
     elements = document.getElementsByTagName(tag)
     for element in elements
-      if (element.hasAttribute("rel") && element.rel == value)
+      if element.hasAttribute("rel") and element.rel == value
         return element
   null
 
@@ -43,11 +43,10 @@ findLinkPattern = (document, patterns) ->
   for i in [0...links.snapshotLength] by 1
     link = links.snapshotItem(i)
 
-    if (isVisibleElement(link) &&
-        isElementMatchPattern(link, patterns))
+    if isVisibleElement(link) and isElementMatchPattern(link, patterns)
       candidateLinks.push(link)
 
-  return if (candidateLinks.length == 0)
+  return if candidateLinks.length == 0
 
   for link in candidateLinks
     link.wordCount = link.textContent.trim().split(/\s+/).length
@@ -59,7 +58,7 @@ findLinkPattern = (document, patterns) ->
   # favor shorter links, and ignore those that are more than one word longer than the shortest link
   candidateLinks =
     candidateLinks.sort((a, b) ->
-      if (a.wordCount == b.wordCount)
+      if a.wordCount == b.wordCount
         a.originalIndex - b.originalIndex
       else
         a.wordCount - b.wordCount
@@ -68,19 +67,19 @@ findLinkPattern = (document, patterns) ->
   for pattern in patterns
     exactWordRegex =
       if /\b/.test(pattern[0]) or /\b/.test(pattern[pattern.length - 1])
-        new RegExp "\\b" + pattern + "\\b", "i"
+        new RegExp '\\b' + pattern + '\\b', 'i'
       else
-        new RegExp pattern, "i"
+        new RegExp pattern, 'i'
 
     for candidateLink in candidateLinks
-      if (exactWordRegex.test(candidateLink.textContent))
+      if exactWordRegex.test(candidateLink.textContent)
         return candidateLink
   null
 
 
 # Find a followable link match ref or patterns
 find = (document, ref, patterns) ->
-  findLinkRef(document, ref) || findLinkPattern(document, patterns)
+  findLinkRef(document, ref) or findLinkPattern(document, patterns)
 
 
 # Returns elements that qualify as links
@@ -103,30 +102,30 @@ getLinkElements = do ->
     return document.evaluate(xpath, document.documentElement, namespaceResolver, resultType, null)
 
 
-# Determine the link is visible
+# Determine if the link is visible
 isVisibleElement = (element) ->
   document = element.ownerDocument
   window   = document.defaultView
 
   # element that isn't visible on the page
   computedStyle = window.getComputedStyle(element, null)
-  if (computedStyle.getPropertyValue('visibility') != 'visible' ||
-        computedStyle.getPropertyValue('display') == 'none' ||
-        computedStyle.getPropertyValue('opacity') == '0')
+  if computedStyle.getPropertyValue('visibility') != 'visible' or
+      computedStyle.getPropertyValue('display') == 'none' or
+      computedStyle.getPropertyValue('opacity') == '0'
     return false
 
   # element that has 0 dimension
   clientRect = element.getBoundingClientRect()
-  if (clientRect.width == 0 || clientRect.height == 0)
+  if clientRect.width == 0 or clientRect.height == 0
     return false
 
   true
 
 
-# Determine the link has a pattern matched
+# Determine if the link has a pattern matched
 isElementMatchPattern = (element, patterns) ->
   for pattern in patterns
-    if (element.textContent.toLowerCase().indexOf(pattern) != -1)
+    if element.textContent.toLowerCase().indexOf(pattern) != -1
       return true
   false
 

@@ -222,16 +222,16 @@ command_follow_in_tab = helper_follow.bind(undefined, {inTab: true})
 command_follow_multiple = helper_follow.bind(undefined, {inTab: true, multiple: true})
 
 helper_follow_link = ({ type, inTab }, vim) ->
-  pattern = getComplexPref("#{ type }_patterns") || ""
-  strings = pattern.split(",").filter( (s) -> s.trim().length )
+  pattern = getComplexPref("#{ type }_patterns") or ''
+  strings = pattern.split(',').filter((s) -> s.trim().length)
   link = find_link.find(vim.window.document, type, strings)
   utils.simulateClick(link, {metaKey: inTab, ctrlKey: inTab}) if link
 
 # Follow previous page
-command_follow_prev = helper_follow_link.bind(undefined, { type: "prev", inTab: false })
+command_follow_prev = helper_follow_link.bind(undefined, { type: 'prev', inTab: false })
 
 # Follow next page
-command_follow_next = helper_follow_link.bind(undefined, { type: "next", inTab: false })
+command_follow_next = helper_follow_link.bind(undefined, { type: 'next', inTab: false })
 
 # Move current tab to the left
 command_tab_move_left = (vim) ->
