@@ -222,9 +222,8 @@ command_follow_in_tab = helper_follow.bind(undefined, {inTab: true})
 command_follow_multiple = helper_follow.bind(undefined, {inTab: true, multiple: true})
 
 helper_follow_link = ({ type, inTab }, vim) ->
-  pattern = getComplexPref("#{ type }_patterns") or ''
-  strings = pattern.split(',').filter((s) -> s.trim().length)
-  link = find_link.find(vim.window.document, type, strings)
+  patterns = getComplexPref("#{ type }_patterns").split(',')
+  link = find_link.find(vim.window.document, patterns)
   utils.simulateClick(link, {metaKey: inTab, ctrlKey: inTab}) if link
 
 # Follow previous page

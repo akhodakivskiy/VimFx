@@ -22,24 +22,12 @@ LINK_ELEMENT_PROPERTIES = [
   "contains(@class, 'button')"
 ]
 
-# Find a link with ref equals value
-findLinkRef = (document, value) ->
-  relTags = ["link", "a", "area"]
-  for tag in relTags
-    elements = document.getElementsByTagName(tag)
-    for element in elements
-      if element.hasAttribute("rel") and element.rel == value
-        return element
-  null
-
-
-# Find a link with match the patterns
-findLinkPattern = (document, patterns) ->
+# Find a link that match with the patterns
+findLinkMatchPattern = (document, patterns) ->
   links = getLinkElements(document)
   candidateLinks = []
 
-  # at the end of this loop, candidateLinks will contain all visible links that match our patterns
-  # links lower in the page are more likely to be the ones we want, so we loop through the snapshot backwards
+  # filter visible links that match patterns and put in candidateLinks
   for i in [0...links.snapshotLength] by 1
     link = links.snapshotItem(i)
 
@@ -51,19 +39,14 @@ findLinkPattern = (document, patterns) ->
   for link in candidateLinks
     link.wordCount = link.textContent.trim().split(/\s+/).length
 
-  # We can use this trick to ensure that Array.sort is stable. We need this property to retain the reverse
-  # in-page order of the links.
-  candidateLinks.forEach((a,i) -> a.originalIndex = i)
-
-  # favor shorter links, and ignore those that are more than one word longer than the shortest link
+  # favor shorter links, links near the end of a page
+  # and ignore those that are more than one word longer than the shortest link
   candidateLinks =
     candidateLinks.sort((a, b) ->
-      if a.wordCount == b.wordCount
-        a.originalIndex - b.originalIndex
-      else
-        a.wordCount - b.wordCount
+      if a.wordCount == b.wordCount then 1 else a.wordCount - b.wordCount
     ).filter((a) -> a.wordCount <= candidateLinks[0].wordCount + 1)
 
+  # match patterns
   for pattern in patterns
     exactWordRegex =
       if /\b/.test(pattern[0]) or /\b/.test(pattern[pattern.length - 1])
@@ -74,13 +57,8 @@ findLinkPattern = (document, patterns) ->
     for candidateLink in candidateLinks
       if exactWordRegex.test(candidateLink.textContent)
         return candidateLink
-  null
 
-
-# Find a followable link match ref or patterns
-find = (document, ref, patterns) ->
-  findLinkRef(document, ref) or findLinkPattern(document, patterns)
-
+  return null
 
 # Returns elements that qualify as links
 # Generates and memoizes an XPath query internally
@@ -101,7 +79,6 @@ getLinkElements = do ->
   return (document, resultType = XPathResult.ORDERED_NODE_SNAPSHOT_TYPE) ->
     return document.evaluate(xpath, document.documentElement, namespaceResolver, resultType, null)
 
-
 # Determine if the link is visible
 isVisibleElement = (element) ->
   document = element.ownerDocument
@@ -114,20 +91,19 @@ isVisibleElement = (element) ->
       computedStyle.getPropertyValue('opacity') == '0'
     return false
 
-  # element that has 0 dimension
+  # element that has zero dimension
   clientRect = element.getBoundingClientRect()
   if clientRect.width == 0 or clientRect.height == 0
     return false
 
-  true
-
+  return true
 
 # Determine if the link has a pattern matched
 isElementMatchPattern = (element, patterns) ->
   for pattern in patterns
     if element.textContent.toLowerCase().indexOf(pattern) != -1
       return true
-  false
 
+  return false
 
-exports.find = find
+exports.find = findLinkMatchPattern
