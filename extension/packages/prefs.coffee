@@ -10,8 +10,8 @@ PREF_BRANCH = 'extensions.VimFx.'
 DEFAULT_PREF_VALUES =
   addon_id:           'VimFx@akhodakivskiy.github.com'
   hint_chars:         'fjdkslaghrueiwovncm' # preferably use letters only
-  prev_patterns:      'prev,previous,back,older,<,\xab,<<'
-  next_patterns:      'next,more,newer,>,\xbb,>>'
+  prev_patterns:      'prev,previous,back,older,<,«,<<'
+  next_patterns:      'next,more,newer,>,»,>>'
   disabled:           false
   scroll_step_lines:  6
   black_list:         '*mail.google.com*'
@@ -55,7 +55,7 @@ getComplexPref = do ->
 
   return (key, defaultValue = undefined) ->
     value = branch.getComplexValue(key, Components.interfaces.nsISupportsString).data
-    return if value == undefined then getDefaultPref(key) else value
+    value ? getDefaultPref(key)
 
 getDefaultPref = (key) -> return DEFAULT_PREF_VALUES[key]
 

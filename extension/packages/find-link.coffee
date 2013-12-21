@@ -46,10 +46,10 @@ findLinkMatchPattern = (document, patterns) ->
   # match patterns
   for pattern in patterns
     exactWordRegex =
-      if /\b/.test(pattern[0]) or /\b/.test(pattern[pattern.length - 1])
-        new RegExp '\\b' + pattern + '\\b', 'i'
+      if /^\b|\b$/.test(pattern)
+        new RegExp('\\b' + pattern + '\\b', 'i')
       else
-        new RegExp pattern, 'i'
+        new RegExp(pattern, 'i')
 
     for candidateLink in candidateLinks
       if exactWordRegex.test(candidateLink.textContent)
@@ -64,7 +64,7 @@ getLinkElements = do ->
     "*[#{ LINK_ELEMENT_PROPERTIES.join(' or ') }]"
   ]
 
-  utils.getDomElements(elements)
+  return utils.getDomElements(elements)
 
 
 # Determine if the link is visible
@@ -89,7 +89,7 @@ isVisibleElement = (element) ->
 # Determine if the link has a pattern matched
 isElementMatchPattern = (element, patterns) ->
   for pattern in patterns
-    if element.textContent.toLowerCase().indexOf(pattern) != -1
+    if element.textContent.toLowerCase().contains(pattern)
       return true
 
   return false

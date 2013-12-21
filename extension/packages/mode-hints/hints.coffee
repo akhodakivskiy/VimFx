@@ -125,7 +125,7 @@ getMarkableElements = do ->
     "*[#{ MARKABLE_ELEMENT_PROPERTIES.join(' or ') }]"
   ]
 
-  utils.getDomElements(elements)
+  return utils.getDomElements(elements)
 
 
 # Uses `element.getBoundingClientRect()`. If that does not return a visible rectange, then looks at
