@@ -112,3 +112,4 @@ addEventListeners = (window) ->
     window.gBrowser.removeTabsProgressListener(tabsListener)
 
 exports.addEventListeners = addEventListeners
+exports.vimBucket         = vimBucket

@@ -23,11 +23,11 @@ positions = {}
 setButtonInstallPosition = (toolbarId, beforeId) ->
   positions[BUTTON_ID] = {toolbarId, beforeId}
 
-addToolbarButton = (window) ->
+addToolbarButton = (vimBucket, window) ->
   document = window.document
   win = document.querySelector('window')
 
-  [ button, keyset ] = createButton(window)
+  [ button, keyset ] = createButton(vimBucket, window)
 
   # Namespace to put the VimFx state on, for example
   button.VimFx = {}
@@ -48,7 +48,7 @@ addToolbarButton = (window) ->
       keysetParent.removeChild(keyset)
     $(document, 'navigator-toolbox').palette.removeChild(button)
 
-createButton = (window) ->
+createButton = (vimBucket, window) ->
   document = window.document
 
   button = document.createElement('toolbarbutton')
@@ -57,16 +57,25 @@ createButton = (window) ->
   button.setAttribute('label', 'VimFx')
   button.setAttribute('class', 'toolbarbutton-1')
 
+  menupopup = createMenupopup(window, button)
+
   onButtonCommand = (event) ->
-    disabled = not getPref('disabled')
-    setPref('disabled', disabled)
-    updateToolbarButton(window, {disabled})
+    switch
+      when button.VimFx.blacklisted
+        menupopup.openPopup(button, 'after_start')
+      when button.VimFx.insertMode
+        return unless currentTabWindow = utils.getEventCurrentTabWindow(event)
+        return unless vim = vimBucket.get(currentTabWindow)
+        updateToolbarButton(window, {insertMode: false})
+        vim.enterMode('normal')
+      else
+        disabled = not getPref('disabled')
+        setPref('disabled', disabled)
+        updateToolbarButton(window, {disabled})
 
     event.stopPropagation()
 
   button.addEventListener('command', onButtonCommand, false)
-
-  createMenupopup(window, button)
 
   vimkey = document.createElement('key')
   vimkey.setAttribute('id', KEY_ID)
