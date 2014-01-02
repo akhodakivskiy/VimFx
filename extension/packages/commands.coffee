@@ -61,13 +61,13 @@ command_marker_yank = (vim) ->
     else if utils.isTextInputElement(marker.element)
       utils.writeToClipboard(vim.window, marker.element.value)
 
-  vim.enterMode('hints', [callback])
+  vim.enterMode('hints', callback)
 
 # Focus element
 command_marker_focus = (vim) ->
   callback = (marker) -> marker.element.focus()
 
-  vim.enterMode('hints', [callback])
+  vim.enterMode('hints', callback)
 
 # Copy current URL to the clipboard
 command_yank = (vim) ->
@@ -207,7 +207,7 @@ helper_follow = ({ inTab, multiple }, vim) ->
       vim.window.setTimeout((-> marker.reset() for marker in markers), 100)
       return true
 
-  vim.enterMode('hints', [callback])
+  vim.enterMode('hints', callback)
 
 # Follow links with hint markers
 command_follow = helper_follow.bind(undefined, {inTab: false})
@@ -241,6 +241,8 @@ command_tab_move_right = (vim) ->
 command_help = (vim) ->
   help.injectHelp(vim.window.document, commands)
 
+findStorage = { lastSearchString: '' }
+
 # Switch into find mode
 command_find = (vim, storage) ->
   vim.enterMode('find', { highlight: false })
@@ -252,13 +254,15 @@ command_find_hl = (vim, storage) ->
 # Search for the last pattern
 command_find_next = (vim, storage) ->
   if findBar = utils.getRootWindow(vim.window).gBrowser.getFindBar()
-    if findBar._findField.value.length > 0
+    if findStorage.lastSearchString.length > 0
+      findBar._findField.value = findStorage.lastSearchString
       findBar.onFindAgainCommand(false)
 
 # Search for the last pattern backwards
 command_find_prev = (vim, storage) ->
   if findBar = utils.getRootWindow(vim.window).gBrowser.getFindBar()
-    if findBar._findField.value.length > 0
+    if findStorage.lastSearchString.length > 0
+      findBar._findField.value = findStorage.lastSearchString
       findBar.onFindAgainCommand(true)
 
 command_insert_mode = (vim) ->
@@ -273,11 +277,11 @@ command_Esc = (vim, storage, event) ->
 
   help.removeHelp(vim.window.document)
 
-  if rootWindow = utils.getRootWindow(vim.window)
-    rootWindow.DeveloperToolbar.hide()
+  return unless rootWindow = utils.getRootWindow(vim.window)
 
-  if findBar = utils.getRootWindow(vim.window).gBrowser.getFindBar()
-    findBar.close()
+  rootWindow.DeveloperToolbar.hide()
+
+  rootWindow.gBrowser.getFindBar()?.close()
 
 
 class Command
@@ -373,3 +377,4 @@ exports.commands                  = commands
 exports.searchForMatchingCommand  = searchForMatchingCommand
 exports.isEscCommandKey           = isEscCommandKey
 exports.isReturnCommandKey        = isReturnCommandKey
+exports.findStorage               = findStorage
