@@ -53,8 +53,8 @@ getComplexPref = do ->
   prefs = Cc['@mozilla.org/preferences-service;1'].getService(Ci.nsIPrefService)
   branch = prefs.getBranch(PREF_BRANCH)
 
-  return (key, defaultValue = undefined) ->
-    value = branch.getComplexValue(key, Components.interfaces.nsISupportsString).data
+  return (key) ->
+    value = branch.getComplexValue(key, Ci.nsISupportsString).data
     value ? getDefaultPref(key)
 
 getDefaultPref = (key) -> return DEFAULT_PREF_VALUES[key]

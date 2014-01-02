@@ -24,7 +24,7 @@ findLinkMatchPattern = (document, patterns) ->
   links = getLinkElements(document)
   candidateLinks = []
 
-  # filter visible links that match patterns and put in candidateLinks
+  # filter visible links that contain patterns and put in candidateLinks
   for i in [0...links.snapshotLength] by 1
     link = links.snapshotItem(i)
 
@@ -37,14 +37,13 @@ findLinkMatchPattern = (document, patterns) ->
     link.wordCount = link.textContent.trim().split(/\s+/).length
 
   # favor shorter links, links near the end of a page
-  # and ignore those that are more than one word longer than the shortest link
-  candidateLinks =
-    candidateLinks.sort((a, b) ->
-      if a.wordCount == b.wordCount then 1 else a.wordCount - b.wordCount
-    ).filter((a) -> a.wordCount <= candidateLinks[0].wordCount + 1)
+  candidateLinks = candidateLinks.sort (a, b) ->
+    if a.wordCount == b.wordCount then 1 else a.wordCount - b.wordCount
 
   # match patterns
   for pattern in patterns
+    # if the pattern is a word, wrapped it in word boundaries.
+    # thus we won't match words like 'previously' to 'previous'
     exactWordRegex =
       if /^\b|\b$/.test(pattern)
         new RegExp('\\b' + pattern + '\\b', 'i')
@@ -55,7 +54,6 @@ findLinkMatchPattern = (document, patterns) ->
       if exactWordRegex.test(candidateLink.textContent)
         return candidateLink
 
-  return null
 
 # Returns elements that qualify as links
 getLinkElements = do ->
@@ -85,6 +83,7 @@ isVisibleElement = (element) ->
     return false
 
   return true
+
 
 # Determine if the link has a pattern matched
 isElementMatchPattern = (element, patterns) ->
