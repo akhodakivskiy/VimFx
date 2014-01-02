@@ -7,7 +7,6 @@ utils                     = require 'utils'
 
 HTMLDocument = Ci.nsIDOMHTMLDocument
 XULDocument  = Ci.nsIDOMXULDocument
-XPathResult  = Ci.nsIDOMXPathResult
 
 CONTAINER_ID = 'VimFxHintMarkerContainer'
 
@@ -90,7 +89,7 @@ insertHints = (markers) ->
 # Creates and injects markers into the DOM
 createMarkers = (document) ->
   # For now we aren't able to handle hint markers in XUL Documents :(
-  if document instanceof HTMLDocument# or document instanceof XULDocument
+  if document instanceof HTMLDocument # or document instanceof XULDocument
     if document.documentElement
       # Select all markable elements in the document, create markers
       # for each of them, and position them on the page.
@@ -120,23 +119,13 @@ createHintsContainer = (document) ->
 
 
 # Returns elements that qualify for hint markers in hints mode.
-# Generates and memoizes an XPath query internally
 getMarkableElements = do ->
-  # Some preparations done on startup
   elements = [
     MARKABLE_ELEMENTS...
     "*[#{ MARKABLE_ELEMENT_PROPERTIES.join(' or ') }]"
   ]
 
-  reduce = (m, rule) -> m.concat(["//#{ rule }", "//xhtml:#{ rule }"])
-  xpath = elements.reduce(reduce, []).join(' | ')
-
-  namespaceResolver = (namespace) ->
-    if namespace == 'xhtml' then 'http://www.w3.org/1999/xhtml' else null
-
-  # The actual function that will return the desired elements
-  return (document, resultType = XPathResult.ORDERED_NODE_SNAPSHOT_TYPE) ->
-    return document.evaluate(xpath, document.documentElement, namespaceResolver, resultType, null)
+  return utils.getDomElements(elements)
 
 
 # Uses `element.getBoundingClientRect()`. If that does not return a visible rectange, then looks at

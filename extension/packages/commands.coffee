@@ -1,7 +1,9 @@
-utils = require 'utils'
-help  = require 'help'
-{ _ } = require 'l10n'
+utils     = require 'utils'
+help      = require 'help'
+find_link = require 'find-link'
+{ _ }     = require 'l10n'
 { getPref
+, getComplexPref
 , setPref
 , isPrefSet
 , getFirefoxPref } = require 'prefs'
@@ -218,6 +220,26 @@ command_follow_in_tab = helper_follow.bind(undefined, {inTab: true})
 # Follow multiple links with hint markers
 command_follow_multiple = helper_follow.bind(undefined, {inTab: true, multiple: true})
 
+helper_follow_link = ({ type }, vim) ->
+  patterns = getComplexPref("#{ type }_patterns").split(',')
+  link = find_link.find(vim.window.document, patterns)
+  utils.simulateClick(link, {metaKey: false, ctrlKey: false}) if link
+
+# Follow previous page
+command_follow_prev = helper_follow_link.bind(undefined, {type: 'prev'})
+
+# Follow next page
+command_follow_next = helper_follow_link.bind(undefined, {type: 'next'})
+
+# Go up one level in the URL hierarchy
+command_go_up_path = (vim) ->
+  path = vim.window.location.pathname
+  vim.window.location.pathname = path.replace(/\/[^\/]*?(\/)?$/, '')
+
+# Go up to root of the URL hierarchy
+command_go_to_root = (vim) ->
+  vim.window.location.href = vim.window.location.origin
+
 # Move current tab to the left
 command_tab_move_left = (vim) ->
   if gBrowser = utils.getRootWindow(vim.window)?.gBrowser
@@ -344,6 +366,10 @@ commands = [
   new Command('browse', 'follow',                 command_follow,                 ['f'])
   new Command('browse', 'follow_in_tab',          command_follow_in_tab,          ['F'])
   new Command('browse', 'follow_multiple',        command_follow_multiple,        ['a,f'])
+  new Command('browse', 'follow_previous',        command_follow_prev,            ['['])
+  new Command('browse', 'follow_next',            command_follow_next,            [']'])
+  new Command('browse', 'go_up_path',             command_go_up_path,             ['g,u'])
+  new Command('browse', 'go_to_root',             command_go_to_root,             ['g,U'])
   new Command('browse', 'back',                   command_back,                   ['H'])
   new Command('browse', 'forward',                command_forward,                ['L'])
 

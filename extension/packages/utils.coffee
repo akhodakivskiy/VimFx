@@ -11,6 +11,7 @@ HTMLTextAreaElement = Ci.nsIDOMHTMLTextAreaElement
 HTMLSelectElement   = Ci.nsIDOMHTMLSelectElement
 XULDocument         = Ci.nsIDOMXULDocument
 XULElement          = Ci.nsIDOMXULElement
+XPathResult         = Ci.nsIDOMXPathResult
 HTMLDocument        = Ci.nsIDOMHTMLDocument
 HTMLElement         = Ci.nsIDOMHTMLElement
 Window              = Ci.nsIDOMWindow
@@ -305,6 +306,19 @@ removeDuplicates = (array) ->
   seen = {}
   return array.filter((item) -> if seen[item] then false else (seen[item] = true))
 
+# Returns elements that qualify as links
+# Generates and memoizes an XPath query internally
+getDomElements = (elements) ->
+  reduce = (m, rule) -> m.concat(["//#{ rule }", "//xhtml:#{ rule }"])
+  xpath = elements.reduce(reduce, []).join(' | ')
+
+  namespaceResolver = (namespace) ->
+    if namespace == 'xhtml' then 'http://www.w3.org/1999/xhtml' else null
+
+  # The actual function that will return the desired elements
+  return (document, resultType = XPathResult.ORDERED_NODE_SNAPSHOT_TYPE) ->
+    return document.evaluate(xpath, document.documentElement, namespaceResolver, resultType, null)
+
 exports.Bucket                    = Bucket
 exports.getEventWindow            = getEventWindow
 exports.getEventRootWindow        = getEventRootWindow
@@ -340,3 +354,4 @@ exports.browserSearchSubmission   = browserSearchSubmission
 exports.getHintChars              = getHintChars
 exports.removeDuplicateCharacters = removeDuplicateCharacters
 exports.getResourceURI            = getResourceURI
+exports.getDomElements            = getDomElements
