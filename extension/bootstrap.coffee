@@ -40,7 +40,8 @@ do (global = this) ->
   global.startup = (data, reason) ->
     # Requires for startup/install
     { loadCss }             = require 'utils'
-    { addEventListeners }   = require 'events'
+    { addEventListeners
+    , vimBucket }           = require 'events'
     { getPref
     , initPrefValues }      = require 'prefs'
     { setButtonInstallPosition
@@ -62,7 +63,7 @@ do (global = this) ->
     options.observe()
 
     watchWindows(addEventListeners, 'navigator:browser')
-    watchWindows(addToolbarButton, 'navigator:browser')
+    watchWindows(addToolbarButton.bind(undefined, vimBucket), 'navigator:browser')
 
     unload(release)
 

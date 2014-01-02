@@ -4,7 +4,7 @@ hints = require 'mode-hints/hints'
 { isEscCommandKey } = require 'commands'
 
 exports.mode_hints =
-  onEnter: (vim, storage, [ callback ]) ->
+  onEnter: (vim, storage, callback) ->
     markers = hints.injectHints(vim.window.document)
     if markers.length == 0
       vim.enterMode('normal')
