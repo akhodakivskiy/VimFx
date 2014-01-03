@@ -101,8 +101,8 @@ Global shortcut to enable/disable VimFx: `shift-alt-v`
     af      Follow multiple links on the current page
     [       Follow the Previous page link on the current page
     ]       Follow the Next page link on the current page
-    gu      Go up in the URL path
-    gU      Go to the current URL domain
+    gu      Go up one level in the URL hierarchy
+    gU      Go up to root of the URL hierarchy
     H       Go Back in history
     L       Go Forward in history
 
