@@ -23,7 +23,7 @@
     <em:targetApplication>
       <Description>
         <em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id>
-        <em:minVersion>12.0</em:minVersion>
+        <em:minVersion>25.0</em:minVersion>
         <em:maxVersion>25.*</em:maxVersion>
       </Description>
     </em:targetApplication>
@@ -65,14 +65,14 @@
         <em:description>Vim Tastenbefehle für Firefox</em:description>
       </Description>
     </em:localized>
-	
+
 	<em:localized>
       <Description>
         <em:locale>el-GR</em:locale>
         <em:description>Συντομεύσεις Πληκτρολογίου του Vim για Firefox</em:description>
       </Description>
     </em:localized>
-	
+
     <em:localized>
       <Description>
         <em:locale>nl</em:locale>

@@ -4,6 +4,7 @@
 
 - Lots of refactoring
 - Insert mode (`i` command)
+- Follow multiple links with `af` command
 - Hint marker rotation with `space` while in hints mode
 
 0.5.1 (Aug 21 2013)

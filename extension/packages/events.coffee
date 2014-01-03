@@ -21,10 +21,10 @@ keyStrFromEvent = (event) ->
 
 # Passthrough mode is activated when VimFx should temporarily stop processing keyboard input, for
 # example when a menu is shown.
-passthrough = false
+popupPassthrough = false
 checkPassthrough = (event) ->
   if event.target.nodeName in ['menupopup', 'panel']
-    passthrough = switch event.type
+    popupPassthrough = switch event.type
       when 'popupshown'  then true
       when 'popuphidden' then false
 
@@ -49,7 +49,9 @@ windowsListeners =
       # No matter what, always reset the `suppress` flag, so we don't suppress more than intended.
       suppress = false
 
-      return if passthrough or getPref('disabled')
+      # Suppress popup passthrough mode if there is no passthrough mode on the root document
+      return if popupPassthrough and !!utils.getEventRootWindow(event).document.popupNode
+      return if getPref('disabled')
 
       return unless window = utils.getEventCurrentTabWindow(event)
       return unless vim = vimBucket.get(window)
@@ -122,3 +124,4 @@ addEventListeners = (window) ->
     window.gBrowser.removeTabsProgressListener(tabsListener)
 
 exports.addEventListeners = addEventListeners
+exports.vimBucket         = vimBucket

@@ -6,14 +6,6 @@
 HTMLDocument      = Ci.nsIDOMHTMLDocument
 HTMLAnchorElement = Ci.nsIDOMHTMLAnchorElement
 
-Z_INDEX_START = 99999999 # The highest `z-index` used in style.css
-_zIndex = Z_INDEX_START
-# Each marker will get a `z-index` of `_zIndex++`. In theory, `z-index` can be infinitely large. In
-# practice, Firefox uses a 32-bit signed integer to store it, so the maximum value is 2147483647
-# (http://www.puidokas.com/max-z-index/). However, we do not need to worry about hitting the limit,
-# since the user would have to browse through a bit more than 2 billion links in a single Firefox
-# session before that happens.
-
 realBloomFilter = new SerializableBloomFilter('hints_bloom_data', 256 * 32, 16)
 dummyBloomFilter = new DummyBloomFilter()
 
@@ -42,9 +34,6 @@ class Marker
 
     # For quick access
     @position = {top, left}
-
-    # Each marker gets a unique `z-index`, so that it can be determined if a marker overlaps another.
-    @markerElement.style.setProperty('z-index', _zIndex++, 'important')
 
   # To be called when the marker has been both assigned a hint and inserted into the DOM, and thus
   # gotten a height and width.

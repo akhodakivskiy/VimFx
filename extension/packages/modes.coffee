@@ -2,16 +2,18 @@ utils                   = require 'utils'
 { mode_hints }          = require 'mode-hints/mode-hints'
 { updateToolbarButton } = require 'button'
 { searchForMatchingCommand
-, isEscCommandKey }     = require 'commands'
+, isEscCommandKey
+, isReturnCommandKey
+, findStorage }         = require 'commands'
 
 modes = {}
 
 modes['normal'] =
-  onEnter: (vim, storage, args) ->
+  onEnter: (vim, storage) ->
     storage.keys ?= []
     storage.commands ?= {}
 
-  onLeave: (vim, storage, args) ->
+  onLeave: (vim, storage) ->
     storage.keys.length = 0
 
   onInput: (vim, storage, keyStr, event) ->
@@ -40,6 +42,31 @@ modes['insert'] =
     if isEscCommandKey(keyStr)
       vim.enterMode('normal')
       return true
+
+modes['find'] =
+  onEnter: (vim, storage, options) ->
+    return unless findBar = utils.getRootWindow(vim.window)?.gBrowser.getFindBar()
+
+    findBar.onFindCommand()
+    findBar._findField.focus()
+    findBar._findField.select()
+
+    return unless highlightButton = findBar.getElement("highlight")
+    return unless highlightButton.checked != options.highlight
+    highlightButton.click()
+
+  onLeave: (vim) ->
+    return unless findBar = utils.getRootWindow(vim.window)?.gBrowser.getFindBar()
+    findStorage.lastSearchString = findBar._findField.value
+    findBar.close()
+
+  onInput: (vim, storage, keyStr) ->
+    return unless findBar = utils.getRootWindow(vim.window)?.gBrowser.getFindBar()
+    if isEscCommandKey(keyStr) or isReturnCommandKey(keyStr)
+      vim.enterMode('normal')
+      return true
+    else
+      findBar._findField.focus()
 
 modes['hints'] = mode_hints
 

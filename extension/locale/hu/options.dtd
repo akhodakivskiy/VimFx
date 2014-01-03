@@ -4,6 +4,14 @@
 <!ENTITY pref.black_list.title      "Fekete lista">
 <!ENTITY pref.black_list.desc       "Vesszővel elválasztott URL-ek, ahol a VimFX inaktív legyen. Helyettesítő karakterek is használhatók: *, !. Alapértelmezett: *mail.google.com*">
 
+<!ENTITY pref.prev_patterns.title   "Previous Page Patterns">
+<!ENTITY pref.prev_patterns.desc    "Comma separated list of patterns that match links to previous page.
+Default: prev,previous,back">
+
+<!ENTITY pref.next_patterns.title   "Next Page Patterns">
+<!ENTITY pref.next_patterns.desc    "Comma separated list of patterns that match links to next page.
+Default: next,more">
+
 <!ENTITY pref.scroll_step_lines.title   "Görgetés mértéke">
 <!ENTITY pref.scroll_step_lines.desc    "Görgetés mértéke">
 
