@@ -1,5 +1,17 @@
 # Change Log
 
+0.5.4 (Jan 3 2014)
+
+- Fix for popup passthrough mode stucking
+- Make toolbar button click depend on current mode
+- Higher weight markers should not be overlapped
+- Refactor find mode to use Firefox native search bar
+- Bump minimum requred Firefox version to 25
+- Added commands to go in the URL path
+- Added commands to navigate previous and next links with customizable link patterns
+- Use Firefox 24+ native console API
+- Update zh-CN localization
+
 0.5.3 (Oct 16 2013)
 
 - Lots of refactoring
