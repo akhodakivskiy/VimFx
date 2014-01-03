@@ -1,19 +1,23 @@
 <!ENTITY pref.hint_chars.title      "Hint Chars">
-<!ENTITY pref.hint_chars.desc       "Default: fjdksla;ghrueiwovncm">
+<!ENTITY pref.hint_chars.desc       "Default: fjdkslaghrueiwovncm">
 
 <!ENTITY pref.black_list.title      "Black List">
 <!ENTITY pref.black_list.desc       "Comma separated list of URL where VimFx should be automatically disabled.
-Wildcards allowed: *, !">
+Wildcards allowed: *, !. Default: *mail.google.com*">
+
+<!ENTITY pref.prev_patterns.title   "Previous Page Patterns">
+<!ENTITY pref.prev_patterns.desc    "Comma separated list of patterns that match links to previous page.
+Default: prev,previous,back">
+
+<!ENTITY pref.next_patterns.title   "Next Page Patterns">
+<!ENTITY pref.next_patterns.desc    "Comma separated list of patterns that match links to next page.
+Default: next,more">
 
 <!ENTITY pref.scroll_step_lines.title "Scroll Step">
 <!ENTITY pref.scroll_step_lines.desc  "Scroll Step">
 
-<!ENTITY pref.blur_on_esc.title     "Blur on Esc">
-<!ENTITY pref.blur_on_esc.desc      "Blur input focus from any active input element in the browser (e.g. address bar)">
-
-<!ENTITY pref.leave_dt_on_esc.title "Leave Developer Toolbar open on Esc">
-<!ENTITY pref.leave_dt_on_esc.desc  "Do not hide Developer Toolbar if it's visible and the Esc is pressed">
-
 <!ENTITY pref.hints_bloom_on.title "Smart hint assignment">
 <!ENTITY pref.hints_bloom_on.desc  "Assign shorter hints to the links that users visit most often">
 
+<!ENTITY customizeButton.title "Keyboard Shortcuts">
+<!ENTITY customizeButton.label "Customize">

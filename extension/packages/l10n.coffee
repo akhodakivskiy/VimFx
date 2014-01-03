@@ -31,7 +31,7 @@ l10n = do ->
   addonsDefaultBundle = Services.strings.createBundle(filePath(DEFAULT_LOCALE))
 
   # The underscore function
-  l10n_underscore = (aKey, aLocale) ->
+  l10n_underscore = (aKey, aLocale, aHolders...) ->
     localeBundle = null
     localeBasicBundle = null
 
@@ -48,6 +48,16 @@ l10n = do ->
         or (defaultBundle && (getStr(defaultBundle, aKey) or (defaultBundle = null))) \
         or (defaultBasicBundle && (getStr(defaultBasicBundle, aKey) or (defaultBasicBundle = null))) \
         or getStr(addonsDefaultBundle, aKey)
+
+    # If placeholder exists, substitute %s in string
+    # e.g.
+    #   _("helloString", username)
+    # Supports `%1s`, `%2s`, ... pattern in order to change arguments order
+    # in translation.
+    if aHolders.length > 0
+        offset = 0
+        aVal = aVal.replace /%(\d*)(s|d)/g, (v, n) =>
+          aHolders[if n != "" then (n - 1) else offset++]
 
     return aVal
 

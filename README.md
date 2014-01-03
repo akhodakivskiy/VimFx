@@ -43,18 +43,19 @@ VimFx will be nice to your browser and to your habits. Promise.
 
 - Concise shortcuts for most commonly performed actions
 - Follow and access controls on the page using hint markers
-- Easy access to the Help page which describes all available shortcuts (press ?)
+- Easy access to the keyboard shortcuts dialog, which describes and lets you customize all available shortcuts (press ?)
 
 ## Shortcuts
 
-Might not be up to date. Please refer to the Help dialog withing the extension
-for the most relevant list.
+This is a text representation of the keyboard shortcuts dialog within the extension. Might not be up to date.
+Press ? or use the toolbar button to open the dialog, which helps you remember the shortcuts, and lets you customize them.
 
-Global shortcut to enable/disable VimFx: `Shift-Alt-v`
+Global shortcut to enable/disable VimFx: `shift-alt-v`
 
 ### Dealing with URLs
 
     o       Focus the Address Bar
+    O       Focus the Search Bar
     p       Navigate to the address in the clipboard
     P       Open new tab and navigate to the address in the clipboard
     yf      Copy link url to the clipboard
@@ -88,7 +89,7 @@ Global shortcut to enable/disable VimFx: `Shift-Alt-v`
     c-J     Move current tab to the Left
     c-K     Move current tab to the Right
     gh      Navigate to the Home Page
-    gH,g0   Go to the First tab
+    gH,g^   Go to the First tab
     gL,g$   Go to the Last tab
     x       Close current tab
     X       Restore last closed tab
@@ -97,18 +98,26 @@ Global shortcut to enable/disable VimFx: `Shift-Alt-v`
 
     f       Follow a link on the current page
     F       Follow a link on the current page in a new tab
+    af      Follow multiple links on the current page
+    [       Follow the Previous page link on the current page
+    ]       Follow the Next page link on the current page
+    gu      Go up in the URL path
+    gU      Go to the current URL domain
     H       Go Back in history
     L       Go Forward in history
 
 ### Misc
 
-    .,/     Enter Find mode
-    a.,a/   Enter Find mode to highlight all matches
+    /       Enter Find mode
+    a/      Enter Find mode to highlight all matches
     n       Go to the next Find match
     N       Go to the previous Find match
-    ?,>     Show Help Dialog
-    Esc     Close this dialog and cancel hint markers
+    i       Enter insert mode: Ignore all commands
+    ?       Show this dialog
     :       Open Developer Toolbar
+    Esc     Enter normal mode (remove hint markers, exit insert mode) or blur/close active element
+
+Can't see a link hint, because it's overlapped by another? Try pressing space or shift-space!
 
 ## Contributing and Reporting Issues
 
@@ -128,7 +137,7 @@ Global shortcut to enable/disable VimFx: `Shift-Alt-v`
 - Put a file called exactly `VimFx@akhodakivskiy.github.com` in the extensions/ folder of a Firefox
   profile, containing the absolute path to the extension/ folder in the project. Then you just need
   to restart Firefox (use some add-on!) after each change. More details in [this MDN article][mdn-extdevenv].
-- Only create tickets for issues and feature requests in English. Otherwise duplicate 
+- Only create tickets for issues and feature requests in English. Otherwise duplicate
   tickets in different languages will pile up.
 
 [mdn-extdevenv]: https://developer.mozilla.org/en-US/docs/Setting_up_extension_development_environment#Firefox_extension_proxy_file
