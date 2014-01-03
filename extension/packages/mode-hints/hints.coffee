@@ -8,7 +8,8 @@ utils                     = require 'utils'
 HTMLDocument = Ci.nsIDOMHTMLDocument
 XULDocument  = Ci.nsIDOMXULDocument
 
-CONTAINER_ID = 'VimFxHintMarkerContainer'
+CONTAINER_ID  = 'VimFxHintMarkerContainer'
+Z_INDEX_START = 100000000 # The highest `z-index` used in style.css plus one
 
 # All the following elements qualify for their own marker in hints mode
 MARKABLE_ELEMENTS = [
@@ -52,6 +53,13 @@ removeHints = (document) ->
 injectHints = (document) ->
   markers = createMarkers(document)
   hintChars = utils.getHintChars()
+
+  # Each marker gets a unique `z-index`, so that it can be determined if a marker overlaps another.
+  # Put more important markers (higher weight) at the end, so that they get higher `z-index`, in
+  # order not to be overlapped.
+  markers.sort((a, b) -> a.weight - b.weight)
+  for marker, index in markers
+    marker.markerElement.style.setProperty('z-index', Z_INDEX_START + index, 'important')
 
   addHuffmanCodeWordsTo(markers, {alphabet: hintChars}, (marker, hint) -> marker.setHint(hint))
 
