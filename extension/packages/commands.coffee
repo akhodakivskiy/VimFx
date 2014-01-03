@@ -1,8 +1,9 @@
-utils = require 'utils'
-help  = require 'help'
-find  = require 'find'
-{ _ } = require 'l10n'
+utils     = require 'utils'
+help      = require 'help'
+find_link = require 'find-link'
+{ _ }     = require 'l10n'
 { getPref
+, getComplexPref
 , setPref
 , isPrefSet
 , getFirefoxPref } = require 'prefs'
@@ -62,13 +63,13 @@ command_marker_yank = (vim) ->
     else if utils.isTextInputElement(marker.element)
       utils.writeToClipboard(vim.window, marker.element.value)
 
-  vim.enterMode('hints', [callback])
+  vim.enterMode('hints', callback)
 
 # Focus element
 command_marker_focus = (vim) ->
   callback = (marker) -> marker.element.focus()
 
-  vim.enterMode('hints', [callback])
+  vim.enterMode('hints', callback)
 
 # Copy current URL to the clipboard
 command_yank = (vim) ->
@@ -208,7 +209,7 @@ helper_follow = ({ inTab, multiple }, vim) ->
       vim.window.setTimeout((-> marker.reset() for marker in markers), 100)
       return true
 
-  vim.enterMode('hints', [callback])
+  vim.enterMode('hints', callback)
 
 # Follow links with hint markers
 command_follow = helper_follow.bind(undefined, {inTab: false})
@@ -218,6 +219,26 @@ command_follow_in_tab = helper_follow.bind(undefined, {inTab: true})
 
 # Follow multiple links with hint markers
 command_follow_multiple = helper_follow.bind(undefined, {inTab: true, multiple: true})
+
+helper_follow_link = ({ type }, vim) ->
+  patterns = getComplexPref("#{ type }_patterns").split(',')
+  link = find_link.find(vim.window.document, patterns)
+  utils.simulateClick(link, {metaKey: false, ctrlKey: false}) if link
+
+# Follow previous page
+command_follow_prev = helper_follow_link.bind(undefined, {type: 'prev'})
+
+# Follow next page
+command_follow_next = helper_follow_link.bind(undefined, {type: 'next'})
+
+# Go up one level in the URL hierarchy
+command_go_up_path = (vim) ->
+  path = vim.window.location.pathname
+  vim.window.location.pathname = path.replace(/\/[^\/]*?(\/)?$/, '')
+
+# Go up to root of the URL hierarchy
+command_go_to_root = (vim) ->
+  vim.window.location.href = vim.window.location.origin
 
 # Move current tab to the left
 command_tab_move_left = (vim) ->
@@ -242,32 +263,29 @@ command_tab_move_right = (vim) ->
 command_help = (vim) ->
   help.injectHelp(vim.window.document, commands)
 
-find.findStr = ''
+findStorage = { lastSearchString: '' }
 
 # Switch into find mode
 command_find = (vim, storage) ->
-  find.injectFind vim.window.document, (findStr, startFindRng) ->
-    # Reset region and find string if new find stirng has arrived
-    if find.findStr != findStr
-      [find.findStr, storage.findRng] = [findStr, startFindRng]
-    # Perform forward find and store found region
-    return storage.findRng = find.find(vim.window, find.findStr, storage.findRng, find.DIRECTION_FORWARDS)
+  vim.enterMode('find', { highlight: false })
 
 # Switch into find mode with highlighting
 command_find_hl = (vim, storage) ->
-  find.injectFind vim.window.document, (findStr) ->
-    # Reset region and find string if new find stirng has arrived
-    return find.highlight(vim.window, findStr)
+  vim.enterMode('find', { highlight: true })
 
 # Search for the last pattern
 command_find_next = (vim, storage) ->
-  if find.findStr.length > 0
-    storage.findRng = find.find(vim.window, find.findStr, storage.findRng, find.DIRECTION_FORWARDS, true)
+  if findBar = utils.getRootWindow(vim.window).gBrowser.getFindBar()
+    if findStorage.lastSearchString.length > 0
+      findBar._findField.value = findStorage.lastSearchString
+      findBar.onFindAgainCommand(false)
 
 # Search for the last pattern backwards
 command_find_prev = (vim, storage) ->
-  if find.findStr.length > 0
-    storage.findRng = find.find(vim.window, find.findStr, storage.findRng, find.DIRECTION_BACKWARDS, true)
+  if findBar = utils.getRootWindow(vim.window).gBrowser.getFindBar()
+    if findStorage.lastSearchString.length > 0
+      findBar._findField.value = findStorage.lastSearchString
+      findBar.onFindAgainCommand(true)
 
 command_insert_mode = (vim) ->
   vim.enterMode('insert')
@@ -279,12 +297,13 @@ command_Esc = (vim, storage, event) ->
   callback = -> event.originalTarget?.ownerDocument?.activeElement?.blur()
   vim.window.setTimeout(callback, 0)
 
-  find.removeFind(vim.window.document)
-
   help.removeHelp(vim.window.document)
 
-  if rootWindow = utils.getRootWindow(vim.window)
-    rootWindow.DeveloperToolbar.hide()
+  return unless rootWindow = utils.getRootWindow(vim.window)
+
+  rootWindow.DeveloperToolbar.hide()
+
+  rootWindow.gBrowser.getFindBar()?.close()
 
 
 class Command
@@ -339,7 +358,7 @@ commands = [
   new Command('tabs',   'tab_move_left',          command_tab_move_left,          ['c-J'])
   new Command('tabs',   'tab_move_right',         command_tab_move_right,         ['c-K'])
   new Command('tabs',   'home',                   command_home,                   ['g,h'])
-  new Command('tabs',   'tab_first',              command_tab_first,              ['g,H', 'g,\^'])
+  new Command('tabs',   'tab_first',              command_tab_first,              ['g,H', 'g,^'])
   new Command('tabs',   'tab_last',               command_tab_last,               ['g,L', 'g,$'])
   new Command('tabs',   'close_tab',              command_close_tab,              ['x'])
   new Command('tabs',   'restore_tab',            command_restore_tab,            ['X'])
@@ -347,6 +366,10 @@ commands = [
   new Command('browse', 'follow',                 command_follow,                 ['f'])
   new Command('browse', 'follow_in_tab',          command_follow_in_tab,          ['F'])
   new Command('browse', 'follow_multiple',        command_follow_multiple,        ['a,f'])
+  new Command('browse', 'follow_previous',        command_follow_prev,            ['['])
+  new Command('browse', 'follow_next',            command_follow_next,            [']'])
+  new Command('browse', 'go_up_path',             command_go_up_path,             ['g,u'])
+  new Command('browse', 'go_to_root',             command_go_to_root,             ['g,U'])
   new Command('browse', 'back',                   command_back,                   ['H'])
   new Command('browse', 'forward',                command_forward,                ['L'])
 
@@ -374,6 +397,10 @@ searchForMatchingCommand = (keys) ->
 
 isEscCommandKey = (keyStr) -> keyStr in escapeCommand.keys()
 
+isReturnCommandKey = (keyStr) -> keyStr.contains('Return')
+
 exports.commands                  = commands
 exports.searchForMatchingCommand  = searchForMatchingCommand
 exports.isEscCommandKey           = isEscCommandKey
+exports.isReturnCommandKey        = isReturnCommandKey
+exports.findStorage               = findStorage

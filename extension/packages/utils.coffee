@@ -11,6 +11,7 @@ HTMLTextAreaElement = Ci.nsIDOMHTMLTextAreaElement
 HTMLSelectElement   = Ci.nsIDOMHTMLSelectElement
 XULDocument         = Ci.nsIDOMXULDocument
 XULElement          = Ci.nsIDOMXULElement
+XPathResult         = Ci.nsIDOMXPathResult
 HTMLDocument        = Ci.nsIDOMHTMLDocument
 HTMLElement         = Ci.nsIDOMHTMLElement
 Window              = Ci.nsIDOMWindow
@@ -292,7 +293,7 @@ browserSearchSubmission = (str) ->
   return engine.getSubmission(str, null)
 
 # Get hint characters, convert them to lower case and fall back
-# to default hint characters if there are less than 3 chars
+# to default hint characters if there are less than 2 chars
 getHintChars = ->
   hintChars = removeDuplicateCharacters(getPref('hint_chars'))
   if hintChars.length < 2
@@ -315,6 +316,19 @@ regexpEscape = (s) -> s and s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')
 removeDuplicates = (array) ->
   seen = {}
   return array.filter((item) -> if seen[item] then false else (seen[item] = true))
+
+# Returns elements that qualify as links
+# Generates and memoizes an XPath query internally
+getDomElements = (elements) ->
+  reduce = (m, rule) -> m.concat(["//#{ rule }", "//xhtml:#{ rule }"])
+  xpath = elements.reduce(reduce, []).join(' | ')
+
+  namespaceResolver = (namespace) ->
+    if namespace == 'xhtml' then 'http://www.w3.org/1999/xhtml' else null
+
+  # The actual function that will return the desired elements
+  return (document, resultType = XPathResult.ORDERED_NODE_SNAPSHOT_TYPE) ->
+    return document.evaluate(xpath, document.documentElement, namespaceResolver, resultType, null)
 
 exports.Bucket                    = Bucket
 exports.getEventWindow            = getEventWindow
@@ -352,3 +366,4 @@ exports.browserSearchSubmission   = browserSearchSubmission
 exports.getHintChars              = getHintChars
 exports.removeDuplicateCharacters = removeDuplicateCharacters
 exports.getResourceURI            = getResourceURI
+exports.getDomElements            = getDomElements

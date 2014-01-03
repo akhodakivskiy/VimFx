@@ -1,29 +1,31 @@
-utils               = require 'utils'
-{ modes }           = require 'modes'
-{ isEscCommandKey } = require 'commands'
+utils                   = require 'utils'
+{ modes }               = require 'modes'
+{ isEscCommandKey
+, isReturnCommandKey }  = require 'commands'
 
 class Vim
   constructor: (@window) ->
     @storage = {}
     @enterMode('normal')
 
-  enterMode: (mode, args) ->
+  enterMode: (mode, args...) ->
     # `args` is an array of arguments to be passed to the mode's `onEnter` method
+
     if mode not of modes
       throw new Error("Not a valid VimFx mode to enter: #{ mode }")
 
     if @mode != mode
       if @mode of modes
-        modes[@mode].onLeave(@, @storage[@mode], args)
+        modes[@mode].onLeave(@, @storage[@mode])
 
       @mode = mode
 
-      modes[@mode].onEnter(@, @storage[@mode] ?= {}, args)
+      modes[@mode].onEnter(@, @storage[@mode] ?= {}, args...)
 
   onInput: (keyStr, event) ->
     isEditable = utils.isElementEditable(event.originalTarget)
 
-    if isEditable and not isEscCommandKey(keyStr)
+    if isEditable and not (isEscCommandKey(keyStr) or isReturnCommandKey(keyStr))
       return false
 
     oldMode = @mode

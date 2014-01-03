@@ -89,7 +89,7 @@ Global shortcut to enable/disable VimFx: `shift-alt-v`
     c-J     Move current tab to the Left
     c-K     Move current tab to the Right
     gh      Navigate to the Home Page
-    gH,g0   Go to the First tab
+    gH,g^   Go to the First tab
     gL,g$   Go to the Last tab
     x       Close current tab
     X       Restore last closed tab
@@ -98,19 +98,24 @@ Global shortcut to enable/disable VimFx: `shift-alt-v`
 
     f       Follow a link on the current page
     F       Follow a link on the current page in a new tab
+    af      Follow multiple links on the current page
+    [       Follow the Previous page link on the current page
+    ]       Follow the Next page link on the current page
+    gu      Go up in the URL path
+    gU      Go to the current URL domain
     H       Go Back in history
     L       Go Forward in history
 
 ### Misc
 
-    .,/     Enter Find mode
-    a.,a/   Enter Find mode to highlight all matches
+    /       Enter Find mode
+    a/      Enter Find mode to highlight all matches
     n       Go to the next Find match
     N       Go to the previous Find match
     i       Enter insert mode: Ignore all commands
-    ?,>     Show this dialog
-    Esc     Enter normal mode (remove hint markers, exit insert mode) or blur/close active element
+    ?       Show this dialog
     :       Open Developer Toolbar
+    Esc     Enter normal mode (remove hint markers, exit insert mode) or blur/close active element
 
 Can't see a link hint, because it's overlapped by another? Try pressing space or shift-space!
 

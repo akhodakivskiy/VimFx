@@ -21,34 +21,18 @@ keyStrFromEvent = (event) ->
 
 # Passthrough mode is activated when VimFx should temporarily stop processing keyboard input, for
 # example when a menu is shown.
-passthrough = false
+popupPassthrough = false
 checkPassthrough = (event) ->
   if event.target.nodeName in ['menupopup', 'panel']
-    passthrough = switch event.type
+    popupPassthrough = switch event.type
       when 'popupshown'  then true
       when 'popuphidden' then false
 
 suppress = false
-keyListener = (event) ->
-  try
-    return if passthrough or getPref('disabled')
-    return unless window = utils.getEventCurrentTabWindow(event)
-    return unless vim = vimBucket.get(window)
-    return if vim.blacklisted
-
-    if event.type == 'keydown'
-      suppress = false
-
-      return unless keyStr = keyStrFromEvent(event)
-
-      suppress = vim.onInput(keyStr, event)
-
-    if suppress
-      event.preventDefault()
-      event.stopPropagation()
-
-  catch error
-    console.log("#{ error } (in #{ event.type })\n#{ error.stack.replace(/@.+-> /g, '@') }")
+suppressEvent = (event) ->
+  if suppress
+    event.preventDefault()
+    event.stopPropagation()
 
 removeVimFromTab = (tab, gBrowser) ->
   return unless browser = gBrowser.getBrowserForTab(tab)
@@ -60,9 +44,37 @@ updateButton = (vim) ->
 
 # The following listeners are installed on every top level Chrome window
 windowsListeners =
-  keydown:     keyListener
-  keypress:    keyListener
-  keyup:       keyListener
+  keydown: (event) ->
+    try
+      # No matter what, always reset the `suppress` flag, so we don't suppress more than intended.
+      suppress = false
+
+      # Suppress popup passthrough mode if there is no passthrough mode on the root document
+      return if popupPassthrough and !!utils.getEventRootWindow(event).document.popupNode
+      return if getPref('disabled')
+
+      return unless window = utils.getEventCurrentTabWindow(event)
+      return unless vim = vimBucket.get(window)
+
+      return if vim.blacklisted
+
+      return unless keyStr = keyStrFromEvent(event)
+      suppress = vim.onInput(keyStr, event)
+
+      suppressEvent(event)
+
+    catch error
+      console.error("#{ error }\n#{ error.stack.replace(/@.+-> /g, '@') }")
+
+  # Note that the below event listeners can suppress the event even in blacklisted sites. That's
+  # intentional. For example, if you press 'x' to close the current tab, it will close before keyup
+  # fires. So keyup (and perhaps keypress) will fire in another tab. Even if that particular tab is
+  # blacklisted, we must suppress the event, so that 'x' isn't sent to the page. The rule is simple:
+  # If the `suppress` flag is `true`, the event should be suppressed, no matter what. It has the
+  # highest priority.
+  keypress: suppressEvent
+  keyup:    suppressEvent
+
   popupshown:  checkPassthrough
   popuphidden: checkPassthrough
 
@@ -112,3 +124,4 @@ addEventListeners = (window) ->
     window.gBrowser.removeTabsProgressListener(tabsListener)
 
 exports.addEventListeners = addEventListeners
+exports.vimBucket         = vimBucket

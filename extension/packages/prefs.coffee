@@ -10,6 +10,8 @@ PREF_BRANCH = 'extensions.VimFx.'
 DEFAULT_PREF_VALUES =
   addon_id:           'VimFx@akhodakivskiy.github.com'
   hint_chars:         'fjdkslaghrueiwovncm' # preferably use letters only
+  prev_patterns:      'prev,previous,back,older,<,«,<<'
+  next_patterns:      'next,more,newer,>,»,>>'
   disabled:           false
   scroll_step_lines:  6
   black_list:         '*mail.google.com*'
@@ -46,6 +48,15 @@ getPref = do ->
     value = getBranchPref(branch, key, defaultValue)
     return if value == undefined then getDefaultPref(key) else value
 
+# Unicode String
+getComplexPref = do ->
+  prefs = Cc['@mozilla.org/preferences-service;1'].getService(Ci.nsIPrefService)
+  branch = prefs.getBranch(PREF_BRANCH)
+
+  return (key) ->
+    value = branch.getComplexValue(key, Ci.nsISupportsString).data
+    value ? getDefaultPref(key)
+
 getDefaultPref = (key) -> return DEFAULT_PREF_VALUES[key]
 
 getFirefoxPref = do ->
@@ -78,6 +89,7 @@ initPrefValues = ->
 
 exports.isPrefSet         = isPrefSet
 exports.getPref           = getPref
+exports.getComplexPref    = getComplexPref
 exports.getDefaultPref    = getDefaultPref
 exports.getFirefoxPref    = getFirefoxPref
 exports.setPref           = setPref
