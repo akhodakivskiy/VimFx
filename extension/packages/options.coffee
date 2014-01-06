@@ -8,8 +8,6 @@ help         = require 'help'
 
 observer =
   observe: (document, topic, addon) ->
-    return unless addon == getPref('addon_id')
-
     hintCharsInput = document.querySelector('setting[pref="extensions.VimFx.hint_chars"]')
     blacklistInput = document.querySelector('setting[pref="extensions.VimFx.black_list"]')
 

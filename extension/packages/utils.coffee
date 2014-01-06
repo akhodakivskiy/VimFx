@@ -1,8 +1,9 @@
 { unload } = require 'unload'
 { getPref
 , setPref
-, getDefaultPref
 } = require 'prefs'
+
+ADDON_ID = 'VimFx@akhodakivskiy.github.com'
 
 { classes: Cc, interfaces: Ci, utils: Cu } = Components
 
@@ -250,9 +251,8 @@ getVersion = do ->
 
   if version == null
     scope = {}
-    addonId = getPref('addon_id')
     Cu.import('resource://gre/modules/AddonManager.jsm', scope)
-    scope.AddonManager.getAddonByID(addonId, (addon) -> version = addon.version)
+    scope.AddonManager.getAddonByID(ADDON_ID, (addon) -> version = addon.version)
 
   return ->
     return version
@@ -281,14 +281,14 @@ browserSearchSubmission = (str) ->
   engine = ss.currentEngine or ss.defaultEngine
   return engine.getSubmission(str, null)
 
-# Get hint characters, convert them to lower case and fall back
-# to default hint characters if there are less than 2 chars
+# Get hint characters, convert them to lower case, and filter duplicates
 getHintChars = ->
-  hintChars = removeDuplicateCharacters(getPref('hint_chars'))
+  hintChars = getPref('hint_chars')
+  # Make sure that hint chars contain at least two characters
   if hintChars.length < 2
-    hintChars = getDefaultPref('hint_chars')
+    hintChars = 'fj'
 
-  return hintChars
+  return removeDuplicateCharacters(hintChars)
 
 # Remove duplicate characters from string (case insensitive)
 removeDuplicateCharacters = (str) ->
@@ -355,3 +355,4 @@ exports.getHintChars              = getHintChars
 exports.removeDuplicateCharacters = removeDuplicateCharacters
 exports.getResourceURI            = getResourceURI
 exports.getDomElements            = getDomElements
+exports.ADDON_ID                  = ADDON_ID

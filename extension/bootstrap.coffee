@@ -42,8 +42,7 @@ do (global = this) ->
     { loadCss }             = require 'utils'
     { addEventListeners
     , vimBucket }           = require 'events'
-    { getPref
-    , initPrefValues }      = require 'prefs'
+    { getPref }             = require 'prefs'
     { setButtonInstallPosition
     , addToolbarButton }    = require 'button'
     options                 = require 'options'
@@ -54,9 +53,6 @@ do (global = this) ->
       # Position the toolbar button right before the default Bookmarks button
       # If Bookmarks button is hidden - then VimFx button will be appended to the toolbar
       setButtonInstallPosition('nav-bar', 'bookmarks-menu-button-container')
-
-    # Write default preference values on install
-    initPrefValues()
 
     loadCss('style')
 

@@ -3,15 +3,13 @@
 
 <!ENTITY pref.black_list.title      "Daftar Larangan">
 <!ENTITY pref.black_list.desc       "Daftar terpisah koma dari URL dimana VimFx harus nonaktif otomatis.
-Wildcard dibolehkan: *, !. Default: *mail.google.com*">
+Wildcard dibolehkan: *, !. Example: *example.com*,*foobar.org*">
 
 <!ENTITY pref.prev_patterns.title   "Previous Page Patterns">
-<!ENTITY pref.prev_patterns.desc    "Comma separated list of patterns that match links to previous page.
-Default: prev,previous,back">
+<!ENTITY pref.prev_patterns.desc    "Comma separated list of patterns that match links to previous page">
 
 <!ENTITY pref.next_patterns.title   "Next Page Patterns">
-<!ENTITY pref.next_patterns.desc    "Comma separated list of patterns that match links to next page.
-Default: next,more">
+<!ENTITY pref.next_patterns.desc    "Comma separated list of patterns that match links to next page">
 
 <!ENTITY pref.scroll_step_lines.title     "Langkah Gulung">
 <!ENTITY pref.scroll_step_lines.desc      "Langkah Gulung">

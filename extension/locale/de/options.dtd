@@ -2,15 +2,13 @@
 <!ENTITY pref.hint_chars.desc       "Voreinstellung: fjdkslaghrueiwovncm">
 
 <!ENTITY pref.black_list.title      "Schwarze Liste">
-<!ENTITY pref.black_list.desc       "Durch Komma getrennte Liste von URLs für die VimFx automatisch deaktiviert werden soll. Erlaubte Wildcard-Zeichen: *, !. Voreinstellung: *mail.google.com*">
+<!ENTITY pref.black_list.desc       "Durch Komma getrennte Liste von URLs für die VimFx automatisch deaktiviert werden soll. Erlaubte Wildcard-Zeichen: *, !. Example: *example.com*,*foobar.org*">
 
 <!ENTITY pref.prev_patterns.title   "Previous Page Patterns">
-<!ENTITY pref.prev_patterns.desc    "Comma separated list of patterns that match links to previous page.
-Default: prev,previous,back">
+<!ENTITY pref.prev_patterns.desc    "Comma separated list of patterns that match links to previous page">
 
 <!ENTITY pref.next_patterns.title   "Next Page Patterns">
-<!ENTITY pref.next_patterns.desc    "Comma separated list of patterns that match links to next page.
-Default: next,more">
+<!ENTITY pref.next_patterns.desc    "Comma separated list of patterns that match links to next page">
 
 <!ENTITY pref.scroll_step_lines.title     "Scroll-Schrittweite">
 <!ENTITY pref.scroll_step_lines.desc      "Scroll-Schrittweite">
