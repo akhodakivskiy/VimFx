@@ -10,6 +10,7 @@ ADDON_ID = 'VimFx@akhodakivskiy.github.com'
 HTMLInputElement    = Ci.nsIDOMHTMLInputElement
 HTMLTextAreaElement = Ci.nsIDOMHTMLTextAreaElement
 HTMLSelectElement   = Ci.nsIDOMHTMLSelectElement
+XULMenuListElement  = Ci.nsIDOMXULMenuListElement
 XULDocument         = Ci.nsIDOMXULDocument
 XULElement          = Ci.nsIDOMXULElement
 XPathResult         = Ci.nsIDOMXPathResult
@@ -79,6 +80,7 @@ isElementEditable = (element) ->
          element instanceof HTMLInputElement or \
          element instanceof HTMLTextAreaElement or \
          element instanceof HTMLSelectElement or \
+         element instanceof XULMenuListElement or \
          element.getAttribute('g_editable') == 'true' or \
          element.getAttribute('contenteditable')?.toLowerCase() == 'true' or \
          element.ownerDocument?.designMode?.toLowerCase() == 'on'
