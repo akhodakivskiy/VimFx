@@ -40,8 +40,13 @@ findLinkMatchPattern = (document, patterns) ->
   candidateLinks = candidateLinks.sort (a, b) ->
     if a.wordCount == b.wordCount then 1 else a.wordCount - b.wordCount
 
-  # match patterns
-  for pattern in patterns
+  results = []
+
+  # match patterns. Sort them to match shorter patterns first.
+  # The latter is to prevent matching first links that contain 
+  # longer words like `next`, `more`, etc.
+  for pattern in patterns.sort((a, b) -> a.length > b.length)
+    console.log(pattern)
     # if the pattern is a word, wrapped it in word boundaries.
     # thus we won't match words like 'previously' to 'previous'
     exactWordRegex =
@@ -52,7 +57,9 @@ findLinkMatchPattern = (document, patterns) ->
 
     for candidateLink in candidateLinks
       if exactWordRegex.test(candidateLink.textContent)
-        return candidateLink
+        results.push(candidateLink)
+
+  return results
 
 
 # Returns elements that qualify as links

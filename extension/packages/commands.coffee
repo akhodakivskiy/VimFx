@@ -222,8 +222,13 @@ command_follow_multiple = helper_follow.bind(undefined, {inTab: true, multiple: 
 
 helper_follow_link = ({ type }, vim) ->
   patterns = getComplexPref("#{ type }_patterns").split(',')
-  link = find_link.find(vim.window.document, patterns)
-  utils.simulateClick(link, {metaKey: false, ctrlKey: false}) if link
+  for link in find_link.find(vim.window.document, patterns)
+    # Only process links that have less than 15 characters of content.
+    # Otherwise it will match many wrong links whose content
+    # contains words link `more`, `next`, etc.
+    if link.textContent.length < 15
+      utils.simulateClick(link, {metaKey: false, ctrlKey: false})
+      return
 
 # Follow previous page
 command_follow_prev = helper_follow_link.bind(undefined, {type: 'prev'})
