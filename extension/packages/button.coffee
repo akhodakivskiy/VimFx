@@ -148,7 +148,7 @@ createMenupopup = (window, button) ->
     event.stopPropagation()
 
   onPreferencesCommand = (event) ->
-    id = encodeURIComponent(getPref('addon_id'))
+    id = encodeURIComponent(utils.ADDON_ID)
     window.BrowserOpenAddonsMgr("addons://detail/#{ id }/preferences")
 
     event.stopPropagation()
