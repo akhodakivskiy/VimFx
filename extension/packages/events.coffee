@@ -69,6 +69,19 @@ windowsListeners =
     catch error
       console.error("#{ error }\n#{ error.stack.replace(/@.+-> /g, '@') }")
 
+  click: (event) ->
+    return if popupPassthrough and !!utils.getEventRootWindow(event).document.popupNode
+    return if getPref('disabled')
+
+    return unless window = utils.getEventCurrentTabWindow(event)
+    return unless vim = vimBucket.get(window)
+
+    return if vim.blacklisted
+
+    return if utils.isElementBrowserChrome(event.originalTarget)
+
+    vim.onClick(event)
+
   # Note that the below event listeners can suppress the event even in blacklisted sites. That's
   # intentional. For example, if you press 'x' to close the current tab, it will close before keyup
   # fires. So keyup (and perhaps keypress) will fire in another tab. Even if that particular tab is
