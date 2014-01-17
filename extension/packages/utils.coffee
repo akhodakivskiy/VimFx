@@ -85,6 +85,9 @@ isElementEditable = (element) ->
          element.getAttribute('contenteditable')?.toLowerCase() == 'true' or \
          element.ownerDocument?.designMode?.toLowerCase() == 'on'
 
+isElementBrowserChrome = (element) ->
+   element.ownerDocument instanceof XULDocument
+
 getWindowId = (window) ->
   return window
     .QueryInterface(Components.interfaces.nsIInterfaceRequestor)
@@ -332,6 +335,7 @@ exports.getWindowId               = getWindowId
 exports.blurActiveElement         = blurActiveElement
 exports.isTextInputElement        = isTextInputElement
 exports.isElementEditable         = isElementEditable
+exports.isElementBrowserChrome    = isElementBrowserChrome
 exports.getSessionStore           = getSessionStore
 
 exports.loadCss                   = loadCss

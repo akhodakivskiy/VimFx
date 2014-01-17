@@ -25,11 +25,7 @@ class Vim
   onInput: (keyStr, event) ->
     isEditable = utils.isElementEditable(event.originalTarget)
 
-    if isEditable and not (isEscCommandKey(keyStr) or isReturnCommandKey(keyStr))
-      return false
-
     oldMode = @mode
-
     suppress = modes[@mode]?.onInput(@, @storage[@mode], keyStr, event)
 
     # Esc key is not suppressed, and passed to the browser in `normal` mode.
