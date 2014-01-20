@@ -58,8 +58,6 @@ windowsListeners =
 
       return if vim.blacklisted
 
-      return if utils.isElementBrowserChrome(event.originalTarget)
-
       return unless keyStr = keyStrFromEvent(event)
 
       suppress = vim.onInput(keyStr, event)
