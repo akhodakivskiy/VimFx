@@ -33,20 +33,14 @@ findLinkMatchPattern = (document, patterns) ->
 
   return if candidateLinks.length == 0
 
-  for link in candidateLinks
+  for link, idx in candidateLinks
+    # links near the bottom has higher rank
+    link.positionRank = idx
     link.wordCount = link.textContent.trim().split(/\s+/).length
-
-  # favor shorter links, links near the end of a page
-  candidateLinks = candidateLinks.sort (a, b) ->
-    if a.wordCount == b.wordCount then 1 else a.wordCount - b.wordCount
 
   results = []
 
-  # match patterns. Sort them to match shorter patterns first.
-  # The latter is to prevent matching first links that contain 
-  # longer words like `next`, `more`, etc.
-  for pattern in patterns.sort((a, b) -> a.length > b.length)
-    console.log(pattern)
+  for pattern in patterns
     # if the pattern is a word, wrapped it in word boundaries.
     # thus we won't match words like 'previously' to 'previous'
     exactWordRegex =
@@ -59,7 +53,14 @@ findLinkMatchPattern = (document, patterns) ->
       if exactWordRegex.test(candidateLink.textContent)
         results.push(candidateLink)
 
-  return results
+  console.log(results)
+
+  # favor shorter links, or links near the end of a page
+  return results.sort (a, b) ->
+    if a.wordCount != b.wordCount
+      a.wordCount - b.wordCount
+    else
+      b.positionRank - a.positionRank
 
 
 # Returns elements that qualify as links
