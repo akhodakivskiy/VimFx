@@ -224,8 +224,6 @@ helper_follow_link = ({ type }, vim) ->
   patterns = getComplexPref("#{ type }_patterns").split(',')
   links = find_link.find(vim.window.document, patterns)
 
-  console.log(links)
-
   if links.length > 0
     utils.simulateClick(links[0], {metaKey: false, ctrlKey: false})
 

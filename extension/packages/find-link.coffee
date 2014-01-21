@@ -34,33 +34,28 @@ findLinkMatchPattern = (document, patterns) ->
   return if candidateLinks.length == 0
 
   for link, idx in candidateLinks
-    # links near the bottom has higher rank
-    link.positionRank = idx
+    link.firstMatch = -1
     link.wordCount = link.textContent.trim().split(/\s+/).length
 
-  results = []
-
-  for pattern in patterns
+  for pattern, idx in patterns
     # if the pattern is a word, wrapped it in word boundaries.
     # thus we won't match words like 'previously' to 'previous'
     exactWordRegex =
       if /^\b|\b$/.test(pattern)
-        new RegExp('\\b' + pattern + '\\b', 'i')
+        new RegExp("^#{pattern}\\b|\\b#{pattern}\\b$", 'i')
       else
         new RegExp(pattern, 'i')
 
-    for candidateLink in candidateLinks
-      if exactWordRegex.test(candidateLink.textContent)
-        results.push(candidateLink)
+    for link in candidateLinks
+      if exactWordRegex.test(link.textContent)
+        link.firstMatch = idx if link.firstMatch == -1
 
-  console.log(results)
-
-  # favor shorter links, or links near the end of a page
-  return results.sort (a, b) ->
+  # favor shorter links, then the pattern matched in order
+  return candidateLinks.filter((a) -> a.firstMatch != -1).sort (a, b) ->
     if a.wordCount != b.wordCount
       a.wordCount - b.wordCount
     else
-      b.positionRank - a.positionRank
+      a.firstMatch - b.firstMatch
 
 
 # Returns elements that qualify as links
