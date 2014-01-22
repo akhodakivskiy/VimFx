@@ -19,7 +19,7 @@ LINK_ELEMENT_PROPERTIES = [
   "contains(@class, 'button')"
 ]
 
-# Find a link that match with the patterns
+# Find an array of links that match with patterns
 findLinkMatchPattern = (document, patterns) ->
   links = getLinkElements(document)
   candidateLinks = []
@@ -29,33 +29,29 @@ findLinkMatchPattern = (document, patterns) ->
     link = links.snapshotItem(i)
 
     if isVisibleElement(link) and isElementMatchPattern(link, patterns)
+      link.firstMatch = -1
+      link.wordCount = link.textContent.trim().split(/\s+/).length
+
       candidateLinks.push(link)
 
-  return if candidateLinks.length == 0
-
-  for link, idx in candidateLinks
-    link.firstMatch = -1
-    link.wordCount = link.textContent.trim().split(/\s+/).length
+  return [] if candidateLinks.length == 0
 
   for pattern, idx in patterns
-    # if the pattern is a word, wrapped it in word boundaries.
-    # thus we won't match words like 'previously' to 'previous'
+    # if the pattern is a word, it needs to be the first or last word in string,
+    # and wrapped in word boundaries.
     exactWordRegex =
       if /^\b|\b$/.test(pattern)
-        new RegExp("^#{pattern}\\b|\\b#{pattern}\\b$", 'i')
+        /// ^#{ pattern }\b | \b#{ pattern }$ ///i
       else
-        new RegExp(pattern, 'i')
+        /// #{ pattern } ///i
 
-    for link in candidateLinks
-      if exactWordRegex.test(link.textContent)
-        link.firstMatch = idx if link.firstMatch == -1
+    for link in candidateLinks when exactWordRegex.test(link.textContent)
+      link.firstMatch = idx if link.firstMatch == -1
 
   # favor shorter links, then the pattern matched in order
-  return candidateLinks.filter((a) -> a.firstMatch != -1).sort (a, b) ->
-    if a.wordCount != b.wordCount
-      a.wordCount - b.wordCount
-    else
-      a.firstMatch - b.firstMatch
+  return candidateLinks
+    .filter((a) -> a.firstMatch != -1)
+    .sort((a, b) -> a.wordCount - b.wordCount or a.firstMatch - b.firstMatch)
 
 
 # Returns elements that qualify as links
