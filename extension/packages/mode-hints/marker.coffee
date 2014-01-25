@@ -1,3 +1,4 @@
+{ createElement }    = require 'utils'
 { SerializableBloomFilter
 , DummyBloomFilter } = require 'mode-hints/bloomfilter'
 
@@ -15,8 +16,7 @@ class Marker
   constructor: (@element) ->
     document = @element.ownerDocument
     window = document.defaultView
-    @markerElement = document.createElement('div')
-    @markerElement.className = 'VimFxReset VimFxHintMarker'
+    @markerElement = createElement(document, 'div', {class: 'VimFxHintMarker'})
 
     Object.defineProperty this, 'bloomFilter',
       get: -> if getPref('hints_bloom_on') then realBloomFilter else dummyBloomFilter
@@ -24,8 +24,9 @@ class Marker
   show: -> @setVisibility(true)
   hide: -> @setVisibility(false)
   setVisibility: (visible) ->
-    method = if visible then 'remove' else 'add'
-    @markerElement.classList[method]('VimFxHiddenHintMarker')
+    @markerElement.classList.toggle('VimFxHiddenHintMarker', !visible)
+  updateVisibility: ->
+    if @hintChars.startsWith(@enteredHintChars) then @show() else @hide()
 
   setPosition: (top, left) ->
     # The positioning is absulute
@@ -51,35 +52,28 @@ class Marker
     document = @element.ownerDocument
 
     while @markerElement.hasChildNodes()
-      @markerElement.removeChild(@markerElement.firstChild)
+      @markerElement.firstChild.remove()
 
     fragment = document.createDocumentFragment()
     for char in @hintChars
-      span = document.createElement('span')
-      span.className = 'VimFxReset'
-      span.textContent = char.toUpperCase()
-      fragment.appendChild(span)
+      charContainer = createElement(document, 'span')
+      charContainer.textContent = char.toUpperCase()
+      fragment.appendChild(charContainer)
 
     @markerElement.appendChild(fragment)
 
   matchHintChar: (char) ->
-    @updateEnteredHintChars(char)
+    @toggleLastHintChar(true)
+    @enteredHintChars += char.toLowerCase()
+    @updateVisibility()
 
   deleteHintChar: ->
-    @updateEnteredHintChars(false)
+    @enteredHintChars = @enteredHintChars[...-1]
+    @toggleLastHintChar(false)
+    @updateVisibility()
 
-  updateEnteredHintChars: (char) ->
-    if char == false
-      method = 'remove'
-      @enteredHintChars = @enteredHintChars[...-1]
-      offset = 0
-    else
-      method = 'add'
-      @enteredHintChars += char.toLowerCase()
-      offset = -1
-
-    @markerElement.children[@enteredHintChars.length + offset]?.classList[method]('VimFxCharMatch')
-    if @hintChars.startsWith(@enteredHintChars) then @show() else @hide()
+  toggleLastHintChar: (visible) ->
+    @markerElement.children[@enteredHintChars.length]?.classList.toggle('VimFxCharMatch', visible)
 
   isMatched: ->
     return @hintChars == @enteredHintChars
