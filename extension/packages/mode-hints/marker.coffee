@@ -24,8 +24,9 @@ class Marker
   show: -> @setVisibility(true)
   hide: -> @setVisibility(false)
   setVisibility: (visible) ->
-    method = if visible then 'remove' else 'add'
-    @markerElement.classList[method]('VimFxHiddenHintMarker')
+    @markerElement.classList.toggle('VimFxHiddenHintMarker', !visible)
+  updateVisibility: ->
+    if @hintChars.startsWith(@enteredHintChars) then @show() else @hide()
 
   setPosition: (top, left) ->
     # The positioning is absulute
@@ -62,23 +63,17 @@ class Marker
     @markerElement.appendChild(fragment)
 
   matchHintChar: (char) ->
-    @updateEnteredHintChars(char)
+    @toggleLastHintChar(true)
+    @enteredHintChars += char.toLowerCase()
+    @updateVisibility()
 
   deleteHintChar: ->
-    @updateEnteredHintChars(false)
+    @enteredHintChars = @enteredHintChars[...-1]
+    @toggleLastHintChar(false)
+    @updateVisibility()
 
-  updateEnteredHintChars: (char) ->
-    if char == false
-      method = 'remove'
-      @enteredHintChars = @enteredHintChars[...-1]
-      offset = 0
-    else
-      method = 'add'
-      @enteredHintChars += char.toLowerCase()
-      offset = -1
-
-    @markerElement.children[@enteredHintChars.length + offset]?.classList[method]('VimFxCharMatch')
-    if @hintChars.startsWith(@enteredHintChars) then @show() else @hide()
+  toggleLastHintChar: (visible) ->
+    @markerElement.children[@enteredHintChars.length]?.classList.toggle('VimFxCharMatch', visible)
 
   isMatched: ->
     return @hintChars == @enteredHintChars
