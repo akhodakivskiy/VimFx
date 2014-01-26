@@ -64,7 +64,7 @@ windowsListeners =
       suppressEvent(event)
 
     catch error
-      console.error("#{ error }\n#{ error.stack.replace(/@.+-> /g, '@') }")
+      console.error("#{ error }\n#{ error.stack?.replace(/@.+-> /g, '@') }")
 
   # Note that the below event listeners can suppress the event even in blacklisted sites. That's
   # intentional. For example, if you press 'x' to close the current tab, it will close before keyup

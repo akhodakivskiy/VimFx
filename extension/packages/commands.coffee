@@ -1,7 +1,6 @@
-utils     = require 'utils'
-help      = require 'help'
-find_link = require 'find-link'
-{ _ }     = require 'l10n'
+utils = require 'utils'
+help  = require 'help'
+{ _ } = require 'l10n'
 { getPref
 , getComplexPref
 , setPref
@@ -220,23 +219,25 @@ command_follow_in_tab = helper_follow.bind(undefined, {inTab: true})
 # Follow multiple links with hint markers
 command_follow_multiple = helper_follow.bind(undefined, {inTab: true, multiple: true})
 
-helper_follow_link = ({ type }, vim) ->
-  patterns = getComplexPref("#{ type }_patterns").split(',')
-  links = find_link.find(vim.window.document, patterns)
+helper_follow_pattern = (type, vim) ->
+  links = utils.getMarkableElements(vim.window.document, {type: 'action'})
+    .filter(utils.isElementVisible)
+  patterns = utils.splitListString(getComplexPref("#{ type }_patterns"))
+  matchingLink = utils.getBestPatternMatch(patterns, links)
 
-  if links.length > 0
-    utils.simulateClick(links[0], {metaKey: false, ctrlKey: false})
+  if matchingLink
+    utils.simulateClick(matchingLink, {metaKey: false, ctrlKey: false})
 
 # Follow previous page
-command_follow_prev = helper_follow_link.bind(undefined, {type: 'prev'})
+command_follow_prev = helper_follow_pattern.bind(undefined, 'prev')
 
 # Follow next page
-command_follow_next = helper_follow_link.bind(undefined, {type: 'next'})
+command_follow_next = helper_follow_pattern.bind(undefined, 'next')
 
 # Go up one level in the URL hierarchy
 command_go_up_path = (vim) ->
   path = vim.window.location.pathname
-  vim.window.location.pathname = path.replace(/\/[^\/]*?(\/)?$/, '')
+  vim.window.location.pathname = path.replace(/// / [^/]+ /?$ ///, '')
 
 # Go up to root of the URL hierarchy
 command_go_to_root = (vim) ->
