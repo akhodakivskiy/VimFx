@@ -19,7 +19,7 @@ LINK_ELEMENT_PROPERTIES = [
   "contains(@class, 'button')"
 ]
 
-# Find a link that match with the patterns
+# Find an array of links that match with patterns
 findLinkMatchPattern = (document, patterns) ->
   links = getLinkElements(document)
   candidateLinks = []
@@ -29,37 +29,29 @@ findLinkMatchPattern = (document, patterns) ->
     link = links.snapshotItem(i)
 
     if isVisibleElement(link) and isElementMatchPattern(link, patterns)
+      link.firstMatch = -1
+      link.wordCount = link.textContent.trim().split(/\s+/).length
+
       candidateLinks.push(link)
 
-  return if candidateLinks.length == 0
+  return [] if candidateLinks.length == 0
 
-  for link in candidateLinks
-    link.wordCount = link.textContent.trim().split(/\s+/).length
-
-  # favor shorter links, links near the end of a page
-  candidateLinks = candidateLinks.sort (a, b) ->
-    if a.wordCount == b.wordCount then 1 else a.wordCount - b.wordCount
-
-  results = []
-
-  # match patterns. Sort them to match shorter patterns first.
-  # The latter is to prevent matching first links that contain 
-  # longer words like `next`, `more`, etc.
-  for pattern in patterns.sort((a, b) -> a.length > b.length)
-    console.log(pattern)
-    # if the pattern is a word, wrapped it in word boundaries.
-    # thus we won't match words like 'previously' to 'previous'
+  for pattern, idx in patterns
+    # if the pattern is a word, it needs to be the first or last word in string,
+    # and wrapped in word boundaries.
     exactWordRegex =
       if /^\b|\b$/.test(pattern)
-        new RegExp('\\b' + pattern + '\\b', 'i')
+        /// ^#{ pattern }\b | \b#{ pattern }$ ///i
       else
-        new RegExp(pattern, 'i')
+        /// #{ pattern } ///i
 
-    for candidateLink in candidateLinks
-      if exactWordRegex.test(candidateLink.textContent)
-        results.push(candidateLink)
+    for link in candidateLinks when exactWordRegex.test(link.textContent)
+      link.firstMatch = idx if link.firstMatch == -1
 
-  return results
+  # favor shorter links, then the pattern matched in order
+  return candidateLinks
+    .filter((a) -> a.firstMatch != -1)
+    .sort((a, b) -> a.wordCount - b.wordCount or a.firstMatch - b.firstMatch)
 
 
 # Returns elements that qualify as links
