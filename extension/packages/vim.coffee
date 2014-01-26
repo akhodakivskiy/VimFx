@@ -23,13 +23,9 @@ class Vim
       modes[@mode].onEnter(@, @storage[@mode] ?= {}, args...)
 
   onInput: (keyStr, event) ->
-    isEditable = utils.isElementEditable(event.originalTarget)
-
-    if isEditable and not (isEscCommandKey(keyStr) or isReturnCommandKey(keyStr))
-      return false
+    return false if @_ignoreInputEvent(keyStr, event.originalTarget)
 
     oldMode = @mode
-
     suppress = modes[@mode]?.onInput(@, @storage[@mode], keyStr, event)
 
     # Esc key is not suppressed, and passed to the browser in `normal` mode.
@@ -46,5 +42,17 @@ class Vim
       return false
     else
       return suppress
+
+  # Want special behaviour for chrome editables (e.g. location and find bars)
+  # See https://github.com/akhodakivskiy/VimFx/pull/256/files#r8987767
+  _ignoreInputEvent: (keyStr, target) ->
+    isChrome = utils.isElementBrowserChrome(target)
+    isNotEscOrEnter = not (isEscCommandKey(keyStr) or isReturnCommandKey(keyStr))
+    isEditable = utils.isElementEditable(target)
+    return isChrome and isEditable and isNotEscOrEnter
+
+  onClick: (event) ->
+    if utils.isElementEditable(event.target)
+       this.enterMode('insert')
 
 exports.Vim = Vim

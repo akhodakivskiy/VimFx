@@ -209,6 +209,10 @@ helper_follow = ({ inTab, multiple }, vim) ->
       vim.window.setTimeout((-> marker.reset() for marker in markers), 100)
       return true
 
+    if isEditable
+      vim.enterMode('insert')
+      return true
+
   vim.enterMode('hints', callback)
 
 # Follow links with hint markers
