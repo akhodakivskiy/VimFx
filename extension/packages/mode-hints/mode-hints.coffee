@@ -1,7 +1,7 @@
 utils = require 'utils'
 hints = require 'mode-hints/hints'
 
-{ isEscCommandKey } = require 'commands'
+{ escapeCommand } = require 'commands'
 
 exports.mode_hints =
   onEnter: (vim, storage, callback) ->
@@ -16,8 +16,8 @@ exports.mode_hints =
     hints.removeHints(vim.window.document)
     storage.markers = storage.callback = undefined
 
-  onInput: (vim, storage, keyStr, event) ->
-    if isEscCommandKey(keyStr)
+  onKeydown: (vim, storage, event, keyStr) ->
+    if keyStr in escapeCommand.keys()
       vim.enterMode('normal')
       return true
 
@@ -45,3 +45,9 @@ exports.mode_hints =
             break
 
     return true
+
+  onLocationChange: (vim, storage, event) ->
+    # If the location changes when in hints mode (for example because the reload button has been
+    # clicked), we're going to end up in hints mode without any markers. So switch back to normal
+    # mode in that case.
+    vim.enterMode('normal')
