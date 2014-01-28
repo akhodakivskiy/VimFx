@@ -19,6 +19,15 @@ keyStrFromEvent = (event) ->
 
   return null
 
+# When a menu or panel is shown VimFx should temporarily stop processing keyboard input, allowing
+# accesskeys to be used.
+popupPassthrough = false
+checkPassthrough = (event) ->
+  if event.target.nodeName in ['menupopup', 'panel']
+    popupPassthrough = switch event.type
+      when 'popupshown'  then true
+      when 'popuphidden' then false
+
 suppress = false
 suppressEvent = (event) ->
   if suppress
@@ -42,10 +51,16 @@ windowsListeners =
 
       return if getPref('disabled')
 
-      return unless rootWindow = utils.getEventRootWindow(event)
-      popups = rootWindow.document.querySelectorAll('menupopup, panel')
-      for popup in popups
-        return if popup.state == 'open'
+      if popupPassthrough
+        # The `popupPassthrough` flag is set a bit unreliably. Sometimes it can be stuck as `true`
+        # even though no popup is shown, effectively disabling the extension. Therefore we check
+        # if there actually _are_ any open popups before stopping processing keyboard input. This is
+        # only done when popups (might) be open (not on every keystroke) of performance reasons.
+        return unless rootWindow = utils.getEventRootWindow(event)
+        popups = rootWindow.document.querySelectorAll('menupopup, panel')
+        for popup in popups
+          return if popup.state == 'open'
+        popupPassthrough = false # No popup was actually open: Reset the flag.
 
       return unless window = utils.getEventCurrentTabWindow(event)
       return unless vim = vimBucket.get(window)
@@ -68,6 +83,9 @@ windowsListeners =
   # highest priority.
   keypress: suppressEvent
   keyup:    suppressEvent
+
+  popupshown:  checkPassthrough
+  popuphidden: checkPassthrough
 
   # When the top level window closes we should release all Vims that were
   # associated with tabs in this window
