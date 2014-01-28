@@ -8,6 +8,15 @@ keyUtils                = require 'key-utils'
 { interfaces: Ci } = Components
 
 vimBucket = new utils.Bucket(utils.getWindowId, (w) -> new Vim(w))
+getVim = (event) ->
+  return if getPref('disabled')
+
+  return unless window = utils.getEventCurrentTabWindow(event)
+  return unless vim = vimBucket.get(window)
+
+  return if vim.blacklisted
+
+  return vim
 
 keyStrFromEvent = (event) ->
   { ctrlKey: ctrl, metaKey: meta, altKey: alt, shiftKey: shift } = event
@@ -51,34 +60,28 @@ windowsListeners =
 
       # Suppress popup passthrough mode if there is no passthrough mode on the root document
       return if popupPassthrough and !!utils.getEventRootWindow(event).document.popupNode
-      return if getPref('disabled')
 
-      return unless window = utils.getEventCurrentTabWindow(event)
-      return unless vim = vimBucket.get(window)
-
-      return if vim.blacklisted
+      return unless vim = getVim(event)
 
       return unless keyStr = keyStrFromEvent(event)
 
-      suppress = vim.onInput(keyStr, event)
-
+      suppress = vim.onKeydown(event, keyStr)
       suppressEvent(event)
 
     catch error
       console.error("#{ error }\n#{ error.stack.replace(/@.+-> /g, '@') }")
 
   click: (event) ->
-    return if popupPassthrough and !!utils.getEventRootWindow(event).document.popupNode
-    return if getPref('disabled')
-
-    return unless window = utils.getEventCurrentTabWindow(event)
-    return unless vim = vimBucket.get(window)
-
-    return if vim.blacklisted
-
-    return if utils.isElementBrowserChrome(event.originalTarget)
-
+    return unless vim = getVim(event)
     vim.onClick(event)
+
+  blur: (event) ->
+    return unless vim = getVim(event)
+    vim.onBlur(event)
+
+  focus: (event) ->
+    return unless vim = getVim(event)
+    vim.onFocus(event)
 
   # Note that the below event listeners can suppress the event even in blacklisted sites. That's
   # intentional. For example, if you press 'x' to close the current tab, it will close before keyup
@@ -116,11 +119,7 @@ tabsListener =
   onLocationChange: (browser, webProgress, request, location) ->
     return unless vim = vimBucket.get(browser.contentWindow)
 
-    # If the location changes when in hints mode (for example because the reload button has been
-    # clicked), we're going to end up in hints mode without any markers. So switch back to normal
-    # mode in that case.
-    if vim.mode == 'hints'
-      vim.enterMode('normal')
+    vim.onLocationChange(event)
 
     vim.blacklisted = utils.isBlacklisted(location.spec)
     updateButton(vim)

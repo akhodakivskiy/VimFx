@@ -81,8 +81,8 @@ isElementEditable = (element) ->
          element instanceof HTMLTextAreaElement or \
          element instanceof HTMLSelectElement or \
          element instanceof XULMenuListElement or \
-         element.getAttribute('g_editable') == 'true' or \
-         element.getAttribute('contenteditable')?.toLowerCase() == 'true' or \
+         element.getAttribute?('g_editable') == 'true' or \
+         element.getAttribute?('contenteditable')?.toLowerCase() == 'true' or \
          element.ownerDocument?.designMode?.toLowerCase() == 'on'
 
 isElementBrowserChrome = (element) ->
@@ -267,6 +267,17 @@ parseHTML = (document, html) ->
   flags = parser.SanitizerAllowStyle
   return parser.parseFragment(html, flags, false, null, document.documentElement)
 
+createElement = (document, type, attributes = {}) ->
+  element = document.createElement(type)
+
+  for attribute, value of attributes
+    element.setAttribute(attribute, value)
+
+  if document instanceof HTMLDocument
+    element.classList.add('VimFxReset')
+
+  return element
+
 # Uses nsIIOService to parse a string as a URL and find out if it is a URL
 isURL = (str) ->
   try
@@ -355,6 +366,7 @@ exports.updateBlacklist           = updateBlacklist
 
 exports.getVersion                = getVersion
 exports.parseHTML                 = parseHTML
+exports.createElement             = createElement
 exports.isURL                     = isURL
 exports.browserSearchSubmission   = browserSearchSubmission
 exports.getHintChars              = getHintChars
