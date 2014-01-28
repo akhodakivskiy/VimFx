@@ -81,9 +81,12 @@ isElementEditable = (element) ->
          element instanceof HTMLTextAreaElement or \
          element instanceof HTMLSelectElement or \
          element instanceof XULMenuListElement or \
-         element.getAttribute('g_editable') == 'true' or \
-         element.getAttribute('contenteditable')?.toLowerCase() == 'true' or \
+         element.getAttribute?('g_editable') == 'true' or \
+         element.getAttribute?('contenteditable')?.toLowerCase() == 'true' or \
          element.ownerDocument?.designMode?.toLowerCase() == 'on'
+
+isElementBrowserChrome = (element) ->
+   element.ownerDocument instanceof XULDocument
 
 getWindowId = (window) ->
   return window
@@ -343,6 +346,7 @@ exports.getWindowId               = getWindowId
 exports.blurActiveElement         = blurActiveElement
 exports.isTextInputElement        = isTextInputElement
 exports.isElementEditable         = isElementEditable
+exports.isElementBrowserChrome    = isElementBrowserChrome
 exports.getSessionStore           = getSessionStore
 
 exports.loadCss                   = loadCss

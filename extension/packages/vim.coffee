@@ -22,29 +22,19 @@ class Vim
 
       modes[@mode].onEnter(@, @storage[@mode] ?= {}, args...)
 
-  onInput: (keyStr, event) ->
-    isEditable = utils.isElementEditable(event.originalTarget)
+  onKeydown: (event, keyStr) ->
+    return modes[@mode].onKeydown?(@, @storage[@mode], event, keyStr)
 
-    if isEditable and not (isEscCommandKey(keyStr) or isReturnCommandKey(keyStr))
-      return false
+  onClick: (event) ->
+    modes[@mode].onClick?(@, @storage[@mode], event)
 
-    oldMode = @mode
+  onBlur: (event) ->
+    modes[@mode].onBlur?(@, @storage[@mode], event)
 
-    suppress = modes[@mode]?.onInput(@, @storage[@mode], keyStr, event)
+  onFocus: (event) ->
+    modes[@mode].onFocus?(@, @storage[@mode], event)
 
-    # Esc key is not suppressed, and passed to the browser in `normal` mode.
-    # Here we compare against the mode that was active before the key was
-    # processed because processing the command may change the mode.
-    #
-    # Not suppressing Esc allows for stopping the loading of the page as well as
-    # closing many custom dialogs (and perhaps other things -- Esc is a very
-    # commonly used key). There are two reasons we might suppress it in other
-    # modes. If some custom dialog of a website is open, we should be able to
-    # cancel hint markers on it without closing it. Secondly, otherwise
-    # cancelling hint markers on google causes its search bar to be focused.
-    if oldMode == 'normal' and keyStr == 'Esc'
-      return false
-    else
-      return suppress
+  onLocationChange: (event) ->
+    modes[@mode].onLocationChange?(@, @storage[@mode], event)
 
 exports.Vim = Vim
