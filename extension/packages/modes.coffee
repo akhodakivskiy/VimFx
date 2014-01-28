@@ -15,7 +15,6 @@ modes['normal'] =
     storage.keys.length = 0
 
   onKeydown: (vim, storage, event, keyStr) ->
-    storage.lastNonCommandKeyStr = undefined
     storage.keys.push(keyStr)
 
     { match, exact, command } = searchForMatchingCommand(storage.keys)
@@ -34,7 +33,6 @@ modes['normal'] =
       # cancelling hint markers on google causes its search bar to be focused.
     else
       storage.keys.length = 0
-      storage.lastNonCommandKeyStr = keyStr
       return false
 
   onClick: (vim, storage, event) ->
@@ -45,7 +43,7 @@ modes['normal'] =
     target = event.originalTarget
     if utils.isElementEditable(target)
       if not vim.window.document.contains(target) or \
-          storage.lastNonCommandKeyStr == 'Tab'
+          vim.lastNonCommandKeyStr == 'Tab'
         vim.enterMode('insert', {auto: true})
 
 
