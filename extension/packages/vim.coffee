@@ -23,7 +23,10 @@ class Vim
       modes[@mode].onEnter(@, @storage[@mode] ?= {}, args...)
 
   onKeydown: (event, keyStr) ->
-    return modes[@mode].onKeydown?(@, @storage[@mode], event, keyStr)
+    suppress = modes[@mode].onKeydown?(@, @storage[@mode], event, keyStr)
+    @lastKeyStr = keyStr
+    @lastNonCommandKeyStr = if suppress then null else keyStr
+    return suppress
 
   onClick: (event) ->
     modes[@mode].onClick?(@, @storage[@mode], event)
