@@ -28,8 +28,8 @@ keyStrFromEvent = (event) ->
 
   return null
 
-# Passthrough mode is activated when VimFx should temporarily stop processing keyboard input, for
-# example when a menu is shown.
+# When a menu or panel is shown VimFx should temporarily stop processing keyboard input, allowing
+# accesskeys to be used.
 popupPassthrough = false
 checkPassthrough = (event) ->
   if event.target.nodeName in ['menupopup', 'panel']
@@ -58,8 +58,16 @@ windowsListeners =
       # No matter what, always reset the `suppress` flag, so we don't suppress more than intended.
       suppress = false
 
-      # Suppress popup passthrough mode if there is no passthrough mode on the root document
-      return if popupPassthrough and !!utils.getEventRootWindow(event).document.popupNode
+      if popupPassthrough
+        # The `popupPassthrough` flag is set a bit unreliably. Sometimes it can be stuck as `true`
+        # even though no popup is shown, effectively disabling the extension. Therefore we check
+        # if there actually _are_ any open popups before stopping processing keyboard input. This is
+        # only done when popups (might) be open (not on every keystroke) of performance reasons.
+        return unless rootWindow = utils.getEventRootWindow(event)
+        popups = rootWindow.document.querySelectorAll('menupopup, panel')
+        for popup in popups
+          return if popup.state == 'open'
+        popupPassthrough = false # No popup was actually open: Reset the flag.
 
       return unless vim = getVim(event)
 
