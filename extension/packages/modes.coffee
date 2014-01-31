@@ -42,8 +42,8 @@ modes['normal'] =
   onFocus: (vim, storage, event) ->
     target = event.originalTarget
     if utils.isElementEditable(target)
-      if not vim.window.document.contains(target) or \
-          vim.lastNonCommandKeyStr == 'Tab'
+      if not vim.window.document.contains(target) \
+          or vim.lastNonCommandKeyStr in ['Tab', 'Shift-Tab']
         vim.enterMode('insert', {auto: true})
 
 
