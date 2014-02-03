@@ -17,5 +17,8 @@
 <!ENTITY pref.hints_bloom_on.title "Έξυπνη ανάθεση υποδείξεων">
 <!ENTITY pref.hints_bloom_on.desc  "Ανάθεσε μικρότερες υποδείξεις στους συνδέσμους που οι χρήστες επισκέπτονται συχνότερα">
 
+<!ENTITY pref.prevent_autofocus.title "Prevent auto focusing inputs">
+<!ENTITY pref.prevent_autofocus.desc  "Inputs will not be focused when the page loads">
+
 <!ENTITY customizeButton.title "Συντομεύσεις Πληκτρολογίου">
 <!ENTITY customizeButton.label "Προσαρμογή">

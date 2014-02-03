@@ -4,4 +4,5 @@ pref('extensions.VimFx.next_patterns',      'next,more,newer,>,›,»,>>,▶,→
 pref('extensions.VimFx.scroll_step_lines',  6);
 pref('extensions.VimFx.black_list',         '*example.com*');
 pref('extensions.VimFx.hints_bloom_data',   '');
+pref('extensions.VimFx.prevent_autofocus',  true);
 pref('extensions.VimFx.hints_bloom_on',     true);
