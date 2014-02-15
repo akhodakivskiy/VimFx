@@ -81,8 +81,8 @@ isElementEditable = (element) ->
          element instanceof HTMLTextAreaElement or \
          element instanceof HTMLSelectElement or \
          element instanceof XULMenuListElement or \
-         element.getAttribute('g_editable') == 'true' or \
-         element.getAttribute('contenteditable')?.toLowerCase() == 'true' or \
+         element.getAttribute?('g_editable') == 'true' or \
+         element.getAttribute?('contenteditable')?.toLowerCase() == 'true' or \
          element.ownerDocument?.designMode?.toLowerCase() == 'on'
 
 getWindowId = (window) ->

@@ -209,6 +209,10 @@ helper_follow = ({ inTab, multiple }, vim) ->
       vim.window.setTimeout((-> marker.reset() for marker in markers), 100)
       return true
 
+    if isEditable
+      vim.enterMode('insert', {auto: true})
+      return true
+
   vim.enterMode('hints', callback)
 
 # Follow links with hint markers
@@ -271,22 +275,22 @@ command_help = (vim) ->
 findStorage = { lastSearchString: '' }
 
 # Switch into find mode
-command_find = (vim, storage) ->
+command_find = (vim) ->
   vim.enterMode('find', { highlight: false })
 
 # Switch into find mode with highlighting
-command_find_hl = (vim, storage) ->
+command_find_hl = (vim) ->
   vim.enterMode('find', { highlight: true })
 
 # Search for the last pattern
-command_find_next = (vim, storage) ->
+command_find_next = (vim) ->
   if findBar = utils.getRootWindow(vim.window).gBrowser.getFindBar()
     if findStorage.lastSearchString.length > 0
       findBar._findField.value = findStorage.lastSearchString
       findBar.onFindAgainCommand(false)
 
 # Search for the last pattern backwards
-command_find_prev = (vim, storage) ->
+command_find_prev = (vim) ->
   if findBar = utils.getRootWindow(vim.window).gBrowser.getFindBar()
     if findStorage.lastSearchString.length > 0
       findBar._findField.value = findStorage.lastSearchString
@@ -295,7 +299,7 @@ command_find_prev = (vim, storage) ->
 command_insert_mode = (vim) ->
   vim.enterMode('insert')
 
-command_Esc = (vim, storage, event) ->
+command_Esc = (vim, event) ->
   utils.blurActiveElement(vim.window)
 
   # Blur active XUL control
@@ -400,12 +404,7 @@ searchForMatchingCommand = (keys) ->
 
   return {match: false}
 
-isEscCommandKey = (keyStr) -> keyStr in escapeCommand.keys()
-
-isReturnCommandKey = (keyStr) -> keyStr.contains('Return')
-
 exports.commands                  = commands
 exports.searchForMatchingCommand  = searchForMatchingCommand
-exports.isEscCommandKey           = isEscCommandKey
-exports.isReturnCommandKey        = isReturnCommandKey
+exports.escapeCommand             = escapeCommand
 exports.findStorage               = findStorage
