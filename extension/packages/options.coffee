@@ -39,10 +39,10 @@ filterChars = (event) ->
 
 validatePatterns = (event) ->
   input = event.target
-  input.value = input.value.split(',')
-                    .map((pattern) -> pattern.trim())
-                    .filter((pattern) -> pattern != '')
-                    .join(',')
+  input.value =
+    utils.removeDuplicates(utils.splitListString(input.value))
+    .filter((pattern) -> pattern != '')
+    .join(',')
   input.valueToPreference()
 
 observe = ->
