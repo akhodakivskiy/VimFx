@@ -81,9 +81,18 @@ isElementEditable = (element) ->
          element instanceof HTMLTextAreaElement or \
          element instanceof HTMLSelectElement or \
          element instanceof XULMenuListElement or \
-         element.getAttribute('g_editable') == 'true' or \
-         element.getAttribute('contenteditable')?.toLowerCase() == 'true' or \
+         element.ownerDocument?.designMode?.toLowerCase() == 'on' or \
+         element.getAttribute?('g_editable') == 'true' or \
+         element.getAttribute?('contenteditable')?.toLowerCase() == 'true' or \
          element.ownerDocument?.designMode?.toLowerCase() == 'on'
+
+isElementVisible = (element) ->
+  document = element.ownerDocument
+  window   = document.defaultView
+  computedStyle = window.getComputedStyle(element, null)
+  return computedStyle.getPropertyValue('visibility') == 'visible' and \
+    computedStyle.getPropertyValue('display') != 'none' and \
+    computedStyle.getPropertyValue('opacity') != '0'
 
 getWindowId = (window) ->
   return window
@@ -213,39 +222,56 @@ isBlacklisted = (str) ->
 
 # Returns all rules in the blacklist that match the provided string
 getMatchingBlacklistRules = (str) ->
-  matchingRules = []
-  for rule in getBlacklist()
-    # Wildcards: * and !
-    regexifiedRule = regexpEscape(rule).replace(/\\\*/g, '.*').replace(/!/g, '.')
-    if str.match(///^#{ regexifiedRule }$///)
-      matchingRules.push(rule)
-
-  return matchingRules
+  return getBlacklist().filter((rule) -> /// ^#{ simpleWildcards(rule) }$ ///i.test(str))
 
 getBlacklist = ->
-  return splitBlacklistString(getPref('black_list'))
+  return splitListString(getPref('black_list'))
 
 setBlacklist = (blacklist) ->
-  setPref('black_list', blacklist.join(', '))
+  setPref('black_list', blacklist.join(','))
 
-splitBlacklistString = (str) ->
-  # Comma/space separated list
-  return str.split(/[\s,]+/)
-
-updateBlacklist = ({ add, remove} = {}) ->
+updateBlacklist = ({ add, remove } = {}) ->
   blacklist = getBlacklist()
 
   if add
-    blacklist.push(splitBlacklistString(add)...)
+    blacklist.push(splitListString(add)...)
 
   blacklist = blacklist.filter((rule) -> rule != '')
   blacklist = removeDuplicates(blacklist)
 
   if remove
-    for rule in splitBlacklistString(remove) when rule in blacklist
+    for rule in splitListString(remove) when rule in blacklist
       blacklist.splice(blacklist.indexOf(rule), 1)
 
   setBlacklist(blacklist)
+
+# Splits a comma/space separated list into an array
+splitListString = (str) ->
+  return str.split(/\s*,[\s,]*/)
+
+# Prepares a string to be used in a regexp, where "*" matches zero or more characters
+# and "!" matches one character.
+simpleWildcards = (string) ->
+  return regexpEscape(string).replace(/\\\*/g, '.*').replace(/!/g, '.')
+
+# Returns the first element that matches a pattern, favoring earlier patterns.
+# The patterns are `simpleWildcards`s and must match either in the beginning or
+# at the end of the text of the element. Moreover, a pattern does not match in
+# the middle of words, so "previous" does not match "previously". If that is
+# desired, a pattern such as "previous*" can be used instead.
+# Note: We cannot use `\b` word boundaries, because they don’t work well with
+# non-English characters. Instead we match a space as word boundary. Therefore
+# we normalize the whitespace and add spaces at the edges of the element text.
+getBestPatternMatch = (patterns, elements) ->
+  for pattern in patterns
+    wildcarded = simpleWildcards(pattern)
+    regexp = /// ^\s(?:#{ wildcarded })\s | \s(?:#{ wildcarded })\s$ ///i
+    for element in elements
+      text = " #{ element.textContent } ".replace(/\s+/g, ' ')
+      if regexp.test(text)
+        return element
+
+  return null
 
 # Gets VimFx verions. AddonManager only provides async API to access addon data, so it's a bit tricky...
 getVersion = do ->
@@ -319,18 +345,68 @@ removeDuplicates = (array) ->
   seen = {}
   return array.filter((item) -> if seen[item] then false else (seen[item] = true))
 
-# Returns elements that qualify as links
-# Generates and memoizes an XPath query internally
-getDomElements = (elements) ->
-  reduce = (m, rule) -> m.concat(["//#{ rule }", "//xhtml:#{ rule }"])
-  xpath = elements.reduce(reduce, []).join(' | ')
+ACTION_ELEMENT_TAGS = [
+  "a"
+  "area[@href]"
+  "button"
+]
+
+ACTION_ELEMENT_PROPERTIES = [
+  "@onclick"
+  "@onmousedown"
+  "@onmouseup"
+  "@oncommand"
+  "@role='link'"
+  "@role='button'"
+  "contains(@class, 'button')"
+  "contains(@class, 'js-new-tweets-bar')"
+]
+
+EDITABLE_ELEMENT_TAGS = [
+  "textarea"
+  "select"
+  "input[not(@type='hidden' or @disabled)]"
+]
+
+EDITABLE_ELEMENT_PROPERTIES = [
+  "@contenteditable=''"
+  "translate(@contenteditable, 'TRUE', 'true')='true'"
+]
+
+FOCUSABLE_ELEMENT_TAGS = [
+  "iframe"
+  "embed"
+  "object"
+]
+
+FOCUSABLE_ELEMENT_PROPERTIES = [
+  "@tabindex"
+]
+
+getMarkableElements = do ->
+  xpathify = (tags, properties)->
+    return tags
+      .concat("*[#{ properties.join(' or ') }]")
+      .map((rule) -> "//#{ rule } | //xhtml:#{ rule }")
+      .join(" | ")
+
+  xpaths =
+    action:    xpathify(ACTION_ELEMENT_TAGS,    ACTION_ELEMENT_PROPERTIES   )
+    editable:  xpathify(EDITABLE_ELEMENT_TAGS,  EDITABLE_ELEMENT_PROPERTIES )
+    focusable: xpathify(FOCUSABLE_ELEMENT_TAGS, FOCUSABLE_ELEMENT_PROPERTIES)
+    all: xpathify(
+      [ACTION_ELEMENT_TAGS...,       EDITABLE_ELEMENT_TAGS...,       FOCUSABLE_ELEMENT_TAGS...      ],
+      [ACTION_ELEMENT_PROPERTIES..., EDITABLE_ELEMENT_PROPERTIES..., FOCUSABLE_ELEMENT_PROPERTIES...]
+    )
 
   namespaceResolver = (namespace) ->
     if namespace == 'xhtml' then 'http://www.w3.org/1999/xhtml' else null
 
   # The actual function that will return the desired elements
-  return (document, resultType = XPathResult.ORDERED_NODE_SNAPSHOT_TYPE) ->
-    return document.evaluate(xpath, document.documentElement, namespaceResolver, resultType, null)
+  return (document, { type }, resultType = XPathResult.ORDERED_NODE_SNAPSHOT_TYPE) ->
+    result = document.evaluate(xpaths[type], document.documentElement, namespaceResolver, resultType, null)
+    return (result.snapshotItem(i) for i in [0...result.snapshotLength] by 1)
+
 
 exports.Bucket                    = Bucket
 exports.getEventWindow            = getEventWindow
@@ -343,6 +419,7 @@ exports.getWindowId               = getWindowId
 exports.blurActiveElement         = blurActiveElement
 exports.isTextInputElement        = isTextInputElement
 exports.isElementEditable         = isElementEditable
+exports.isElementVisible          = isElementVisible
 exports.getSessionStore           = getSessionStore
 
 exports.loadCss                   = loadCss
@@ -359,6 +436,8 @@ exports.timeIt                    = timeIt
 exports.getMatchingBlacklistRules = getMatchingBlacklistRules
 exports.isBlacklisted             = isBlacklisted
 exports.updateBlacklist           = updateBlacklist
+exports.splitListString           = splitListString
+exports.getBestPatternMatch       = getBestPatternMatch
 
 exports.getVersion                = getVersion
 exports.parseHTML                 = parseHTML
@@ -366,7 +445,8 @@ exports.createElement             = createElement
 exports.isURL                     = isURL
 exports.browserSearchSubmission   = browserSearchSubmission
 exports.getHintChars              = getHintChars
+exports.removeDuplicates          = removeDuplicates
 exports.removeDuplicateCharacters = removeDuplicateCharacters
 exports.getResourceURI            = getResourceURI
-exports.getDomElements            = getDomElements
+exports.getMarkableElements       = getMarkableElements
 exports.ADDON_ID                  = ADDON_ID

@@ -11,35 +11,6 @@ XULDocument  = Ci.nsIDOMXULDocument
 CONTAINER_ID  = 'VimFxHintMarkerContainer'
 Z_INDEX_START = 100000000 # The highest `z-index` used in style.css plus one
 
-# All the following elements qualify for their own marker in hints mode
-MARKABLE_ELEMENTS = [
-  "a"
-  "iframe"
-  "area[@href]"
-  "textarea"
-  "button"
-  "select"
-  "input[not(@type='hidden' or @disabled)]"
-  "embed"
-  "object"
-]
-
-# All elements that have one or more of the following properties
-# qualify for their own marker in hints mode
-MARKABLE_ELEMENT_PROPERTIES = [
-  "@tabindex"
-  "@onclick"
-  "@onmousedown"
-  "@onmouseup"
-  "@oncommand"
-  "@role='link'"
-  "@role='button'"
-  "contains(@class, 'button')"
-  "contains(@class, 'js-new-tweets-bar')"
-  "@contenteditable='' or translate(@contenteditable, 'TRUE', 'true')='true'"
-]
-
-
 # Remove previously injected hints from the DOM
 removeHints = (document) ->
   document.getElementById(CONTAINER_ID)?.remove()
@@ -70,6 +41,7 @@ injectHints = (document) ->
 
   return markers
 
+
 insertHints = (markers) ->
   docFrags = []
 
@@ -92,7 +64,6 @@ insertHints = (markers) ->
     doc.documentElement.appendChild(container)
 
 
-# Creates and injects markers into the DOM
 createMarkers = (document) ->
   # For now we aren't able to handle hint markers in XUL Documents :(
   if document instanceof HTMLDocument # or document instanceof XULDocument
@@ -100,10 +71,9 @@ createMarkers = (document) ->
       # Select all markable elements in the document, create markers
       # for each of them, and position them on the page.
       # Note that the markers are not given hints.
-      set = getMarkableElements(document)
+      set = utils.getMarkableElements(document, {type: 'all'})
       markers = []
-      for i in [0...set.snapshotLength] by 1
-        element = set.snapshotItem(i)
+      for element in set
         if rect = getElementRect(element)
           marker = new Marker(element)
           marker.setPosition(rect.top, rect.left)
@@ -122,16 +92,6 @@ createHintsContainer = (document) ->
   return container
 
 
-# Returns elements that qualify for hint markers in hints mode.
-getMarkableElements = do ->
-  elements = [
-    MARKABLE_ELEMENTS...
-    "*[#{ MARKABLE_ELEMENT_PROPERTIES.join(' or ') }]"
-  ]
-
-  return utils.getDomElements(elements)
-
-
 # Uses `element.getBoundingClientRect()`. If that does not return a visible rectange, then looks at
 # the children of the markable node.
 #
@@ -142,13 +102,7 @@ getElementRect = (element) ->
   docElem  = document.documentElement
   body     = document.body
 
-  # Prune elements that aren't visible on the page
-  computedStyle = window.getComputedStyle(element, null)
-  if computedStyle
-    if computedStyle.getPropertyValue('visibility') != 'visible' or \
-       computedStyle.getPropertyValue('display') == 'none' or \
-       computedStyle.getPropertyValue('opacity') == '0'
-      return
+  return unless utils.isElementVisible(element)
 
   clientTop  = docElem.clientTop  or body?.clientTop  or 0
   clientLeft = docElem.clientLeft or body?.clientLeft or 0

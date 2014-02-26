@@ -3,19 +3,22 @@
 
 <!ENTITY pref.black_list.title      "Μαύρη Λίστα">
 <!ENTITY pref.black_list.desc       "Διευθύνσης διαχωρισμένες με κόμματα στις οποίες το VimFX θα είναι αυτόματα απενεργοποιημένο.
-Επιτρέπονται χαρακτήρες μπαλαντέρ: *, !. Example: *example.com*,*foobar.org*">
+Επιτρέπονται χαρακτήρες μπαλαντέρ: *, !. Παράδειγμα: *example.com*,*foobar.org*">
 
-<!ENTITY pref.prev_patterns.title   "Previous Page Patterns">
-<!ENTITY pref.prev_patterns.desc    "Comma separated list of patterns that match links to previous page">
+<!ENTITY pref.prev_patterns.title   "Patterns Προηγούμενης Σελίδας">
+<!ENTITY pref.prev_patterns.desc    "Λίστα patterns χωριζόμενες με κόμμα που αντιστοιχούν με συνδέσμους σε προηγούμενες σελίδες">
 
-<!ENTITY pref.next_patterns.title   "Next Page Patterns">
-<!ENTITY pref.next_patterns.desc    "Comma separated list of patterns that match links to next page">
+<!ENTITY pref.next_patterns.title   "Patterns Επόμενης Σελίδας">
+<!ENTITY pref.next_patterns.desc    "Λίστα patterns χωριζόμενες με κόμμα που αντιστοιχούν με συνδέσμους σε επόμενες σελίδες">
 
 <!ENTITY pref.scroll_step_lines.title "Βήμα Κύλισης">
 <!ENTITY pref.scroll_step_lines.desc  "Βήμα Κύλισης">
 
 <!ENTITY pref.hints_bloom_on.title "Έξυπνη ανάθεση υποδείξεων">
 <!ENTITY pref.hints_bloom_on.desc  "Ανάθεσε μικρότερες υποδείξεις στους συνδέσμους που οι χρήστες επισκέπτονται συχνότερα">
+
+<!ENTITY pref.prevent_autofocus.title "Prevent auto focusing inputs">
+<!ENTITY pref.prevent_autofocus.desc  "Inputs will not be focused when the page loads">
 
 <!ENTITY customizeButton.title "Συντομεύσεις Πληκτρολογίου">
 <!ENTITY customizeButton.label "Προσαρμογή">

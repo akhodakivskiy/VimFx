@@ -17,5 +17,8 @@
 <!ENTITY pref.hints_bloom_on.title "Умное распределение маркеров">
 <!ENTITY pref.hints_bloom_on.desc  "Назначать короткие маркеры ссылкам и элементам, которые часто используются">
 
+<!ENTITY pref.prevent_autofocus.title "Не фокусировать поля ввода автоматически">
+<!ENTITY pref.prevent_autofocus.desc  "Поля ввода не будут автоматически фокусироваться сразу после загрузки страницы">
+
 <!ENTITY customizeButton.title "Команды">
 <!ENTITY customizeButton.label "Настроить">
