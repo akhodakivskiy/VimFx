@@ -395,7 +395,9 @@ searchForMatchingCommand = (keys) ->
     str = keys[index..].join(',')
     for command in commands
       for key in command.keys()
-        if key.startsWith(str)
+        # The following hack is a workaround for the issue where # letter `c` 
+        # is considered a start of command with control modifier `c-xxx`
+        if "#{key},".startsWith("#{str},")
           return {match: true, exact: (key == str), command}
 
   return {match: false}
