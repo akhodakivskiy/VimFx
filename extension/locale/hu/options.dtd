@@ -2,21 +2,22 @@
 <!ENTITY pref.hint_chars.desc       "Alapértelmezett: fjdkslaghrueiwovncm">
 
 <!ENTITY pref.black_list.title      "Fekete lista">
-<!ENTITY pref.black_list.desc       "Vesszővel elválasztott URL-ek, ahol a VimFX inaktív legyen. Helyettesítő karakterek is használhatók: *, !. Alapértelmezett: *mail.google.com*">
+<!ENTITY pref.black_list.desc       "Vesszővel elválasztott URL-ek, ahol a VimFX inaktív legyen. Helyettesítő karakterek is használhatók: *, !. Example: *example.com*,*foobar.org*">
 
 <!ENTITY pref.prev_patterns.title   "Previous Page Patterns">
-<!ENTITY pref.prev_patterns.desc    "Comma separated list of patterns that match links to previous page.
-Default: prev,previous,back">
+<!ENTITY pref.prev_patterns.desc    "Comma separated list of patterns that match links to previous page">
 
 <!ENTITY pref.next_patterns.title   "Next Page Patterns">
-<!ENTITY pref.next_patterns.desc    "Comma separated list of patterns that match links to next page.
-Default: next,more">
+<!ENTITY pref.next_patterns.desc    "Comma separated list of patterns that match links to next page">
 
 <!ENTITY pref.scroll_step_lines.title   "Görgetés mértéke">
 <!ENTITY pref.scroll_step_lines.desc    "Görgetés mértéke">
 
 <!ENTITY pref.hints_bloom_on.title "Smart hint assignment (needs translation)">
 <!ENTITY pref.hints_bloom_on.desc  "Assign shorter hints to the links that users visit most often (needs translation)">
+
+<!ENTITY pref.prevent_autofocus.title "Prevent auto focusing inputs">
+<!ENTITY pref.prevent_autofocus.desc  "Inputs will not be focused when the page loads">
 
 <!ENTITY customizeButton.title "Keyboard Shortcuts">
 <!ENTITY customizeButton.label "Customize">

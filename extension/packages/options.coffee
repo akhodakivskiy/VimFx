@@ -8,8 +8,6 @@ help         = require 'help'
 
 observer =
   observe: (document, topic, addon) ->
-    return unless addon == getPref('addon_id')
-
     hintCharsInput = document.querySelector('setting[pref="extensions.VimFx.hint_chars"]')
     blacklistInput = document.querySelector('setting[pref="extensions.VimFx.black_list"]')
 
@@ -41,10 +39,10 @@ filterChars = (event) ->
 
 validatePatterns = (event) ->
   input = event.target
-  input.value = input.value.split(',')
-                    .map((pattern) -> pattern.trim())
-                    .filter((pattern) -> pattern != '')
-                    .join(',')
+  input.value =
+    utils.removeDuplicates(utils.splitListString(input.value))
+    .filter((pattern) -> pattern != '')
+    .join(',')
   input.valueToPreference()
 
 observe = ->

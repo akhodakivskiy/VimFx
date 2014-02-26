@@ -3,15 +3,13 @@
 
 <!ENTITY pref.black_list.title      "Стоп список">
 <!ENTITY pref.black_list.desc       "Список адесов, разделенных запятой, на которых VimFx не активен.
-Разрешены одстановки: *, !. По умолчанию: *mail.google.com*">
+Разрешены одстановки: *, !. Пример: *example.com*,*foobar.org*">
 
-<!ENTITY pref.prev_patterns.title   "Previous Page Patterns">
-<!ENTITY pref.prev_patterns.desc    "Comma separated list of patterns that match links to previous page.
-Default: prev,previous,back">
+<!ENTITY pref.prev_patterns.title   "Шаблоны ссылок на следующую страницу">
+<!ENTITY pref.prev_patterns.desc    "Тексты ссылок на следующую страницу (разделенные запятой)">
 
-<!ENTITY pref.next_patterns.title   "Next Page Patterns">
-<!ENTITY pref.next_patterns.desc    "Comma separated list of patterns that match links to next page.
-Default: next,more">
+<!ENTITY pref.next_patterns.title   "Шаблоны ссылок на предыдущую страницу">
+<!ENTITY pref.next_patterns.desc    "Тексты ссылок на предыдущую страницу (разделенные запятой)">
 
 <!ENTITY pref.scroll_step_lines.title   "Шаг прокрутки страницы">
 <!ENTITY pref.scroll_step_lines.desc    "По умолчанию: 6">
@@ -19,5 +17,8 @@ Default: next,more">
 <!ENTITY pref.hints_bloom_on.title "Умное распределение маркеров">
 <!ENTITY pref.hints_bloom_on.desc  "Назначать короткие маркеры ссылкам и элементам, которые часто используются">
 
-<!ENTITY customizeButton.title "Keyboard Shortcuts">
-<!ENTITY customizeButton.label "Customize">
+<!ENTITY pref.prevent_autofocus.title "Не фокусировать поля ввода автоматически">
+<!ENTITY pref.prevent_autofocus.desc  "Поля ввода не будут автоматически фокусироваться сразу после загрузки страницы">
+
+<!ENTITY customizeButton.title "Команды">
+<!ENTITY customizeButton.label "Настроить">

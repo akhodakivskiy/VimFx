@@ -7,6 +7,8 @@ keyUtils                = require 'key-utils'
 
 { interfaces: Ci } = Components
 
+HTMLDocument = Ci.nsIDOMHTMLDocument
+
 vimBucket = new utils.Bucket(utils.getWindowId, (w) -> new Vim(w))
 
 keyStrFromEvent = (event) ->
@@ -19,8 +21,8 @@ keyStrFromEvent = (event) ->
 
   return null
 
-# Passthrough mode is activated when VimFx should temporarily stop processing keyboard input, for
-# example when a menu is shown.
+# When a menu or panel is shown VimFx should temporarily stop processing keyboard input, allowing
+# accesskeys to be used.
 popupPassthrough = false
 checkPassthrough = (event) ->
   if event.target.nodeName in ['menupopup', 'panel']
@@ -30,9 +32,8 @@ checkPassthrough = (event) ->
 
 suppress = false
 suppressEvent = (event) ->
-  if suppress
-    event.preventDefault()
-    event.stopPropagation()
+  event.preventDefault()
+  event.stopPropagation()
 
 removeVimFromTab = (tab, gBrowser) ->
   return unless browser = gBrowser.getBrowserForTab(tab)
@@ -49,9 +50,18 @@ windowsListeners =
       # No matter what, always reset the `suppress` flag, so we don't suppress more than intended.
       suppress = false
 
-      # Suppress popup passthrough mode if there is no passthrough mode on the root document
-      return if popupPassthrough and !!utils.getEventRootWindow(event).document.popupNode
       return if getPref('disabled')
+
+      if popupPassthrough
+        # The `popupPassthrough` flag is set a bit unreliably. Sometimes it can be stuck as `true`
+        # even though no popup is shown, effectively disabling the extension. Therefore we check
+        # if there actually _are_ any open popups before stopping processing keyboard input. This is
+        # only done when popups (might) be open (not on every keystroke) of performance reasons.
+        return unless rootWindow = utils.getEventRootWindow(event)
+        popups = rootWindow.document.querySelectorAll('menupopup, panel')
+        for popup in popups
+          return if popup.state == 'open'
+        popupPassthrough = false # No popup was actually open: Reset the flag.
 
       return unless window = utils.getEventCurrentTabWindow(event)
       return unless vim = vimBucket.get(window)
@@ -61,10 +71,10 @@ windowsListeners =
       return unless keyStr = keyStrFromEvent(event)
       suppress = vim.onInput(keyStr, event)
 
-      suppressEvent(event)
+      suppressEvent(event) if suppress
 
     catch error
-      console.error("#{ error }\n#{ error.stack.replace(/@.+-> /g, '@') }")
+      console.error("#{ error }\n#{ error.stack?.replace(/@.+-> /g, '@') }")
 
   # Note that the below event listeners can suppress the event even in blacklisted sites. That's
   # intentional. For example, if you press 'x' to close the current tab, it will close before keyup
@@ -72,11 +82,38 @@ windowsListeners =
   # blacklisted, we must suppress the event, so that 'x' isn't sent to the page. The rule is simple:
   # If the `suppress` flag is `true`, the event should be suppressed, no matter what. It has the
   # highest priority.
-  keypress: suppressEvent
-  keyup:    suppressEvent
+  keypress: (event) -> suppressEvent(event) if suppress
+  keyup: (event) -> suppressEvent(event) if suppress
 
   popupshown:  checkPassthrough
   popuphidden: checkPassthrough
+  
+  focus: (event) ->
+    return if getPref('disabled') or getPref('prevent_autofocus')
+    return unless target = event.originalTarget
+    return unless target.ownerDocument instanceof HTMLDocument
+    return unless window = utils.getEventCurrentTabWindow(event)
+    return unless vim = vimBucket.get(window)
+    return unless isEditable = utils.isElementEditable(target)
+    return unless lastLoad = vim.storage.lastLoad
+
+    if (new Date().getTime() - lastLoad.getTime()) < 1000
+      console.log("blur")
+      vim.storage.lastLoad = undefined
+      window.setTimeout((-> target.blur()), 0)
+
+  DOMContentLoaded: (event) ->
+    return if getPref('disabled') or getPref('prevent_autofocus')
+    return unless window = utils.getEventCurrentTabWindow(event)
+    return unless vim = vimBucket.get(window)
+    if vim.storage.location != window.location.href
+      vim.storage.location = window.location.href
+      vim.storage.lastLoad = new Date
+
+    if vim.storage.lastLoad && activeElement = window.document.activeElement
+      console.log("blur")
+      vim.storage.lastLoad = undefined
+      window.setTimeout((-> activeElement.blur()), 0)
 
   # When the top level window closes we should release all Vims that were
   # associated with tabs in this window
@@ -95,6 +132,7 @@ windowsListeners =
     return unless window = event.originalTarget?.linkedBrowser?.contentDocument?.defaultView
     return unless vim = vimBucket.get(window)
     updateButton(vim)
+
 
 # This listener works on individual tabs within Chrome Window
 tabsListener =

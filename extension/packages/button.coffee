@@ -42,20 +42,19 @@ addToolbarButton = (vimBucket, window) ->
   win.appendChild(keyset)
 
   unload ->
-    if buttonParent = button.parentNode
-      buttonParent.removeChild(button)
-    if keysetParent = keyset.parentNode
-      keysetParent.removeChild(keyset)
+    button.remove()
+    keyset.remove()
     $(document, 'navigator-toolbox').palette.removeChild(button)
 
 createButton = (vimBucket, window) ->
   document = window.document
 
-  button = document.createElement('toolbarbutton')
-  button.setAttribute('id', BUTTON_ID)
-  button.setAttribute('type', 'menu-button')
-  button.setAttribute('label', 'VimFx')
-  button.setAttribute('class', 'toolbarbutton-1')
+  button = utils.createElement(document, 'toolbarbutton', {
+    id: BUTTON_ID
+    type: 'menu-button'
+    label: 'VimFx'
+    class: 'toolbarbutton-1'
+  })
 
   menupopup = createMenupopup(window, button)
 
@@ -77,15 +76,15 @@ createButton = (vimBucket, window) ->
 
   button.addEventListener('command', onButtonCommand, false)
 
-  vimkey = document.createElement('key')
-  vimkey.setAttribute('id', KEY_ID)
-  vimkey.setAttribute('key', 'V')
-  vimkey.setAttribute('modifiers', 'shift,alt')
-  vimkey.setAttribute('oncommand', 'void(0);')
+  vimkey = utils.createElement(document, 'key', {
+    id: KEY_ID
+    key: 'V'
+    modifiers: 'shift,alt'
+    oncommand: 'void(0);'
+  })
   vimkey.addEventListener('command', onButtonCommand, false)
 
-  keyset = document.createElement('keyset')
-  keyset.setAttribute('id', KEYSET_ID)
+  keyset = utils.createElement(document, 'keyset', {id: KEYSET_ID})
   keyset.appendChild(vimkey)
 
   return [button, keyset]
@@ -93,27 +92,32 @@ createButton = (vimBucket, window) ->
 createMenupopup = (window, button) ->
   document = window.document
 
-  blacklistTextbox = document.createElement('textbox')
-  blacklistTextbox.id = TEXTBOX_BLACKLIST_ID
-  blacklistButton = document.createElement('toolbarbutton')
-  blacklistButton.id = BUTTON_BLACKLIST_ID
-  blacklistButton.setAttribute('class', 'toolbarbutton-1')
-  hbox = document.createElement('hbox')
-  hbox.appendChild(blacklistTextbox)
-  hbox.appendChild(blacklistButton)
+  blacklistTextbox = utils.createElement(document, 'textbox', {
+    id: TEXTBOX_BLACKLIST_ID
+  })
+  blacklistButton  = utils.createElement(document, 'toolbarbutton', {
+    id: BUTTON_BLACKLIST_ID
+    class: 'toolbarbutton-1'
+  })
+  blacklistControls = utils.createElement(document, 'hbox')
+  blacklistControls.appendChild(blacklistTextbox)
+  blacklistControls.appendChild(blacklistButton)
 
-  itemPreferences = document.createElement('menuitem')
-  itemPreferences.id = MENU_ITEM_PREF
-  itemPreferences.setAttribute('label', _('item_preferences'))
+  itemPreferences = utils.createElement(document, 'menuitem', {
+    id: MENU_ITEM_PREF
+    label: _('item_preferences')
+  })
 
-  itemHelp = document.createElement('menuitem')
-  itemHelp.id = MENU_ITEM_HELP
-  itemHelp.setAttribute('label', _('help_title'))
+  itemHelp = utils.createElement(document, 'menuitem', {
+    id: MENU_ITEM_HELP
+    label: _('help_title')
+  })
 
-  menupopup = document.createElement('menupopup')
-  menupopup.id = MENUPOPUP_ID
-  menupopup.setAttribute('ignorekeys', true)
-  menupopup.appendChild(hbox)
+  menupopup = utils.createElement(document, 'menupopup', {
+    id: MENUPOPUP_ID
+    ignorekeys: true
+  })
+  menupopup.appendChild(blacklistControls)
   menupopup.appendChild(itemPreferences)
   menupopup.appendChild(itemHelp)
 
@@ -148,7 +152,7 @@ createMenupopup = (window, button) ->
     event.stopPropagation()
 
   onPreferencesCommand = (event) ->
-    id = encodeURIComponent(getPref('addon_id'))
+    id = encodeURIComponent(utils.ADDON_ID)
     window.BrowserOpenAddonsMgr("addons://detail/#{ id }/preferences")
 
     event.stopPropagation()

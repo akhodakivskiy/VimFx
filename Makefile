@@ -10,7 +10,7 @@ coffee_files += $(shell find extension/packages -type f -name '*.coffee')
 
 js_files = $(coffee_files:.coffee=.js)
 
-zip_files = chrome.manifest icon.png install.rdf options.xul resources locale
+zip_files = chrome.manifest icon.png install.rdf options.xul resources locale defaults
 zip_files += $(subst extension/,,$(js_files))
 
 all: clean gen zip

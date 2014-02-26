@@ -4,20 +4,8 @@
 
 PREF_BRANCH = 'extensions.VimFx.'
 
-# Default values for the preference
-# All used preferences should be mentioned here becuase
-# preference type is derived from here
-DEFAULT_PREF_VALUES =
-  addon_id:           'VimFx@akhodakivskiy.github.com'
-  hint_chars:         'fjdkslaghrueiwovncm' # preferably use letters only
-  prev_patterns:      'prev,previous,back,older,<,«,<<'
-  next_patterns:      'next,more,newer,>,»,>>'
-  disabled:           false
-  scroll_step_lines:  6
-  black_list:         '*mail.google.com*'
-  hints_bloom_data:   ''
-  hints_bloom_on:     true
-
+# Default values for preferences are now specified in 
+# defaults/preferences/defaults.js
 
 getBranchPref = (branch, key, defaultValue) ->
   type = branch.getPrefType(key)
@@ -45,8 +33,7 @@ getPref = do ->
   branch = prefs.getBranch(PREF_BRANCH)
 
   return (key, defaultValue = undefined) ->
-    value = getBranchPref(branch, key, defaultValue)
-    return if value == undefined then getDefaultPref(key) else value
+    return getBranchPref(branch, key, defaultValue)
 
 # Unicode String
 getComplexPref = do ->
@@ -54,10 +41,7 @@ getComplexPref = do ->
   branch = prefs.getBranch(PREF_BRANCH)
 
   return (key) ->
-    value = branch.getComplexValue(key, Ci.nsISupportsString).data
-    value ? getDefaultPref(key)
-
-getDefaultPref = (key) -> return DEFAULT_PREF_VALUES[key]
+    return branch.getComplexValue(key, Ci.nsISupportsString).data
 
 getFirefoxPref = do ->
   prefs = Cc['@mozilla.org/preferences-service;1'].getService(Ci.nsIPrefService)
@@ -82,15 +66,8 @@ setPref = do ->
       else
         branch.clearUserPref(key)
 
-initPrefValues = ->
-  for key, value of DEFAULT_PREF_VALUES
-    if not isPrefSet(key)
-      setPref(key, value)
-
 exports.isPrefSet         = isPrefSet
 exports.getPref           = getPref
 exports.getComplexPref    = getComplexPref
-exports.getDefaultPref    = getDefaultPref
 exports.getFirefoxPref    = getFirefoxPref
 exports.setPref           = setPref
-exports.initPrefValues    = initPrefValues
