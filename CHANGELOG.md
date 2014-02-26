@@ -1,5 +1,10 @@
 # Change Log
 
+0.5.6 (Feb 26 2014)
+
+- Updated some translations
+- Updated pagination patterns and logic
+
 0.5.5 (Jan 3 2014)
 
 - Hotfix release to address a bug that has been introduced in 0.5.4
