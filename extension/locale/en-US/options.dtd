@@ -17,5 +17,8 @@ Wildcards allowed: *, !. Example: *example.com*,*foobar.org*">
 <!ENTITY pref.hints_bloom_on.title "Smart hint assignment">
 <!ENTITY pref.hints_bloom_on.desc  "Assign shorter hints to the links that users visit most often">
 
+<!ENTITY pref.prevent_autofocus.title "Prevent auto focusing inputs">
+<!ENTITY pref.prevent_autofocus.desc  "Inputs will not be focused when the page loads">
+
 <!ENTITY customizeButton.title "Keyboard Shortcuts">
 <!ENTITY customizeButton.label "Customize">

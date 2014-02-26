@@ -16,5 +16,8 @@
 <!ENTITY pref.hints_bloom_on.title "Intelligente Hinweiszuweisung">
 <!ENTITY pref.hints_bloom_on.desc  "Oft besuchten Links kürzere Hinweise zuweisen">
 
+<!ENTITY pref.prevent_autofocus.title "Prevent auto focusing inputs">
+<!ENTITY pref.prevent_autofocus.desc  "Inputs will not be focused when the page loads">
+
 <!ENTITY customizeButton.title "Keyboard Shortcuts">
 <!ENTITY customizeButton.label "Customize">
