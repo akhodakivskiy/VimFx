@@ -68,7 +68,7 @@ blurActiveElement = (window) ->
   # really needed? What if a website has made more elements focusable -- shouldn't those also be
   # blurred?
   { activeElement } = window.document
-  if isElementEditable(activeElement)
+  if activeElement and isElementEditable(activeElement)
     activeElement.blur()
 
 isTextInputElement = (element) ->
@@ -89,10 +89,10 @@ isElementEditable = (element) ->
 isElementVisible = (element) ->
   document = element.ownerDocument
   window   = document.defaultView
-  computedStyle = window.getComputedStyle(element, null)
-  return computedStyle.getPropertyValue('visibility') == 'visible' and \
-    computedStyle.getPropertyValue('display') != 'none' and \
-    computedStyle.getPropertyValue('opacity') != '0'
+  if computedStyle = window.getComputedStyle(element, null)
+    return computedStyle.getPropertyValue('visibility') == 'visible' and \
+      computedStyle.getPropertyValue('display') != 'none' and \
+      computedStyle.getPropertyValue('opacity') != '0'
 
 getWindowId = (window) ->
   return window
