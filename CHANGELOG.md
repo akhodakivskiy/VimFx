@@ -1,5 +1,9 @@
 # Change Log
 
+0.5.7 (Mar 3 2014)
+
+- Bug fix
+
 0.5.6 (Feb 26 2014)
 
 - Updated some translations
