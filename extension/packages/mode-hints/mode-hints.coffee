@@ -6,11 +6,11 @@ hints = require 'mode-hints/hints'
 exports.mode_hints =
   onEnter: (vim, storage, callback) ->
     markers = hints.injectHints(vim.window.document)
-    if markers.length == 0
-      vim.enterMode('normal')
-    else
+    if markers?.length > 0
       storage.markers  = markers
       storage.callback = callback
+    else
+      vim.enterMode('normal')
 
   onLeave: (vim, storage) ->
     hints.removeHints(vim.window.document)
