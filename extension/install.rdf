@@ -86,5 +86,12 @@
         <em:description>Shortcut keyboard Vim untuk Firefox</em:description>
       </Description>
     </em:localized>
+
+    <em:localized>
+      <Description>
+        <em:locale>it</em:locale>
+        <em:description>Comandi Vim per Firefox</em:description>
+      </Description>
+    </em:localized>
   </Description>
 </RDF>
