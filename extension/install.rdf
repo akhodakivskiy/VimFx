@@ -94,4 +94,11 @@
       </Description>
     </em:localized>
   </Description>
+
+    <em:localized>
+      <Description>
+        <em:locale>sk</em:locale>
+        <em:description>Vim klávesové skratky pre Firefox</em:description>
+      </Description>
+    </em:localized>
 </RDF>
