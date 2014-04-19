@@ -1,5 +1,9 @@
 # Change Log
 
+0.5.8 (Apr 18 2014)
+
+AMO Preliminary Review bug fix (sorry for such long delay)
+
 0.5.7 (Mar 3 2014)
 
 - Bug fix
