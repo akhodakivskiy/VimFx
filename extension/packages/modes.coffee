@@ -23,8 +23,7 @@ modes['normal'] =
 
     if match
       if exact
-        commandStorage = storage.commands[command.name] ?= {}
-        command.func(vim, commandStorage, event)
+        command.func(vim, event)
         storage.keys.length = 0
       return true
     else

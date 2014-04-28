@@ -269,22 +269,22 @@ command_help = (vim) ->
 findStorage = { lastSearchString: '' }
 
 # Switch into find mode
-command_find = (vim, storage) ->
+command_find = (vim) ->
   vim.enterMode('find', { highlight: false })
 
 # Switch into find mode with highlighting
-command_find_hl = (vim, storage) ->
+command_find_hl = (vim) ->
   vim.enterMode('find', { highlight: true })
 
 # Search for the last pattern
-command_find_next = (vim, storage) ->
+command_find_next = (vim) ->
   if findBar = utils.getRootWindow(vim.window).gBrowser.getFindBar()
     if findStorage.lastSearchString.length > 0
       findBar._findField.value = findStorage.lastSearchString
       findBar.onFindAgainCommand(false)
 
 # Search for the last pattern backwards
-command_find_prev = (vim, storage) ->
+command_find_prev = (vim) ->
   if findBar = utils.getRootWindow(vim.window).gBrowser.getFindBar()
     if findStorage.lastSearchString.length > 0
       findBar._findField.value = findStorage.lastSearchString
@@ -293,7 +293,7 @@ command_find_prev = (vim, storage) ->
 command_insert_mode = (vim) ->
   vim.enterMode('insert')
 
-command_Esc = (vim, storage, event) ->
+command_Esc = (vim, event) ->
   utils.blurActiveElement(vim.window)
 
   # Blur active XUL control
@@ -393,7 +393,7 @@ searchForMatchingCommand = (keys) ->
     str = keys[index..].join(',')
     for command in commands
       for key in command.keys()
-        # The following hack is a workaround for the issue where # letter `c` 
+        # The following hack is a workaround for the issue where # letter `c`
         # is considered a start of command with control modifier `c-xxx`
         if "#{key},".startsWith("#{str},")
           return {match: true, exact: (key == str), command}
