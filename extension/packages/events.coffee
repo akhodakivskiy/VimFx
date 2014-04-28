@@ -40,8 +40,7 @@ removeVimFromTab = (tab, gBrowser) ->
   vimBucket.forget(browser.contentWindow)
 
 updateButton = (vim) ->
-  return unless rootWindow = utils.getRootWindow(vim.window)
-  updateToolbarButton(rootWindow, {blacklisted: vim.blacklisted, insertMode: vim.mode == 'insert'})
+  updateToolbarButton(vim.rootWindow, {blacklisted: vim.blacklisted, insertMode: vim.mode == 'insert'})
 
 # The following listeners are installed on every top level Chrome window
 windowsListeners =
@@ -87,7 +86,7 @@ windowsListeners =
 
   popupshown:  checkPassthrough
   popuphidden: checkPassthrough
-  
+
   focus: (event) ->
     return if getPref('disabled') or getPref('prevent_autofocus')
     return unless target = event.originalTarget

@@ -31,11 +31,9 @@ modes['normal'] =
 
 modes['insert'] =
   onEnter: (vim) ->
-    return unless rootWindow = utils.getRootWindow(vim.window)
-    updateToolbarButton(rootWindow, {insertMode: true})
+    updateToolbarButton(vim.rootWindow, {insertMode: true})
   onLeave: (vim) ->
-    return unless rootWindow = utils.getRootWindow(vim.window)
-    updateToolbarButton(rootWindow, {insertMode: false})
+    updateToolbarButton(vim.rootWindow, {insertMode: false})
     utils.blurActiveElement(vim.window)
   onInput: (vim, storage, keyStr) ->
     if isEscCommandKey(keyStr)

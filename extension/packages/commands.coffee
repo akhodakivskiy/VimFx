@@ -11,20 +11,17 @@ help  = require 'help'
 
 # Open developer toolbar (Default shotrcut: Shift-F2)
 command_dev = (vim) ->
-  if chromeWindow = utils.getRootWindow vim.window
-    chromeWindow.DeveloperToolbar.show(true)
-    chromeWindow.DeveloperToolbar.focus()
+  vim.rootWindow.DeveloperToolbar.show(true)
+  vim.rootWindow.DeveloperToolbar.focus()
 
 # Focus the Address Bar
 command_focus = (vim) ->
-  if chromeWindow = utils.getRootWindow(vim.window)
-    chromeWindow.focusAndSelectUrlBar()
+  vim.rootWindow.focusAndSelectUrlBar()
 
 # Focus the Search Bar
 command_focus_search = (vim) ->
-  if chromeWindow = utils.getRootWindow(vim.window)
-    if searchBar = chromeWindow.document.getElementById("searchbar")
-      searchBar.select()
+  if searchBar = vim.rootWindow.document.getElementById("searchbar")
+    searchBar.select()
 
 # Navigate to the address that is currently stored in the system clipboard
 command_paste = (vim) ->
@@ -34,8 +31,7 @@ command_paste = (vim) ->
     url = submission.uri.spec
     { postData } = submission
 
-  if chromeWindow = utils.getRootWindow(vim.window)
-    chromeWindow.gBrowser.loadURIWithFlags(url, null, null, null, postData)
+  vim.rootWindow.gBrowser.loadURIWithFlags(url, null, null, null, postData)
 
 # Open new tab and navigate to the address that is currently stored in the system clipboard
 command_paste_tab = (vim) ->
@@ -45,13 +41,11 @@ command_paste_tab = (vim) ->
     url = submission.uri.spec
     { postData } = submission
 
-  if chromeWindow = utils.getRootWindow vim.window
-    chromeWindow.gBrowser.selectedTab = chromeWindow.gBrowser.addTab(url, null, null, postData, null, false)
+  vim.rootWindow.gBrowser.selectedTab = vim.rootWindow.gBrowser.addTab(url, null, null, postData, null, false)
 
 # Open new tab and focus the address bar
 command_open_tab = (vim) ->
-  if chromeWindow = utils.getRootWindow(vim.window)
-    chromeWindow.BrowserOpenTab()
+  vim.rootWindow.BrowserOpenTab()
 
 # Copy element URL to the clipboard
 command_marker_yank = (vim) ->
@@ -84,29 +78,26 @@ command_reload_force = (vim) ->
 
 # Reload the page, possibly from cache
 command_reload_all = (vim) ->
-  if rootWindow = utils.getRootWindow(vim.window)
-    if tabs = rootWindow.gBrowser.tabContainer
-      for i in [0...tabs.itemCount]
-        window = tabs.getItemAtIndex(i).linkedBrowser.contentWindow
-        window.location.reload(false)
+  if tabs = vim.rootWindow.gBrowser.tabContainer
+    for i in [0...tabs.itemCount]
+      window = tabs.getItemAtIndex(i).linkedBrowser.contentWindow
+      window.location.reload(false)
 
 # Reload the page from the server
 command_reload_all_force = (vim) ->
-  if rootWindow = utils.getRootWindow(vim.window)
-    if tabs = rootWindow.gBrowser.tabContainer
-      for i in [0...tabs.itemCount]
-        window = tabs.getItemAtIndex(i).linkedBrowser.contentWindow
-        window.location.reload(true)
+  if tabs = vim.rootWindow.gBrowser.tabContainer
+    for i in [0...tabs.itemCount]
+      window = tabs.getItemAtIndex(i).linkedBrowser.contentWindow
+      window.location.reload(true)
 
 command_stop = (vim) ->
   vim.window.stop()
 
 command_stop_all = (vim) ->
-  if rootWindow = utils.getRootWindow(vim.window)
-    if tabs = rootWindow.gBrowser.tabContainer
-      for i in [0...tabs.itemCount]
-        window = tabs.getItemAtIndex(i).linkedBrowser.contentWindow
-        window.stop()
+  if tabs = vim.rootWindow.gBrowser.tabContainer
+    for i in [0...tabs.itemCount]
+      window = tabs.getItemAtIndex(i).linkedBrowser.contentWindow
+      window.stop()
 
 # Scroll to the top of the page
 command_scroll_to_top = (vim) ->
@@ -152,29 +143,24 @@ command_scroll_page_up = (vim) ->
 
 # Activate previous tab
 command_tab_prev = (vim) ->
-  if rootWindow = utils.getRootWindow(vim.window)
-    rootWindow.gBrowser.tabContainer.advanceSelectedTab(-1, true)
+  vim.rootWindow.gBrowser.tabContainer.advanceSelectedTab(-1, true)
 
 # Activate next tab
 command_tab_next = (vim) ->
-  if rootWindow = utils.getRootWindow(vim.window)
-    rootWindow.gBrowser.tabContainer.advanceSelectedTab(1, true)
+  vim.rootWindow.gBrowser.tabContainer.advanceSelectedTab(1, true)
 
 command_home = (vim) ->
   url = getFirefoxPref('browser.startup.homepage')
-  if chromeWindow = utils.getRootWindow(vim.window)
-    chromeWindow.gBrowser.loadURIWithFlags(url, null, null, null, null)
+  vim.rootWindow.gBrowser.loadURIWithFlags(url, null, null, null, null)
 
 # Go to the first tab
 command_tab_first = (vim) ->
-  if rootWindow = utils.getRootWindow(vim.window)
-    rootWindow.gBrowser.tabContainer.selectedIndex = 0
+  vim.rootWindow.gBrowser.tabContainer.selectedIndex = 0
 
 # Go to the last tab
 command_tab_last = (vim) ->
-  if rootWindow = utils.getRootWindow(vim.window)
-    itemCount = rootWindow.gBrowser.tabContainer.itemCount
-    rootWindow.gBrowser.tabContainer.selectedIndex = itemCount - 1
+  itemCount = vim.rootWindow.gBrowser.tabContainer.itemCount
+  vim.rootWindow.gBrowser.tabContainer.selectedIndex = itemCount - 1
 
 # Go back in history
 command_back = (vim) ->
@@ -186,16 +172,14 @@ command_forward = (vim) ->
 
 # Close current tab
 command_close_tab = (vim) ->
-  if rootWindow = utils.getRootWindow(vim.window)
-    unless rootWindow.gBrowser.selectedTab.pinned
-      rootWindow.gBrowser.removeCurrentTab()
+  unless vim.rootWindow.gBrowser.selectedTab.pinned
+    vim.rootWindow.gBrowser.removeCurrentTab()
 
 # Restore last closed tab
 command_restore_tab = (vim) ->
-  if rootWindow = utils.getRootWindow(vim.window)
-    ss = utils.getSessionStore()
-    if ss and ss.getClosedTabCount(rootWindow) > 0
-      ss.undoCloseTab(rootWindow, 0)
+  ss = utils.getSessionStore()
+  if ss and ss.getClosedTabCount(vim.rootWindow) > 0
+    ss.undoCloseTab(vim.rootWindow, 0)
 
 helper_follow = ({ inTab, multiple }, vim) ->
   callback = (matchedMarker, markers) ->
@@ -245,7 +229,7 @@ command_go_to_root = (vim) ->
 
 # Move current tab to the left
 command_tab_move_left = (vim) ->
-  if gBrowser = utils.getRootWindow(vim.window)?.gBrowser
+  if { gBrowser } = vim.rootWindow
     if tab = gBrowser.selectedTab
       index = gBrowser.tabContainer.selectedIndex
       total = gBrowser.tabContainer.itemCount
@@ -255,7 +239,7 @@ command_tab_move_left = (vim) ->
 
 # Move current tab to the right
 command_tab_move_right = (vim) ->
-  if gBrowser = utils.getRootWindow(vim.window)?.gBrowser
+  if { gBrowser } = vim.window
     if tab = gBrowser.selectedTab
       index = gBrowser.tabContainer.selectedIndex
       total = gBrowser.tabContainer.itemCount
@@ -278,14 +262,14 @@ command_find_hl = (vim) ->
 
 # Search for the last pattern
 command_find_next = (vim) ->
-  if findBar = utils.getRootWindow(vim.window).gBrowser.getFindBar()
+  if findBar = vim.rootWindow.gBrowser.getFindBar()
     if findStorage.lastSearchString.length > 0
       findBar._findField.value = findStorage.lastSearchString
       findBar.onFindAgainCommand(false)
 
 # Search for the last pattern backwards
 command_find_prev = (vim) ->
-  if findBar = utils.getRootWindow(vim.window).gBrowser.getFindBar()
+  if findBar = vim.rootWindow.gBrowser.getFindBar()
     if findStorage.lastSearchString.length > 0
       findBar._findField.value = findStorage.lastSearchString
       findBar.onFindAgainCommand(true)
@@ -302,11 +286,9 @@ command_Esc = (vim, event) ->
 
   help.removeHelp(vim.window.document)
 
-  return unless rootWindow = utils.getRootWindow(vim.window)
+  vim.rootWindow.DeveloperToolbar.hide()
 
-  rootWindow.DeveloperToolbar.hide()
-
-  rootWindow.gBrowser.getFindBar()?.close()
+  vim.rootWindow.gBrowser.getFindBar()?.close()
 
 
 class Command

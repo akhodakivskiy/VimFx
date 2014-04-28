@@ -5,6 +5,7 @@ utils                   = require 'utils'
 
 class Vim
   constructor: (@window) ->
+    @rootWindow = utils.getRootWindow(@window) # For convenience.
     @storage = {}
     @enterMode('normal')
 
