@@ -70,27 +70,23 @@ command_marker_focus = (vim) ->
 command_yank = (vim) ->
   utils.writeToClipboard(vim.window.location.href)
 
-# Reload the page, possibly from cache
+# Reload the current tab, possibly from cache
 command_reload = (vim) ->
-  vim.window.location.reload(false)
+  vim.rootWindow.BrowserReload()
 
-# Reload the page from the server
+# Reload the current tab, skipping cache
 command_reload_force = (vim) ->
-  vim.window.location.reload(true)
+  vim.rootWindow.BrowserReloadSkipCache()
 
-# Reload the page, possibly from cache
+# Reload all tabs, possibly from cache
 command_reload_all = (vim) ->
-  if tabs = vim.rootWindow.gBrowser.tabContainer
-    for i in [0...tabs.itemCount]
-      window = tabs.getItemAtIndex(i).linkedBrowser.contentWindow
-      window.location.reload(false)
+  vim.rootWindow.gBrowser.reloadAllTabs()
 
-# Reload the page from the server
+# Reload all tabs, skipping cache
 command_reload_all_force = (vim) ->
-  if tabs = vim.rootWindow.gBrowser.tabContainer
-    for i in [0...tabs.itemCount]
-      window = tabs.getItemAtIndex(i).linkedBrowser.contentWindow
-      window.location.reload(true)
+  for tab in vim.rootWindow.gBrowser.visibleTabs
+    window = tab.linkedBrowser.contentWindow
+    window.location.reload(true)
 
 command_stop = (vim) ->
   vim.window.stop()
