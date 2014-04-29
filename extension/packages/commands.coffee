@@ -49,14 +49,14 @@ command_paste_tab = (vim) ->
 command_open_tab = (vim) ->
   vim.rootWindow.BrowserOpenTab()
 
-# Copy element URL to the clipboard
+# Copy the URL or text of a marker element to the system clipboard
 command_marker_yank = (vim) ->
   callback = (marker) ->
     if url = marker.element.href
       marker.element.focus()
-      utils.writeToClipboard(vim.window, url)
+      utils.writeToClipboard(url)
     else if utils.isTextInputElement(marker.element)
-      utils.writeToClipboard(vim.window, marker.element.value)
+      utils.writeToClipboard(marker.element.value)
 
   vim.enterMode('hints', callback)
 
@@ -66,9 +66,9 @@ command_marker_focus = (vim) ->
 
   vim.enterMode('hints', callback)
 
-# Copy current URL to the clipboard
+# Copy the current URL to the system clipboard
 command_yank = (vim) ->
-  utils.writeToClipboard(vim.window, vim.window.location.toString())
+  utils.writeToClipboard(vim.window.location.href)
 
 # Reload the page, possibly from cache
 command_reload = (vim) ->
