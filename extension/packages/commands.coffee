@@ -9,7 +9,10 @@ help  = require 'help'
 
 { classes: Cc, interfaces: Ci, utils: Cu } = Components
 
-# Open developer toolbar (Default shotrcut: Shift-F2)
+# “Selecting an element” means “focusing and selecting the text, if any, of an
+# element”.
+
+# Open and select the Developer Toolbar
 command_dev = (vim) ->
   vim.rootWindow.DeveloperToolbar.show(true)
   vim.rootWindow.DeveloperToolbar.focus()
