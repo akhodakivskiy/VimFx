@@ -17,8 +17,9 @@ command_dev = (vim) ->
   vim.rootWindow.DeveloperToolbar.show(true)
   vim.rootWindow.DeveloperToolbar.focus()
 
-# Focus the Address Bar
+# Select the Address Bar
 command_focus = (vim) ->
+  # This function works even if the Address Bar has been removed.
   vim.rootWindow.focusAndSelectUrlBar()
 
 # Focus the Search Bar
