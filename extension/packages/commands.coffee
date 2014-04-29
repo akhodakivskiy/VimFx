@@ -27,24 +27,22 @@ command_focus_search = (vim) ->
   # A `?` is used since the Search Bar might have been removed.
   vim.BrowserSearch.searchBar?.select()
 
-# Navigate to the address that is currently stored in the system clipboard
-command_paste = (vim) ->
+helper_paste = (vim) ->
   url = utils.readFromClipboard(vim.window)
   postData = null
   if not utils.isURL(url) and submission = utils.browserSearchSubmission(url)
     url = submission.uri.spec
     { postData } = submission
+  return { url, postData }
 
+# Go to or search for the contents of the system clipboard
+command_paste = (vim) ->
+  { url, postData } = helper_paste(vim)
   vim.rootWindow.gBrowser.loadURIWithFlags(url, null, null, null, postData)
 
-# Open new tab and navigate to the address that is currently stored in the system clipboard
+# Go to or search for the contents of the system clipboard in a new tab
 command_paste_tab = (vim) ->
-  url = utils.readFromClipboard(vim.window)
-  postData = null
-  if not utils.isURL(url) and submission = utils.browserSearchSubmission(url)
-    url = submission.uri.spec
-    { postData } = submission
-
+  { url, postData } = helper_paste(vim)
   vim.rootWindow.gBrowser.selectedTab = vim.rootWindow.gBrowser.addTab(url, null, null, postData, null, false)
 
 # Open new tab and focus the address bar

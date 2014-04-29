@@ -181,7 +181,7 @@ writeToClipboard = (window, text) ->
 
   _clip.setData(trans, null, Ci.nsIClipboard.kGlobalClipboard)
 
-# Write a string into system clipboard
+# Read the system clipboard
 readFromClipboard = (window) ->
   trans = Cc['@mozilla.org/widget/transferable;1'].createInstance(Ci.nsITransferable)
 
@@ -194,7 +194,8 @@ readFromClipboard = (window) ->
 
   trans.addDataFlavor('text/unicode')
 
-  _clip.getData(trans, Ci.nsIClipboard.kGlobalClipboard)
+  clip = Cc['@mozilla.org/widget/clipboard;1'].getService(Ci.nsIClipboard)
+  clip.getData(trans, Ci.nsIClipboard.kGlobalClipboard)
 
   str = {}
   strLength = {}
