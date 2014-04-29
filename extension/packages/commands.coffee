@@ -45,7 +45,7 @@ command_paste_tab = (vim) ->
   { url, postData } = helper_paste(vim)
   vim.rootWindow.gBrowser.selectedTab = vim.rootWindow.gBrowser.addTab(url, null, null, postData, null, false)
 
-# Open new tab and focus the address bar
+# Open a new tab and select the Address Bar
 command_open_tab = (vim) ->
   vim.rootWindow.BrowserOpenTab()
 
