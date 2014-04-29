@@ -88,14 +88,15 @@ command_reload_all_force = (vim) ->
     window = tab.linkedBrowser.contentWindow
     window.location.reload(true)
 
+# Stop loading the current tab
 command_stop = (vim) ->
   vim.window.stop()
 
+# Stop loading all tabs
 command_stop_all = (vim) ->
-  if tabs = vim.rootWindow.gBrowser.tabContainer
-    for i in [0...tabs.itemCount]
-      window = tabs.getItemAtIndex(i).linkedBrowser.contentWindow
-      window.stop()
+  for tab in vim.rootWindow.gBrowser.visibleTabs
+    window = tab.linkedBrowser.contentWindow
+    window.stop()
 
 # Scroll to the top of the page
 command_scroll_to_top = (vim) ->
