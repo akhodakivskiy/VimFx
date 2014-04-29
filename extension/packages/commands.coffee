@@ -100,13 +100,11 @@ command_stop_all = (vim) ->
 
 # Scroll to the top of the page
 command_scroll_to_top = (vim) ->
-  for i in [0...1000]
-    utils.simulateWheel(vim.window, 0, -1, utils.WHEEL_MODE_PAGE)
+  vim.rootWindow.goDoCommand('cmd_scrollTop')
 
 # Scroll to the bottom of the page
 command_scroll_to_bottom = (vim) ->
-  for i in [0...1000]
-    utils.simulateWheel(vim.window, 0, 1, utils.WHEEL_MODE_PAGE)
+  vim.rootWindow.goDoCommand('cmd_scrollBottom')
 
 # Scroll down a bit
 command_scroll_down = (vim) ->
