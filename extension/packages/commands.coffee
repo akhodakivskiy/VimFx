@@ -22,10 +22,10 @@ command_focus = (vim) ->
   # This function works even if the Address Bar has been removed.
   vim.rootWindow.focusAndSelectUrlBar()
 
-# Focus the Search Bar
+# Select the Search Bar
 command_focus_search = (vim) ->
-  if searchBar = vim.rootWindow.document.getElementById("searchbar")
-    searchBar.select()
+  # A `?` is used since the Search Bar might have been removed.
+  vim.BrowserSearch.searchBar?.select()
 
 # Navigate to the address that is currently stored in the system clipboard
 command_paste = (vim) ->
