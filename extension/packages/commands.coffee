@@ -12,11 +12,6 @@ help  = require 'help'
 # “Selecting an element” means “focusing and selecting the text, if any, of an
 # element”.
 
-# Open and select the Developer Toolbar
-command_dev = (vim) ->
-  vim.rootWindow.DeveloperToolbar.show(true)
-  vim.rootWindow.DeveloperToolbar.focus()
-
 # Select the Address Bar
 command_focus = (vim) ->
   # This function works even if the Address Bar has been removed.
@@ -44,10 +39,6 @@ command_paste = (vim) ->
 command_paste_tab = (vim) ->
   { url, postData } = helper_paste(vim)
   vim.rootWindow.gBrowser.selectedTab = vim.rootWindow.gBrowser.addTab(url, null, null, postData, null, false)
-
-# Open a new tab and select the Address Bar
-command_open_tab = (vim) ->
-  vim.rootWindow.BrowserOpenTab()
 
 # Copy the URL or text of a marker element to the system clipboard
 command_marker_yank = (vim) ->
@@ -138,6 +129,10 @@ command_scroll_page_down = (vim) ->
 command_scroll_page_up = (vim) ->
   utils.simulateWheel(vim.window, 0, -1, utils.WHEEL_MODE_PAGE)
 
+# Open a new tab and select the Address Bar
+command_open_tab = (vim) ->
+  vim.rootWindow.BrowserOpenTab()
+
 # Switch to the previous tab
 command_tab_prev = (vim) ->
   vim.rootWindow.gBrowser.tabContainer.advanceSelectedTab(-1, true) # `true` to allow wrapping
@@ -145,6 +140,22 @@ command_tab_prev = (vim) ->
 # Switch to the next tab
 command_tab_next = (vim) ->
   vim.rootWindow.gBrowser.tabContainer.advanceSelectedTab(1, true) # `true` to allow wrapping
+
+# Move the current tab backward
+command_tab_move_left = (vim) ->
+  { gBrowser } = vim.rootWindow
+  lastIndex = gBrowser.tabContainer.selectedIndex
+  gBrowser.moveTabBackward()
+  if gBrowser.tabContainer.selectedIndex == lastIndex
+    gBrowser.moveTabToEnd()
+
+# Move the current tab forward
+command_tab_move_right = (vim) ->
+  { gBrowser } = vim.rootWindow
+  lastIndex = gBrowser.tabContainer.selectedIndex
+  gBrowser.moveTabForward()
+  if gBrowser.tabContainer.selectedIndex == lastIndex
+    gBrowser.moveTabToStart()
 
 # Load the home page
 command_home = (vim) ->
@@ -157,14 +168,6 @@ command_tab_first = (vim) ->
 # Switch to the last tab
 command_tab_last = (vim) ->
   vim.rootWindow.gBrowser.selectTabAtIndex(-1)
-
-# Go back in history
-command_back = (vim) ->
-  vim.rootWindow.BrowserBack()
-
-# Go forward in history
-command_forward = (vim) ->
-  vim.rootWindow.BrowserForward()
 
 # Close current tab
 command_close_tab = (vim) ->
@@ -221,25 +224,13 @@ command_go_up_path = (vim) ->
 command_go_to_root = (vim) ->
   vim.window.location.href = vim.window.location.origin
 
-# Move the current tab backward
-command_tab_move_left = (vim) ->
-  { gBrowser } = vim.rootWindow
-  lastIndex = gBrowser.tabContainer.selectedIndex
-  gBrowser.moveTabBackward()
-  if gBrowser.tabContainer.selectedIndex == lastIndex
-    gBrowser.moveTabToEnd()
+# Go back in history
+command_back = (vim) ->
+  vim.rootWindow.BrowserBack()
 
-# Move the current tab forward
-command_tab_move_right = (vim) ->
-  { gBrowser } = vim.rootWindow
-  lastIndex = gBrowser.tabContainer.selectedIndex
-  gBrowser.moveTabForward()
-  if gBrowser.tabContainer.selectedIndex == lastIndex
-    gBrowser.moveTabToStart()
-
-# Display the Help Dialog
-command_help = (vim) ->
-  help.injectHelp(vim.window.document, commands)
+# Go forward in history
+command_forward = (vim) ->
+  vim.rootWindow.BrowserForward()
 
 findStorage = { lastSearchString: '' }
 
@@ -268,6 +259,15 @@ command_find_prev = (vim) ->
 # Enter insert mode
 command_insert_mode = (vim) ->
   vim.enterMode('insert')
+
+# Display the Help Dialog
+command_help = (vim) ->
+  help.injectHelp(vim.window.document, commands)
+
+# Open and select the Developer Toolbar
+command_dev = (vim) ->
+  vim.rootWindow.DeveloperToolbar.show(true)
+  vim.rootWindow.DeveloperToolbar.focus()
 
 command_Esc = (vim, event) ->
   utils.blurActiveElement(vim.window)
