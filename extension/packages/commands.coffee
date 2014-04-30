@@ -173,9 +173,7 @@ command_close_tab = (vim) ->
 
 # Restore last closed tab
 command_restore_tab = (vim) ->
-  ss = utils.getSessionStore()
-  if ss and ss.getClosedTabCount(vim.rootWindow) > 0
-    ss.undoCloseTab(vim.rootWindow, 0)
+  vim.rootWindow.undoCloseTab()
 
 helper_follow = ({ inTab, multiple }, vim) ->
   callback = (matchedMarker, markers) ->
