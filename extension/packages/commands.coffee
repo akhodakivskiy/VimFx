@@ -221,24 +221,21 @@ command_go_up_path = (vim) ->
 command_go_to_root = (vim) ->
   vim.window.location.href = vim.window.location.origin
 
-# Move current tab to the left
+# Move the current tab backward
 command_tab_move_left = (vim) ->
-  if { gBrowser } = vim.rootWindow
-    if tab = gBrowser.selectedTab
-      index = gBrowser.tabContainer.selectedIndex
-      total = gBrowser.tabContainer.itemCount
+  { gBrowser } = vim.rootWindow
+  lastIndex = gBrowser.tabContainer.selectedIndex
+  gBrowser.moveTabBackward()
+  if gBrowser.tabContainer.selectedIndex == lastIndex
+    gBrowser.moveTabToEnd()
 
-      # `total` is added to deal with negative offset
-      gBrowser.moveTabTo(tab, (total + index - 1) % total)
-
-# Move current tab to the right
+# Move the current tab forward
 command_tab_move_right = (vim) ->
-  if { gBrowser } = vim.window
-    if tab = gBrowser.selectedTab
-      index = gBrowser.tabContainer.selectedIndex
-      total = gBrowser.tabContainer.itemCount
-
-      gBrowser.moveTabTo(tab, (index + 1) % total)
+  { gBrowser } = vim.rootWindow
+  lastIndex = gBrowser.tabContainer.selectedIndex
+  gBrowser.moveTabForward()
+  if gBrowser.tabContainer.selectedIndex == lastIndex
+    gBrowser.moveTabToStart()
 
 # Display the Help Dialog
 command_help = (vim) ->
