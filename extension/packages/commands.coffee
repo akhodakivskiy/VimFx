@@ -138,13 +138,13 @@ command_scroll_page_down = (vim) ->
 command_scroll_page_up = (vim) ->
   utils.simulateWheel(vim.window, 0, -1, utils.WHEEL_MODE_PAGE)
 
-# Activate previous tab
+# Switch to the previous tab
 command_tab_prev = (vim) ->
-  vim.rootWindow.gBrowser.tabContainer.advanceSelectedTab(-1, true)
+  vim.rootWindow.gBrowser.tabContainer.advanceSelectedTab(-1, true) # `true` to allow wrapping
 
-# Activate next tab
+# Switch to the next tab
 command_tab_next = (vim) ->
-  vim.rootWindow.gBrowser.tabContainer.advanceSelectedTab(1, true)
+  vim.rootWindow.gBrowser.tabContainer.advanceSelectedTab(1, true) # `true` to allow wrapping
 
 command_home = (vim) ->
   url = getFirefoxPref('browser.startup.homepage')
