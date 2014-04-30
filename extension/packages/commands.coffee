@@ -160,11 +160,11 @@ command_tab_last = (vim) ->
 
 # Go back in history
 command_back = (vim) ->
-  vim.window.history.back()
+  vim.rootWindow.BrowserBack()
 
 # Go forward in history
 command_forward = (vim) ->
-  vim.window.history.forward()
+  vim.rootWindow.BrowserForward()
 
 # Close current tab
 command_close_tab = (vim) ->
