@@ -265,6 +265,7 @@ command_find_prev = (vim) ->
       findBar._findField.value = findStorage.lastSearchString
       findBar.onFindAgainCommand(true)
 
+# Enter insert mode
 command_insert_mode = (vim) ->
   vim.enterMode('insert')
 
