@@ -146,9 +146,9 @@ command_tab_prev = (vim) ->
 command_tab_next = (vim) ->
   vim.rootWindow.gBrowser.tabContainer.advanceSelectedTab(1, true) # `true` to allow wrapping
 
+# Load the home page
 command_home = (vim) ->
-  url = getFirefoxPref('browser.startup.homepage')
-  vim.rootWindow.gBrowser.loadURIWithFlags(url, null, null, null, null)
+  vim.rootWindow.BrowserHome()
 
 # Go to the first tab
 command_tab_first = (vim) ->
