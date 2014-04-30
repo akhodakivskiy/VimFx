@@ -150,14 +150,13 @@ command_tab_next = (vim) ->
 command_home = (vim) ->
   vim.rootWindow.BrowserHome()
 
-# Go to the first tab
+# Switch to the first tab
 command_tab_first = (vim) ->
-  vim.rootWindow.gBrowser.tabContainer.selectedIndex = 0
+  vim.rootWindow.gBrowser.selectTabAtIndex(0)
 
-# Go to the last tab
+# Switch to the last tab
 command_tab_last = (vim) ->
-  itemCount = vim.rootWindow.gBrowser.tabContainer.itemCount
-  vim.rootWindow.gBrowser.tabContainer.selectedIndex = itemCount - 1
+  vim.rootWindow.gBrowser.selectTabAtIndex(-1)
 
 # Go back in history
 command_back = (vim) ->
