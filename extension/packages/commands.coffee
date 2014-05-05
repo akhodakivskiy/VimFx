@@ -9,58 +9,45 @@ help  = require 'help'
 
 { classes: Cc, interfaces: Ci, utils: Cu } = Components
 
-# Open developer toolbar (Default shotrcut: Shift-F2)
-command_dev = (vim) ->
-  if chromeWindow = utils.getRootWindow vim.window
-    chromeWindow.DeveloperToolbar.show(true)
-    chromeWindow.DeveloperToolbar.focus()
+# “Selecting an element” means “focusing and selecting the text, if any, of an
+# element”.
 
-# Focus the Address Bar
+# Select the Address Bar
 command_focus = (vim) ->
-  if chromeWindow = utils.getRootWindow(vim.window)
-    chromeWindow.focusAndSelectUrlBar()
+  # This function works even if the Address Bar has been removed.
+  vim.rootWindow.focusAndSelectUrlBar()
 
-# Focus the Search Bar
+# Select the Search Bar
 command_focus_search = (vim) ->
-  if chromeWindow = utils.getRootWindow(vim.window)
-    if searchBar = chromeWindow.document.getElementById("searchbar")
-      searchBar.select()
+  # A `?` is used since the Search Bar might have been removed.
+  vim.BrowserSearch.searchBar?.select()
 
-# Navigate to the address that is currently stored in the system clipboard
+helper_paste = (vim) ->
+  url = utils.readFromClipboard(vim.window)
+  postData = null
+  if not utils.isURL(url) and submission = utils.browserSearchSubmission(url)
+    url = submission.uri.spec
+    { postData } = submission
+  return { url, postData }
+
+# Go to or search for the contents of the system clipboard
 command_paste = (vim) ->
-  url = utils.readFromClipboard(vim.window)
-  postData = null
-  if not utils.isURL(url) and submission = utils.browserSearchSubmission(url)
-    url = submission.uri.spec
-    { postData } = submission
+  { url, postData } = helper_paste(vim)
+  vim.rootWindow.gBrowser.loadURIWithFlags(url, null, null, null, postData)
 
-  if chromeWindow = utils.getRootWindow(vim.window)
-    chromeWindow.gBrowser.loadURIWithFlags(url, null, null, null, postData)
-
-# Open new tab and navigate to the address that is currently stored in the system clipboard
+# Go to or search for the contents of the system clipboard in a new tab
 command_paste_tab = (vim) ->
-  url = utils.readFromClipboard(vim.window)
-  postData = null
-  if not utils.isURL(url) and submission = utils.browserSearchSubmission(url)
-    url = submission.uri.spec
-    { postData } = submission
+  { url, postData } = helper_paste(vim)
+  vim.rootWindow.gBrowser.selectedTab = vim.rootWindow.gBrowser.addTab(url, null, null, postData, null, false)
 
-  if chromeWindow = utils.getRootWindow vim.window
-    chromeWindow.gBrowser.selectedTab = chromeWindow.gBrowser.addTab(url, null, null, postData, null, false)
-
-# Open new tab and focus the address bar
-command_open_tab = (vim) ->
-  if chromeWindow = utils.getRootWindow(vim.window)
-    chromeWindow.BrowserOpenTab()
-
-# Copy element URL to the clipboard
+# Copy the URL or text of a marker element to the system clipboard
 command_marker_yank = (vim) ->
   callback = (marker) ->
     if url = marker.element.href
       marker.element.focus()
-      utils.writeToClipboard(vim.window, url)
+      utils.writeToClipboard(url)
     else if utils.isTextInputElement(marker.element)
-      utils.writeToClipboard(vim.window, marker.element.value)
+      utils.writeToClipboard(marker.element.value)
 
   vim.enterMode('hints', callback)
 
@@ -70,53 +57,45 @@ command_marker_focus = (vim) ->
 
   vim.enterMode('hints', callback)
 
-# Copy current URL to the clipboard
+# Copy the current URL to the system clipboard
 command_yank = (vim) ->
-  utils.writeToClipboard(vim.window, vim.window.location.toString())
+  utils.writeToClipboard(vim.window.location.href)
 
-# Reload the page, possibly from cache
+# Reload the current tab, possibly from cache
 command_reload = (vim) ->
-  vim.window.location.reload(false)
+  vim.rootWindow.BrowserReload()
 
-# Reload the page from the server
+# Reload the current tab, skipping cache
 command_reload_force = (vim) ->
-  vim.window.location.reload(true)
+  vim.rootWindow.BrowserReloadSkipCache()
 
-# Reload the page, possibly from cache
+# Reload all tabs, possibly from cache
 command_reload_all = (vim) ->
-  if rootWindow = utils.getRootWindow(vim.window)
-    if tabs = rootWindow.gBrowser.tabContainer
-      for i in [0...tabs.itemCount]
-        window = tabs.getItemAtIndex(i).linkedBrowser.contentWindow
-        window.location.reload(false)
+  vim.rootWindow.gBrowser.reloadAllTabs()
 
-# Reload the page from the server
+# Reload all tabs, skipping cache
 command_reload_all_force = (vim) ->
-  if rootWindow = utils.getRootWindow(vim.window)
-    if tabs = rootWindow.gBrowser.tabContainer
-      for i in [0...tabs.itemCount]
-        window = tabs.getItemAtIndex(i).linkedBrowser.contentWindow
-        window.location.reload(true)
+  for tab in vim.rootWindow.gBrowser.visibleTabs
+    window = tab.linkedBrowser.contentWindow
+    window.location.reload(true)
 
+# Stop loading the current tab
 command_stop = (vim) ->
   vim.window.stop()
 
+# Stop loading all tabs
 command_stop_all = (vim) ->
-  if rootWindow = utils.getRootWindow(vim.window)
-    if tabs = rootWindow.gBrowser.tabContainer
-      for i in [0...tabs.itemCount]
-        window = tabs.getItemAtIndex(i).linkedBrowser.contentWindow
-        window.stop()
+  for tab in vim.rootWindow.gBrowser.visibleTabs
+    window = tab.linkedBrowser.contentWindow
+    window.stop()
 
 # Scroll to the top of the page
 command_scroll_to_top = (vim) ->
-  for i in [0...1000]
-    utils.simulateWheel(vim.window, 0, -1, utils.WHEEL_MODE_PAGE)
+  vim.rootWindow.goDoCommand('cmd_scrollTop')
 
 # Scroll to the bottom of the page
 command_scroll_to_bottom = (vim) ->
-  for i in [0...1000]
-    utils.simulateWheel(vim.window, 0, 1, utils.WHEEL_MODE_PAGE)
+  vim.rootWindow.goDoCommand('cmd_scrollBottom')
 
 # Scroll down a bit
 command_scroll_down = (vim) ->
@@ -150,52 +129,54 @@ command_scroll_page_down = (vim) ->
 command_scroll_page_up = (vim) ->
   utils.simulateWheel(vim.window, 0, -1, utils.WHEEL_MODE_PAGE)
 
-# Activate previous tab
+# Open a new tab and select the Address Bar
+command_open_tab = (vim) ->
+  vim.rootWindow.BrowserOpenTab()
+
+# Switch to the previous tab
 command_tab_prev = (vim) ->
-  if rootWindow = utils.getRootWindow(vim.window)
-    rootWindow.gBrowser.tabContainer.advanceSelectedTab(-1, true)
+  vim.rootWindow.gBrowser.tabContainer.advanceSelectedTab(-1, true) # `true` to allow wrapping
 
-# Activate next tab
+# Switch to the next tab
 command_tab_next = (vim) ->
-  if rootWindow = utils.getRootWindow(vim.window)
-    rootWindow.gBrowser.tabContainer.advanceSelectedTab(1, true)
+  vim.rootWindow.gBrowser.tabContainer.advanceSelectedTab(1, true) # `true` to allow wrapping
 
+# Move the current tab backward
+command_tab_move_left = (vim) ->
+  { gBrowser } = vim.rootWindow
+  lastIndex = gBrowser.tabContainer.selectedIndex
+  gBrowser.moveTabBackward()
+  if gBrowser.tabContainer.selectedIndex == lastIndex
+    gBrowser.moveTabToEnd()
+
+# Move the current tab forward
+command_tab_move_right = (vim) ->
+  { gBrowser } = vim.rootWindow
+  lastIndex = gBrowser.tabContainer.selectedIndex
+  gBrowser.moveTabForward()
+  if gBrowser.tabContainer.selectedIndex == lastIndex
+    gBrowser.moveTabToStart()
+
+# Load the home page
 command_home = (vim) ->
-  url = getFirefoxPref('browser.startup.homepage')
-  if chromeWindow = utils.getRootWindow(vim.window)
-    chromeWindow.gBrowser.loadURIWithFlags(url, null, null, null, null)
+  vim.rootWindow.BrowserHome()
 
-# Go to the first tab
+# Switch to the first tab
 command_tab_first = (vim) ->
-  if rootWindow = utils.getRootWindow(vim.window)
-    rootWindow.gBrowser.tabContainer.selectedIndex = 0
+  vim.rootWindow.gBrowser.selectTabAtIndex(0)
 
-# Go to the last tab
+# Switch to the last tab
 command_tab_last = (vim) ->
-  if rootWindow = utils.getRootWindow(vim.window)
-    itemCount = rootWindow.gBrowser.tabContainer.itemCount
-    rootWindow.gBrowser.tabContainer.selectedIndex = itemCount - 1
-
-# Go back in history
-command_back = (vim) ->
-  vim.window.history.back()
-
-# Go forward in history
-command_forward = (vim) ->
-  vim.window.history.forward()
+  vim.rootWindow.gBrowser.selectTabAtIndex(-1)
 
 # Close current tab
 command_close_tab = (vim) ->
-  if rootWindow = utils.getRootWindow(vim.window)
-    unless rootWindow.gBrowser.selectedTab.pinned
-      rootWindow.gBrowser.removeCurrentTab()
+  unless vim.rootWindow.gBrowser.selectedTab.pinned
+    vim.rootWindow.gBrowser.removeCurrentTab()
 
 # Restore last closed tab
 command_restore_tab = (vim) ->
-  if rootWindow = utils.getRootWindow(vim.window)
-    ss = utils.getSessionStore()
-    if ss and ss.getClosedTabCount(rootWindow) > 0
-      ss.undoCloseTab(rootWindow, 0)
+  vim.rootWindow.undoCloseTab()
 
 helper_follow = ({ inTab, multiple }, vim) ->
   callback = (matchedMarker, markers) ->
@@ -243,57 +224,52 @@ command_go_up_path = (vim) ->
 command_go_to_root = (vim) ->
   vim.window.location.href = vim.window.location.origin
 
-# Move current tab to the left
-command_tab_move_left = (vim) ->
-  if gBrowser = utils.getRootWindow(vim.window)?.gBrowser
-    if tab = gBrowser.selectedTab
-      index = gBrowser.tabContainer.selectedIndex
-      total = gBrowser.tabContainer.itemCount
+# Go back in history
+command_back = (vim) ->
+  vim.rootWindow.BrowserBack()
 
-      # `total` is added to deal with negative offset
-      gBrowser.moveTabTo(tab, (total + index - 1) % total)
-
-# Move current tab to the right
-command_tab_move_right = (vim) ->
-  if gBrowser = utils.getRootWindow(vim.window)?.gBrowser
-    if tab = gBrowser.selectedTab
-      index = gBrowser.tabContainer.selectedIndex
-      total = gBrowser.tabContainer.itemCount
-
-      gBrowser.moveTabTo(tab, (index + 1) % total)
-
-# Display the Help Dialog
-command_help = (vim) ->
-  help.injectHelp(vim.window.document, commands)
+# Go forward in history
+command_forward = (vim) ->
+  vim.rootWindow.BrowserForward()
 
 findStorage = { lastSearchString: '' }
 
 # Switch into find mode
-command_find = (vim, storage) ->
+command_find = (vim) ->
   vim.enterMode('find', { highlight: false })
 
 # Switch into find mode with highlighting
-command_find_hl = (vim, storage) ->
+command_find_hl = (vim) ->
   vim.enterMode('find', { highlight: true })
 
 # Search for the last pattern
-command_find_next = (vim, storage) ->
-  if findBar = utils.getRootWindow(vim.window).gBrowser.getFindBar()
+command_find_next = (vim) ->
+  if findBar = vim.rootWindow.gBrowser.getFindBar()
     if findStorage.lastSearchString.length > 0
       findBar._findField.value = findStorage.lastSearchString
       findBar.onFindAgainCommand(false)
 
 # Search for the last pattern backwards
-command_find_prev = (vim, storage) ->
-  if findBar = utils.getRootWindow(vim.window).gBrowser.getFindBar()
+command_find_prev = (vim) ->
+  if findBar = vim.rootWindow.gBrowser.getFindBar()
     if findStorage.lastSearchString.length > 0
       findBar._findField.value = findStorage.lastSearchString
       findBar.onFindAgainCommand(true)
 
+# Enter insert mode
 command_insert_mode = (vim) ->
   vim.enterMode('insert')
 
-command_Esc = (vim, storage, event) ->
+# Display the Help Dialog
+command_help = (vim) ->
+  help.injectHelp(vim.window.document, commands)
+
+# Open and select the Developer Toolbar
+command_dev = (vim) ->
+  vim.rootWindow.DeveloperToolbar.show(true)
+  vim.rootWindow.DeveloperToolbar.focus()
+
+command_Esc = (vim, event) ->
   utils.blurActiveElement(vim.window)
 
   # Blur active XUL control
@@ -302,11 +278,9 @@ command_Esc = (vim, storage, event) ->
 
   help.removeHelp(vim.window.document)
 
-  return unless rootWindow = utils.getRootWindow(vim.window)
+  vim.rootWindow.DeveloperToolbar.hide()
 
-  rootWindow.DeveloperToolbar.hide()
-
-  rootWindow.gBrowser.getFindBar()?.close()
+  vim.rootWindow.gBrowser.getFindBar()?.close()
 
 
 class Command
@@ -393,7 +367,7 @@ searchForMatchingCommand = (keys) ->
     str = keys[index..].join(',')
     for command in commands
       for key in command.keys()
-        # The following hack is a workaround for the issue where # letter `c` 
+        # The following hack is a workaround for the issue where # letter `c`
         # is considered a start of command with control modifier `c-xxx`
         if "#{key},".startsWith("#{str},")
           return {match: true, exact: (key == str), command}

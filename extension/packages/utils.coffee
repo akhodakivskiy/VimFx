@@ -19,8 +19,6 @@ HTMLElement         = Ci.nsIDOMHTMLElement
 Window              = Ci.nsIDOMWindow
 ChromeWindow        = Ci.nsIDOMChromeWindow
 
-_clip = Cc['@mozilla.org/widget/clipboard;1'].getService(Ci.nsIClipboard)
-
 class Bucket
   constructor: (@idFunc, @newFunc) ->
     @bucket = {}
@@ -162,26 +160,12 @@ simulateWheel = (window, deltaX, deltaY, mode = WHEEL_MODE_PIXEL) ->
     0                   # Options
   )
 
-# Write a string into system clipboard
-writeToClipboard = (window, text) ->
-  str = Cc['@mozilla.org/supports-string;1'].createInstance(Ci.nsISupportsString)
-  str.data = text
+# Write a string to the system clipboard
+writeToClipboard = (text) ->
+  clipboardHelper = Cc['@mozilla.org/widget/clipboardhelper;1'].getService(Ci.nsIClipboardHelper)
+  clipboardHelper.copyString(text)
 
-  trans = Cc['@mozilla.org/widget/transferable;1'].createInstance(Ci.nsITransferable)
-
-  if trans.init
-    privacyContext = window
-      .QueryInterface(Ci.nsIInterfaceRequestor)
-      .getInterface(Ci.nsIWebNavigation)
-      .QueryInterface(Ci.nsILoadContext)
-    trans.init(privacyContext)
-
-  trans.addDataFlavor('text/unicode')
-  trans.setTransferData('text/unicode', str, text.length * 2)
-
-  _clip.setData(trans, null, Ci.nsIClipboard.kGlobalClipboard)
-
-# Write a string into system clipboard
+# Read the system clipboard
 readFromClipboard = (window) ->
   trans = Cc['@mozilla.org/widget/transferable;1'].createInstance(Ci.nsITransferable)
 
@@ -194,7 +178,8 @@ readFromClipboard = (window) ->
 
   trans.addDataFlavor('text/unicode')
 
-  _clip.getData(trans, Ci.nsIClipboard.kGlobalClipboard)
+  clip = Cc['@mozilla.org/widget/clipboard;1'].getService(Ci.nsIClipboard)
+  clip.getData(trans, Ci.nsIClipboard.kGlobalClipboard)
 
   str = {}
   strLength = {}
