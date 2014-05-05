@@ -87,7 +87,7 @@ windowsListeners =
 
   popupshown:  checkPassthrough
   popuphidden: checkPassthrough
-  
+
   focus: (event) ->
     return if getPref('disabled') or getPref('prevent_autofocus')
     return unless target = event.originalTarget
@@ -118,12 +118,14 @@ windowsListeners =
   # When the top level window closes we should release all Vims that were
   # associated with tabs in this window
   DOMWindowClose: (event) ->
-    return unless { gBrowser } = event.originalTarget
+    { gBrowser } = event.originalTarget
+    return unless gBrowser
     for tab in gBrowser.tabs
       removeVimFromTab(tab, gBrowser)
 
   TabClose: (event) ->
-    return unless { gBrowser } = utils.getEventRootWindow(event) ? {}
+    { gBrowser } = utils.getEventRootWindow(event) ? {}
+    return unless gBrowser
     tab = event.originalTarget
     removeVimFromTab(tab, gBrowser)
 

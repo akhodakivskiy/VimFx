@@ -3,8 +3,9 @@
 { unload } = require 'unload'
 
 PREF_BRANCH = 'extensions.VimFx.'
+DEFAULT_PREFS_FILE = 'defaults/preferences/defaults.js'
 
-# Default values for preferences are now specified in 
+# Default values for preferences are now specified in
 # defaults/preferences/defaults.js
 
 getBranchPref = (branch, key, defaultValue) ->
@@ -50,11 +51,7 @@ getFirefoxPref = do ->
   return (key, defaultValue = undefined) ->
     return getBranchPref(branch, key, defaultValue)
 
-# Assign and save Firefox preference value
-setPref = do ->
-  prefs = Cc['@mozilla.org/preferences-service;1'].getService(Ci.nsIPrefService)
-  branch = prefs.getBranch(PREF_BRANCH)
-
+makePrefSetter = (branch) ->
   return (key, value) ->
     switch typeof value
       when 'boolean'
@@ -66,8 +63,27 @@ setPref = do ->
       else
         branch.clearUserPref(key)
 
+# Assign and save Firefox preference value
+setPref = do ->
+  prefs = Cc['@mozilla.org/preferences-service;1'].getService(Ci.nsIPrefService)
+  return makePrefSetter(prefs.getBranch(PREF_BRANCH))
+
+setDefaultPrefs = ->
+  scriptLoader = Cc['@mozilla.org/moz/jssubscript-loader;1'].getService(Ci.mozIJSSubScriptLoader)
+  ioService = Cc['@mozilla.org/network/io-service;1'].getService(Ci.nsIIOService)
+  prefs = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefService)
+
+  baseUri = ioService.newURI(__SCRIPT_URI_SPEC__, null, null)
+  uri = ioService.newURI(DEFAULT_PREFS_FILE, null, baseUri)
+
+  if uri.QueryInterface(Ci.nsIFileURL).file.exists()
+    branch = prefs.getDefaultBranch("")
+    scope = { pref: makePrefSetter(branch) }
+    scriptLoader.loadSubScript(uri.spec, scope)
+
 exports.isPrefSet         = isPrefSet
 exports.getPref           = getPref
 exports.getComplexPref    = getComplexPref
 exports.getFirefoxPref    = getFirefoxPref
 exports.setPref           = setPref
+exports.setDefaultPrefs   = setDefaultPrefs

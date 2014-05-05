@@ -324,7 +324,7 @@ browserSearchSubmission = (str) ->
 getHintChars = ->
   hintChars = getPref('hint_chars')
   # Make sure that hint chars contain at least two characters
-  if hintChars.length < 2
+  if !hintChars or hintChars.length < 2
     hintChars = 'fj'
 
   return removeDuplicateCharacters(hintChars)
