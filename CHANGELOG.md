@@ -1,5 +1,9 @@
 # Change Log
 
+0.5.9 (May 4 2014)
+
+Fixed bug with default preferences
+
 0.5.8 (Apr 18 2014)
 
 AMO Preliminary Review bug fix (sorry for such long delay)

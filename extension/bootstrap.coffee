@@ -42,12 +42,15 @@ do (global = this) ->
     { loadCss }             = require 'utils'
     { addEventListeners
     , vimBucket }           = require 'events'
-    { getPref }             = require 'prefs'
+    { getPref
+    , setDefaultPrefs }     = require 'prefs'
     { setButtonInstallPosition
     , addToolbarButton }    = require 'button'
     options                 = require 'options'
     { watchWindows }        = require 'window-utils'
     { unload }              = require 'unload'
+
+    setDefaultPrefs()
 
     if reason == ADDON_INSTALL
       # Position the toolbar button right before the default Bookmarks button
