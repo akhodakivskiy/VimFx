@@ -2,7 +2,8 @@
 
 0.5.9 (May 4 2014)
 
-Fixed bug with default preferences
+- Fixed a bug with default preferences not being set
+- Fixed gg and G to be faster
 
 0.5.8 (Apr 18 2014)
 
@@ -129,7 +130,7 @@ AMO Preliminary Review bug fix (sorry for such long delay)
 - Removed c-b/c-f for now. c-f is a standard search hotkey. Will put c-f back when proper Vim-like search with / is implemented
 - Scrolling with G will now reach the bottom of the page
 - Implemented localization, currently there is only Russian localization. Community is welcome
-  [to contribute your localizations](https://github.com/akhodakivskiy/VimFx/tree/master/extension/locale)! 
+  [to contribute your localizations](https://github.com/akhodakivskiy/VimFx/tree/master/extension/locale)!
 - Implemented simple smooth scolling
 
 0.2 (5 Nov 2012)
