@@ -203,9 +203,16 @@ command_follow_multiple = helper_follow.bind(undefined, {inTab: true, multiple: 
 helper_follow_pattern = (type, vim) ->
   links = utils.getMarkableElements(vim.window.document, {type: 'action'})
     .filter(utils.isElementVisible)
+
+  # matching link type (rel="prev/next")
+  relLink = links.find((link) -> link.rel.toLowerCase().split(" ").indexOf(type) != -1)
+  if relLink
+    utils.simulateClick(relLink, {metaKey: false, ctrlKey: false})
+    return
+
+  # fallback to text pattern matching
   patterns = utils.splitListString(getComplexPref("#{ type }_patterns"))
   matchingLink = utils.getBestPatternMatch(patterns, links)
-
   if matchingLink
     utils.simulateClick(matchingLink, {metaKey: false, ctrlKey: false})
 
