@@ -1,5 +1,9 @@
 # Change Log
 
+0.5.10 (May 7 2014)
+
+- Fixed yet another bug related to the default pereferences
+
 0.5.9 (May 4 2014)
 
 - Fixed a bug with default preferences not being set
