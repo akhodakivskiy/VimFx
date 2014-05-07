@@ -76,10 +76,9 @@ setDefaultPrefs = ->
   baseUri = ioService.newURI(__SCRIPT_URI_SPEC__, null, null)
   uri = ioService.newURI(DEFAULT_PREFS_FILE, null, baseUri)
 
-  if uri.QueryInterface(Ci.nsIFileURL).file.exists()
-    branch = prefs.getDefaultBranch("")
-    scope = { pref: makePrefSetter(branch) }
-    scriptLoader.loadSubScript(uri.spec, scope)
+  branch = prefs.getDefaultBranch("")
+  scope = { pref: makePrefSetter(branch) }
+  scriptLoader.loadSubScript(uri.spec, scope)
 
 exports.isPrefSet         = isPrefSet
 exports.getPref           = getPref
