@@ -59,9 +59,9 @@ addHandler = (document, commands, event) ->
     value = { value: null }
     check = { value: null }
     if promptService.prompt(document.defaultView, title, text, value, null, check)
-      conflict_cmd = commands.filter((c) => c.keys().indexOf(value.value) != -1)
-      if conflict_cmd.length < 1 || overwriteCmd(conflict_cmd[0], value.value)
       return if value.value.length == 0
+      conflict_cmd = commands.filter((c) -> c.keys().indexOf(value.value) != -1)
+      if conflict_cmd.length < 1 or overwriteCmd(conflict_cmd[0], value.value)
         cmd.keys(cmd.keys().concat(value.value))
         for div in document.getElementsByClassName('VimFxKeySequence')
           if div.getAttribute('data-command') == cmd.name
