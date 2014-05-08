@@ -16,7 +16,7 @@ exports.addHuffmanCodeWordsTo = (originalElements, {alphabet}, callback) ->
     throw new Error('`alphabet` must consist of at least 2 characters.')
 
   unless typeof(callback) == "function"
-    throw new TypeError "`callback` must be provided and be a function."
+    throw new TypeError("`callback` must be provided and be a function.")
 
 
   # Shallow working copy.
