@@ -205,7 +205,7 @@ helper_follow_pattern = (type, vim) ->
     .filter(utils.isElementVisible)
 
   # matching link type (rel="prev/next")
-  relLink = links.find((link) -> link.rel.toLowerCase().split(" ").indexOf(type) != -1)
+  relLink = links.find((link) -> link.rel?.toLowerCase().contains(type))
   if relLink
     utils.simulateClick(relLink, {metaKey: false, ctrlKey: false})
     return
