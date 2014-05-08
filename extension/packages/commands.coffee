@@ -19,8 +19,10 @@ command_focus = (vim) ->
 
 # Select the Search Bar
 command_focus_search = (vim) ->
-  # A `?` is used since the Search Bar might have been removed.
-  vim.BrowserSearch.searchBar?.select()
+  # The `.webSearch()` method opens a search engine in a tab if the Search Bar
+  # has been removed. Therefore we first check if it exists.
+  if vim.rootWindow.BrowserSearch.searchBar
+    vim.rootWindow.BrowserSearch.webSearch()
 
 helper_paste = (vim) ->
   url = utils.readFromClipboard(vim.window)
