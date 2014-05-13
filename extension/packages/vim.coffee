@@ -26,7 +26,9 @@ class Vim
   onInput: (keyStr, event) ->
     isEditable = utils.isElementEditable(event.originalTarget)
 
-    if isEditable and not (isEscCommandKey(keyStr) or isReturnCommandKey(keyStr))
+
+    if (isEditable or @rootWindow.TabView.isVisible()) \
+        and not (isEscCommandKey(keyStr) or isReturnCommandKey(keyStr))
       return false
 
     oldMode = @mode
