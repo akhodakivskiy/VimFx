@@ -384,13 +384,23 @@ getMarkableElements = do ->
       [ACTION_ELEMENT_PROPERTIES..., EDITABLE_ELEMENT_PROPERTIES..., FOCUSABLE_ELEMENT_PROPERTIES...]
     )
 
+  # The actual function that will return the desired elements
+  return (document, { type }) ->
+    return xpathQueryAll(document, xpaths[type])
+
+xpathHelper = (node, query, resultType) ->
+  document = node.ownerDocument ? node
   namespaceResolver = (namespace) ->
     if namespace == 'xhtml' then 'http://www.w3.org/1999/xhtml' else null
+  return document.evaluate(query, node, namespaceResolver, resultType, null)
 
-  # The actual function that will return the desired elements
-  return (document, { type }, resultType = XPathResult.ORDERED_NODE_SNAPSHOT_TYPE) ->
-    result = document.evaluate(xpaths[type], document.documentElement, namespaceResolver, resultType, null)
-    return (result.snapshotItem(i) for i in [0...result.snapshotLength] by 1)
+xpathQuery = (node, query) ->
+  result = xpathHelper(node, query, XPathResult.FIRST_ORDERED_NODE_TYPE)
+  return result.singleNodeValue
+
+xpathQueryAll = (node, query) ->
+  result = xpathHelper(node, query, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE)
+  return (result.snapshotItem(i) for i in [0...result.snapshotLength] by 1)
 
 
 exports.Bucket                    = Bucket
@@ -434,4 +444,6 @@ exports.removeDuplicates          = removeDuplicates
 exports.removeDuplicateCharacters = removeDuplicateCharacters
 exports.getResourceURI            = getResourceURI
 exports.getMarkableElements       = getMarkableElements
+exports.xpathQuery                = xpathQuery
+exports.xpathQueryAll             = xpathQueryAll
 exports.ADDON_ID                  = ADDON_ID
