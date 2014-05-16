@@ -298,6 +298,8 @@ command_Esc = (vim, event) ->
 
   vim.rootWindow.gBrowser.getFindBar()?.close()
 
+  vim.rootWindow.TabView.hide()
+
 
 class Command
   constructor: (@group, @name, @func, keys) ->
