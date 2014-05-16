@@ -202,14 +202,28 @@ command_follow_in_tab = helper_follow.bind(undefined, {inTab: true})
 # Follow multiple links with hint markers
 command_follow_multiple = helper_follow.bind(undefined, {inTab: true, multiple: true})
 
-helper_follow_pattern = (type, vim) ->
-  links = utils.getMarkableElements(vim.window.document, {type: 'action'})
-    .filter(utils.isElementVisible)
-  patterns = utils.splitListString(getComplexPref("#{ type }_patterns"))
-  matchingLink = utils.getBestPatternMatch(patterns, links)
+helper_follow_pattern = do ->
+  # The rel attribute is an case in-senstive space-separated list of tokens.
+  # “previous” is allowed in addition to “prev”, since Google does that.
+  rel =
+    prev: /\bprev(?:ious)?\b/i
+    next: /\bnext\b/i
 
-  if matchingLink
-    utils.simulateClick(matchingLink, {metaKey: false, ctrlKey: false})
+  return (type, vim) ->
+    links = utils.getMarkableElements(vim.window.document, {type: 'action'})
+      .filter(utils.isElementVisible)
+
+    # First try to find a prev/next link marked up according to web standards.
+    # A `?` is used since some elements in `links` may not have the `rel` attribute.
+    matchingLink = links.find((link) -> link.rel?.match(rel[type]))
+
+    # Otherwise fallback to pattern matching of the text contents of `links`.
+    if not matchingLink
+      patterns = utils.splitListString(getComplexPref("#{ type }_patterns"))
+      matchingLink = utils.getBestPatternMatch(patterns, links)
+
+    if matchingLink
+      utils.simulateClick(matchingLink, {metaKey: false, ctrlKey: false})
 
 # Follow previous page
 command_follow_prev = helper_follow_pattern.bind(undefined, 'prev')
