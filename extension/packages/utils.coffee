@@ -331,7 +331,7 @@ removeDuplicates = (array) ->
   return array.filter((item) -> if seen[item] then false else (seen[item] = true))
 
 ACTION_ELEMENT_TAGS = [
-  "a"
+  "a[@href]"
   "area[@href]"
   "button"
 ]
@@ -365,7 +365,7 @@ FOCUSABLE_ELEMENT_TAGS = [
 ]
 
 FOCUSABLE_ELEMENT_PROPERTIES = [
-  "@tabindex"
+  "@tabindex!=-1"
 ]
 
 getMarkableElements = do ->
