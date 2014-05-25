@@ -75,7 +75,8 @@ div#VimFxHelpDialog {
     opacity: 0.92 !important;
     background-color: Window !important;
     position: fixed !important;
-    z-index: 99999998 !important;
+    /* See mode-hints/hints.coffee for where the z-index value comes from. */
+    z-index: 2147480000 !important;
     border-radius: 3px !important;
     padding: 15px 30px !important;
     width: 700px !important;

@@ -9,7 +9,14 @@ HTMLDocument = Ci.nsIDOMHTMLDocument
 XULDocument  = Ci.nsIDOMXULDocument
 
 CONTAINER_ID  = 'VimFxHintMarkerContainer'
-Z_INDEX_START = 100000000 # The highest `z-index` used in style.css plus one
+Z_INDEX_START = 2147480001 # The highest `z-index` used in style.css plus one.
+# In theory, `z-index` can be infinitely large. In practice, Firefox uses a
+# 32-bit signed integer to store it, so the maximum value is 2147483647
+# (http://www.puidokas.com/max-z-index/). Youtube (insanely) uses 1999999999
+# for its top bar. So by using 2147480001 as a base, we trump that value with
+# lots of margin, still leaving a few thousand values for markers, which should
+# be more than enough. Hopefully no sites are crazy enough to use even higher
+# values.
 
 # Remove previously injected hints from the DOM
 removeHints = (document) ->
