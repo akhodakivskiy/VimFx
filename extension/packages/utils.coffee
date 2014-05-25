@@ -79,10 +79,8 @@ isElementEditable = (element) ->
          element instanceof HTMLTextAreaElement or \
          element instanceof HTMLSelectElement or \
          element instanceof XULMenuListElement or \
-         element.ownerDocument?.designMode?.toLowerCase() == 'on' or \
-         element.getAttribute?('g_editable') == 'true' or \
-         element.getAttribute?('contenteditable')?.toLowerCase() == 'true' or \
-         element.ownerDocument?.designMode?.toLowerCase() == 'on'
+         element.isContentEditable or \
+         element.getAttribute?('g_editable') == 'true' # Non-standard attribute commonly used by Google.
 
 isElementVisible = (element) ->
   document = element.ownerDocument
