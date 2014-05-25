@@ -38,12 +38,6 @@
     float: none !important;
 }
 
-/* Find */
-
-input.VimFxNotFound#VimFxFindInput {
-    color: red !important;
-}
-
 div.VimFxKeySequence {
     max-width:70px !important;
     text-align: right !important;
@@ -77,19 +71,6 @@ a.VimFxAddShortcutLink {
     color: #c55500 !important;
     cursor: pointer !important;
     margin-left: 2px !important;
-}
-
-input#VimFxFindInput {
-    position: fixed !important;
-    z-index: 99999999 !important;
-    bottom: 2px !important;
-    right: 2px !important;
-    font-size: 13px !important;
-    min-width: 200px !important;
-    background: white !important;
-    border: solid 1px ThreeDShadow !important;
-    border-radius: 3px 3px 0 0 !important;
-    padding: 4px 4px 6px !important;
 }
 
 /* Markers */
