@@ -109,7 +109,6 @@ windowsListeners =
     # DOMContentLoaded already has fired we blur only if the focus happens
     # within a second after it.
     if !vim.lastLoad or Date.now() - vim.lastLoad < 1000
-      console.log 'blur'
       target.blur()
 
   # Record when the page was loaded. This is used by the autofocus prevention feature.
@@ -125,7 +124,6 @@ windowsListeners =
     # focused something on his own.
     if !vim.lastLoad
       vim.lastLoad = Date.now()
-    console.log vim.lastLoad
     return
 
   # When the top level window closes we should release all Vims that were
