@@ -5,8 +5,10 @@ utils                     = require 'utils'
 
 { interfaces: Ci } = Components
 
-HTMLDocument = Ci.nsIDOMHTMLDocument
-XULDocument  = Ci.nsIDOMXULDocument
+HTMLDocument  = Ci.nsIDOMHTMLDocument
+XULDocument   = Ci.nsIDOMXULDocument
+FrameElement  = Ci.nsIDOMHTMLFrameElement
+IFrameElement = Ci.nsIDOMHTMLIFrameElement
 
 CONTAINER_ID  = 'VimFxHintMarkerContainer'
 Z_INDEX_START = 2147480001 # The highest `z-index` used in style.css plus one.
@@ -18,17 +20,30 @@ Z_INDEX_START = 2147480001 # The highest `z-index` used in style.css plus one.
 # be more than enough. Hopefully no sites are crazy enough to use even higher
 # values.
 
-# Remove previously injected hints from the DOM
+
 removeHints = (document) ->
   document.getElementById(CONTAINER_ID)?.remove()
 
-  for frame in document.defaultView.frames
-    removeHints(frame.document)
 
+injectHints = (window) ->
+  { document } = window
 
-injectHints = (document) ->
-  markers = createMarkers(document)
-  hintChars = utils.getHintChars()
+  { clientWidth, clientHeight } = document.documentElement
+  viewport =
+    left:    0
+    top:     0
+    right:   clientWidth
+    bottom:  clientHeight
+    width:   clientWidth
+    height:  clientHeight
+    scrollX: window.scrollX
+    scrollY: window.scrollY
+  markers = createMarkers(window, viewport)
+
+  return if markers.length == 0
+
+  for marker in markers
+    marker.weight = marker.elementShape.area
 
   # Each marker gets a unique `z-index`, so that it can be determined if a marker overlaps another.
   # Put more important markers (higher weight) at the end, so that they get higher `z-index`, in
@@ -37,118 +52,215 @@ injectHints = (document) ->
   for marker, index in markers
     marker.markerElement.style.setProperty('z-index', Z_INDEX_START + index, 'important')
 
+  hintChars = utils.getHintChars()
   addHuffmanCodeWordsTo(markers, {alphabet: hintChars}, (marker, hint) -> marker.setHint(hint))
 
   removeHints(document)
-  insertHints(markers)
+  container = utils.createElement(document, 'div', {id: CONTAINER_ID})
+  document.documentElement.appendChild(container)
 
-  # Must be done after the hints have been inserted into the DOM (see marker.coffee)
   for marker in markers
-    marker.completePosition()
+    container.appendChild(marker.markerElement)
+    # Must be done after the hints have been inserted into the DOM (see marker.coffee)
+    marker.setPosition(viewport)
 
   return markers
 
 
-insertHints = (markers) ->
-  docFrags = []
+createMarkers = (window, viewport, parents = []) ->
+  { document } = window
+  markers = []
 
-  getFrag = (document) ->
-    for [doc, frag] in docFrags
-      if document == doc
-        return frag
-
-  for marker in markers
-    doc = marker.element.ownerDocument
-    if not getFrag(doc)
-      docFrags.push([doc, doc.createDocumentFragment()])
-
-    frag = getFrag(doc)
-    frag.appendChild(marker.markerElement)
-
-  for [doc, frag] in docFrags
-    container = createHintsContainer(doc)
-    container.appendChild(frag)
-    doc.documentElement.appendChild(container)
-
-
-createMarkers = (document) ->
   # For now we aren't able to handle hint markers in XUL Documents :(
-  if document instanceof HTMLDocument # or document instanceof XULDocument
-    if document.documentElement
-      # Select all markable elements in the document, create markers
-      # for each of them, and position them on the page.
-      # Note that the markers are not given hints.
-      set = utils.getMarkableElements(document, {type: 'all'})
-      markers = []
-      for element in set
-        if rect = getElementRect(element)
-          marker = new Marker(element)
-          marker.setPosition(rect.top, rect.left)
-          marker.weight = rect.area * marker.calcBloomRating()
+  return [] unless document instanceof HTMLDocument # or document instanceof XULDocument
 
-          markers.push(marker)
+  candidates = utils.getMarkableElements(document, {type: 'all'})
+  for element in candidates
+    shape = getElementShape(window, element, viewport, parents)
+    # If `element` has no visible shape then it shouldn’t get any marker.
+    continue unless shape
 
-      for frame in document.defaultView.frames
-        markers = markers.concat(createMarkers(frame.document))
+    markers.push(new Marker(element, shape))
 
-  return markers or []
+    if element instanceof FrameElement or element instanceof IFrameElement
+      frame = element.contentWindow
+      [ rect ] = shape.rects # Frames only have one rect.
 
+      # Calculate the visible part of the frame, according to the top-level window.
+      { clientWidth, clientHeight } = frame.document.documentElement
+      frameViewport =
+        left:   Math.max(viewport.left - rect.left, 0)
+        top:    Math.max(viewport.top  - rect.top,  0)
+        right:  clientWidth  + Math.min(viewport.right  - rect.right,  0)
+        bottom: clientHeight + Math.min(viewport.bottom - rect.bottom, 0)
 
-createHintsContainer = (document) ->
-  container = utils.createElement(document, 'div', {id: CONTAINER_ID})
-  return container
+      computedStyle = window.getComputedStyle(frame.frameElement)
+      offset =
+        left: rect.left +
+          parseFloat(computedStyle.getPropertyValue('border-left-width')) +
+          parseFloat(computedStyle.getPropertyValue('padding-left'))
+        top: rect.top +
+          parseFloat(computedStyle.getPropertyValue('border-top-width')) +
+          parseFloat(computedStyle.getPropertyValue('padding-top'))
 
+      frameMarkers = createMarkers(frame, frameViewport, parents.concat({ window, offset }))
+      markers.push(frameMarkers...)
 
-# Uses `element.getBoundingClientRect()`. If that does not return a visible rectange, then looks at
-# the children of the markable node.
+  return markers
+
+# Returns the “shape” of `element`:
 #
-# The logic has been copied over from Vimiun originally.
-getElementRect = (element) ->
-  document = element.ownerDocument
-  window   = document.defaultView
-  docElem  = document.documentElement
-  body     = document.body
+# - `rects`: Its `.getClientRects()` rectangles.
+# - `visibleRects`: The parts of rectangles out of the above that are inside
+#   `viewport`.
+# - `nonCoveredPoint`: The coordinates of the first point of `element` that
+#   isn’t covered by another element (except children of `element`).
+# - `area`: The area of the part of `element` that is inside `viewport`.
+#
+# Returns `null` if `element` is outside `viewport` or entirely covered by
+# other elements.
+getElementShape = (window, element, viewport, parents) ->
+  # `element.getClientRects()` returns a list of rectangles, usually just one,
+  # which is identical to the one returned by
+  # `element.getBoundingClientRect()`. However, if `element` is inline and
+  # line-wrapped, then it returns one rectangle for each line, since each line
+  # may be of different length, for example. That allows us to properly add
+  # hints to line-wrapped links.
+  rects = element.getClientRects()
+  totalArea = 0
+  visibleRects = []
+  for rect in rects when isInsideViewport(rect, viewport)
+    visibleRect = adjustRectToViewport(rect, viewport)
+    totalArea += visibleRect.area
+    visibleRects.push(visibleRect)
 
-  return unless utils.isElementVisible(element)
+  # If `element` has no area there is nothing to click. It is likely hidden
+  # using `display: none;`. However, if all the children of `element` are
+  # floated and/or absolutely positioned, then the area is 0, too. In that case
+  # it is actually possible to click `element` by clicking one of its children.
+  # For performance, let’s ignore this case until it’s needed. I haven’t found
+  # a need for this on real sites.
+  return null if totalArea == 0
 
-  clientTop  = docElem.clientTop  or body?.clientTop  or 0
-  clientLeft = docElem.clientLeft or body?.clientLeft or 0
-  scrollTop  = window.pageYOffset or docElem.scrollTop
-  scrollLeft = window.pageXOffset or docElem.scrollLeft
+  for visibleRect in visibleRects
+    nonCoveredPoint = getFirstNonCoveredPoint(window, element, visibleRect, parents)
+    break if nonCoveredPoint
 
-  clientRect = element.getBoundingClientRect()
+  return null unless nonCoveredPoint
 
-  if isRectOk(clientRect, window)
-    return {
-      top:    clientRect.top  + scrollTop  - clientTop
-      left:   clientRect.left + scrollLeft - clientLeft
-      width:  clientRect.width
-      height: clientRect.height
-      area:   clientRect.width * clientRect.height
-    }
-
-  # If the rect has 0 dimensions, then check what's inside.
-  # Floated or absolutely positioned elements are of particular interest.
-  if clientRect.width is 0 or clientRect.height is 0
-    for childElement in element.children
-      if computedStyle = window.getComputedStyle(childElement, null)
-        if computedStyle.getPropertyValue('float') != 'none' or \
-           computedStyle.getPropertyValue('position') == 'absolute'
-
-          return getElementRect(childElement)
-
-  return
+  return {
+    rects, visibleRects, nonCoveredPoint, area: totalArea
+  }
 
 
-# Checks if the given TextRectangle object qualifies
-# for its own Marker with respect to the `window` object
-isRectOk = (rect, window) ->
-  minimum = 2
-  rect.width >  minimum and rect.height >  minimum and \
-  rect.top   > -minimum and rect.left   > -minimum and \
-  rect.top   <  window.innerHeight - minimum and \
-  rect.left  <  window.innerWidth  - minimum
+MINIMUM_EDGE_DISTANCE = 4
+isInsideViewport = (rect, viewport) ->
+  return \
+    rect.left   <= viewport.right  - MINIMUM_EDGE_DISTANCE and
+    rect.top    <= viewport.bottom + MINIMUM_EDGE_DISTANCE and
+    rect.right  >= viewport.left   + MINIMUM_EDGE_DISTANCE and
+    rect.bottom >= viewport.top    - MINIMUM_EDGE_DISTANCE
 
+
+adjustRectToViewport = (rect, viewport) ->
+  left   = Math.max(rect.left,   viewport.left)
+  right  = Math.min(rect.right,  viewport.right)
+  top    = Math.max(rect.top,    viewport.top)
+  bottom = Math.min(rect.bottom, viewport.bottom)
+
+  width  = right - left
+  height = bottom - top
+  area   = width * height
+
+  return {
+    left, right, top, bottom
+    height, width, area
+  }
+
+
+getFirstNonCoveredPoint = (window, element, elementRect, parents) ->
+  # Determining if `element` is covered by other elements is a bit tricky.  We
+  # use `document.elementFromPoint()` to check if `element`, or a child of
+  # `element` (anything inside an `<a>` is clickable too), really is present in
+  # `elementRect`. If so, we prepare that point for being returned (#A).
+  #
+  # However, if we’re currently in a frame, there might be something on top of
+  # the frame that covers `element`. Therefore we check that the frame really
+  # is present at the point for each parent in `parents`. (#B)
+  #
+  # If `element` still isn’t determined to be covered, we return the point. (#C)
+  #
+  # We start by checking the top-left corner, since that’s where we want to
+  # place the marker, if possible. If there’s something else there, we check if
+  # that element is not as wide as `element`. If so we recurse, checking the
+  # point directly to the right of the found element. (#D)
+  #
+  # If that doesn’t find some exposed space of `element` we do the same
+  # procedure again, but downwards instead. (#E)
+  #
+  # Otherwise `element` seems to be covered to the right of `x` and below `y`.
+  # (#F)
+  #
+  # But before we start we need to hack around a little problem. If `element`
+  # has `border-radius`, the top-left corner won’t really belong to `element`,
+  # so `document.elementFromPoint()` will return whatever is behind. The
+  # solution is to temporarily add a CSS class that removes `border-radius`.
+  element.classList.add('VimFxNoBorderRadius')
+
+  triedElements = new Set()
+
+  nonCoveredPoint = do recurse = (x = elementRect.left, y = elementRect.top) ->
+    # (#A)
+    elementAtPoint = window.document.elementFromPoint(x, y)
+    if element.contains(elementAtPoint) # Note that `a.contains(a) == true`!
+      covered = false
+      point = {x, y}
+
+      # (#B)
+      currentWindow = window
+      for {window: parentWindow, offset} in parents by -1
+        point.x += offset.left
+        point.y += offset.top
+        elementAtPoint = parentWindow.document.elementFromPoint(point.x, point.y)
+        if elementAtPoint != currentWindow.frameElement
+          covered = true
+          adjustment =
+            x: point.x - x
+            y: point.y - y
+          break
+        currentWindow = parentWindow
+
+      # (#C)
+      return point unless covered
+
+    # `document.elementFromPoint()` returns `null` if the point is outside the
+    # viewport. That should never happen, but in case it does we return.
+    return false if elementAtPoint == null
+
+    # If we have already looked around the found element, it is a waste of time
+    # to do it again.
+    return false if triedElements.has(elementAtPoint)
+    triedElements.add(elementAtPoint)
+
+    { right, bottom } = elementAtPoint.getBoundingClientRect()
+    if adjustment
+      right  -= adjustment.x
+      bottom -= adjustment.y
+
+    # (#B)
+    if right < elementRect.right
+      return point if point = recurse(right + 1, y)
+
+    # (#C)
+    if bottom < elementRect.bottom
+      return point if point = recurse(x, bottom + 1)
+
+    # (#D)
+    return false
+
+  element.classList.remove('VimFxNoBorderRadius')
+
+  return nonCoveredPoint
 
 
 # Finds all stacks of markers that overlap each other (by using `getStackFor`) (#1), and rotates

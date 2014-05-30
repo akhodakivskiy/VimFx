@@ -13,9 +13,8 @@ dummyBloomFilter = new DummyBloomFilter()
 # Wraps the markable element and provides methods to manipulate the markers
 class Marker
   # Creates the marker DOM node
-  constructor: (@element) ->
+  constructor: (@element, @elementShape) ->
     document = @element.ownerDocument
-    window = document.defaultView
     @markerElement = createElement(document, 'div', {class: 'VimFxHintMarker'})
 
     Object.defineProperty this, 'bloomFilter',
@@ -28,22 +27,27 @@ class Marker
   updateVisibility: ->
     if @hintChars.startsWith(@enteredHintChars) then @show() else @hide()
 
-  setPosition: (top, left) ->
-    # The positioning is absulute
-    @markerElement.style.top  = "#{ top }px"
+  # To be called when the marker has been both assigned a hint and inserted
+  # into the DOM, and thus gotten a height and width
+  setPosition: (viewport) ->
+    {
+      markerElement: { offsetHeight: height, offsetWidth: width }
+      elementShape: { nonCoveredPoint: { x, y } }
+    } = this
+
+    # Make sure that the hint isn’t partly off-screen
+    x = Math.min(x, viewport.width  - width)
+    y = Math.min(y, viewport.height - height)
+
+    left = viewport.scrollX + x
+    top  = viewport.scrollY + y
+
+    # The positioning is absolute
     @markerElement.style.left = "#{ left }px"
+    @markerElement.style.top  = "#{ top }px"
 
     # For quick access
-    @position = {top, left}
-
-  # To be called when the marker has been both assigned a hint and inserted into the DOM, and thus
-  # gotten a height and width.
-  completePosition: ->
-    {
-      position: { top, left }
-      markerElement: { offsetHeight: height, offsetWidth: width }
-    } = this
-    @position = {top, bottom: top + height, left, right: left + width, height, width}
+    @position = {left, right: left + width, top, bottom: top + height, height, width}
 
   setHint: (@hintChars) ->
     # Hint chars that have been matched so far

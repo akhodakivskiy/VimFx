@@ -69,6 +69,14 @@
     display: none !important;
 }
 
+.VimFxNoBorderRadius {
+  border-radius: 0 !important;
+  /* Reset `transition` in case there’s a transition on `border-radius`, or
+   * `all`, so that the above `border-radius` reset really takes affect
+   * immediately. */
+  transition: none !important;
+}
+
 /* Help Dialog */
 
 div#VimFxHelpDialog {

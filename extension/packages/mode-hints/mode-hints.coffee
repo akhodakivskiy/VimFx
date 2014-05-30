@@ -5,7 +5,7 @@ hints = require 'mode-hints/hints'
 
 exports.mode_hints =
   onEnter: (vim, storage, callback) ->
-    markers = hints.injectHints(vim.window.document)
+    markers = hints.injectHints(vim.window)
     if markers?.length > 0
       storage.markers  = markers
       storage.callback = callback
