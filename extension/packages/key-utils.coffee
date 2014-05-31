@@ -1,64 +1,44 @@
-{ interfaces: Ci } = Components
+MODIFIERS = [
+  'Shift', 'Control', 'Alt', 'AltGraph', 'Meta', 'Super', 'Hyper', 'OS'
+]
+LEGACY_VIMFX_SHIFT_KEYCHARS = [
+  'Esc', 'Backspace', 'Space', 'Tab', 'Return', 'Left', 'Right', 'Up', 'Down'
+]
 
-KE = Ci.nsIDOMKeyEvent
+# This function used to receive `event.keyCode` as the first argument, and then
+# try to translate it to a readable “keyChar”. Now it gets `event.key` instead,
+# which means that, ideally, no translation should be needed. However, we used
+# to call some keys one thing, while `event.key` is something else. To maintain
+# backwards compatibility with the users’ customizations, this function is
+# kept, trying to behave just like the old one. The only exception is that now
+# we allow more keys to be used, since `event.key` recognizes more keys than
+# this function used to. At some point we should refactor this function away.
+keyCharFromCode = (key, shiftKey = false) ->
+  # The function used to return `undefined` if the `keyCode` wasn’t in the
+  # allowed set or wasn’t recognized, so let’s keep it that way for now. The
+  # only difference is that the allowed set has been changed to anything but
+  # modifiers.
+  if key in MODIFIERS or key == 'Unidentified'
+    return undefined
 
-# Extract keyChar from keyCode taking into account the shift modifier
-keyCharFromCode = (keyCode, shiftKey = false) ->
-  keyChar = undefined
-  if keyCode >= KE.DOM_VK_A and keyCode <= KE.DOM_VK_Z
-    keyChar = String.fromCharCode(keyCode)
-    if shiftKey
-      keyChar = keyChar.toUpperCase()
-    else
-      keyChar = keyChar.toLowerCase()
-  else
-    fn = (code, codeWithShift, char, charWithShift) ->
-      if keyCode == code
-        return if shiftKey then charWithShift else char
-      else if keyCode == codeWithShift
-        return charWithShift
+  # `event.key` calls the space bar “ ” (an actual space character), while we
+  # called it “Space”. This translation is sane and should be kept after a
+  # refactor.
+  if key == ' '
+    key = 'Space'
 
-    options = [
-      [ KE.DOM_VK_ESCAPE,         KE.DOM_VK_ESCAPE,     'Esc',       'Shift-Esc'        ],
-      [ KE.DOM_VK_BACK_SPACE,     KE.DOM_VK_BACK_SPACE, 'Backspace', 'Shift-Backspace'  ],
-      [ KE.DOM_VK_SPACE,          KE.DOM_VK_SPACE,      'Space',     'Shift-Space'      ],
-      [ KE.DOM_VK_TAB,            KE.DOM_VK_TAB,        'Tab',       'Shift-Tab'        ],
-      [ KE.DOM_VK_RETURN,         KE.DOM_VK_RETURN,     'Return',    'Shift-Return'     ],
-      [ KE.DOM_VK_LEFT,           KE.DOM_VK_LEFT,       'Left',      'Shift-Left'       ],
-      [ KE.DOM_VK_RIGHT,          KE.DOM_VK_RIGHT,      'Right',     'Shift-Right'      ],
-      [ KE.DOM_VK_UP,             KE.DOM_VK_UP,         'Up',        'Shift-Up'         ],
-      [ KE.DOM_VK_DOWN,           KE.DOM_VK_DOWN,       'Down',      'Shift-Down'       ],
+  # `event.key` says “Enter”, we used to say “Return”.
+  if key == 'Enter'
+    key = 'Return'
 
-      [ KE.DOM_VK_1,              KE.DOM_VK_EXCLAMATION,          '1',  '!' ],
-      [ KE.DOM_VK_2,              KE.DOM_VK_AT,                   '2',  '@' ],
-      [ KE.DOM_VK_3,              KE.DOM_VK_HASH,                 '3',  '#' ],
-      [ KE.DOM_VK_4,              KE.DOM_VK_DOLLAR,               '4',  '$' ],
-      [ KE.DOM_VK_5,              KE.DOM_VK_PERCENT,              '5',  '%' ],
-      [ KE.DOM_VK_6,              KE.DOM_VK_CIRCUMFLEX,           '6',  '^' ],
-      [ KE.DOM_VK_7,              KE.DOM_VK_AMPERSAND,            '7',  '&' ],
-      [ KE.DOM_VK_8,              KE.DOM_VK_ASTERISK,             '8',  '*' ],
-      [ KE.DOM_VK_9,              KE.DOM_VK_OPEN_PAREN,           '9',  '(' ],
-      [ KE.DOM_VK_0,              KE.DOM_VK_CLOSE_PAREN,          '0',  ')' ],
+  # We used to return for example “Shift-Esc” if shift was held when Esc was
+  # pressed. In the future you should be able to use shift with any
+  # non-character key (shift with character keys are taken care of
+  # automatically by `event.key`).
+  if shiftKey and key in LEGACY_VIMFX_SHIFT_KEYCHARS
+    key = "Shift-#{ key }"
 
-      [ KE.DOM_VK_OPEN_BRACKET,   KE.DOM_VK_OPEN_CURLY_BRACKET,   '[',  '{' ],
-      [ KE.DOM_VK_CLOSE_BRACKET,  KE.DOM_VK_CLOSE_CURLY_BRACKET,  ']',  '}' ],
-      [ KE.DOM_VK_SEMICOLON,      KE.DOM_VK_COLON,                ';',  ':' ],
-      [ KE.DOM_VK_QUOTE,          KE.DOM_VK_DOUBLEQUOTE,          "'",  '"' ],
-      [ KE.DOM_VK_BACK_QUOTE,     KE.DOM_VK_TILDE,                '`',  '~' ],
-      [ KE.DOM_VK_BACK_SLASH,     KE.DOM_VK_PIPE,                 '\\', '|' ],
-      [ KE.DOM_VK_COMMA,          KE.DOM_VK_LESS_THAN,            ',',  '<' ],
-      [ KE.DOM_VK_PERIOD,         KE.DOM_VK_GREATER_THAN,         '.',  '>' ],
-      [ KE.DOM_VK_SLASH,          KE.DOM_VK_QUESTION_MARK,        '/',  '?' ],
-      [ KE.DOM_VK_HYPHEN_MINUS,   KE.DOM_VK_UNDERSCORE,           '-',  '_' ],
-      [ KE.DOM_VK_EQUALS,         KE.DOM_VK_PLUS,                 '=',  '+' ],
-    ]
-
-    for opt in options
-      if char = fn(opt...)
-        keyChar = char
-        break
-
-  return keyChar
+  return key
 
 # Format keyChar that arrives during `keypress` into keyStr
 applyModifiers = (keyChar, ctrlKey = false, altKey = false, metaKey = false) ->
