@@ -1,5 +1,10 @@
 # Change Log
 
+0.5.12 (June 1 2014)
+
+- Fixed: Autofocus preventiton got stuck sometimes, making it impossible to
+  focus inputs.
+
 0.5.11 (June 1 2014)
 
 - Fixed: The focus search bar command was broken.
