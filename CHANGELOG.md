@@ -1,5 +1,15 @@
 # Change Log
 
+0.5.11 (June 1 2014)
+
+- Fixed: The focus search bar command was broken.
+- Fixed: Autofocus prevention was broken.
+- Fixed: The top bar on YouTube could not be accessed by VimFx.
+- Fixed: You can no longer add blank hotkeys.
+- Improved: Tab Groups are supported.
+- Improved: Matching of previous/next links should be more reliable.
+- Improved: A few minor things.
+
 0.5.10 (May 7 2014)
 
 - Fixed yet another bug related to the default pereferences
