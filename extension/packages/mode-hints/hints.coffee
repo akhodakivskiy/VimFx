@@ -134,14 +134,24 @@ getElementShape = (window, element, viewport, parents) ->
     totalArea += visibleRect.area
     visibleRects.push(visibleRect)
 
-  # If `element` has no area there is nothing to click. It is likely hidden
-  # using `display: none;`. However, if all the children of `element` are
-  # floated and/or absolutely positioned, then the area is 0, too. In that case
-  # it is actually possible to click `element` by clicking one of its children.
-  # For performance, let’s ignore this case until it’s needed. I haven’t found
-  # a need for this on real sites.
-  return null if totalArea == 0
+  # If `element` has no area there is nothing to click, unless `element` has
+  # only one visible rect and either a width or a height. That means that
+  # everything inside `element` is floated and/or absolutely positioned (and
+  # that `element` hasn’t been made to “contain” the floats). For example, a
+  # link in a menu could contain a span of text floated to the left and an icon
+  # floated to the right. Those are still clickable. Therefore we return the
+  # shape of the first visible child instead. At least in that example, that’s
+  # the best bet.
+  if totalArea == 0
+    if visibleRects.length == 1
+      [ rect ] = visibleRects
+      if rect.width > 0 or rect.height > 0
+        for child in element.children
+          shape = getElementShape(window, child, viewport, parents)
+          return shape if shape
+    return null
 
+  # Even if `element` has a visible rect, it might be covered by other elements.
   for visibleRect in visibleRects
     nonCoveredPoint = getFirstNonCoveredPoint(window, element, visibleRect, parents)
     break if nonCoveredPoint
