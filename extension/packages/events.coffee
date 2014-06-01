@@ -35,6 +35,16 @@ suppressEvent = (event) ->
   event.preventDefault()
   event.stopPropagation()
 
+# Returns the appropriate vim instance for `event`, but only if it’s okay to do
+# so. VimFx must not be disabled or blacklisted.
+getVimFromEvent = (event) ->
+  return if getPref('disabled')
+  return unless window = utils.getEventCurrentTabWindow(event)
+  return unless vim = vimBucket.get(window)
+  return if vim.blacklisted
+
+  return vim
+
 removeVimFromTab = (tab, gBrowser) ->
   return unless browser = gBrowser.getBrowserForTab(tab)
   vimBucket.forget(browser.contentWindow)
@@ -49,8 +59,6 @@ windowsListeners =
       # No matter what, always reset the `suppress` flag, so we don't suppress more than intended.
       suppress = false
 
-      return if getPref('disabled')
-
       if popupPassthrough
         # The `popupPassthrough` flag is set a bit unreliably. Sometimes it can be stuck as `true`
         # even though no popup is shown, effectively disabling the extension. Therefore we check
@@ -62,11 +70,7 @@ windowsListeners =
           return if popup.state == 'open'
         popupPassthrough = false # No popup was actually open: Reset the flag.
 
-      return unless window = utils.getEventCurrentTabWindow(event)
-      return unless vim = vimBucket.get(window)
-
-      return if vim.blacklisted
-
+      return unless vim = getVimFromEvent(event)
       return unless keyStr = keyStrFromEvent(event)
       suppress = vim.onInput(keyStr, event)
 
@@ -88,31 +92,39 @@ windowsListeners =
   popuphidden: checkPassthrough
 
   focus: (event) ->
-    return if getPref('disabled') or getPref('prevent_autofocus')
-    return unless target = event.originalTarget
+    return unless getPref('prevent_autofocus')
+
+    target = event.originalTarget
     return unless target.ownerDocument instanceof HTMLDocument
-    return unless window = utils.getEventCurrentTabWindow(event)
-    return unless vim = vimBucket.get(window)
-    return unless isEditable = utils.isElementEditable(target)
-    return unless lastLoad = vim.storage.lastLoad
 
-    if (new Date().getTime() - lastLoad.getTime()) < 1000
-      console.log("blur")
-      vim.storage.lastLoad = undefined
-      window.setTimeout((-> target.blur()), 0)
+    # We only prevent autofocus from editable elements, that is, elements that
+    # can “steal” the keystrokes, in order not to interfere too much.
+    return unless utils.isElementEditable(target)
 
+    return unless vim = getVimFromEvent(event)
+
+    # Focus events can occur before DOMContentLoaded, both when the `autofocus`
+    # attribute is used, and when a script contains `element.focus()`. If so,
+    # `vim.lastLoad` isn’t set yet and we should blur the target. If
+    # DOMContentLoaded already has fired we blur only if the focus happens
+    # within a second after it.
+    if !vim.lastLoad or Date.now() - vim.lastLoad < 1000
+      target.blur()
+
+  # Record when the page was loaded. This is used by the autofocus prevention feature.
   DOMContentLoaded: (event) ->
-    return if getPref('disabled') or getPref('prevent_autofocus')
-    return unless window = utils.getEventCurrentTabWindow(event)
-    return unless vim = vimBucket.get(window)
-    if vim.storage.location != window.location.href
-      vim.storage.location = window.location.href
-      vim.storage.lastLoad = new Date
+    target = event.originalTarget
+    return unless target instanceof HTMLDocument
+    return unless vim = getVimFromEvent(event)
 
-    if vim.storage.lastLoad && activeElement = window.document.activeElement
-      console.log("blur")
-      vim.storage.lastLoad = undefined
-      window.setTimeout((-> activeElement.blur()), 0)
+    # Some pages (at least amazon.com) loads weirdly, firing DOMContentLoaded
+    # many times. Therefore we only set `vim.lastLoad` if it wasn’t set
+    # already. Otherwise too many focus events might be considered to be
+    # autofocus events and thus blurred, even though the user might have
+    # focused something on his own.
+    if !vim.lastLoad
+      vim.lastLoad = Date.now()
+    return
 
   # When the top level window closes we should release all Vims that were
   # associated with tabs in this window
@@ -137,9 +149,11 @@ windowsListeners =
 
 # This listener works on individual tabs within Chrome Window
 tabsListener =
-  # Listenfor location changes and disable the extension on blacklisted urls
   onLocationChange: (browser, webProgress, request, location) ->
     return unless vim = vimBucket.get(browser.contentWindow)
+
+    # Mark the new location as not loaded yet.
+    vim.lastLoad = null
 
     # If the location changes when in hints mode (for example because the reload button has been
     # clicked), we're going to end up in hints mode without any markers. So switch back to normal
@@ -147,6 +161,7 @@ tabsListener =
     if vim.mode == 'hints'
       vim.enterMode('normal')
 
+    # Update the blacklist state.
     vim.blacklisted = utils.isBlacklisted(location.spec)
     updateButton(vim)
 
