@@ -86,7 +86,7 @@ createMarkers = (window, viewport, parents = []) ->
       frame = element.contentWindow
       [ rect ] = shape.rects # Frames only have one rect.
 
-      # Calculate the visible part of the frame, according to the top-level window.
+      # Calculate the visible part of the frame, according to the parent.
       { clientWidth, clientHeight } = frame.document.documentElement
       frameViewport =
         left:   Math.max(viewport.left - rect.left, 0)
@@ -134,6 +134,8 @@ getElementShape = (window, element, viewport, parents) ->
     totalArea += visibleRect.area
     visibleRects.push(visibleRect)
 
+  return null if visibleRects.length == 0
+
   # If `element` has no area there is nothing to click, unless `element` has
   # only one visible rect and either a width or a height. That means that
   # everything inside `element` is floated and/or absolutely positioned (and
@@ -142,14 +144,15 @@ getElementShape = (window, element, viewport, parents) ->
   # floated to the right. Those are still clickable. Therefore we return the
   # shape of the first visible child instead. At least in that example, that’s
   # the best bet.
-  if totalArea == 0
-    if visibleRects.length == 1
-      [ rect ] = visibleRects
-      if rect.width > 0 or rect.height > 0
-        for child in element.children
-          shape = getElementShape(window, child, viewport, parents)
-          return shape if shape
-    return null
+  if totalArea == 0 and visibleRects.length == 1
+    [ rect ] = visibleRects
+    if rect.width > 0 or rect.height > 0
+      for child in element.children
+        shape = getElementShape(window, child, viewport, parents)
+        return shape if shape
+      return null
+
+  return null if totalArea == 0
 
   # Even if `element` has a visible rect, it might be covered by other elements.
   for visibleRect in visibleRects
