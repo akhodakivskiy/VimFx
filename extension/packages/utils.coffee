@@ -328,8 +328,11 @@ removeDuplicates = (array) ->
   seen = {}
   return array.filter((item) -> if seen[item] then false else (seen[item] = true))
 
+# Why isn’t `a[@href]` used, when `area[@href]` is? Some sites (such as
+# StackExchange sites) leave out the `href` property and use the anchor as a
+# JavaScript-powered button (instead of just using the `button` element).
 ACTION_ELEMENT_TAGS = [
-  "a[@href]"
+  "a"
   "area[@href]"
   "button"
 ]
