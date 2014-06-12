@@ -80,7 +80,12 @@ isElementEditable = (element) ->
          element instanceof HTMLSelectElement or \
          element instanceof XULMenuListElement or \
          element.isContentEditable or \
-         element.getAttribute?('g_editable') == 'true' # Non-standard attribute commonly used by Google.
+         isElementGoogleEditable(element)
+
+# Non-standard attribute commonly used by Google.
+isElementGoogleEditable = (element) ->
+  element.getAttribute?('g_editable') == 'true' or \
+  (element instanceof HTMLElement and isElementGoogleEditable(element.ownerDocument.body))
 
 isElementVisible = (element) ->
   document = element.ownerDocument
