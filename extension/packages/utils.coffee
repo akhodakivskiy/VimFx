@@ -85,7 +85,7 @@ isElementEditable = (element) ->
 # Non-standard attribute commonly used by Google.
 isElementGoogleEditable = (element) ->
   element.getAttribute?('g_editable') == 'true' or \
-  (element instanceof HTMLElement and isElementGoogleEditable(element.ownerDocument.body))
+  (element instanceof HTMLElement and element.ownerDocument.body?.getAttribute('g_editable') == 'true')
 
 isElementVisible = (element) ->
   document = element.ownerDocument
