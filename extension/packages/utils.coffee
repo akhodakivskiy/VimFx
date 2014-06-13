@@ -250,14 +250,30 @@ simpleWildcards = (string) ->
 # Note: We cannot use `\b` word boundaries, because they don’t work well with
 # non-English characters. Instead we match a space as word boundary. Therefore
 # we normalize the whitespace and add spaces at the edges of the element text.
-getBestPatternMatch = (patterns, elements) ->
+getBestPatternMatch = (patterns, attrs, elements) ->
+  # Create function that will match against string token
+  regexps = []
   for pattern in patterns
     wildcarded = simpleWildcards(pattern)
-    regexp = /// ^\s(?:#{ wildcarded })\s | \s(?:#{ wildcarded })\s$ ///i
+    regexps.push(/// ^\s(?:#{ wildcarded })\s | \s(?:#{ wildcarded })\s$ ///i)
+
+  matches = (text) ->
+    for re in regexps
+      if re.test(" #{ text } ".replace(/\s+/g, ' '))
+        return true
+    return false
+
+  # First search in attributes as it's likely that they are more specific
+  # than text contexts
+  for attr in attrs
     for element in elements
-      text = " #{ element.textContent } ".replace(/\s+/g, ' ')
-      if regexp.test(text)
+      if matches(element.getAttribute(attr))
         return element
+
+  # Then search in element contents
+  for element in elements
+    if matches(element.textContent)
+      return element
 
   return null
 
