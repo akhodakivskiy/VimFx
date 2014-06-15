@@ -192,7 +192,7 @@ adjustRectToViewport = (rect, viewport) ->
 
 
 getFirstNonCoveredPoint = (window, element, elementRect, parents) ->
-  # Determining if `element` is covered by other elements is a bit tricky.  We
+  # Determining if `element` is covered by other elements is a bit tricky. We
   # use `document.elementFromPoint()` to check if `element`, or a child of
   # `element` (anything inside an `<a>` is clickable too), really is present in
   # `elementRect`. If so, we prepare that point for being returned (#A).
@@ -223,10 +223,30 @@ getFirstNonCoveredPoint = (window, element, elementRect, parents) ->
   triedElements = new Set()
 
   nonCoveredPoint = do recurse = (x = elementRect.left, y = elementRect.top) ->
-    # (#A)
     elementAtPoint = window.document.elementFromPoint(x, y)
+
+    # `document.elementFromPoint()` returns `null` if the point is outside the
+    # viewport. That should never happen, but in case it does we return.
+    return false if elementAtPoint == null
+
+    # (#A)
+    covered = true
     if element.contains(elementAtPoint) # Note that `a.contains(a) == true`!
       covered = false
+    else
+      # Some sites use a pseudo-element to give fancy borders or shadows to
+      # <input>s, which might cover `element`. There is no way of getting the
+      # dimensions of pseudo-elements, so we add `pointer-events: none;` to
+      # them, so that we can get what’s below. In theory there might be yet a
+      # pseudo-element there, which could be solved through recursion, but it
+      # seems to be impossible to know when to end that recursion.
+      elementAtPoint.classList.add('VimFxBeforeAfterClickThrough')
+      elementAtPoint = window.document.elementFromPoint(x, y)
+      elementAtPoint.classList.remove('VimFxBeforeAfterClickThrough')
+      if element.contains(elementAtPoint)
+        covered = false
+
+    if not covered
       point = {x, y}
 
       # (#B)
@@ -245,10 +265,6 @@ getFirstNonCoveredPoint = (window, element, elementRect, parents) ->
 
       # (#C)
       return point unless covered
-
-    # `document.elementFromPoint()` returns `null` if the point is outside the
-    # viewport. That should never happen, but in case it does we return.
-    return false if elementAtPoint == null
 
     # If we have already looked around the found element, it is a waste of time
     # to do it again.

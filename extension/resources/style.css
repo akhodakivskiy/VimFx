@@ -23,6 +23,7 @@
     min-height: 0 !important;
     min-width: 0 !important;
     opacity: 1 !important;
+    outline: none !important;
     padding: 0 !important;
     position: static !important;
     /*right: auto !important;*/
@@ -36,6 +37,10 @@
     white-space: normal !important;
     width: auto !important;
     float: none !important;
+}
+.VimFxReset::before,
+.VimFxReset::after {
+    content: none !important;
 }
 
 /* Markers */
@@ -70,11 +75,16 @@
 }
 
 .VimFxNoBorderRadius {
-  border-radius: 0 !important;
-  /* Reset `transition` in case there’s a transition on `border-radius`, or
-   * `all`, so that the above `border-radius` reset really takes affect
-   * immediately. */
-  transition: none !important;
+    border-radius: 0 !important;
+    /* Reset `transition` in case there’s a transition on `border-radius`, or
+     * `all`, so that the above `border-radius` reset really takes affect
+     * immediately. */
+    transition: none !important;
+}
+
+.VimFxBeforeAfterClickThrough::before,
+.VimFxBeforeAfterClickThrough::after {
+    pointer-events: none !important;
 }
 
 /* Help Dialog */
