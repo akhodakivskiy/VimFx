@@ -159,7 +159,21 @@ getElementShape = (window, element, viewport, parents) ->
     nonCoveredPoint = getFirstNonCoveredPoint(window, element, visibleRect, parents)
     break if nonCoveredPoint
 
-  return null unless nonCoveredPoint
+  unless nonCoveredPoint
+    # If no non-covered point could be found, it might be because the
+    # `line-height` of a parent element is less than the `font-size` of
+    # `element` and the parent has `overflow: hidden;`. If so, the top of the
+    # first `rect` will be cut off, so `document.elementFromPoint()` will
+    # return whatever is behind. The solution is to temporarily add a CSS class
+    # that normalizes `line-height`. (Unlike the similar `border-radius` hack
+    # below, we cannot do this in advance, because changing the `line-height`
+    # is too expensive).
+    shape = null
+    unless element.classList.contains('VimFxNormalLineHeight')
+      element.classList.add('VimFxNormalLineHeight')
+      shape = getElementShape(window, element, viewport, parents)
+    element.classList.remove('VimFxNormalLineHeight')
+    return shape
 
   return {
     rects, visibleRects, nonCoveredPoint, area: totalArea
@@ -216,8 +230,9 @@ getFirstNonCoveredPoint = (window, element, elementRect, parents) ->
   #
   # But before we start we need to hack around a little problem. If `element`
   # has `border-radius`, the top-left corner won’t really belong to `element`,
-  # so `document.elementFromPoint()` will return whatever is behind. The
-  # solution is to temporarily add a CSS class that removes `border-radius`.
+  # so `document.elementFromPoint()` will return whatever is behind. This will
+  # result in missing or out-of-place markers. The solution is to temporarily
+  # add a CSS class that removes `border-radius`.
   element.classList.add('VimFxNoBorderRadius')
 
   triedElements = new Set()

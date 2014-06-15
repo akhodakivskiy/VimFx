@@ -74,11 +74,14 @@
     display: none !important;
 }
 
+/* `transition` is reset here to make sure that these rules take effect
+ * immediately.  */
 .VimFxNoBorderRadius {
     border-radius: 0 !important;
-    /* Reset `transition` in case there’s a transition on `border-radius`, or
-     * `all`, so that the above `border-radius` reset really takes affect
-     * immediately. */
+    transition: none !important;
+}
+.VimFxNormalLineHeight {
+    line-height: normal !important;
     transition: none !important;
 }
 
