@@ -9,7 +9,7 @@ keyUtils                = require 'key-utils'
 
 HTMLDocument = Ci.nsIDOMHTMLDocument
 
-vimBucket = new utils.Bucket(utils.getWindowId, (w) -> new Vim(w))
+vimBucket = new utils.Bucket((window) -> new Vim(window))
 
 keyStrFromEvent = (event) ->
   { ctrlKey: ctrl, metaKey: meta, altKey: alt, shiftKey: shift } = event

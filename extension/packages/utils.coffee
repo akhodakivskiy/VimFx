@@ -20,18 +20,17 @@ Window              = Ci.nsIDOMWindow
 ChromeWindow        = Ci.nsIDOMChromeWindow
 
 class Bucket
-  constructor: (@idFunc, @newFunc) ->
-    @bucket = {}
+  constructor: (@newFunc) ->
+    @bucket = new WeakMap()
 
   get: (obj) ->
-    id = @idFunc(obj)
-    if container = @bucket[id]
-      return container
+    if @bucket.has(obj)
+      return @bucket.get(obj)
     else
-      return @bucket[id] = @newFunc(obj)
+      return @bucket.set(obj, @newFunc(obj))
 
   forget: (obj) ->
-    delete @bucket[id] if id = @idFunc(obj)
+    @bucket.delete(obj)
 
 getEventWindow = (event) ->
   if event.originalTarget instanceof Window
@@ -94,12 +93,6 @@ isElementVisible = (element) ->
     return computedStyle.getPropertyValue('visibility') == 'visible' and \
       computedStyle.getPropertyValue('display') != 'none' and \
       computedStyle.getPropertyValue('opacity') != '0'
-
-getWindowId = (window) ->
-  return window
-    .QueryInterface(Components.interfaces.nsIInterfaceRequestor)
-    .getInterface(Components.interfaces.nsIDOMWindowUtils)
-    .outerWindowID
 
 getSessionStore = ->
   Cc['@mozilla.org/browser/sessionstore;1'].getService(Ci.nsISessionStore)
@@ -433,7 +426,6 @@ exports.getEventCurrentTabWindow  = getEventCurrentTabWindow
 exports.getRootWindow             = getRootWindow
 exports.getCurrentTabWindow       = getCurrentTabWindow
 
-exports.getWindowId               = getWindowId
 exports.blurActiveElement         = blurActiveElement
 exports.isTextInputElement        = isTextInputElement
 exports.isElementEditable         = isElementEditable
