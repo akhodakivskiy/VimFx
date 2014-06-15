@@ -203,7 +203,12 @@ command_follow_in_tab = helper_follow.bind(undefined, {inTab: true})
 command_follow_multiple = helper_follow.bind(undefined, {inTab: true, multiple: true})
 
 helper_follow_pattern = do ->
-  # Search for the next/prev patterns in the following attributes of the element
+  # Search for the prev/next patterns in the following attributes of the element.
+  # `rel` should be kept as the first attribute, since the standard way of
+  # marking up prev/next links (`rel="prev"` and `rel="next"`) should be
+  # favored. Even though some of these attributes only allow a fixed set of
+  # keywords, we pattern-match them anyways since lots of sites don’t follow
+  # the spec and use the attributes arbitrarily.
   attrs = [ 'rel', 'role', 'data-tooltip', 'aria-label' ]
 
   return (type, vim) ->

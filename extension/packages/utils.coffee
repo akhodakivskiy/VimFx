@@ -243,34 +243,35 @@ simpleWildcards = (string) ->
   return regexpEscape(string).replace(/\\\*/g, '.*').replace(/!/g, '.')
 
 # Returns the first element that matches a pattern, favoring earlier patterns.
-# The patterns are `simpleWildcards`s and must match either in the beginning or
-# at the end of the text of the element. Moreover, a pattern does not match in
-# the middle of words, so "previous" does not match "previously". If that is
-# desired, a pattern such as "previous*" can be used instead.
-# Note: We cannot use `\b` word boundaries, because they don’t work well with
-# non-English characters. Instead we match a space as word boundary. Therefore
-# we normalize the whitespace and add spaces at the edges of the element text.
+# The patterns are case insensitive `simpleWildcards`s and must match either in
+# the beginning or at the end of a string. Moreover, a pattern does not match
+# in the middle of words, so "previous" does not match "previously". If that is
+# desired, a pattern such as "previous*" can be used instead. Note: We cannot
+# use `\b` word boundaries, because they don’t work well with non-English
+# characters. Instead we match a space as word boundary. Therefore we normalize
+# the whitespace and add spaces at the edges of the element text.
 getBestPatternMatch = (patterns, attrs, elements) ->
-  # Create function that will match against string token
   regexps = []
   for pattern in patterns
     wildcarded = simpleWildcards(pattern)
     regexps.push(/// ^\s(?:#{ wildcarded })\s | \s(?:#{ wildcarded })\s$ ///i)
 
+  # Helper function that matches a string against all the patterns.
   matches = (text) ->
+    normalizedText = " #{ text } ".replace(/\s+/g, ' ')
     for re in regexps
-      if re.test(" #{ text } ".replace(/\s+/g, ' '))
+      if re.test(normalizedText)
         return true
     return false
 
-  # First search in attributes as it's likely that they are more specific
-  # than text contexts
+  # First search in attributes (favoring earlier attributes) as it's likely
+  # that they are more specific than text contexts.
   for attr in attrs
     for element in elements
       if matches(element.getAttribute(attr))
         return element
 
-  # Then search in element contents
+  # Then search in element contents.
   for element in elements
     if matches(element.textContent)
       return element
