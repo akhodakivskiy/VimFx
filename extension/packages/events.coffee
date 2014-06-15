@@ -154,24 +154,51 @@ windowsListeners =
   pagehide: markVimUnloaded
 
   focus: (event) ->
-    return unless getPref('prevent_autofocus')
-
     target = event.originalTarget
-    return unless target.ownerDocument instanceof HTMLDocument
-
-    # We only prevent autofocus from editable elements, that is, elements that
-    # can “steal” the keystrokes, in order not to interfere too much.
-    return unless utils.isElementEditable(target)
-
     return unless vim = getVimFromEvent(event)
 
-    # Focus events can occur before DOMContentLoaded, both when the `autofocus`
-    # attribute is used, and when a script contains `element.focus()`. So if
-    # the `vim` instance isn’t marked as loaded, all focus events should be
-    # blurred. Autofocus events can occur later, too. How much later? One
-    # second seems to be a good compromise.
-    if !vim.loaded or Date.now() - vim.lastLoad < 1000
-      target.blur()
+    findBar = vim.rootWindow.gBrowser.getFindBar()
+    if target == findBar._findField.mInputField
+      vim.enterMode('find')
+      return
+
+    if getPref('prevent_autofocus')
+      return unless target.ownerDocument instanceof HTMLDocument
+
+      # We only prevent autofocus from editable elements, that is, elements that
+      # can “steal” the keystrokes, in order not to interfere too much.
+      return unless utils.isElementEditable(target)
+
+      # Focus events can occur before DOMContentLoaded, both when the `autofocus`
+      # attribute is used, and when a script contains `element.focus()`. So if
+      # the `vim` instance isn’t marked as loaded, all focus events should be
+      # blurred. Autofocus events can occur later, too. How much later? One
+      # second seems to be a good compromise.
+      if !vim.loaded or Date.now() - vim.lastLoad < 1000
+        target.blur()
+
+  blur: (event) ->
+    target = event.originalTarget
+    return unless vim = getVimFromEvent(event)
+
+    findBar = vim.rootWindow.gBrowser.getFindBar()
+    if target == findBar._findField.mInputField
+      vim.enterMode('normal')
+      return
+
+  click: (event) ->
+    target = event.originalTarget
+    return unless vim = getVimFromEvent(event)
+
+    # If the user clicks the reload button or a link when in hints mode, we’re
+    # going to end up in hints mode without any markers. Or if the user clicks
+    # a text input, then that input will be focused, but you can’t type in it
+    # (instead markers will be matched). So if the user clicks anything in
+    # hints mode it’s better to leave it.
+    if vim.mode == 'hints' and not utils.isEventSimulated(event)
+      vim.enterMode('normal')
+      return
+
 
   # When the top level window closes we should release all Vims that were
   # associated with tabs in this window
@@ -200,12 +227,6 @@ tabsListener =
     return unless vim = vimBucket.get(browser.contentWindow)
 
     vim.lastLoad = Date.now() # See the `pagehide` event.
-
-    # If the location changes when in hints mode (for example because the reload button has been
-    # clicked), we're going to end up in hints mode without any markers. So switch back to normal
-    # mode in that case.
-    if vim.mode == 'hints'
-      vim.enterMode('normal')
 
     # Update the blacklist state.
     vim.blacklisted = utils.isBlacklisted(location.spec)

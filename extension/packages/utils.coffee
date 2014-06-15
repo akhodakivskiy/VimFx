@@ -127,6 +127,12 @@ loadCss = do ->
     unload ->
       sss.unregisterSheet(uri, sss.AGENT_SHEET)
 
+# Store events that we’ve simulated. A `WeakMap` is used in order not to leak
+# memory. This approach is better than for example setting `event.simulated =
+# true`, since that tells the sites that the click was simulated, and allows
+# sites to spoof it.
+simulated_events = new WeakMap()
+
 # Simulate mouse click with full chain of event
 # Copied from Vimium codebase
 simulateClick = (element, modifiers = {}) ->
@@ -138,9 +144,13 @@ simulateClick = (element, modifiers = {}) ->
     mouseEvent = document.createEvent('MouseEvents')
     mouseEvent.initMouseEvent(event, true, true, window, 1, 0, 0, 0, 0, modifiers.ctrlKey, false, false,
         modifiers.metaKey, 0, null)
+    simulated_events.set(mouseEvent, true)
     # Debugging note: Firefox will not execute the element's default action if we dispatch this click event,
     # but Webkit will. Dispatching a click on an input box does not seem to focus it; we do that separately
     element.dispatchEvent(mouseEvent)
+
+isEventSimulated = (event) ->
+  return simulated_events.has(event)
 
 WHEEL_MODE_PIXEL = Ci.nsIDOMWheelEvent.DOM_DELTA_PIXEL
 WHEEL_MODE_LINE = Ci.nsIDOMWheelEvent.DOM_DELTA_LINE
@@ -443,6 +453,7 @@ exports.getSessionStore           = getSessionStore
 exports.loadCss                   = loadCss
 
 exports.simulateClick             = simulateClick
+exports.isEventSimulated          = isEventSimulated
 exports.simulateWheel             = simulateWheel
 exports.WHEEL_MODE_PIXEL          = WHEEL_MODE_PIXEL
 exports.WHEEL_MODE_LINE           = WHEEL_MODE_LINE

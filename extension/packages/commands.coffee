@@ -245,27 +245,34 @@ command_forward = (vim) ->
 
 findStorage = { lastSearchString: '' }
 
-# Switch into find mode
-command_find = (vim) ->
-  vim.enterMode('find', { highlight: false })
+helper_find = (highlight, vim) ->
+  findBar = vim.rootWindow.gBrowser.getFindBar()
 
-# Switch into find mode with highlighting
-command_find_hl = (vim) ->
-  vim.enterMode('find', { highlight: true })
+  findBar.onFindCommand()
+  findBar._findField.focus()
+  findBar._findField.select()
+
+  return unless highlightButton = findBar.getElement('highlight')
+  if highlightButton.checked != highlight
+    highlightButton.click()
+
+# Open the find bar, making sure that hightlighting is off.
+command_find = helper_find.bind(undefined, false)
+
+# Open the find bar, making sure that hightlighting is on.
+command_find_hl = helper_find.bind(undefined, true)
+
+helper_find_again = (direction, vim) ->
+  findBar = vim.rootWindow.gBrowser.getFindBar()
+  if findStorage.lastSearchString.length > 0
+    findBar._findField.value = findStorage.lastSearchString
+    findBar.onFindAgainCommand(direction)
 
 # Search for the last pattern
-command_find_next = (vim) ->
-  if findBar = vim.rootWindow.gBrowser.getFindBar()
-    if findStorage.lastSearchString.length > 0
-      findBar._findField.value = findStorage.lastSearchString
-      findBar.onFindAgainCommand(false)
+command_find_next = helper_find_again.bind(undefined, false)
 
 # Search for the last pattern backwards
-command_find_prev = (vim) ->
-  if findBar = vim.rootWindow.gBrowser.getFindBar()
-    if findStorage.lastSearchString.length > 0
-      findBar._findField.value = findStorage.lastSearchString
-      findBar.onFindAgainCommand(true)
+command_find_prev = helper_find_again.bind(undefined, true)
 
 # Enter insert mode
 command_insert_mode = (vim) ->
@@ -291,7 +298,7 @@ command_Esc = (vim, event) ->
 
   vim.rootWindow.DeveloperToolbar.hide()
 
-  vim.rootWindow.gBrowser.getFindBar()?.close()
+  vim.rootWindow.gBrowser.getFindBar().close()
 
   vim.rootWindow.TabView.hide()
 
@@ -389,10 +396,7 @@ searchForMatchingCommand = (keys) ->
 
 isEscCommandKey = (keyStr) -> keyStr in escapeCommand.keys()
 
-isReturnCommandKey = (keyStr) -> keyStr.contains('Return')
-
 exports.commands                  = commands
 exports.searchForMatchingCommand  = searchForMatchingCommand
 exports.isEscCommandKey           = isEscCommandKey
-exports.isReturnCommandKey        = isReturnCommandKey
 exports.findStorage               = findStorage
