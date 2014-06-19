@@ -7,7 +7,8 @@ keyUtils                = require 'key-utils'
 
 { interfaces: Ci } = Components
 
-HTMLDocument = Ci.nsIDOMHTMLDocument
+HTMLDocument     = Ci.nsIDOMHTMLDocument
+HTMLInputElement = Ci.nsIDOMHTMLInputElement
 
 vimBucket = new utils.Bucket((window) -> new Vim(window))
 
@@ -35,36 +36,6 @@ suppressEvent = (event) ->
   event.preventDefault()
   event.stopPropagation()
 
-# This function may be run several times, because:
-#
-# - It is assigned to several events. Whichever is fired first should mark
-#   `vim` as loaded.
-# - The events are fired for each frame of the document. Only the first of those
-#   should mark `vim` as loaded. (This is very noticeable on amazon.com.)
-#
-# If we’d updated `vim.lastLoad` each time, too many focus events might be
-# considered to be autofocus events and thus blurred, even though the user
-# might have focused something on his own.
-markVimLoaded = (event) ->
-  target = event.originalTarget
-  return unless target instanceof HTMLDocument
-  return unless vim = getVimFromEvent(event)
-
-  unless vim.loaded
-    vim.loaded = true
-    vim.lastLoad = Date.now()
-
-markVimUnloaded = (event) ->
-  target = event.originalTarget
-  return unless target instanceof HTMLDocument
-  return unless vim = getVimFromEvent(event)
-
-  # Only mark `vim` as unloaded if the main document is the target, not some
-  # frame inside the main document.
-  if target == vim.window.document
-    vim.loaded = false
-
-
 # Returns the appropriate vim instance for `event`, but only if it’s okay to do
 # so. VimFx must not be disabled or blacklisted.
 getVimFromEvent = (event) ->
@@ -74,6 +45,13 @@ getVimFromEvent = (event) ->
   return if vim.blacklisted
 
   return vim
+
+# Save the time of the last user interaction. This is used to determine whether
+# a focus event was automatic or voluntarily dispatched.
+markLastInteraction = (event, vim = null) ->
+  return unless vim ?= getVimFromEvent(event)
+  return unless event.originalTarget.ownerDocument instanceof HTMLDocument
+  vim.lastInteraction = Date.now()
 
 removeVimFromTab = (tab, gBrowser) ->
   return unless browser = gBrowser.getBrowserForTab(tab)
@@ -94,13 +72,22 @@ windowsListeners =
         # even though no popup is shown, effectively disabling the extension. Therefore we check
         # if there actually _are_ any open popups before stopping processing keyboard input. This is
         # only done when popups (might) be open (not on every keystroke) of performance reasons.
+        #
+        # The autocomplete popup in text inputs (for example) is technically a panel, but it does
+        # not respond to key presses. Therefore `[ignorekeys="true"]` is excluded.
+        # <https://developer.mozilla.org/en-US/docs/Mozilla/Tech/XUL/PopupGuide/PopupKeys#Ignoring_Keys>
         return unless rootWindow = utils.getEventRootWindow(event)
-        popups = rootWindow.document.querySelectorAll('menupopup, panel')
+        popups = rootWindow.document.querySelectorAll(
+          ':-moz-any(menupopup, panel):not([ignorekeys="true"])'
+        )
         for popup in popups
           return if popup.state == 'open'
         popupPassthrough = false # No popup was actually open: Reset the flag.
 
       return unless vim = getVimFromEvent(event)
+
+      markLastInteraction(event, vim)
+
       return unless keyStr = keyStrFromEvent(event)
       suppress = vim.onInput(keyStr, event)
 
@@ -121,38 +108,6 @@ windowsListeners =
   popupshown:  checkPassthrough
   popuphidden: checkPassthrough
 
-  # `DOMContentLoaded` does not fire when going back and forward in the history
-  # (nor does the `load` event), but `pageshow` does. Therefore we assign
-  # `markVimLoaded` to both events. The reason we do not simply only use
-  # `pageshow` is that it fires later than `DOMContentLoaded`: just after the
-  # `load` event, which is a a bit too late, causing too many focus events to
-  # be considered as autofocus events and thus blurred. But it fires quick
-  # enough when going back and forward in the history, since then an in-memory
-  # cache is used.
-  DOMContentLoaded: markVimLoaded
-  pageshow:         markVimLoaded
-
-  # It is tempting to mark a `vim` instance as unloaded in the
-  # `onLocationChange` event. However, if `history.pushState()` is used,
-  # `onLocationChange` will fire, but load events such as `DOMContentLoaded`
-  # and `pageshow` won’t. That means that the `vim` instance won’t be marked as
-  # loaded again, which will cause _all_ focus events to be considered as
-  # autofocus events, making it impossible to focus inputs.
-  #
-  # Therefore we use the `pagehide` event instead. It fires when the user
-  # navigates away from the page (clicks a link, goes back and forward in the
-  # history, enters something in the location bar etc.), but not when
-  # `history.pushState()` is used.
-  #
-  # However, we still want to disable autofocus after a `history.pushState()`
-  # call. Therefore we set `vim.lastLoad` in the `onLocationChange` event, so
-  # that all focus events within one second after that get blurred.
-  # `history.pushState()` is usually used together with a quick AJAX call, so
-  # that second should be enough (as opposed to a full page request where
-  # several seconds may pass between the location change and the actual page
-  # load).
-  pagehide: markVimUnloaded
-
   focus: (event) ->
     target = event.originalTarget
     return unless vim = getVimFromEvent(event)
@@ -162,20 +117,27 @@ windowsListeners =
       vim.enterMode('find')
       return
 
-    if getPref('prevent_autofocus')
-      return unless target.ownerDocument instanceof HTMLDocument
-
-      # We only prevent autofocus from editable elements, that is, elements that
-      # can “steal” the keystrokes, in order not to interfere too much.
-      return unless utils.isElementEditable(target)
-
-      # Focus events can occur before DOMContentLoaded, both when the `autofocus`
-      # attribute is used, and when a script contains `element.focus()`. So if
-      # the `vim` instance isn’t marked as loaded, all focus events should be
-      # blurred. Autofocus events can occur later, too. How much later? One
-      # second seems to be a good compromise.
-      if !vim.loaded or Date.now() - vim.lastLoad < 1000
-        target.blur()
+    # Autofocus prevention. Strictly speaking, autofocus may only happen during
+    # page load, which means that we should only prevent focus events during
+    # page load. However, it is very difficult to reliably determine when the
+    # page load ends. Moreover, a page may load very slowly. Then it is likely
+    # that the user tries to focus something before the page has loaded fully.
+    # Therefore focus events that aren’t reasonably close to a user interaction
+    # (click or key press) are blurred (regardless of whether the page is
+    # loaded or not -- but that isn’t so bad: if the user doesn’t like
+    # autofocus, he doesn’t like any automatic focusing, right? This is
+    # actually useful on devdocs.io). There is a slight risk that the user
+    # presses a key just before an autofocus, causing it not to be blurred, but
+    # that’s not likely. Lastly, the autofocus prevention is restricted to
+    # `<input>` elements, since only such elements are commonly autofocused.
+    # Many sites have buttons which inserts a `<textarea>` when clicked (which
+    # might take up to a second) and then focuses the `<textarea>`. Such focus
+    # events should _not_ be blurred.
+    if getPref('prevent_autofocus') and
+        target.ownerDocument instanceof HTMLDocument and
+        target instanceof HTMLInputElement and
+        (vim.lastInteraction == null or Date.now() - vim.lastInteraction > 100)
+      target.blur()
 
   blur: (event) ->
     target = event.originalTarget
@@ -199,6 +161,8 @@ windowsListeners =
       vim.enterMode('normal')
       return
 
+  mousedown: markLastInteraction
+  mouseup:   markLastInteraction
 
   # When the top level window closes we should release all Vims that were
   # associated with tabs in this window
@@ -226,7 +190,8 @@ tabsListener =
   onLocationChange: (browser, webProgress, request, location) ->
     return unless vim = vimBucket.get(browser.contentWindow)
 
-    vim.lastLoad = Date.now() # See the `pagehide` event.
+    # There hasn’t been any interaction on the page yet, so reset it.
+    vim.lastInteraction = null
 
     # Update the blacklist state.
     vim.blacklisted = utils.isBlacklisted(location.spec)
