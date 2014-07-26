@@ -15,7 +15,7 @@ keyStrFromEvent = (event) ->
   { ctrlKey: ctrl, metaKey: meta, altKey: alt, shiftKey: shift } = event
 
   if !meta and !alt
-    return unless keyChar = keyUtils.keyCharFromCode(event.keyCode, shift)
+    return unless keyChar = keyUtils.keyCharFromCode(event.key, shift)
     keyStr = keyUtils.applyModifiers(keyChar, ctrl, alt, meta)
     return keyStr
 
