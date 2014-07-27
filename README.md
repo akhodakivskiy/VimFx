@@ -112,6 +112,7 @@ Global shortcut to enable/disable VimFx: `shift-alt-v`
     a/      Enter Find mode to highlight all matches
     n       Go to the next Find match
     N       Go to the previous Find match
+    z       Toggle image size
     i       Enter insert mode: Ignore all commands
     ?       Show this dialog
     :       Open Developer Toolbar

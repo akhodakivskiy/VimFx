@@ -274,6 +274,13 @@ command_find_next = helper_find_again.bind(undefined, false)
 # Search for the last pattern backwards
 command_find_prev = helper_find_again.bind(undefined, true)
 
+# Toggle image size
+command_toggle_image_size = (vim) ->
+  if vim.window.document.body.childElementCount == 1 and vim.window.document.images.length == 1
+    img = vim.window.document.images[0]
+    utils.simulateClick(img)
+    vim.window.scrollTo((img.width - vim.window.innerWidth) / 2, (img.height - vim.window.innerHeight) / 2)
+
 # Enter insert mode
 command_insert_mode = (vim) ->
   vim.enterMode('insert')
@@ -374,6 +381,7 @@ commands = [
   new Command('misc',   'find_hl',                command_find_hl,                ['a,/'])
   new Command('misc',   'find_next',              command_find_next,              ['n'])
   new Command('misc',   'find_prev',              command_find_prev,              ['N'])
+  new Command('misc',   'toggle_image_size',      command_toggle_image_size,      ['z'])
   new Command('misc',   'insert_mode',            command_insert_mode,            ['i'])
   new Command('misc',   'help',                   command_help,                   ['?'])
   new Command('misc',   'dev',                    command_dev,                    [':'])
