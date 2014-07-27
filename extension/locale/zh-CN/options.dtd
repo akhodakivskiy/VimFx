@@ -12,13 +12,11 @@
 <!ENTITY pref.next_patterns.desc    "列表内字符将用来匹配下一页（逗号分隔）">
 
 <!ENTITY pref.scroll_step_lines.title   "滚动步长">
-<!ENTITY pref.scroll_step_lines.desc    "滚动步长">
 
 <!ENTITY pref.hints_bloom_on.title "智能分配提示符">
 <!ENTITY pref.hints_bloom_on.desc  "为最常访问的链接分配更短的提示符">
 
 <!ENTITY pref.prevent_autofocus.title "阻止自动聚焦输入框">
-<!ENTITY pref.prevent_autofocus.desc  "当页面加载完后输入框将不会被聚焦">
 
 <!ENTITY customizeButton.title "键盘快捷键">
 <!ENTITY customizeButton.label "自定义">

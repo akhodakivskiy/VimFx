@@ -12,13 +12,11 @@ Wildcard dibolehkan: *, !. Example: *example.com*,*foobar.org*">
 <!ENTITY pref.next_patterns.desc    "Comma separated list of patterns that match links to next page">
 
 <!ENTITY pref.scroll_step_lines.title     "Langkah Gulung">
-<!ENTITY pref.scroll_step_lines.desc      "Langkah Gulung">
 
 <!ENTITY pref.hints_bloom_on.title "Penempatan petunjuk cerdas">
 <!ENTITY pref.hints_bloom_on.desc  "Menempatkan petunjuk lebih pendek untuk pranala yang sering dikunjungi">
 
 <!ENTITY pref.prevent_autofocus.title "Prevent auto focusing inputs">
-<!ENTITY pref.prevent_autofocus.desc  "Inputs will not be focused when the page loads">
 
 <!ENTITY customizeButton.title "Keyboard Shortcuts">
 <!ENTITY customizeButton.label "Customize">
