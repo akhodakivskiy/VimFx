@@ -17,6 +17,12 @@ modes['normal'] =
     storage.keys.length = 0
 
   onInput: (vim, storage, keyStr, event) ->
+    isEditable = utils.isElementEditable(event.originalTarget)
+    autoInsertMode = isEditable or vim.rootWindow.TabView.isVisible()
+
+    if autoInsertMode and not isEscCommandKey(keyStr)
+      return false
+
     storage.keys.push(keyStr)
 
     { match, exact, command } = searchForMatchingCommand(storage.keys)
@@ -25,9 +31,27 @@ modes['normal'] =
       if exact
         command.func(vim, event)
         storage.keys.length = 0
+
+      # Esc key is not suppressed, and passed to the browser in normal mode.
+      #
+      # - It allows for stopping the loading of the page.
+      # - It allows for closing many custom dialogs (and perhaps other things
+      #   -- Esc is a very commonly used key).
+      # - It is not passed if Esc is used for `command_Esc` and we’re blurring
+      #   an element. That allows for blurring an input in a custom dialog
+      #   without closing the dialog too.
+      # - There are two reasons we might suppress it in other modes. If some
+      #   custom dialog of a website is open, we should be able to cancel hint
+      #   markers on it without closing it. Secondly, otherwise cancelling hint
+      #   markers on Google causes its search bar to be focused.
+      if keyStr == 'Esc' and not autoInsertMode
+        return false
+
       return true
+
     else
       storage.keys.length = 0
+      return false
 
 modes['insert'] =
   onEnter: (vim) ->
@@ -41,29 +65,18 @@ modes['insert'] =
       return true
 
 modes['find'] =
-  onEnter: (vim, storage, options) ->
-    return unless findBar = utils.getRootWindow(vim.window)?.gBrowser.getFindBar()
-
-    findBar.onFindCommand()
-    findBar._findField.focus()
-    findBar._findField.select()
-
-    return unless highlightButton = findBar.getElement("highlight")
-    return unless highlightButton.checked != options.highlight
-    highlightButton.click()
+  onEnter: ->
 
   onLeave: (vim) ->
-    return unless findBar = utils.getRootWindow(vim.window)?.gBrowser.getFindBar()
+    findBar = vim.rootWindow.gBrowser.getFindBar()
     findStorage.lastSearchString = findBar._findField.value
-    findBar.close()
 
   onInput: (vim, storage, keyStr) ->
-    return unless findBar = utils.getRootWindow(vim.window)?.gBrowser.getFindBar()
-    if isEscCommandKey(keyStr) or isReturnCommandKey(keyStr)
-      vim.enterMode('normal')
+    findBar = vim.rootWindow.gBrowser.getFindBar()
+    if isEscCommandKey(keyStr) or keyStr == 'Return'
+      findBar.close()
       return true
-    else
-      findBar._findField.focus()
+    return false
 
 modes['hints'] = mode_hints
 
