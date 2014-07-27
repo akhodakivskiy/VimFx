@@ -360,6 +360,9 @@ ACTION_ELEMENT_TAGS = [
   "a"
   "area[@href]"
   "button"
+  # When viewing an image directly, and it is larger than the viewport,
+  # clicking it toggles zoom.
+  "img[contains(@class, 'decoded') and (contains(@class, 'overflowing') or contains(@class, 'shrinkToFit'))]"
 ]
 
 ACTION_ELEMENT_PROPERTIES = [
