@@ -60,21 +60,41 @@ addHandler = (document, commands, event) ->
     check = { value: null }
     if promptService.prompt(document.defaultView, title, text, value, null, check)
       return if value.value.length == 0
-      conflict_cmd = commands.filter((c) -> c.keys().indexOf(value.value) != -1)
-      if conflict_cmd.length < 1 or overwriteCmd(conflict_cmd[0], value.value)
+      conflicts = getConflicts(commands, value.value)
+      if conflicts.length == 0 or overwriteCmd(document, conflicts, value.value)
         cmd.keys(cmd.keys().concat(value.value))
         for div in document.getElementsByClassName('VimFxKeySequence')
           if div.getAttribute('data-command') == cmd.name
             div.insertAdjacentHTML('beforeend', hint(cmd, value.value))
   return
 
-overwriteCmd = (cmd, key) ->
+getConflicts = (commands, value) ->
+  conflicts = []
+  for command in commands
+    conflictingKeys = []
+    for key in command.keys()
+      shortest = Math.min(value.length, key.length)
+      if "#{value},"[..shortest] == "#{key},"[..shortest]
+        conflictingKeys.push(key)
+    if conflictingKeys.length > 0
+      conflicts.push({ command, conflictingKeys })
+  return conflicts
+
+overwriteCmd = (document, conflicts, key) ->
   title = _('help_add_shortcut_title')
-  text = _('help_add_shortcut_text_overwrite', null, key, cmd.help())
+  conflictSummary = conflicts.map((conflict) ->
+    return "#{ conflict.command.help() }:  #{ conflict.conflictingKeys.join('  ') }"
+  ).join("\n")
+  text = """
+    #{ _('help_add_shortcut_text_overwrite', null, key) }
+
+    #{ conflictSummary }
+  """
   if promptService.confirm(document.defaultView, title, text)
-    cmd.keys(cmd.keys().filter((a) -> a != key))
-    dom = document.querySelectorAll("a[data-key='#{key}']")
-    dom[0].remove() if dom.length > 0
+    for { command, conflictingKeys } in conflicts
+      command.keys(command.keys().filter((key) -> key not in conflictingKeys))
+      for key in conflictingKeys
+        document.querySelector("a[data-key='#{key}']").remove()
     return true
   else
     return false
