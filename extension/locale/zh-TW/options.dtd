@@ -12,7 +12,6 @@
 <!ENTITY pref.next_patterns.desc    "符合連回下一頁的比對模式清單（以逗號分隔）">
 
 <!ENTITY pref.scroll_step_lines.title   "捲動行數">
-<!ENTITY pref.scroll_step_lines.desc    "捲動行數">
 
 <!ENTITY pref.hints_bloom_on.title "智慧設定提示符號">
 <!ENTITY pref.hints_bloom_on.desc  "為最常造訪的連結設定更短的提示符號">

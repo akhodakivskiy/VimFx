@@ -5,8 +5,7 @@ class Vim
   constructor: (@window) ->
     @rootWindow = utils.getRootWindow(@window) # For convenience.
     @storage = {}
-    @loaded = false
-    @lastLoad = Date.now()
+    @lastInteraction = null
     @enterMode('normal')
 
   enterMode: (mode, args...) ->
