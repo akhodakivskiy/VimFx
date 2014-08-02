@@ -32,15 +32,32 @@ class Marker
   setPosition: (viewport) ->
     {
       markerElement: { offsetHeight: height, offsetWidth: width }
-      elementShape: { nonCoveredPoint: { x, y } }
+      elementShape: { nonCoveredPoint: { x, y, offset, rect } }
     } = this
 
-    # Make sure that the hint isn’t partly off-screen
-    x = Math.min(x, viewport.width  - width)
-    y = Math.min(y, viewport.height - height)
+    # Center the marker on the non-covered point
+    left = x - width  / 2
+    top  = y - height / 2
 
-    left = viewport.scrollX + x
-    top  = viewport.scrollY + y
+    # Make sure that the marker stays within its element
+    left = Math.min(left, rect.right  - width)
+    top  = Math.min(top,  rect.bottom - height)
+    left = Math.max(left, rect.left)
+    top  = Math.max(top,  rect.top)
+
+    # Make the position relative to the top frame
+    left += offset.left
+    top  += offset.top
+
+    # Make sure that the marker stays within the viewport
+    left = Math.min(left, viewport.right  - width)
+    top  = Math.min(top,  viewport.bottom - height)
+    left = Math.max(left, viewport.left)
+    top  = Math.max(top,  viewport.top)
+
+    # Make the position relative to the document, rather than to the viewport
+    left += viewport.scrollX
+    top  += viewport.scrollY
 
     # The positioning is absolute
     @markerElement.style.left = "#{ left }px"

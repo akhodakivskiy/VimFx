@@ -74,20 +74,11 @@
     display: none !important;
 }
 
-/* `transition` is reset here to make sure that these rules take effect
- * immediately.  */
 .VimFxNoBorderRadius {
     border-radius: 0 !important;
+    /* `transition` is reset here to make sure that the above declaration
+     * takes effect immediately.  */
     transition: none !important;
-}
-.VimFxNormalLineHeight {
-    line-height: normal !important;
-    transition: none !important;
-}
-
-.VimFxBeforeAfterClickThrough::before,
-.VimFxBeforeAfterClickThrough::after {
-    pointer-events: none !important;
 }
 
 /* Help Dialog */

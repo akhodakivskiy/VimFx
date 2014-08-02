@@ -114,7 +114,9 @@ createMarkers = (window, viewport, parents = []) ->
 # - `visibleRects`: The parts of rectangles out of the above that are inside
 #   `viewport`.
 # - `nonCoveredPoint`: The coordinates of the first point of `element` that
-#   isn’t covered by another element (except children of `element`).
+#   isn’t covered by another element (except children of `element`). It also
+#   contains the offset needed to make those coordinates relative to the top
+#   frame, as well as the rectangle that the coordinates occur in.
 # - `area`: The area of the part of `element` that is inside `viewport`.
 #
 # Returns `null` if `element` is outside `viewport` or entirely covered by
@@ -157,23 +159,11 @@ getElementShape = (window, element, viewport, parents) ->
   # Even if `element` has a visible rect, it might be covered by other elements.
   for visibleRect in visibleRects
     nonCoveredPoint = getFirstNonCoveredPoint(window, element, visibleRect, parents)
-    break if nonCoveredPoint
+    if nonCoveredPoint
+      nonCoveredPoint.rect = visibleRect
+      break
 
-  unless nonCoveredPoint
-    # If no non-covered point could be found, it might be because the
-    # `line-height` of a parent element is less than the `font-size` of
-    # `element` and the parent has `overflow: hidden;`. If so, the top of the
-    # first `rect` will be cut off, so `document.elementFromPoint()` will
-    # return whatever is behind. The solution is to temporarily add a CSS class
-    # that normalizes `line-height`. (Unlike the similar `border-radius` hack
-    # below, we cannot do this in advance, because changing the `line-height`
-    # is too expensive).
-    shape = null
-    unless element.classList.contains('VimFxNormalLineHeight')
-      element.classList.add('VimFxNormalLineHeight')
-      shape = getElementShape(window, element, viewport, parents)
-    element.classList.remove('VimFxNormalLineHeight')
-    return shape
+  return null unless nonCoveredPoint
 
   return {
     rects, visibleRects, nonCoveredPoint, area: totalArea
@@ -190,10 +180,13 @@ isInsideViewport = (rect, viewport) ->
 
 
 adjustRectToViewport = (rect, viewport) ->
-  left   = Math.max(rect.left,   viewport.left)
-  right  = Math.min(rect.right,  viewport.right)
-  top    = Math.max(rect.top,    viewport.top)
-  bottom = Math.min(rect.bottom, viewport.bottom)
+  # The right and bottom values are subtracted by 1 because
+  # `document.elementFromPoint(right, bottom)` does not return the element
+  # otherwise.
+  left   = Math.max(rect.left,       viewport.left)
+  right  = Math.min(rect.right - 1,  viewport.right)
+  top    = Math.max(rect.top,        viewport.top)
+  bottom = Math.min(rect.bottom - 1, viewport.bottom)
 
   width  = right - left
   height = bottom - top
@@ -206,101 +199,54 @@ adjustRectToViewport = (rect, viewport) ->
 
 
 getFirstNonCoveredPoint = (window, element, elementRect, parents) ->
-  # Determining if `element` is covered by other elements is a bit tricky. We
-  # use `document.elementFromPoint()` to check if `element`, or a child of
-  # `element` (anything inside an `<a>` is clickable too), really is present in
-  # `elementRect`. If so, we prepare that point for being returned (#A).
-  #
-  # However, if we’re currently in a frame, there might be something on top of
-  # the frame that covers `element`. Therefore we check that the frame really
-  # is present at the point for each parent in `parents`. (#B)
-  #
-  # If `element` still isn’t determined to be covered, we return the point. (#C)
-  #
-  # We start by checking the top-left corner, since that’s where we want to
-  # place the marker, if possible. If there’s something else there, we check if
-  # that element is not as wide as `element`. If so we recurse, checking the
-  # point directly to the right of the found element. (#D)
-  #
-  # If that doesn’t find some exposed space of `element` we do the same
-  # procedure again, but downwards instead. (#E)
-  #
-  # Otherwise `element` seems to be covered to the right of `x` and below `y`.
-  # (#F)
-  #
-  # But before we start we need to hack around a little problem. If `element`
-  # has `border-radius`, the top-left corner won’t really belong to `element`,
-  # so `document.elementFromPoint()` will return whatever is behind. This will
+  # Before we start we need to hack around a little problem. If `element` has
+  # `border-radius`, the corners won’t really belong to `element`, so
+  # `document.elementFromPoint()` will return whatever is behind. This will
   # result in missing or out-of-place markers. The solution is to temporarily
   # add a CSS class that removes `border-radius`.
   element.classList.add('VimFxNoBorderRadius')
 
-  triedElements = new Set()
-
-  nonCoveredPoint = do recurse = (x = elementRect.left, y = elementRect.top) ->
+  tryPoint = (x, y) ->
+    # Ensure that `element`, or a child of `element` (anything inside an `<a>`
+    # is clickable too), really is present at (x,y). Note that this is not 100%
+    # bullet proof: Combinations of CSS can cause this check to fail, even
+    # though `element` isn’t covered. We don’t try to temporarily reset such
+    # CSS (as with `border-radius`) because of performance. Instead we rely on
+    # that some of the 6 attempts below will work.
     elementAtPoint = window.document.elementFromPoint(x, y)
+    return false unless element.contains(elementAtPoint) # Note that `a.contains(a) == true`!
 
-    # `document.elementFromPoint()` returns `null` if the point is outside the
-    # viewport. That should never happen, but in case it does we return.
-    return false if elementAtPoint == null
+    # If we’re currently in a frame, there might be something on top of the
+    # frame that covers `element`. Therefore we ensure that the frame really is
+    # present at the point for each parent in `parents`.
+    currentWindow = window
+    offset = left: 0, top: 0
+    for parent in parents by -1
+      offset.left += parent.offset.left
+      offset.top  += parent.offset.top
+      elementAtPoint = parent.window.document.elementFromPoint(offset.left + x, offset.top + y)
+      if elementAtPoint != currentWindow.frameElement
+        return false
+      currentWindow = parent.window
 
-    # (#A)
-    covered = true
-    if element.contains(elementAtPoint) # Note that `a.contains(a) == true`!
-      covered = false
-    else
-      # Some sites use a pseudo-element to give fancy borders or shadows to
-      # <input>s, which might cover `element`. There is no way of getting the
-      # dimensions of pseudo-elements, so we add `pointer-events: none;` to
-      # them, so that we can get what’s below. In theory there might be yet a
-      # pseudo-element there, which could be solved through recursion, but it
-      # seems to be impossible to know when to end that recursion.
-      elementAtPoint.classList.add('VimFxBeforeAfterClickThrough')
-      elementAtPoint = window.document.elementFromPoint(x, y)
-      elementAtPoint.classList.remove('VimFxBeforeAfterClickThrough')
-      if element.contains(elementAtPoint)
-        covered = false
+    return {x, y, offset}
 
-    if not covered
-      point = {x, y}
-
-      # (#B)
-      currentWindow = window
-      for {window: parentWindow, offset} in parents by -1
-        point.x += offset.left
-        point.y += offset.top
-        elementAtPoint = parentWindow.document.elementFromPoint(point.x, point.y)
-        if elementAtPoint != currentWindow.frameElement
-          covered = true
-          adjustment =
-            x: point.x - x
-            y: point.y - y
-          break
-        currentWindow = parentWindow
-
-      # (#C)
-      return point unless covered
-
-    # If we have already looked around the found element, it is a waste of time
-    # to do it again.
-    return false if triedElements.has(elementAtPoint)
-    triedElements.add(elementAtPoint)
-
-    { right, bottom } = elementAtPoint.getBoundingClientRect()
-    if adjustment
-      right  -= adjustment.x
-      bottom -= adjustment.y
-
-    # (#B)
-    if right < elementRect.right
-      return point if point = recurse(right + 1, y)
-
-    # (#C)
-    if bottom < elementRect.bottom
-      return point if point = recurse(x, bottom + 1)
-
-    # (#D)
-    return false
+  # Try the following 6 positions in order. If all of those are covered the
+  # whole element is considered to be covered.
+  # +-------------------------------+
+  # |1 left-top          right-top 4|
+  # |                               |
+  # |2 left-middle    right-middle 5|
+  # |                               |
+  # |3 left-bottom    right-bottom 6|
+  # +-------------------------------+
+  nonCoveredPoint =
+    tryPoint(elementRect.left,  elementRect.top                         ) or
+    tryPoint(elementRect.left,  elementRect.top + elementRect.height / 2) or
+    tryPoint(elementRect.left,  elementRect.bottom                      ) or
+    tryPoint(elementRect.right, elementRect.top                         ) or
+    tryPoint(elementRect.right, elementRect.top + elementRect.height / 2) or
+    tryPoint(elementRect.right, elementRect.bottom                      )
 
   element.classList.remove('VimFxNoBorderRadius')
 
