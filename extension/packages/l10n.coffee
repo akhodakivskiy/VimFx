@@ -23,6 +23,10 @@ l10n = do ->
   # Folder in the format `en-US`, e.g. locale/en-US/vimfx.properties
   defaultBundle = Services.strings.createBundle(filePath(locale))
 
+  # The URL 'chrome://vimfx/locale/vimfx.properties' is automagically fowarded to
+  # e.g. 'chrome://vimfx/locale/de/vimfx.properties'
+  genericBundle = Services.strings.createBundle('chrome://vimfx/locale/vimfx.properties')
+
   if locale_base = locale.match(splitter)
     # Folder in the basic format: `en`, e.g. locale/en/vimfx.properties
     defaultBasicBundle = Services.strings.createBundle(filePath(locale_base[1]))
@@ -45,6 +49,7 @@ l10n = do ->
 
     aVal = getStr(localeBundle, aKey) \
         or getStr(localeBasicBundle, aKey) \
+        or (genericBundle && getStr(genericBundle, aKey) ) \
         or (defaultBundle && (getStr(defaultBundle, aKey) or (defaultBundle = null))) \
         or (defaultBasicBundle && (getStr(defaultBasicBundle, aKey) or (defaultBasicBundle = null))) \
         or getStr(addonsDefaultBundle, aKey)
