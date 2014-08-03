@@ -2,13 +2,13 @@
 <!ENTITY pref.hint_chars.desc       "Voreinstellung: fjdkslaghrueiwovncm">
 
 <!ENTITY pref.black_list.title      "Schwarze Liste">
-<!ENTITY pref.black_list.desc       "Durch Komma getrennte Liste von URLs für die VimFx automatisch deaktiviert werden soll. Erlaubte Wildcard-Zeichen: *, !. Example: *example.com*,*foobar.org*">
+<!ENTITY pref.black_list.desc       "Durch Komma getrennte Liste von URLs für die VimFx automatisch deaktiviert werden soll. Erlaubte Wildcard-Zeichen: *, !. Beispiel: *example.com*,*foobar.org*">
 
-<!ENTITY pref.prev_patterns.title   "Previous Page Patterns">
-<!ENTITY pref.prev_patterns.desc    "Comma separated list of patterns that match links to previous page">
+<!ENTITY pref.prev_patterns.title   "Muster für die vorherige Seite">
+<!ENTITY pref.prev_patterns.desc    "Muster für Links, die auf die vorherige Seite verweisen; getrennt durch Kommas">
 
-<!ENTITY pref.next_patterns.title   "Next Page Patterns">
-<!ENTITY pref.next_patterns.desc    "Comma separated list of patterns that match links to next page">
+<!ENTITY pref.next_patterns.title   "Muster für die nächste Seite">
+<!ENTITY pref.next_patterns.desc    "Muster für Links, die auf die nächste Seite verweisen; getrennt durch Kommas">
 
 <!ENTITY pref.scroll_step_lines.title     "Scroll-Schrittweite">
 
@@ -17,5 +17,5 @@
 
 <!ENTITY pref.prevent_autofocus.title "Prevent auto focusing inputs">
 
-<!ENTITY customizeButton.title "Keyboard Shortcuts">
-<!ENTITY customizeButton.label "Customize">
+<!ENTITY customizeButton.title "Tastaturbefehle">
+<!ENTITY customizeButton.label "Anpassen">
