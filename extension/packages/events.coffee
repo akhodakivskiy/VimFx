@@ -117,6 +117,15 @@ windowsListeners =
       vim.enterMode('find')
       return
 
+    # If the user has interacted with the page and the `window` of the page
+    # gets focus, it means that the user just switched back to the page from
+    # another window or tab. If a text input was focused when the user focused
+    # _away_ from the page Firefox blurs it and then re-focuses it when the
+    # user switches back. Therefore we count this case as an interaction, so
+    # the re-focus event isn’t caught as autofocus.
+    if vim.lastInteraction != null and target == vim.window
+      vim.lastInteraction = Date.now()
+
     # Autofocus prevention. Strictly speaking, autofocus may only happen during
     # page load, which means that we should only prevent focus events during
     # page load. However, it is very difficult to reliably determine when the
