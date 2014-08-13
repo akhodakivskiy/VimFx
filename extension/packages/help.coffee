@@ -86,7 +86,7 @@ overwriteCmd = (document, conflicts, key) ->
     return "#{ conflict.command.help() }:  #{ conflict.conflictingKeys.join('  ') }"
   ).join("\n")
   text = """
-    #{ _('help_add_shortcut_text_overwrite', null, key) }
+    #{ _('help_add_shortcut_text_overwrite', key) }
 
     #{ conflictSummary }
   """
