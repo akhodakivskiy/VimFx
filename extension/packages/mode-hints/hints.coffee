@@ -5,10 +5,8 @@ utils                     = require 'utils'
 
 { interfaces: Ci } = Components
 
-HTMLDocument  = Ci.nsIDOMHTMLDocument
-XULDocument   = Ci.nsIDOMXULDocument
-FrameElement  = Ci.nsIDOMHTMLFrameElement
-IFrameElement = Ci.nsIDOMHTMLIFrameElement
+HTMLDocument = Ci.nsIDOMHTMLDocument
+XULDocument  = Ci.nsIDOMXULDocument
 
 CONTAINER_ID  = 'VimFxHintMarkerContainer'
 Z_INDEX_START = 2147480001 # The highest `z-index` used in style.css plus one.
@@ -82,29 +80,29 @@ createMarkers = (window, viewport, parents = []) ->
 
     markers.push(new Marker(element, shape))
 
-    if element instanceof FrameElement or element instanceof IFrameElement
-      frame = element.contentWindow
-      [ rect ] = shape.rects # Frames only have one rect.
+  for frame in window.frames
+    rect = frame.frameElement.getBoundingClientRect() # Frames only have one rect.
+    continue unless isInsideViewport(rect, viewport)
 
-      # Calculate the visible part of the frame, according to the parent.
-      { clientWidth, clientHeight } = frame.document.documentElement
-      frameViewport =
-        left:   Math.max(viewport.left - rect.left, 0)
-        top:    Math.max(viewport.top  - rect.top,  0)
-        right:  clientWidth  + Math.min(viewport.right  - rect.right,  0)
-        bottom: clientHeight + Math.min(viewport.bottom - rect.bottom, 0)
+    # Calculate the visible part of the frame, according to the parent.
+    { clientWidth, clientHeight } = frame.document.documentElement
+    frameViewport =
+      left:   Math.max(viewport.left - rect.left, 0)
+      top:    Math.max(viewport.top  - rect.top,  0)
+      right:  clientWidth  + Math.min(viewport.right  - rect.right,  0)
+      bottom: clientHeight + Math.min(viewport.bottom - rect.bottom, 0)
 
-      computedStyle = window.getComputedStyle(frame.frameElement)
-      offset =
-        left: rect.left +
-          parseFloat(computedStyle.getPropertyValue('border-left-width')) +
-          parseFloat(computedStyle.getPropertyValue('padding-left'))
-        top: rect.top +
-          parseFloat(computedStyle.getPropertyValue('border-top-width')) +
-          parseFloat(computedStyle.getPropertyValue('padding-top'))
+    computedStyle = window.getComputedStyle(frame.frameElement)
+    offset =
+      left: rect.left +
+        parseFloat(computedStyle.getPropertyValue('border-left-width')) +
+        parseFloat(computedStyle.getPropertyValue('padding-left'))
+      top: rect.top +
+        parseFloat(computedStyle.getPropertyValue('border-top-width')) +
+        parseFloat(computedStyle.getPropertyValue('padding-top'))
 
-      frameMarkers = createMarkers(frame, frameViewport, parents.concat({ window, offset }))
-      markers.push(frameMarkers...)
+    frameMarkers = createMarkers(frame, frameViewport, parents.concat({ window, offset }))
+    markers.push(frameMarkers...)
 
   return markers
 
