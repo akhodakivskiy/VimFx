@@ -87,5 +87,12 @@
         <em:description>Comandi Vim per Firefox</em:description>
       </Description>
     </em:localized>
+
+    <em:localized>
+      <Description>
+        <em:locale>ja</em:locale>
+        <em:description>Vimキーボードショートカット for Firefox</em:description>
+      </Description>
+    </em:localized>
   </Description>
 </RDF>
