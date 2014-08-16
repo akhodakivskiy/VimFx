@@ -1,5 +1,16 @@
 # Change Log
 
+0.5.14 (Aug 16 2014)
+
+- Fixed: Locales should now work properly.
+- Improved: Updated the zh-CN locale (@mozillazg).
+- Improved: Updated the de locale (@Kambphase).
+- Added: Japanese locale (@pluser).
+- Fixed: If you switched to another tab or window while an `<input>` element
+  was focused and then switched back, the `<input>` element got blurred, while
+  it should have stayed focused. This caused the auto-type feature of KeePassX
+  to break.
+
 0.5.13 (Aug 2 2014)
 
 - Fixed: The vote button on StackExchange sites are now markable again.
