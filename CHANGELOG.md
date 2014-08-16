@@ -4,7 +4,7 @@
 
 - Fixed: Locales should now work properly.
 - Improved: Updated the zh-CN locale (@mozillazg).
-- Improved: Updated the de locale (@Kambphase).
+- Improved: Updated the de locale (@Kambfhase).
 - Added: Japanese locale (@pluser).
 - Fixed: If you switched to another tab or window while an `<input>` element
   was focused and then switched back, the `<input>` element got blurred, while
