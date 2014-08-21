@@ -34,7 +34,7 @@ exports.mode_hints =
           marker.deleteHintChar()
 
       else
-        return false if keyStr not in utils.getHintChars() or event.ctrlKey or event.metaKey
+        return true if keyStr not in utils.getHintChars() or event.ctrlKey or event.metaKey
         for marker in markers
           marker.matchHintChar(keyStr)
 
