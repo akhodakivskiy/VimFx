@@ -1,10 +1,10 @@
 { getPref
-, setPref }      = require 'prefs'
-{ injectHelp }   = require 'help'
-{ commands }     = require 'commands'
-utils            = require 'utils'
-{ unload }       = require 'unload'
-{ _ }            = require 'l10n'
+, setPref }    = require 'prefs'
+{ injectHelp } = require 'help'
+{ commands }   = require 'commands'
+utils          = require 'utils'
+{ unloader }   = require 'unloader'
+{ _ }          = require 'l10n'
 
 KEYSET_ID             = 'vimfx-keyset'
 BUTTON_ID             = 'vimfx-toolbar-button'
@@ -15,8 +15,8 @@ MENU_ITEM_HELP        = 'vimfx-menu-item-help'
 TEXTBOX_BLACKLIST_ID  = 'vimfx-textbox-blacklist-id'
 BUTTON_BLACKLIST_ID   = 'vimfx-button-blacklist-id'
 
-$  = (document, sel) -> document.getElementById(sel)
-$$ = (document, sel) -> document.querySelectorAll(sel)
+$  = (document, selector) -> document.getElementById(selector)
+$$ = (document, selector) -> document.querySelectorAll(selector)
 
 positions = {}
 
@@ -29,7 +29,7 @@ addToolbarButton = (vimBucket, window) ->
 
   [ button, keyset ] = createButton(vimBucket, window)
 
-  # Namespace to put the VimFx state on, for example
+  # Namespace to put the VimFx state on, for example.
   button.VimFx = {}
 
   restorePosition(document, button)
@@ -41,10 +41,11 @@ addToolbarButton = (vimBucket, window) ->
 
   win.appendChild(keyset)
 
-  unload ->
+  unloader.add(->
     button.remove()
     keyset.remove()
     $(document, 'navigator-toolbox').palette.removeChild(button)
+  )
 
 createButton = (vimBucket, window) ->
   document = window.document
@@ -128,13 +129,20 @@ createMenupopup = (window, button) ->
       matchingRules = utils.getMatchingBlacklistRules(tabWindow.location.href)
       blacklistTextbox.value = matchingRules.join(', ')
       blacklistTextbox.setAttribute('readonly', true)
-      blacklistButton.setAttribute('tooltiptext', _('item_blacklist_button_inverse_tooltip'))
+      blacklistButton.setAttribute('tooltiptext',
+                                   _('item_blacklist_button_inverse_tooltip'))
       blacklistButton.style.listStyleImage = iconUrl('blacklist_inverse')
     else
-      # In `about:` pages, the `host` property is an empty string. Fall back to the whole URL
-      blacklistTextbox.value = "*#{ tabWindow.location.host or tabWindow.location.href }*"
+      blacklistTextbox.value =
+        # In `about:` pages, the `host` property is an empty string. Fall back
+        # to the whole URL.
+        if tabWindow.location.host != ''
+          "*#{ tabWindow.location.host }*"
+        else
+          tabWindow.location.href
       blacklistTextbox.removeAttribute('readonly')
-      blacklistButton.setAttribute('tooltiptext', _('item_blacklist_button_tooltip'))
+      blacklistButton.setAttribute('tooltiptext',
+                                   _('item_blacklist_button_tooltip'))
       blacklistButton.style.listStyleImage = iconUrl('blacklist')
 
   onBlacklistButtonCommand = (event) ->
@@ -181,15 +189,15 @@ restorePosition = (document, button) ->
       toolbar = tb
       break
 
-  # Saved position not found, using the default one, after persisting it
-  if !toolbar and button.id of positions
+  # Saved position not found, using the default one, after persisting it.
+  if not toolbar and button.id of positions
     { toolbarId, beforeId } = positions[button.id]
     if toolbar = $(document, toolbarId)
       [ currentset, idx ] = persist(document, toolbar, button.id, beforeId)
 
   if toolbar and idx != -1
     # Inserting the button before the first item in `currentset`
-    # after `idx` that is present in the document
+    # after `idx` that is present in the document.
     for id in currentset[idx+1..]
       if before = $(document, id)
         toolbar.insertItem(button.id, before)

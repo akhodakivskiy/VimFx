@@ -1,4 +1,4 @@
-{ unload } = require 'unload'
+{ unloader } = require 'unloader'
 { getPref
 , setPref
 } = require 'prefs'
@@ -61,64 +61,56 @@ getCurrentTabWindow = (window) ->
   return window.gBrowser.selectedTab.linkedBrowser.contentWindow
 
 blurActiveElement = (window) ->
-  # Only blur editable elements, in order not to interfere with the browser too much. TODO: Is that
-  # really needed? What if a website has made more elements focusable -- shouldn't those also be
-  # blurred?
+  # Only blur editable elements, in order to interfere with the browser as
+  # little as possible.
   { activeElement } = window.document
   if activeElement and isElementEditable(activeElement)
     activeElement.blur()
 
 isTextInputElement = (element) ->
-  return element instanceof HTMLInputElement or \
+  return element instanceof HTMLInputElement or
          element instanceof HTMLTextAreaElement
 
 isElementEditable = (element) ->
-  return element.isContentEditable or \
-         element instanceof HTMLInputElement or \
-         element instanceof HTMLTextAreaElement or \
-         element instanceof HTMLSelectElement or \
-         element instanceof XULMenuListElement or \
-         element.isContentEditable or \
+  return element.isContentEditable or
+         element instanceof HTMLInputElement or
+         element instanceof HTMLTextAreaElement or
+         element instanceof HTMLSelectElement or
+         element instanceof XULMenuListElement or
+         element.isContentEditable or
          isElementGoogleEditable(element)
 
-# Non-standard attribute commonly used by Google.
 isElementGoogleEditable = (element) ->
-  element.getAttribute?('g_editable') == 'true' or \
-  (element instanceof HTMLElement and element.ownerDocument.body?.getAttribute('g_editable') == 'true')
+  # `g_editable` is a non-standard attribute commonly used by Google.
+  return element.getAttribute?('g_editable') == 'true' or
+         (element instanceof HTMLElement and
+          element.ownerDocument.body?.getAttribute('g_editable') == 'true')
 
 isElementVisible = (element) ->
   document = element.ownerDocument
   window   = document.defaultView
-  if computedStyle = window.getComputedStyle(element, null)
-    return computedStyle.getPropertyValue('visibility') == 'visible' and \
-      computedStyle.getPropertyValue('display') != 'none' and \
-      computedStyle.getPropertyValue('opacity') != '0'
+  computedStyle = window.getComputedStyle(element, null)
+  return computedStyle.getPropertyValue('visibility') == 'visible' and
+         computedStyle.getPropertyValue('display') != 'none' and
+         computedStyle.getPropertyValue('opacity') != '0'
 
 getSessionStore = ->
   Cc['@mozilla.org/browser/sessionstore;1'].getService(Ci.nsISessionStore)
 
-# Function that returns a URI to the css file that's part of the extension
-cssUri = do ->
-  (name) ->
-    baseURI = Services.io.newURI(__SCRIPT_URI_SPEC__, null, null)
-    uri = Services.io.newURI("resources/#{ name }.css", null, baseURI)
-    return uri
-
-# Loads the css identified by the name in the StyleSheetService as User Stylesheet
-# The stylesheet is then appended to every document, but it can be overwritten by
-# any user css
 loadCss = do ->
-  sss = Cc['@mozilla.org/content/style-sheet-service;1'].getService(Ci.nsIStyleSheetService)
+  sss = Cc['@mozilla.org/content/style-sheet-service;1']
+    .getService(Ci.nsIStyleSheetService)
   return (name) ->
-    uri = cssUri(name)
-    # `AGENT_SHEET` is used to override userContent.css and Stylish. Custom website themes installed
-    # by users often make the hint markers unreadable, for example. Just using `!important` in the
-    # CSS is not enough.
+    uri = getResourceURI("resources/#{ name }.css")
+    # `AGENT_SHEET` is used to override userContent.css and Stylish. Custom
+    # website themes installed by users often make the hint markers unreadable,
+    # for example. Just using `!important` in the CSS is not enough.
     if !sss.sheetRegistered(uri, sss.AGENT_SHEET)
       sss.loadAndRegisterSheet(uri, sss.AGENT_SHEET)
 
-    unload ->
+    unloader.add(->
       sss.unregisterSheet(uri, sss.AGENT_SHEET)
+    )
 
 # Store events that we’ve simulated. A `WeakMap` is used in order not to leak
 # memory. This approach is better than for example setting `event.simulated =
@@ -126,8 +118,8 @@ loadCss = do ->
 # sites to spoof it.
 simulated_events = new WeakMap()
 
-# Simulate mouse click with full chain of event
-# Copied from Vimium codebase
+# Simulate mouse click with a full chain of events.  Copied from Vimium
+# codebase.
 simulateClick = (element, modifiers = {}) ->
   document = element.ownerDocument
   window = document.defaultView
@@ -135,22 +127,26 @@ simulateClick = (element, modifiers = {}) ->
   eventSequence = ['mouseover', 'mousedown', 'mouseup', 'click']
   for event in eventSequence
     mouseEvent = document.createEvent('MouseEvents')
-    mouseEvent.initMouseEvent(event, true, true, window, 1, 0, 0, 0, 0, modifiers.ctrlKey, false, false,
-        modifiers.metaKey, 0, null)
+    mouseEvent.initMouseEvent(
+      event, true, true, window, 1, 0, 0, 0, 0,
+      modifiers.ctrlKey, false, false, modifiers.metaKey,
+      0, null
+    )
     simulated_events.set(mouseEvent, true)
-    # Debugging note: Firefox will not execute the element's default action if we dispatch this click event,
-    # but Webkit will. Dispatching a click on an input box does not seem to focus it; we do that separately
+    # Debugging note: Firefox will not execute the element's default action if
+    # we dispatch this click event, but Webkit will. Dispatching a click on an
+    # input box does not seem to focus it; we do that separately.
     element.dispatchEvent(mouseEvent)
 
 isEventSimulated = (event) ->
   return simulated_events.has(event)
 
 WHEEL_MODE_PIXEL = Ci.nsIDOMWheelEvent.DOM_DELTA_PIXEL
-WHEEL_MODE_LINE = Ci.nsIDOMWheelEvent.DOM_DELTA_LINE
-WHEEL_MODE_PAGE = Ci.nsIDOMWheelEvent.DOM_DELTA_PAGE
+WHEEL_MODE_LINE  = Ci.nsIDOMWheelEvent.DOM_DELTA_LINE
+WHEEL_MODE_PAGE  = Ci.nsIDOMWheelEvent.DOM_DELTA_PAGE
 
-# Simulate mouse scroll event by specific offsets given
-# that mouse cursor is at specified position
+# Simulate mouse scroll event by specific offsets given that mouse cursor is at
+# specified position.
 simulateWheel = (window, deltaX, deltaY, mode = WHEEL_MODE_PIXEL) ->
   windowUtils = window
     .QueryInterface(Ci.nsIInterfaceRequestor)
@@ -158,22 +154,24 @@ simulateWheel = (window, deltaX, deltaY, mode = WHEEL_MODE_PIXEL) ->
 
   [pX, pY] = [window.innerWidth / 2, window.innerHeight / 2]
   windowUtils.sendWheelEvent(
-    pX, pY,             # Window offset (x, y) in pixels
-    deltaX, deltaY, 0,  # Deltas (x, y, z)
-    mode,               # Mode (pixel, line, page)
-    0,                  # Key Modifiers
-    0, 0,               # Line or Page deltas (x, y)
-    0                   # Options
+    pX, pY,             # Window offset (x, y) in pixels.
+    deltaX, deltaY, 0,  # Deltas (x, y, z).
+    mode,               # Mode (pixel, line, page).
+    0,                  # Key Modifiers.
+    0, 0,               # Line or Page deltas (x, y).
+    0                   # Options.
   )
 
-# Write a string to the system clipboard
+# Write a string to the system clipboard.
 writeToClipboard = (text) ->
-  clipboardHelper = Cc['@mozilla.org/widget/clipboardhelper;1'].getService(Ci.nsIClipboardHelper)
+  clipboardHelper = Cc['@mozilla.org/widget/clipboardhelper;1']
+    .getService(Ci.nsIClipboardHelper)
   clipboardHelper.copyString(text)
 
-# Read the system clipboard
+# Read the system clipboard.
 readFromClipboard = (window) ->
-  trans = Cc['@mozilla.org/widget/transferable;1'].createInstance(Ci.nsITransferable)
+  trans = Cc['@mozilla.org/widget/transferable;1']
+    .createInstance(Ci.nsITransferable)
 
   if trans.init
     privacyContext = window
@@ -198,22 +196,22 @@ readFromClipboard = (window) ->
 
   return undefined
 
-# Executes function `func` and mearues how much time it took
-timeIt = (func, msg) ->
-  start = new Date().getTime()
+# Executes function `func` and mearues how much time it took.
+timeIt = (func, name) ->
+  console.time(name)
   result = func()
-  end = new Date().getTime()
-
-  console.log(msg, end - start)
+  console.timeEnd(name)
   return result
 
 isBlacklisted = (str) ->
   matchingRules = getMatchingBlacklistRules(str)
   return (matchingRules.length != 0)
 
-# Returns all rules in the blacklist that match the provided string
+# Returns all rules in the blacklist that match the provided string.
 getMatchingBlacklistRules = (str) ->
-  return getBlacklist().filter((rule) -> /// ^#{ simpleWildcards(rule) }$ ///i.test(str))
+  return getBlacklist().filter((rule) ->
+    /// ^#{ simpleWildcards(rule) }$ ///i.test(str)
+  )
 
 getBlacklist = ->
   return splitListString(getPref('black_list'))
@@ -236,12 +234,12 @@ updateBlacklist = ({ add, remove } = {}) ->
 
   setBlacklist(blacklist)
 
-# Splits a comma/space separated list into an array
+# Splits a comma/space separated list into an array.
 splitListString = (str) ->
   return str.split(/\s*,[\s,]*/)
 
-# Prepares a string to be used in a regexp, where "*" matches zero or more characters
-# and "!" matches one character.
+# Prepares a string to be used in a regexp, where "*" matches zero or more
+# characters and "!" matches one character.
 simpleWildcards = (string) ->
   return regexpEscape(string).replace(/\\\*/g, '.*').replace(/!/g, '.')
 
@@ -281,14 +279,14 @@ getBestPatternMatch = (patterns, attrs, elements) ->
 
   return null
 
-# Gets VimFx verions. AddonManager only provides async API to access addon data, so it's a bit tricky...
+# Get VimFx verion. AddonManager only provides async API to access addon data,
+# so it's a bit tricky...
 getVersion = do ->
   version = null
 
-  if version == null
-    scope = {}
-    Cu.import('resource://gre/modules/AddonManager.jsm', scope)
-    scope.AddonManager.getAddonByID(ADDON_ID, (addon) -> version = addon.version)
+  scope = {}
+  Cu.import('resource://gre/modules/AddonManager.jsm', scope)
+  scope.AddonManager.getAddonByID(ADDON_ID, (addon) -> version = addon.version)
 
   return ->
     return version
@@ -296,7 +294,8 @@ getVersion = do ->
 parseHTML = (document, html) ->
   parser = Cc['@mozilla.org/parserutils;1'].getService(Ci.nsIParserUtils)
   flags = parser.SanitizerAllowStyle
-  return parser.parseFragment(html, flags, false, null, document.documentElement)
+  return parser.parseFragment(html, flags, false, null,
+                              document.documentElement)
 
 createElement = (document, type, attributes = {}) ->
   element = document.createElement(type)
@@ -309,7 +308,6 @@ createElement = (document, type, attributes = {}) ->
 
   return element
 
-# Uses nsIIOService to parse a string as a URL and find out if it is a URL
 isURL = (str) ->
   try
     url = Cc['@mozilla.org/network/io-service;1']
@@ -320,7 +318,7 @@ isURL = (str) ->
   catch err
     return false
 
-# Use Firefox services to search for a given string
+# Use Firefox services to search for a given string.
 browserSearchSubmission = (str) ->
   ss = Cc['@mozilla.org/browser/search-service;1']
     .getService(Ci.nsIBrowserSearchService)
@@ -328,30 +326,29 @@ browserSearchSubmission = (str) ->
   engine = ss.currentEngine or ss.defaultEngine
   return engine.getSubmission(str, null)
 
-# Get hint characters, convert them to lower case, and filter duplicates
+# Get hint characters, convert them to lower case, and filter duplicates.
 getHintChars = ->
   hintChars = getPref('hint_chars')
-  # Make sure that hint chars contain at least two characters
-  if !hintChars or hintChars.length < 2
+  # Make sure that hint chars contain at least two characters.
+  if not hintChars or hintChars.length < 2
     hintChars = 'fj'
 
   return removeDuplicateCharacters(hintChars)
 
-# Remove duplicate characters from string (case insensitive)
+# Remove duplicate characters from string (case insensitive).
 removeDuplicateCharacters = (str) ->
   return removeDuplicates( str.toLowerCase().split('') ).join('')
 
-# Return URI to some file in the extension packaged as resource
+# Return URI to some file in the extension packaged as resource.
 getResourceURI = do ->
   baseURI = Services.io.newURI(__SCRIPT_URI_SPEC__, null, null)
   return (path) -> return Services.io.newURI(path, null, baseURI)
 
-# Escape string to render it usable in regular expressions
+# Escape a string to render it usable in regular expressions.
 regexpEscape = (s) -> s and s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')
 
 removeDuplicates = (array) ->
-  seen = {}
-  return array.filter((item) -> if seen[item] then false else (seen[item] = true))
+  return `[...new Set(array)]`
 
 # Why isn’t `a[@href]` used, when `area[@href]` is? Some sites (such as
 # StackExchange sites) leave out the `href` property and use the anchor as a
@@ -362,7 +359,9 @@ ACTION_ELEMENT_TAGS = [
   "button"
   # When viewing an image directly, and it is larger than the viewport,
   # clicking it toggles zoom.
-  "img[contains(@class, 'decoded') and (contains(@class, 'overflowing') or contains(@class, 'shrinkToFit'))]"
+  "img[contains(@class, 'decoded') and
+     (contains(@class, 'overflowing') or
+     contains(@class, 'shrinkToFit'))]"
 ]
 
 ACTION_ELEMENT_PROPERTIES = [
@@ -413,7 +412,7 @@ getMarkableElements = do ->
       [ACTION_ELEMENT_PROPERTIES..., EDITABLE_ELEMENT_PROPERTIES..., FOCUSABLE_ELEMENT_PROPERTIES...]
     )
 
-  # The actual function that will return the desired elements
+  # The actual function that will return the desired elements.
   return (document, { type }) ->
     return xpathQueryAll(document, xpaths[type])
 

@@ -9,7 +9,8 @@ class Vim
     @enterMode('normal')
 
   enterMode: (mode, args...) ->
-    # `args` is an array of arguments to be passed to the mode's `onEnter` method
+    # `args` is an array of arguments to be passed to the mode's `onEnter`
+    # method.
 
     if mode not of modes
       throw new Error("Not a valid VimFx mode to enter: #{ mode }")

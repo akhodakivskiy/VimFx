@@ -24,8 +24,10 @@ injectHelp = (document, commands) ->
 
     document.documentElement.appendChild(container)
 
-    container.addEventListener('click', removeHandler.bind(undefined, document, commands), false)
-    container.addEventListener('click', addHandler.bind(undefined, document, commands), false)
+    container.addEventListener('click',
+      removeHandler.bind(undefined, document, commands), false)
+    container.addEventListener('click',
+      addHandler.bind(undefined, document, commands), false)
 
     if button = document.getElementById('VimFxClose')
       clickHandler = (event) ->
@@ -34,7 +36,9 @@ injectHelp = (document, commands) ->
         removeHelp(document)
       button.addEventListener('click', clickHandler, false)
 
-promptService = Cc["@mozilla.org/embedcomp/prompt-service;1"].getService(Ci.nsIPromptService)
+promptService = Cc['@mozilla.org/embedcomp/prompt-service;1']
+  .getService(Ci.nsIPromptService)
+
 removeHandler = (document, commands, event) ->
   return unless event.target.classList.contains('VimFxKeyLink')
   event.preventDefault()
@@ -56,8 +60,8 @@ addHandler = (document, commands, event) ->
   if cmd = commands.reduce(((m, v) -> if (v.name == name) then v else m), null)
     title = _('help_add_shortcut_title')
     text = _('help_add_shortcut_text')
-    value = { value: null }
-    check = { value: null }
+    value = {value: null}
+    check = {value: null}
     if promptService.prompt(document.defaultView, title, text, value, null, check)
       return if value.value.length == 0
       conflicts = getConflicts(commands, value.value)
@@ -74,10 +78,10 @@ getConflicts = (commands, value) ->
     conflictingKeys = []
     for key in command.keys()
       shortest = Math.min(value.length, key.length)
-      if "#{value},"[..shortest] == "#{key},"[..shortest]
+      if "#{ value },"[..shortest] == "#{ key },"[..shortest]
         conflictingKeys.push(key)
     if conflictingKeys.length > 0
-      conflicts.push({ command, conflictingKeys })
+      conflicts.push({command, conflictingKeys})
   return conflicts
 
 overwriteCmd = (document, conflicts, key) ->
@@ -94,7 +98,7 @@ overwriteCmd = (document, conflicts, key) ->
     for { command, conflictingKeys } in conflicts
       command.keys(command.keys().filter((key) -> key not in conflictingKeys))
       for key in conflictingKeys
-        document.querySelector("a[data-key='#{key}']").remove()
+        document.querySelector("a[data-key='#{ key }']").remove()
     return true
   else
     return false
@@ -160,13 +164,13 @@ helpDialogHtml = (commands) ->
 
     <div class="VimFxBody">
       <div class="VimFxColumn">
-        #{ section(_('help_section_urls'),    commands.filter((a) -> a.group == 'urls')) }
-        #{ section(_('help_section_nav'),     commands.filter((a) -> a.group == 'nav')) }
+        #{ section(_('help_section_urls'),   commands.filter((a) -> a.group == 'urls')) }
+        #{ section(_('help_section_nav'),    commands.filter((a) -> a.group == 'nav')) }
       </div>
       <div class="VimFxColumn">
-        #{ section(_('help_section_tabs'),    commands.filter((a) -> a.group == 'tabs')) }
-        #{ section(_('help_section_browse'),  commands.filter((a) -> a.group == 'browse')) }
-        #{ section(_('help_section_misc'),    commands.filter((a) -> a.group == 'misc')) }
+        #{ section(_('help_section_tabs'),   commands.filter((a) -> a.group == 'tabs')) }
+        #{ section(_('help_section_browse'), commands.filter((a) -> a.group == 'browse')) }
+        #{ section(_('help_section_misc'),   commands.filter((a) -> a.group == 'misc')) }
       </div>
       <div class="VimFxClearFix"></div>
     </div>
