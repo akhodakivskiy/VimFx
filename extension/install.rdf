@@ -1,23 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- This Source Code Form is subject to the terms of the Mozilla Public
-   - License, v. 2.0. If a copy of the MPL was not distributed with this
-   - file, You can obtain one at http://mozilla.org/MPL/2.0/.
-   -->
+
 <RDF xmlns="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
      xmlns:em="http://www.mozilla.org/2004/em-rdf#">
 
   <Description about="urn:mozilla:install-manifest">
     <em:id>VimFx@akhodakivskiy.github.com</em:id>
     <em:homepageURL>http://www.github.com/akhodakivskiy/VimFx</em:homepageURL>
-    <em:version>0.5.10</em:version>
-    <em:type>2</em:type>
+    <em:version>0.5.14</em:version>
     <em:bootstrap>true</em:bootstrap>
-    <em:optionsType>2</em:optionsType>
+    <em:type>2</em:type>
 
-    <!-- Front End MetaData -->
     <em:name>VimFx</em:name>
     <em:description>Vim keyboard shortcuts for Firefox</em:description>
     <em:creator>Anton Khodakivskiy</em:creator>
+    <em:developer>Simon Lydell</em:developer>
 
     <!-- Firefox -->
     <em:targetApplication>
@@ -28,7 +24,6 @@
       </Description>
     </em:targetApplication>
 
-    <!-- Localization -->
     <em:localized>
       <Description>
         <em:locale>pl</em:locale>
@@ -66,7 +61,7 @@
       </Description>
     </em:localized>
 
-	<em:localized>
+    <em:localized>
       <Description>
         <em:locale>el-GR</em:locale>
         <em:description>Συντομεύσεις Πληκτρολογίου του Vim για Firefox</em:description>
@@ -91,6 +86,13 @@
       <Description>
         <em:locale>it</em:locale>
         <em:description>Comandi Vim per Firefox</em:description>
+      </Description>
+    </em:localized>
+
+    <em:localized>
+      <Description>
+        <em:locale>ja</em:locale>
+        <em:description>Vimキーボードショートカット for Firefox</em:description>
       </Description>
     </em:localized>
   </Description>

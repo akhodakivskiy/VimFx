@@ -12,13 +12,11 @@ Wildcards permesse: *, !. Esempio: *example.com*,*foobar.org*">
 <!ENTITY pref.next_patterns.desc    "Lista di pattern, separati da virgola, che corrispondono ad un link alla pagina successiva.">
 
 <!ENTITY pref.scroll_step_lines.title "Righe di avanzamento">
-<!ENTITY pref.scroll_step_lines.desc  "Di quante righe vuoi avanzare con la funzione di scorrimento">
 
 <!ENTITY pref.hints_bloom_on.title "Suggerimenti intelligenti.">
 <!ENTITY pref.hints_bloom_on.desc  "Assegna suggerimenti più corti ai link che visiti più spesso.">
 
 <!ENTITY pref.prevent_autofocus.title "Previene il focus automatico delle caselle di input">
-<!ENTITY pref.prevent_autofocus.desc  "Le caselle di inserimento di testo non riceveranno il focus al caricamento della pagina.">
 
 <!ENTITY customizeButton.title "Scorciatoie da tastiera">
 <!ENTITY customizeButton.label "Personalizza">

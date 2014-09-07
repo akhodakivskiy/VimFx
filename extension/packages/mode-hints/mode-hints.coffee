@@ -34,12 +34,13 @@ exports.mode_hints =
           marker.deleteHintChar()
 
       else
-        return false if keyStr not in utils.getHintChars() or event.ctrlKey or event.metaKey
+        if keyStr not in utils.getHintChars() or event.ctrlKey or event.metaKey
+          return true
         for marker in markers
           marker.matchHintChar(keyStr)
 
           if marker.isMatched()
-            marker.reward() # Add element features to the bloom filter
+            marker.reward() # Add element features to the bloom filter.
             dontEnterNormalMode = callback(marker, markers)
             vim.enterMode('normal') unless dontEnterNormalMode
             break

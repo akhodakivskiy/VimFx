@@ -1,36 +1,32 @@
 utils        = require 'utils'
-{ unload }   = require 'unload'
+{ unloader } = require 'unloader'
 { getPref }  = require 'prefs'
 help         = require 'help'
 { commands } = require 'commands'
-{ unload }   = require 'unload'
-{ getPref }  = require 'prefs'
+
+observe = ->
+  Services.obs.addObserver(observer, 'addon-options-displayed', false)
+  Services.obs.addObserver(observer, 'addon-options-hidden',    false)
 
 observer =
   observe: (document, topic, addon) ->
-    hintCharsInput = document.querySelector('setting[pref="extensions.VimFx.hint_chars"]')
-    blacklistInput = document.querySelector('setting[pref="extensions.VimFx.black_list"]')
-
-    prevPatternsInput = document.querySelector('setting[pref="extensions.VimFx.prev_patterns"]')
-    nextPatternsInput = document.querySelector('setting[pref="extensions.VimFx.next_patterns"]')
-
-    customizeButton = document.getElementById('customizeButton')
-    injectHelp = help.injectHelp.bind(undefined, document, commands)
+    spec =
+      'setting[pref="extensions.VimFx.hint_chars"]':
+        change: filterChars
+      'setting[pref="extensions.VimFx.black_list"]':
+        change: utils.updateBlacklist
+      'setting[pref="extensions.VimFx.prev_patterns"]':
+        change: validatePatterns
+      'setting[pref="extensions.VimFx.next_patterns"]':
+        change: validatePatterns
+      '#customizeButton':
+        command: help.injectHelp.bind(undefined, document, commands)
 
     switch topic
       when 'addon-options-displayed'
-        hintCharsInput.addEventListener('change', filterChars, false)
-        blacklistInput.addEventListener('change', utils.updateBlacklist, false)
-        prevPatternsInput.addEventListener('change', validatePatterns, false)
-        nextPatternsInput.addEventListener('change', validatePatterns, false)
-        customizeButton.addEventListener('command', injectHelp, false)
-
+        applySpec(document, spec, true)
       when 'addon-options-hidden'
-        hintCharsInput.removeEventListener('change', filterChars, false)
-        blacklistInput.removeEventListener('change', utils.updateBlacklist, false)
-        prevPatternsInput.addEventListener('change', validatePatterns, false)
-        nextPatternsInput.addEventListener('change', validatePatterns, false)
-        customizeButton.removeEventListener('command', injectHelp, false)
+        applySpec(document, spec, false)
 
 filterChars = (event) ->
   input = event.target
@@ -45,12 +41,16 @@ validatePatterns = (event) ->
     .join(',')
   input.valueToPreference()
 
-observe = ->
-  Services.obs.addObserver(observer, 'addon-options-displayed', false)
-  Services.obs.addObserver(observer, 'addon-options-hidden',    false)
+applySpec = (document, spec, enable) ->
+  for selector, events of spec
+    element = document.querySelector(selector)
+    method = if enable then 'addEventListener' else 'removeEventListener'
+    for event, action of events
+      element[method](event, action, false)
 
-  unload ->
+  unloader.add(->
     Services.obs.removeObserver(observer, 'addon-options-displayed')
     Services.obs.removeObserver(observer, 'addon-options-hidden')
+  )
 
 exports.observe = observe

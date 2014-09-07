@@ -1,0 +1,22 @@
+<!ENTITY pref.hint_chars.title      "ヒント機能で使用する文字">
+<!ENTITY pref.hint_chars.desc       "既定値: fjdkslaghrueiwovncm">
+
+<!ENTITY pref.black_list.title      "ブラックリスト">
+<!ENTITY pref.black_list.desc       "VimFXを自動で無効にするURLをカンマ区切りのリストで指定します
+ワイルドカードも有効です: *, !. 例: *example.com*,*foobar.org*">
+
+<!ENTITY pref.prev_patterns.title   "前のページへのリンクのパターン">
+<!ENTITY pref.prev_patterns.desc    "前のページへのリンクにマッチするパターンをカンマ区切りのリストで指定します">
+
+<!ENTITY pref.next_patterns.title   "次のページへのリンクのパターン">
+<!ENTITY pref.next_patterns.desc    "次のページへのリンクにマッチするパターンをカンマ区切りのリストで指定します">
+
+<!ENTITY pref.scroll_step_lines.title "スクロールの度合い">
+
+<!ENTITY pref.hints_bloom_on.title "賢いヒント割り当て">
+<!ENTITY pref.hints_bloom_on.desc  "ユーザーがよく訪れるページに短いヒントを割り当てるようにします">
+
+<!ENTITY pref.prevent_autofocus.title "入力欄によるフォーカスの奪取を妨害">
+
+<!ENTITY customizeButton.title "キーボードショートカット">
+<!ENTITY customizeButton.label "カスタマイズ">

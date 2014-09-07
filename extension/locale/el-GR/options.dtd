@@ -12,13 +12,11 @@
 <!ENTITY pref.next_patterns.desc    "Λίστα patterns χωριζόμενες με κόμμα που αντιστοιχούν με συνδέσμους σε επόμενες σελίδες">
 
 <!ENTITY pref.scroll_step_lines.title "Βήμα Κύλισης">
-<!ENTITY pref.scroll_step_lines.desc  "Βήμα Κύλισης">
 
 <!ENTITY pref.hints_bloom_on.title "Έξυπνη ανάθεση υποδείξεων">
 <!ENTITY pref.hints_bloom_on.desc  "Ανάθεσε μικρότερες υποδείξεις στους συνδέσμους που οι χρήστες επισκέπτονται συχνότερα">
 
-<!ENTITY pref.prevent_autofocus.title "Prevent auto focusing inputs">
-<!ENTITY pref.prevent_autofocus.desc  "Inputs will not be focused when the page loads">
+<!ENTITY pref.prevent_autofocus.title "Αποτροπή αυτόματης εστίασης στα inputs">
 
 <!ENTITY customizeButton.title "Συντομεύσεις Πληκτρολογίου">
 <!ENTITY customizeButton.label "Προσαρμογή">

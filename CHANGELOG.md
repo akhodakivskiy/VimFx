@@ -1,5 +1,53 @@
 # Change Log
 
+0.5.14 (Aug 16 2014)
+
+- Fixed: Locales should now work properly.
+- Improved: Updated the zh-CN locale (@mozillazg).
+- Improved: Updated the de locale (@Kambfhase).
+- Added: Japanese locale (@pluser).
+- Fixed: If you switched to another tab or window while an `<input>` element
+  was focused and then switched back, the `<input>` element got blurred, while
+  it should have stayed focused. This caused the auto-type feature of KeePassX
+  to break.
+
+0.5.13 (Aug 2 2014)
+
+- Fixed: The vote button on StackExchange sites are now markable again.
+- Improved: Detection of previous/next links. Should work better on gmail now.
+- Fixed: It is now possible to use Enter/Return in keyboard shortcuts.
+- Improved: The n/N commands (etc.) now work even if you didn’t open the finbar
+  using the VimFx command (such as the default key binding ctrl+f, or by
+  clicking a menu item).
+- Improved: It is now possible to blur text inputs without sending Esc to the
+  page, which could cause dialogs etc. to annoyingly close.
+- Improved: Updated the el-GR locale (@sirodoht).
+- Fixed: Autofocus prevention sometimes made text inputs impossible to focus
+  until you reloaded the page.
+- Improved: Autofocus prevention now works on more sites than before.
+- Improved: Autofocus prevention now prevents _all_ automatic focusing (not
+  just when the page loads). This makes devdocs.io much easier to use.
+- Added: When viewing images directly and the image has been resized to fit the
+  screen the image is now markable, allowing you to toggle zoom on it using the
+  keyboard.
+- Fixed: It is no longer possible to add conflicting shortcuts (such as adding
+  'a' when 'af' and 'as' are already present).
+
+0.5.12 (June 1 2014)
+
+- Fixed: Autofocus preventiton got stuck sometimes, making it impossible to
+  focus inputs.
+
+0.5.11 (June 1 2014)
+
+- Fixed: The focus search bar command was broken.
+- Fixed: Autofocus prevention was broken.
+- Fixed: The top bar on YouTube could not be accessed by VimFx.
+- Fixed: You can no longer add blank hotkeys.
+- Improved: Tab Groups are supported.
+- Improved: Matching of previous/next links should be more reliable.
+- Improved: A few minor things.
+
 0.5.10 (May 7 2014)
 
 - Fixed yet another bug related to the default pereferences

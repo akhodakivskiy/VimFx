@@ -11,14 +11,12 @@ Dopuszczalne wieloznaczniki: *, !. Domyślnie: *mail.google.com*">
 <!ENTITY pref.next_patterns.title   "Next Page Patterns">
 <!ENTITY pref.next_patterns.desc    "Comma separated list of patterns that match links to next page">
 
-<!ENTITY pref.scroll_step_liens.title   "Krok przewijania">
-<!ENTITY pref.scroll_step_lines.desc    "Krok przewijania">
+<!ENTITY pref.scroll_step_lines.title   "Krok przewijania">
 
 <!ENTITY pref.hints_bloom_on.title "Smart hint assignment">
 <!ENTITY pref.hints_bloom_on.desc  "Assign shorter hints to the links that users visit most often">
 
 <!ENTITY pref.prevent_autofocus.title "Prevent auto focusing inputs">
-<!ENTITY pref.prevent_autofocus.desc  "Inputs will not be focused when the page loads">
 
 <!ENTITY customizeButton.title "Keyboard Shortcuts">
 <!ENTITY customizeButton.label "Customize">
