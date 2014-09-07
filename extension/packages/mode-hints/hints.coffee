@@ -12,10 +12,10 @@ CONTAINER_ID  = 'VimFxHintMarkerContainer'
 Z_INDEX_START = 2147480001 # The highest `z-index` used in style.css plus one.
 # In theory, `z-index` can be infinitely large. In practice, Firefox uses a
 # 32-bit signed integer to store it, so the maximum value is 2147483647
-# (http://www.puidokas.com/max-z-index/). Youtube (insanely) uses 1999999999
-# for its top bar. So by using 2147480001 as a base, we trump that value with
-# lots of margin, still leaving a few thousand values for markers, which should
-# be more than enough. Hopefully no sites are crazy enough to use even higher
+# (http://www.puidokas.com/max-z-index/). Youtube (insanely) uses 1999999999 for
+# its top bar. So by using 2147480001 as a base, we trump that value with lots
+# of margin, still leaving a few thousand values for markers, which should be
+# more than enough. Hopefully no sites are crazy enough to use even higher
 # values.
 
 
@@ -43,15 +43,17 @@ injectHints = (window) ->
   for marker in markers
     marker.weight = marker.elementShape.area
 
-  # Each marker gets a unique `z-index`, so that it can be determined if a marker overlaps another.
-  # Put more important markers (higher weight) at the end, so that they get higher `z-index`, in
-  # order not to be overlapped.
+  # Each marker gets a unique `z-index`, so that it can be determined if a
+  # marker overlaps another.  Put more important markers (higher weight) at the
+  # end, so that they get higher `z-index`, in order not to be overlapped.
   markers.sort((a, b) -> a.weight - b.weight)
   for marker, index in markers
-    marker.markerElement.style.setProperty('z-index', Z_INDEX_START + index, 'important')
+    marker.markerElement.style.setProperty('z-index', Z_INDEX_START + index,
+                                           'important')
 
   hintChars = utils.getHintChars()
-  addHuffmanCodeWordsTo(markers, {alphabet: hintChars}, (marker, hint) -> marker.setHint(hint))
+  addHuffmanCodeWordsTo(markers, {alphabet: hintChars},
+                        (marker, hint) -> marker.setHint(hint))
 
   removeHints(document)
   container = utils.createElement(document, 'div', {id: CONTAINER_ID})
@@ -59,7 +61,8 @@ injectHints = (window) ->
 
   for marker in markers
     container.appendChild(marker.markerElement)
-    # Must be done after the hints have been inserted into the DOM (see marker.coffee)
+    # Must be done after the hints have been inserted into the DOM (see
+    # marker.coffee).
     marker.setPosition(viewport)
 
   return markers
@@ -81,7 +84,7 @@ createMarkers = (window, viewport, parents = []) ->
     markers.push(new Marker(element, shape))
 
   for frame in window.frames
-    rect = frame.frameElement.getBoundingClientRect() # Frames only have one rect.
+    rect = frame.frameElement.getBoundingClientRect() # Frames only have one.
     continue unless isInsideViewport(rect, viewport)
 
     # Calculate the visible part of the frame, according to the parent.
@@ -101,7 +104,8 @@ createMarkers = (window, viewport, parents = []) ->
         parseFloat(computedStyle.getPropertyValue('border-top-width')) +
         parseFloat(computedStyle.getPropertyValue('padding-top'))
 
-    frameMarkers = createMarkers(frame, frameViewport, parents.concat({ window, offset }))
+    frameMarkers = createMarkers(frame, frameViewport,
+                                 parents.concat({ window, offset }))
     markers.push(frameMarkers...)
 
   return markers
@@ -117,15 +121,14 @@ createMarkers = (window, viewport, parents = []) ->
 #   frame, as well as the rectangle that the coordinates occur in.
 # - `area`: The area of the part of `element` that is inside `viewport`.
 #
-# Returns `null` if `element` is outside `viewport` or entirely covered by
-# other elements.
+# Returns `null` if `element` is outside `viewport` or entirely covered by other
+# elements.
 getElementShape = (window, element, viewport, parents) ->
   # `element.getClientRects()` returns a list of rectangles, usually just one,
-  # which is identical to the one returned by
-  # `element.getBoundingClientRect()`. However, if `element` is inline and
-  # line-wrapped, then it returns one rectangle for each line, since each line
-  # may be of different length, for example. That allows us to properly add
-  # hints to line-wrapped links.
+  # which is identical to the one returned by `element.getBoundingClientRect()`.
+  # However, if `element` is inline and line-wrapped, then it returns one
+  # rectangle for each line, since each line may be of different length, for
+  # example. That allows us to properly add hints to line-wrapped links.
   rects = element.getClientRects()
   totalArea = 0
   visibleRects = []
@@ -156,7 +159,8 @@ getElementShape = (window, element, viewport, parents) ->
 
   # Even if `element` has a visible rect, it might be covered by other elements.
   for visibleRect in visibleRects
-    nonCoveredPoint = getFirstNonCoveredPoint(window, element, visibleRect, parents)
+    nonCoveredPoint = getFirstNonCoveredPoint(window, element, visibleRect,
+                                              parents)
     if nonCoveredPoint
       nonCoveredPoint.rect = visibleRect
       break
@@ -208,11 +212,12 @@ getFirstNonCoveredPoint = (window, element, elementRect, parents) ->
     # Ensure that `element`, or a child of `element` (anything inside an `<a>`
     # is clickable too), really is present at (x,y). Note that this is not 100%
     # bullet proof: Combinations of CSS can cause this check to fail, even
-    # though `element` isn’t covered. We don’t try to temporarily reset such
-    # CSS (as with `border-radius`) because of performance. Instead we rely on
-    # that some of the 6 attempts below will work.
+    # though `element` isn’t covered. We don’t try to temporarily reset such CSS
+    # (as with `border-radius`) because of performance. Instead we rely on that
+    # some of the 6 attempts below will work.
     elementAtPoint = window.document.elementFromPoint(x, y)
-    return false unless element.contains(elementAtPoint) # Note that `a.contains(a) == true`!
+    return false unless element.contains(elementAtPoint)
+    # Note that `a.contains(a) == true`!
 
     # If we’re currently in a frame, there might be something on top of the
     # frame that covers `element`. Therefore we ensure that the frame really is
@@ -251,36 +256,42 @@ getFirstNonCoveredPoint = (window, element, elementRect, parents) ->
   return nonCoveredPoint
 
 
-# Finds all stacks of markers that overlap each other (by using `getStackFor`) (#1), and rotates
-# their `z-index`:es (#2), thus alternating which markers are visible.
+# Finds all stacks of markers that overlap each other (by using `getStackFor`)
+# (#1), and rotates their `z-index`:es (#2), thus alternating which markers are
+# visible.
 rotateOverlappingMarkers = (originalMarkers, forward) ->
-  # Shallow working copy. This is necessary since `markers` will be mutated and eventually empty.
+  # Shallow working copy. This is necessary since `markers` will be mutated and
+  # eventually empty.
   markers = originalMarkers[..]
 
   # (#1)
   stacks = (getStackFor(markers.pop(), markers) while markers.length > 0)
 
   # (#2)
-  # Stacks of length 1 don't participate in any overlapping, and can therefore be skipped.
+  # Stacks of length 1 don't participate in any overlapping, and can therefore
+  # be skipped.
   for stack in stacks when stack.length > 1
     # This sort is not required, but makes the rotation more predictable.
-    stack.sort((a, b) -> a.markerElement.style.zIndex - b.markerElement.style.zIndex)
+    stack.sort((a, b) -> a.markerElement.style.zIndex -
+                         b.markerElement.style.zIndex)
 
-    # Array of z-indices
+    # Array of z-indices.
     indexStack = (marker.markerElement.style.zIndex for marker in stack)
-    # Shift the array of indices one item forward or back
+    # Shift the array of indices one item forward or back.
     if forward
       indexStack.unshift(indexStack.pop())
     else
       indexStack.push(indexStack.shift())
 
     for marker, index in stack
-      marker.markerElement.style.setProperty('z-index', indexStack[index], 'important')
+      marker.markerElement.style.setProperty('z-index', indexStack[index],
+                                             'important')
 
   return
 
-# Get an array containing `marker` and all markers that overlap `marker`, if any, which is called
-# a "stack". All markers in the returned stack are spliced out from `markers`, thus mutating it.
+# Get an array containing `marker` and all markers that overlap `marker`, if
+# any, which is called a "stack". All markers in the returned stack are spliced
+# out from `markers`, thus mutating it.
 getStackFor = (marker, markers) ->
   stack = [marker]
 
@@ -290,21 +301,21 @@ getStackFor = (marker, markers) ->
   while index < markers.length
     nextMarker = markers[index]
 
-    { top: nextTop, bottom: nextBottom, left: nextLeft, right: nextRight } = nextMarker.position
-    overlapsVertically   = (nextBottom >= top  and nextTop  <= bottom)
-    overlapsHorizontally = (nextRight  >= left and nextLeft <= right)
+    next = nextMarker.position
+    overlapsVertically   = (next.bottom >= top  and next.top  <= bottom)
+    overlapsHorizontally = (next.right  >= left and next.left <= right)
 
     if overlapsVertically and overlapsHorizontally
-      # Also get all markers overlapping this one
+      # Also get all markers overlapping this one.
       markers.splice(index, 1)
       stack = stack.concat(getStackFor(nextMarker, markers))
     else
-      # Continue the search
+      # Continue the search.
       index++
 
   return stack
 
 
-exports.injectHints = injectHints
-exports.removeHints = removeHints
+exports.injectHints              = injectHints
+exports.removeHints              = removeHints
 exports.rotateOverlappingMarkers = rotateOverlappingMarkers
