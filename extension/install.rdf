@@ -8,6 +8,7 @@
     <em:homepageURL>http://www.github.com/akhodakivskiy/VimFx</em:homepageURL>
     <em:version>0.5.14</em:version>
     <em:bootstrap>true</em:bootstrap>
+    <em:type>2</em:type>
 
     <em:name>VimFx</em:name>
     <em:description>Vim keyboard shortcuts for Firefox</em:description>
