@@ -64,7 +64,8 @@ Create a new topic branch, based on either master or develop. See above.
 
 Code! Try to follow the following simple rules:
 
-- Always use parenthesis when calling functions.
+- Always use parenthesis when calling functions. (Except `require`.)
+- Always use explicit `return`s, unless the function is a one-liner.
 - Always use single quotes, unless you use interpolation.
 - Prefer interpolation over concatenation, both in strings and in regexes.
 - Always use the following forms (not any aliases):
@@ -72,8 +73,11 @@ Code! Try to follow the following simple rules:
   - `==` and `!=`
   - `and` and `or`
   - `not`
+- Put spaces inside `[]` and `{}` when destructuring and interpolating, but not
+  in array and object literals.
 - Comment when necessary. Comments should be full sentences.
-- Don’t make lines too long.
+- Try to keep lines at most 80 characters long.
+- Indent using two spaces.
 
 Break up your pull request in several commits if necessary. The first line of
 commit messages should be a short summary. Add a blank line and then a nicely
