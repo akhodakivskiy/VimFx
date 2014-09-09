@@ -188,8 +188,15 @@ command_restore_tab = (vim) ->
 
 helper_follow = ({ inTab, multiple }, vim) ->
   callback = (matchedMarker, markers) ->
+    if matchedMarker.element.target == '_blank'
+      targetReset = matchedMarker.element.target
+      matchedMarker.element.target = ''
+
     matchedMarker.element.focus()
     utils.simulateClick(matchedMarker.element, {metaKey: inTab, ctrlKey: inTab})
+
+    matchedMarker.element.target = targetReset if targetReset
+
     isEditable = utils.isElementEditable(matchedMarker.element)
     if multiple and not isEditable
       # By not resetting immediately one is able to see the last char being
