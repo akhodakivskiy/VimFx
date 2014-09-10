@@ -14,6 +14,7 @@ modes['normal'] =
     storage.commands ?= {}
 
   onLeave: (vim, storage) ->
+    vim.window.clearTimeout(storage.timeoutId)
     storage.keys.length = 0
 
   onInput: (vim, storage, keyStr, event) ->
@@ -25,11 +26,12 @@ modes['normal'] =
 
     storage.keys.push(keyStr)
 
-    { match, exact, command } = searchForMatchingCommand(storage.keys)
+    { match, exact, command, count } = searchForMatchingCommand(storage.keys)
 
     if match
       if exact
-        command.func(vim, event)
+        command.func(vim, event, count)
+        vim.window.clearTimeout(storage.timeoutId)
         storage.keys.length = 0
 
       # Esc key is not suppressed, and passed to the browser in normal mode.
@@ -50,7 +52,14 @@ modes['normal'] =
       return true
 
     else
-      storage.keys.length = 0
+      vim.window.clearTimeout(storage.timeoutId)
+
+      if /\d/.test(keyStr)
+        storage.timeoutId =
+          vim.window.setTimeout((-> storage.keys.length = 0), 500)
+      else
+        storage.keys.length = 0
+
       return false
 
 modes['insert'] =
