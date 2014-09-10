@@ -159,8 +159,8 @@ getElementShape = (window, element, viewport, parents) ->
 
   # Even if `element` has a visible rect, it might be covered by other elements.
   for visibleRect in visibleRects
-    nonCoveredPoint = getFirstNonCoveredPoint(window, element, visibleRect,
-                                              parents)
+    nonCoveredPoint = getFirstNonCoveredPoint(window, viewport, element,
+                                              visibleRect, parents)
     if nonCoveredPoint
       nonCoveredPoint.rect = visibleRect
       break
@@ -200,7 +200,7 @@ adjustRectToViewport = (rect, viewport) ->
   }
 
 
-getFirstNonCoveredPoint = (window, element, elementRect, parents) ->
+getFirstNonCoveredPoint = (window, viewport, element, elementRect, parents) ->
   # Before we start we need to hack around a little problem. If `element` has
   # `border-radius`, the corners won’t really belong to `element`, so
   # `document.elementFromPoint()` will return whatever is behind. This will
@@ -208,48 +208,63 @@ getFirstNonCoveredPoint = (window, element, elementRect, parents) ->
   # add a CSS class that removes `border-radius`.
   element.classList.add('VimFxNoBorderRadius')
 
-  tryPoint = (x, y) ->
+  tryPoint = (x, y, tryRight = 0) ->
+    elementAtPoint = window.document.elementFromPoint(x, y)
+    offset = {left: 0, top: 0}
+    found = false
+
     # Ensure that `element`, or a child of `element` (anything inside an `<a>`
     # is clickable too), really is present at (x,y). Note that this is not 100%
     # bullet proof: Combinations of CSS can cause this check to fail, even
     # though `element` isn’t covered. We don’t try to temporarily reset such CSS
     # (as with `border-radius`) because of performance. Instead we rely on that
-    # some of the 6 attempts below will work.
-    elementAtPoint = window.document.elementFromPoint(x, y)
-    return false unless element.contains(elementAtPoint)
-    # Note that `a.contains(a) == true`!
+    # some of the attempts below will work.
+    if element.contains(elementAtPoint) # Note that `a.contains(a) == true`!
+      found = true
+      # If we’re currently in a frame, there might be something on top of the
+      # frame that covers `element`. Therefore we ensure that the frame really
+      # is present at the point for each parent in `parents`.
+      currentWindow = window
+      for parent in parents by -1
+        offset.left += parent.offset.left
+        offset.top  += parent.offset.top
+        elementAtPoint = parent.window.document.elementFromPoint(
+          offset.left + x, offset.top + y
+        )
+        unless elementAtPoint == currentWindow.frameElement
+          found = false
+          break
+        currentWindow = parent.window
 
-    # If we’re currently in a frame, there might be something on top of the
-    # frame that covers `element`. Therefore we ensure that the frame really is
-    # present at the point for each parent in `parents`.
-    currentWindow = window
-    offset = left: 0, top: 0
-    for parent in parents by -1
-      offset.left += parent.offset.left
-      offset.top  += parent.offset.top
-      elementAtPoint = parent.window.document.elementFromPoint(offset.left + x, offset.top + y)
-      if elementAtPoint != currentWindow.frameElement
-        return false
-      currentWindow = parent.window
+    if found
+      return {x, y, offset}
+    else
+      return false if elementAtPoint == null or tryRight == 0
+      rect = elementAtPoint.getBoundingClientRect()
+      x = rect.right - offset.left + 1
+      return false if x > viewport.right
+      return tryPoint(x, y, tryRight - 1)
 
-    return {x, y, offset}
 
-  # Try the following 6 positions in order. If all of those are covered the
-  # whole element is considered to be covered.
+  # Try the following 3 positions, or immediately to the right of a covering
+  # element at one of those positions, in order. If all of those are covered the
+  # whole element is considered to be covered. The reasoning is:
+  #
+  # - A marker should show up as near the left edge of its visible area as
+  #   possible. Having it appear to the far right (for example) is confusing.
+  # - We can’t try too many times because of performance.
+  #
   # +-------------------------------+
-  # |1 left-top          right-top 4|
+  # |1 left-top                     |
   # |                               |
-  # |2 left-middle    right-middle 5|
+  # |2 left-middle                  |
   # |                               |
-  # |3 left-bottom    right-bottom 6|
+  # |3 left-bottom                  |
   # +-------------------------------+
   nonCoveredPoint =
-    tryPoint(elementRect.left,  elementRect.top                         ) or
-    tryPoint(elementRect.left,  elementRect.top + elementRect.height / 2) or
-    tryPoint(elementRect.left,  elementRect.bottom                      ) or
-    tryPoint(elementRect.right, elementRect.top                         ) or
-    tryPoint(elementRect.right, elementRect.top + elementRect.height / 2) or
-    tryPoint(elementRect.right, elementRect.bottom                      )
+    tryPoint(elementRect.left, elementRect.top                         , 1) or
+    tryPoint(elementRect.left, elementRect.top + elementRect.height / 2, 1) or
+    tryPoint(elementRect.left, elementRect.bottom                      , 1)
 
   element.classList.remove('VimFxNoBorderRadius')
 

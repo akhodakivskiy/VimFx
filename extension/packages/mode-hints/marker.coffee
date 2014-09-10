@@ -32,18 +32,15 @@ class Marker
   setPosition: (viewport) ->
     {
       markerElement: { offsetHeight: height, offsetWidth: width }
-      elementShape: { nonCoveredPoint: { x, y, offset, rect } }
+      elementShape: { nonCoveredPoint: { x: left, y: top, offset, rect } }
     } = this
 
-    # Center the marker on the non-covered point.
-    left = x - width  / 2
-    top  = y - height / 2
+    # Center the marker vertically on the non-covered point.
+    top -= height / 2
 
-    # Make sure that the marker stays within its element.
-    left = Math.min(left, rect.right  - width)
-    top  = Math.min(top,  rect.bottom - height)
-    left = Math.max(left, rect.left)
-    top  = Math.max(top,  rect.top)
+    # Make sure that the marker stays within its element (vertically).
+    top = Math.min(top, rect.bottom - height)
+    top = Math.max(top, rect.top)
 
     # Make the position relative to the top frame.
     left += offset.left
