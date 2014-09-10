@@ -100,22 +100,22 @@ command_scroll_to_bottom = (vim) ->
   vim.rootWindow.goDoCommand('cmd_scrollBottom')
 
 # Scroll down a bit.
-command_scroll_down = (vim, event, count = 1) ->
+command_scroll_down = (vim, event, count) ->
   step = getPref('scroll_step_lines') * count
   utils.simulateWheel(vim.window, 0, +step, utils.WHEEL_MODE_LINE)
 
 # Scroll up a bit.
-command_scroll_up = (vim, event, count = 1) ->
+command_scroll_up = (vim, event, count) ->
   step = getPref('scroll_step_lines') * count
   utils.simulateWheel(vim.window, 0, -step, utils.WHEEL_MODE_LINE)
 
 # Scroll left a bit.
-command_scroll_left = (vim, event, count = 1) ->
+command_scroll_left = (vim, event, count) ->
   step = getPref('scroll_step_lines') * count
   utils.simulateWheel(vim.window, -step, 0, utils.WHEEL_MODE_LINE)
 
 # Scroll right a bit.
-command_scroll_right = (vim, event, count = 1) ->
+command_scroll_right = (vim, event, count) ->
   step = getPref('scroll_step_lines') * count
   utils.simulateWheel(vim.window, +step, 0, utils.WHEEL_MODE_LINE)
 
@@ -398,6 +398,7 @@ searchForMatchingCommand = (keys) ->
         if "#{ key },".startsWith("#{ str },")
           numbers = keys[0..index].join('').match(/\d+/g)
           count = parseInt(numbers[numbers.length - 1], 10) if numbers
+          count = if count > 1 then count else 1
 
           return {match: true, exact: (key == str), command, count}
 
