@@ -139,15 +139,25 @@ command_scroll_page_up = (vim, event, count) ->
 command_open_tab = (vim) ->
   vim.rootWindow.BrowserOpenTab()
 
+helper_switch_tab = (direction, vim, event, count) ->
+  gBrowser = vim.rootWindow.gBrowser
+
+  if count == 1
+    gBrowser.tabContainer.advanceSelectedTab(direction, wrap = true)
+  else
+    currentIndex = gBrowser.visibleTabs.indexOf(gBrowser.selectedTab)
+
+    targetIndex = currentIndex + count * direction
+    targetIndex = Math.max(0, targetIndex)
+    targetIndex = Math.min(targetIndex, gBrowser.visibleTabs.length - 1)
+
+    gBrowser.selectTabAtIndex(targetIndex)
+
 # Switch to the previous tab.
-command_tab_prev = (vim) ->
-  wrap = true
-  vim.rootWindow.gBrowser.tabContainer.advanceSelectedTab(-1, true) # wrap
+command_tab_prev = helper_switch_tab.bind(undefined, -1)
 
 # Switch to the next tab.
-command_tab_next = (vim) ->
-  wrap = true
-  vim.rootWindow.gBrowser.tabContainer.advanceSelectedTab(+1, true) # wrap
+command_tab_next = helper_switch_tab.bind(undefined, +1)
 
 # Move the current tab backward.
 command_tab_move_left = (vim) ->
