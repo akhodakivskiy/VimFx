@@ -396,7 +396,12 @@ searchForMatchingCommand = (keys) ->
         # The following hack is a workaround for the issue where letter `c` is
         # considered a start of command with control modifier `c-xxx`.
         if "#{ key },".startsWith("#{ str },")
-          numbers = keys[0..index].join('').match(/\d+/g)
+          numbers = keys[0..index].join('').match(/[1-9]\d*/g)
+
+          # When letter `0` follows after a number, it is considered as number `0`
+          # instead of a valid command.
+          continue if key == '0' and numbers
+
           count = parseInt(numbers[numbers.length - 1], 10) if numbers
           count = if count > 1 then count else 1
 
