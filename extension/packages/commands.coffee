@@ -140,7 +140,7 @@ command_open_tab = (vim) ->
   vim.rootWindow.BrowserOpenTab()
 
 helper_switch_tab = (direction, vim, event, count) ->
-  gBrowser = vim.rootWindow.gBrowser
+  { gBrowser } = vim.rootWindow
 
   if count == 1
     gBrowser.tabContainer.advanceSelectedTab(direction, wrap = true)
@@ -196,19 +196,22 @@ command_close_tab = (vim) ->
 command_restore_tab = (vim) ->
   vim.rootWindow.undoCloseTab()
 
-helper_follow = ({ inTab, multiple }, vim) ->
+helper_follow = ({ inTab, multiple }, vim, event, count) ->
   callback = (matchedMarker, markers) ->
     if matchedMarker.element.target == '_blank'
       targetReset = matchedMarker.element.target
       matchedMarker.element.target = ''
 
     matchedMarker.element.focus()
-    utils.simulateClick(matchedMarker.element, {metaKey: inTab, ctrlKey: inTab})
+
+    _inTab = if count > 1 then true else inTab
+    utils.simulateClick(matchedMarker.element, {metaKey: _inTab, ctrlKey: _inTab})
 
     matchedMarker.element.target = targetReset if targetReset
 
+    count -= 1
     isEditable = utils.isElementEditable(matchedMarker.element)
-    if multiple and not isEditable
+    if (multiple or count > 0) and not isEditable
       # By not resetting immediately one is able to see the last char being
       # matched, which gives some nice visual feedback that you've typed the
       # right char.
