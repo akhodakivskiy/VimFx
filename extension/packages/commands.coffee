@@ -177,6 +177,21 @@ command_tab_first = (vim) ->
 command_tab_last = (vim) ->
   vim.rootWindow.gBrowser.selectTabAtIndex(-1)
 
+# Duplicate current tab.
+command_duplicate_tab = (vim) ->
+  { gBrowser } = vim.rootWindow
+  gBrowser.duplicateTab(gBrowser.selectedTab)
+
+# Close all tabs from current to the right.
+command_close_tabs_to_end = (vim) ->
+  { gBrowser } = vim.rootWindow
+  gBrowser.removeTabsToTheEndFrom(gBrowser.selectedTab)
+
+# Close all tabs except the current.
+command_close_other_tabs = (vim) ->
+  { gBrowser } = vim.rootWindow
+  gBrowser.removeAllTabsBut(gBrowser.selectedTab)
+
 # Close current tab.
 command_close_tab = (vim) ->
   unless vim.rootWindow.gBrowser.selectedTab.pinned
@@ -363,6 +378,9 @@ commands = [
   new Command('tabs',   'home',                  command_home,                  ['g,h'])
   new Command('tabs',   'tab_first',             command_tab_first,             ['g,H', 'g,^'])
   new Command('tabs',   'tab_last',              command_tab_last,              ['g,L', 'g,$'])
+  new Command('tabs',   'duplicate_tab',         command_duplicate_tab,         [])
+  new Command('tabs',   'close_tabs_to_end',     command_close_tabs_to_end,     [])
+  new Command('tabs',   'close_other_tabs',      command_close_other_tabs,      [])
   new Command('tabs',   'close_tab',             command_close_tab,             ['x'])
   new Command('tabs',   'restore_tab',           command_restore_tab,           ['X'])
 
