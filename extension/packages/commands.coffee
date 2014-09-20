@@ -193,7 +193,7 @@ command_duplicate_tab = (vim) ->
   { gBrowser } = vim.rootWindow
   gBrowser.duplicateTab(gBrowser.selectedTab)
 
-# Close all tabs from current to the right.
+# Close all tabs from current to the end.
 command_close_tabs_to_end = (vim) ->
   { gBrowser } = vim.rootWindow
   gBrowser.removeTabsToTheEndFrom(gBrowser.selectedTab)
