@@ -177,16 +177,14 @@ command_tab_first = (vim) ->
 command_tab_last = (vim) ->
   vim.rootWindow.gBrowser.selectTabAtIndex(-1)
 
-# Toggle Pin Tab
+# Toggle Pin Tab.
 command_toggle_pin_tab = (vim) ->
-  console.log "pinning tab"
-  currenTab = vim.rootWindow.gBrowser.selectedTab
+  currentTab = vim.rootWindow.gBrowser.selectedTab
 
-  console.log "yes inside #{currenTab}"
-  if currenTab.pinned
-    vim.rootWindow.gBrowser.unpinTab(currenTab)
+  if currentTab.pinned
+    vim.rootWindow.gBrowser.unpinTab(currentTab)
   else
-    vim.rootWindow.gBrowser.pinTab(currenTab)
+    vim.rootWindow.gBrowser.pinTab(currentTab)
 
 # Duplicate current tab.
 command_duplicate_tab = (vim) ->
