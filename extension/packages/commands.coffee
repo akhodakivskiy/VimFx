@@ -23,8 +23,8 @@ command_focus_search = (vim) ->
   if vim.rootWindow.BrowserSearch.searchBar
     vim.rootWindow.BrowserSearch.webSearch()
 
-helper_paste = (vim) ->
-  url = utils.readFromClipboard(vim.window)
+helper_paste = (vim, whichClipboard) ->
+  url = utils.readFromClipboard(vim.window, whichClipboard)
   postData = null
   if not utils.isURL(url) and submission = utils.browserSearchSubmission(url)
     url = submission.uri.spec
@@ -33,12 +33,23 @@ helper_paste = (vim) ->
 
 # Go to or search for the contents of the system clipboard.
 command_paste = (vim) ->
-  { url, postData } = helper_paste(vim)
+  { url, postData } = helper_paste(vim, 'global')
   vim.rootWindow.gBrowser.loadURIWithFlags(url, null, null, null, postData)
 
 # Go to or search for the contents of the system clipboard in a new tab.
 command_paste_tab = (vim) ->
-  { url, postData } = helper_paste(vim)
+  { url, postData } = helper_paste(vim, 'global')
+  vim.rootWindow.gBrowser.selectedTab =
+    vim.rootWindow.gBrowser.addTab(url, null, null, postData, null, false)
+
+# Go to or search for the contents of the system selection.
+command_paste_selection = (vim) ->
+  { url, postData } = helper_paste(vim, 'selection')
+  vim.rootWindow.gBrowser.loadURIWithFlags(url, null, null, null, postData)
+
+# Go to or search for the contents of the system selection in a new tab.
+command_paste_selection_tab = (vim) ->
+  { url, postData } = helper_paste(vim, 'selection')
   vim.rootWindow.gBrowser.selectedTab =
     vim.rootWindow.gBrowser.addTab(url, null, null, postData, null, false)
 
@@ -334,6 +345,8 @@ commands = [
   new Command('urls',   'focus_search',          command_focus_search,          ['O'])
   new Command('urls',   'paste',                 command_paste,                 ['p'])
   new Command('urls',   'paste_tab',             command_paste_tab,             ['P'])
+  new Command('urls',   'paste_selection',       command_paste_selection,       [])
+  new Command('urls',   'paste_selection_tab',   command_paste_selection_tab,   [])
   new Command('urls',   'marker_yank',           command_marker_yank,           ['y,f'])
   new Command('urls',   'marker_focus',          command_marker_focus,          ['v,f'])
   new Command('urls',   'yank',                  command_yank,                  ['y,y'])

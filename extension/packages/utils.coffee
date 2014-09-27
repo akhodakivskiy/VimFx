@@ -169,7 +169,7 @@ writeToClipboard = (text) ->
   clipboardHelper.copyString(text)
 
 # Read the system clipboard.
-readFromClipboard = (window) ->
+readFromClipboard = (window, whichClipboard = 'global') ->
   trans = Cc['@mozilla.org/widget/transferable;1']
     .createInstance(Ci.nsITransferable)
 
@@ -183,7 +183,14 @@ readFromClipboard = (window) ->
   trans.addDataFlavor('text/unicode')
 
   clip = Cc['@mozilla.org/widget/clipboard;1'].getService(Ci.nsIClipboard)
-  clip.getData(trans, Ci.nsIClipboard.kGlobalClipboard)
+  clipBoardId = switch
+    when whichClipboard == 'selection' and clip.supportsSelectionClipboard()
+      Ci.nsIClipboard.kSelectionClipboard
+    when whichClipboard == 'find' and clip.supportsFindClipboard()
+      Ci.nsIClipboard.kFindClipboard
+    else
+      Ci.nsIClipboard.kGlobalClipboard
+  clip.getData(trans, clipBoardId)
 
   str = {}
   strLength = {}
