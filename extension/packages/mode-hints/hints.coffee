@@ -134,28 +134,25 @@ getElementShape = (window, element, viewport, parents) ->
   visibleRects = []
   for rect in rects when isInsideViewport(rect, viewport)
     visibleRect = adjustRectToViewport(rect, viewport)
+    continue if visibleRect.area == 0
     totalArea += visibleRect.area
     visibleRects.push(visibleRect)
 
-  return null if visibleRects.length == 0
+  if visibleRects.length == 0
+    if rects.length == 1 and totalArea == 0
+      [ rect ] = rects
+      if rect.width > 0 or rect.height > 0
+        # If we get here, it means that everything inside `element` is floated
+        # and/or absolutely positioned (and that `element` hasn’t been made to
+        # “contain” the floats). For example, a link in a menu could contain a
+        # span of text floated to the left and an icon floated to the right.
+        # Those are still clickable. Therefore we return the shape of the first
+        # visible child instead. At least in that example, that’s the best bet.
+        for child in element.children
+          shape = getElementShape(window, child, viewport, parents)
+          return shape if shape
+    return null
 
-  # If `element` has no area there is nothing to click, unless `element` has
-  # only one visible rect and either a width or a height. That means that
-  # everything inside `element` is floated and/or absolutely positioned (and
-  # that `element` hasn’t been made to “contain” the floats). For example, a
-  # link in a menu could contain a span of text floated to the left and an icon
-  # floated to the right. Those are still clickable. Therefore we return the
-  # shape of the first visible child instead. At least in that example, that’s
-  # the best bet.
-  if totalArea == 0 and visibleRects.length == 1
-    [ rect ] = visibleRects
-    if rect.width > 0 or rect.height > 0
-      for child in element.children
-        shape = getElementShape(window, child, viewport, parents)
-        return shape if shape
-      return null
-
-  return null if totalArea == 0
 
   # Even if `element` has a visible rect, it might be covered by other elements.
   for visibleRect in visibleRects
@@ -190,9 +187,14 @@ adjustRectToViewport = (rect, viewport) ->
   top    = Math.max(rect.top,        viewport.top)
   bottom = Math.min(rect.bottom - 1, viewport.bottom)
 
+  # Make sure that `right >= left and bottom >= top`, since we subtracted by 1
+  # above.
+  right  = Math.max(right, left)
+  bottom = Math.max(bottom, top)
+
   width  = right - left
   height = bottom - top
-  area   = width * height
+  area   = Math.floor(width * height)
 
   return {
     left, right, top, bottom
