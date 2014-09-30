@@ -263,10 +263,13 @@ getFirstNonCoveredPoint = (window, viewport, element, elementRect, parents) ->
   # |                               |
   # |3 left-bottom                  |
   # +-------------------------------+
+  #
+  # It is safer to try points at least one pixel into the element from the edges.
+  left = elementRect.left + 1
   nonCoveredPoint =
-    tryPoint(elementRect.left, elementRect.top                         , 1) or
-    tryPoint(elementRect.left, elementRect.top + elementRect.height / 2, 1) or
-    tryPoint(elementRect.left, elementRect.bottom                      , 1)
+    tryPoint(left, elementRect.top + 1                     , 1) or
+    tryPoint(left, elementRect.top + elementRect.height / 2, 1) or
+    tryPoint(left, elementRect.bottom - 1                  , 1)
 
   element.classList.remove('VimFxNoBorderRadius')
 
