@@ -35,12 +35,6 @@ class Marker
       elementShape: { nonCoveredPoint: { x: left, y: top, offset, rect } }
     } = this
 
-    # The `nonCoveredPoint` is 1px from the edges of the element (see
-    # hints.coffee). It looks nicer if the marker is placed exactly at the
-    # edge, though.
-    left -= 1
-    top  -= 1
-
     # Center the marker vertically on the non-covered point.
     top -= height / 2
 

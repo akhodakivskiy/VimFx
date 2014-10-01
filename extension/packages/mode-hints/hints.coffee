@@ -210,8 +210,13 @@ getFirstNonCoveredPoint = (window, viewport, element, elementRect, parents) ->
   # add a CSS class that removes `border-radius`.
   element.classList.add('VimFxNoBorderRadius')
 
-  tryPoint = (x, y, tryRight = 0) ->
-    elementAtPoint = window.document.elementFromPoint(x, y)
+  # Tries a point `(x + dx, y + dy)`. Returns `(x, y)` (and the frame offset)
+  # if it passes the tests. Otherwise it tries to the right of whatever is at
+  # `(x, y)`, `tryRight` times . If nothing succeeds, `false` is returned. `dx`
+  # and `dy` are used to offset the wanted point `(x, y)` while trying (see the
+  # invocations of `tryPoint` below).
+  tryPoint = (x, dx, y, dy, tryRight = 0) ->
+    elementAtPoint = window.document.elementFromPoint(x + dx, y + dy)
     offset = {left: 0, top: 0}
     found = false
 
@@ -231,7 +236,7 @@ getFirstNonCoveredPoint = (window, viewport, element, elementRect, parents) ->
         offset.left += parent.offset.left
         offset.top  += parent.offset.top
         elementAtPoint = parent.window.document.elementFromPoint(
-          offset.left + x, offset.top + y
+          offset.left + x + dx, offset.top + y + dy
         )
         unless elementAtPoint == currentWindow.frameElement
           found = false
@@ -245,7 +250,7 @@ getFirstNonCoveredPoint = (window, viewport, element, elementRect, parents) ->
       rect = elementAtPoint.getBoundingClientRect()
       x = rect.right - offset.left + 1
       return false if x > viewport.right
-      return tryPoint(x, y, tryRight - 1)
+      return tryPoint(x, 0, y, 0, tryRight - 1)
 
 
   # Try the following 3 positions, or immediately to the right of a covering
@@ -264,12 +269,13 @@ getFirstNonCoveredPoint = (window, viewport, element, elementRect, parents) ->
   # |3 left-bottom                  |
   # +-------------------------------+
   #
-  # It is safer to try points at least one pixel into the element from the edges.
-  left = elementRect.left + 1
+  # It is safer to try points at least one pixel into the element from the
+  # edges, hence the `+1`s and `-1`s.
+  { left, top, bottom, height } = elementRect
   nonCoveredPoint =
-    tryPoint(left, elementRect.top + 1                     , 1) or
-    tryPoint(left, elementRect.top + elementRect.height / 2, 1) or
-    tryPoint(left, elementRect.bottom - 1                  , 1)
+    tryPoint(left, +1, top,              +1, 1) or
+    tryPoint(left, +1, top + height / 2,  0, 1) or
+    tryPoint(left, +1, bottom,           -1, 1)
 
   element.classList.remove('VimFxNoBorderRadius')
 
