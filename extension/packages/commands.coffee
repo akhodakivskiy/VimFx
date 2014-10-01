@@ -173,6 +173,11 @@ command_home = (vim) ->
 command_tab_first = (vim) ->
   vim.rootWindow.gBrowser.selectTabAtIndex(0)
 
+# Switch to the first non-pinned tab.
+command_tab_first_non_pinned = (vim) ->
+  firstNonPinned = vim.rootWindow.gBrowser._numPinnedTabs
+  vim.rootWindow.gBrowser.selectTabAtIndex(firstNonPinned)
+
 # Switch to the last tab.
 command_tab_last = (vim) ->
   vim.rootWindow.gBrowser.selectTabAtIndex(-1)
@@ -361,7 +366,8 @@ commands = [
   new Command('tabs',   'tab_move_left',         command_tab_move_left,         ['c-J'])
   new Command('tabs',   'tab_move_right',        command_tab_move_right,        ['c-K'])
   new Command('tabs',   'home',                  command_home,                  ['g,h'])
-  new Command('tabs',   'tab_first',             command_tab_first,             ['g,H', 'g,^'])
+  new Command('tabs',   'tab_first',             command_tab_first,             ['g,H', 'g,0'])
+  new Command('tabs',   'tab_first_non_pinned',  command_tab_first_non_pinned,  ['g,^'])
   new Command('tabs',   'tab_last',              command_tab_last,              ['g,L', 'g,$'])
   new Command('tabs',   'close_tab',             command_close_tab,             ['x'])
   new Command('tabs',   'restore_tab',           command_restore_tab,           ['X'])
