@@ -6,6 +6,10 @@ utils                   = require 'utils'
 , isReturnCommandKey
 , findStorage }         = require 'commands'
 
+{ interfaces: Ci } = Components
+
+XULDocument = Ci.nsIDOMXULDocument
+
 modes = {}
 
 modes['normal'] =
@@ -44,7 +48,12 @@ modes['normal'] =
       #   custom dialog of a website is open, we should be able to cancel hint
       #   markers on it without closing it. Secondly, otherwise cancelling hint
       #   markers on Google causes its search bar to be focused.
-      if keyStr == 'Esc' and not autoInsertMode
+      # - It may only be suppressed in web pages, not in browser chrome. That
+      #   allows for reseting the location bar when blurring it, and closing
+      #   dialogs such as the “bookmark this page” dialog (<c-d>).
+      document = event.originalTarget.ownerDocument
+      inBrowserChrome = (document instanceof XULDocument)
+      if keyStr == 'Esc' and (not autoInsertMode or inBrowserChrome)
         return false
 
       return true
