@@ -139,6 +139,15 @@ command_scroll_page_up = (vim) ->
 command_open_tab = (vim) ->
   vim.rootWindow.BrowserOpenTab()
 
+# Open a new tab next to the current tab and select the Address Bar.
+command_open_tab_near_current = (vim) ->
+  { gBrowser } = vim.rootWindow
+  newTab = gBrowser.addTab('about:newtab')
+  newTabPos = gBrowser.selectedTab._tPos + 1
+  gBrowser.moveTabTo(newTab, newTabPos)
+  gBrowser.selectedTab = newTab
+  vim.rootWindow.focusAndSelectUrlBar()
+
 # Switch to the previous tab.
 command_tab_prev = (vim) ->
   wrap = true
@@ -361,6 +370,7 @@ commands = [
   new Command('nav',    'scroll_page_up',        command_scroll_page_up,        ['Shift-Space'])
 
   new Command('tabs',   'open_tab',              command_open_tab,              ['t'])
+  new Command('tabs',   'open_tab_near_current', command_open_tab_near_current, ['T'])
   new Command('tabs',   'tab_prev',              command_tab_prev,              ['J', 'g,T'])
   new Command('tabs',   'tab_next',              command_tab_next,              ['K', 'g,t'])
   new Command('tabs',   'tab_move_left',         command_tab_move_left,         ['g,J'])
