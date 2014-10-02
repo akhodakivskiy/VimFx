@@ -29,11 +29,11 @@ modes['normal'] =
 
     storage.keys.push(keyStr)
 
-    { match, exact, command } = searchForMatchingCommand(storage.keys)
+    { match, exact, command, count } = searchForMatchingCommand(storage.keys)
 
     if match
       if exact
-        command.func(vim, event)
+        command.func(vim, event, count)
         storage.keys.length = 0
 
       # Esc key is not suppressed, and passed to the browser in normal mode.
@@ -59,7 +59,8 @@ modes['normal'] =
       return true
 
     else
-      storage.keys.length = 0
+      storage.keys.length = 0 unless /\d/.test(keyStr)
+
       return false
 
 modes['insert'] =

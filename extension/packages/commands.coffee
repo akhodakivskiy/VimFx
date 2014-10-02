@@ -100,23 +100,23 @@ command_scroll_to_bottom = (vim) ->
   vim.rootWindow.goDoCommand('cmd_scrollBottom')
 
 # Scroll down a bit.
-command_scroll_down = (vim) ->
-  step = getPref('scroll_step_lines')
+command_scroll_down = (vim, event, count) ->
+  step = getPref('scroll_step_lines') * count
   utils.simulateWheel(vim.window, 0, +step, utils.WHEEL_MODE_LINE)
 
 # Scroll up a bit.
-command_scroll_up = (vim) ->
-  step = getPref('scroll_step_lines')
+command_scroll_up = (vim, event, count) ->
+  step = getPref('scroll_step_lines') * count
   utils.simulateWheel(vim.window, 0, -step, utils.WHEEL_MODE_LINE)
 
 # Scroll left a bit.
-command_scroll_left = (vim) ->
-  step = getPref('scroll_step_lines')
+command_scroll_left = (vim, event, count) ->
+  step = getPref('scroll_step_lines') * count
   utils.simulateWheel(vim.window, -step, 0, utils.WHEEL_MODE_LINE)
 
 # Scroll right a bit.
-command_scroll_right = (vim) ->
-  step = getPref('scroll_step_lines')
+command_scroll_right = (vim, event, count) ->
+  step = getPref('scroll_step_lines') * count
   utils.simulateWheel(vim.window, +step, 0, utils.WHEEL_MODE_LINE)
 
 # Scroll down half a page.
@@ -139,15 +139,25 @@ command_scroll_page_up = (vim) ->
 command_open_tab = (vim) ->
   vim.rootWindow.BrowserOpenTab()
 
+helper_switch_tab = (direction, vim, event, count) ->
+  { gBrowser } = vim.rootWindow
+
+  if count == 1
+    gBrowser.tabContainer.advanceSelectedTab(direction, wrap = true)
+  else
+    currentIndex = gBrowser.visibleTabs.indexOf(gBrowser.selectedTab)
+
+    targetIndex = currentIndex + count * direction
+    targetIndex = Math.max(0, targetIndex)
+    targetIndex = Math.min(targetIndex, gBrowser.visibleTabs.length - 1)
+
+    gBrowser.selectTabAtIndex(targetIndex)
+
 # Switch to the previous tab.
-command_tab_prev = (vim) ->
-  wrap = true
-  vim.rootWindow.gBrowser.tabContainer.advanceSelectedTab(-1, true) # wrap
+command_tab_prev = helper_switch_tab.bind(undefined, -1)
 
 # Switch to the next tab.
-command_tab_next = (vim) ->
-  wrap = true
-  vim.rootWindow.gBrowser.tabContainer.advanceSelectedTab(+1, true) # wrap
+command_tab_next = helper_switch_tab.bind(undefined, +1)
 
 # Move the current tab backward.
 command_tab_move_left = (vim) ->
@@ -178,27 +188,32 @@ command_tab_last = (vim) ->
   vim.rootWindow.gBrowser.selectTabAtIndex(-1)
 
 # Close current tab.
-command_close_tab = (vim) ->
-  unless vim.rootWindow.gBrowser.selectedTab.pinned
-    vim.rootWindow.gBrowser.removeCurrentTab()
+command_close_tab = (vim, event, count) ->
+  { gBrowser } = vim.rootWindow
+  currentIndex = gBrowser.visibleTabs.indexOf(gBrowser.selectedTab)
+  for tab in gBrowser.visibleTabs[currentIndex...(currentIndex + count)]
+    gBrowser.removeTab(tab)
 
 # Restore last closed tab.
-command_restore_tab = (vim) ->
-  vim.rootWindow.undoCloseTab()
+command_restore_tab = (vim, event, count) ->
+  vim.rootWindow.undoCloseTab() for idx in [1..count]
 
-helper_follow = ({ inTab, multiple }, vim) ->
+helper_follow = ({ inTab, multiple }, vim, event, count) ->
   callback = (matchedMarker, markers) ->
     if matchedMarker.element.target == '_blank'
       targetReset = matchedMarker.element.target
       matchedMarker.element.target = ''
 
     matchedMarker.element.focus()
-    utils.simulateClick(matchedMarker.element, {metaKey: inTab, ctrlKey: inTab})
+
+    _inTab = if count > 1 then true else inTab
+    utils.simulateClick(matchedMarker.element, {metaKey: _inTab, ctrlKey: _inTab})
 
     matchedMarker.element.target = targetReset if targetReset
 
+    count -= 1
     isEditable = utils.isElementEditable(matchedMarker.element)
-    if multiple and not isEditable
+    if (multiple or count > 0) and not isEditable
       # By not resetting immediately one is able to see the last char being
       # matched, which gives some nice visual feedback that you've typed the
       # right char.
@@ -403,7 +418,16 @@ searchForMatchingCommand = (keys) ->
         # The following hack is a workaround for the issue where letter `c` is
         # considered a start of command with control modifier `c-xxx`.
         if "#{ key },".startsWith("#{ str },")
-          return {match: true, exact: (key == str), command}
+          numbers = keys[0..index].join('').match(/[1-9]\d*/g)
+
+          # When letter `0` follows after a number, it is considered as number `0`
+          # instead of a valid command.
+          continue if key == '0' and numbers
+
+          count = parseInt(numbers[numbers.length - 1], 10) if numbers
+          count = if count > 1 then count else 1
+
+          return {match: true, exact: (key == str), command, count}
 
   return {match: false}
 
