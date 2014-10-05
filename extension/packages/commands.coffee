@@ -276,13 +276,20 @@ command_go_up_path = (vim) ->
 command_go_to_root = (vim) ->
   vim.window.location.href = vim.window.location.origin
 
+helper_go_history = (num, vim, event, count) ->
+  { index } = vim.rootWindow.getWebNavigation().sessionHistory
+  { history } = vim.window
+  num *= count
+  num = Math.max(num, -index)
+  num = Math.min(num, history.length - 1 - index)
+  return if num == 0
+  history.go(num)
+
 # Go back in history.
-command_back = (vim) ->
-  vim.rootWindow.BrowserBack()
+command_back = helper_go_history.bind(undefined, -1)
 
 # Go forward in history.
-command_forward = (vim) ->
-  vim.rootWindow.BrowserForward()
+command_forward = helper_go_history.bind(undefined, +1)
 
 findStorage = {lastSearchString: ''}
 
