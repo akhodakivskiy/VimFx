@@ -268,9 +268,11 @@ command_follow_prev = helper_follow_pattern.bind(undefined, 'prev')
 command_follow_next = helper_follow_pattern.bind(undefined, 'next')
 
 # Go up one level in the URL hierarchy.
-command_go_up_path = (vim) ->
-  path = vim.window.location.pathname
-  vim.window.location.pathname = path.replace(/// / [^/]+ /?$ ///, '')
+command_go_up_path = (vim, event, count) ->
+  { pathname } = vim.window.location
+  vim.window.location.pathname = pathname.replace(
+    /// (?: /[^/]+ ){1,#{ count }} /?$ ///, ''
+  )
 
 # Go up to root of the URL hierarchy.
 command_go_to_root = (vim) ->
