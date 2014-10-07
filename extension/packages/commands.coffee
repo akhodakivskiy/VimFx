@@ -100,70 +100,91 @@ command_scroll_to_bottom = (vim) ->
   vim.rootWindow.goDoCommand('cmd_scrollBottom')
 
 # Scroll down a bit.
-command_scroll_down = (vim) ->
-  step = getPref('scroll_step_lines')
+command_scroll_down = (vim, event, count) ->
+  step = getPref('scroll_step_lines') * count
   utils.simulateWheel(vim.window, 0, +step, utils.WHEEL_MODE_LINE)
 
 # Scroll up a bit.
-command_scroll_up = (vim) ->
-  step = getPref('scroll_step_lines')
+command_scroll_up = (vim, event, count) ->
+  step = getPref('scroll_step_lines') * count
   utils.simulateWheel(vim.window, 0, -step, utils.WHEEL_MODE_LINE)
 
 # Scroll left a bit.
-command_scroll_left = (vim) ->
-  step = getPref('scroll_step_lines')
+command_scroll_left = (vim, event, count) ->
+  step = getPref('scroll_step_lines') * count
   utils.simulateWheel(vim.window, -step, 0, utils.WHEEL_MODE_LINE)
 
 # Scroll right a bit.
-command_scroll_right = (vim) ->
-  step = getPref('scroll_step_lines')
+command_scroll_right = (vim, event, count) ->
+  step = getPref('scroll_step_lines') * count
   utils.simulateWheel(vim.window, +step, 0, utils.WHEEL_MODE_LINE)
 
 # Scroll down half a page.
-command_scroll_half_page_down = (vim) ->
-  utils.simulateWheel(vim.window, 0, +0.5, utils.WHEEL_MODE_PAGE)
+command_scroll_half_page_down = (vim, event, count) ->
+  utils.simulateWheel(vim.window, 0, +0.5 * count, utils.WHEEL_MODE_PAGE)
 
 # Scroll up half a page.
-command_scroll_half_page_up = (vim) ->
-  utils.simulateWheel(vim.window, 0, -0.5, utils.WHEEL_MODE_PAGE)
+command_scroll_half_page_up = (vim, event, count) ->
+  utils.simulateWheel(vim.window, 0, -0.5 * count, utils.WHEEL_MODE_PAGE)
 
 # Scroll down full a page.
-command_scroll_page_down = (vim) ->
-  utils.simulateWheel(vim.window, 0, +1, utils.WHEEL_MODE_PAGE)
+command_scroll_page_down = (vim, event, count) ->
+  utils.simulateWheel(vim.window, 0, +1 * count, utils.WHEEL_MODE_PAGE)
 
 # Scroll up full a page.
-command_scroll_page_up = (vim) ->
-  utils.simulateWheel(vim.window, 0, -1, utils.WHEEL_MODE_PAGE)
+command_scroll_page_up = (vim, event, count) ->
+  utils.simulateWheel(vim.window, 0, -1 * count, utils.WHEEL_MODE_PAGE)
 
 # Open a new tab and select the Address Bar.
 command_open_tab = (vim) ->
   vim.rootWindow.BrowserOpenTab()
 
+absoluteTabIndex = (relativeIndex, gBrowser) ->
+  tabs = gBrowser.visibleTabs
+  { selectedTab } = gBrowser
+
+  currentIndex  = tabs.indexOf(selectedTab)
+  absoluteIndex = currentIndex + relativeIndex
+  numTabs       = tabs.length
+
+  wrap = (Math.abs(relativeIndex) == 1)
+  if wrap
+    absoluteIndex %%= numTabs
+  else
+    absoluteIndex = Math.max(0, absoluteIndex)
+    absoluteIndex = Math.min(absoluteIndex, numTabs - 1)
+
+  return absoluteIndex
+
+helper_switch_tab = (direction, vim, event, count) ->
+  { gBrowser } = vim.rootWindow
+  gBrowser.selectTabAtIndex(absoluteTabIndex(direction * count, gBrowser))
+
 # Switch to the previous tab.
-command_tab_prev = (vim) ->
-  wrap = true
-  vim.rootWindow.gBrowser.tabContainer.advanceSelectedTab(-1, true) # wrap
+command_tab_prev = helper_switch_tab.bind(undefined, -1)
 
 # Switch to the next tab.
-command_tab_next = (vim) ->
-  wrap = true
-  vim.rootWindow.gBrowser.tabContainer.advanceSelectedTab(+1, true) # wrap
+command_tab_next = helper_switch_tab.bind(undefined, +1)
+
+helper_move_tab = (direction, vim, event, count) ->
+  { gBrowser }    = vim.rootWindow
+  { selectedTab } = gBrowser
+  { pinned }      = selectedTab
+
+  index = absoluteTabIndex(direction * count, gBrowser)
+
+  if index < gBrowser._numPinnedTabs
+    gBrowser.pinTab(selectedTab) unless pinned
+  else
+    gBrowser.unpinTab(selectedTab) if pinned
+
+  gBrowser.moveTabTo(selectedTab, index)
 
 # Move the current tab backward.
-command_tab_move_left = (vim) ->
-  { gBrowser } = vim.rootWindow
-  lastIndex = gBrowser.tabContainer.selectedIndex
-  gBrowser.moveTabBackward()
-  if gBrowser.tabContainer.selectedIndex == lastIndex
-    gBrowser.moveTabToEnd()
+command_tab_move_left = helper_move_tab.bind(undefined, -1)
 
 # Move the current tab forward.
-command_tab_move_right = (vim) ->
-  { gBrowser } = vim.rootWindow
-  lastIndex = gBrowser.tabContainer.selectedIndex
-  gBrowser.moveTabForward()
-  if gBrowser.tabContainer.selectedIndex == lastIndex
-    gBrowser.moveTabToStart()
+command_tab_move_right = helper_move_tab.bind(undefined, +1)
 
 # Load the home page.
 command_home = (vim) ->
@@ -178,20 +199,33 @@ command_tab_last = (vim) ->
   vim.rootWindow.gBrowser.selectTabAtIndex(-1)
 
 # Close current tab.
-command_close_tab = (vim) ->
-  unless vim.rootWindow.gBrowser.selectedTab.pinned
-    vim.rootWindow.gBrowser.removeCurrentTab()
+command_close_tab = (vim, event, count) ->
+  { gBrowser } = vim.rootWindow
+  return if gBrowser.selectedTab.pinned
+  currentIndex = gBrowser.visibleTabs.indexOf(gBrowser.selectedTab)
+  for tab in gBrowser.visibleTabs[currentIndex...(currentIndex + count)]
+    gBrowser.removeTab(tab)
 
 # Restore last closed tab.
-command_restore_tab = (vim) ->
-  vim.rootWindow.undoCloseTab()
+command_restore_tab = (vim, event, count) ->
+  vim.rootWindow.undoCloseTab() for [1..count]
 
-helper_follow = ({ inTab, multiple }, vim) ->
+helper_follow = ({ inTab, multiple }, vim, event, count) ->
   callback = (matchedMarker, markers) ->
+    if matchedMarker.element.target == '_blank'
+      targetReset = matchedMarker.element.target
+      matchedMarker.element.target = ''
+
     matchedMarker.element.focus()
-    utils.simulateClick(matchedMarker.element, {metaKey: inTab, ctrlKey: inTab})
+
+    _inTab = if count > 1 then true else inTab
+    utils.simulateClick(matchedMarker.element, {metaKey: _inTab, ctrlKey: _inTab})
+
+    matchedMarker.element.target = targetReset if targetReset
+
+    count -= 1
     isEditable = utils.isElementEditable(matchedMarker.element)
-    if multiple and not isEditable
+    if (multiple or count > 0) and not isEditable
       # By not resetting immediately one is able to see the last char being
       # matched, which gives some nice visual feedback that you've typed the
       # right char.
@@ -234,21 +268,30 @@ command_follow_prev = helper_follow_pattern.bind(undefined, 'prev')
 command_follow_next = helper_follow_pattern.bind(undefined, 'next')
 
 # Go up one level in the URL hierarchy.
-command_go_up_path = (vim) ->
-  path = vim.window.location.pathname
-  vim.window.location.pathname = path.replace(/// / [^/]+ /?$ ///, '')
+command_go_up_path = (vim, event, count) ->
+  { pathname } = vim.window.location
+  vim.window.location.pathname = pathname.replace(
+    /// (?: /[^/]+ ){1,#{ count }} /?$ ///, ''
+  )
 
 # Go up to root of the URL hierarchy.
 command_go_to_root = (vim) ->
   vim.window.location.href = vim.window.location.origin
 
+helper_go_history = (num, vim, event, count) ->
+  { index } = vim.rootWindow.getWebNavigation().sessionHistory
+  { history } = vim.window
+  num *= count
+  num = Math.max(num, -index)
+  num = Math.min(num, history.length - 1 - index)
+  return if num == 0
+  history.go(num)
+
 # Go back in history.
-command_back = (vim) ->
-  vim.rootWindow.BrowserBack()
+command_back = helper_go_history.bind(undefined, -1)
 
 # Go forward in history.
-command_forward = (vim) ->
-  vim.rootWindow.BrowserForward()
+command_forward = helper_go_history.bind(undefined, +1)
 
 findStorage = {lastSearchString: ''}
 
@@ -396,7 +439,16 @@ searchForMatchingCommand = (keys) ->
         # The following hack is a workaround for the issue where letter `c` is
         # considered a start of command with control modifier `c-xxx`.
         if "#{ key },".startsWith("#{ str },")
-          return {match: true, exact: (key == str), command}
+          numbers = keys[0..index].join('').match(/[1-9]\d*/g)
+
+          # When letter `0` follows after a number, it is considered as number `0`
+          # instead of a valid command.
+          continue if key == '0' and numbers
+
+          count = parseInt(numbers[numbers.length - 1], 10) if numbers
+          count = if count > 1 then count else 1
+
+          return {match: true, exact: (key == str), command, count}
 
   return {match: false}
 
