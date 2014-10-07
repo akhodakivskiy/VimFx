@@ -7,15 +7,14 @@
 HTMLDocument      = Ci.nsIDOMHTMLDocument
 HTMLAnchorElement = Ci.nsIDOMHTMLAnchorElement
 
-realBloomFilter = new SerializableBloomFilter('hints_bloom_data', 256 * 32, 16)
+realBloomFilter  = new SerializableBloomFilter('hints_bloom_data', 256 * 32, 16)
 dummyBloomFilter = new DummyBloomFilter()
 
-# Wraps the markable element and provides methods to manipulate the markers
+# Wraps the markable element and provides methods to manipulate the markers.
 class Marker
-  # Creates the marker DOM node
-  constructor: (@element) ->
+  # Creates the marker DOM node.
+  constructor: (@element, @elementShape) ->
     document = @element.ownerDocument
-    window = document.defaultView
     @markerElement = createElement(document, 'div', {class: 'VimFxHintMarker'})
 
     Object.defineProperty this, 'bloomFilter',
@@ -28,25 +27,48 @@ class Marker
   updateVisibility: ->
     if @hintChars.startsWith(@enteredHintChars) then @show() else @hide()
 
-  setPosition: (top, left) ->
-    # The positioning is absulute
-    @markerElement.style.top  = "#{ top }px"
-    @markerElement.style.left = "#{ left }px"
-
-    # For quick access
-    @position = {top, left}
-
-  # To be called when the marker has been both assigned a hint and inserted into the DOM, and thus
-  # gotten a height and width.
-  completePosition: ->
+  # To be called when the marker has been both assigned a hint and inserted
+  # into the DOM, and thus gotten a height and width.
+  setPosition: (viewport) ->
     {
-      position: { top, left }
       markerElement: { offsetHeight: height, offsetWidth: width }
+      elementShape: { nonCoveredPoint: { x: left, y: top, offset, rect } }
     } = this
-    @position = {top, bottom: top + height, left, right: left + width, height, width}
+
+    # Center the marker vertically on the non-covered point.
+    top -= height / 2
+
+    # Make sure that the marker stays within its element (vertically).
+    top = Math.min(top, rect.bottom - height)
+    top = Math.max(top, rect.top)
+
+    # Make the position relative to the top frame.
+    left += offset.left
+    top  += offset.top
+
+    # Make sure that the marker stays within the viewport.
+    left = Math.min(left, viewport.right  - width)
+    top  = Math.min(top,  viewport.bottom - height)
+    left = Math.max(left, viewport.left)
+    top  = Math.max(top,  viewport.top)
+
+    # Make the position relative to the document, rather than to the viewport.
+    left += viewport.scrollX
+    top  += viewport.scrollY
+
+    # The positioning is absolute.
+    @markerElement.style.left = "#{ left }px"
+    @markerElement.style.top  = "#{ top }px"
+
+    # For quick access.
+    @position = {
+      left, right: left + width,
+      top, bottom: top + height,
+      height, width
+    }
 
   setHint: (@hintChars) ->
-    # Hint chars that have been matched so far
+    # Hint chars that have been matched so far.
     @enteredHintChars = ''
 
     document = @element.ownerDocument
@@ -73,7 +95,8 @@ class Marker
     @updateVisibility()
 
   toggleLastHintChar: (visible) ->
-    @markerElement.children[@enteredHintChars.length]?.classList.toggle('VimFxCharMatch', visible)
+    @markerElement.children[@enteredHintChars.length]
+      ?.classList.toggle('VimFxCharMatch', visible)
 
   isMatched: ->
     return @hintChars == @enteredHintChars
@@ -83,11 +106,12 @@ class Marker
     @show()
 
   # Returns string features of the element that can be used in the bloom filter
-  # in order to add relevance to the hint marker
+  # in order to add relevance to the hint marker.
   extractBloomFeatures: ->
     features = {}
 
-    # Class name of an element (walks up the node tree to find first element with at least one class)
+    # Class name of an element (walks up the node tree to find first element
+    # with at least one class).
     suffix = ''
     el = @element
     while el.classList?.length == 0 and el not instanceof HTMLDocument
@@ -101,13 +125,13 @@ class Marker
       features["#{ el.tagName }.#{ @element.id }"] = 5
 
     if @element instanceof HTMLAnchorElement
-      features["a"] = 20 # Reward links no matter what
+      features["a"] = 20 # Reward links no matter what.
       features["#{ el.tagName }.#{ @element.href }"] = 60
       features["#{ el.tagName }.#{ @element.title }"] = 40
 
     return features
 
-  # Returns rating of all present bloom features (plus 1)
+  # Returns rating of all present bloom features (plus 1).
   calcBloomRating: ->
     rating = 1
     for feature, weight of @extractBloomFeatures()

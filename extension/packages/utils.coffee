@@ -387,6 +387,7 @@ EDITABLE_ELEMENT_PROPERTIES = [
 ]
 
 FOCUSABLE_ELEMENT_TAGS = [
+  "frame"
   "iframe"
   "embed"
   "object"

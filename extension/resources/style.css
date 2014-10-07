@@ -23,6 +23,7 @@
     min-height: 0 !important;
     min-width: 0 !important;
     opacity: 1 !important;
+    outline: none !important;
     padding: 0 !important;
     position: static !important;
     /*right: auto !important;*/
@@ -36,6 +37,10 @@
     white-space: normal !important;
     width: auto !important;
     float: none !important;
+}
+.VimFxReset::before,
+.VimFxReset::after {
+    content: none !important;
 }
 
 /* Markers */
@@ -67,6 +72,13 @@
 
 .VimFxHintMarker.VimFxHiddenHintMarker {
     display: none !important;
+}
+
+.VimFxNoBorderRadius {
+    border-radius: 0 !important;
+    /* `transition` is reset here to make sure that the above declaration
+     * takes effect immediately.  */
+    transition: none !important;
 }
 
 /* Help Dialog */
