@@ -100,40 +100,40 @@ command_scroll_to_bottom = (vim) ->
   vim.rootWindow.goDoCommand('cmd_scrollBottom')
 
 # Scroll down a bit.
-command_scroll_down = (vim) ->
-  step = getPref('scroll_step_lines')
+command_scroll_down = (vim, event, count) ->
+  step = getPref('scroll_step_lines') * count
   utils.simulateWheel(vim.window, 0, +step, utils.WHEEL_MODE_LINE)
 
 # Scroll up a bit.
-command_scroll_up = (vim) ->
-  step = getPref('scroll_step_lines')
+command_scroll_up = (vim, event, count) ->
+  step = getPref('scroll_step_lines') * count
   utils.simulateWheel(vim.window, 0, -step, utils.WHEEL_MODE_LINE)
 
 # Scroll left a bit.
-command_scroll_left = (vim) ->
-  step = getPref('scroll_step_lines')
+command_scroll_left = (vim, event, count) ->
+  step = getPref('scroll_step_lines') * count
   utils.simulateWheel(vim.window, -step, 0, utils.WHEEL_MODE_LINE)
 
 # Scroll right a bit.
-command_scroll_right = (vim) ->
-  step = getPref('scroll_step_lines')
+command_scroll_right = (vim, event, count) ->
+  step = getPref('scroll_step_lines') * count
   utils.simulateWheel(vim.window, +step, 0, utils.WHEEL_MODE_LINE)
 
 # Scroll down half a page.
-command_scroll_half_page_down = (vim) ->
-  utils.simulateWheel(vim.window, 0, +0.5, utils.WHEEL_MODE_PAGE)
+command_scroll_half_page_down = (vim, event, count) ->
+  utils.simulateWheel(vim.window, 0, +0.5 * count, utils.WHEEL_MODE_PAGE)
 
 # Scroll up half a page.
-command_scroll_half_page_up = (vim) ->
-  utils.simulateWheel(vim.window, 0, -0.5, utils.WHEEL_MODE_PAGE)
+command_scroll_half_page_up = (vim, event, count) ->
+  utils.simulateWheel(vim.window, 0, -0.5 * count, utils.WHEEL_MODE_PAGE)
 
 # Scroll down full a page.
-command_scroll_page_down = (vim) ->
-  utils.simulateWheel(vim.window, 0, +1, utils.WHEEL_MODE_PAGE)
+command_scroll_page_down = (vim, event, count) ->
+  utils.simulateWheel(vim.window, 0, +1 * count, utils.WHEEL_MODE_PAGE)
 
 # Scroll up full a page.
-command_scroll_page_up = (vim) ->
-  utils.simulateWheel(vim.window, 0, -1, utils.WHEEL_MODE_PAGE)
+command_scroll_page_up = (vim, event, count) ->
+  utils.simulateWheel(vim.window, 0, -1 * count, utils.WHEEL_MODE_PAGE)
 
 # Open a new tab and select the Address Bar.
 command_open_tab = (vim) ->
