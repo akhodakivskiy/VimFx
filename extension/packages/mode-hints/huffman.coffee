@@ -1,3 +1,22 @@
+###
+# Copyright Simon Lydell 2013, 2014.
+#
+# This file is part of VimFx.
+#
+# VimFx is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# VimFx is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with VimFx.  If not, see <http://www.gnu.org/licenses/>.
+###
+
 # `originalElements` should be an array of objects. Each object is expected to
 # have a `weight` property which represents the _weight_ of the object, which is
 # a positive number. Each object will be given a _code word_. The larger the

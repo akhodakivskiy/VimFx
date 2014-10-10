@@ -14,6 +14,7 @@
     <em:description>Vim keyboard shortcuts for Firefox</em:description>
     <em:creator>Anton Khodakivskiy</em:creator>
     <em:developer>Simon Lydell</em:developer>
+    <em:contributor>Wang Zhuochun</em:contributor>
 
     <!-- Firefox -->
     <em:targetApplication>
