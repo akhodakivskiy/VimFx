@@ -232,6 +232,10 @@ tabsListener =
 
     # Update the blacklist state.
     vim.blacklisted = utils.isBlacklisted(location.spec)
+    vim.blacklistedKeys = utils.getBlacklistedKeys(location.spec)
+    # If only specific keys are blacklisted, remove blacklist state.
+    if vim.blacklistedKeys.length > 0
+      vim.blacklisted = false
     updateButton(vim)
 
 addEventListeners = (window) ->
