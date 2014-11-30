@@ -52,6 +52,9 @@ modes['normal'] =
 
     { match, exact, command, count } = searchForMatchingCommand(storage.keys)
 
+    if vim.blacklistedKeys and storage.keys.join('') in vim.blacklistedKeys
+      match = false
+
     if match
       if exact
         command.func(vim, event, count)

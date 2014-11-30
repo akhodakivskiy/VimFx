@@ -228,10 +228,18 @@ isBlacklisted = (str) ->
   matchingRules = getMatchingBlacklistRules(str)
   return (matchingRules.length != 0)
 
+# Returns all blacklisted keys in matching rules.
+getBlacklistedKeys = (str) ->
+  matchingRules = getMatchingBlacklistRules(str)
+  blacklistedKeys = []
+  for rule in matchingRules when /##/.test(rule)
+    blacklistedKeys.push(x) for x in rule.split('##')[1].split('#')
+  return blacklistedKeys
+
 # Returns all rules in the blacklist that match the provided string.
 getMatchingBlacklistRules = (str) ->
   return getBlacklist().filter((rule) ->
-    /// ^#{ simpleWildcards(rule) }$ ///i.test(str)
+    /// ^#{ simpleWildcards(rule.split('##')[0]) }$ ///i.test(str)
   )
 
 getBlacklist = ->
@@ -480,6 +488,7 @@ exports.timeIt                    = timeIt
 
 exports.getMatchingBlacklistRules = getMatchingBlacklistRules
 exports.isBlacklisted             = isBlacklisted
+exports.getBlacklistedKeys        = getBlacklistedKeys
 exports.updateBlacklist           = updateBlacklist
 exports.splitListString           = splitListString
 exports.getBestPatternMatch       = getBestPatternMatch
