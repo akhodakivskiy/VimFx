@@ -5,3 +5,4 @@ node_modules
 *.js
 .DS_Store
 VimFx.xpi
+build

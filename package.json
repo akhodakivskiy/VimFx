@@ -1,0 +1,19 @@
+{
+  "name": "VimFx",
+  "version": "0.5.14",
+  "license": "GPLv3",
+  "private": true,
+  "scripts": {},
+  "dependencies": {},
+  "devDependencies": {
+    "coffee-script": "~1.8.0",
+    "gulp": "^3.8.10",
+    "gulp-changed": "^1.0.0",
+    "gulp-coffee": "^2.2.0",
+    "gulp-coffeelint": "^0.4.0",
+    "gulp-zip": "^2.0.2",
+    "gutil": "^1.5.5",
+    "request": "^2.49.0",
+    "rimraf": "^2.2.8"
+  }
+}
