@@ -79,6 +79,8 @@ Code! Try to follow the following simple rules:
 - Try to keep lines at most 80 characters long.
 - Indent using two spaces.
 
+Please lint your code. See below.
+
 Break up your pull request in several commits if necessary. The first line of
 commit messages should be a short summary. Add a blank line and then a nicely
 formatted markdown description after it if needed.
@@ -86,17 +88,26 @@ formatted markdown description after it if needed.
 Finally send a pull request to same branch as you based your topic branch on
 (master or develop).
 
-### Tips:
+### Building VimFx
 
-- Compile the .coffee files with the **`--bare`** option! Otherwise you will
-  get errors.
-- Run `coffee -cbw .` from the root of the project to automatically compile on
-  changes.
-- Put a file called exactly `VimFx@akhodakivskiy.github.com` in the extensions/
-  folder of a Firefox profile, containing the absolute path to the extension/
-  folder in the project. Then you just need to restart Firefox (use some
-  add-on!) after each change. More details in this [MDN article][mdn-extdevenv].
-- Only create tickets for issues and feature requests in English. Otherwise
-  duplicate tickets in different languages will pile up.
+1. Install [Node.js].
+2. Run `npm install` to download dependencies and development dependencies.
+3. Run `npm install -g gulp` to be able to run [`gulp`][gulp] commands.
+   (Alternatively, you may use `./node_modules/.bin/gulp`.)
+4. Create a new Firefox profile for development.
+5. Install the [Extension Auto-Installer] add-on in your development profile.
 
-[mdn-extdevenv]: https://developer.mozilla.org/en-US/docs/Setting_up_extension_development_environment#Firefox_extension_proxy_file
+- `gulp build` creates the `build/` directory. It is basically a copy of the
+  `extension/` directory, with the .coffee files compiled to .js.
+- `gulp xpi` zips up the `build/` directory into `build/VimFx.xpi`.
+- `gulp push` (or just `gulp`) pushes `build/VimFx.xpi` to
+  `http://localhost:8888`, which causes the Extension Auto-Installer to
+  automatically install it. (No need to restart Firefox.)
+- `gulp clean` removes the `build/` directory.
+- `gulp lint` lints your code.
+
+An easy workflow is code, `gulp`, test, repeat.
+
+[Node.js]: http://nodejs.org/
+[gulp]: https://github.com/gulpjs/gulp
+[Extension Auto-Installer]: https://addons.mozilla.org/firefox/addon/autoinstaller
