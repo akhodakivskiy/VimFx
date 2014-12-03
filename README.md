@@ -20,7 +20,7 @@ significantly reducing the use of mouse, and allowing your hands to rest on the 
 VimFx was inspired by [Vimperator](http://www.vimperator.org/)
 and designed after [Vimium](http://vimium.github.com/) for
 [Google Chrome](https://www.google.com/intl/en/chrome/browser/) preserving the shortcuts and behavior.
-If your are used to Vimium then it will be easy to get started with VimFx.
+If you are used to Vimium then it will be easy to get started with VimFx.
 
 ## Why VimFx was created
 
