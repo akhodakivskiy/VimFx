@@ -18,18 +18,23 @@
 ###
 
 fs         = require('fs')
-path       = require('path')
+{ join }   = require('path')
 request    = require('request')
 gulp       = require('gulp')
 gutil      = require('gutil')
 changed    = require('gulp-changed')
 coffee     = require('gulp-coffee')
 coffeelint = require('gulp-coffeelint')
+mustache   = require('gulp-mustache')
 zip        = require('gulp-zip')
 rimraf     = require('rimraf')
 
-DEST = 'build'
-XPI  = 'VimFx.xpi'
+DEST   = 'build'
+XPI    = 'VimFx.xpi'
+LOCALE = 'extension/locale'
+
+read = (filepath) -> fs.readFileSync(filepath).toString()
+template = (data) -> mustache(data, {extension: ''})
 
 gulp.task('default', ['push'])
 
@@ -38,7 +43,7 @@ gulp.task('clean', (callback) ->
 )
 
 gulp.task('copy', ->
-  gulp.src(['extension/**/!(*.coffee)', 'COPYING'])
+  gulp.src(['extension/**/!(*.coffee|*.tmpl)', 'COPYING'])
     .pipe(changed(DEST))
     .pipe(gulp.dest(DEST))
 )
@@ -50,7 +55,40 @@ gulp.task('coffee', ->
     .pipe(gulp.dest(DEST))
 )
 
-gulp.task('build', ['copy', 'coffee'])
+gulp.task('chrome.manifest', ->
+  gulp.src('extension/chrome.manifest.tmpl')
+    .pipe(template({locales: fs.readdirSync(LOCALE).map((locale) -> {locale})}))
+    .pipe(gulp.dest(DEST))
+)
+
+gulp.task('install.rdf', ->
+  pkg = require('./package.json')
+
+  [ [ { name: creator } ], developers, contributors, translators ] =
+    read('PEOPLE.md').trim().replace(/^#.+\n|^\s*-\s*/mg, '').split('\n\n')
+    .map((block) -> block.split('\n').map((name) -> {name}))
+
+  getDescription = (locale) -> read(join(LOCALE, locale, 'description')).trim()
+
+  descriptions = fs.readdirSync(LOCALE)
+    .map((locale) -> {
+      locale: locale
+      description: getDescription(locale)
+    })
+
+  gulp.src('extension/install.rdf.tmpl')
+    .pipe(template({
+      version: pkg.version
+      minVersion: pkg.firefoxVersions.min
+      maxVersion: pkg.firefoxVersions.max
+      creator, developers, contributors, translators
+      defaultDescription: getDescription('en-US')
+      descriptions
+    }))
+    .pipe(gulp.dest(DEST))
+)
+
+gulp.task('build', ['copy', 'coffee', 'chrome.manifest', 'install.rdf'])
 
 gulp.task('xpi', ['build'], ->
   gulp.src("#{ DEST }/**/!(#{ XPI })")
@@ -59,7 +97,7 @@ gulp.task('xpi', ['build'], ->
 )
 
 gulp.task('push', ['xpi'], ->
-  body = fs.readFileSync(path.join(DEST, XPI))
+  body = fs.readFileSync(join(DEST, XPI))
   request.post({url: 'http://localhost:8888', body })
 )
 
