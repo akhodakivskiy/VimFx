@@ -1,6 +1,10 @@
 {
   "name": "VimFx",
   "version": "0.5.14",
+  "firefoxVersions": {
+    "min": "29.0",
+    "max": "31.*"
+  },
   "license": "GPLv3",
   "private": true,
   "scripts": {},
@@ -11,6 +15,7 @@
     "gulp-changed": "^1.0.0",
     "gulp-coffee": "^2.2.0",
     "gulp-coffeelint": "^0.4.0",
+    "gulp-mustache": "^1.0.0",
     "gulp-util": "^3.0.1",
     "gulp-zip": "^2.0.2",
     "request": "^2.49.0",
