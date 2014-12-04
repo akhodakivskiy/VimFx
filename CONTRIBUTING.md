@@ -111,3 +111,18 @@ An easy workflow is code, `gulp`, test, repeat.
 [Node.js]: http://nodejs.org/
 [gulp]: https://github.com/gulpjs/gulp
 [Extension Auto-Installer]: https://addons.mozilla.org/firefox/addon/autoinstaller
+
+### Making a release
+
+1. Add a list of changes since the last version at the top of CHANGELOG.md.
+2. Update the version in package.json (see above about versioning), and, if
+   needed, the min and max Firefox versions.
+3. Run `gulp release`, which does the following for you:
+  - Adds a heading with the new version number and today’s date at the top of
+    CHANGELOG.md.
+  - Commits CHANGELOG.md and package.json.
+  - Tags the commit.
+4. Run `gulp xpi` to rebuild with the new version number.
+5. Push to github. Don’t forget to push the tag!
+6. Make a “release” out of the new tag on github, and attach VimFx.xpi to it.
+7. Publish on addons.mozilla.org. Add the release notes list as HTML.
