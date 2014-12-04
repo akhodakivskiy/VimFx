@@ -21,11 +21,11 @@ fs         = require('fs')
 { join }   = require('path')
 request    = require('request')
 gulp       = require('gulp')
-gutil      = require('gutil')
 changed    = require('gulp-changed')
 coffee     = require('gulp-coffee')
 coffeelint = require('gulp-coffeelint')
 mustache   = require('gulp-mustache')
+util       = require('gulp-util')
 zip        = require('gulp-zip')
 rimraf     = require('rimraf')
 
@@ -51,7 +51,7 @@ gulp.task('copy', ->
 gulp.task('coffee', ->
   gulp.src('extension/**/*.coffee')
     .pipe(changed(DEST, {extension: '.coffee'}))
-    .pipe(coffee({bare: true}).on('error', gutil.log))
+    .pipe(coffee({bare: true}).on('error', util.log))
     .pipe(gulp.dest(DEST))
 )
 
