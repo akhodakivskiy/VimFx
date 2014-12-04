@@ -111,7 +111,7 @@ gulp.task('lint', ->
 )
 
 gulp.task('release', ->
-  { version } = require('package.json')
+  { version } = require('./package.json')
   message = "VimFx v#{ version }"
   today = new Date().toISOString()[...10]
   merge(
