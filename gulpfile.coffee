@@ -24,6 +24,9 @@ gulp       = require('gulp')
 changed    = require('gulp-changed')
 coffee     = require('gulp-coffee')
 coffeelint = require('gulp-coffeelint')
+git        = require('gulp-git')
+header     = require('gulp-header')
+merge      = require('gulp-merge')
 mustache   = require('gulp-mustache')
 util       = require('gulp-util')
 zip        = require('gulp-zip')
@@ -105,4 +108,17 @@ gulp.task('lint', ->
   gulp.src(['extension/**/*.coffee', 'gulpfile.coffee'])
     .pipe(coffeelint())
     .pipe(coffeelint.reporter())
+)
+
+gulp.task('release', ->
+  { version } = require('./package.json')
+  message = "VimFx v#{ version }"
+  today = new Date().toISOString()[...10]
+  merge(
+    gulp.src('package.json'),
+    gulp.src('CHANGELOG.md')
+      .pipe(header("### #{ version } (#{ today })\n"))
+      .pipe(gulp.dest('.'))
+  ).pipe(git.commit(message))
+  git.tag(version, message)
 )
