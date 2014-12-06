@@ -18,9 +18,9 @@
 # along with VimFx.  If not, see <http://www.gnu.org/licenses/>.
 ###
 
-utils        = require 'utils'
-prefs        = require 'prefs'
-{ _ }        = require 'l10n'
+utils = require('./utils')
+prefs = require('./prefs')
+_     = require('./l10n')
 
 { classes: Cc, interfaces: Ci, utils: Cu } = Components
 

@@ -18,10 +18,10 @@
 # along with VimFx.  If not, see <http://www.gnu.org/licenses/>.
 ###
 
-utils                     = require 'utils'
-{ getPref }               = require 'prefs'
-{ Marker }                = require 'mode-hints/marker'
-{ addHuffmanCodeWordsTo } = require 'mode-hints/huffman'
+utils       = require('../utils')
+{ getPref } = require('../prefs')
+{ Marker }  = require('./marker')
+huffman     = require('n-ary-huffman')
 
 { interfaces: Ci } = Components
 
@@ -72,8 +72,8 @@ injectHints = (window) ->
                                            'important')
 
   hintChars = utils.getHintChars()
-  addHuffmanCodeWordsTo(markers, {alphabet: hintChars},
-                        (marker, hint) -> marker.setHint(hint))
+  huffman(markers, {alphabet: hintChars},
+          (marker, hint) -> marker.setHint(hint))
 
   removeHints(document)
   container = utils.createElement(document, 'div', {id: CONTAINER_ID})

@@ -19,12 +19,11 @@
 ###
 
 { getPref
-, setPref }    = require 'prefs'
-{ injectHelp } = require 'help'
-{ commands }   = require 'commands'
-utils          = require 'utils'
-{ unloader }   = require 'unloader'
-{ _ }          = require 'l10n'
+, setPref }    = require('./prefs')
+{ injectHelp } = require('./help')
+{ commands }   = require('./commands')
+utils          = require('./utils')
+_              = require('./l10n')
 
 KEYSET_ID             = 'vimfx-keyset'
 BUTTON_ID             = 'vimfx-toolbar-button'
@@ -61,7 +60,7 @@ addToolbarButton = (vimBucket, window) ->
 
   win.appendChild(keyset)
 
-  unloader.add(->
+  module.onShutdown(->
     button.remove()
     keyset.remove()
     $(document, 'navigator-toolbox').palette.removeChild(button)

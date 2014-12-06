@@ -18,10 +18,10 @@
 # along with VimFx.  If not, see <http://www.gnu.org/licenses/>.
 ###
 
-utils = require 'utils'
-hints = require 'mode-hints/hints'
+utils = require('../utils')
+hints = require('./hints')
 
-{ isEscCommandKey } = require 'commands'
+{ isEscCommandKey } = require('../commands')
 
 exports.mode_hints =
   onEnter: (vim, storage, callback) ->

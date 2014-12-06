@@ -8,7 +8,9 @@
   "license": "GPLv3",
   "private": true,
   "scripts": {},
-  "dependencies": {},
+  "dependencies": {
+    "n-ary-huffman": "^1.0.0"
+  },
   "devDependencies": {
     "coffee-script": "~1.8.0",
     "gulp": "^3.8.10",
@@ -22,6 +24,8 @@
     "gulp-util": "^3.0.1",
     "gulp-zip": "^2.0.2",
     "request": "^2.49.0",
-    "rimraf": "^2.2.8"
+    "require-precompute": "~0.2.0",
+    "rimraf": "^2.2.8",
+    "run-sequence": "^1.0.2"
   }
 }

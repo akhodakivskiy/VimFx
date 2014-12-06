@@ -1,5 +1,5 @@
 { getPref
-, setPref } = require 'prefs'
+, setPref } = require('../prefs')
 
 `
 (function(exports) {

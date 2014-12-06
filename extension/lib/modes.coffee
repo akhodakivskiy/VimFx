@@ -19,21 +19,19 @@
 # along with VimFx.  If not, see <http://www.gnu.org/licenses/>.
 ###
 
-utils                   = require 'utils'
-{ mode_hints }          = require 'mode-hints/mode-hints'
-{ updateToolbarButton } = require 'button'
+utils                   = require('./utils')
+{ mode_hints }          = require('./mode-hints/mode-hints')
+{ updateToolbarButton } = require('./button')
 { searchForMatchingCommand
 , isEscCommandKey
 , isReturnCommandKey
-, findStorage }         = require 'commands'
+, findStorage }         = require('./commands')
 
 { interfaces: Ci } = Components
 
 XULDocument = Ci.nsIDOMXULDocument
 
-modes = {}
-
-modes['normal'] =
+exports['normal'] =
   onEnter: (vim, storage) ->
     storage.keys ?= []
     storage.commands ?= {}
@@ -84,7 +82,7 @@ modes['normal'] =
 
       return false
 
-modes['insert'] =
+exports['insert'] =
   onEnter: (vim) ->
     updateToolbarButton(vim.rootWindow, {insertMode: true})
   onLeave: (vim) ->
@@ -95,7 +93,7 @@ modes['insert'] =
       vim.enterMode('normal')
       return true
 
-modes['find'] =
+exports['find'] =
   onEnter: ->
 
   onLeave: (vim) ->
@@ -109,6 +107,4 @@ modes['find'] =
       return true
     return false
 
-modes['hints'] = mode_hints
-
-exports.modes = modes
+exports['hints'] = mode_hints

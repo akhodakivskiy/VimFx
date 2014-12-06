@@ -18,11 +18,10 @@
 # along with VimFx.  If not, see <http://www.gnu.org/licenses/>.
 ###
 
-utils        = require 'utils'
-{ unloader } = require 'unloader'
-{ getPref }  = require 'prefs'
-help         = require 'help'
-{ commands } = require 'commands'
+utils        = require('./utils')
+{ getPref }  = require('./prefs')
+help         = require('./help')
+{ commands } = require('./commands')
 
 observe = ->
   Services.obs.addObserver(observer, 'addon-options-displayed', false)
@@ -68,7 +67,7 @@ applySpec = (document, spec, enable) ->
     for event, action of events
       element[method](event, action, false)
 
-  unloader.add(->
+  module.onShutdown(->
     Services.obs.removeObserver(observer, 'addon-options-displayed')
     Services.obs.removeObserver(observer, 'addon-options-hidden')
   )

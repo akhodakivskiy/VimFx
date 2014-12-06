@@ -64,7 +64,7 @@ Create a new topic branch, based on either master or develop. See above.
 
 Code! Try to follow the following simple rules:
 
-- Always use parenthesis when calling functions. (Except `require`.)
+- Always use parenthesis when calling functions.
 - Always use explicit `return`s, unless the function is a one-liner.
 - Always use single quotes, unless you use interpolation.
 - Prefer interpolation over concatenation, both in strings and in regexes.

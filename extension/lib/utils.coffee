@@ -19,10 +19,9 @@
 # along with VimFx.  If not, see <http://www.gnu.org/licenses/>.
 ###
 
-{ unloader } = require 'unloader'
 { getPref
 , setPref
-} = require 'prefs'
+} = require('./prefs')
 
 ADDON_ID = 'VimFx@akhodakivskiy.github.com'
 
@@ -129,7 +128,7 @@ loadCss = do ->
     if !sss.sheetRegistered(uri, sss.AGENT_SHEET)
       sss.loadAndRegisterSheet(uri, sss.AGENT_SHEET)
 
-    unloader.add(->
+    module.onShutdown(->
       sss.unregisterSheet(uri, sss.AGENT_SHEET)
     )
 

@@ -18,12 +18,11 @@
 # along with VimFx.  If not, see <http://www.gnu.org/licenses/>.
 ###
 
-utils                   = require 'utils'
-keyUtils                = require 'key-utils'
-{ Vim }                 = require 'vim'
-{ getPref }             = require 'prefs'
-{ updateToolbarButton } = require 'button'
-{ unloader }            = require 'unloader'
+utils                   = require('./utils')
+keyUtils                = require('./key-utils')
+Vim                     = require('./vim')
+{ getPref }             = require('./prefs')
+{ updateToolbarButton } = require('./button')
 
 { interfaces: Ci } = Components
 
@@ -240,7 +239,7 @@ addEventListeners = (window) ->
 
   window.gBrowser.addTabsProgressListener(tabsListener)
 
-  unloader.add(->
+  module.onShutdown(->
     for name, listener of windowsListeners
       window.removeEventListener(name, listener, true)
 

@@ -17,20 +17,23 @@
 # along with VimFx.  If not, see <http://www.gnu.org/licenses/>.
 ###
 
-fs         = require('fs')
-{ join }   = require('path')
-request    = require('request')
-gulp       = require('gulp')
-changed    = require('gulp-changed')
-coffee     = require('gulp-coffee')
-coffeelint = require('gulp-coffeelint')
-git        = require('gulp-git')
-header     = require('gulp-header')
-merge      = require('gulp-merge')
-mustache   = require('gulp-mustache')
-util       = require('gulp-util')
-zip        = require('gulp-zip')
-rimraf     = require('rimraf')
+fs          = require('fs')
+{ join }    = require('path')
+gulp        = require('gulp')
+changed     = require('gulp-changed')
+coffee      = require('gulp-coffee')
+coffeelint  = require('gulp-coffeelint')
+git         = require('gulp-git')
+header      = require('gulp-header')
+merge       = require('gulp-merge')
+mustache    = require('gulp-mustache')
+util        = require('gulp-util')
+zip         = require('gulp-zip')
+precompute  = require('require-precompute')
+request     = require('request')
+rimraf      = require('rimraf')
+runSequence = require('run-sequence')
+pkg         = require('./package.json')
 
 DEST   = 'build'
 XPI    = 'VimFx.xpi'
@@ -47,8 +50,15 @@ gulp.task('clean', (callback) ->
 
 gulp.task('copy', ->
   gulp.src(['extension/**/!(*.coffee|*.tmpl)', 'COPYING'])
-    .pipe(changed(DEST))
     .pipe(gulp.dest(DEST))
+)
+
+gulp.task('node_modules', ->
+  dependencies = (name for name of pkg.dependencies)
+  # Note! When installing or updating node modules, make sure that the following
+  # glob does not include too much or too little!
+  gulp.src("node_modules/+(#{ dependencies.join('|') })/**/{*.js,LICENSE}")
+    .pipe(gulp.dest("#{ DEST }/node_modules"))
 )
 
 gulp.task('coffee', ->
@@ -65,8 +75,6 @@ gulp.task('chrome.manifest', ->
 )
 
 gulp.task('install.rdf', ->
-  pkg = require('./package.json')
-
   [ [ { name: creator } ], developers, contributors, translators ] =
     read('PEOPLE.md').trim().replace(/^#.+\n|^\s*-\s*/mg, '').split('\n\n')
     .map((block) -> block.split('\n').map((name) -> {name}))
@@ -91,7 +99,26 @@ gulp.task('install.rdf', ->
     .pipe(gulp.dest(DEST))
 )
 
-gulp.task('build', ['copy', 'coffee', 'chrome.manifest', 'install.rdf'])
+gulp.task('require-data', ['node_modules'], ->
+  data = JSON.stringify(precompute('.'), null, 2)
+  gulp.src('extension/require-data.js.tmpl')
+    .pipe(template({data}))
+    .pipe(gulp.dest(DEST))
+)
+
+gulp.task('templates', [
+  'chrome.manifest'
+  'install.rdf'
+  'require-data'
+])
+
+gulp.task('build', (callback) ->
+  runSequence(
+    'clean',
+    ['copy', 'node_modules', 'coffee', 'templates'],
+    callback
+  )
+)
 
 gulp.task('xpi', ['build'], ->
   gulp.src("#{ DEST }/**/!(#{ XPI })")
@@ -111,7 +138,7 @@ gulp.task('lint', ->
 )
 
 gulp.task('release', ->
-  { version } = require('./package.json')
+  { version } = pkg
   message = "VimFx v#{ version }"
   today = new Date().toISOString()[...10]
   merge(

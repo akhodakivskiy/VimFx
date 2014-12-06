@@ -1,5 +1,4 @@
 ###
-# Copyright Anton Khodakivskiy 2012.
 # Copyright Simon Lydell 2014.
 #
 # This file is part of VimFx.
@@ -18,17 +17,12 @@
 # along with VimFx.  If not, see <http://www.gnu.org/licenses/>.
 ###
 
-class Unloader
-  constructor: ->
-    @unloaders = []
+PROPERTIES_FILE = 'vimfx.properties'
 
-  unload: ->
-    unloader() for unloader in @unloaders
-    @unloaders.length = 0
+# Randomize URI to work around bug 719376.
+stringBundle = Services.strings.createBundle(
+  "chrome://vimfx/locale/#{ PROPERTIES_FILE }?#{ Math.random() }"
+)
 
-  add: (callback) ->
-    # Wrap the callback in a function that ignores failures.
-    unloader = -> try callback()
-    @unloaders.push(unloader)
-
-exports.unloader = new Unloader
+module.exports = (name, values...) ->
+  return stringBundle.formatStringFromName(name, values, values.length)

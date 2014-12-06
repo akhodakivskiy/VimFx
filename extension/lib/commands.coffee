@@ -19,13 +19,13 @@
 # along with VimFx.  If not, see <http://www.gnu.org/licenses/>.
 ###
 
-utils = require 'utils'
-help  = require 'help'
-{ _ } = require 'l10n'
+utils = require('./utils')
+help  = require('./help')
+_     = require('./l10n')
 { getPref
 , getComplexPref
 , setPref
-, isPrefSet } = require 'prefs'
+, isPrefSet } = require('./prefs')
 
 { classes: Cc, interfaces: Ci, utils: Cu } = Components
 

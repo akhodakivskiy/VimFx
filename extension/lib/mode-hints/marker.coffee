@@ -18,11 +18,10 @@
 # along with VimFx.  If not, see <http://www.gnu.org/licenses/>.
 ###
 
-{ createElement }    = require 'utils'
+{ createElement }    = require('../utils')
 { SerializableBloomFilter
-, DummyBloomFilter } = require 'mode-hints/bloomfilter'
-
-{ getPref } = require 'prefs'
+, DummyBloomFilter } = require('./bloomfilter')
+{ getPref }          = require('../prefs')
 
 HTMLDocument      = Ci.nsIDOMHTMLDocument
 HTMLAnchorElement = Ci.nsIDOMHTMLAnchorElement

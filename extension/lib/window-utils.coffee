@@ -1,5 +1,3 @@
-{ unloader } = require 'unloader'
-
 #
 # Waits for a browser window to finish loading before running the callback.
 #
@@ -62,7 +60,7 @@ watchWindows = (callback, winType) ->
   Services.ww.registerNotification(windowWatcher)
 
   # Make sure to stop watching for windows if we're unloading.
-  unloader.add(-> Services.ww.unregisterNotification(windowWatcher))
+  module.onShutdown(-> Services.ww.unregisterNotification(windowWatcher))
 
 exports.runOnLoad    = runOnLoad
 exports.runOnWindows = runOnWindows

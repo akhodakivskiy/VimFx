@@ -18,10 +18,10 @@
 # along with VimFx.  If not, see <http://www.gnu.org/licenses/>.
 ###
 
-utils     = require 'utils'
-{ modes } = require 'modes'
+utils = require('./utils')
+modes = require('./modes')
 
-class Vim
+module.exports = class Vim
   constructor: (@window) ->
     @rootWindow = utils.getRootWindow(@window) # For convenience.
     @storage = {}
@@ -46,5 +46,3 @@ class Vim
   onInput: (keyStr, event) ->
     suppress = modes[@mode]?.onInput(@, @storage[@mode], keyStr, event)
     return suppress
-
-exports.Vim = Vim
