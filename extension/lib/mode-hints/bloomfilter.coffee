@@ -1,3 +1,6 @@
+# coffeelint: disable=max_line_length
+# coffeelint: disable=no_backticks
+
 { getPref
 , setPref } = require('../prefs')
 

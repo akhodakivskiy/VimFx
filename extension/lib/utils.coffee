@@ -125,7 +125,7 @@ loadCss = do ->
     # `AGENT_SHEET` is used to override userContent.css and Stylish. Custom
     # website themes installed by users often make the hint markers unreadable,
     # for example. Just using `!important` in the CSS is not enough.
-    if !sss.sheetRegistered(uri, sss.AGENT_SHEET)
+    unless sss.sheetRegistered(uri, sss.AGENT_SHEET)
       sss.loadAndRegisterSheet(uri, sss.AGENT_SHEET)
 
     module.onShutdown(->
@@ -368,69 +368,73 @@ getResourceURI = do ->
 regexpEscape = (s) -> s and s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')
 
 removeDuplicates = (array) ->
+  # coffeelint: disable=no_backticks
   return `[...new Set(array)]`
+  # coffeelint: enable=no_backticks
 
 # Why isn’t `a[@href]` used, when `area[@href]` is? Some sites (such as
 # StackExchange sites) leave out the `href` property and use the anchor as a
 # JavaScript-powered button (instead of just using the `button` element).
 ACTION_ELEMENT_TAGS = [
-  "a"
-  "area[@href]"
-  "button"
+  'a'
+  'area[@href]'
+  'button'
   # When viewing an image directly, and it is larger than the viewport,
   # clicking it toggles zoom.
-  "img[contains(@class, 'decoded') and
-     (contains(@class, 'overflowing') or
-     contains(@class, 'shrinkToFit'))]"
+  'img[contains(@class, "decoded") and
+     (contains(@class, "overflowing") or
+     contains(@class, "shrinkToFit"))]'
 ]
 
 ACTION_ELEMENT_PROPERTIES = [
-  "@onclick"
-  "@onmousedown"
-  "@onmouseup"
-  "@oncommand"
-  "@role='link'"
-  "@role='button'"
-  "contains(@class, 'button')"
-  "contains(@class, 'js-new-tweets-bar')"
+  '@onclick'
+  '@onmousedown'
+  '@onmouseup'
+  '@oncommand'
+  '@role="link"'
+  '@role="button"'
+  'contains(@class, "button")'
+  'contains(@class, "js-new-tweets-bar")'
 ]
 
 EDITABLE_ELEMENT_TAGS = [
-  "textarea"
-  "select"
-  "input[not(@type='hidden' or @disabled)]"
+  'textarea'
+  'select'
+  'input[not(@type="hidden" or @disabled)]'
 ]
 
 EDITABLE_ELEMENT_PROPERTIES = [
-  "@contenteditable=''"
-  "translate(@contenteditable, 'TRUE', 'true')='true'"
+  '@contenteditable=""'
+  'translate(@contenteditable, "TRUE", "true")="true"'
 ]
 
 FOCUSABLE_ELEMENT_TAGS = [
-  "frame"
-  "iframe"
-  "embed"
-  "object"
+  'frame'
+  'iframe'
+  'embed'
+  'object'
 ]
 
 FOCUSABLE_ELEMENT_PROPERTIES = [
-  "@tabindex!=-1"
+  '@tabindex!=-1'
 ]
 
 getMarkableElements = do ->
-  xpathify = (tags, properties)->
+  xpathify = (tags, properties) ->
     return tags
       .concat("*[#{ properties.join(' or ') }]")
       .map((rule) -> "//#{ rule } | //xhtml:#{ rule }")
-      .join(" | ")
+      .join(' | ')
 
   xpaths =
     action:    xpathify(ACTION_ELEMENT_TAGS,    ACTION_ELEMENT_PROPERTIES   )
     editable:  xpathify(EDITABLE_ELEMENT_TAGS,  EDITABLE_ELEMENT_PROPERTIES )
     focusable: xpathify(FOCUSABLE_ELEMENT_TAGS, FOCUSABLE_ELEMENT_PROPERTIES)
     all: xpathify(
+      # coffeelint: disable=max_line_length
       [ACTION_ELEMENT_TAGS...,       EDITABLE_ELEMENT_TAGS...,       FOCUSABLE_ELEMENT_TAGS...      ],
       [ACTION_ELEMENT_PROPERTIES..., EDITABLE_ELEMENT_PROPERTIES..., FOCUSABLE_ELEMENT_PROPERTIES...]
+      # coffeelint: enable=max_line_length
     )
 
   # The actual function that will return the desired elements.

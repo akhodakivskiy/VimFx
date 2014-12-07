@@ -38,6 +38,7 @@ keyCharFromCode = (keyCode, shiftKey = false) ->
       else if keyCode == codeWithShift
         return charWithShift
 
+    # coffeelint: disable=max_line_length
     options = [
       [KE.DOM_VK_ESCAPE,     KE.DOM_VK_ESCAPE,     'Esc',       'Shift-Esc'      ]
       [KE.DOM_VK_BACK_SPACE, KE.DOM_VK_BACK_SPACE, 'Backspace', 'Shift-Backspace']
@@ -72,6 +73,7 @@ keyCharFromCode = (keyCode, shiftKey = false) ->
       [KE.DOM_VK_HYPHEN_MINUS,  KE.DOM_VK_UNDERSCORE,          '-', '_']
       [KE.DOM_VK_EQUALS,        KE.DOM_VK_PLUS,                '=', '+']
     ]
+    # coffeelint: enable=max_line_length
 
     for opt in options
       if char = fn(opt...)

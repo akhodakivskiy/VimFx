@@ -93,7 +93,7 @@ createMarkers = (window, viewport, parents = []) ->
   markers = []
 
   # For now we aren't able to handle hint markers in XUL Documents :(
-  return [] unless document instanceof HTMLDocument # or document instanceof XULDocument
+  return [] unless document instanceof HTMLDocument
 
   candidates = utils.getMarkableElements(document, {type: 'all'})
   for element in candidates

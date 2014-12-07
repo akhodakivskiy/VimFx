@@ -244,8 +244,8 @@ helper_follow = ({ inTab, multiple }, vim, event, count) ->
 
     matchedMarker.element.focus()
 
-    _inTab = if count > 1 then true else inTab
-    utils.simulateClick(matchedMarker.element, {metaKey: _inTab, ctrlKey: _inTab})
+    inTab = if count > 1 then true else inTab
+    utils.simulateClick(matchedMarker.element, {metaKey: inTab, ctrlKey: inTab})
 
     matchedMarker.element.target = targetReset if targetReset
 
@@ -267,7 +267,8 @@ command_follow = helper_follow.bind(undefined, {inTab: false})
 command_follow_in_tab = helper_follow.bind(undefined, {inTab: true})
 
 # Follow multiple links with hint markers.
-command_follow_multiple = helper_follow.bind(undefined, {inTab: true, multiple: true})
+command_follow_multiple = helper_follow.bind(undefined,
+                                             {inTab: true, multiple: true})
 
 helper_follow_pattern = do ->
   # Search for the prev/next patterns in the following attributes of the
@@ -390,7 +391,7 @@ class Command
   prefName: (value) -> "commands.#{ @name }.#{ value }"
 
   keys: (value) ->
-    if value is undefined
+    if value == undefined
       return @keyValues
     else
       @keyValues = value or @defaultKeyValues
@@ -398,6 +399,7 @@ class Command
 
   help: -> _("help_command_#{ @name }")
 
+# coffeelint: disable=max_line_length
 commands = [
   new Command('urls',   'focus',                 command_focus,                 ['o'])
   new Command('urls',   'focus_search',          command_focus_search,          ['O'])
@@ -457,6 +459,7 @@ commands = [
   escapeCommand =
   new Command('misc',   'Esc',                   command_Esc,                   ['Esc'])
 ]
+# coffeelint: enable=max_line_length
 
 searchForMatchingCommand = (keys) ->
   for index in [0...keys.length] by 1
@@ -468,7 +471,7 @@ searchForMatchingCommand = (keys) ->
         if "#{ key },".startsWith("#{ str },")
           numbers = keys[0..index].join('').match(/[1-9]\d*/g)
 
-          # When letter `0` follows after a number, it is considered as number `0`
+          # When letter 0 follows after a number, it is considered as number 0
           # instead of a valid command.
           continue if key == '0' and numbers
 

@@ -37,12 +37,12 @@ module.exports = class Vim
 
     if @mode != mode
       if @mode of modes
-        modes[@mode].onLeave(@, @storage[@mode])
+        modes[@mode].onLeave(this, @storage[@mode])
 
       @mode = mode
 
-      modes[@mode].onEnter(@, @storage[@mode] ?= {}, args...)
+      modes[@mode].onEnter(this, @storage[@mode] ?= {}, args...)
 
   onInput: (keyStr, event) ->
-    suppress = modes[@mode]?.onInput(@, @storage[@mode], keyStr, event)
+    suppress = modes[@mode]?.onInput(this, @storage[@mode], keyStr, event)
     return suppress

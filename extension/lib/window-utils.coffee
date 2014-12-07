@@ -1,3 +1,5 @@
+# coffeelint: disable=max_line_length
+
 #
 # Waits for a browser window to finish loading before running the callback.
 #

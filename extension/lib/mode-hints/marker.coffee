@@ -36,13 +36,18 @@ class Marker
     document = @element.ownerDocument
     @markerElement = createElement(document, 'div', {class: 'VimFxHintMarker'})
 
-    Object.defineProperty this, 'bloomFilter',
-      get: -> if getPref('hints_bloom_on') then realBloomFilter else dummyBloomFilter
+    Object.defineProperty(this, 'bloomFilter',
+      get: ->
+        if getPref('hints_bloom_on')
+          realBloomFilter
+        else
+          dummyBloomFilter
+    )
 
   show: -> @setVisibility(true)
   hide: -> @setVisibility(false)
   setVisibility: (visible) ->
-    @markerElement.classList.toggle('VimFxHiddenHintMarker', !visible)
+    @markerElement.classList.toggle('VimFxHiddenHintMarker', not visible)
   updateVisibility: ->
     if @hintChars.startsWith(@enteredHintChars) then @show() else @hide()
 
@@ -144,7 +149,7 @@ class Marker
       features["#{ el.tagName }.#{ @element.id }"] = 5
 
     if @element instanceof HTMLAnchorElement
-      features["a"] = 20 # Reward links no matter what.
+      features['a'] = 20 # Reward links no matter what.
       features["#{ el.tagName }.#{ @element.href }"] = 60
       features["#{ el.tagName }.#{ @element.title }"] = 40
 

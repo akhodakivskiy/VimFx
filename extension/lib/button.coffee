@@ -217,7 +217,7 @@ restorePosition = (document, button) ->
   if toolbar and idx != -1
     # Inserting the button before the first item in `currentset`
     # after `idx` that is present in the document.
-    for id in currentset[idx+1..]
+    for id in currentset[idx + 1..]
       if before = $(document, id)
         toolbar.insertItem(button.id, before)
         return

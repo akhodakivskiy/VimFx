@@ -28,6 +28,8 @@ XULDocument  = Ci.nsIDOMXULDocument
 
 CONTAINER_ID = 'VimFxHelpDialogContainer'
 
+# coffeelint: disable=max_line_length
+
 removeHelp = (document) ->
   document.getElementById(CONTAINER_ID)?.remove()
 
@@ -108,7 +110,7 @@ overwriteCmd = (document, conflicts, key) ->
   title = _('help_add_shortcut_title')
   conflictSummary = conflicts.map((conflict) ->
     return "#{ conflict.command.help() }:  #{ conflict.conflictingKeys.join('  ') }"
-  ).join("\n")
+  ).join('\n')
   text = """
     #{ _('help_add_shortcut_text_overwrite', key) }
 
@@ -123,7 +125,7 @@ overwriteCmd = (document, conflicts, key) ->
   else
     return false
 
-td = (text, klass='') ->
+td = (text, klass = '') ->
   """<td class="#{ klass }">#{ text }</td>"""
 
 hint = (cmd, key) ->
@@ -137,7 +139,7 @@ tr = (cmd) ->
       #{ (hint(cmd, key) for key in cmd.keys()).join('\n') }
     </div>
   """
-  dot = """<span class="VimFxDot">&#8729;</span>"""
+  dot = '<span class="VimFxDot">&#8729;</span>'
   a = """#{ cmd.help() }"""
   add = """
     <a href="#" data-command="#{ cmd.name }"

@@ -34,7 +34,7 @@ vimBucket = new utils.Bucket((window) -> new Vim(window))
 keyStrFromEvent = (event) ->
   { ctrlKey: ctrl, metaKey: meta, altKey: alt, shiftKey: shift } = event
 
-  if !meta and !alt
+  if not meta and not alt
     return unless keyChar = keyUtils.keyCharFromCode(event.keyCode, shift)
     keyStr = keyUtils.applyModifiers(keyChar, ctrl, alt, meta)
     return keyStr
@@ -101,7 +101,10 @@ windowsListeners =
         # The autocomplete popup in text inputs (for example) is technically a
         # panel, but it does not respond to key presses. Therefore
         # `[ignorekeys="true"]` is excluded.
+        #
+        # coffeelint: disable=max_line_length
         # <https://developer.mozilla.org/en-US/docs/Mozilla/Tech/XUL/PopupGuide/PopupKeys#Ignoring_Keys>
+        # coffeelint: enable=max_line_length
         return unless rootWindow = utils.getEventRootWindow(event)
         popups = rootWindow.document.querySelectorAll(
           ':-moz-any(menupopup, panel):not([ignorekeys="true"])'
@@ -216,7 +219,8 @@ windowsListeners =
 
   # Update the toolbar button icon to reflect the blacklisted state.
   TabSelect: (event) ->
-    return unless window = event.originalTarget?.linkedBrowser?.contentDocument?.defaultView
+    return unless window = event.originalTarget?.linkedBrowser?.contentDocument
+                           ?.defaultView
     return unless vim = vimBucket.get(window)
     updateButton(vim)
 
