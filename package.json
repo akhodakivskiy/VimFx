@@ -16,7 +16,6 @@
     "coffeelint-forbidden-keywords": "0.0.4",
     "coffeelint-newline-at-eof": "^0.4.1",
     "gulp": "^3.8.10",
-    "gulp-changed": "^1.0.0",
     "gulp-coffee": "^2.2.0",
     "gulp-coffeelint": "^0.4.0",
     "gulp-git": "^0.5.5",

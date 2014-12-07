@@ -20,7 +20,6 @@
 fs          = require('fs')
 { join }    = require('path')
 gulp        = require('gulp')
-changed     = require('gulp-changed')
 coffee      = require('gulp-coffee')
 coffeelint  = require('gulp-coffeelint')
 git         = require('gulp-git')
@@ -63,7 +62,6 @@ gulp.task('node_modules', ->
 
 gulp.task('coffee', ->
   gulp.src('extension/**/*.coffee')
-    .pipe(changed(DEST, {extension: '.coffee'}))
     .pipe(coffee({bare: true}).on('error', util.log))
     .pipe(gulp.dest(DEST))
 )
@@ -121,7 +119,7 @@ gulp.task('build', (callback) ->
 )
 
 gulp.task('xpi', ['build'], ->
-  gulp.src("#{ DEST }/**/!(#{ XPI })")
+  gulp.src("#{ DEST }/**/*")
     .pipe(zip(XPI, {compress: false}))
     .pipe(gulp.dest(DEST))
 )
