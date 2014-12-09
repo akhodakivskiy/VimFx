@@ -26,7 +26,6 @@ git         = require('gulp-git')
 header      = require('gulp-header')
 merge       = require('gulp-merge')
 mustache    = require('gulp-mustache')
-util        = require('gulp-util')
 zip         = require('gulp-zip')
 precompute  = require('require-precompute')
 request     = require('request')
@@ -37,6 +36,10 @@ pkg         = require('./package.json')
 DEST   = 'build'
 XPI    = 'VimFx.xpi'
 LOCALE = 'extension/locale'
+TEST   = 'extension/test'
+
+test = '--test' in process.argv or '-t' in process.argv
+ifTest = (value) -> if test then [value] else []
 
 read = (filepath) -> fs.readFileSync(filepath).toString()
 template = (data) -> mustache(data, {extension: ''})
@@ -61,8 +64,12 @@ gulp.task('node_modules', ->
 )
 
 gulp.task('coffee', ->
-  gulp.src('extension/**/*.coffee')
-    .pipe(coffee({bare: true}).on('error', util.log))
+  gulp.src([
+    'extension/bootstrap.coffee'
+    'extension/lib/**/*.coffee'
+    ifTest('extension/test/**/*.coffee')...
+  ], {base: 'extension'})
+    .pipe(coffee({bare: true}))
     .pipe(gulp.dest(DEST))
 )
 
@@ -104,10 +111,21 @@ gulp.task('require-data', ['node_modules'], ->
     .pipe(gulp.dest(DEST))
 )
 
+gulp.task('tests-list', ->
+  list = JSON.stringify(fs.readdirSync(TEST)
+    .map((name) -> name.match(/^(test-.+)\.coffee$/)?[1])
+    .filter(Boolean)
+  )
+  gulp.src("#{ TEST }/tests-list.js.tmpl", {base: 'extension'})
+    .pipe(template({list}))
+    .pipe(gulp.dest(DEST))
+)
+
 gulp.task('templates', [
   'chrome.manifest'
   'install.rdf'
   'require-data'
+  ifTest('tests-list')...
 ])
 
 gulp.task('build', (callback) ->

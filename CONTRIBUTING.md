@@ -81,6 +81,8 @@ Code! Try to follow the following simple rules:
 
 Please lint your code. See below.
 
+Run the tests and make sure that all pass. See below. Add tests if possible.
+
 Break up your pull request in several commits if necessary. The first line of
 commit messages should be a short summary. Add a blank line and then a nicely
 formatted markdown description after it if needed.
@@ -105,8 +107,12 @@ Finally send a pull request to same branch as you based your topic branch on
   automatically install it. (No need to restart Firefox.)
 - `gulp clean` removes the `build/` directory.
 - `gulp lint` lints your code.
+- Use the `--test` or `-t` option to include the unit test files. The output of
+  the tests are `console.log`ed. See the browser console, or start Firefox from
+  the command line to see it.
 
-An easy workflow is code, `gulp`, test, repeat.
+An easy workflow is code, `gulp`, test, repeat. (Use `gulp -t` to also run the
+unit tests.)
 
 [Node.js]: http://nodejs.org/
 [gulp]: https://github.com/gulpjs/gulp

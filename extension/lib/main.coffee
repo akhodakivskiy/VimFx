@@ -27,8 +27,11 @@
 , addToolbarButton }    = require('./button')
 options                 = require('./options')
 { watchWindows }        = require('./window-utils')
+test                    = try require('../test/index')
 
 module.exports = (data, reason) ->
+  test?()
+
   setDefaultPrefs()
 
   if reason == ADDON_INSTALL
