@@ -5,18 +5,18 @@
 <!ENTITY pref.black_list.desc       "Lista adresów oddzielonych przecinkami pod którymi VimFx powinien być automatycznie wyłączony.
 Dopuszczalne wieloznaczniki: *, !. Domyślnie: *mail.google.com*">
 
-<!ENTITY pref.prev_patterns.title   "Previous Page Patterns">
-<!ENTITY pref.prev_patterns.desc    "Comma separated list of patterns that match links to previous page">
+<!ENTITY pref.prev_patterns.title   "Poprzednia strona - wzorce">
+<!ENTITY pref.prev_patterns.desc    "Wzorce (oddzielone przecinkami), które określają linki do poprzedniej strony.">
 
-<!ENTITY pref.next_patterns.title   "Next Page Patterns">
-<!ENTITY pref.next_patterns.desc    "Comma separated list of patterns that match links to next page">
+<!ENTITY pref.next_patterns.title   "Następna strona - wzorce">
+<!ENTITY pref.next_patterns.desc    "Wzorce (oddzielone przecinkami), które określają linki do następnej strony.">
 
 <!ENTITY pref.scroll_step_lines.title   "Krok przewijania">
 
-<!ENTITY pref.hints_bloom_on.title "Smart hint assignment">
-<!ENTITY pref.hints_bloom_on.desc  "Assign shorter hints to the links that users visit most often">
+<!ENTITY pref.hints_bloom_on.title "Inteligentne przypisywanie podpowiedzi">
+<!ENTITY pref.hints_bloom_on.desc  "Przypisz krótsze podpowiedzi do linków, które są odwiedzane częściej.">
 
-<!ENTITY pref.prevent_autofocus.title "Prevent auto focusing inputs">
+<!ENTITY pref.prevent_autofocus.title "Wyłącz autofocus pól.">
 
-<!ENTITY customizeButton.title "Keyboard Shortcuts">
-<!ENTITY customizeButton.label "Customize">
+<!ENTITY customizeButton.title "Skróty klawiszowe">
+<!ENTITY customizeButton.label "Dostosuj">
