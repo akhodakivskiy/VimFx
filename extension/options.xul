@@ -38,6 +38,10 @@ along with VimFx.  If not, see <http://www.gnu.org/licenses/>.
         title="&pref.hints_bloom_on.title;" desc="&pref.hints_bloom_on.desc;" />
     <setting pref="extensions.VimFx.prevent_autofocus" type="bool"
         title="&pref.prevent_autofocus.title;" />
+    <setting pref="extensions.VimFx.ignore_keyboard_layout" type="bool"
+        title="&pref.ignore_keyboard_layout.title;" desc="&pref.ignore_keyboard_layout.desc;" />
+    <setting pref="dom.keyboardevent.code.enabled" type="bool"
+        title="&pref.keyboardevent.code.enabled.title;" desc="&pref.keyboardevent.code.enabled.desc;" />
     <setting title="&customizeButton.title;" type="control">
         <button id="customizeButton" label="&customizeButton.label;" />
     </setting>

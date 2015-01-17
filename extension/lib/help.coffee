@@ -18,9 +18,11 @@
 # along with VimFx.  If not, see <http://www.gnu.org/licenses/>.
 ###
 
-utils = require('./utils')
-prefs = require('./prefs')
-_     = require('./l10n')
+notation = require('vim-like-key-notation')
+legacy   = require('./legacy')
+utils    = require('./utils')
+prefs    = require('./prefs')
+_        = require('./l10n')
 
 { classes: Cc, interfaces: Ci, utils: Cu } = Components
 
@@ -71,7 +73,7 @@ removeHandler = (document, commands, event) ->
     title = _('help_remove_shortcut_title')
     text = _('help_remove_shortcut_text')
     if promptService.confirm(document.defaultView, title, text)
-      cmd.keys(cmd.keys().filter((a) -> a != key))
+      cmd.keys(cmd.keys().filter((a) -> utils.normalizedKey(a) != key))
       event.target.remove()
 
 addHandler = (document, commands, event) ->
@@ -80,18 +82,29 @@ addHandler = (document, commands, event) ->
   event.stopPropagation()
   name = event.target.getAttribute('data-command')
   if cmd = commands.reduce(((m, v) -> if (v.name == name) then v else m), null)
-    title = _('help_add_shortcut_title')
-    text = _('help_add_shortcut_text')
-    value = {value: null}
-    check = {value: null}
-    if promptService.prompt(document.defaultView, title, text, value, null, check)
-      return if value.value.length == 0
-      conflicts = getConflicts(commands, value.value)
-      if conflicts.length == 0 or overwriteCmd(document, conflicts, value.value)
-        cmd.keys(cmd.keys().concat(value.value))
-        for div in document.getElementsByClassName('VimFxKeySequence')
-          if div.getAttribute('data-command') == cmd.name
-            div.insertAdjacentHTML('beforeend', hint(cmd, value.value))
+    errorText = ''
+    loop
+      title = _('help_add_shortcut_title')
+      text = errorText + _('help_add_shortcut_text')
+      value = {value: null}
+      check = {value: null}
+      if promptService.prompt(document.defaultView, title, text, value, null, check)
+        input = value.value.trim()
+        return if input.length == 0
+        key = notation.parseSequence(input)
+        try
+          normalizedKey = utils.normalizedKey(key)
+        catch {id, context, subject}
+          if /^\s$/.test(subject) then id = 'invalid_whitespace'
+          errorText = _("error_#{ id }", context ? subject, subject) + '\n'
+          continue
+        conflicts = getConflicts(commands, normalizedKey)
+        if conflicts.length == 0 or overwriteCmd(document, conflicts, key)
+          cmd.keys(cmd.keys().concat([key]))
+          for div in document.getElementsByClassName('VimFxKeySequence')
+            if div.getAttribute('data-command') == cmd.name
+              div.insertAdjacentHTML('beforeend', hint(cmd, key))
+      break
   return
 
 getConflicts = (commands, value) ->
@@ -99,8 +112,9 @@ getConflicts = (commands, value) ->
   for command in commands
     conflictingKeys = []
     for key in command.keys()
-      shortest = Math.min(value.length, key.length)
-      if "#{ value },"[..shortest] == "#{ key },"[..shortest]
+      normalizedKey = utils.normalizedKey(key)
+      shortest = Math.min(value.length, normalizedKey.length)
+      if value[...shortest] == normalizedKey[...shortest]
         conflictingKeys.push(key)
     if conflictingKeys.length > 0
       conflicts.push({command, conflictingKeys})
@@ -109,17 +123,22 @@ getConflicts = (commands, value) ->
 overwriteCmd = (document, conflicts, key) ->
   title = _('help_add_shortcut_title')
   conflictSummary = conflicts.map((conflict) ->
-    return "#{ conflict.command.help() }:  #{ conflict.conflictingKeys.join('  ') }"
+    conflictingKeys = conflict.conflictingKeys
+      .map((key) -> key.join('')).join('  ')
+    return "#{ conflict.command.help() }:  #{ conflictingKeys }"
   ).join('\n')
   text = """
-    #{ _('help_add_shortcut_text_overwrite', key) }
+    #{ _('help_add_shortcut_text_overwrite', key.join('')) }
 
     #{ conflictSummary }
   """
   if promptService.confirm(document.defaultView, title, text)
     for { command, conflictingKeys } in conflicts
-      command.keys(command.keys().filter((key) -> key not in conflictingKeys))
-      for key in conflictingKeys
+      normalizedKeys = conflictingKeys.map((key) -> utils.normalizedKey(key))
+      command.keys(command.keys().filter((key) ->
+        return utils.normalizedKey(key) not in normalizedKeys
+      ))
+      for key in normalizedKeys
         document.querySelector("a[data-key='#{ key }']").remove()
     return true
   else
@@ -129,9 +148,10 @@ td = (text, klass = '') ->
   """<td class="#{ klass }">#{ text }</td>"""
 
 hint = (cmd, key) ->
-  keyDisplay = key.replace(/,/g, '')
-  """<a href="#" class="VimFxReset VimFxKeyLink" title="#{ _('help_remove_shortcut') }"
-          data-command="#{ cmd.name }" data-key="#{ key }">#{ keyDisplay }</a>"""
+  normalizedKey = utils.escapeHTML(utils.normalizedKey(key))
+  displayKey = utils.escapeHTML(key.join(''))
+  """<a href="#" class="VimFxReset VimFxKeyLink" title="#{ _('help_remove_shortcut') }" \
+          data-command="#{ cmd.name }" data-key="#{ normalizedKey }">#{ displayKey }</a>"""
 
 tr = (cmd) ->
   hints = """

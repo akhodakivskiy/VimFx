@@ -19,9 +19,11 @@
 # along with VimFx.  If not, see <http://www.gnu.org/licenses/>.
 ###
 
-utils = require('./utils')
-help  = require('./help')
-_     = require('./l10n')
+notation = require('vim-like-key-notation')
+legacy   = require('./legacy')
+utils    = require('./utils')
+help     = require('./help')
+_        = require('./l10n')
 { getPref
 , getComplexPref
 , setPref
@@ -410,6 +412,8 @@ class Command
       try @keyValues = JSON.parse(getPref(@prefName('keys')))
     else
       @keyValues = keys
+    for key, index in @keyValues when typeof key == 'string'
+      @keyValues[index] = legacy.convertKey(key)
 
   # Name of the preference for a given property.
   prefName: (value) -> "commands.#{ @name }.#{ value }"
@@ -425,78 +429,77 @@ class Command
 
 # coffeelint: disable=max_line_length
 commands = [
-  new Command('urls',   'focus',                 command_focus,                 ['o'])
-  new Command('urls',   'focus_search',          command_focus_search,          ['O'])
-  new Command('urls',   'paste',                 command_paste,                 ['p'])
-  new Command('urls',   'paste_tab',             command_paste_tab,             ['P'])
-  new Command('urls',   'marker_yank',           command_marker_yank,           ['y,f'])
-  new Command('urls',   'marker_focus',          command_marker_focus,          ['v,f'])
-  new Command('urls',   'yank',                  command_yank,                  ['y,y'])
-  new Command('urls',   'reload',                command_reload,                ['r'])
-  new Command('urls',   'reload_force',          command_reload_force,          ['R'])
-  new Command('urls',   'reload_all',            command_reload_all,            ['a,r'])
-  new Command('urls',   'reload_all_force',      command_reload_all_force,      ['a,R'])
-  new Command('urls',   'stop',                  command_stop,                  ['s'])
-  new Command('urls',   'stop_all',              command_stop_all,              ['a,s'])
+  new Command('urls',   'focus',                 command_focus,                 [['o']])
+  new Command('urls',   'focus_search',          command_focus_search,          [['O']])
+  new Command('urls',   'paste',                 command_paste,                 [['p']])
+  new Command('urls',   'paste_tab',             command_paste_tab,             [['P']])
+  new Command('urls',   'marker_yank',           command_marker_yank,           [['y', 'f']])
+  new Command('urls',   'marker_focus',          command_marker_focus,          [['v', 'f']])
+  new Command('urls',   'yank',                  command_yank,                  [['y', 'y']])
+  new Command('urls',   'reload',                command_reload,                [['r']])
+  new Command('urls',   'reload_force',          command_reload_force,          [['R']])
+  new Command('urls',   'reload_all',            command_reload_all,            [['a', 'r']])
+  new Command('urls',   'reload_all_force',      command_reload_all_force,      [['a', 'R']])
+  new Command('urls',   'stop',                  command_stop,                  [['s']])
+  new Command('urls',   'stop_all',              command_stop_all,              [['a', 's']])
 
-  new Command('nav',    'scroll_to_top',         command_scroll_to_top ,        ['g,g'])
-  new Command('nav',    'scroll_to_bottom',      command_scroll_to_bottom,      ['G'])
-  new Command('nav',    'scroll_down',           command_scroll_down,           ['j'])
-  new Command('nav',    'scroll_up',             command_scroll_up,             ['k'])
-  new Command('nav',    'scroll_left',           command_scroll_left,           ['h'])
-  new Command('nav',    'scroll_right',          command_scroll_right ,         ['l'])
-  new Command('nav',    'scroll_half_page_down', command_scroll_half_page_down, ['d'])
-  new Command('nav',    'scroll_half_page_up',   command_scroll_half_page_up,   ['u'])
-  new Command('nav',    'scroll_page_down',      command_scroll_page_down,      ['Space'])
-  new Command('nav',    'scroll_page_up',        command_scroll_page_up,        ['Shift-Space'])
+  new Command('nav',    'scroll_to_top',         command_scroll_to_top ,        [['g', 'g']])
+  new Command('nav',    'scroll_to_bottom',      command_scroll_to_bottom,      [['G']])
+  new Command('nav',    'scroll_down',           command_scroll_down,           [['j']])
+  new Command('nav',    'scroll_up',             command_scroll_up,             [['k']])
+  new Command('nav',    'scroll_left',           command_scroll_left,           [['h']])
+  new Command('nav',    'scroll_right',          command_scroll_right ,         [['l']])
+  new Command('nav',    'scroll_half_page_down', command_scroll_half_page_down, [['d']])
+  new Command('nav',    'scroll_half_page_up',   command_scroll_half_page_up,   [['u']])
+  new Command('nav',    'scroll_page_down',      command_scroll_page_down,      [['<Space>']])
+  new Command('nav',    'scroll_page_up',        command_scroll_page_up,        [['<s-Space>']])
 
-  new Command('tabs',   'open_tab',              command_open_tab,              ['t'])
-  new Command('tabs',   'tab_prev',              command_tab_prev,              ['J', 'g,T'])
-  new Command('tabs',   'tab_next',              command_tab_next,              ['K', 'g,t'])
-  new Command('tabs',   'tab_move_left',         command_tab_move_left,         ['g,J'])
-  new Command('tabs',   'tab_move_right',        command_tab_move_right,        ['g,K'])
-  new Command('tabs',   'home',                  command_home,                  ['g,h'])
-  new Command('tabs',   'tab_first',             command_tab_first,             ['g,H', 'g,0'])
-  new Command('tabs',   'tab_first_non_pinned',  command_tab_first_non_pinned,  ['g,^'])
-  new Command('tabs',   'tab_last',              command_tab_last,              ['g,L', 'g,$'])
-  new Command('tabs',   'toggle_pin_tab',        command_toggle_pin_tab,        ['g,p'])
-  new Command('tabs',   'duplicate_tab',         command_duplicate_tab,         ['y,t'])
-  new Command('tabs',   'close_tabs_to_end',     command_close_tabs_to_end,     ['g,x,$'])
-  new Command('tabs',   'close_other_tabs',      command_close_other_tabs,      ['g,x,a'])
-  new Command('tabs',   'close_tab',             command_close_tab,             ['x'])
-  new Command('tabs',   'restore_tab',           command_restore_tab,           ['X'])
+  new Command('tabs',   'open_tab',              command_open_tab,              [['t']])
+  new Command('tabs',   'tab_prev',              command_tab_prev,              [['J'], ['g', 'T']])
+  new Command('tabs',   'tab_next',              command_tab_next,              [['K'], ['g', 't']])
+  new Command('tabs',   'tab_move_left',         command_tab_move_left,         [['g', 'J']])
+  new Command('tabs',   'tab_move_right',        command_tab_move_right,        [['g', 'K']])
+  new Command('tabs',   'home',                  command_home,                  [['g', 'h']])
+  new Command('tabs',   'tab_first',             command_tab_first,             [['g', 'H'], ['g', '0']])
+  new Command('tabs',   'tab_first_non_pinned',  command_tab_first_non_pinned,  [['g', '^']])
+  new Command('tabs',   'tab_last',              command_tab_last,              [['g', 'L'], ['g', '$']])
+  new Command('tabs',   'toggle_pin_tab',        command_toggle_pin_tab,        [['g', 'p']])
+  new Command('tabs',   'duplicate_tab',         command_duplicate_tab,         [['y', 't']])
+  new Command('tabs',   'close_tabs_to_end',     command_close_tabs_to_end,     [['g', 'x', '$']])
+  new Command('tabs',   'close_other_tabs',      command_close_other_tabs,      [['g', 'x', 'a']])
+  new Command('tabs',   'close_tab',             command_close_tab,             [['x']])
+  new Command('tabs',   'restore_tab',           command_restore_tab,           [['X']])
 
-  new Command('browse', 'follow',                command_follow,                ['f'])
-  new Command('browse', 'follow_in_tab',         command_follow_in_tab,         ['F'])
-  new Command('browse', 'follow_multiple',       command_follow_multiple,       ['a,f'])
-  new Command('browse', 'follow_previous',       command_follow_prev,           ['['])
-  new Command('browse', 'follow_next',           command_follow_next,           [']'])
-  new Command('browse', 'go_up_path',            command_go_up_path,            ['g,u'])
-  new Command('browse', 'go_to_root',            command_go_to_root,            ['g,U'])
-  new Command('browse', 'back',                  command_back,                  ['H'])
-  new Command('browse', 'forward',               command_forward,               ['L'])
+  new Command('browse', 'follow',                command_follow,                [['f']])
+  new Command('browse', 'follow_in_tab',         command_follow_in_tab,         [['F']])
+  new Command('browse', 'follow_multiple',       command_follow_multiple,       [['a', 'f']])
+  new Command('browse', 'follow_previous',       command_follow_prev,           [['[']])
+  new Command('browse', 'follow_next',           command_follow_next,           [[']']])
+  new Command('browse', 'go_up_path',            command_go_up_path,            [['g', 'u']])
+  new Command('browse', 'go_to_root',            command_go_to_root,            [['g', 'U']])
+  new Command('browse', 'back',                  command_back,                  [['H']])
+  new Command('browse', 'forward',               command_forward,               [['L']])
 
-  new Command('misc',   'find',                  command_find,                  ['/'])
-  new Command('misc',   'find_hl',               command_find_hl,               ['a,/'])
-  new Command('misc',   'find_next',             command_find_next,             ['n'])
-  new Command('misc',   'find_prev',             command_find_prev,             ['N'])
-  new Command('misc',   'insert_mode',           command_insert_mode,           ['i'])
-  new Command('misc',   'help',                  command_help,                  ['?'])
-  new Command('misc',   'dev',                   command_dev,                   [':'])
+  new Command('misc',   'find',                  command_find,                  [['/']])
+  new Command('misc',   'find_hl',               command_find_hl,               [['a', '/']])
+  new Command('misc',   'find_next',             command_find_next,             [['n']])
+  new Command('misc',   'find_prev',             command_find_prev,             [['N']])
+  new Command('misc',   'insert_mode',           command_insert_mode,           [['i']])
+  new Command('misc',   'help',                  command_help,                  [['?']])
+  new Command('misc',   'dev',                   command_dev,                   [[':']])
 
   escapeCommand =
-  new Command('misc',   'Esc',                   command_Esc,                   ['Esc'])
+  new Command('misc',   'Esc',                   command_Esc,                   [['<Esc>']])
 ]
 # coffeelint: enable=max_line_length
 
 searchForMatchingCommand = (keys) ->
   for index in [0...keys.length] by 1
-    str = keys[index..].join(',')
+    str = keys[index..].join('')
     for command in commands
       for key in command.keys()
-        # The following hack is a workaround for the issue where letter `c` is
-        # considered a start of command with control modifier `c-xxx`.
-        if "#{ key },".startsWith("#{ str },")
+        key = utils.normalizedKey(key)
+        if key.startsWith(str)
           numbers = keys[0..index].join('').match(/[1-9]\d*/g)
 
           # When letter 0 follows after a number, it is considered as number 0
@@ -510,7 +513,11 @@ searchForMatchingCommand = (keys) ->
 
   return {match: false}
 
-isEscCommandKey = (keyStr) -> keyStr in escapeCommand.keys()
+isEscCommandKey = (keyStr) ->
+  for key in escapeCommand.keys()
+    if keyStr == utils.normalizedKey(key)
+      return true
+  return false
 
 exports.commands                  = commands
 exports.searchForMatchingCommand  = searchForMatchingCommand
