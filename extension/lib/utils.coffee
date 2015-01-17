@@ -188,34 +188,6 @@ writeToClipboard = (text) ->
     .getService(Ci.nsIClipboardHelper)
   clipboardHelper.copyString(text)
 
-# Read the system clipboard.
-readFromClipboard = (window) ->
-  trans = Cc['@mozilla.org/widget/transferable;1']
-    .createInstance(Ci.nsITransferable)
-
-  if trans.init
-    privacyContext = window
-      .QueryInterface(Ci.nsIInterfaceRequestor)
-      .getInterface(Ci.nsIWebNavigation)
-      .QueryInterface(Ci.nsILoadContext)
-    trans.init(privacyContext)
-
-  trans.addDataFlavor('text/unicode')
-
-  clip = Cc['@mozilla.org/widget/clipboard;1'].getService(Ci.nsIClipboard)
-  clip.getData(trans, Ci.nsIClipboard.kGlobalClipboard)
-
-  str = {}
-  strLength = {}
-
-  trans.getTransferData('text/unicode', str, strLength)
-
-  if str
-    str = str.value.QueryInterface(Ci.nsISupportsString)
-    return str.data.substring(0, strLength.value / 2)
-
-  return undefined
-
 # Executes function `func` and mearues how much time it took.
 timeIt = (func, name) ->
   console.time(name)
@@ -485,7 +457,6 @@ exports.simulateWheel             = simulateWheel
 exports.WHEEL_MODE_PIXEL          = WHEEL_MODE_PIXEL
 exports.WHEEL_MODE_LINE           = WHEEL_MODE_LINE
 exports.WHEEL_MODE_PAGE           = WHEEL_MODE_PAGE
-exports.readFromClipboard         = readFromClipboard
 exports.writeToClipboard          = writeToClipboard
 exports.timeIt                    = timeIt
 

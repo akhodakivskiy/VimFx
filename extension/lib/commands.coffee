@@ -45,7 +45,7 @@ command_focus_search = (vim) ->
     vim.rootWindow.BrowserSearch.webSearch()
 
 helper_paste = (vim) ->
-  url = utils.readFromClipboard(vim.window)
+  url = vim.rootWindow.readFromClipboard()
   postData = null
   if not utils.isURL(url) and submission = utils.browserSearchSubmission(url)
     url = submission.uri.spec
