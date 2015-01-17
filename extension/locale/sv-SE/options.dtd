@@ -1,0 +1,22 @@
+<!ENTITY pref.hint_chars.title      "Etikettstecken">
+<!ENTITY pref.hint_chars.desc       "Standardinställning: fjdkslaghrueiwovncm">
+
+<!ENTITY pref.black_list.title      "Svartlista">
+<!ENTITY pref.black_list.desc       "Kommaseparerad lista av URL:er där VimFx automatiskt ska vara avaktiverat.
+Jokertecken tillåts: *, !. Exempel: *example.com*,*foobar.org*">
+
+<!ENTITY pref.prev_patterns.title   "Mönster för föregående sida">
+<!ENTITY pref.prev_patterns.desc    "Kommaseparerad lista av mönster som matchar länkar till föregående sida">
+
+<!ENTITY pref.next_patterns.title   "Mönster för nästa sida">
+<!ENTITY pref.next_patterns.desc    "Kommaseparerad lista av mönster som matchar länkar till nästa sida">
+
+<!ENTITY pref.scroll_step_lines.title "Scrollsteg">
+
+<!ENTITY pref.hints_bloom_on.title "Smart etikettstilldelning">
+<!ENTITY pref.hints_bloom_on.desc  "Tilldela kortare etiketter till de länkar som besöks oftast">
+
+<!ENTITY pref.prevent_autofocus.title "Hindra autofokus för inmatningsfält">
+
+<!ENTITY customizeButton.title "Tangentbordskommandon">
+<!ENTITY customizeButton.label "Finjustera">
