@@ -3,8 +3,7 @@
 
 <!ENTITY pref.black_list.title      "Black List">
 <!ENTITY pref.black_list.desc       "Comma separated list of URL where VimFx should be automatically disabled.
-Wildcards allowed: *, !. Example: *example.com*,*foobar.org*. To disable only specific keys use the syntax:
-pattern##key1#key2... Example: *example.com*##j#k">
+Wildcards allowed: *, !. Example: *example.com*,*foobar.org*.">
 
 <!ENTITY pref.prev_patterns.title   "Previous Page Patterns">
 <!ENTITY pref.prev_patterns.desc    "Comma separated list of patterns that match links to previous page">
