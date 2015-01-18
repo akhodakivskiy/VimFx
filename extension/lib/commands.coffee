@@ -305,7 +305,18 @@ helper_follow_pattern = do ->
   attrs = ['rel', 'role', 'data-tooltip', 'aria-label']
 
   return (type, vim) ->
-    links = utils.getMarkableElements(vim.window.document, {type: 'action'})
+    { document } = vim.window
+
+    # If there’s a `<link rel=prev/next>` element we use that.
+    for linkElement in document.head.getElementsByTagName('link')
+      # Also support `rel=previous`, just like Google.
+      if type == linkElement.rel.toLowerCase().replace(/^previous$/, 'prev')
+        vim.rootWindow.gBrowser.loadURI(linkElement.href)
+        return
+
+    # Otherwise we look for a link on the page that seems to go to the previous
+    # or next page.
+    links = utils.getMarkableElements(document, {type: 'action'})
       .filter(utils.isElementVisible)
 
     patterns = utils.splitListString(getPref("#{ type }_patterns"))
