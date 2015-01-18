@@ -18,8 +18,8 @@
 # along with VimFx.  If not, see <http://www.gnu.org/licenses/>.
 ###
 
+notation                = require('vim-like-key-notation')
 utils                   = require('./utils')
-keyUtils                = require('./key-utils')
 Vim                     = require('./vim')
 { getPref }             = require('./prefs')
 { updateToolbarButton } = require('./button')
@@ -32,14 +32,16 @@ HTMLInputElement = Ci.nsIDOMHTMLInputElement
 vimBucket = new utils.Bucket((window) -> new Vim(window))
 
 keyStrFromEvent = (event) ->
-  { ctrlKey: ctrl, metaKey: meta, altKey: alt, shiftKey: shift } = event
-
-  if not meta and not alt
-    return unless keyChar = keyUtils.keyCharFromCode(event.keyCode, shift)
-    keyStr = keyUtils.applyModifiers(keyChar, ctrl, alt, meta)
-    return keyStr
-
-  return null
+  return notation.stringify(event, {
+    # Check that `event.code` really is available before using the
+    # 'ignore_keyboard_layout' option. If not `event.key` will be used anyway,
+    # and the user needs to enable `event.code` support (which can be done from
+    # VimFx’s settings page).
+    ignoreKeyboardLayout: getPref('ignore_keyboard_layout') and event.code?
+    # Advanced setting for advanced users. Currently requires you to modifiy it
+    # from about:config and check the error console for errors.
+    translations: JSON.parse(getPref('translations'))
+  })
 
 # When a menu or panel is shown VimFx should temporarily stop processing
 # keyboard input, allowing accesskeys to be used.

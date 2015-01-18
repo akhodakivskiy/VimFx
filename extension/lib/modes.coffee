@@ -75,7 +75,7 @@ exports['normal'] =
       #   dialogs such as the “bookmark this page” dialog (<c-d>).
       document = event.originalTarget.ownerDocument
       inBrowserChrome = (document instanceof XULDocument)
-      if keyStr == 'Esc' and (not autoInsertMode or inBrowserChrome)
+      if keyStr == '<escape>' and (not autoInsertMode or inBrowserChrome)
         return false
 
       return true
@@ -105,7 +105,7 @@ exports['find'] =
 
   onInput: (vim, storage, keyStr) ->
     findBar = vim.rootWindow.gBrowser.getFindBar()
-    if isEscCommandKey(keyStr) or keyStr == 'Return'
+    if isEscCommandKey(keyStr) or keyStr == '<enter>'
       findBar.close()
       return true
     return false

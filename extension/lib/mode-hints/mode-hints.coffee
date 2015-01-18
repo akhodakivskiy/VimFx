@@ -44,17 +44,17 @@ exports.mode_hints =
     { markers, callback } = storage
 
     switch keyStr
-      when 'Space'
+      when '<space>'
         hints.rotateOverlappingMarkers(markers, true)
-      when 'Shift-Space'
+      when '<s-space>'
         hints.rotateOverlappingMarkers(markers, false)
 
-      when 'Backspace'
+      when '<backspace>'
         for marker in markers
           marker.deleteHintChar()
 
       else
-        if keyStr not in utils.getHintChars() or event.ctrlKey or event.metaKey
+        if keyStr not in utils.getHintChars()
           return true
         for marker in markers
           marker.matchHintChar(keyStr)

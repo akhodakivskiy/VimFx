@@ -19,6 +19,7 @@
 # along with VimFx.  If not, see <http://www.gnu.org/licenses/>.
 ###
 
+notation = require('vim-like-key-notation')
 { getPref
 , setPref
 } = require('./prefs')
@@ -297,6 +298,14 @@ parseHTML = (document, html) ->
   return parser.parseFragment(html, flags, false, null,
                               document.documentElement)
 
+escapeHTML = (s) ->
+  return s
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&apos;')
+
 createElement = (document, type, attributes = {}) ->
   element = document.createElement(type)
 
@@ -325,6 +334,8 @@ browserSearchSubmission = (str) ->
 
   engine = ss.currentEngine or ss.defaultEngine
   return engine.getSubmission(str, null)
+
+normalizedKey = (key) -> key.map(notation.normalize).join('')
 
 # Get hint characters, convert them to lower case, and filter duplicates.
 getHintChars = ->
@@ -469,9 +480,11 @@ exports.getBestPatternMatch       = getBestPatternMatch
 
 exports.getVersion                = getVersion
 exports.parseHTML                 = parseHTML
+exports.escapeHTML                = escapeHTML
 exports.createElement             = createElement
 exports.isURL                     = isURL
 exports.browserSearchSubmission   = browserSearchSubmission
+exports.normalizedKey             = normalizedKey
 exports.getHintChars              = getHintChars
 exports.removeDuplicates          = removeDuplicates
 exports.removeDuplicateCharacters = removeDuplicateCharacters
