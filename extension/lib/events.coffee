@@ -179,6 +179,7 @@ windowsListeners =
         target instanceof HTMLInputElement and
         (vim.lastInteraction == null or
          Date.now() - vim.lastInteraction > getPref('autofocus_limit'))
+      vim.lastAutofocusPrevention = Date.now()
       target.blur()
 
   blur: (event) ->
@@ -188,6 +189,15 @@ windowsListeners =
     findBar = vim.rootWindow.gBrowser.getFindBar()
     if target == findBar._findField.mInputField
       vim.enterMode('normal')
+      return
+
+    # Some sites (such as icloud.com) re-focuses inputs if they are blurred,
+    # causing an infinite loop autofocus prevention and re-focusing. Therefore
+    # we suppress blur events that happen just after an autofocus prevention.
+    if vim.lastAutofocusPrevention != null and
+       Date.now() - vim.lastAutofocusPrevention < 1
+      vim.lastAutofocusPrevention = null
+      suppressEvent(event)
       return
 
   click: (event) ->

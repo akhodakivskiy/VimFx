@@ -26,6 +26,7 @@ module.exports = class Vim
     @rootWindow = utils.getRootWindow(@window) # For convenience.
     @storage = {}
     @lastInteraction = null
+    @lastAutofocusPrevention = null
     @enterMode('normal')
 
   enterMode: (mode, args...) ->
