@@ -16,7 +16,10 @@
 <!ENTITY pref.hints_bloom_on.title "智慧設定提示符號">
 <!ENTITY pref.hints_bloom_on.desc  "為最常造訪的連結設定更短的提示符號">
 
-<!ENTITY pref.prevent_autofocus.title "Prevent auto focusing inputs">
+<!ENTITY pref.prevent_autofocus.title "Prevent autofocus of text inputs">
+
+<!ENTITY pref.autofocus_limit.title "Autofocus limit">
+<!ENTITY pref.autofocus_limit.desc  "Used when Prevent autofocus is on. If a text input is focused more than this number of milliseconds after you last interacted with the page, it is considered an autofocus.">
 
 <!ENTITY pref.ignore_keyboard_layout.title "Ignore keyboard layout">
 <!ENTITY pref.ignore_keyboard_layout.desc  "Pretend that the en-US QWERTY layout is always used">

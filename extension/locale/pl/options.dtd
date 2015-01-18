@@ -16,7 +16,10 @@ Dopuszczalne wieloznaczniki: *, !. Domyślnie: *mail.google.com*">
 <!ENTITY pref.hints_bloom_on.title "Smart hint assignment">
 <!ENTITY pref.hints_bloom_on.desc  "Assign shorter hints to the links that users visit most often">
 
-<!ENTITY pref.prevent_autofocus.title "Prevent auto focusing inputs">
+<!ENTITY pref.prevent_autofocus.title "Prevent autofocus of text inputs">
+
+<!ENTITY pref.autofocus_limit.title "Autofocus limit">
+<!ENTITY pref.autofocus_limit.desc  "Used when Prevent autofocus is on. If a text input is focused more than this number of milliseconds after you last interacted with the page, it is considered an autofocus.">
 
 <!ENTITY pref.ignore_keyboard_layout.title "Ignore keyboard layout">
 <!ENTITY pref.ignore_keyboard_layout.desc  "Pretend that the en-US QWERTY layout is always used">

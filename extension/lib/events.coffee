@@ -177,7 +177,8 @@ windowsListeners =
     if getPref('prevent_autofocus') and
         target.ownerDocument instanceof HTMLDocument and
         target instanceof HTMLInputElement and
-        (vim.lastInteraction == null or Date.now() - vim.lastInteraction > 100)
+        (vim.lastInteraction == null or
+         Date.now() - vim.lastInteraction > getPref('autofocus_limit'))
       target.blur()
 
   blur: (event) ->
