@@ -408,10 +408,12 @@ command_Esc = (vim, event) ->
 class Command
   constructor: (@group, @name, @func, keys) ->
     @defaultKeys = keys
-    if isPrefSet(@prefName('keys'))
-      try @keyValues = JSON.parse(getPref(@prefName('keys')))
-    else
-      @keyValues = keys
+    @keyValues =
+      if isPrefSet(@prefName('keys'))
+        try JSON.parse(getPref(@prefName('keys')))
+        catch then []
+      else
+        keys
     for key, index in @keyValues when typeof key == 'string'
       @keyValues[index] = legacy.convertKey(key)
 
@@ -422,7 +424,7 @@ class Command
     if value == undefined
       return @keyValues
     else
-      @keyValues = value or @defaultKeyValues
+      @keyValues = value or @defaultKeys
       setPref(@prefName('keys'), value and JSON.stringify(value))
 
   help: -> _("help_command_#{ @name }")
