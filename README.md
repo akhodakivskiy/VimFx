@@ -84,6 +84,10 @@ Global shortcut to enable/disable VimFx: `shift-alt-v`
     gh      Navigate to the Home Page
     gH,g^   Go to the First tab
     gL,g$   Go to the Last tab
+    gp      Pin/Unpin current tab
+    yt      Duplicate current tab
+    gx$     Close tabs to the right
+    gxa     Close other tabs except the current tab
     x       Close current tab
     X       Restore last closed tab
 
