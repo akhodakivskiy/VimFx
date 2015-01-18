@@ -12,8 +12,8 @@
 
 <!ENTITY pref.scroll_step_lines.title   "Görgetés mértéke">
 
-<!ENTITY pref.hints_bloom_on.title "Smart hint assignment (needs translation)">
-<!ENTITY pref.hints_bloom_on.desc  "Assign shorter hints to the links that users visit most often (needs translation)">
+<!ENTITY pref.hints_bloom_on.title "Smart hint assignment">
+<!ENTITY pref.hints_bloom_on.desc  "Assign shorter hints to the links that users visit most often">
 
 <!ENTITY pref.prevent_autofocus.title "Prevent autofocus of text inputs">
 
