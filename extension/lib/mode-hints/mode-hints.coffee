@@ -21,8 +21,6 @@
 utils = require('../utils')
 hints = require('./hints')
 
-{ isEscCommandKey } = require('../commands')
-
 exports.mode_hints =
   onEnter: (vim, storage, callback) ->
     markers = hints.injectHints(vim.window)
@@ -37,19 +35,19 @@ exports.mode_hints =
     storage.markers = storage.callback = undefined
 
   onInput: (vim, storage, keyStr, event) ->
-    if isEscCommandKey(keyStr)
-      vim.enterMode('normal')
-      return true
-
     { markers, callback } = storage
 
-    switch keyStr
-      when '<space>'
+    switch
+      when @commands['exit'].match(keyStr)
+        vim.enterMode('normal')
+        return true
+
+      when @commands['rotate_markers_forward'].match(keyStr)
         hints.rotateOverlappingMarkers(markers, true)
-      when '<s-space>'
+      when @commands['rotate_markers_backward'].match(keyStr)
         hints.rotateOverlappingMarkers(markers, false)
 
-      when '<backspace>'
+      when @commands['delete_hint_char'].match(keyStr)
         for marker in markers
           marker.deleteHintChar()
 
@@ -66,3 +64,9 @@ exports.mode_hints =
             break
 
     return true
+
+  commands:
+    exit:                    ['<escape>']
+    rotate_markers_forward:  ['<space>']
+    rotate_markers_backward: ['<s-space>']
+    delete_hint_char:        ['<backspace>']

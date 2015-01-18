@@ -22,9 +22,10 @@
 utils                   = require('./utils')
 { mode_hints }          = require('./mode-hints/mode-hints')
 { updateToolbarButton } = require('./button')
-{ searchForMatchingCommand
-, isEscCommandKey
-, isReturnCommandKey
+{ commands
+, searchForMatchingCommand
+, escapeCommand
+, Command
 , findStorage }         = require('./commands')
 
 { interfaces: Ci } = Components
@@ -43,9 +44,6 @@ exports['normal'] =
     isEditable = utils.isElementEditable(event.originalTarget)
     autoInsertMode = isEditable or vim.rootWindow.TabView.isVisible()
 
-    if autoInsertMode and not isEscCommandKey(keyStr)
-      return false
-
     storage.keys.push(keyStr)
 
     { match, exact, command, count } = searchForMatchingCommand(storage.keys)
@@ -54,6 +52,11 @@ exports['normal'] =
       match = false
 
     if match
+
+      if autoInsertMode and command != escapeCommand
+        storage.keys.pop()
+        return false
+
       if exact
         command.func(vim, event, count)
         storage.keys.length = 0
@@ -85,6 +88,8 @@ exports['normal'] =
 
       return false
 
+  commands: commands
+
 exports['insert'] =
   onEnter: (vim) ->
     updateToolbarButton(vim.rootWindow, {insertMode: true})
@@ -92,9 +97,11 @@ exports['insert'] =
     updateToolbarButton(vim.rootWindow, {insertMode: false})
     utils.blurActiveElement(vim.window)
   onInput: (vim, storage, keyStr) ->
-    if isEscCommandKey(keyStr)
+    if @commands['exit'].match(keyStr)
       vim.enterMode('normal')
       return true
+  commands:
+    exit: ['<c-escape>']
 
 exports['find'] =
   onEnter: ->
@@ -105,9 +112,20 @@ exports['find'] =
 
   onInput: (vim, storage, keyStr) ->
     findBar = vim.rootWindow.gBrowser.getFindBar()
-    if isEscCommandKey(keyStr) or keyStr == '<enter>'
+    if @commands['exit'].match(keyStr)
       findBar.close()
       return true
     return false
 
+  commands:
+    exit: ['<escape>', '<enter>']
+
 exports['hints'] = mode_hints
+
+for modeName of exports
+  mode = exports[modeName]
+  continue if Array.isArray(mode.commands)
+  for commandName of mode.commands
+    name = "mode_#{ modeName }_#{ commandName }"
+    keys = mode.commands[commandName].map((key) -> [key])
+    mode.commands[commandName] = new Command(null, name, null, keys)

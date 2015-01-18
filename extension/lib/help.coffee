@@ -35,23 +35,34 @@ CONTAINER_ID = 'VimFxHelpDialogContainer'
 removeHelp = (document) ->
   document.getElementById(CONTAINER_ID)?.remove()
 
-injectHelp = (document, commands) ->
+injectHelp = (document, modes) ->
   if document.documentElement
     removeHelp(document)
 
     type = if document instanceof XULDocument then 'box' else 'div'
     container = utils.createElement(document, type, {id: CONTAINER_ID})
 
-    container.appendChild(utils.parseHTML(document, helpDialogHtml(commands)))
+    modeCommands = {}
+    for modeName of modes
+      cmds = modes[modeName].commands
+      modeCommands[modeName] =
+        if Array.isArray(cmds)
+          cmds
+        else
+          (cmds[commandName] for commandName of cmds)
+
+    container.appendChild(utils.parseHTML(document, helpDialogHtml(modeCommands)))
     for element in container.getElementsByTagName('*')
       element.classList.add('VimFxReset')
 
     document.documentElement.appendChild(container)
 
-    container.addEventListener('click',
-      removeHandler.bind(undefined, document, commands), false)
-    container.addEventListener('click',
-      addHandler.bind(undefined, document, commands), false)
+    for element in container.querySelectorAll('[data-commands]')
+      elementCommands = modeCommands[element.dataset.commands]
+      element.addEventListener('click',
+        removeHandler.bind(undefined, document, elementCommands), false)
+      element.addEventListener('click',
+        addHandler.bind(undefined, document, elementCommands), false)
 
     if button = document.getElementById('VimFxClose')
       clickHandler = (event) ->
@@ -93,6 +104,8 @@ addHandler = (document, commands, event) ->
         return if input.length == 0
         key = notation.parseSequence(input)
         try
+          if name.startsWith('mode_') and key.length > 1
+            throw {id: 'single_keystrokes_only'}
           normalizedKey = utils.normalizedKey(key)
         catch {id, context, subject}
           if /^\s$/.test(subject) then id = 'invalid_whitespace'
@@ -175,20 +188,21 @@ tr = (cmd) ->
     </tr>
   """
 
-table = (commands) ->
+table = (commands, modeName) ->
   """
-  <table>
+  <table #{ "data-commands='#{modeName}'" }>
     #{ (tr(cmd) for cmd in commands).join('') }
   </table>
   """
 
-section = (title, commands) ->
+section = (title, commands, modeName = 'normal') ->
   """
   <div class="VimFxSectionTitle">#{ title }</div>
-  #{ table(commands) }
+  #{ table(commands, modeName) }
   """
 
-helpDialogHtml = (commands) ->
+helpDialogHtml = (modeCommands) ->
+  commands = modeCommands['normal']
   return """
   <div id="VimFxHelpDialog">
     <div class="VimFxHeader">
@@ -208,17 +222,19 @@ helpDialogHtml = (commands) ->
       <div class="VimFxColumn">
         #{ section(_('help_section_urls'),   commands.filter((a) -> a.group == 'urls')) }
         #{ section(_('help_section_nav'),    commands.filter((a) -> a.group == 'nav')) }
+        #{ section(_('help_section_misc'),   commands.filter((a) -> a.group == 'misc')) }
       </div>
       <div class="VimFxColumn">
         #{ section(_('help_section_tabs'),   commands.filter((a) -> a.group == 'tabs')) }
         #{ section(_('help_section_browse'), commands.filter((a) -> a.group == 'browse')) }
-        #{ section(_('help_section_misc'),   commands.filter((a) -> a.group == 'misc')) }
+        #{ section(_('help_section_mode_hints'),  modeCommands['hints'],  'hints') }
+        #{ section(_('help_section_mode_insert'), modeCommands['insert'], 'insert') }
+        #{ section(_('help_section_mode_find'),   modeCommands['find'],   'find') }
       </div>
       <div class="VimFxClearFix"></div>
     </div>
 
     <div class="VimFxFooter">
-      <p>#{ _('help_overlapping_hints') }</p>
       <p>
         #{ _('help_found_bug') }
         <a target="_blank" href="https://github.com/akhodakivskiy/VimFx/issues">

@@ -393,7 +393,7 @@ command_insert_mode = (vim) ->
 
 # Display the Help Dialog.
 command_help = (vim) ->
-  help.injectHelp(vim.window.document, commands)
+  help.injectHelp(vim.window.document, require('./modes'))
 
 # Open and select the Developer Toolbar.
 command_dev = (vim) ->
@@ -417,27 +417,39 @@ command_Esc = (vim, event) ->
 
 class Command
   constructor: (@group, @name, @func, keys) ->
-    @defaultKeys = keys
+    @prefName = "commands.#{ @name }.keys"
     @keyValues =
-      if isPrefSet(@prefName('keys'))
-        try JSON.parse(getPref(@prefName('keys')))
+      if isPrefSet(@prefName)
+        try JSON.parse(getPref(@prefName))
         catch then []
       else
         keys
     for key, index in @keyValues when typeof key == 'string'
       @keyValues[index] = legacy.convertKey(key)
 
-  # Name of the preference for a given property.
-  prefName: (value) -> "commands.#{ @name }.#{ value }"
 
   keys: (value) ->
     if value == undefined
       return @keyValues
     else
-      @keyValues = value or @defaultKeys
-      setPref(@prefName('keys'), value and JSON.stringify(value))
+      @keyValues = value
+      setPref(@prefName, JSON.stringify(value))
 
   help: -> _("help_command_#{ @name }")
+
+  match: (str, numbers = null) ->
+    for key in @keys()
+      key = utils.normalizedKey(key)
+      if key.startsWith(str)
+        # When letter 0 follows after a number, it is considered as number 0
+        # instead of a valid command.
+        continue if key == '0' and numbers
+
+        count = parseInt(numbers[numbers.length - 1], 10) if numbers
+        count = if count > 1 then count else 1
+
+        return {match: true, exact: (key == str), command: this, count}
+
 
 # coffeelint: disable=max_line_length
 commands = [
@@ -463,8 +475,8 @@ commands = [
   new Command('nav',    'scroll_right',          command_scroll_right ,         [['l']])
   new Command('nav',    'scroll_half_page_down', command_scroll_half_page_down, [['d']])
   new Command('nav',    'scroll_half_page_up',   command_scroll_half_page_up,   [['u']])
-  new Command('nav',    'scroll_page_down',      command_scroll_page_down,      [['<Space>']])
-  new Command('nav',    'scroll_page_up',        command_scroll_page_up,        [['<s-Space>']])
+  new Command('nav',    'scroll_page_down',      command_scroll_page_down,      [['<space>']])
+  new Command('nav',    'scroll_page_up',        command_scroll_page_up,        [['<s-space>']])
 
   new Command('tabs',   'open_tab',              command_open_tab,              [['t']])
   new Command('tabs',   'tab_prev',              command_tab_prev,              [['J'], ['g', 'T']])
@@ -501,37 +513,20 @@ commands = [
   new Command('misc',   'dev',                   command_dev,                   [[':']])
 
   escapeCommand =
-  new Command('misc',   'Esc',                   command_Esc,                   [['<Esc>']])
+  new Command('misc',   'Esc',                   command_Esc,                   [['<escape>']])
 ]
 # coffeelint: enable=max_line_length
 
 searchForMatchingCommand = (keys) ->
   for index in [0...keys.length] by 1
     str = keys[index..].join('')
+    numbers = keys[0..index].join('').match(/[1-9]\d*/g)
     for command in commands
-      for key in command.keys()
-        key = utils.normalizedKey(key)
-        if key.startsWith(str)
-          numbers = keys[0..index].join('').match(/[1-9]\d*/g)
-
-          # When letter 0 follows after a number, it is considered as number 0
-          # instead of a valid command.
-          continue if key == '0' and numbers
-
-          count = parseInt(numbers[numbers.length - 1], 10) if numbers
-          count = if count > 1 then count else 1
-
-          return {match: true, exact: (key == str), command, count}
-
+      return match if match = command.match(str, numbers)
   return {match: false}
-
-isEscCommandKey = (keyStr) ->
-  for key in escapeCommand.keys()
-    if keyStr == utils.normalizedKey(key)
-      return true
-  return false
 
 exports.commands                  = commands
 exports.searchForMatchingCommand  = searchForMatchingCommand
-exports.isEscCommandKey           = isEscCommandKey
+exports.escapeCommand             = escapeCommand
+exports.Command                   = Command
 exports.findStorage               = findStorage
