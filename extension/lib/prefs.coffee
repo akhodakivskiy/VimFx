@@ -38,7 +38,7 @@ getBranchPref = (branch, key, defaultValue = undefined) ->
     when branch.PREF_INT
       branch.getIntPref(key)
     when branch.PREF_STRING
-      branch.getCharPref(key)
+      branch.getComplexValue(key, Ci.nsISupportsString).data
     else
       defaultValue
 
@@ -46,10 +46,6 @@ isPrefSet = (key) ->
   return vimfxBranch.prefHasUserValue(key)
 
 getPref = getBranchPref.bind(undefined, vimfxBranch)
-
-# Unicode String.
-getComplexPref = (key) ->
-  return vimfxBranch.getComplexValue(key, Ci.nsISupportsString).data
 
 setBranchPref = (branch, key, value) ->
   switch typeof value
@@ -74,6 +70,5 @@ setDefaultPrefs = ->
 
 exports.isPrefSet         = isPrefSet
 exports.getPref           = getPref
-exports.getComplexPref    = getComplexPref
 exports.setPref           = setPref
 exports.setDefaultPrefs   = setDefaultPrefs

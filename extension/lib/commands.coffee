@@ -25,7 +25,6 @@ utils    = require('./utils')
 help     = require('./help')
 _        = require('./l10n')
 { getPref
-, getComplexPref
 , setPref
 , isPrefSet } = require('./prefs')
 
@@ -309,7 +308,7 @@ helper_follow_pattern = do ->
     links = utils.getMarkableElements(vim.window.document, {type: 'action'})
       .filter(utils.isElementVisible)
 
-    patterns = utils.splitListString(getComplexPref("#{ type }_patterns"))
+    patterns = utils.splitListString(getPref("#{ type }_patterns"))
 
     if matchingLink = utils.getBestPatternMatch(patterns, attrs, links)
       utils.simulateClick(matchingLink, {metaKey: false, ctrlKey: false})
