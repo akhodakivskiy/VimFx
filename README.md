@@ -43,8 +43,6 @@ VimFx will be nice to your browser and to your habits. Promise.
 This is a text representation of the keyboard shortcuts dialog within the extension. Might not be up to date.
 Press ? or use the toolbar button to open the dialog, which helps you remember the shortcuts, and lets you customize them.
 
-Global shortcut to enable/disable VimFx: `shift-alt-v`
-
 ### Dealing with URLs
 
     o       Focus the Address Bar

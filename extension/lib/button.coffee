@@ -25,9 +25,7 @@
 utils          = require('./utils')
 _              = require('./l10n')
 
-KEYSET_ID             = 'vimfx-keyset'
 BUTTON_ID             = 'vimfx-toolbar-button'
-KEY_ID                = 'vimfx-key'
 MENUPOPUP_ID          = 'vimfx-menupopup'
 MENU_ITEM_PREF        = 'vimfx-menu-item-preferences'
 MENU_ITEM_HELP        = 'vimfx-menu-item-help'
@@ -46,7 +44,7 @@ addToolbarButton = (vimBucket, window) ->
   document = window.document
   win = document.querySelector('window')
 
-  [ button, keyset ] = createButton(vimBucket, window)
+  button = createButton(vimBucket, window)
 
   # Namespace to put the VimFx state on, for example.
   button.VimFx = {}
@@ -58,11 +56,8 @@ addToolbarButton = (vimBucket, window) ->
   disabled = getPref('disabled')
   updateToolbarButton(window, {disabled, blacklisted})
 
-  win.appendChild(keyset)
-
   module.onShutdown(->
     button.remove()
-    keyset.remove()
     $(document, 'navigator-toolbox').palette.removeChild(button)
   )
 
@@ -96,18 +91,7 @@ createButton = (vimBucket, window) ->
 
   button.addEventListener('command', onButtonCommand, false)
 
-  vimkey = utils.createElement(document, 'key', {
-    id: KEY_ID
-    key: 'V'
-    modifiers: 'shift,alt'
-    oncommand: 'void(0);'
-  })
-  vimkey.addEventListener('command', onButtonCommand, false)
-
-  keyset = utils.createElement(document, 'keyset', {id: KEYSET_ID})
-  keyset.appendChild(vimkey)
-
-  return [button, keyset]
+  return button
 
 createMenupopup = (window, button) ->
   document = window.document
