@@ -45,71 +45,85 @@ Press ? or use the toolbar button to open the dialog, which helps you remember t
 
 ### Dealing with URLs
 
-    o       Focus the Address Bar
-    O       Focus the Search Bar
-    p       Navigate to the address in the clipboard
-    P       Open new tab and navigate to the address in the clipboard
-    yf      Copy link url to the clipboard
-    vf      Focus element
-    yy      Copy current page link to the clipboard
-    r       Reload current page
-    R       Reload current page and all the assets (js, css, etc.)
-    ar      Reload pages in all tabs
-    aR      Reload pages in all tabs including assets (js, css, img)
-    s       Stop loading current page
-    as      Stop loading pages in all tabs
+    o            Focus the Address Bar
+    O            Focus the Search Bar
+    p            Navigate to the address in the clipboard
+    P            Open new tab and navigate to the address in the clipboard
+    yf           Copy link url to the clipboard
+    vf           Focus element
+    yy           Copy current page link to the clipboard
+    r            Reload current page
+    R            Reload current page and all the assets (js, css, etc.)
+    ar           Reload pages in all tabs
+    aR           Reload pages in all tabs including assets (js, css, img)
+    s            Stop loading current page
+    as           Stop loading pages in all tabs
 
 ### Navigating the Page
 
-    gg      Scroll to the Top of the page
-    G       Scroll to the Bottom of the page
-    j,c-e   Scroll Down
-    k,c-y   Scroll Up
-    h       Scroll Left
-    l       Scroll Right
-    d       Scroll half a Page Down
-    u       Scroll half a Page Up
-    c-f     Scroll full Page Down
-    c-b     Scroll full Page Up
+    gg           Scroll to the Top of the page
+    G            Scroll to the Bottom of the page
+    j            Scroll Down
+    k            Scroll Up
+    h            Scroll Left
+    l            Scroll Right
+    d            Scroll half a Page Down
+    u            Scroll half a Page Up
+    <space>      Scroll full Page Down
+    <s-space>    Scroll full Page Up
 
 ### Working with Tabs
 
-    t       Open New Blank tab
-    J,gT    Go to the Previous tab
-    K,gt    Go to the Next tab
-    c-J     Move current tab to the Left
-    c-K     Move current tab to the Right
-    gh      Navigate to the Home Page
-    gH,g^   Go to the First tab
-    gL,g$   Go to the Last tab
-    gp      Pin/Unpin current tab
-    yt      Duplicate current tab
-    gx$     Close tabs to the right
-    gxa     Close other tabs except the current tab
-    x       Close current tab
-    X       Restore last closed tab
+    t            Open New Blank tab
+    J  gT        Go to the Previous tab
+    K  gt        Go to the Next tab
+    gJ           Move current tab to the Left
+    gK           Move current tab to the Right
+    gh           Navigate to the Home Page
+    gH  g0       Go to the First tab
+    g^           Go to the First non-pinned tab
+    gL  g$       Go to the Last tab
+    gp           Pin/Unpin current tab
+    yt           Duplicate current tab
+    gx$          Close tabs to the right
+    gxa          Close other tabs except the current tab
+    x            Close current tab
+    X            Restore last closed tab
 
 ### Browsing
 
-    f       Follow a link on the current page
-    F       Follow a link on the current page in a new tab
-    af      Follow multiple links on the current page
-    [       Follow the Previous page link on the current page
-    ]       Follow the Next page link on the current page
-    gu      Go up one level in the URL hierarchy
-    gU      Go up to root of the URL hierarchy
-    H       Go Back in history
-    L       Go Forward in history
+    f            Follow a link on the current page
+    F            Follow a link on the current page in a new tab
+    af           Follow multiple links on the current page
+    [            Follow the Previous page link on the current page
+    ]            Follow the Next page link on the current page
+    gu           Go up one level in the URL hierarchy
+    gU           Go up to root of the URL hierarchy
+    H            Go Back in history
+    L            Go Forward in history
 
 ### Misc
 
-    /       Enter Find mode
-    a/      Enter Find mode to highlight all matches
-    n       Go to the next Find match
-    N       Go to the previous Find match
-    i       Enter insert mode: Ignore all commands
-    ?       Show this dialog
-    :       Open Developer Toolbar
-    Esc     Enter normal mode (remove hint markers, exit insert mode) or blur/close active element
+    /            Enter Find mode
+    a/           Enter Find mode to highlight all matches
+    n            Go to the next Find match
+    N            Go to the previous Find match
+    i            Enter insert mode: Ignore all commands
+    ?            Show this dialog
+    :            Open Developer Toolbar
+    <escape>     Blur/close active element
 
-Can't see a link hint, because it's overlapped by another? Try pressing space or shift-space!
+### Hints Mode
+
+    <escape>     Return to normal mode
+    <space>      Rotate overlapping markers forward
+    <s-space>    Rotate overlapping markers backward
+    <backspace>  Delete last typed hint character
+
+### Insert Mode
+
+    <c-escape>   Return to normal mode
+
+### Find Mode
+
+    <escape> <return> Close find bar
