@@ -175,6 +175,7 @@ windowsListeners =
     # a second) and then focuses the `<textarea>`. Such focus events should
     # _not_ be blurred.
     if getPref('prevent_autofocus') and
+        vim.mode != 'insert' and
         target.ownerDocument instanceof HTMLDocument and
         target instanceof HTMLInputElement and
         (vim.lastInteraction == null or
