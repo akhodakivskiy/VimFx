@@ -27,7 +27,9 @@ class Bucket
     if @bucket.has(obj)
       return @bucket.get(obj)
     else
-      return @bucket.set(obj, @newFunc(obj))
+      value = @newFunc(obj)
+      @bucket.set(obj, value)
+      return value
 
   forget: (obj) ->
     @bucket.delete(obj)
