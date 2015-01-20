@@ -18,6 +18,8 @@ Anton Khodakivskiy
 - Grzegorz Niewisiewicz (pl)
 - Anton Khodakivskiy (ru)
 - Zakhar Pilipchuk (ru)
+- Andreas Lindhé (sv-SE)
+- Simon Lydell (sv-SE)
 - Wang Zhuochun (zh-CN)
 - mozillazg (zh-CN)
 - Robert (zh-TW)

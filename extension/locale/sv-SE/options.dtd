@@ -1,0 +1,31 @@
+<!ENTITY pref.hint_chars.title      "Etikettstecken">
+<!ENTITY pref.hint_chars.desc       "Standardinställning: fjdkslaghrueiwovncm">
+
+<!ENTITY pref.black_list.title      "Svartlista">
+<!ENTITY pref.black_list.desc       "Kommaseparerad lista av URL:er där VimFx automatiskt ska vara avaktiverat.
+Jokertecken tillåts: *, !. Exempel: *example.com*,*foobar.org*">
+
+<!ENTITY pref.prev_patterns.title   "Mönster för föregående sida">
+<!ENTITY pref.prev_patterns.desc    "Kommaseparerad lista av mönster som matchar länkar till föregående sida">
+
+<!ENTITY pref.next_patterns.title   "Mönster för nästa sida">
+<!ENTITY pref.next_patterns.desc    "Kommaseparerad lista av mönster som matchar länkar till nästa sida">
+
+<!ENTITY pref.scroll_step_lines.title "Scrollsteg">
+
+<!ENTITY pref.hints_bloom_on.title "Smart etikettstilldelning">
+<!ENTITY pref.hints_bloom_on.desc  "Tilldela kortare etiketter till de länkar som besöks oftast">
+
+<!ENTITY pref.prevent_autofocus.title "Hindra autofokus för textrutor">
+
+<!ENTITY pref.autofocus_limit.title "Autofokusgräns">
+<!ENTITY pref.autofocus_limit.desc  "Används när Hindra autofokus är på. Om en textruta fokuseras efter mer än detta antal millisekunder sedan du senast interagerade med sidan, så tolkas det som autofokus.">
+
+<!ENTITY pref.ignore_keyboard_layout.title "Ignorera tangentbordslayout">
+<!ENTITY pref.ignore_keyboard_layout.desc  "Låtsas att en-US QWERTY-layouten alltid används">
+
+<!ENTITY pref.keyboardevent.code.enabled.title "Aktivera `KeyboardEvent.code`-support">
+<!ENTITY pref.keyboardevent.code.enabled.desc  "Anses &quot;experimentellt&quot; av Firefox, men fungerar riktigt bra. Behövs för Ignorera tangentbordslayout-inställningen. Kräver omstart.">
+
+<!ENTITY customizeButton.title "Tangentbordskommandon">
+<!ENTITY customizeButton.label "Finjustera">
