@@ -47,71 +47,71 @@ Press ? or use the toolbar button to open the dialog, which helps you remember t
 
     o            Focus the Address Bar
     O            Focus the Search Bar
-    p            Navigate to the address in the clipboard
-    P            Open new tab and navigate to the address in the clipboard
+    p            Paste and go
+    P            Paste and go in a new tab
     yf           Copy link url to the clipboard
     vf           Focus element
-    yy           Copy current page link to the clipboard
-    r            Reload current page
-    R            Reload current page and all the assets (js, css, etc.)
-    ar           Reload pages in all tabs
-    aR           Reload pages in all tabs including assets (js, css, img)
-    s            Stop loading current page
-    as           Stop loading pages in all tabs
+    yy           Copy link or text input value
+    r            Reload
+    R            Reload (override cache)
+    ar           Reload all tabs
+    aR           Reload all tabs (override cache)
+    s            Stop loading the page
+    as           Stop loading all tabs
 
 ### Navigating the Page
 
-    gg           Scroll to the Top of the page
-    G            Scroll to the Bottom of the page
-    j            Scroll Down
-    k            Scroll Up
-    h            Scroll Left
-    l            Scroll Right
-    d            Scroll half a Page Down
-    u            Scroll half a Page Up
-    <space>      Scroll full Page Down
-    <s-space>    Scroll full Page Up
+    gg           Scroll to top
+    G            Scroll to bottom
+    j            Scroll down
+    k            Scroll up
+    h            Scroll left
+    l            Scroll right
+    d            Scroll half a page down
+    u            Scroll half a page up
+    <space>      Scroll full page down
+    <s-space>    Scroll full page up
 
 ### Working with Tabs
 
-    t            Open New Blank tab
-    J  gT        Go to the Previous tab
-    K  gt        Go to the Next tab
-    gJ           Move current tab to the Left
-    gK           Move current tab to the Right
-    gh           Navigate to the Home Page
-    gH  g0       Go to the First tab
-    g^           Go to the First non-pinned tab
-    gL  g$       Go to the Last tab
-    gp           Pin/Unpin current tab
-    yt           Duplicate current tab
+    t            New tab
+    J  gT        Previous tab
+    K  gt        Next tab
+    gJ           Move tab left
+    gK           Move tab right
+    gh           Go to the Home Page
+    gH  g0       Go to the first tab
+    g^           Go to the first non-pinned tab
+    gL  g$       Go to the last tab
+    gp           Pin/Unpin tab
+    yt           Duplicate tab
     gx$          Close tabs to the right
-    gxa          Close other tabs except the current tab
-    x            Close current tab
-    X            Restore last closed tab
+    gxa          Close other tabs
+    x            Close tab
+    X            Restore closed tab
 
 ### Browsing
 
-    f            Follow a link on the current page
-    F            Follow a link on the current page in a new tab
-    af           Follow multiple links on the current page
-    [            Follow the Previous page link on the current page
-    ]            Follow the Next page link on the current page
-    gu           Go up one level in the URL hierarchy
-    gU           Go up to root of the URL hierarchy
-    H            Go Back in history
-    L            Go Forward in history
+    f            Follow link, focus text input or click button
+    F            Follow link in a new tab
+    af           Follow a link on the current page in a new tab
+    [            Go to the next page
+    ]            Go to the previous page
+    gu           Go up one level in the URL
+    gU           Go to root in the URL
+    H            Go back in history
+    L            Go forward in history
 
 ### Misc
 
     /            Enter Find mode
-    a/           Enter Find mode to highlight all matches
-    n            Go to the next Find match
-    N            Go to the previous Find match
+    a/           Enter Find mode highlighting all matches
+    n            Find next
+    N            Find previous
     i            Enter insert mode: Ignore all commands
     I            Pass next keypress through to the page
     ?            Show this dialog
-    :            Open Developer Toolbar
+    :            Open the Developer Toolbar
     <escape>     Blur/close active element
 
 ### Hints Mode
