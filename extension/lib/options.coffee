@@ -21,7 +21,6 @@
 utils        = require('./utils')
 { getPref }  = require('./prefs')
 help         = require('./help')
-{ commands } = require('./commands')
 
 observe = ->
   Services.obs.addObserver(observer, 'addon-options-displayed', false)
@@ -39,7 +38,7 @@ observer =
       'setting[pref="extensions.VimFx.next_patterns"]':
         change: validatePatterns
       '#customizeButton':
-        command: help.injectHelp.bind(undefined, document, commands)
+        command: help.injectHelp.bind(undefined, document, require('./modes'))
 
     switch topic
       when 'addon-options-displayed'
