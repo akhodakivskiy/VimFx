@@ -21,7 +21,6 @@
 { getPref
 , setPref }    = require('./prefs')
 { injectHelp } = require('./help')
-{ commands }   = require('./commands')
 utils          = require('./utils')
 _              = require('./l10n')
 
@@ -170,7 +169,7 @@ createMenupopup = (window, button) ->
 
   onHelpCommand = (event) ->
     if tabWindow = utils.getCurrentTabWindow(window)
-      injectHelp(tabWindow.document, commands)
+      injectHelp(tabWindow.document, require('./modes'))
 
     event.stopPropagation()
 
