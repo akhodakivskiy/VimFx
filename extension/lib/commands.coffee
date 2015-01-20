@@ -391,6 +391,10 @@ command_find_prev = helper_find_again.bind(undefined, true)
 command_insert_mode = (vim) ->
   vim.enterMode('insert')
 
+# Quote next keypress (pass it through to the page).
+command_quote = (vim, event, count) ->
+  vim.enterMode('insert', count)
+
 # Display the Help Dialog.
 command_help = (vim) ->
   help.injectHelp(vim.window.document, require('./modes'))
@@ -509,6 +513,7 @@ commands = [
   new Command('misc',   'find_next',             command_find_next,             [['n']])
   new Command('misc',   'find_prev',             command_find_prev,             [['N']])
   new Command('misc',   'insert_mode',           command_insert_mode,           [['i']])
+  new Command('misc',   'quote',                 command_quote,                 [['I']])
   new Command('misc',   'help',                  command_help,                  [['?']])
   new Command('misc',   'dev',                   command_dev,                   [[':']])
 

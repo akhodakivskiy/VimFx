@@ -91,15 +91,23 @@ exports['normal'] =
   commands: commands
 
 exports['insert'] =
-  onEnter: (vim) ->
+  onEnter: (vim, storage, count = null) ->
+    storage.count = count
     updateToolbarButton(vim.rootWindow, {insertMode: true})
   onLeave: (vim) ->
     updateToolbarButton(vim.rootWindow, {insertMode: false})
     utils.blurActiveElement(vim.window)
   onInput: (vim, storage, keyStr) ->
-    if @commands['exit'].match(keyStr)
-      vim.enterMode('normal')
-      return true
+    switch storage.count
+      when null
+        if @commands['exit'].match(keyStr)
+          vim.enterMode('normal')
+          return true
+      when 1
+        vim.enterMode('normal')
+      else
+        storage.count--
+    return false
   commands:
     exit: ['<c-escape>']
 
