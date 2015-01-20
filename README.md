@@ -109,6 +109,7 @@ Press ? or use the toolbar button to open the dialog, which helps you remember t
     n            Go to the next Find match
     N            Go to the previous Find match
     i            Enter insert mode: Ignore all commands
+    I            Pass next keypress through to the page
     ?            Show this dialog
     :            Open Developer Toolbar
     <escape>     Blur/close active element
