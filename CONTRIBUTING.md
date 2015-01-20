@@ -24,10 +24,8 @@ Lastly, don’t hesitate to open issues!
 
 ## Localizing
 
-Contribute your localization! See `locale` folder.
-
-Send your pull request to the **master** branch (no matter if it is a new
-locale or an update to an existing one).
+Contribute your localization! Copy the extension/locale/en-US directory and go
+wild!
 
 
 ## Developing
