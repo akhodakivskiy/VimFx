@@ -1,20 +1,20 @@
 <!ENTITY pref.hint_chars.title      "Hint Chars">
 <!ENTITY pref.hint_chars.desc       "Default: fjdkslaghrueiwovncm">
 
-<!ENTITY pref.black_list.title      "Black List">
-<!ENTITY pref.black_list.desc       "Comma separated list of URL where VimFx should be automatically disabled.
+<!ENTITY pref.black_list.title      "Blacklist">
+<!ENTITY pref.black_list.desc       "Comma separated list of URLs where VimFx should be automatically disabled.
 Wildcards allowed: *, !. Example: *example.com*,*foobar.org*.">
 
 <!ENTITY pref.prev_patterns.title   "Previous Page Patterns">
-<!ENTITY pref.prev_patterns.desc    "Comma separated list of patterns that match links to previous page">
+<!ENTITY pref.prev_patterns.desc    "Comma separated list of patterns that match links to the previous page.">
 
 <!ENTITY pref.next_patterns.title   "Next Page Patterns">
-<!ENTITY pref.next_patterns.desc    "Comma separated list of patterns that match links to next page">
+<!ENTITY pref.next_patterns.desc    "Comma separated list of patterns that match links to the next page.">
 
 <!ENTITY pref.scroll_step_lines.title "Scroll Step">
 
 <!ENTITY pref.hints_bloom_on.title "Smart hint assignment">
-<!ENTITY pref.hints_bloom_on.desc  "Assign shorter hints to the links that users visit most often">
+<!ENTITY pref.hints_bloom_on.desc  "Assign shorter hints to frequently visited links.">
 
 <!ENTITY pref.prevent_autofocus.title "Prevent autofocus of text inputs">
 
@@ -22,7 +22,7 @@ Wildcards allowed: *, !. Example: *example.com*,*foobar.org*.">
 <!ENTITY pref.autofocus_limit.desc  "Used when Prevent autofocus is on. If a text input is focused more than this number of milliseconds after you last interacted with the page, it is considered an autofocus.">
 
 <!ENTITY pref.ignore_keyboard_layout.title "Ignore keyboard layout">
-<!ENTITY pref.ignore_keyboard_layout.desc  "Pretend that the en-US QWERTY layout is always used">
+<!ENTITY pref.ignore_keyboard_layout.desc  "Pretend that the en-US QWERTY layout is always used.">
 
 <!ENTITY pref.keyboardevent.code.enabled.title "Enable `KeyboardEvent.code` support">
 <!ENTITY pref.keyboardevent.code.enabled.desc  "Considered &quot;experimental&quot; by Firefox, but works really well. Needed by the Ignore keyboard layout setting. Requires restart.">
