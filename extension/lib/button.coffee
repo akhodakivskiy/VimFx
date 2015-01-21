@@ -228,16 +228,17 @@ updateToolbarButton = (window, { disabled, blacklisted, insertMode }) ->
 
   [ icon, tooltip ] = switch
     when button.VimFx.disabled
-      ['grey', 'disabled']
+      ['grey', _('button_tooltip_disabled')]
     when button.VimFx.blacklisted
-      ['red', 'blacklisted']
+      ['red', _('button_tooltip_blacklisted')]
     when button.VimFx.insertMode
-      ['grey', 'insertMode']
+      keys = require('./modes')['insert'].commands['exit'].keys().join(', ')
+      ['grey', _('button_tooltip_insertMode', keys)]
     else
-      ['normal', 'enabled']
+      ['normal', _('button_tooltip_enabled')]
 
   button.style.listStyleImage = iconUrl(icon)
-  button.setAttribute('tooltiptext', _("button_tooltip_#{ tooltip }"))
+  button.setAttribute('tooltiptext', tooltip)
 
 iconUrl = (kind) ->
   url = utils.getResourceURI("resources/icon16-#{ kind }.png").spec
