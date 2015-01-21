@@ -431,7 +431,6 @@ class Command
     for key, index in @keyValues when typeof key == 'string'
       @keyValues[index] = legacy.convertKey(key)
 
-
   keys: (value) ->
     if value == undefined
       return @keyValues
