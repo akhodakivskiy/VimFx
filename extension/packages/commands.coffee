@@ -319,10 +319,14 @@ command_Esc = (vim, event) ->
 class Command
   constructor: (@group, @name, @func, keys) ->
     @defaultKeys = keys
-    if isPrefSet(@prefName('keys'))
-      try @keyValues = JSON.parse(getPref(@prefName('keys')))
-    else
-      @keyValues = keys
+    @keyValues =
+      if isPrefSet(@prefName('keys'))
+        try JSON.parse(getPref(@prefName('keys')))
+        catch then []
+      else
+        keys
+    for key, index in @keyValues when Array.isArray(key)
+      @keyValues[index] = key.join(',')
 
   # Name of the preference for a given property.
   prefName: (value) -> "commands.#{ @name }.#{ value }"
