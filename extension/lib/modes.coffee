@@ -109,7 +109,7 @@ exports['insert'] =
         storage.count--
     return false
   commands:
-    exit: ['<c-escape>']
+    exit: ['<s-escape>']
 
 exports['find'] =
   onEnter: ->
