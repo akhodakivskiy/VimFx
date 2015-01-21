@@ -1,5 +1,21 @@
 # Change Log
 
+0.5.15 (Jan 21 2015)
+
+- Improved: This version is now forwards-compatible with the upcoming version
+  0.6.0. Downgrading from 0.6.0 to 0.5.14 or older might cause VimFx to crash,
+  but downgrading from 0.6.0 to 0.5.15 is safe.
+- Fixed: Non-hintchars key presses in hints mode are now suppressed. They used
+  to be passed along to the browser, which could confusingly activate site
+  commands.
+- Fixed: The 'f' command now always opens links in the same tab. Links used to
+  be able to force a new tab or window.
+- Fixed: Pressing 'Esc' in the location bar now restores the URL, as is the
+  default behaviour of Firefox. You may now also close Firefox dialogs using
+  'Esc'.
+- Improved: Updated the de locale. Thanks to Alexander Haeussler!
+- Improved: Updated the pl locale. Thanks to morethanoneanimal!
+
 0.5.14 (Aug 16 2014)
 
 - Fixed: Locales should now work properly.
