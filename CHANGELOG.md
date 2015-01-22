@@ -1,3 +1,8 @@
+### 0.5.16 (2015-01-22)
+
+- Fixed: The toolbar button no longer throws errors. (This fix should have been
+  in 0.5.15 but was forgotten. Luckily an AMO reviewer found it.)
+
 ### 0.5.15 (2015-01-21)
 
 - Improved: This version is now forwards-compatible with the upcoming version
