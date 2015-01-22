@@ -6,7 +6,7 @@
   <Description about="urn:mozilla:install-manifest">
     <em:id>VimFx@akhodakivskiy.github.com</em:id>
     <em:homepageURL>http://www.github.com/akhodakivskiy/VimFx</em:homepageURL>
-    <em:version>0.5.15</em:version>
+    <em:version>0.5.16</em:version>
     <em:bootstrap>true</em:bootstrap>
     <em:type>2</em:type>
 

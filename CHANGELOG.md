@@ -1,5 +1,10 @@
 # Change Log
 
+0.5.16 (Jan 22 2015)
+
+- Fixed: The toolbar button no longer throws errors. (This fix should have been
+  in 0.5.15 but was forgotten. Luckily an AMO reviewer found it.)
+
 0.5.15 (Jan 21 2015)
 
 - Improved: This version is now forwards-compatible with the upcoming version
