@@ -2,21 +2,15 @@
 
 ## Reporting issues
 
-First off, write in English!
+_Please_ read the following four lines!
 
-Secondly, search both open and closed issues, to avoid duplicates.
+- Use **English.**
+- Search for **duplicates**—also closed issues.
+- Bugs: Include **VimFx version**, Firefox version, OS and keyboard layout.
+- Feature requests: Include a specific detailed **use case** example.
 
-Include this in bug reports:
 
-- VimFx version, Firefox version, keyboard layout and operating system.
-- Steps to reproduce.
-- Whether the bug is a regression or not (if you know). Bonus points for
-  telling since when the bug appeared.
-
-If you’re suggesting a new feature always state your use case. Try to do it
-both in general and with a really specific example.
-
-Lastly, don’t hesitate to open issues!
+---
 
 
 ## Localizing
