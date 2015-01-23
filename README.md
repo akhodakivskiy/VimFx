@@ -134,7 +134,7 @@ Press <kbd>?</kbd> or use the toolbar button to open it.
 
 ### Insert Mode
 
-    <c-escape>   Return to normal mode
+    <s-escape>   Return to normal mode
 
 ### Find Mode
 
