@@ -72,8 +72,8 @@ injectHints = (window) ->
                                            'important')
 
   hintChars = utils.getHintChars()
-  huffman(markers, {alphabet: hintChars},
-          (marker, hint) -> marker.setHint(hint))
+  tree = huffman.createTree(markers, hintChars.length, {sorted: true})
+  tree.assignCodeWords(hintChars, (marker, hint) -> marker.setHint(hint))
 
   removeHints(document)
   container = utils.createElement(document, 'div', {id: CONTAINER_ID})

@@ -9,7 +9,7 @@
   "private": true,
   "scripts": {},
   "dependencies": {
-    "n-ary-huffman": "^1.0.0",
+    "n-ary-huffman": "^2.1.1",
     "vim-like-key-notation": "~0.1.1"
   },
   "devDependencies": {
