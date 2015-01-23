@@ -28,6 +28,8 @@ ADDON_ID = 'VimFx@akhodakivskiy.github.com'
 
 { classes: Cc, interfaces: Ci, utils: Cu } = Components
 
+HTMLAnchorElement   = Ci.nsIDOMHTMLAnchorElement
+HTMLButtonElement   = Ci.nsIDOMHTMLButtonElement
 HTMLInputElement    = Ci.nsIDOMHTMLInputElement
 HTMLTextAreaElement = Ci.nsIDOMHTMLTextAreaElement
 HTMLSelectElement   = Ci.nsIDOMHTMLSelectElement
@@ -95,8 +97,7 @@ isTextInputElement = (element) ->
          element instanceof HTMLTextAreaElement
 
 isElementEditable = (element) ->
-  return element.isContentEditable or
-         element instanceof HTMLInputElement or
+  return element instanceof HTMLInputElement or
          element instanceof HTMLTextAreaElement or
          element instanceof HTMLSelectElement or
          element instanceof XULMenuListElement or
@@ -108,6 +109,11 @@ isElementGoogleEditable = (element) ->
   return element.getAttribute?('g_editable') == 'true' or
          (element instanceof HTMLElement and
           element.ownerDocument.body?.getAttribute('g_editable') == 'true')
+
+isElementClickable = (element) ->
+  return element instanceof HTMLAnchorElement or
+         element instanceof HTMLButtonElement or
+         isElementEditable(element)
 
 isElementVisible = (element) ->
   document = element.ownerDocument
@@ -461,6 +467,7 @@ exports.getCurrentTabWindow       = getCurrentTabWindow
 exports.blurActiveElement         = blurActiveElement
 exports.isTextInputElement        = isTextInputElement
 exports.isElementEditable         = isElementEditable
+exports.isElementClickable        = isElementClickable
 exports.isElementVisible          = isElementVisible
 exports.getSessionStore           = getSessionStore
 

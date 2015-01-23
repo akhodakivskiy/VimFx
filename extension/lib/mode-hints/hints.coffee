@@ -60,19 +60,44 @@ injectHints = (window) ->
 
   return if markers.length == 0
 
+  # Each marker gets a unique `z-index`, so that it can be determined if a
+  # marker overlaps another. Put more important markers (higher weight) at the
+  # end, so that they get higher `z-index`, in order not to be overlapped.
+  zIndex = Z_INDEX_START
+  setZIndexes = (markers) ->
+    markers.sort((a, b) -> a.weight - b.weight)
+    for marker in markers when marker not instanceof huffman.BranchPoint
+      marker.markerElement.style.setProperty('z-index', zIndex++, 'important')
+
+  # The `markers` passed to this function have been sorted by `setZIndexes` in
+  # advance, so we can skip sorting in the `huffman.createTree` function.
+  hintChars = utils.getHintChars()
+  createHuffmanTree = (markers) ->
+    return huffman.createTree(markers, hintChars.length, {sorted: true})
+
+  semantic   = []
+  unsemantic = []
   for marker in markers
     marker.weight = marker.elementShape.area
+    if utils.isElementClickable(marker.element)
+      semantic.push(marker)
+    else
+      unsemantic.push(marker)
 
-  # Each marker gets a unique `z-index`, so that it can be determined if a
-  # marker overlaps another.  Put more important markers (higher weight) at the
-  # end, so that they get higher `z-index`, in order not to be overlapped.
-  markers.sort((a, b) -> a.weight - b.weight)
-  for marker, index in markers
-    marker.markerElement.style.setProperty('z-index', Z_INDEX_START + index,
-                                           'important')
+  # Semantic elements should always get better hints than unsemantic ones, even
+  # if they are smaller. This is achieved by putting the unsemantic elements in
+  # their own branch of the huffman tree.
+  if unsemantic.length > 0
+    if markers.length > hintChars.length
+      setZIndexes(unsemantic)
+      subTree = createHuffmanTree(unsemantic)
+      semantic.push(subTree)
+    else
+      semantic.push(unsemantic...)
 
-  hintChars = utils.getHintChars()
-  tree = huffman.createTree(markers, hintChars.length, {sorted: true})
+  setZIndexes(semantic)
+
+  tree = createHuffmanTree(semantic)
   tree.assignCodeWords(hintChars, (marker, hint) -> marker.setHint(hint))
 
   removeHints(document)
@@ -86,7 +111,6 @@ injectHints = (window) ->
     marker.setPosition(viewport)
 
   return markers
-
 
 createMarkers = (window, viewport, parents = []) ->
   { document } = window
