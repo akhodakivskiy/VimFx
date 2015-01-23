@@ -13,9 +13,6 @@ Wildcard dibolehkan: *, !. Example: *example.com*,*foobar.org*">
 
 <!ENTITY pref.scroll_step_lines.title     "Langkah Gulung">
 
-<!ENTITY pref.hints_bloom_on.title "Penempatan petunjuk cerdas">
-<!ENTITY pref.hints_bloom_on.desc  "Menempatkan petunjuk lebih pendek untuk pranala yang sering dikunjungi">
-
 <!ENTITY pref.prevent_autofocus.title "Prevent autofocus of text inputs">
 
 <!ENTITY pref.autofocus_limit.title "Autofocus limit">

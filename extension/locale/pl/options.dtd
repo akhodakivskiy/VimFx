@@ -13,9 +13,6 @@ Dopuszczalne wieloznaczniki: *, !. Domyślnie: *mail.google.com*">
 
 <!ENTITY pref.scroll_step_lines.title   "Krok przewijania">
 
-<!ENTITY pref.hints_bloom_on.title "Inteligentne przypisywanie podpowiedzi">
-<!ENTITY pref.hints_bloom_on.desc  "Przypisz krótsze podpowiedzi do linków, które są odwiedzane częściej.">
-
 <!ENTITY pref.prevent_autofocus.title "Wyłącz autofocus pól.">
 
 <!ENTITY pref.autofocus_limit.title "Autofocus limit">

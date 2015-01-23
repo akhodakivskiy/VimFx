@@ -13,9 +13,6 @@
 
 <!ENTITY pref.scroll_step_lines.title "スクロールの度合い">
 
-<!ENTITY pref.hints_bloom_on.title "賢いヒント割り当て">
-<!ENTITY pref.hints_bloom_on.desc  "ユーザーがよく訪れるページに短いヒントを割り当てるようにします">
-
 <!ENTITY pref.prevent_autofocus.title "入力欄によるフォーカスの奪取を妨害">
 
 <!ENTITY pref.autofocus_limit.title "Autofocus limit">

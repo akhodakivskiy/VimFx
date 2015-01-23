@@ -13,9 +13,6 @@
 
 <!ENTITY pref.scroll_step_lines.title   "滚动步长">
 
-<!ENTITY pref.hints_bloom_on.title "智能分配提示符">
-<!ENTITY pref.hints_bloom_on.desc  "为最常访问的链接分配更短的提示符">
-
 <!ENTITY pref.prevent_autofocus.title "阻止自动聚焦输入框">
 
 <!ENTITY pref.autofocus_limit.title "Autofocus limit">

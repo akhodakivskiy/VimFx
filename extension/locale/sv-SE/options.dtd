@@ -13,9 +13,6 @@ Jokertecken tillåts: *, !. Exempel: *example.com*,*foobar.org*.">
 
 <!ENTITY pref.scroll_step_lines.title "Scrollsteg">
 
-<!ENTITY pref.hints_bloom_on.title "Smart etikettstilldelning">
-<!ENTITY pref.hints_bloom_on.desc  "Tilldela kortare etiketter till de länkar som besöks oftast.">
-
 <!ENTITY pref.prevent_autofocus.title "Hindra autofokus för textrutor">
 
 <!ENTITY pref.autofocus_limit.title "Autofokusgräns">

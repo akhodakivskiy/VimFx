@@ -18,10 +18,9 @@
 # along with VimFx.  If not, see <http://www.gnu.org/licenses/>.
 ###
 
-utils       = require('../utils')
-{ getPref } = require('../prefs')
-{ Marker }  = require('./marker')
-huffman     = require('n-ary-huffman')
+utils      = require('../utils')
+{ Marker } = require('./marker')
+huffman    = require('n-ary-huffman')
 
 { interfaces: Ci } = Components
 

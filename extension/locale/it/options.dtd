@@ -13,9 +13,6 @@ Wildcards permesse: *, !. Esempio: *example.com*,*foobar.org*">
 
 <!ENTITY pref.scroll_step_lines.title "Righe di avanzamento">
 
-<!ENTITY pref.hints_bloom_on.title "Suggerimenti intelligenti.">
-<!ENTITY pref.hints_bloom_on.desc  "Assegna suggerimenti più corti ai link che visiti più spesso.">
-
 <!ENTITY pref.prevent_autofocus.title "Previene il focus automatico delle caselle di input">
 
 <!ENTITY pref.autofocus_limit.title "Autofocus limit">

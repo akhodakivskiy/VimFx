@@ -13,9 +13,6 @@
 
 <!ENTITY pref.scroll_step_lines.title   "Шаг прокрутки страницы">
 
-<!ENTITY pref.hints_bloom_on.title "Умное распределение маркеров">
-<!ENTITY pref.hints_bloom_on.desc  "Назначать короткие маркеры ссылкам и элементам, которые часто используются">
-
 <!ENTITY pref.prevent_autofocus.title "Не фокусировать поля ввода автоматически">
 
 <!ENTITY pref.autofocus_limit.title "Autofocus limit">
