@@ -1,5 +1,5 @@
 ###
-# Copyright Anton Khodakivskiy 2013.
+# Copyright Anton Khodakivskiy 2013, 2014.
 # Copyright Simon Lydell 2013, 2014.
 # Copyright Wang Zhuochun 2014.
 #
@@ -20,7 +20,7 @@
 ###
 
 utils                   = require('./utils')
-{ mode_hints }          = require('./mode-hints/mode-hints')
+hints                   = require('./hints')
 { updateToolbarButton } = require('./button')
 { commands
 , searchForMatchingCommand
@@ -128,7 +128,54 @@ exports['find'] =
   commands:
     exit: ['<escape>', '<enter>']
 
-exports['hints'] = mode_hints
+exports['hints'] =
+  onEnter: (vim, storage, callback) ->
+    markers = hints.injectHints(vim.window)
+    if markers?.length > 0
+      storage.markers  = markers
+      storage.callback = callback
+    else
+      vim.enterMode('normal')
+
+  onLeave: (vim, storage) ->
+    hints.removeHints(vim.window.document)
+    storage.markers = storage.callback = undefined
+
+  onInput: (vim, storage, keyStr, event) ->
+    { markers, callback } = storage
+
+    switch
+      when @commands['exit'].match(keyStr)
+        vim.enterMode('normal')
+        return true
+
+      when @commands['rotate_markers_forward'].match(keyStr)
+        hints.rotateOverlappingMarkers(markers, true)
+      when @commands['rotate_markers_backward'].match(keyStr)
+        hints.rotateOverlappingMarkers(markers, false)
+
+      when @commands['delete_hint_char'].match(keyStr)
+        for marker in markers
+          marker.deleteHintChar()
+
+      else
+        if keyStr not in utils.getHintChars()
+          return true
+        for marker in markers
+          marker.matchHintChar(keyStr)
+
+          if marker.isMatched()
+            dontEnterNormalMode = callback(marker, markers)
+            vim.enterMode('normal') unless dontEnterNormalMode
+            break
+
+    return true
+
+  commands:
+    exit:                    ['<escape>']
+    rotate_markers_forward:  ['<space>']
+    rotate_markers_backward: ['<s-space>']
+    delete_hint_char:        ['<backspace>']
 
 for modeName of exports
   mode = exports[modeName]

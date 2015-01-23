@@ -18,7 +18,7 @@
 # along with VimFx.  If not, see <http://www.gnu.org/licenses/>.
 ###
 
-{ createElement } = require('../utils')
+{ createElement } = require('./utils')
 
 # Wraps the markable element and provides methods to manipulate the markers.
 class Marker

@@ -18,7 +18,7 @@
 # along with VimFx.  If not, see <http://www.gnu.org/licenses/>.
 ###
 
-utils      = require('../utils')
+utils      = require('./utils')
 { Marker } = require('./marker')
 huffman    = require('n-ary-huffman')
 
