@@ -18,14 +18,13 @@
 # along with VimFx.  If not, see <http://www.gnu.org/licenses/>.
 ###
 
-{ createElement } = require('./utils')
-
 # Wraps the markable element and provides methods to manipulate the markers.
 class Marker
   # Creates the marker DOM node.
   constructor: (@element, @elementShape) ->
     document = @element.ownerDocument
-    @markerElement = createElement(document, 'div', {class: 'VimFxHintMarker'})
+    @markerElement = document.createElement('div')
+    @markerElement.classList.add('VimFxHintMarker')
 
   show: -> @setVisibility(true)
   hide: -> @setVisibility(false)
@@ -59,10 +58,6 @@ class Marker
     left = Math.max(left, viewport.left)
     top  = Math.max(top,  viewport.top)
 
-    # Make the position relative to the document, rather than to the viewport.
-    left += viewport.scrollX
-    top  += viewport.scrollY
-
     # The positioning is absolute.
     @markerElement.style.left = "#{ left }px"
     @markerElement.style.top  = "#{ top }px"
@@ -85,7 +80,7 @@ class Marker
 
     fragment = document.createDocumentFragment()
     for char in @hintChars
-      charContainer = createElement(document, 'span')
+      charContainer = document.createElement('span')
       charContainer.textContent = char.toUpperCase()
       fragment.appendChild(charContainer)
 

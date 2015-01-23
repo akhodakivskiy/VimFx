@@ -130,16 +130,17 @@ exports['find'] =
 
 exports['hints'] =
   onEnter: (vim, storage, callback) ->
-    markers = hints.injectHints(vim.window)
-    if markers?.length > 0
-      storage.markers  = markers
-      storage.callback = callback
+    [ markers, container ] = hints.injectHints(vim.rootWindow, vim.window)
+    if markers.length > 0
+      storage.markers   = markers
+      storage.container = container
+      storage.callback  = callback
     else
       vim.enterMode('normal')
 
   onLeave: (vim, storage) ->
-    hints.removeHints(vim.window.document)
-    storage.markers = storage.callback = undefined
+    storage.container?.remove()
+    storage.markers = storage.container = storage.callback = undefined
 
   onInput: (vim, storage, keyStr, event) ->
     { markers, callback } = storage

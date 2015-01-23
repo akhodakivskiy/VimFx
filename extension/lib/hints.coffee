@@ -27,25 +27,8 @@ huffman    = require('n-ary-huffman')
 HTMLDocument = Ci.nsIDOMHTMLDocument
 XULDocument  = Ci.nsIDOMXULDocument
 
-CONTAINER_ID  = 'VimFxHintMarkerContainer'
-Z_INDEX_START = 2147480001 # The highest `z-index` used in style.css plus one.
-# In theory, `z-index` can be infinitely large. In practice, Firefox uses a
-# 32-bit signed integer to store it, so the maximum value is 2147483647
-# (http://www.puidokas.com/max-z-index/). Youtube (insanely) uses 1999999999 for
-# its top bar. So by using 2147480001 as a base, we trump that value with lots
-# of margin, still leaving a few thousand values for markers, which should be
-# more than enough. Hopefully no sites are crazy enough to use even higher
-# values.
-
-
-removeHints = (document) ->
-  document.getElementById(CONTAINER_ID)?.remove()
-
-
-injectHints = (window) ->
-  { document } = window
-
-  { clientWidth, clientHeight } = document.documentElement
+injectHints = (rootWindow, window) ->
+  { clientWidth, clientHeight } = window.document.documentElement
   viewport =
     left:    0
     top:     0
@@ -53,20 +36,18 @@ injectHints = (window) ->
     bottom:  clientHeight
     width:   clientWidth
     height:  clientHeight
-    scrollX: window.scrollX
-    scrollY: window.scrollY
   markers = createMarkers(window, viewport)
 
-  return if markers.length == 0
+  return [[], null] if markers.length == 0
 
   # Each marker gets a unique `z-index`, so that it can be determined if a
   # marker overlaps another. Put more important markers (higher weight) at the
   # end, so that they get higher `z-index`, in order not to be overlapped.
-  zIndex = Z_INDEX_START
+  zIndex = 0
   setZIndexes = (markers) ->
     markers.sort((a, b) -> a.weight - b.weight)
     for marker in markers when marker not instanceof huffman.BranchPoint
-      marker.markerElement.style.setProperty('z-index', zIndex++, 'important')
+      marker.markerElement.style.zIndex = zIndex++
 
   # The `markers` passed to this function have been sorted by `setZIndexes` in
   # advance, so we can skip sorting in the `huffman.createTree` function.
@@ -99,9 +80,9 @@ injectHints = (window) ->
   tree = createHuffmanTree(semantic)
   tree.assignCodeWords(hintChars, (marker, hint) -> marker.setHint(hint))
 
-  removeHints(document)
-  container = utils.createElement(document, 'div', {id: CONTAINER_ID})
-  document.documentElement.appendChild(container)
+  container = rootWindow.document.createElement('box')
+  container.classList.add('VimFxMarkersContainer')
+  rootWindow.gBrowser.mCurrentBrowser.parentNode.appendChild(container)
 
   for marker in markers
     container.appendChild(marker.markerElement)
@@ -109,7 +90,7 @@ injectHints = (window) ->
     # marker.coffee).
     marker.setPosition(viewport)
 
-  return markers
+  return [markers, container]
 
 createMarkers = (window, viewport, parents = []) ->
   { document } = window
@@ -355,8 +336,7 @@ rotateOverlappingMarkers = (originalMarkers, forward) ->
       indexStack.push(indexStack.shift())
 
     for marker, index in stack
-      marker.markerElement.style.setProperty('z-index', indexStack[index],
-                                             'important')
+      marker.markerElement.style.zIndex = indexStack[index]
 
   return
 
@@ -388,5 +368,4 @@ getStackFor = (marker, markers) ->
 
 
 exports.injectHints              = injectHints
-exports.removeHints              = removeHints
 exports.rotateOverlappingMarkers = rotateOverlappingMarkers
