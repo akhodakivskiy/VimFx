@@ -112,7 +112,9 @@ isElementGoogleEditable = (element) ->
 isElementVisible = (element) ->
   document = element.ownerDocument
   window   = document.defaultView
-  computedStyle = window.getComputedStyle(element, null)
+  # `.getComputedStyle()` may return `null` if the computed style isn’t
+  # availble yet. If so, consider the element not visible.
+  return false unless computedStyle = window.getComputedStyle(element, null)
   return computedStyle.getPropertyValue('visibility') == 'visible' and
          computedStyle.getPropertyValue('display') != 'none' and
          computedStyle.getPropertyValue('opacity') != '0'

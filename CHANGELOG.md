@@ -1,3 +1,8 @@
+### 0.5.17 (2015-01-23)
+
+- Fixed: The hints generation no longer crashes on some pages (regression since
+  version 0.5.15).
+
 ### 0.5.16 (2015-01-22)
 
 - Fixed: The toolbar button no longer throws errors. (This fix should have been
