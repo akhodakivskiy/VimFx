@@ -115,7 +115,9 @@ createMarkers = (window, viewport, parents = []) ->
       right:  clientWidth  + Math.min(viewport.right  - rect.right,  0)
       bottom: clientHeight + Math.min(viewport.bottom - rect.bottom, 0)
 
-    computedStyle = window.getComputedStyle(frame.frameElement)
+    # `.getComputedStyle()` may return `null` if the computed style isn’t
+    # availble yet. If so, consider the element not visible.
+    continue unless computedStyle = window.getComputedStyle(frame.frameElement)
     offset =
       left: rect.left +
         parseFloat(computedStyle.getPropertyValue('border-left-width')) +
