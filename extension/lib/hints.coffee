@@ -28,14 +28,25 @@ HTMLDocument = Ci.nsIDOMHTMLDocument
 XULDocument  = Ci.nsIDOMXULDocument
 
 injectHints = (rootWindow, window) ->
-  { clientWidth, clientHeight } = window.document.documentElement
-  viewport =
+  {
+    clientWidth, clientHeight # Viewport size excluding scrollbars, usually.
+    scrollWidth, scrollHeight
+  } = window.document.documentElement
+  { innerWidth, innerHeight } = window # Viewport size including scrollbars.
+  # We don’t want markers to cover the scrollbars, so we should use
+  # `clientWidth` and `clientHeight`. However, when there are no scrollbars
+  # those might be too small. Then we use `innerWidth` and `innerHeight`.
+  width  = if scrollWidth  > innerWidth  then clientWidth  else innerWidth
+  height = if scrollHeight > innerHeight then clientHeight else innerHeight
+  viewport = {
     left:    0
     top:     0
-    right:   clientWidth
-    bottom:  clientHeight
-    width:   clientWidth
-    height:  clientHeight
+    right:   width
+    bottom:  height
+    width
+    height
+  }
+
   markers = createMarkers(window, viewport)
 
   return [[], null] if markers.length == 0
