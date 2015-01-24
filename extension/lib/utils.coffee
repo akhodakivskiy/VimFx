@@ -154,7 +154,7 @@ simulateClick = (element, modifiers = {}) ->
     mouseEvent = document.createEvent('MouseEvents')
     mouseEvent.initMouseEvent(
       event, true, true, window, 1, 0, 0, 0, 0,
-      modifiers.ctrlKey, false, false, modifiers.metaKey,
+      modifiers.ctrlKey, false, modifiers.shiftKey, modifiers.metaKey,
       0, null
     )
     simulated_events.set(mouseEvent, true)

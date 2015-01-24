@@ -261,7 +261,7 @@ command_close_tab = (vim, event, count) ->
 command_restore_tab = (vim, event, count) ->
   vim.rootWindow.undoCloseTab() for [1..count]
 
-helper_follow = ({ inTab, multiple }, vim, event, count) ->
+helper_follow = ({ inTab, multiple, inWindow }, vim, event, count) ->
   callback = (matchedMarker, markers) ->
     if matchedMarker.element.target == '_blank'
       targetReset = matchedMarker.element.target
@@ -270,7 +270,7 @@ helper_follow = ({ inTab, multiple }, vim, event, count) ->
     matchedMarker.element.focus()
 
     inTab = if count > 1 then true else inTab
-    utils.simulateClick(matchedMarker.element, {metaKey: inTab, ctrlKey: inTab})
+    utils.simulateClick(matchedMarker.element, {metaKey: inTab, ctrlKey: inTab, shiftKey: inWindow})
 
     matchedMarker.element.target = targetReset if targetReset
 
@@ -291,6 +291,8 @@ command_follow = helper_follow.bind(undefined, {inTab: false})
 # Follow links in a new Tab with hint markers.
 command_follow_in_tab = helper_follow.bind(undefined, {inTab: true})
 
+# Follow link with hint markers in a new window.
+command_follow_in_window = helper_follow.bind(undefined, {inTab: false, inWindow: true})
 # Follow multiple links with hint markers.
 command_follow_multiple = helper_follow.bind(undefined,
                                              {inTab: true, multiple: true})
@@ -499,6 +501,7 @@ commands = [
 
   new Command('browse', 'follow',                command_follow,                [['f']])
   new Command('browse', 'follow_in_tab',         command_follow_in_tab,         [['F']])
+  new Command('browse', 'follow_in_window',      command_follow_in_window,      [['n', 'f']])
   new Command('browse', 'follow_multiple',       command_follow_multiple,       [['a', 'f']])
   new Command('browse', 'follow_previous',       command_follow_prev,           [['[']])
   new Command('browse', 'follow_next',           command_follow_next,           [[']']])
