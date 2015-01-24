@@ -75,9 +75,13 @@ command_marker_yank = (vim) ->
 
   vim.enterMode('hints', callback)
 
-# Focus element.
+# Focus element and select it.
 command_marker_focus = (vim) ->
-  callback = (marker) -> marker.element.focus()
+  callback = (marker) ->
+    if utils.isTextInputElement(marker.element)
+      marker.element.select()
+    else
+      marker.element.focus()
 
   vim.enterMode('hints', callback)
 
