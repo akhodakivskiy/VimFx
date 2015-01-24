@@ -19,14 +19,15 @@
 # along with VimFx.  If not, see <http://www.gnu.org/licenses/>.
 ###
 
-utils                   = require('./utils')
-hints                   = require('./hints')
-{ updateToolbarButton } = require('./button')
+utils                        = require('./utils')
+{ injectHints }              = require('./hints')
+{ rotateOverlappingMarkers } = require('./marker')
+{ updateToolbarButton }      = require('./button')
 { commands
 , searchForMatchingCommand
 , escapeCommand
 , Command
-, findStorage }         = require('./commands')
+, findStorage }              = require('./commands')
 
 { interfaces: Ci } = Components
 
@@ -130,8 +131,7 @@ exports['find'] =
 
 exports['hints'] =
   onEnter: (vim, storage, filter, callback) ->
-    [ markers, container ] = hints.injectHints(vim.rootWindow, vim.window,
-                                               filter)
+    [ markers, container ] = injectHints(vim.rootWindow, vim.window, filter)
     if markers.length > 0
       storage.markers   = markers
       storage.container = container
@@ -159,9 +159,9 @@ exports['hints'] =
         return true
 
       when @commands['rotate_markers_forward'].match(keyStr)
-        hints.rotateOverlappingMarkers(markers, true)
+        rotateOverlappingMarkers(markers, true)
       when @commands['rotate_markers_backward'].match(keyStr)
-        hints.rotateOverlappingMarkers(markers, false)
+        rotateOverlappingMarkers(markers, false)
 
       when @commands['delete_hint_char'].match(keyStr)
         for marker in markers
