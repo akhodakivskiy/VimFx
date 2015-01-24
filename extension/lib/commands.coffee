@@ -76,7 +76,7 @@ command_marker_yank = (vim) ->
   vim.enterMode('hints', callback)
 
 # Focus element and select it.
-command_marker_focus = (vim) ->
+command_marker_focus_or_select = (vim) ->
   callback = (marker) ->
     if utils.isTextInputElement(marker.element)
       marker.element.select()
@@ -465,7 +465,7 @@ commands = [
   new Command('urls',   'paste',                 command_paste,                 [['p']])
   new Command('urls',   'paste_tab',             command_paste_tab,             [['P']])
   new Command('urls',   'marker_yank',           command_marker_yank,           [['y', 'f']])
-  new Command('urls',   'marker_focus',          command_marker_focus,          [['v', 'f']])
+  new Command('urls',   'marker_focus_or_select',command_marker_focus_or_select,[['v', 'f']])
   new Command('urls',   'yank',                  command_yank,                  [['y', 'y']])
   new Command('urls',   'reload',                command_reload,                [['r']])
   new Command('urls',   'reload_force',          command_reload_force,          [['R']])
