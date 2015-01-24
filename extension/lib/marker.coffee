@@ -26,12 +26,14 @@ class Marker
     @markerElement = document.createElement('div')
     @markerElement.classList.add('VimFxHintMarker')
 
+  reset: ->
+    @setHint(@hint)
+    @show()
+
   show: -> @setVisibility(true)
   hide: -> @setVisibility(false)
   setVisibility: (visible) ->
     @markerElement.classList.toggle('VimFxHiddenHintMarker', not visible)
-  updateVisibility: ->
-    if @hintChars.startsWith(@enteredHintChars) then @show() else @hide()
 
   # To be called when the marker has been both assigned a hint and inserted
   # into the DOM, and thus gotten a height and width.
@@ -69,9 +71,8 @@ class Marker
       height, width
     }
 
-  setHint: (@hintChars) ->
-    # Hint chars that have been matched so far.
-    @enteredHintChars = ''
+  setHint: (@hint) ->
+    @hintIndex = 0
 
     document = @element.ownerDocument
 
@@ -79,32 +80,29 @@ class Marker
       @markerElement.firstChild.remove()
 
     fragment = document.createDocumentFragment()
-    for char in @hintChars
+    for char in @hint
       charContainer = document.createElement('span')
-      charContainer.textContent = char.toUpperCase()
+      charContainer.textContent = char
       fragment.appendChild(charContainer)
 
     @markerElement.appendChild(fragment)
 
   matchHintChar: (char) ->
-    @toggleLastHintChar(true)
-    @enteredHintChars += char.toLowerCase()
-    @updateVisibility()
+    if char == @hint[@hintIndex]
+      @toggleLastHintChar(true)
+      @hintIndex++
+      return true
+    return false
 
   deleteHintChar: ->
-    @enteredHintChars = @enteredHintChars[...-1]
-    @toggleLastHintChar(false)
-    @updateVisibility()
+    if @hintIndex > 0
+      @hintIndex--
+      @toggleLastHintChar(false)
 
   toggleLastHintChar: (visible) ->
-    @markerElement.children[@enteredHintChars.length]
-      ?.classList.toggle('VimFxCharMatch', visible)
+    @markerElement.children[@hintIndex]
+      .classList.toggle('VimFxCharMatch', visible)
 
-  isMatched: ->
-    return @hintChars == @enteredHintChars
-
-  reset: ->
-    @setHint(@hintChars)
-    @show()
+  isMatched: -> (@hintIndex == @hint.length)
 
 exports.Marker = Marker

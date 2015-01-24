@@ -135,12 +135,14 @@ exports['hints'] =
       storage.markers   = markers
       storage.container = container
       storage.callback  = callback
+      storage.numEnteredChars = 0
     else
       vim.enterMode('normal')
 
   onLeave: (vim, storage) ->
     storage.container?.remove()
-    storage.markers = storage.container = storage.callback = undefined
+    for key of storage
+      storage[key] = null
 
   onInput: (vim, storage, keyStr, event) ->
     { markers, callback } = storage
@@ -157,18 +159,22 @@ exports['hints'] =
 
       when @commands['delete_hint_char'].match(keyStr)
         for marker in markers
-          marker.deleteHintChar()
+          switch marker.hintIndex - storage.numEnteredChars
+            when  0 then marker.deleteHintChar()
+            when -1 then marker.show()
+        storage.numEnteredChars-- unless storage.numEnteredChars == 0
 
       else
         if keyStr not in utils.getHintChars()
           return true
-        for marker in markers
-          marker.matchHintChar(keyStr)
-
+        for marker in markers when marker.hintIndex == storage.numEnteredChars
+          match = marker.matchHintChar(keyStr)
+          marker.hide() unless match
           if marker.isMatched()
             dontEnterNormalMode = callback(marker, markers)
             vim.enterMode('normal') unless dontEnterNormalMode
             break
+        storage.numEnteredChars++
 
     return true
 
