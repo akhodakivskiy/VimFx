@@ -19,7 +19,6 @@
 ###
 
 utils      = require('./utils')
-{ Marker } = require('./marker')
 huffman    = require('n-ary-huffman')
 
 { interfaces: Ci } = Components
@@ -27,7 +26,7 @@ huffman    = require('n-ary-huffman')
 HTMLDocument = Ci.nsIDOMHTMLDocument
 XULDocument  = Ci.nsIDOMXULDocument
 
-injectHints = (rootWindow, window) ->
+injectHints = (rootWindow, window, filter) ->
   {
     clientWidth, clientHeight # Viewport size excluding scrollbars, usually.
     scrollWidth, scrollHeight
@@ -47,7 +46,10 @@ injectHints = (rootWindow, window) ->
     height
   }
 
-  markers = createMarkers(window, viewport)
+  groups = {semantic: [], unsemantic: []}
+  createMarkers(window, viewport, groups, filter)
+  { semantic, unsemantic } = groups
+  markers = semantic.concat(unsemantic)
 
   return [[], null] if markers.length == 0
 
@@ -66,18 +68,9 @@ injectHints = (rootWindow, window) ->
   createHuffmanTree = (markers) ->
     return huffman.createTree(markers, hintChars.length, {sorted: true})
 
-  semantic   = []
-  unsemantic = []
-  for marker in markers
-    marker.weight = marker.elementShape.area
-    if utils.isElementClickable(marker.element)
-      semantic.push(marker)
-    else
-      unsemantic.push(marker)
-
-  # Semantic elements should always get better hints than unsemantic ones, even
-  # if they are smaller. This is achieved by putting the unsemantic elements in
-  # their own branch of the huffman tree.
+  # Semantic elements should always get better hints and higher `z-index`:es
+  # than unsemantic ones, even if they are smaller. The latter is achieved by
+  # putting the unsemantic elements in their own branch of the huffman tree.
   if unsemantic.length > 0
     if markers.length > hintChars.length
       setZIndexes(unsemantic)
@@ -103,20 +96,26 @@ injectHints = (rootWindow, window) ->
 
   return [markers, container]
 
-createMarkers = (window, viewport, parents = []) ->
+# `filter` is a function that is given every element in every frame of the page.
+# It should return new `Marker`s for markable elements and a falsy value for all
+# other elements. All returned `Marker`s are added to `groups`. `groups` is
+# modified instead of using return values to avoid array concatenation for each
+# frame. It might sound expensive to go through _every_ element, but that’s
+# actually what other methods like using XPath or CSS selectors would need to do
+# anyway behind the scenes.
+createMarkers = (window, viewport, groups, filter, parents = []) ->
   { document } = window
-  markers = []
 
   # For now we aren't able to handle hint markers in XUL Documents :(
   return [] unless document instanceof HTMLDocument
 
-  candidates = utils.getMarkableElements(document, {type: 'all'})
-  for element in candidates
-    shape = getElementShape(window, element, viewport, parents)
-    # If `element` has no visible shape then it shouldn’t get any marker.
-    continue unless shape
-
-    markers.push(new Marker(element, shape))
+  localGetElementShape = getElementShape.bind(null, window, viewport, parents)
+  for element in document.getElementsByTagName('*')
+    continue unless marker = filter(element, localGetElementShape)
+    if marker.semantic
+      groups.semantic.push(marker)
+    else
+      groups.unsemantic.push(marker)
 
   for frame in window.frames
     rect = frame.frameElement.getBoundingClientRect() # Frames only have one.
@@ -141,11 +140,10 @@ createMarkers = (window, viewport, parents = []) ->
         parseFloat(computedStyle.getPropertyValue('border-top-width')) +
         parseFloat(computedStyle.getPropertyValue('padding-top'))
 
-    frameMarkers = createMarkers(frame, frameViewport,
-                                 parents.concat({ window, offset }))
-    markers.push(frameMarkers...)
+    createMarkers(frame, frameViewport, groups, filter,
+                  parents.concat({ window, offset }))
 
-  return markers
+  return
 
 # Returns the “shape” of `element`:
 #
@@ -160,7 +158,7 @@ createMarkers = (window, viewport, parents = []) ->
 #
 # Returns `null` if `element` is outside `viewport` or entirely covered by other
 # elements.
-getElementShape = (window, element, viewport, parents) ->
+getElementShape = (window, viewport, parents, element) ->
   # `element.getClientRects()` returns a list of rectangles, usually just one,
   # which is identical to the one returned by `element.getBoundingClientRect()`.
   # However, if `element` is inline and line-wrapped, then it returns one
@@ -186,7 +184,7 @@ getElementShape = (window, element, viewport, parents) ->
         # Those are still clickable. Therefore we return the shape of the first
         # visible child instead. At least in that example, that’s the best bet.
         for child in element.children
-          shape = getElementShape(window, child, viewport, parents)
+          shape = getElementShape(window, viewport, parents, child)
           return shape if shape
     return null
 

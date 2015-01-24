@@ -92,38 +92,33 @@ blurActiveElement = (window) ->
   if activeElement and isElementEditable(activeElement)
     activeElement.blur()
 
+isProperLink = (element) ->
+  return element instanceof HTMLAnchorElement and
+         not element.href.endsWith('#') and
+         not element.href.startsWith('javascript:')
+
 isTextInputElement = (element) ->
-  return element instanceof HTMLInputElement or
+  return (element instanceof HTMLInputElement and element.type in [
+           'text', 'search', 'tel', 'url', 'email', 'password', 'number'
+         ]) or
          element instanceof HTMLTextAreaElement
+
+isContentEditable = (element) ->
+  return element.isContentEditable or
+         isGoogleEditable(element)
+
+isGoogleEditable = (element) ->
+  # `g_editable` is a non-standard attribute commonly used by Google.
+  return element.getAttribute?('g_editable') == 'true' or
+         (element instanceof HTMLElement and
+          element.ownerDocument.body?.getAttribute('g_editable') == 'true')
 
 isElementEditable = (element) ->
   return element instanceof HTMLInputElement or
          element instanceof HTMLTextAreaElement or
          element instanceof HTMLSelectElement or
          element instanceof XULMenuListElement or
-         element.isContentEditable or
-         isElementGoogleEditable(element)
-
-isElementGoogleEditable = (element) ->
-  # `g_editable` is a non-standard attribute commonly used by Google.
-  return element.getAttribute?('g_editable') == 'true' or
-         (element instanceof HTMLElement and
-          element.ownerDocument.body?.getAttribute('g_editable') == 'true')
-
-isElementClickable = (element) ->
-  return element instanceof HTMLAnchorElement or
-         element instanceof HTMLButtonElement or
-         isElementEditable(element)
-
-isElementVisible = (element) ->
-  document = element.ownerDocument
-  window   = document.defaultView
-  # `.getComputedStyle()` may return `null` if the computed style isn’t
-  # availble yet. If so, consider the element not visible.
-  return false unless computedStyle = window.getComputedStyle(element, null)
-  return computedStyle.getPropertyValue('visibility') == 'visible' and
-         computedStyle.getPropertyValue('display') != 'none' and
-         computedStyle.getPropertyValue('opacity') != '0'
+         isContentEditable(element)
 
 getSessionStore = ->
   Cc['@mozilla.org/browser/sessionstore;1'].getService(Ci.nsISessionStore)
@@ -373,90 +368,6 @@ removeDuplicates = (array) ->
   return `[...new Set(array)]`
   # coffeelint: enable=no_backticks
 
-# Why isn’t `a[@href]` used, when `area[@href]` is? Some sites (such as
-# StackExchange sites) leave out the `href` property and use the anchor as a
-# JavaScript-powered button (instead of just using the `button` element).
-ACTION_ELEMENT_TAGS = [
-  'a'
-  'area[@href]'
-  'button'
-  # When viewing an image directly, and it is larger than the viewport,
-  # clicking it toggles zoom.
-  'img[contains(@class, "decoded") and
-     (contains(@class, "overflowing") or
-     contains(@class, "shrinkToFit"))]'
-]
-
-ACTION_ELEMENT_PROPERTIES = [
-  '@onclick'
-  '@onmousedown'
-  '@onmouseup'
-  '@oncommand'
-  '@role="link"'
-  '@role="button"'
-  'contains(@class, "button")'
-  'contains(@class, "js-new-tweets-bar")'
-]
-
-EDITABLE_ELEMENT_TAGS = [
-  'textarea'
-  'select'
-  'input[not(@type="hidden" or @disabled)]'
-]
-
-EDITABLE_ELEMENT_PROPERTIES = [
-  '@contenteditable=""'
-  'translate(@contenteditable, "TRUE", "true")="true"'
-]
-
-FOCUSABLE_ELEMENT_TAGS = [
-  'frame'
-  'iframe'
-  'embed'
-  'object'
-]
-
-FOCUSABLE_ELEMENT_PROPERTIES = [
-  '@tabindex!=-1'
-]
-
-getMarkableElements = do ->
-  xpathify = (tags, properties) ->
-    return tags
-      .concat("*[#{ properties.join(' or ') }]")
-      .map((rule) -> "//#{ rule } | //xhtml:#{ rule }")
-      .join(' | ')
-
-  xpaths =
-    action:    xpathify(ACTION_ELEMENT_TAGS,    ACTION_ELEMENT_PROPERTIES   )
-    editable:  xpathify(EDITABLE_ELEMENT_TAGS,  EDITABLE_ELEMENT_PROPERTIES )
-    focusable: xpathify(FOCUSABLE_ELEMENT_TAGS, FOCUSABLE_ELEMENT_PROPERTIES)
-    all: xpathify(
-      # coffeelint: disable=max_line_length
-      [ACTION_ELEMENT_TAGS...,       EDITABLE_ELEMENT_TAGS...,       FOCUSABLE_ELEMENT_TAGS...      ],
-      [ACTION_ELEMENT_PROPERTIES..., EDITABLE_ELEMENT_PROPERTIES..., FOCUSABLE_ELEMENT_PROPERTIES...]
-      # coffeelint: enable=max_line_length
-    )
-
-  # The actual function that will return the desired elements.
-  return (document, { type }) ->
-    return xpathQueryAll(document, xpaths[type])
-
-xpathHelper = (node, query, resultType) ->
-  document = node.ownerDocument ? node
-  namespaceResolver = (namespace) ->
-    if namespace == 'xhtml' then 'http://www.w3.org/1999/xhtml' else null
-  return document.evaluate(query, node, namespaceResolver, resultType, null)
-
-xpathQuery = (node, query) ->
-  result = xpathHelper(node, query, XPathResult.FIRST_ORDERED_NODE_TYPE)
-  return result.singleNodeValue
-
-xpathQueryAll = (node, query) ->
-  result = xpathHelper(node, query, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE)
-  return (result.snapshotItem(i) for i in [0...result.snapshotLength] by 1)
-
-
 exports.Bucket                    = Bucket
 exports.getEventWindow            = getEventWindow
 exports.getEventRootWindow        = getEventRootWindow
@@ -465,10 +376,10 @@ exports.getRootWindow             = getRootWindow
 exports.getCurrentTabWindow       = getCurrentTabWindow
 
 exports.blurActiveElement         = blurActiveElement
+exports.isProperLink              = isProperLink
 exports.isTextInputElement        = isTextInputElement
+exports.isContentEditable         = isContentEditable
 exports.isElementEditable         = isElementEditable
-exports.isElementClickable        = isElementClickable
-exports.isElementVisible          = isElementVisible
 exports.getSessionStore           = getSessionStore
 
 exports.loadCss                   = loadCss
@@ -500,7 +411,4 @@ exports.getHintChars              = getHintChars
 exports.removeDuplicates          = removeDuplicates
 exports.removeDuplicateCharacters = removeDuplicateCharacters
 exports.getResourceURI            = getResourceURI
-exports.getMarkableElements       = getMarkableElements
-exports.xpathQuery                = xpathQuery
-exports.xpathQueryAll             = xpathQueryAll
 exports.ADDON_ID                  = ADDON_ID

@@ -108,7 +108,8 @@
     text-transform: uppercase;
 }
 
-.VimFxCharMatch {
+.VimFxCharMatch,
+.VimFxMatchedHintMarker {
     color: #ffa22a;
 }
 

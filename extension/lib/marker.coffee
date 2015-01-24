@@ -21,10 +21,11 @@
 # Wraps the markable element and provides methods to manipulate the markers.
 class Marker
   # Creates the marker DOM node.
-  constructor: (@element, @elementShape) ->
+  constructor: (@element, @elementShape, { @semantic, @type }) ->
     document = @element.ownerDocument
     @markerElement = document.createElement('div')
     @markerElement.classList.add('VimFxHintMarker')
+    @weight = @elementShape.area
 
   reset: ->
     @setHint(@hint)
@@ -104,5 +105,8 @@ class Marker
       .classList.toggle('VimFxCharMatch', visible)
 
   isMatched: -> (@hintIndex == @hint.length)
+
+  markMatched: (matched) ->
+    @markerElement.classList.toggle('VimFxMatchedHintMarker', matched)
 
 exports.Marker = Marker

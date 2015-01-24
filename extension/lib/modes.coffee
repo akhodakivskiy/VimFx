@@ -129,8 +129,9 @@ exports['find'] =
     exit: ['<escape>', '<enter>']
 
 exports['hints'] =
-  onEnter: (vim, storage, callback) ->
-    [ markers, container ] = hints.injectHints(vim.rootWindow, vim.window)
+  onEnter: (vim, storage, filter, callback) ->
+    [ markers, container ] = hints.injectHints(vim.rootWindow, vim.window,
+                                               filter)
     if markers.length > 0
       storage.markers   = markers
       storage.container = container
@@ -140,7 +141,10 @@ exports['hints'] =
       vim.enterMode('normal')
 
   onLeave: (vim, storage) ->
-    storage.container?.remove()
+    { container } = storage
+    vim.rootWindow.setTimeout((->
+      container?.remove()
+    ), @timeout)
     for key of storage
       storage[key] = null
 
@@ -149,6 +153,8 @@ exports['hints'] =
 
     switch
       when @commands['exit'].match(keyStr)
+        # Remove the hints immediately.
+        storage.container?.remove()
         vim.enterMode('normal')
         return true
 
@@ -167,16 +173,29 @@ exports['hints'] =
       else
         if keyStr not in utils.getHintChars()
           return true
+        matchedMarker = null
         for marker in markers when marker.hintIndex == storage.numEnteredChars
           match = marker.matchHintChar(keyStr)
           marker.hide() unless match
           if marker.isMatched()
-            dontEnterNormalMode = callback(marker, markers)
-            vim.enterMode('normal') unless dontEnterNormalMode
-            break
+            marker.markMatched(true)
+            matchedMarker = marker
+        if matchedMarker
+          again = callback(matchedMarker)
+          if again
+            vim.rootWindow.setTimeout((->
+              matchedMarker.markMatched(false)
+            ), @timeout)
+            marker.reset() for marker in markers
+            storage.numEnteredChars = 0
+          else
+            vim.enterMode('normal')
+          return true
         storage.numEnteredChars++
 
     return true
+
+  timeout: 200
 
   commands:
     exit:                    ['<escape>']

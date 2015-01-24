@@ -19,14 +19,17 @@
 # along with VimFx.  If not, see <http://www.gnu.org/licenses/>.
 ###
 
-notation = require('vim-like-key-notation')
-legacy   = require('./legacy')
-utils    = require('./utils')
-help     = require('./help')
-_        = require('./l10n')
+notation   = require('vim-like-key-notation')
+{ Marker } = require('./marker')
+legacy     = require('./legacy')
+utils      = require('./utils')
+help       = require('./help')
+_          = require('./l10n')
 { getPref
 , setPref
 , isPrefSet } = require('./prefs')
+
+{ isProperLink, isTextInputElement, isContentEditable } = utils
 
 { classes: Cc, interfaces: Ci, utils: Cu } = Components
 
@@ -63,23 +66,6 @@ command_paste_tab = (vim) ->
   { url, postData } = helper_paste(vim)
   vim.rootWindow.gBrowser.selectedTab =
     vim.rootWindow.gBrowser.addTab(url, null, null, postData, null, false)
-
-# Copy the URL or text of a marker element to the system clipboard.
-command_marker_yank = (vim) ->
-  callback = (marker) ->
-    if url = marker.element.href
-      marker.element.focus()
-      utils.writeToClipboard(url)
-    else if utils.isTextInputElement(marker.element)
-      utils.writeToClipboard(marker.element.value)
-
-  vim.enterMode('hints', callback)
-
-# Focus element.
-command_marker_focus = (vim) ->
-  callback = (marker) -> marker.element.focus()
-
-  vim.enterMode('hints', callback)
 
 # Copy the current URL to the system clipboard.
 command_yank = (vim) ->
@@ -261,68 +247,160 @@ command_close_tab = (vim, event, count) ->
 command_restore_tab = (vim, event, count) ->
   vim.rootWindow.undoCloseTab() for [1..count]
 
-helper_follow = ({ inTab, multiple }, vim, event, count) ->
-  callback = (matchedMarker, markers) ->
-    if matchedMarker.element.target == '_blank'
-      targetReset = matchedMarker.element.target
-      matchedMarker.element.target = ''
+# Follow links, focus text inputs and click buttons with hint markers.
+command_follow = (vim, event, count) ->
+  filter = (element, getElementShape) ->
+    semantic = true
+    switch
+      when isProperLink(element)
+        type = 'link'
+      when isTextInputElement(element), isContentEditable(element)
+        type = 'text'
+      when element.tabIndex > -1
+        type = 'clickable'
+        unless element.nodeName in ['A', 'INPUT', 'BUTTON', 'SELECT']
+          semantic = false
+      when element.hasAttribute('onclick') or
+           element.hasAttribute('onmousedown') or
+           element.hasAttribute('onmouseup') or
+           element.hasAttribute('oncommand') or
+           element.getAttribute('role') in ['link', 'button'] or
+           # Twitter special-case.
+           element.classList.contains('js-new-tweets-bar')
+        type = 'clickable'
+        semantic = false
+      # Putting markers on `<label>` elements is generally redundant, because
+      # its `<input>` gets one. However, some sites hide the actual `<input>`
+      # but keeps the `<label>` to click, either for styling purposes or to keep
+      # the `<input>` hidden until it is used. In those cases we should add a
+      # marker for the `<label>`.
+      when element.nodeName == 'LABEL'
+        if element.htmlFor
+          input = element.ownerDocument.getElementById(element.htmlFor)
+          if input and not getElementShape(input)
+            type = 'clickable'
+      # Elements that have “button” somewhere in the class might be clickable,
+      # unless they contain a real link or button in which case they likely are
+      # “button-wrapper”s. (`<SVG element>.className` is not a string!)
+      when typeof element.className == 'string' and
+           element.className.toLowerCase().contains('button')
+        unless element.querySelector('a, button')
+          type = 'clickable'
+          semantic = false
+      # When viewing an image it should get a marker to toggle zoom.
+      when element.ownerDocument.body.childElementCount == 1 and
+           element.nodeName == 'IMG' and
+           (element.classList.contains('overflowing') or
+            element.classList.contains('shrinkToFit'))
+        type = 'clickable'
+    return unless type
+    return unless shape = getElementShape(element)
+    return new Marker(element, shape, {semantic, type})
 
-    matchedMarker.element.focus()
+  callback = (marker) ->
+    { element } = marker
+    element.focus()
+    last = (count == 1)
+    if not last and marker.type == 'link'
+      vim.rootWindow.gBrowser.loadOneTab(element.href, {
+        inBackground: true
+        relatedToCurrent: true
+      })
+    else
+      if element.target == '_blank'
+        targetReset = element.target
+        element.target = ''
+      utils.simulateClick(element)
+      element.target = targetReset if targetReset
+    count--
+    return (not last and marker.type != 'text')
 
-    inTab = if count > 1 then true else inTab
-    utils.simulateClick(matchedMarker.element, {metaKey: inTab, ctrlKey: inTab})
+  vim.enterMode('hints', filter, callback)
 
-    matchedMarker.element.target = targetReset if targetReset
+# Like command_follow but multiple times.
+command_follow_multiple = (vim, event) ->
+  command_follow(vim, event, Infinity)
 
-    count -= 1
-    isEditable = utils.isElementEditable(matchedMarker.element)
-    if (multiple or count > 0) and not isEditable
-      # By not resetting immediately one is able to see the last char being
-      # matched, which gives some nice visual feedback that you've typed the
-      # right char.
-      vim.window.setTimeout((-> marker.reset() for marker in markers), 100)
-      return true
+# Follow links in a new background tab with hint markers.
+command_follow_in_tab = (vim, event, count, inBackground = true) ->
+  filter = (element, getElementShape) ->
+    return unless isProperLink(element)
+    return unless shape = getElementShape(element)
+    return new Marker(element, shape, {semantic: true})
 
-  vim.enterMode('hints', callback)
+  callback = (marker) ->
+    last = (count == 1)
+    vim.rootWindow.gBrowser.loadOneTab(marker.element.href, {
+      inBackground: if last then inBackground else true
+      relatedToCurrent: true
+    })
+    count--
+    return not last
 
-# Follow links with hint markers.
-command_follow = helper_follow.bind(undefined, {inTab: false})
+  vim.enterMode('hints', filter, callback)
 
-# Follow links in a new Tab with hint markers.
-command_follow_in_tab = helper_follow.bind(undefined, {inTab: true})
+# Follow links in a new foreground tab with hint markers.
+command_follow_in_focused_tab = (vim, event, count) ->
+  command_follow_in_tab(vim, event, count, false)
 
-# Follow multiple links with hint markers.
-command_follow_multiple = helper_follow.bind(undefined,
-                                             {inTab: true, multiple: true})
+# Copy the URL or text of a markable element to the system clipboard.
+command_marker_yank = (vim) ->
+  filter = (element, getElementShape) ->
+    type = switch
+      when isProperLink(element)       then 'link'
+      when isTextInputElement(element) then 'textInput'
+      when isContentEditable(element)  then 'contenteditable'
+    return unless type
+    return unless shape = getElementShape(element)
+    return new Marker(element, shape, {semantic: true, type})
 
-helper_follow_pattern = do ->
-  # Search for the prev/next patterns in the following attributes of the
-  # element. `rel` should be kept as the first attribute, since the standard
-  # way of marking up prev/next links (`rel="prev"` and `rel="next"`) should be
-  # favored. Even though some of these attributes only allow a fixed set of
-  # keywords, we pattern-match them anyways since lots of sites don’t follow
-  # the spec and use the attributes arbitrarily.
-  attrs = ['rel', 'role', 'data-tooltip', 'aria-label']
+  callback = (marker) ->
+    { element } = marker
+    text = switch marker.type
+      when 'link'            then element.href
+      when 'textInput'       then element.value
+      when 'contenteditable' then element.textContent
+    utils.writeToClipboard(text)
 
-  return (type, vim) ->
-    { document } = vim.window
+  vim.enterMode('hints', filter, callback)
 
-    # If there’s a `<link rel=prev/next>` element we use that.
-    for linkElement in document.head.getElementsByTagName('link')
-      # Also support `rel=previous`, just like Google.
-      if type == linkElement.rel.toLowerCase().replace(/^previous$/, 'prev')
-        vim.rootWindow.gBrowser.loadURI(linkElement.href)
-        return
+# Focus element with hint markers.
+command_marker_focus = (vim) ->
+  filter = (element, getElementShape) ->
+    return unless element.tabIndex > -1
+    return unless shape = getElementShape(element)
+    return new Marker(element, shape, {semantic: true})
 
-    # Otherwise we look for a link on the page that seems to go to the previous
-    # or next page.
-    links = utils.getMarkableElements(document, {type: 'action'})
-      .filter(utils.isElementVisible)
+  callback = (marker) ->
+    { element } = marker
+    element.focus()
+    element.select?()
 
-    patterns = utils.splitListString(getPref("#{ type }_patterns"))
+  vim.enterMode('hints', filter, callback)
 
-    if matchingLink = utils.getBestPatternMatch(patterns, attrs, links)
-      utils.simulateClick(matchingLink, {metaKey: false, ctrlKey: false})
+# Search for the prev/next patterns in the following attributes of the element.
+# `rel` should be kept as the first attribute, since the standard way of marking
+# up prev/next links (`rel="prev"` and `rel="next"`) should be favored. Even
+# though some of these attributes only allow a fixed set of keywords, we
+# pattern-match them anyways since lots of sites don’t follow the spec and use
+# the attributes arbitrarily.
+attrs = ['rel', 'role', 'data-tooltip', 'aria-label']
+helper_follow_pattern = (type, vim) ->
+  { document } = vim.window
+
+  # If there’s a `<link rel=prev/next>` element we use that.
+  for link in document.head.getElementsByTagName('link')
+    # Also support `rel=previous`, just like Google.
+    if type == link.rel.toLowerCase().replace(/^previous$/, 'prev')
+      vim.rootWindow.gBrowser.loadURI(link.href)
+      return
+
+  # Otherwise we look for a link or button on the page that seems to go to the
+  # previous or next page.
+  candidates = document.querySelectorAll('a, button')
+  patterns = utils.splitListString(getPref("#{ type }_patterns"))
+  if matchingLink = utils.getBestPatternMatch(patterns, attrs, candidates)
+    utils.simulateClick(matchingLink)
 
 # Follow previous page.
 command_follow_prev = helper_follow_pattern.bind(undefined, 'prev')
@@ -499,6 +577,7 @@ commands = [
 
   new Command('browse', 'follow',                command_follow,                [['f']])
   new Command('browse', 'follow_in_tab',         command_follow_in_tab,         [['F']])
+  new Command('browse', 'follow_in_focused_tab', command_follow_in_focused_tab, [['g', 'f']])
   new Command('browse', 'follow_multiple',       command_follow_multiple,       [['a', 'f']])
   new Command('browse', 'follow_previous',       command_follow_prev,           [['[']])
   new Command('browse', 'follow_next',           command_follow_next,           [[']']])
