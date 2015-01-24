@@ -42,8 +42,16 @@ exports['normal'] =
     storage.keys.length = 0
 
   onInput: (vim, storage, keyStr, event) ->
-    isEditable = utils.isElementEditable(event.originalTarget)
-    autoInsertMode = isEditable or vim.rootWindow.TabView.isVisible()
+    target = event.originalTarget
+    autoInsertMode = \
+      utils.isTextInputElement(target) or
+      utils.isContentEditable(target) or
+      (utils.isActivatable(target) and keyStr == '<enter>') or
+      (utils.isAdjustable(target) and keyStr in [
+        '<arrowup>', '<arrowdown>', '<arrowleft>', '<arrowright>'
+        '<space>', '<enter>'
+      ]) or
+      vim.rootWindow.TabView.isVisible()
 
     storage.keys.push(keyStr)
 

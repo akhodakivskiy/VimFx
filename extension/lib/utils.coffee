@@ -86,10 +86,10 @@ getCurrentTabWindow = (window) ->
   return window.gBrowser.selectedTab.linkedBrowser.contentWindow
 
 blurActiveElement = (window) ->
-  # Only blur editable elements, in order to interfere with the browser as
+  # Only blur focusable elements, in order to interfere with the browser as
   # little as possible.
   { activeElement } = window.document
-  if activeElement and isElementEditable(activeElement)
+  if activeElement and activeElement.tabIndex > -1
     activeElement.blur()
 
 isProperLink = (element) ->
@@ -101,7 +101,11 @@ isTextInputElement = (element) ->
   return (element instanceof HTMLInputElement and element.type in [
            'text', 'search', 'tel', 'url', 'email', 'password', 'number'
          ]) or
-         element instanceof HTMLTextAreaElement
+         element instanceof HTMLTextAreaElement or
+         # `<select>` elements can also receive text input: You may type the
+         # text of an item to select it.
+         element instanceof HTMLSelectElement or
+         element instanceof XULMenuListElement
 
 isContentEditable = (element) ->
   return element.isContentEditable or
@@ -113,12 +117,18 @@ isGoogleEditable = (element) ->
          (element instanceof HTMLElement and
           element.ownerDocument.body?.getAttribute('g_editable') == 'true')
 
-isElementEditable = (element) ->
-  return element instanceof HTMLInputElement or
-         element instanceof HTMLTextAreaElement or
-         element instanceof HTMLSelectElement or
-         element instanceof XULMenuListElement or
-         isContentEditable(element)
+isActivatable = (element) ->
+  return element instanceof HTMLAnchorElement or
+         element instanceof HTMLButtonElement or
+         (element instanceof HTMLInputElement and element.type in [
+           'button', 'submit', 'reset', 'image'
+         ])
+
+isAdjustable = (element) ->
+  return element instanceof HTMLInputElement and element.type in [
+           'checkbox', 'radio', 'file', 'color'
+           'date', 'time', 'datetime', 'datetime-local', 'month', 'week'
+         ]
 
 getSessionStore = ->
   Cc['@mozilla.org/browser/sessionstore;1'].getService(Ci.nsISessionStore)
@@ -379,7 +389,8 @@ exports.blurActiveElement         = blurActiveElement
 exports.isProperLink              = isProperLink
 exports.isTextInputElement        = isTextInputElement
 exports.isContentEditable         = isContentEditable
-exports.isElementEditable         = isElementEditable
+exports.isActivatable             = isActivatable
+exports.isAdjustable              = isAdjustable
 exports.getSessionStore           = getSessionStore
 
 exports.loadCss                   = loadCss
