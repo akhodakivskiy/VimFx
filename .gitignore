@@ -1,7 +1,2 @@
-mozmill-tests
-*Thumbs.db
-developer
 node_modules
-*.js
-.DS_Store
-VimFx.xpi
+build

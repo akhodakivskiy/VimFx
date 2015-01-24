@@ -1,5 +1,26 @@
 <?xml version="1.0"?>
 
+<!--
+Copyright Anton Khodakivskiy 2012-2013.
+Copyright Simon Lydell 2013-2014.
+Copyright Wang Zhuochun 2013.
+
+This file is part of VimFx.
+
+VimFx is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+VimFx is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with VimFx.  If not, see <http://www.gnu.org/licenses/>.
+-->
+
 <!DOCTYPE mydialog SYSTEM "chrome://vimfx/locale/options.dtd">
 
 <vbox xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
@@ -17,6 +38,12 @@
         title="&pref.hints_bloom_on.title;" desc="&pref.hints_bloom_on.desc;" />
     <setting pref="extensions.VimFx.prevent_autofocus" type="bool"
         title="&pref.prevent_autofocus.title;" />
+    <setting pref="extensions.VimFx.autofocus_limit" type="integer"
+        title="&pref.autofocus_limit.title;" desc="&pref.autofocus_limit.desc;" />
+    <setting pref="extensions.VimFx.ignore_keyboard_layout" type="bool"
+        title="&pref.ignore_keyboard_layout.title;" desc="&pref.ignore_keyboard_layout.desc;" />
+    <setting pref="dom.keyboardevent.code.enabled" type="bool"
+        title="&pref.keyboardevent.code.enabled.title;" desc="&pref.keyboardevent.code.enabled.desc;" />
     <setting title="&customizeButton.title;" type="control">
         <button id="customizeButton" label="&customizeButton.label;" />
     </setting>
