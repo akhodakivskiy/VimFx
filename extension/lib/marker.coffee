@@ -26,6 +26,7 @@ class Marker
     @markerElement = document.createElement('div')
     @markerElement.classList.add('VimFxHintMarker')
     @weight = @elementShape.area
+    @numChildren = 0
 
   reset: ->
     @setHint(@hint)

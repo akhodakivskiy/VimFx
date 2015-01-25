@@ -45,9 +45,9 @@ injectHints = (rootWindow, window, filter) ->
     height
   }
 
-  groups = {semantic: [], unsemantic: []}
+  groups = {semantic: [], unsemantic: [], combined: []}
   createMarkers(window, viewport, groups, filter)
-  { semantic, unsemantic } = groups
+  { semantic, unsemantic, combined } = groups
   markers = semantic.concat(unsemantic)
 
   return [[], null] if markers.length == 0
@@ -60,6 +60,8 @@ injectHints = (rootWindow, window, filter) ->
     markers.sort((a, b) -> a.weight - b.weight)
     for marker in markers when marker not instanceof huffman.BranchPoint
       marker.markerElement.style.zIndex = zIndex++
+      # Add `z-index` space for all the children of the marker (usually 0).
+      zIndex += marker.numChildren
 
   # The `markers` passed to this function have been sorted by `setZIndexes` in
   # advance, so we can skip sorting in the `huffman.createTree` function.
@@ -82,6 +84,16 @@ injectHints = (rootWindow, window, filter) ->
 
   tree = createHuffmanTree(semantic)
   tree.assignCodeWords(hintChars, (marker, hint) -> marker.setHint(hint))
+
+  # Markers for links with the same href can be combined to use the same hint.
+  # They should all have the same `z-index` (because they all have the same
+  # combined weight), but in case any of them cover another they still get a
+  # unique `z-index` (space for this was added in `setZIndexes`).
+  for marker in combined
+    { parent } = marker
+    marker.markerElement.style.zIndex = parent.markerElement.style.zIndex++
+    marker.setHint(parent.hint)
+  markers.push(combined...)
 
   container = rootWindow.document.createElement('box')
   container.classList.add('VimFxMarkersContainer')
@@ -108,7 +120,9 @@ createMarkers = (window, viewport, groups, filter, parents = []) ->
   localGetElementShape = getElementShape.bind(null, window, viewport, parents)
   for element in utils.getAllElements(document)
     continue unless marker = filter(element, localGetElementShape)
-    if marker.semantic
+    if marker.parent
+      groups.combined.push(marker)
+    else if marker.semantic
       groups.semantic.push(marker)
     else
       groups.unsemantic.push(marker)

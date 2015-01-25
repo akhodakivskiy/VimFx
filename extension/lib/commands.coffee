@@ -249,8 +249,22 @@ command_close_tab = (vim, event, count) ->
 command_restore_tab = (vim, event, count) ->
   vim.rootWindow.undoCloseTab() for [1..count]
 
+# Combine links with the same href.
+combine = (hrefs, marker) ->
+  if marker.type == 'link'
+    { href } = marker.element
+    if href of hrefs
+      parent = hrefs[href]
+      marker.parent = parent
+      parent.weight += marker.weight
+      parent.numChildren++
+    else
+      hrefs[href] = marker
+  return marker
+
 # Follow links, focus text inputs and click buttons with hint markers.
 command_follow = (vim, event, count) ->
+  hrefs = {}
   filter = (element, getElementShape) ->
     document = element.ownerDocument
     isXUL = (document instanceof XULDocument)
@@ -300,7 +314,7 @@ command_follow = (vim, event, count) ->
         type = 'clickable'
     return unless type
     return unless shape = getElementShape(element)
-    return new Marker(element, shape, {semantic, type})
+    return combine(hrefs, new Marker(element, shape, {semantic, type}))
 
   callback = (marker) ->
     { element } = marker
@@ -328,10 +342,11 @@ command_follow_multiple = (vim, event) ->
 
 # Follow links in a new background tab with hint markers.
 command_follow_in_tab = (vim, event, count, inBackground = true) ->
+  hrefs = {}
   filter = (element, getElementShape) ->
     return unless isProperLink(element)
     return unless shape = getElementShape(element)
-    return new Marker(element, shape, {semantic: true})
+    return combine(hrefs, new Marker(element, shape, {semantic: true}))
 
   callback = (marker) ->
     last = (count == 1)
@@ -350,6 +365,7 @@ command_follow_in_focused_tab = (vim, event, count) ->
 
 # Copy the URL or text of a markable element to the system clipboard.
 command_marker_yank = (vim) ->
+  hrefs = {}
   filter = (element, getElementShape) ->
     type = switch
       when isProperLink(element)       then 'link'
@@ -357,7 +373,7 @@ command_marker_yank = (vim) ->
       when isContentEditable(element)  then 'contenteditable'
     return unless type
     return unless shape = getElementShape(element)
-    return new Marker(element, shape, {semantic: true, type})
+    return combine(hrefs, new Marker(element, shape, {semantic: true, type}))
 
   callback = (marker) ->
     { element } = marker

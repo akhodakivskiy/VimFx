@@ -181,18 +181,18 @@ exports['hints'] =
       else
         if keyStr not in utils.getHintChars()
           return true
-        matchedMarker = null
+        matchedMarkers = []
         for marker in markers when marker.hintIndex == storage.numEnteredChars
           match = marker.matchHintChar(keyStr)
           marker.hide() unless match
           if marker.isMatched()
             marker.markMatched(true)
-            matchedMarker = marker
-        if matchedMarker
-          again = callback(matchedMarker)
+            matchedMarkers.push(marker)
+        if matchedMarkers.length > 0
+          again = callback(matchedMarkers[0])
           if again
             vim.rootWindow.setTimeout((->
-              matchedMarker.markMatched(false)
+              marker.markMatched(false) for marker in matchedMarkers
             ), @timeout)
             marker.reset() for marker in markers
             storage.numEnteredChars = 0
