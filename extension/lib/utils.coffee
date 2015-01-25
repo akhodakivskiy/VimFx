@@ -28,19 +28,20 @@ ADDON_ID = 'VimFx@akhodakivskiy.github.com'
 
 { classes: Cc, interfaces: Ci, utils: Cu } = Components
 
+Window              = Ci.nsIDOMWindow
+ChromeWindow        = Ci.nsIDOMChromeWindow
+Element             = Ci.nsIDOMElement
+HTMLDocument        = Ci.nsIDOMHTMLDocument
 HTMLAnchorElement   = Ci.nsIDOMHTMLAnchorElement
 HTMLButtonElement   = Ci.nsIDOMHTMLButtonElement
 HTMLInputElement    = Ci.nsIDOMHTMLInputElement
 HTMLTextAreaElement = Ci.nsIDOMHTMLTextAreaElement
 HTMLSelectElement   = Ci.nsIDOMHTMLSelectElement
-XULMenuListElement  = Ci.nsIDOMXULMenuListElement
 XULDocument         = Ci.nsIDOMXULDocument
-XULElement          = Ci.nsIDOMXULElement
-XPathResult         = Ci.nsIDOMXPathResult
-HTMLDocument        = Ci.nsIDOMHTMLDocument
-HTMLElement         = Ci.nsIDOMHTMLElement
-Window              = Ci.nsIDOMWindow
-ChromeWindow        = Ci.nsIDOMChromeWindow
+XULButtonElement    = Ci.nsIDOMXULButtonElement
+XULControlElement   = Ci.nsIDOMXULControlElement
+XULMenuListElement  = Ci.nsIDOMXULMenuListElement
+XULTextBoxElement   = Ci.nsIDOMXULTextBoxElement
 
 class Bucket
   constructor: (@newFunc) ->
@@ -93,7 +94,9 @@ blurActiveElement = (window) ->
     activeElement.blur()
 
 isProperLink = (element) ->
-  return element instanceof HTMLAnchorElement and
+  return (element instanceof HTMLAnchorElement or
+          (element.ownerDocument instanceof XULDocument and
+           element.hasAttribute('href'))) and
          not element.href.endsWith('#') and
          not element.href.startsWith('javascript:')
 
@@ -105,7 +108,8 @@ isTextInputElement = (element) ->
          # `<select>` elements can also receive text input: You may type the
          # text of an item to select it.
          element instanceof HTMLSelectElement or
-         element instanceof XULMenuListElement
+         element instanceof XULMenuListElement or
+         element instanceof XULTextBoxElement
 
 isContentEditable = (element) ->
   return element.isContentEditable or
@@ -114,21 +118,22 @@ isContentEditable = (element) ->
 isGoogleEditable = (element) ->
   # `g_editable` is a non-standard attribute commonly used by Google.
   return element.getAttribute?('g_editable') == 'true' or
-         (element instanceof HTMLElement and
-          element.ownerDocument.body?.getAttribute('g_editable') == 'true')
+         element.ownerDocument.body?.getAttribute('g_editable') == 'true'
 
 isActivatable = (element) ->
   return element instanceof HTMLAnchorElement or
          element instanceof HTMLButtonElement or
          (element instanceof HTMLInputElement and element.type in [
            'button', 'submit', 'reset', 'image'
-         ])
+         ]) or
+         element instanceof XULButtonElement
 
 isAdjustable = (element) ->
   return element instanceof HTMLInputElement and element.type in [
            'checkbox', 'radio', 'file', 'color'
            'date', 'time', 'datetime', 'datetime-local', 'month', 'week'
-         ]
+         ] or
+         element instanceof XULControlElement
 
 getSessionStore = ->
   Cc['@mozilla.org/browser/sessionstore;1'].getService(Ci.nsISessionStore)
@@ -154,24 +159,13 @@ loadCss = do ->
 # sites to spoof it.
 simulated_events = new WeakMap()
 
-# Simulate mouse click with a full chain of events.  Copied from Vimium
-# codebase.
-simulateClick = (element, modifiers = {}) ->
-  document = element.ownerDocument
-  window = document.defaultView
-
-  eventSequence = ['mouseover', 'mousedown', 'mouseup', 'click']
-  for event in eventSequence
-    mouseEvent = document.createEvent('MouseEvents')
-    mouseEvent.initMouseEvent(
-      event, true, true, window, 1, 0, 0, 0, 0,
-      modifiers.ctrlKey, false, false, modifiers.metaKey,
-      0, null
-    )
-    simulated_events.set(mouseEvent, true)
-    # Debugging note: Firefox will not execute the element's default action if
-    # we dispatch this click event, but Webkit will. Dispatching a click on an
-    # input box does not seem to focus it; we do that separately.
+# Simulate mouse click with a full chain of events. ('command' is for XUL
+# elements.)
+eventSequence = ['mouseover', 'mousedown', 'mouseup', 'click', 'command']
+simulateClick = (element) ->
+  window = element.ownerDocument.defaultView
+  for type in eventSequence
+    mouseEvent = new window.MouseEvent(type)
     element.dispatchEvent(mouseEvent)
 
 isEventSimulated = (event) ->
@@ -332,6 +326,25 @@ createElement = (document, type, attributes = {}) ->
 
   return element
 
+getAllElements = (document) -> switch
+  when document instanceof HTMLDocument
+    return document.getElementsByTagName('*')
+  when document instanceof XULDocument
+    elements = []
+    getAllRegular = (element) ->
+      for child in element.getElementsByTagName('*')
+        elements.push(child)
+        getAllAnonymous(child)
+      return
+    getAllAnonymous = (element) ->
+      for child in document.getAnonymousNodes(element) or []
+        continue unless child instanceof Element
+        elements.push(child)
+        getAllRegular(child)
+      return
+    getAllRegular(document.documentElement)
+    return elements
+
 isURL = (str) ->
   try
     url = Cc['@mozilla.org/network/io-service;1']
@@ -415,6 +428,7 @@ exports.getVersion                = getVersion
 exports.parseHTML                 = parseHTML
 exports.escapeHTML                = escapeHTML
 exports.createElement             = createElement
+exports.getAllElements            = getAllElements
 exports.isURL                     = isURL
 exports.browserSearchSubmission   = browserSearchSubmission
 exports.normalizedKey             = normalizedKey

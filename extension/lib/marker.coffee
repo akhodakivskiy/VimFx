@@ -40,7 +40,7 @@ class Marker
   # into the DOM, and thus gotten a height and width.
   setPosition: (viewport) ->
     {
-      markerElement: { offsetHeight: height, offsetWidth: width }
+      markerElement: { clientHeight: height, clientWidth: width }
       elementShape: { nonCoveredPoint: { x: left, y: top, offset, rect } }
     } = this
 

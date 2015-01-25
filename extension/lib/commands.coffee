@@ -33,6 +33,8 @@ _          = require('./l10n')
 
 { classes: Cc, interfaces: Ci, utils: Cu } = Components
 
+XULDocument  = Ci.nsIDOMXULDocument
+
 # “Selecting an element” means “focusing and selecting the text, if any, of an
 # element”.
 
@@ -250,15 +252,18 @@ command_restore_tab = (vim, event, count) ->
 # Follow links, focus text inputs and click buttons with hint markers.
 command_follow = (vim, event, count) ->
   filter = (element, getElementShape) ->
+    document = element.ownerDocument
+    isXUL = (document instanceof XULDocument)
     semantic = true
     switch
       when isProperLink(element)
         type = 'link'
-      when isTextInputElement(element), isContentEditable(element)
+      when isTextInputElement(element) or isContentEditable(element)
         type = 'text'
-      when element.tabIndex > -1
+      when element.tabIndex > -1 and
+           not (isXUL and element.nodeName.endsWith('box'))
         type = 'clickable'
-        unless element.nodeName in ['A', 'INPUT', 'BUTTON', 'SELECT']
+        unless isXUL or element.nodeName in ['A', 'INPUT', 'BUTTON']
           semantic = false
       when element.hasAttribute('onclick') or
            element.hasAttribute('onmousedown') or
@@ -276,19 +281,19 @@ command_follow = (vim, event, count) ->
       # marker for the `<label>`.
       when element.nodeName == 'LABEL'
         if element.htmlFor
-          input = element.ownerDocument.getElementById(element.htmlFor)
+          input = document.getElementById(element.htmlFor)
           if input and not getElementShape(input)
             type = 'clickable'
       # Elements that have “button” somewhere in the class might be clickable,
       # unless they contain a real link or button in which case they likely are
       # “button-wrapper”s. (`<SVG element>.className` is not a string!)
-      when typeof element.className == 'string' and
+      when not isXUL and typeof element.className == 'string' and
            element.className.toLowerCase().contains('button')
         unless element.querySelector('a, button')
           type = 'clickable'
           semantic = false
       # When viewing an image it should get a marker to toggle zoom.
-      when element.ownerDocument.body.childElementCount == 1 and
+      when document.body?.childElementCount == 1 and
            element.nodeName == 'IMG' and
            (element.classList.contains('overflowing') or
             element.classList.contains('shrinkToFit'))

@@ -23,7 +23,6 @@ huffman    = require('n-ary-huffman')
 
 { interfaces: Ci } = Components
 
-HTMLDocument = Ci.nsIDOMHTMLDocument
 XULDocument  = Ci.nsIDOMXULDocument
 
 injectHints = (rootWindow, window, filter) ->
@@ -106,11 +105,8 @@ injectHints = (rootWindow, window, filter) ->
 createMarkers = (window, viewport, groups, filter, parents = []) ->
   { document } = window
 
-  # For now we aren't able to handle hint markers in XUL Documents :(
-  return [] unless document instanceof HTMLDocument
-
   localGetElementShape = getElementShape.bind(null, window, viewport, parents)
-  for element in document.getElementsByTagName('*')
+  for element in utils.getAllElements(document)
     continue unless marker = filter(element, localGetElementShape)
     if marker.semantic
       groups.semantic.push(marker)
@@ -188,7 +184,6 @@ getElementShape = (window, viewport, parents, element) ->
           return shape if shape
     return null
 
-
   # Even if `element` has a visible rect, it might be covered by other elements.
   for visibleRect in visibleRects
     nonCoveredPoint = getFirstNonCoveredPoint(window, viewport, element,
@@ -261,7 +256,9 @@ getFirstNonCoveredPoint = (window, viewport, element, elementRect, parents) ->
     # though `element` isn’t covered. We don’t try to temporarily reset such CSS
     # (as with `border-radius`) because of performance. Instead we rely on that
     # some of the attempts below will work.
-    if element.contains(elementAtPoint) # Note that `a.contains(a) == true`!
+    if element.contains(elementAtPoint) or # Note that `a.contains(a) == true`!
+       (window.document instanceof XULDocument and
+        getClosestNonAnonymousParent(element) == elementAtPoint)
       found = true
       # If we’re currently in a frame, there might be something on top of the
       # frame that covers `element`. Therefore we ensure that the frame really
@@ -315,5 +312,12 @@ getFirstNonCoveredPoint = (window, viewport, element, elementRect, parents) ->
   element.classList.remove('VimFxNoBorderRadius')
 
   return nonCoveredPoint
+
+# In XUL documents there are “anonymous” elements, whose node names start with
+# `xul:` or `html:`. These are not never returned by `document.elementFromPoint`
+# but their closest non-anonymous parents are.
+getClosestNonAnonymousParent = (element) ->
+  element = element.parentNode while element.prefix?
+  return element
 
 exports.injectHints = injectHints
