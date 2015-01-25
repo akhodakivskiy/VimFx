@@ -324,7 +324,7 @@ command_follow = (vim, event, count) ->
     element.focus()
     last = (count == 1)
     if not last and marker.type == 'link'
-      vim.rootWindow.gBrowser.loadOneTab(element.href, {
+      utils.openTab(vim.rootWindow, element.href, {
         inBackground: true
         relatedToCurrent: true
       })
@@ -353,7 +353,7 @@ command_follow_in_tab = (vim, event, count, inBackground = true) ->
 
   callback = (marker) ->
     last = (count == 1)
-    vim.rootWindow.gBrowser.loadOneTab(marker.element.href, {
+    utils.openTab(vim.rootWindow, marker.element.href, {
       inBackground: if last then inBackground else true
       relatedToCurrent: true
     })

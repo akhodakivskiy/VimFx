@@ -366,6 +366,11 @@ browserSearchSubmission = (str) ->
   engine = ss.currentEngine or ss.defaultEngine
   return engine.getSubmission(str, null)
 
+openTab = (rootWindow, url, options) ->
+  { gBrowser } = rootWindow
+  rootWindow.TreeStyleTabService?.readyToOpenChildTab(gBrowser.selectedTab)
+  gBrowser.loadOneTab(url, options)
+
 normalizedKey = (key) -> key.map(notation.normalize).join('')
 
 # Get hint characters, convert them to lower case, and filter duplicates.
@@ -435,6 +440,7 @@ exports.createElement             = createElement
 exports.getAllElements            = getAllElements
 exports.isURL                     = isURL
 exports.browserSearchSubmission   = browserSearchSubmission
+exports.openTab                   = openTab
 exports.normalizedKey             = normalizedKey
 exports.getHintChars              = getHintChars
 exports.removeDuplicates          = removeDuplicates
