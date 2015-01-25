@@ -93,6 +93,7 @@
 }
 
 .VimFxHintMarker {
+    white-space: nowrap;
     position: absolute;
     padding: 1px 2px 0 2px;
     line-height: 1;
