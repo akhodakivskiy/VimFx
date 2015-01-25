@@ -34,6 +34,8 @@ module.exports = class Vim
       blacklistedKeys: null
       lastInteraction: null
       lastAutofocusPrevention: null
+      scrollableElements: new WeakMap()
+      largestScrollableElement: null
 
   enterMode: (mode, args...) ->
     # `args` is an array of arguments to be passed to the mode's `onEnter`

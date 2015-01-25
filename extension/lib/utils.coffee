@@ -135,6 +135,9 @@ isAdjustable = (element) ->
          ] or
          element instanceof XULControlElement
 
+area = (element) ->
+  return element.clientWidth * element.clientHeight
+
 getSessionStore = ->
   Cc['@mozilla.org/browser/sessionstore;1'].getService(Ci.nsISessionStore)
 
@@ -404,6 +407,7 @@ exports.isTextInputElement        = isTextInputElement
 exports.isContentEditable         = isContentEditable
 exports.isActivatable             = isActivatable
 exports.isAdjustable              = isAdjustable
+exports.area                      = area
 exports.getSessionStore           = getSessionStore
 
 exports.loadCss                   = loadCss

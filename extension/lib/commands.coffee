@@ -279,6 +279,9 @@ command_follow = (vim, event, count) ->
         type = 'clickable'
         unless isXUL or element.nodeName in ['A', 'INPUT', 'BUTTON']
           semantic = false
+      when element != vim.state.largestScrollableElement and
+           vim.state.scrollableElements.has(element)
+        type = 'scrollable'
       when element.hasAttribute('onclick') or
            element.hasAttribute('onmousedown') or
            element.hasAttribute('onmouseup') or
@@ -388,9 +391,15 @@ command_marker_yank = (vim) ->
 # Focus element with hint markers.
 command_marker_focus = (vim) ->
   filter = (element, getElementShape) ->
-    return unless element.tabIndex > -1
+    type = switch
+      when element.tabIndex > -1
+        'focusable'
+      when element != vim.state.largestScrollableElement and
+           vim.state.scrollableElements.has(element)
+        'scrollable'
+    return unless type
     return unless shape = getElementShape(element)
-    return new Marker(element, shape, {semantic: true})
+    return new Marker(element, shape, {semantic: true, type})
 
   callback = (marker) ->
     { element } = marker
