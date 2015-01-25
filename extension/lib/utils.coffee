@@ -168,7 +168,10 @@ eventSequence = ['mouseover', 'mousedown', 'mouseup', 'click', 'command']
 simulateClick = (element) ->
   window = element.ownerDocument.defaultView
   for type in eventSequence
-    mouseEvent = new window.MouseEvent(type)
+    mouseEvent = new window.MouseEvent(type, {
+      # Let the event bubble in order to trigger delegated event listeners.
+      bubbles: true
+    })
     element.dispatchEvent(mouseEvent)
 
 isEventSimulated = (event) ->
