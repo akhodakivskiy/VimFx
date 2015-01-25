@@ -57,7 +57,8 @@ exports['normal'] =
 
     { match, exact, command, count } = searchForMatchingCommand(storage.keys)
 
-    if vim.blacklistedKeys and storage.keys.join('') in vim.blacklistedKeys
+    if vim.state.blacklistedKeys and
+       storage.keys.join('') in vim.state.blacklistedKeys
       match = false
 
     if match

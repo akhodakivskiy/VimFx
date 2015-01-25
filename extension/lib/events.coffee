@@ -63,7 +63,7 @@ getVimFromEvent = (event) ->
   return if getPref('disabled')
   return unless window = utils.getEventCurrentTabWindow(event)
   return unless vim = vimBucket.get(window)
-  return if vim.blacklisted
+  return if vim.state.blacklisted
 
   return vim
 
@@ -72,7 +72,7 @@ getVimFromEvent = (event) ->
 markLastInteraction = (event, vim = null) ->
   return unless vim ?= getVimFromEvent(event)
   return unless event.originalTarget.ownerDocument instanceof HTMLDocument
-  vim.lastInteraction = Date.now()
+  vim.state.lastInteraction = Date.now()
 
 removeVimFromTab = (tab, gBrowser) ->
   return unless browser = gBrowser.getBrowserForTab(tab)
@@ -80,7 +80,7 @@ removeVimFromTab = (tab, gBrowser) ->
 
 updateButton = (vim) ->
   updateToolbarButton(vim.rootWindow, {
-    blacklisted: vim.blacklisted
+    blacklisted: vim.state.blacklisted
     insertMode:  vim.mode == 'insert'
   })
 
@@ -155,8 +155,8 @@ windowsListeners =
     # from the page Firefox blurs it and then re-focuses it when the user
     # switches back. Therefore we count this case as an interaction, so the
     # re-focus event isn’t caught as autofocus.
-    if vim.lastInteraction != null and target == vim.window
-      vim.lastInteraction = Date.now()
+    if vim.state.lastInteraction != null and target == vim.window
+      vim.state.lastInteraction = Date.now()
 
     # Autofocus prevention. Strictly speaking, autofocus may only happen during
     # page load, which means that we should only prevent focus events during
@@ -178,9 +178,9 @@ windowsListeners =
         vim.mode != 'insert' and
         target.ownerDocument instanceof HTMLDocument and
         target instanceof HTMLInputElement and
-        (vim.lastInteraction == null or
-         Date.now() - vim.lastInteraction > getPref('autofocus_limit'))
-      vim.lastAutofocusPrevention = Date.now()
+        (vim.state.lastInteraction == null or
+         Date.now() - vim.state.lastInteraction > getPref('autofocus_limit'))
+      vim.state.lastAutofocusPrevention = Date.now()
       target.blur()
 
   blur: (event) ->
@@ -195,9 +195,9 @@ windowsListeners =
     # Some sites (such as icloud.com) re-focuses inputs if they are blurred,
     # causing an infinite loop autofocus prevention and re-focusing. Therefore
     # we suppress blur events that happen just after an autofocus prevention.
-    if vim.lastAutofocusPrevention != null and
-       Date.now() - vim.lastAutofocusPrevention < 1
-      vim.lastAutofocusPrevention = null
+    if vim.state.lastAutofocusPrevention != null and
+       Date.now() - vim.state.lastAutofocusPrevention < 1
+      vim.state.lastAutofocusPrevention = null
       suppressEvent(event)
       return
 
@@ -244,15 +244,14 @@ tabsListener =
   onLocationChange: (browser, webProgress, request, location) ->
     return unless vim = vimBucket.get(browser.contentWindow)
 
-    # There hasn’t been any interaction on the page yet, so reset it.
-    vim.lastInteraction = null
+    vim.resetState()
 
     # Update the blacklist state.
-    vim.blacklisted = utils.isBlacklisted(location.spec)
-    vim.blacklistedKeys = utils.getBlacklistedKeys(location.spec)
+    vim.state.blacklisted = utils.isBlacklisted(location.spec)
+    vim.state.blacklistedKeys = utils.getBlacklistedKeys(location.spec)
     # If only specific keys are blacklisted, remove blacklist state.
-    if vim.blacklistedKeys.length > 0
-      vim.blacklisted = false
+    if vim.state.blacklistedKeys.length > 0
+      vim.state.blacklisted = false
     updateButton(vim)
 
 addEventListeners = (window) ->
