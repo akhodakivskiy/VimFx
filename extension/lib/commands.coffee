@@ -526,6 +526,12 @@ command_Esc = (vim, event) ->
 
   vim.rootWindow.TabView.hide()
 
+  { document } = vim.window
+  if document.exitFullscreen
+    document.exitFullscreen()
+  else
+    document.mozCancelFullScreen()
+
 
 class Command
   constructor: (@group, @name, @func, keys) ->
