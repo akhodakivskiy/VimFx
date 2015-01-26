@@ -1,5 +1,5 @@
 ###
-# Copyright Anton Khodakivskiy 2013.
+# Copyright Anton Khodakivskiy 2013, 2014.
 # Copyright Simon Lydell 2013, 2014.
 # Copyright Wang Zhuochun 2014.
 #
@@ -19,14 +19,15 @@
 # along with VimFx.  If not, see <http://www.gnu.org/licenses/>.
 ###
 
-utils                   = require('./utils')
-{ mode_hints }          = require('./mode-hints/mode-hints')
-{ updateToolbarButton } = require('./button')
+utils                        = require('./utils')
+{ injectHints }              = require('./hints')
+{ rotateOverlappingMarkers } = require('./marker')
+{ updateToolbarButton }      = require('./button')
 { commands
 , searchForMatchingCommand
 , escapeCommand
 , Command
-, findStorage }         = require('./commands')
+, findStorage }              = require('./commands')
 
 { interfaces: Ci } = Components
 
@@ -41,14 +42,23 @@ exports['normal'] =
     storage.keys.length = 0
 
   onInput: (vim, storage, keyStr, event) ->
-    isEditable = utils.isElementEditable(event.originalTarget)
-    autoInsertMode = isEditable or vim.rootWindow.TabView.isVisible()
+    target = event.originalTarget
+    autoInsertMode = \
+      utils.isTextInputElement(target) or
+      utils.isContentEditable(target) or
+      (utils.isActivatable(target) and keyStr == '<enter>') or
+      (utils.isAdjustable(target) and keyStr in [
+        '<arrowup>', '<arrowdown>', '<arrowleft>', '<arrowright>'
+        '<space>', '<enter>'
+      ]) or
+      vim.rootWindow.TabView.isVisible()
 
     storage.keys.push(keyStr)
 
     { match, exact, command, count } = searchForMatchingCommand(storage.keys)
 
-    if vim.blacklistedKeys and storage.keys.join('') in vim.blacklistedKeys
+    if vim.state.blacklistedKeys and
+       storage.keys.join('') in vim.state.blacklistedKeys
       match = false
 
     if match
@@ -128,7 +138,79 @@ exports['find'] =
   commands:
     exit: ['<escape>', '<enter>']
 
-exports['hints'] = mode_hints
+exports['hints'] =
+  onEnter: (vim, storage, filter, callback) ->
+    [ markers, container ] = injectHints(vim.rootWindow, vim.window, filter)
+    if markers.length > 0
+      storage.markers   = markers
+      storage.container = container
+      storage.callback  = callback
+      storage.numEnteredChars = 0
+    else
+      vim.enterMode('normal')
+
+  onLeave: (vim, storage) ->
+    { container } = storage
+    vim.rootWindow.setTimeout((->
+      container?.remove()
+    ), @timeout)
+    for key of storage
+      storage[key] = null
+
+  onInput: (vim, storage, keyStr, event) ->
+    { markers, callback } = storage
+
+    switch
+      when @commands['exit'].match(keyStr)
+        # Remove the hints immediately.
+        storage.container?.remove()
+        vim.enterMode('normal')
+        return true
+
+      when @commands['rotate_markers_forward'].match(keyStr)
+        rotateOverlappingMarkers(markers, true)
+      when @commands['rotate_markers_backward'].match(keyStr)
+        rotateOverlappingMarkers(markers, false)
+
+      when @commands['delete_hint_char'].match(keyStr)
+        for marker in markers
+          switch marker.hintIndex - storage.numEnteredChars
+            when  0 then marker.deleteHintChar()
+            when -1 then marker.show()
+        storage.numEnteredChars-- unless storage.numEnteredChars == 0
+
+      else
+        if keyStr not in utils.getHintChars()
+          return true
+        matchedMarkers = []
+        for marker in markers when marker.hintIndex == storage.numEnteredChars
+          match = marker.matchHintChar(keyStr)
+          marker.hide() unless match
+          if marker.isMatched()
+            marker.markMatched(true)
+            matchedMarkers.push(marker)
+        if matchedMarkers.length > 0
+          again = callback(matchedMarkers[0])
+          if again
+            vim.rootWindow.setTimeout((->
+              marker.markMatched(false) for marker in matchedMarkers
+            ), @timeout)
+            marker.reset() for marker in markers
+            storage.numEnteredChars = 0
+          else
+            vim.enterMode('normal')
+          return true
+        storage.numEnteredChars++
+
+    return true
+
+  timeout: 200
+
+  commands:
+    exit:                    ['<escape>']
+    rotate_markers_forward:  ['<space>']
+    rotate_markers_backward: ['<s-space>']
+    delete_hint_char:        ['<backspace>']
 
 for modeName of exports
   mode = exports[modeName]

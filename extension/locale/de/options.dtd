@@ -12,9 +12,6 @@
 
 <!ENTITY pref.scroll_step_lines.title     "Scroll-Schrittweite">
 
-<!ENTITY pref.hints_bloom_on.title "Intelligente Hinweiszuweisung">
-<!ENTITY pref.hints_bloom_on.desc  "Oft besuchten Links kürzere Hinweise zuweisen">
-
 <!ENTITY pref.prevent_autofocus.title "Eingabefelder nicht automatische fokussieren">
 
 <!ENTITY pref.autofocus_limit.title "Autofocus limit">

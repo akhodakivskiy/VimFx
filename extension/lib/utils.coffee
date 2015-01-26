@@ -28,17 +28,20 @@ ADDON_ID = 'VimFx@akhodakivskiy.github.com'
 
 { classes: Cc, interfaces: Ci, utils: Cu } = Components
 
+Window              = Ci.nsIDOMWindow
+ChromeWindow        = Ci.nsIDOMChromeWindow
+Element             = Ci.nsIDOMElement
+HTMLDocument        = Ci.nsIDOMHTMLDocument
+HTMLAnchorElement   = Ci.nsIDOMHTMLAnchorElement
+HTMLButtonElement   = Ci.nsIDOMHTMLButtonElement
 HTMLInputElement    = Ci.nsIDOMHTMLInputElement
 HTMLTextAreaElement = Ci.nsIDOMHTMLTextAreaElement
 HTMLSelectElement   = Ci.nsIDOMHTMLSelectElement
-XULMenuListElement  = Ci.nsIDOMXULMenuListElement
 XULDocument         = Ci.nsIDOMXULDocument
-XULElement          = Ci.nsIDOMXULElement
-XPathResult         = Ci.nsIDOMXPathResult
-HTMLDocument        = Ci.nsIDOMHTMLDocument
-HTMLElement         = Ci.nsIDOMHTMLElement
-Window              = Ci.nsIDOMWindow
-ChromeWindow        = Ci.nsIDOMChromeWindow
+XULButtonElement    = Ci.nsIDOMXULButtonElement
+XULControlElement   = Ci.nsIDOMXULControlElement
+XULMenuListElement  = Ci.nsIDOMXULMenuListElement
+XULTextBoxElement   = Ci.nsIDOMXULTextBoxElement
 
 class Bucket
   constructor: (@newFunc) ->
@@ -84,40 +87,56 @@ getCurrentTabWindow = (window) ->
   return window.gBrowser.selectedTab.linkedBrowser.contentWindow
 
 blurActiveElement = (window) ->
-  # Only blur editable elements, in order to interfere with the browser as
+  # Only blur focusable elements, in order to interfere with the browser as
   # little as possible.
   { activeElement } = window.document
-  if activeElement and isElementEditable(activeElement)
+  if activeElement and activeElement.tabIndex > -1
     activeElement.blur()
 
-isTextInputElement = (element) ->
-  return element instanceof HTMLInputElement or
-         element instanceof HTMLTextAreaElement
+isProperLink = (element) ->
+  return element.hasAttribute('href') and
+         (element instanceof HTMLAnchorElement or
+          element.ownerDocument instanceof XULDocument) and
+         not element.href.endsWith('#') and
+         not element.href.startsWith('javascript:')
 
-isElementEditable = (element) ->
-  return element.isContentEditable or
-         element instanceof HTMLInputElement or
+isTextInputElement = (element) ->
+  return (element instanceof HTMLInputElement and element.type in [
+           'text', 'search', 'tel', 'url', 'email', 'password', 'number'
+         ]) or
          element instanceof HTMLTextAreaElement or
+         # `<select>` elements can also receive text input: You may type the
+         # text of an item to select it.
          element instanceof HTMLSelectElement or
          element instanceof XULMenuListElement or
-         element.isContentEditable or
-         isElementGoogleEditable(element)
+         element instanceof XULTextBoxElement
 
-isElementGoogleEditable = (element) ->
+isContentEditable = (element) ->
+  return element.isContentEditable or
+         isGoogleEditable(element)
+
+isGoogleEditable = (element) ->
   # `g_editable` is a non-standard attribute commonly used by Google.
   return element.getAttribute?('g_editable') == 'true' or
-         (element instanceof HTMLElement and
-          element.ownerDocument.body?.getAttribute('g_editable') == 'true')
+         element.ownerDocument.body?.getAttribute('g_editable') == 'true'
 
-isElementVisible = (element) ->
-  document = element.ownerDocument
-  window   = document.defaultView
-  # `.getComputedStyle()` may return `null` if the computed style isn’t
-  # availble yet. If so, consider the element not visible.
-  return false unless computedStyle = window.getComputedStyle(element, null)
-  return computedStyle.getPropertyValue('visibility') == 'visible' and
-         computedStyle.getPropertyValue('display') != 'none' and
-         computedStyle.getPropertyValue('opacity') != '0'
+isActivatable = (element) ->
+  return element instanceof HTMLAnchorElement or
+         element instanceof HTMLButtonElement or
+         (element instanceof HTMLInputElement and element.type in [
+           'button', 'submit', 'reset', 'image'
+         ]) or
+         element instanceof XULButtonElement
+
+isAdjustable = (element) ->
+  return element instanceof HTMLInputElement and element.type in [
+           'checkbox', 'radio', 'file', 'color'
+           'date', 'time', 'datetime', 'datetime-local', 'month', 'week'
+         ] or
+         element instanceof XULControlElement
+
+area = (element) ->
+  return element.clientWidth * element.clientHeight
 
 getSessionStore = ->
   Cc['@mozilla.org/browser/sessionstore;1'].getService(Ci.nsISessionStore)
@@ -143,24 +162,16 @@ loadCss = do ->
 # sites to spoof it.
 simulated_events = new WeakMap()
 
-# Simulate mouse click with a full chain of events.  Copied from Vimium
-# codebase.
-simulateClick = (element, modifiers = {}) ->
-  document = element.ownerDocument
-  window = document.defaultView
-
-  eventSequence = ['mouseover', 'mousedown', 'mouseup', 'click']
-  for event in eventSequence
-    mouseEvent = document.createEvent('MouseEvents')
-    mouseEvent.initMouseEvent(
-      event, true, true, window, 1, 0, 0, 0, 0,
-      modifiers.ctrlKey, false, false, modifiers.metaKey,
-      0, null
-    )
-    simulated_events.set(mouseEvent, true)
-    # Debugging note: Firefox will not execute the element's default action if
-    # we dispatch this click event, but Webkit will. Dispatching a click on an
-    # input box does not seem to focus it; we do that separately.
+# Simulate mouse click with a full chain of events. ('command' is for XUL
+# elements.)
+eventSequence = ['mouseover', 'mousedown', 'mouseup', 'click', 'command']
+simulateClick = (element) ->
+  window = element.ownerDocument.defaultView
+  for type in eventSequence
+    mouseEvent = new window.MouseEvent(type, {
+      # Let the event bubble in order to trigger delegated event listeners.
+      bubbles: true
+    })
     element.dispatchEvent(mouseEvent)
 
 isEventSimulated = (event) ->
@@ -321,6 +332,25 @@ createElement = (document, type, attributes = {}) ->
 
   return element
 
+getAllElements = (document) -> switch
+  when document instanceof HTMLDocument
+    return document.getElementsByTagName('*')
+  when document instanceof XULDocument
+    elements = []
+    getAllRegular = (element) ->
+      for child in element.getElementsByTagName('*')
+        elements.push(child)
+        getAllAnonymous(child)
+      return
+    getAllAnonymous = (element) ->
+      for child in document.getAnonymousNodes(element) or []
+        continue unless child instanceof Element
+        elements.push(child)
+        getAllRegular(child)
+      return
+    getAllRegular(document.documentElement)
+    return elements
+
 isURL = (str) ->
   try
     url = Cc['@mozilla.org/network/io-service;1']
@@ -338,6 +368,11 @@ browserSearchSubmission = (str) ->
 
   engine = ss.currentEngine or ss.defaultEngine
   return engine.getSubmission(str, null)
+
+openTab = (rootWindow, url, options) ->
+  { gBrowser } = rootWindow
+  rootWindow.TreeStyleTabService?.readyToOpenChildTab(gBrowser.selectedTab)
+  gBrowser.loadOneTab(url, options)
 
 normalizedKey = (key) -> key.map(notation.normalize).join('')
 
@@ -367,90 +402,6 @@ removeDuplicates = (array) ->
   return `[...new Set(array)]`
   # coffeelint: enable=no_backticks
 
-# Why isn’t `a[@href]` used, when `area[@href]` is? Some sites (such as
-# StackExchange sites) leave out the `href` property and use the anchor as a
-# JavaScript-powered button (instead of just using the `button` element).
-ACTION_ELEMENT_TAGS = [
-  'a'
-  'area[@href]'
-  'button'
-  # When viewing an image directly, and it is larger than the viewport,
-  # clicking it toggles zoom.
-  'img[contains(@class, "decoded") and
-     (contains(@class, "overflowing") or
-     contains(@class, "shrinkToFit"))]'
-]
-
-ACTION_ELEMENT_PROPERTIES = [
-  '@onclick'
-  '@onmousedown'
-  '@onmouseup'
-  '@oncommand'
-  '@role="link"'
-  '@role="button"'
-  'contains(@class, "button")'
-  'contains(@class, "js-new-tweets-bar")'
-]
-
-EDITABLE_ELEMENT_TAGS = [
-  'textarea'
-  'select'
-  'input[not(@type="hidden" or @disabled)]'
-]
-
-EDITABLE_ELEMENT_PROPERTIES = [
-  '@contenteditable=""'
-  'translate(@contenteditable, "TRUE", "true")="true"'
-]
-
-FOCUSABLE_ELEMENT_TAGS = [
-  'frame'
-  'iframe'
-  'embed'
-  'object'
-]
-
-FOCUSABLE_ELEMENT_PROPERTIES = [
-  '@tabindex!=-1'
-]
-
-getMarkableElements = do ->
-  xpathify = (tags, properties) ->
-    return tags
-      .concat("*[#{ properties.join(' or ') }]")
-      .map((rule) -> "//#{ rule } | //xhtml:#{ rule }")
-      .join(' | ')
-
-  xpaths =
-    action:    xpathify(ACTION_ELEMENT_TAGS,    ACTION_ELEMENT_PROPERTIES   )
-    editable:  xpathify(EDITABLE_ELEMENT_TAGS,  EDITABLE_ELEMENT_PROPERTIES )
-    focusable: xpathify(FOCUSABLE_ELEMENT_TAGS, FOCUSABLE_ELEMENT_PROPERTIES)
-    all: xpathify(
-      # coffeelint: disable=max_line_length
-      [ACTION_ELEMENT_TAGS...,       EDITABLE_ELEMENT_TAGS...,       FOCUSABLE_ELEMENT_TAGS...      ],
-      [ACTION_ELEMENT_PROPERTIES..., EDITABLE_ELEMENT_PROPERTIES..., FOCUSABLE_ELEMENT_PROPERTIES...]
-      # coffeelint: enable=max_line_length
-    )
-
-  # The actual function that will return the desired elements.
-  return (document, { type }) ->
-    return xpathQueryAll(document, xpaths[type])
-
-xpathHelper = (node, query, resultType) ->
-  document = node.ownerDocument ? node
-  namespaceResolver = (namespace) ->
-    if namespace == 'xhtml' then 'http://www.w3.org/1999/xhtml' else null
-  return document.evaluate(query, node, namespaceResolver, resultType, null)
-
-xpathQuery = (node, query) ->
-  result = xpathHelper(node, query, XPathResult.FIRST_ORDERED_NODE_TYPE)
-  return result.singleNodeValue
-
-xpathQueryAll = (node, query) ->
-  result = xpathHelper(node, query, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE)
-  return (result.snapshotItem(i) for i in [0...result.snapshotLength] by 1)
-
-
 exports.Bucket                    = Bucket
 exports.getEventWindow            = getEventWindow
 exports.getEventRootWindow        = getEventRootWindow
@@ -459,9 +410,12 @@ exports.getRootWindow             = getRootWindow
 exports.getCurrentTabWindow       = getCurrentTabWindow
 
 exports.blurActiveElement         = blurActiveElement
+exports.isProperLink              = isProperLink
 exports.isTextInputElement        = isTextInputElement
-exports.isElementEditable         = isElementEditable
-exports.isElementVisible          = isElementVisible
+exports.isContentEditable         = isContentEditable
+exports.isActivatable             = isActivatable
+exports.isAdjustable              = isAdjustable
+exports.area                      = area
 exports.getSessionStore           = getSessionStore
 
 exports.loadCss                   = loadCss
@@ -486,14 +440,13 @@ exports.getVersion                = getVersion
 exports.parseHTML                 = parseHTML
 exports.escapeHTML                = escapeHTML
 exports.createElement             = createElement
+exports.getAllElements            = getAllElements
 exports.isURL                     = isURL
 exports.browserSearchSubmission   = browserSearchSubmission
+exports.openTab                   = openTab
 exports.normalizedKey             = normalizedKey
 exports.getHintChars              = getHintChars
 exports.removeDuplicates          = removeDuplicates
 exports.removeDuplicateCharacters = removeDuplicateCharacters
 exports.getResourceURI            = getResourceURI
-exports.getMarkableElements       = getMarkableElements
-exports.xpathQuery                = xpathQuery
-exports.xpathQueryAll             = xpathQueryAll
 exports.ADDON_ID                  = ADDON_ID

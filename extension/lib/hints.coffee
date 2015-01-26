@@ -18,66 +18,86 @@
 # along with VimFx.  If not, see <http://www.gnu.org/licenses/>.
 ###
 
-utils       = require('../utils')
-{ getPref } = require('../prefs')
-{ Marker }  = require('./marker')
-huffman     = require('n-ary-huffman')
+utils      = require('./utils')
+huffman    = require('n-ary-huffman')
 
 { interfaces: Ci } = Components
 
-HTMLDocument = Ci.nsIDOMHTMLDocument
 XULDocument  = Ci.nsIDOMXULDocument
 
-CONTAINER_ID  = 'VimFxHintMarkerContainer'
-Z_INDEX_START = 2147480001 # The highest `z-index` used in style.css plus one.
-# In theory, `z-index` can be infinitely large. In practice, Firefox uses a
-# 32-bit signed integer to store it, so the maximum value is 2147483647
-# (http://www.puidokas.com/max-z-index/). Youtube (insanely) uses 1999999999 for
-# its top bar. So by using 2147480001 as a base, we trump that value with lots
-# of margin, still leaving a few thousand values for markers, which should be
-# more than enough. Hopefully no sites are crazy enough to use even higher
-# values.
-
-
-removeHints = (document) ->
-  document.getElementById(CONTAINER_ID)?.remove()
-
-
-injectHints = (window) ->
-  { document } = window
-
-  { clientWidth, clientHeight } = document.documentElement
-  viewport =
+injectHints = (rootWindow, window, filter) ->
+  {
+    clientWidth, clientHeight # Viewport size excluding scrollbars, usually.
+    scrollWidth, scrollHeight
+  } = window.document.documentElement
+  { innerWidth, innerHeight } = window # Viewport size including scrollbars.
+  # We don’t want markers to cover the scrollbars, so we should use
+  # `clientWidth` and `clientHeight`. However, when there are no scrollbars
+  # those might be too small. Then we use `innerWidth` and `innerHeight`.
+  width  = if scrollWidth  > innerWidth  then clientWidth  else innerWidth
+  height = if scrollHeight > innerHeight then clientHeight else innerHeight
+  viewport = {
     left:    0
     top:     0
-    right:   clientWidth
-    bottom:  clientHeight
-    width:   clientWidth
-    height:  clientHeight
-    scrollX: window.scrollX
-    scrollY: window.scrollY
-  markers = createMarkers(window, viewport)
+    right:   width
+    bottom:  height
+    width
+    height
+  }
 
-  return if markers.length == 0
+  groups = {semantic: [], unsemantic: [], combined: []}
+  createMarkers(window, viewport, groups, filter)
+  { semantic, unsemantic, combined } = groups
+  markers = semantic.concat(unsemantic)
 
-  for marker in markers
-    marker.weight = marker.elementShape.area
+  return [[], null] if markers.length == 0
 
   # Each marker gets a unique `z-index`, so that it can be determined if a
-  # marker overlaps another.  Put more important markers (higher weight) at the
+  # marker overlaps another. Put more important markers (higher weight) at the
   # end, so that they get higher `z-index`, in order not to be overlapped.
-  markers.sort((a, b) -> a.weight - b.weight)
-  for marker, index in markers
-    marker.markerElement.style.setProperty('z-index', Z_INDEX_START + index,
-                                           'important')
+  zIndex = 0
+  setZIndexes = (markers) ->
+    markers.sort((a, b) -> a.weight - b.weight)
+    for marker in markers when marker not instanceof huffman.BranchPoint
+      marker.markerElement.style.zIndex = zIndex++
+      # Add `z-index` space for all the children of the marker (usually 0).
+      zIndex += marker.numChildren
 
+  # The `markers` passed to this function have been sorted by `setZIndexes` in
+  # advance, so we can skip sorting in the `huffman.createTree` function.
   hintChars = utils.getHintChars()
-  tree = huffman.createTree(markers, hintChars.length, {sorted: true})
+  createHuffmanTree = (markers) ->
+    return huffman.createTree(markers, hintChars.length, {sorted: true})
+
+  # Semantic elements should always get better hints and higher `z-index`:es
+  # than unsemantic ones, even if they are smaller. The latter is achieved by
+  # putting the unsemantic elements in their own branch of the huffman tree.
+  if unsemantic.length > 0
+    if markers.length > hintChars.length
+      setZIndexes(unsemantic)
+      subTree = createHuffmanTree(unsemantic)
+      semantic.push(subTree)
+    else
+      semantic.push(unsemantic...)
+
+  setZIndexes(semantic)
+
+  tree = createHuffmanTree(semantic)
   tree.assignCodeWords(hintChars, (marker, hint) -> marker.setHint(hint))
 
-  removeHints(document)
-  container = utils.createElement(document, 'div', {id: CONTAINER_ID})
-  document.documentElement.appendChild(container)
+  # Markers for links with the same href can be combined to use the same hint.
+  # They should all have the same `z-index` (because they all have the same
+  # combined weight), but in case any of them cover another they still get a
+  # unique `z-index` (space for this was added in `setZIndexes`).
+  for marker in combined
+    { parent } = marker
+    marker.markerElement.style.zIndex = parent.markerElement.style.zIndex++
+    marker.setHint(parent.hint)
+  markers.push(combined...)
+
+  container = rootWindow.document.createElement('box')
+  container.classList.add('VimFxMarkersContainer')
+  rootWindow.gBrowser.mCurrentBrowser.parentNode.appendChild(container)
 
   for marker in markers
     container.appendChild(marker.markerElement)
@@ -85,23 +105,27 @@ injectHints = (window) ->
     # marker.coffee).
     marker.setPosition(viewport)
 
-  return markers
+  return [markers, container]
 
-
-createMarkers = (window, viewport, parents = []) ->
+# `filter` is a function that is given every element in every frame of the page.
+# It should return new `Marker`s for markable elements and a falsy value for all
+# other elements. All returned `Marker`s are added to `groups`. `groups` is
+# modified instead of using return values to avoid array concatenation for each
+# frame. It might sound expensive to go through _every_ element, but that’s
+# actually what other methods like using XPath or CSS selectors would need to do
+# anyway behind the scenes.
+createMarkers = (window, viewport, groups, filter, parents = []) ->
   { document } = window
-  markers = []
 
-  # For now we aren't able to handle hint markers in XUL Documents :(
-  return [] unless document instanceof HTMLDocument
-
-  candidates = utils.getMarkableElements(document, {type: 'all'})
-  for element in candidates
-    shape = getElementShape(window, element, viewport, parents)
-    # If `element` has no visible shape then it shouldn’t get any marker.
-    continue unless shape
-
-    markers.push(new Marker(element, shape))
+  localGetElementShape = getElementShape.bind(null, window, viewport, parents)
+  for element in utils.getAllElements(document)
+    continue unless marker = filter(element, localGetElementShape)
+    if marker.parent
+      groups.combined.push(marker)
+    else if marker.semantic
+      groups.semantic.push(marker)
+    else
+      groups.unsemantic.push(marker)
 
   for frame in window.frames
     rect = frame.frameElement.getBoundingClientRect() # Frames only have one.
@@ -126,11 +150,10 @@ createMarkers = (window, viewport, parents = []) ->
         parseFloat(computedStyle.getPropertyValue('border-top-width')) +
         parseFloat(computedStyle.getPropertyValue('padding-top'))
 
-    frameMarkers = createMarkers(frame, frameViewport,
-                                 parents.concat({ window, offset }))
-    markers.push(frameMarkers...)
+    createMarkers(frame, frameViewport, groups, filter,
+                  parents.concat({ window, offset }))
 
-  return markers
+  return
 
 # Returns the “shape” of `element`:
 #
@@ -145,7 +168,7 @@ createMarkers = (window, viewport, parents = []) ->
 #
 # Returns `null` if `element` is outside `viewport` or entirely covered by other
 # elements.
-getElementShape = (window, element, viewport, parents) ->
+getElementShape = (window, viewport, parents, element) ->
   # `element.getClientRects()` returns a list of rectangles, usually just one,
   # which is identical to the one returned by `element.getBoundingClientRect()`.
   # However, if `element` is inline and line-wrapped, then it returns one
@@ -171,10 +194,9 @@ getElementShape = (window, element, viewport, parents) ->
         # Those are still clickable. Therefore we return the shape of the first
         # visible child instead. At least in that example, that’s the best bet.
         for child in element.children
-          shape = getElementShape(window, child, viewport, parents)
+          shape = getElementShape(window, viewport, parents, child)
           return shape if shape
     return null
-
 
   # Even if `element` has a visible rect, it might be covered by other elements.
   for visibleRect in visibleRects
@@ -248,7 +270,9 @@ getFirstNonCoveredPoint = (window, viewport, element, elementRect, parents) ->
     # though `element` isn’t covered. We don’t try to temporarily reset such CSS
     # (as with `border-radius`) because of performance. Instead we rely on that
     # some of the attempts below will work.
-    if element.contains(elementAtPoint) # Note that `a.contains(a) == true`!
+    if element.contains(elementAtPoint) or # Note that `a.contains(a) == true`!
+       (window.document instanceof XULDocument and
+        getClosestNonAnonymousParent(element) == elementAtPoint)
       found = true
       # If we’re currently in a frame, there might be something on top of the
       # frame that covers `element`. Therefore we ensure that the frame really
@@ -303,67 +327,11 @@ getFirstNonCoveredPoint = (window, viewport, element, elementRect, parents) ->
 
   return nonCoveredPoint
 
+# In XUL documents there are “anonymous” elements, whose node names start with
+# `xul:` or `html:`. These are not never returned by `document.elementFromPoint`
+# but their closest non-anonymous parents are.
+getClosestNonAnonymousParent = (element) ->
+  element = element.parentNode while element.prefix?
+  return element
 
-# Finds all stacks of markers that overlap each other (by using `getStackFor`)
-# (#1), and rotates their `z-index`:es (#2), thus alternating which markers are
-# visible.
-rotateOverlappingMarkers = (originalMarkers, forward) ->
-  # Shallow working copy. This is necessary since `markers` will be mutated and
-  # eventually empty.
-  markers = originalMarkers[..]
-
-  # (#1)
-  stacks = (getStackFor(markers.pop(), markers) while markers.length > 0)
-
-  # (#2)
-  # Stacks of length 1 don't participate in any overlapping, and can therefore
-  # be skipped.
-  for stack in stacks when stack.length > 1
-    # This sort is not required, but makes the rotation more predictable.
-    stack.sort((a, b) -> a.markerElement.style.zIndex -
-                         b.markerElement.style.zIndex)
-
-    # Array of z-indices.
-    indexStack = (marker.markerElement.style.zIndex for marker in stack)
-    # Shift the array of indices one item forward or back.
-    if forward
-      indexStack.unshift(indexStack.pop())
-    else
-      indexStack.push(indexStack.shift())
-
-    for marker, index in stack
-      marker.markerElement.style.setProperty('z-index', indexStack[index],
-                                             'important')
-
-  return
-
-# Get an array containing `marker` and all markers that overlap `marker`, if
-# any, which is called a "stack". All markers in the returned stack are spliced
-# out from `markers`, thus mutating it.
-getStackFor = (marker, markers) ->
-  stack = [marker]
-
-  { top, bottom, left, right } = marker.position
-
-  index = 0
-  while index < markers.length
-    nextMarker = markers[index]
-
-    next = nextMarker.position
-    overlapsVertically   = (next.bottom >= top  and next.top  <= bottom)
-    overlapsHorizontally = (next.right  >= left and next.left <= right)
-
-    if overlapsVertically and overlapsHorizontally
-      # Also get all markers overlapping this one.
-      markers.splice(index, 1)
-      stack = stack.concat(getStackFor(nextMarker, markers))
-    else
-      # Continue the search.
-      index++
-
-  return stack
-
-
-exports.injectHints              = injectHints
-exports.removeHints              = removeHints
-exports.rotateOverlappingMarkers = rotateOverlappingMarkers
+exports.injectHints = injectHints
