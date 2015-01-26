@@ -10,6 +10,7 @@ _Please_ read the following four lines!
 - Use **English.**
 - Search for **duplicates**—also closed issues.
 - Bugs: Include **VimFx version**, Firefox version, OS and keyboard layout.
+  Also, **did it use to work before?**
 - Feature requests: Include a specific detailed **use case** example.
 
 
