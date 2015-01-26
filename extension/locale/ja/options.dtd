@@ -13,10 +13,16 @@
 
 <!ENTITY pref.scroll_step_lines.title "スクロールの度合い">
 
-<!ENTITY pref.hints_bloom_on.title "賢いヒント割り当て">
-<!ENTITY pref.hints_bloom_on.desc  "ユーザーがよく訪れるページに短いヒントを割り当てるようにします">
-
 <!ENTITY pref.prevent_autofocus.title "入力欄によるフォーカスの奪取を妨害">
+
+<!ENTITY pref.autofocus_limit.title "Autofocus limit">
+<!ENTITY pref.autofocus_limit.desc  "Used when Prevent autofocus is on. If a text input is focused more than this number of milliseconds after you last interacted with the page, it is considered an autofocus.">
+
+<!ENTITY pref.ignore_keyboard_layout.title "Ignore keyboard layout">
+<!ENTITY pref.ignore_keyboard_layout.desc  "Pretend that the en-US QWERTY layout is always used">
+
+<!ENTITY pref.keyboardevent.code.enabled.title "Enable `KeyboardEvent.code` support">
+<!ENTITY pref.keyboardevent.code.enabled.desc  "Considered &quot;experimental&quot; by Firefox, but works really well. Needed by the Ignore keyboard layout setting. Requires restart.">
 
 <!ENTITY customizeButton.title "キーボードショートカット">
 <!ENTITY customizeButton.label "カスタマイズ">

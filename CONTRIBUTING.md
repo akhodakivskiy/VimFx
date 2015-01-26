@@ -1,5 +1,8 @@
 # Contributing
 
+**Just upgraded to version 0.6.0?** Be sure to checkout the
+[changelog](CHANGELOG.md) to see what’s new, and what has changed.
+
 ## Reporting issues
 
 _Please_ read the following four lines!
@@ -16,10 +19,8 @@ _Please_ read the following four lines!
 
 ## Localizing
 
-Contribute your localization! See `locale` folder.
-
-Send your pull request to the **master** branch (no matter if it is a new
-locale or an update to an existing one).
+Contribute your localization! Copy the extension/locale/en-US directory and go
+wild!
 
 
 ## Developing
@@ -59,7 +60,7 @@ Create a new topic branch, based on either master or develop. See above.
 
 Code! Try to follow the following simple rules:
 
-- Always use parenthesis when calling functions. (Except `require`.)
+- Always use parenthesis when calling functions.
 - Always use explicit `return`s, unless the function is a one-liner.
 - Always use single quotes, unless you use interpolation.
 - Prefer interpolation over concatenation, both in strings and in regexes.
@@ -74,6 +75,10 @@ Code! Try to follow the following simple rules:
 - Try to keep lines at most 80 characters long.
 - Indent using two spaces.
 
+Please lint your code. See below.
+
+Run the tests and make sure that all pass. See below. Add tests if possible.
+
 Break up your pull request in several commits if necessary. The first line of
 commit messages should be a short summary. Add a blank line and then a nicely
 formatted markdown description after it if needed.
@@ -81,17 +86,45 @@ formatted markdown description after it if needed.
 Finally send a pull request to same branch as you based your topic branch on
 (master or develop).
 
-### Tips:
+### Building VimFx
 
-- Compile the .coffee files with the **`--bare`** option! Otherwise you will
-  get errors.
-- Run `coffee -cbw .` from the root of the project to automatically compile on
-  changes.
-- Put a file called exactly `VimFx@akhodakivskiy.github.com` in the extensions/
-  folder of a Firefox profile, containing the absolute path to the extension/
-  folder in the project. Then you just need to restart Firefox (use some
-  add-on!) after each change. More details in this [MDN article][mdn-extdevenv].
-- Only create tickets for issues and feature requests in English. Otherwise
-  duplicate tickets in different languages will pile up.
+1. Install [Node.js].
+2. Run `npm install` to download dependencies and development dependencies.
+3. Run `npm install -g gulp` to be able to run [`gulp`][gulp] commands.
+   (Alternatively, you may use `./node_modules/.bin/gulp`.)
+4. Create a new Firefox profile for development.
+5. Install the [Extension Auto-Installer] add-on in your development profile.
 
-[mdn-extdevenv]: https://developer.mozilla.org/en-US/docs/Setting_up_extension_development_environment#Firefox_extension_proxy_file
+- `gulp build` creates the `build/` directory. It is basically a copy of the
+  `extension/` directory, with the .coffee files compiled to .js.
+- `gulp xpi` zips up the `build/` directory into `build/VimFx.xpi`.
+- `gulp push` (or just `gulp`) pushes `build/VimFx.xpi` to
+  `http://localhost:8888`, which causes the Extension Auto-Installer to
+  automatically install it. (No need to restart Firefox.)
+- `gulp clean` removes the `build/` directory.
+- `gulp lint` lints your code.
+- Use the `--test` or `-t` option to include the unit test files. The output of
+  the tests are `console.log`ed. See the browser console, or start Firefox from
+  the command line to see it.
+
+An easy workflow is code, `gulp`, test, repeat. (Use `gulp -t` to also run the
+unit tests.)
+
+[Node.js]: http://nodejs.org/
+[gulp]: https://github.com/gulpjs/gulp
+[Extension Auto-Installer]: https://addons.mozilla.org/firefox/addon/autoinstaller
+
+### Making a release
+
+1. Add a list of changes since the last version at the top of CHANGELOG.md.
+2. Update the version in package.json (see above about versioning), and, if
+   needed, the min and max Firefox versions.
+3. Run `gulp release`, which does the following for you:
+  - Adds a heading with the new version number and today’s date at the top of
+    CHANGELOG.md.
+  - Commits CHANGELOG.md and package.json.
+  - Tags the commit.
+4. Run `gulp xpi` to rebuild with the new version number.
+5. Push to github. Don’t forget to push the tag!
+6. Make a “release” out of the new tag on github, and attach VimFx.xpi to it.
+7. Publish on addons.mozilla.org. Add the release notes list as HTML.

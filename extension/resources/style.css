@@ -1,3 +1,46 @@
+/*
+ * Copyright Anton Khodakivskiy 2012, 2013.
+ * Copyright Simon Lydell 2013, 2014.
+ *
+ * This file is part of VimFx.
+ *
+ * VimFx is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * VimFx is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with VimFx.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * Copyright (c) 2010 Phil Crosby, Ilya Sukhar.
+ *
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use,
+ * copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following
+ * conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+ */
+
 /* Copied over from vimium project */
 .VimFxReset {
     background: none !important;
@@ -23,6 +66,7 @@
     min-height: 0 !important;
     min-width: 0 !important;
     opacity: 1 !important;
+    outline: none !important;
     padding: 0 !important;
     position: static !important;
     /*right: auto !important;*/
@@ -37,36 +81,50 @@
     width: auto !important;
     float: none !important;
 }
+.VimFxReset::before,
+.VimFxReset::after {
+    content: none !important;
+}
 
 /* Markers */
 
+.VimFxMarkersContainer {
+  position: absolute;
+}
+
 .VimFxHintMarker {
-    position: absolute !important;
-    display: block !important;
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    font-size: 12px !important;
-    padding: 1px 2px 0 2px !important;
-    box-shadow: 0 3px 7px 0 rgba(0, 0, 0, 0.3) !important;
-    background-color: #FFD76E !important;
-    border: solid 1px #AD810C !important;
-    border-radius: 2px !important;
+    white-space: nowrap;
+    position: absolute;
+    padding: 1px 2px 0 2px;
+    line-height: 1;
+    background-color: #FFD76E;
+    border: solid 1px #AD810C;
+    border-radius: 2px;
+    box-shadow: 0 3px 7px 0 rgba(0, 0, 0, 0.3);
+    font-size: 12px;
+    color: #302505;
+    font-family: "Helvetica Neue", "Helvetica", "Arial", "Sans";
+    font-weight: bold;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
+    text-transform: uppercase;
 }
 
-.VimFxHintMarker > span {
-    color: #302505 !important;
-    font-family: "Helvetica Neue", "Helvetica", "Arial", "Sans" !important;
-    font-weight: bold !important;
-    font-size: 12px !important;
-    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6) !important;
+.VimFxCharMatch,
+.VimFxMatchedHintMarker {
+    color: #ffa22a;
 }
 
-.VimFxHintMarker > span.VimFxCharMatch {
-    color: #ffa22a !important;
+.VimFxHiddenHintMarker {
+    display: none;
 }
 
-.VimFxHintMarker.VimFxHiddenHintMarker {
-    display: none !important;
+/* This class is temporarily added to markable element, to remove border-radius
+ * while doing some computations. The `!important`s are therefore needed. */
+.VimFxNoBorderRadius {
+    border-radius: 0 !important;
+    /* `transition` is reset here to make sure that the above declaration
+     * takes effect immediately. */
+    transition: none !important;
 }
 
 /* Help Dialog */

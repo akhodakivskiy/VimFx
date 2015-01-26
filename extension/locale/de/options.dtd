@@ -12,10 +12,16 @@
 
 <!ENTITY pref.scroll_step_lines.title     "Scroll-Schrittweite">
 
-<!ENTITY pref.hints_bloom_on.title "Intelligente Hinweiszuweisung">
-<!ENTITY pref.hints_bloom_on.desc  "Oft besuchten Links kürzere Hinweise zuweisen">
-
 <!ENTITY pref.prevent_autofocus.title "Eingabefelder nicht automatische fokussieren">
+
+<!ENTITY pref.autofocus_limit.title "Autofocus limit">
+<!ENTITY pref.autofocus_limit.desc  "Used when Prevent autofocus is on. If a text input is focused more than this number of milliseconds after you last interacted with the page, it is considered an autofocus.">
+
+<!ENTITY pref.ignore_keyboard_layout.title "Ignore keyboard layout">
+<!ENTITY pref.ignore_keyboard_layout.desc  "Pretend that the en-US QWERTY layout is always used">
+
+<!ENTITY pref.keyboardevent.code.enabled.title "Enable `KeyboardEvent.code` support">
+<!ENTITY pref.keyboardevent.code.enabled.desc  "Considered &quot;experimental&quot; by Firefox, but works really well. Needed by the Ignore keyboard layout setting. Requires restart.">
 
 <!ENTITY customizeButton.title "Tastaturbefehle">
 <!ENTITY customizeButton.label "Anpassen">

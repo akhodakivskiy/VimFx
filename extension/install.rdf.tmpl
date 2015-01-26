@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RDF xmlns="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:em="http://www.mozilla.org/2004/em-rdf#">
+
+  <Description about="urn:mozilla:install-manifest">
+    <em:name>VimFx</em:name>
+    <em:id>VimFx@akhodakivskiy.github.com</em:id>
+    <em:homepageURL>http://www.github.com/akhodakivskiy/VimFx</em:homepageURL>
+    <em:version>{{version}}</em:version>
+    <em:bootstrap>true</em:bootstrap>
+    <em:type>2</em:type>
+
+    <!-- Firefox -->
+    <em:targetApplication>
+      <Description>
+        <em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id>
+        <em:minVersion>{{minVersion}}</em:minVersion>
+        <em:maxVersion>{{maxVersion}}</em:maxVersion>
+      </Description>
+    </em:targetApplication>
+
+    <em:description>{{defaultDescription}}</em:description>
+
+    <em:creator>{{creator}}</em:creator>
+
+    {{#developers}}
+    <em:developer>{{name}}</em:developer>
+    {{/developers}}
+
+    {{#contributors}}
+    <em:contributor>{{name}}</em:contributor>
+    {{/contributors}}
+
+    {{#translators}}
+    <em:translator>{{name}}</em:translator>
+    {{/translators}}
+
+    {{#locales}}
+    <em:localized>
+      <Description>
+        <em:locale>{{locale}}</em:locale>
+        <em:description>{{description}}</em:description>
+      </Description>
+    </em:localized>
+    {{/locales}}
+
+  </Description>
+</RDF>
