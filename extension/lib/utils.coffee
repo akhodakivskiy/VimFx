@@ -94,9 +94,9 @@ blurActiveElement = (window) ->
     activeElement.blur()
 
 isProperLink = (element) ->
-  return (element instanceof HTMLAnchorElement or
-          (element.ownerDocument instanceof XULDocument and
-           element.hasAttribute('href'))) and
+  return element.hasAttribute('href') and
+         (element instanceof HTMLAnchorElement or
+          element.ownerDocument instanceof XULDocument) and
          not element.href.endsWith('#') and
          not element.href.startsWith('javascript:')
 
