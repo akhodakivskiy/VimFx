@@ -1,6 +1,6 @@
 # Contributing
 
-Just upgraded to version 0.6.0? Be sure to checkout the
+**Just upgraded to version 0.6.0?** Be sure to checkout the
 [changelog](CHANGELOG.md) to see what’s new, and what has changed.
 
 ## Reporting issues
