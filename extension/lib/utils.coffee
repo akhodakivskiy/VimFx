@@ -120,6 +120,12 @@ isGoogleEditable = (element) ->
   return element.getAttribute?('g_editable') == 'true' or
          element.ownerDocument.body?.getAttribute('g_editable') == 'true'
 
+isDataApp = (element) ->
+  # `data-app-action and data-uri` are a non-standard attributes commonly used by Feedly.
+  return element.hasAttribute('data-app-action') or
+         element.hasAttribute('data-uri') or
+         element.hasAttribute('data-page-action')
+
 isActivatable = (element) ->
   return element instanceof HTMLAnchorElement or
          element instanceof HTMLButtonElement or
@@ -416,6 +422,7 @@ exports.blurActiveElement         = blurActiveElement
 exports.isProperLink              = isProperLink
 exports.isTextInputElement        = isTextInputElement
 exports.isContentEditable         = isContentEditable
+exports.isDataApp                 = isDataApp
 exports.isActivatable             = isActivatable
 exports.isAdjustable              = isAdjustable
 exports.area                      = area
