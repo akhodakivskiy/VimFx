@@ -29,7 +29,7 @@ _          = require('./l10n')
 , setPref
 , isPrefSet } = require('./prefs')
 
-{ isProperLink, isTextInputElement, isContentEditable } = utils
+{ isProperLink, isTextInputElement, isContentEditable, isDataApp } = utils
 
 { classes: Cc, interfaces: Ci, utils: Cu } = Components
 
@@ -288,7 +288,9 @@ command_follow = (vim, event, count) ->
            element.hasAttribute('oncommand') or
            element.getAttribute('role') in ['link', 'button'] or
            # Twitter special-case.
-           element.classList.contains('js-new-tweets-bar')
+           element.classList.contains('js-new-tweets-bar') or
+           # Feedly special-case.
+           isDataApp(element)
         type = 'clickable'
         semantic = false
       # Putting markers on `<label>` elements is generally redundant, because
@@ -372,6 +374,7 @@ command_marker_yank = (vim) ->
   filter = (element, getElementShape) ->
     type = switch
       when isProperLink(element)       then 'link'
+      when isDataApp(element)          then 'clickable'
       when isTextInputElement(element) then 'textInput'
       when isContentEditable(element)  then 'contenteditable'
     return unless type
