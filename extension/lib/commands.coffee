@@ -288,7 +288,11 @@ command_follow = (vim, event, count) ->
            element.hasAttribute('oncommand') or
            element.getAttribute('role') in ['link', 'button'] or
            # Twitter special-case.
-           element.classList.contains('js-new-tweets-bar')
+           element.classList.contains('js-new-tweets-bar') or
+           # Feedly special-case.
+           element.hasAttribute('data-app-action') or
+           element.hasAttribute('data-uri') or
+           element.hasAttribute('data-page-action')
         type = 'clickable'
         semantic = false
       # Putting markers on `<label>` elements is generally redundant, because
