@@ -261,7 +261,8 @@ combine = (hrefs, marker) ->
     else
       hrefs[href] = marker
   return marker
-
+  
+# Follow links, focus text inputs and click buttons with hint markers.
 command_follow = (vim, event, count, newTab, inBackground) ->
   hrefs = {}
   filter = (element, getElementShape) ->
