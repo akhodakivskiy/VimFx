@@ -262,8 +262,7 @@ combine = (hrefs, marker) ->
       hrefs[href] = marker
   return marker
 
-# Follow links, focus text inputs and click buttons with hint markers.
-command_follow = (vim, event, count) ->
+command_follow = (vim, event, count, newTab, inBackground) ->
   hrefs = {}
   filter = (element, getElementShape) ->
     document = element.ownerDocument
@@ -323,9 +322,9 @@ command_follow = (vim, event, count) ->
     { element } = marker
     element.focus()
     last = (count == 1)
-    if not last and marker.type == 'link'
+    if not last and marker.type == 'link' or newTab
       utils.openTab(vim.rootWindow, element.href, {
-        inBackground: true
+        inBackground: inBackground
         relatedToCurrent: true
       })
     else
@@ -344,27 +343,12 @@ command_follow_multiple = (vim, event) ->
   command_follow(vim, event, Infinity)
 
 # Follow links in a new background tab with hint markers.
-command_follow_in_tab = (vim, event, count, inBackground = true) ->
-  hrefs = {}
-  filter = (element, getElementShape) ->
-    return unless isProperLink(element)
-    return unless shape = getElementShape(element)
-    return combine(hrefs, new Marker(element, shape, {semantic: true}))
-
-  callback = (marker) ->
-    last = (count == 1)
-    utils.openTab(vim.rootWindow, marker.element.href, {
-      inBackground: if last then inBackground else true
-      relatedToCurrent: true
-    })
-    count--
-    return not last
-
-  vim.enterMode('hints', filter, callback)
+command_follow_in_tab = (vim, event, count) ->
+  command_follow(vim, event, count, true, true)
 
 # Follow links in a new foreground tab with hint markers.
 command_follow_in_focused_tab = (vim, event, count) ->
-  command_follow_in_tab(vim, event, count, false)
+  command_follow(vim, event, count, true, false)
 
 # Copy the URL or text of a markable element to the system clipboard.
 command_marker_yank = (vim) ->
