@@ -359,7 +359,7 @@ command_marker_yank = (vim) ->
   filter = (element, getElementShape) ->
     type = switch
       when isProperLink(element)       then 'link'
-      when isDataApp(element)          then 'link'
+      when isDataApp(element)          then 'clickable'
       when isTextInputElement(element) then 'textInput'
       when isContentEditable(element)  then 'contenteditable'
     return unless type
