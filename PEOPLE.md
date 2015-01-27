@@ -6,6 +6,7 @@ Anton Khodakivskiy
 
 # Contributors
 - Wang Zhuochun
+- Heidi Xu (icon design)
 
 # Translators
 - Frank Hase (de)
