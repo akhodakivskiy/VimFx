@@ -174,6 +174,9 @@ simulateClick = (element) ->
     mouseEvent = new window.MouseEvent(type, {
       # Let the event bubble in order to trigger delegated event listeners.
       bubbles: true
+      # Make the event cancelable so that `<a href="#">` can be used as a
+      # JavaScript-powered button without scrolling to the top of the page.
+      cancelable: true
     })
     element.dispatchEvent(mouseEvent)
 
