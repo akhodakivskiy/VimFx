@@ -210,7 +210,7 @@ writeToClipboard = (text) ->
     .getService(Ci.nsIClipboardHelper)
   clipboardHelper.copyString(text)
 
-# Executes function `func` and mearues how much time it took.
+# Executes function `func` and measures how much time it took.
 timeIt = (func, name) ->
   console.time(name)
   result = func()
