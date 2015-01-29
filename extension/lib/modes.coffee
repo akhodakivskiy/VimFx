@@ -96,7 +96,7 @@ exports['normal'] =
       return true
 
     else
-      storage.keys.length = 0 unless /\d/.test(keyStr)
+      storage.keys.length = 0 unless /^\d$/.test(keyStr)
 
       return false
 
