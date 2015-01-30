@@ -338,9 +338,18 @@ createElement = (document, type, attributes = {}) ->
 
   return element
 
-getAllElements = (document) -> switch
+getAllElements = (document, viewport) -> switch
   when document instanceof HTMLDocument
-    return document.getElementsByTagName('*')
+    windowUtils = document.defaultView
+      .QueryInterface(Ci.nsIInterfaceRequestor)
+      .getInterface(Ci.nsIDOMWindowUtils)
+    return windowUtils.nodesFromRect(
+      viewport.left, viewport.top, # Rect coordinates, relative to the viewport.
+      # Distances to expand in all directions: top, right, bottom, left.
+      0, viewport.right, viewport.bottom, 0,
+      true, # Unsure what this does. Toggling it seems to make no difference.
+      true  # Ensure that the list of matching elements is fully up to date.
+    )
   when document instanceof XULDocument
     elements = []
     getAllRegular = (element) ->

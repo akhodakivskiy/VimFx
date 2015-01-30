@@ -23,6 +23,7 @@ huffman    = require('n-ary-huffman')
 
 { interfaces: Ci } = Components
 
+Element      = Ci.nsIDOMElement
 XULDocument  = Ci.nsIDOMXULDocument
 
 injectHints = (rootWindow, window, filter) ->
@@ -118,7 +119,8 @@ createMarkers = (window, viewport, groups, filter, parents = []) ->
   { document } = window
 
   localGetElementShape = getElementShape.bind(null, window, viewport, parents)
-  for element in utils.getAllElements(document)
+  allElements = utils.getAllElements(document, viewport)
+  for element in allElements when element instanceof Element
     continue unless marker = filter(element, localGetElementShape)
     if marker.parent
       groups.combined.push(marker)
