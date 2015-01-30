@@ -226,18 +226,10 @@ windowsListeners =
     return unless computedStyle = vim.window.getComputedStyle(event.target)
     return if computedStyle.getPropertyValue('overflow') == 'hidden'
     vim.state.scrollableElements.set(event.target)
-    { largestScrollableElement } = vim.state
-    if largestScrollableElement == null or
-       utils.area(event.target) > utils.area(largestScrollableElement)
-      vim.state.largestScrollableElement = event.target
 
   underflow: (event) ->
     return unless vim = getVimFromEvent(event)
     vim.state.scrollableElements.delete(event.target)
-    # It is not likely that the largest scrollable element underflows, so don’t
-    # bother looking for a new largest one now. Just pretend that there is none.
-    if event.target == vim.state.largestScrollableElement
-      vim.state.largestScrollableElement = null
 
   # When the top level window closes we should release all Vims that were
   # associated with tabs in this window.

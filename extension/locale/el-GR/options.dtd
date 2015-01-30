@@ -10,8 +10,6 @@
 <!ENTITY pref.next_patterns.title "Patterns Επόμενης Σελίδας">
 <!ENTITY pref.next_patterns.desc "Λίστα patterns χωριζόμενες με κόμμα που αντιστοιχούν με συνδέσμους σε επόμενες σελίδες">
 
-<!ENTITY pref.scroll_step_lines.title "Βήμα Κύλισης">
-
 <!ENTITY pref.prevent_autofocus.title "Αποτροπή αυτόματης εστίασης στα inputs">
 
 <!ENTITY pref.autofocus_limit.title "Autofocus limit">

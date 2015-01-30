@@ -35,7 +35,6 @@ module.exports = class Vim
       lastInteraction: null
       lastAutofocusPrevention: null
       scrollableElements: new WeakMap()
-      largestScrollableElement: null
       lastFocusedTextInput: null
 
   enterMode: (mode, args...) ->

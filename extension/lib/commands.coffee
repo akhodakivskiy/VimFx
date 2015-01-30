@@ -19,12 +19,14 @@
 # along with VimFx.  If not, see <http://www.gnu.org/licenses/>.
 ###
 
-notation    = require('vim-like-key-notation')
-Command     = require('./command')
-{ Marker }  = require('./marker')
-utils       = require('./utils')
-help        = require('./help')
-{ getPref } = require('./prefs')
+notation   = require('vim-like-key-notation')
+Command    = require('./command')
+{ Marker } = require('./marker')
+utils      = require('./utils')
+help       = require('./help')
+{ getPref
+, getFirefoxPref
+, withFirefoxPrefAs } = require('./prefs')
 
 { isProperLink, isTextInputElement, isContentEditable } = utils
 
@@ -98,49 +100,66 @@ command_stop_all = (vim) ->
     window = tab.linkedBrowser.contentWindow
     window.stop()
 
-# Scroll to the top of the page.
-command_scroll_to_top = (vim) ->
-  vim.rootWindow.goDoCommand('cmd_scrollTop')
+axisMap =
+  x: ['left', 'clientWidth',  'horizontalScrollDistance',  5]
+  y: ['top',  'clientHeight', 'verticalScrollDistance',   20]
+helper_scroll = (method, type, axis, amount, vim, event, count = 1) ->
+  frameDocument = event.target.ownerDocument
+  element =
+    if vim.state.scrollableElements.has(event.target)
+      event.target
+    else
+      frameDocument.documentElement
 
-# Scroll to the bottom of the page.
-command_scroll_to_bottom = (vim) ->
-  vim.rootWindow.goDoCommand('cmd_scrollBottom')
+  [ direction, dimension, distance, lineAmount ] = axisMap[axis]
 
-# Scroll down a bit.
-command_scroll_down = (vim, event, count = 1) ->
-  step = getPref('scroll_step_lines') * count
-  utils.simulateWheel(vim.window, 0, +step, utils.WHEEL_MODE_LINE)
+  if method == 'scrollTo'
+    amount = Math.min(amount, element.scrollTopMax)
+  else
+    unit = switch type
+      when 'lines'
+        getFirefoxPref("toolkit.scrollbox.#{ distance }") * lineAmount
+      when 'pages'
+        element[dimension]
+    amount *= unit * count
 
-# Scroll up a bit.
-command_scroll_up = (vim, event, count = 1) ->
-  step = getPref('scroll_step_lines') * count
-  utils.simulateWheel(vim.window, 0, -step, utils.WHEEL_MODE_LINE)
+  options = {}
+  options[direction] = amount
+  if getFirefoxPref('general.smoothScroll') and
+     getFirefoxPref("general.smoothScroll.#{ type }")
+    options.behavior = 'smooth'
 
-# Scroll left a bit.
-command_scroll_left = (vim, event, count = 1) ->
-  step = getPref('scroll_step_lines') * count
-  utils.simulateWheel(vim.window, -step, 0, utils.WHEEL_MODE_LINE)
+  withFirefoxPrefAs(
+    'layout.css.scroll-behavior.spring-constant',
+    getPref("smoothScroll.#{ type }.spring-constant"),
+    ->
+      element[method](options)
+      # When scrolling the whole page, the body sometimes needs to be scrolled
+      # too.
+      if element == frameDocument.documentElement
+        frameDocument.body?[method](options)
+  )
 
-# Scroll right a bit.
-command_scroll_right = (vim, event, count = 1) ->
-  step = getPref('scroll_step_lines') * count
-  utils.simulateWheel(vim.window, +step, 0, utils.WHEEL_MODE_LINE)
-
-# Scroll down half a page.
-command_scroll_half_page_down = (vim, event, count = 1) ->
-  utils.simulateWheel(vim.window, 0, +0.5 * count, utils.WHEEL_MODE_PAGE)
-
-# Scroll up half a page.
-command_scroll_half_page_up = (vim, event, count = 1) ->
-  utils.simulateWheel(vim.window, 0, -0.5 * count, utils.WHEEL_MODE_PAGE)
-
-# Scroll down full a page.
-command_scroll_page_down = (vim, event, count = 1) ->
-  utils.simulateWheel(vim.window, 0, +1 * count, utils.WHEEL_MODE_PAGE)
-
-# Scroll up full a page.
-command_scroll_page_up = (vim, event, count = 1) ->
-  utils.simulateWheel(vim.window, 0, -1 * count, utils.WHEEL_MODE_PAGE)
+command_scroll_to_top =
+  helper_scroll.bind(undefined, 'scrollTo', 'other', 'y', 0)
+command_scroll_to_bottom =
+  helper_scroll.bind(undefined, 'scrollTo', 'other', 'y', Infinity)
+command_scroll_down =
+  helper_scroll.bind(undefined, 'scrollBy', 'lines', 'y', +1)
+command_scroll_up =
+  helper_scroll.bind(undefined, 'scrollBy', 'lines', 'y', -1)
+command_scroll_right =
+  helper_scroll.bind(undefined, 'scrollBy', 'lines', 'x', +1)
+command_scroll_left =
+  helper_scroll.bind(undefined, 'scrollBy', 'lines', 'x', -1)
+command_scroll_half_page_down =
+  helper_scroll.bind(undefined, 'scrollBy', 'pages', 'y', +0.5)
+command_scroll_half_page_up =
+  helper_scroll.bind(undefined, 'scrollBy', 'pages', 'y', -0.5)
+command_scroll_page_down =
+  helper_scroll.bind(undefined, 'scrollBy', 'pages', 'y', +1)
+command_scroll_page_up =
+  helper_scroll.bind(undefined, 'scrollBy', 'pages', 'y', -1)
 
 # Open a new tab and select the Address Bar.
 command_open_tab = (vim) ->
@@ -276,7 +295,7 @@ command_follow = (vim, event, count = 1) ->
         type = 'clickable'
         unless isXUL or element.nodeName in ['A', 'INPUT', 'BUTTON']
           semantic = false
-      when element != vim.state.largestScrollableElement and
+      when element != document.documentElement and
            vim.state.scrollableElements.has(element)
         type = 'scrollable'
       when element.hasAttribute('onclick') or
@@ -396,7 +415,7 @@ command_marker_focus = (vim) ->
     type = switch
       when element.tabIndex > -1
         'focusable'
-      when element != vim.state.largestScrollableElement and
+      when element != element.ownerDocument.documentElement and
            vim.state.scrollableElements.has(element)
         'scrollable'
     return unless type

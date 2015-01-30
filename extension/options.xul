@@ -33,8 +33,6 @@ along with VimFx.  If not, see <http://www.gnu.org/licenses/>.
     <setting pref="extensions.VimFx.next_patterns" type="string"
         title="&pref.next_patterns.title;" desc="&pref.next_patterns.desc;" />
     <setting pref="extensions.VimFx.scroll_step_lines" type="integer"
-        title="&pref.scroll_step_lines.title;" />
-    <setting pref="extensions.VimFx.prevent_autofocus" type="bool"
         title="&pref.prevent_autofocus.title;" />
     <setting pref="extensions.VimFx.autofocus_limit" type="integer"
         title="&pref.autofocus_limit.title;" desc="&pref.autofocus_limit.desc;" />

@@ -10,8 +10,6 @@
 <!ENTITY pref.next_patterns.title "Pattern pagina successiva">
 <!ENTITY pref.next_patterns.desc "Lista di pattern, separati da virgola, che corrispondono ad un link alla pagina successiva.">
 
-<!ENTITY pref.scroll_step_lines.title "Righe di avanzamento">
-
 <!ENTITY pref.prevent_autofocus.title "Previene il focus automatico delle caselle di input">
 
 <!ENTITY pref.autofocus_limit.title "Autofocus limit">
