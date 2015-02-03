@@ -23,10 +23,9 @@ utils                        = require('./utils')
 { injectHints }              = require('./hints')
 { rotateOverlappingMarkers } = require('./marker')
 { updateToolbarButton }      = require('./button')
+Command                      = require('./command')
 { commands
-, searchForMatchingCommand
 , escapeCommand
-, Command
 , findStorage }              = require('./commands')
 
 { interfaces: Ci } = Components
@@ -58,7 +57,8 @@ exports['normal'] =
 
     storage.keys.push(keyStr)
 
-    { match, exact, command, count } = searchForMatchingCommand(storage.keys)
+    { match, exact, command, count } =
+      Command.searchForMatchingCommand(@commands, storage.keys)
 
     if vim.state.blacklistedKeys and
        storage.keys.join('') in vim.state.blacklistedKeys

@@ -19,15 +19,12 @@
 # along with VimFx.  If not, see <http://www.gnu.org/licenses/>.
 ###
 
-notation   = require('vim-like-key-notation')
-{ Marker } = require('./marker')
-legacy     = require('./legacy')
-utils      = require('./utils')
-help       = require('./help')
-_          = require('./l10n')
-{ getPref
-, setPref
-, isPrefSet } = require('./prefs')
+notation    = require('vim-like-key-notation')
+Command     = require('./command')
+{ Marker }  = require('./marker')
+utils       = require('./utils')
+help        = require('./help')
+{ getPref } = require('./prefs')
 
 { isProperLink, isTextInputElement, isContentEditable } = utils
 
@@ -537,41 +534,6 @@ command_Esc = (vim, event) ->
     document.mozCancelFullScreen()
 
 
-class Command
-  constructor: (@group, @name, @func, keys) ->
-    @prefName = "commands.#{ @name }.keys"
-    @keyValues =
-      if isPrefSet(@prefName)
-        try JSON.parse(getPref(@prefName))
-        catch then []
-      else
-        keys
-    for key, index in @keyValues when typeof key == 'string'
-      @keyValues[index] = legacy.convertKey(key)
-
-  keys: (value) ->
-    if value == undefined
-      return @keyValues
-    else
-      @keyValues = value
-      setPref(@prefName, JSON.stringify(value))
-
-  help: -> _("help_command_#{ @name }")
-
-  match: (str, numbers = null) ->
-    for key in @keys()
-      key = utils.normalizedKey(key)
-      if key.startsWith(str)
-        # When letter 0 follows after a number, it is considered as number 0
-        # instead of a valid command.
-        continue if key == '0' and numbers
-
-        count = parseInt(numbers[numbers.length - 1], 10) if numbers
-        count = if count > 1 then count else 1
-
-        return {match: true, exact: (key == str), command: this, count}
-
-
 # coffeelint: disable=max_line_length
 commands = [
   new Command('urls',   'focus',                 command_focus,                 [['o']])
@@ -640,16 +602,6 @@ commands = [
 ]
 # coffeelint: enable=max_line_length
 
-searchForMatchingCommand = (keys) ->
-  for index in [0...keys.length] by 1
-    str = keys[index..].join('')
-    numbers = keys[0..index].join('').match(/[1-9]\d*/g)
-    for command in commands
-      return match if match = command.match(str, numbers)
-  return {match: false}
-
 exports.commands                  = commands
-exports.searchForMatchingCommand  = searchForMatchingCommand
 exports.escapeCommand             = escapeCommand
-exports.Command                   = Command
 exports.findStorage               = findStorage
