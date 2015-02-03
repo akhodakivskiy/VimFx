@@ -338,34 +338,6 @@ createElement = (document, type, attributes = {}) ->
 
   return element
 
-getAllElements = (document, viewport) -> switch
-  when document instanceof HTMLDocument
-    windowUtils = document.defaultView
-      .QueryInterface(Ci.nsIInterfaceRequestor)
-      .getInterface(Ci.nsIDOMWindowUtils)
-    return windowUtils.nodesFromRect(
-      viewport.left, viewport.top, # Rect coordinates, relative to the viewport.
-      # Distances to expand in all directions: top, right, bottom, left.
-      0, viewport.right, viewport.bottom, 0,
-      true, # Unsure what this does. Toggling it seems to make no difference.
-      true  # Ensure that the list of matching elements is fully up to date.
-    )
-  when document instanceof XULDocument
-    elements = []
-    getAllRegular = (element) ->
-      for child in element.getElementsByTagName('*')
-        elements.push(child)
-        getAllAnonymous(child)
-      return
-    getAllAnonymous = (element) ->
-      for child in document.getAnonymousNodes(element) or []
-        continue unless child instanceof Element
-        elements.push(child)
-        getAllRegular(child)
-      return
-    getAllRegular(document.documentElement)
-    return elements
-
 isURL = (str) ->
   try
     url = Cc['@mozilla.org/network/io-service;1']
@@ -455,7 +427,6 @@ exports.getVersion                = getVersion
 exports.parseHTML                 = parseHTML
 exports.escapeHTML                = escapeHTML
 exports.createElement             = createElement
-exports.getAllElements            = getAllElements
 exports.isURL                     = isURL
 exports.browserSearchSubmission   = browserSearchSubmission
 exports.openTab                   = openTab

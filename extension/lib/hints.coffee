@@ -24,6 +24,7 @@ huffman    = require('n-ary-huffman')
 { interfaces: Ci } = Components
 
 Element      = Ci.nsIDOMElement
+HTMLDocument = Ci.nsIDOMHTMLDocument
 XULDocument  = Ci.nsIDOMXULDocument
 
 injectHints = (rootWindow, window, filter) ->
@@ -119,8 +120,7 @@ createMarkers = (window, viewport, groups, filter, parents = []) ->
   { document } = window
 
   localGetElementShape = getElementShape.bind(null, window, viewport, parents)
-  allElements = utils.getAllElements(document, viewport)
-  for element in allElements when element instanceof Element
+  for element in getElements(document, viewport) when element instanceof Element
     continue unless marker = filter(element, localGetElementShape)
     if marker.parent
       groups.combined.push(marker)
@@ -157,6 +157,41 @@ createMarkers = (window, viewport, groups, filter, parents = []) ->
 
   return
 
+# Returns a suitable set of elements in `document` that could possibly get
+# markers.
+getElements = (document, viewport) -> switch
+  # In HTML documents we can use a super-fast Firefox API to get all elements in
+  # the viewport.
+  when document instanceof HTMLDocument
+    windowUtils = document.defaultView
+      .QueryInterface(Ci.nsIInterfaceRequestor)
+      .getInterface(Ci.nsIDOMWindowUtils)
+    return windowUtils.nodesFromRect(
+      viewport.left, viewport.top, # Rect coordinates, relative to the viewport.
+      # Distances to expand in all directions: top, right, bottom, left.
+      0, viewport.right, viewport.bottom, 0,
+      true, # Unsure what this does. Toggling it seems to make no difference.
+      true  # Ensure that the list of matching elements is fully up to date.
+    )
+  # In XUL documents we have to resort to get every single element in the entire
+  # document, because there are lots of complicated “anonymous” elements, which
+  # `windowUtils.nodesFromRect()` does not catch.
+  when document instanceof XULDocument
+    elements = []
+    getAllRegular = (element) ->
+      for child in element.getElementsByTagName('*')
+        elements.push(child)
+        getAllAnonymous(child)
+      return
+    getAllAnonymous = (element) ->
+      for child in document.getAnonymousNodes(element) or []
+        continue unless child instanceof Element
+        elements.push(child)
+        getAllRegular(child)
+      return
+    getAllRegular(document.documentElement)
+    return elements
+
 # Returns the “shape” of `element`:
 #
 # - `rects`: Its `.getClientRects()` rectangles.
@@ -179,6 +214,9 @@ getElementShape = (window, viewport, parents, element) ->
   rects = element.getClientRects()
   totalArea = 0
   visibleRects = []
+  # The `isInsideViewport` check is not needed in HTML documents, but in XUL
+  # documents (see `getElements()`). However, there seems to be no performance
+  # gain in not running the check in HTML documents, so let’s keep it simple.
   for rect in rects when isInsideViewport(rect, viewport)
     visibleRect = adjustRectToViewport(rect, viewport)
     continue if visibleRect.area == 0
