@@ -303,11 +303,12 @@ command_follow = (vim, event, count) ->
           if input and not getElementShape(input)
             type = 'clickable'
       # Elements that have “button” somewhere in the class might be clickable,
-      # unless they contain a real link or button in which case they likely are
+      # unless they contain a real link or button or yet an element with
+      # “button” somewhere in the class, in which case they likely are
       # “button-wrapper”s. (`<SVG element>.className` is not a string!)
       when not isXUL and typeof element.className == 'string' and
            element.className.toLowerCase().contains('button')
-        unless element.querySelector('a, button')
+        unless element.querySelector('a, button, [class*=button]')
           type = 'clickable'
           semantic = false
       # When viewing an image it should get a marker to toggle zoom.
