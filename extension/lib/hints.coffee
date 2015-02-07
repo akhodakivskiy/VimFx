@@ -287,13 +287,6 @@ adjustRectToViewport = (rect, viewport) ->
 
 
 getFirstNonCoveredPoint = (window, viewport, element, elementRect, parents) ->
-  # Before we start we need to hack around a little problem. If `element` has
-  # `border-radius`, the corners won’t really belong to `element`, so
-  # `document.elementFromPoint()` will return whatever is behind. This will
-  # result in missing or out-of-place markers. The solution is to temporarily
-  # add a CSS class that removes `border-radius`.
-  element.classList.add('VimFxNoBorderRadius')
-
   # Tries a point `(x + dx, y + dy)`. Returns `(x, y)` (and the frame offset)
   # if it passes the tests. Otherwise it tries to the right of whatever is at
   # `(x, y)`, `tryRight` times . If nothing succeeds, `false` is returned. `dx`
@@ -308,8 +301,8 @@ getFirstNonCoveredPoint = (window, viewport, element, elementRect, parents) ->
     # is clickable too), really is present at (x,y). Note that this is not 100%
     # bullet proof: Combinations of CSS can cause this check to fail, even
     # though `element` isn’t covered. We don’t try to temporarily reset such CSS
-    # (as with `border-radius`) because of performance. Instead we rely on that
-    # some of the attempts below will work.
+    # because of performance. Instead we rely on that some of the attempts below
+    # will work.
     if element.contains(elementAtPoint) or # Note that `a.contains(a) == true`!
        (window.document instanceof XULDocument and
         getClosestNonAnonymousParent(element) == elementAtPoint)
@@ -339,31 +332,27 @@ getFirstNonCoveredPoint = (window, viewport, element, elementRect, parents) ->
       return tryPoint(x, 0, y, 0, tryRight - 1)
 
 
-  # Try the following 3 positions, or immediately to the right of a covering
-  # element at one of those positions, in order. If all of those are covered the
-  # whole element is considered to be covered. The reasoning is:
+  # Try the left-middle point, or immediately to the right of a covering element
+  # at that point. If both of those are covered the whole element is considered
+  # to be covered. The reasoning is:
   #
   # - A marker should show up as near the left edge of its visible area as
   #   possible. Having it appear to the far right (for example) is confusing.
   # - We can’t try too many times because of performance.
-  #
-  # +-------------------------------+
-  # |1 left-top                     |
-  # |                               |
-  # |2 left-middle                  |
-  # |                               |
-  # |3 left-bottom                  |
-  # +-------------------------------+
+  # - We used to try left-top first, but if `element` has `border-radius`, the
+  #   corners won’t really belong to `element`, so `document.elementFromPoint()`
+  #   will return whatever is behind. This will result in missing or
+  #   out-of-place markers. The solution is to temporarily add a CSS class that
+  #   removes `border-radius`, but that turned out to be rather slow, making it
+  #   not worth it. Usually you don’t see the difference between left-top and
+  #   left-middle, because links are usually not that high.
+  # - We used to try left-bottom as well, but that is so rare that it’s not
+  #   worth it.
   #
   # It is safer to try points at least one pixel into the element from the
-  # edges, hence the `+1`s and `-1`s.
+  # edges, hence the `+1`.
   { left, top, bottom, height } = elementRect
-  nonCoveredPoint =
-    tryPoint(left, +1, top,              +1, 1) or
-    tryPoint(left, +1, top + height / 2,  0, 1) or
-    tryPoint(left, +1, bottom,           -1, 1)
-
-  element.classList.remove('VimFxNoBorderRadius')
+  nonCoveredPoint = tryPoint(left, +1, Math.floor(top + height / 2), 0, 1)
 
   return nonCoveredPoint
 

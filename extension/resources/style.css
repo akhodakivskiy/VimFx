@@ -118,15 +118,6 @@
     display: none;
 }
 
-/* This class is temporarily added to markable element, to remove border-radius
- * while doing some computations. The `!important`s are therefore needed. */
-.VimFxNoBorderRadius {
-    border-radius: 0 !important;
-    /* `transition` is reset here to make sure that the above declaration
-     * takes effect immediately. */
-    transition: none !important;
-}
-
 /* Help Dialog */
 
 div#VimFxHelpDialog {
