@@ -25,9 +25,9 @@ coffee      = require('gulp-coffee')
 coffeelint  = require('gulp-coffeelint')
 git         = require('gulp-git')
 header      = require('gulp-header')
-merge       = require('gulp-merge')
 mustache    = require('gulp-mustache')
 zip         = require('gulp-zip')
+merge       = require('merge2')
 precompute  = require('require-precompute')
 request     = require('request')
 rimraf      = require('rimraf')
@@ -160,12 +160,12 @@ gulp.task('release', ->
   { version } = pkg
   message = "VimFx v#{ version }"
   today = new Date().toISOString()[...10]
-  merge(
+  merge([
     gulp.src('package.json'),
     gulp.src('CHANGELOG.md')
       .pipe(header("### #{ version } (#{ today })\n\n"))
       .pipe(gulp.dest('.'))
-  ).pipe(git.commit(message))
+  ]).pipe(git.commit(message))
   git.tag("v#{ version }", message, (error) -> throw error if error)
 )
 
