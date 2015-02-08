@@ -53,10 +53,7 @@ class Command
         # When letter 0 follows after a number, it is considered as number 0
         # instead of a valid command.
         continue if key == '0' and numbers
-
-        count = parseInt(numbers[numbers.length - 1], 10) if numbers
-        count = if count > 1 then count else 1
-
+        count = if numbers then Number(numbers[numbers.length - 1]) else null
         return {match: true, exact: (key == str), command: this, count}
 
   @searchForMatchingCommand: (commands, keys) ->

@@ -107,39 +107,39 @@ command_scroll_to_bottom = (vim) ->
   vim.rootWindow.goDoCommand('cmd_scrollBottom')
 
 # Scroll down a bit.
-command_scroll_down = (vim, event, count) ->
+command_scroll_down = (vim, event, count = 1) ->
   step = getPref('scroll_step_lines') * count
   utils.simulateWheel(vim.window, 0, +step, utils.WHEEL_MODE_LINE)
 
 # Scroll up a bit.
-command_scroll_up = (vim, event, count) ->
+command_scroll_up = (vim, event, count = 1) ->
   step = getPref('scroll_step_lines') * count
   utils.simulateWheel(vim.window, 0, -step, utils.WHEEL_MODE_LINE)
 
 # Scroll left a bit.
-command_scroll_left = (vim, event, count) ->
+command_scroll_left = (vim, event, count = 1) ->
   step = getPref('scroll_step_lines') * count
   utils.simulateWheel(vim.window, -step, 0, utils.WHEEL_MODE_LINE)
 
 # Scroll right a bit.
-command_scroll_right = (vim, event, count) ->
+command_scroll_right = (vim, event, count = 1) ->
   step = getPref('scroll_step_lines') * count
   utils.simulateWheel(vim.window, +step, 0, utils.WHEEL_MODE_LINE)
 
 # Scroll down half a page.
-command_scroll_half_page_down = (vim, event, count) ->
+command_scroll_half_page_down = (vim, event, count = 1) ->
   utils.simulateWheel(vim.window, 0, +0.5 * count, utils.WHEEL_MODE_PAGE)
 
 # Scroll up half a page.
-command_scroll_half_page_up = (vim, event, count) ->
+command_scroll_half_page_up = (vim, event, count = 1) ->
   utils.simulateWheel(vim.window, 0, -0.5 * count, utils.WHEEL_MODE_PAGE)
 
 # Scroll down full a page.
-command_scroll_page_down = (vim, event, count) ->
+command_scroll_page_down = (vim, event, count = 1) ->
   utils.simulateWheel(vim.window, 0, +1 * count, utils.WHEEL_MODE_PAGE)
 
 # Scroll up full a page.
-command_scroll_page_up = (vim, event, count) ->
+command_scroll_page_up = (vim, event, count = 1) ->
   utils.simulateWheel(vim.window, 0, -1 * count, utils.WHEEL_MODE_PAGE)
 
 # Open a new tab and select the Address Bar.
@@ -163,7 +163,7 @@ absoluteTabIndex = (relativeIndex, gBrowser) ->
 
   return absoluteIndex
 
-helper_switch_tab = (direction, vim, event, count) ->
+helper_switch_tab = (direction, vim, event, count = 1) ->
   { gBrowser } = vim.rootWindow
   gBrowser.selectTabAtIndex(absoluteTabIndex(direction * count, gBrowser))
 
@@ -173,7 +173,7 @@ command_tab_prev = helper_switch_tab.bind(undefined, -1)
 # Switch to the next tab.
 command_tab_next = helper_switch_tab.bind(undefined, +1)
 
-helper_move_tab = (direction, vim, event, count) ->
+helper_move_tab = (direction, vim, event, count = 1) ->
   { gBrowser }    = vim.rootWindow
   { selectedTab } = gBrowser
   { pinned }      = selectedTab
@@ -235,7 +235,7 @@ command_close_other_tabs = (vim) ->
   gBrowser.removeAllTabsBut(gBrowser.selectedTab)
 
 # Close current tab.
-command_close_tab = (vim, event, count) ->
+command_close_tab = (vim, event, count = 1) ->
   { gBrowser } = vim.rootWindow
   return if gBrowser.selectedTab.pinned
   currentIndex = gBrowser.visibleTabs.indexOf(gBrowser.selectedTab)
@@ -243,7 +243,7 @@ command_close_tab = (vim, event, count) ->
     gBrowser.removeTab(tab)
 
 # Restore last closed tab.
-command_restore_tab = (vim, event, count) ->
+command_restore_tab = (vim, event, count = 1) ->
   vim.rootWindow.undoCloseTab() for [1..count]
 
 # Combine links with the same href.
@@ -260,7 +260,7 @@ combine = (hrefs, marker) ->
   return marker
 
 # Follow links, focus text inputs and click buttons with hint markers.
-command_follow = (vim, event, count) ->
+command_follow = (vim, event, count = 1) ->
   hrefs = {}
   filter = (element, getElementShape) ->
     document = element.ownerDocument
@@ -346,7 +346,7 @@ command_follow_multiple = (vim, event) ->
   command_follow(vim, event, Infinity)
 
 # Follow links in a new background tab with hint markers.
-command_follow_in_tab = (vim, event, count, inBackground = true) ->
+command_follow_in_tab = (vim, event, count = 1, inBackground = true) ->
   hrefs = {}
   filter = (element, getElementShape) ->
     return unless isProperLink(element)
@@ -365,7 +365,7 @@ command_follow_in_tab = (vim, event, count, inBackground = true) ->
   vim.enterMode('hints', filter, callback)
 
 # Follow links in a new foreground tab with hint markers.
-command_follow_in_focused_tab = (vim, event, count) ->
+command_follow_in_focused_tab = (vim, event, count = 1) ->
   command_follow_in_tab(vim, event, count, false)
 
 # Copy the URL or text of a markable element to the system clipboard.
@@ -442,6 +442,7 @@ command_follow_next = helper_follow_pattern.bind(undefined, 'next')
 
 # Focus last focused or first text input and enter text input mode.
 command_text_input = (vim, event, count) ->
+  console.log count
   { lastFocusedTextInput } = vim.state
   inputs = Array.filter(
     vim.window.document.querySelectorAll('input, textarea'), (element) ->
@@ -451,13 +452,13 @@ command_text_input = (vim, event, count) ->
     inputs.push(lastFocusedTextInput)
   return unless inputs.length > 0
   inputs.sort((a, b) -> a.tabIndex - b.tabIndex)
-  if count == 1 and lastFocusedTextInput
+  if count == null and lastFocusedTextInput
     count = inputs.indexOf(lastFocusedTextInput) + 1
   inputs[count - 1].select()
   vim.enterMode('text-input', inputs)
 
 # Go up one level in the URL hierarchy.
-command_go_up_path = (vim, event, count) ->
+command_go_up_path = (vim, event, count = 1) ->
   { pathname } = vim.window.location
   vim.window.location.pathname = pathname.replace(
     /// (?: /[^/]+ ){1,#{ count }} /?$ ///, ''
@@ -467,7 +468,7 @@ command_go_up_path = (vim, event, count) ->
 command_go_to_root = (vim) ->
   vim.window.location.href = vim.window.location.origin
 
-helper_go_history = (num, vim, event, count) ->
+helper_go_history = (num, vim, event, count = 1) ->
   { index } = vim.rootWindow.getWebNavigation().sessionHistory
   { history } = vim.window
   num *= count
@@ -518,7 +519,7 @@ command_insert_mode = (vim) ->
   vim.enterMode('insert')
 
 # Quote next keypress (pass it through to the page).
-command_quote = (vim, event, count) ->
+command_quote = (vim, event, count = 1) ->
   vim.enterMode('insert', count)
 
 # Display the Help Dialog.
