@@ -103,6 +103,9 @@ Finally send a pull request to same branch as you based your topic branch on
   automatically install it. (No need to restart Firefox.)
 - `gulp clean` removes the `build/` directory.
 - `gulp lint` lints your code.
+- `gulp sync-locale` syncs all locales against the en-US locale. To sync against
+  for example the sv-SE locale instead, pass `--sv-SE` as an option. See also
+  the “Syncing locales” section below.
 - Use the `--test` or `-t` option to include the unit test files. The output of
   the tests are `console.log`ed. See the browser console, or start Firefox from
   the command line to see it.
@@ -113,6 +116,43 @@ unit tests.)
 [Node.js]: http://nodejs.org/
 [gulp]: https://github.com/gulpjs/gulp
 [Extension Auto-Installer]: https://addons.mozilla.org/firefox/addon/autoinstaller
+
+### Syncing locales
+
+This is usually not done by translators, but by developers who change, add or
+remove features that involves localized text.
+
+If you add, remove or reorder translations in a file, do so in _one_ of the
+locales (one that is easy for you to test—but always write new translations in
+English!). If you modified the en-US locale, run `gulp sync-locales` (or `gulp
+sync-locales --en-US`—substitute “en-US” with a locale of choice if needed).
+That rewrites all other locales so that:
+
+- Old translations are removed.
+- New translations are added (in English).
+- All translations appear in the same order.
+
+If you modify an existing translation in a file and want to update all other
+locales to use the new wording:
+
+- If possible, edit all other locales by hand to save as much translated text as
+  possible.
+- Otherwise:
+  1. Before modifying existing translations, copy the file in question and add
+     the extension “.old” to the filename. For example, copy a
+     “vimfx.properties” file to “vimfx.properties.old”.
+  2. Make your modifications (in for example “vimfx.properties”, leaving
+     “vimfx.properties.old” intact).
+  3. Run `gulp sync-locales`. It does the same thing as before, except that if a
+     translation has changed compared to an “.old”-file, the newly changed
+     translation is used in all locales, replacing what was there before.
+  4. Remove the “.old”-file.
+
+Note that `gulp sync-locales` requires every translation to be in a single line.
+In other words, do not line-wrap translations. Also don’t bother adding comments
+when translating locale files, since they’ll likely be removed by `gulp
+sync-locales`.
+
 
 ### Making a release
 

@@ -18,7 +18,8 @@
 ###
 
 fs          = require('fs')
-{ join }    = require('path')
+path        = require('path')
+regexEscape = require('escape-string-regexp')
 gulp        = require('gulp')
 coffee      = require('gulp-coffee')
 coffeelint  = require('gulp-coffeelint')
@@ -41,6 +42,7 @@ TEST   = 'extension/test'
 test = '--test' in process.argv or '-t' in process.argv
 ifTest = (value) -> if test then [value] else []
 
+{ join } = path
 read = (filepath) -> fs.readFileSync(filepath).toString()
 template = (data) -> mustache(data, {extension: ''})
 
@@ -166,3 +168,59 @@ gulp.task('release', ->
   ).pipe(git.commit(message))
   git.tag("v#{ version }", message, (error) -> throw error if error)
 )
+
+gulp.task('sync-locales', ->
+  baseLocale = 'en-US'
+  for arg in process.argv when arg[...2] == '--'
+    baseLocale = arg[2..]
+  for file in fs.readdirSync(join(LOCALE, baseLocale))
+    templateString = switch path.extname(file)
+      when '.properties' then '%key=%value'
+      when '.dtd'        then '<!ENTITY %key "%value">'
+    syncLocale(file, baseLocale, templateString) if templateString
+)
+
+syncLocale = (fileName, baseLocaleName, templateString) ->
+  regex = ///^ #{
+    regexEscape(templateString)
+      .replace(/%key/,   '([^\\s=]+)')
+      .replace(/%value/, '(.+)')
+  } $///
+  basePath = join(LOCALE, baseLocaleName, fileName)
+  base = parseLocaleFile(read(basePath), regex)
+  oldBasePath = "#{basePath}.old"
+  if fs.existsSync(oldBasePath)
+    oldBase = parseLocaleFile(read(oldBasePath), regex)
+  for localeName in fs.readdirSync(LOCALE) when localeName != baseLocaleName
+    localePath = join(LOCALE, localeName, fileName)
+    locale = parseLocaleFile(read(localePath), regex)
+    newLocale = base.template.map((line) ->
+      if Array.isArray(line)
+        [ key ] = line
+        oldValue = oldBase?.keys[key]
+        value =
+          if (oldValue? and oldValue != base.keys[key]) or
+             key not of locale.keys
+            base.keys[key]
+          else
+            locale.keys[key]
+        return templateString.replace(/%key/, key).replace(/%value/, value)
+      else
+        return line
+    )
+    fs.writeFileSync(localePath, newLocale.join(base.newline))
+  return
+
+parseLocaleFile = (fileContents, regex) ->
+  keys  = {}
+  lines = []
+  [ newline ] = fileContents.match(/\r?\n/)
+  for line in fileContents.split(newline)
+    line = line.trim()
+    [ match, key, value ] = line.match(regex) ? []
+    if match
+      keys[key] = value
+      lines.push([key])
+    else
+      lines.push(line)
+  return {keys, template: lines, newline}
