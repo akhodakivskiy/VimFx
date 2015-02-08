@@ -165,8 +165,11 @@ gulp.task('release', ->
     gulp.src('CHANGELOG.md')
       .pipe(header("### #{ version } (#{ today })\n\n"))
       .pipe(gulp.dest('.'))
-  ]).pipe(git.commit(message))
-  git.tag("v#{ version }", message, (error) -> throw error if error)
+  ])
+    .pipe(git.commit(message))
+    .on('end', ->
+      git.tag("v#{ version }", message, (error) -> throw error if error)
+    )
 )
 
 gulp.task('sync-locales', ->
