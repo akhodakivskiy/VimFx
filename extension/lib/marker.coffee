@@ -46,7 +46,7 @@ class Marker
     } = this
 
     # Center the marker vertically on the non-covered point.
-    top -= height / 2
+    top -= Math.ceil(height / 2)
 
     # Make sure that the marker stays within its element (vertically).
     top = Math.min(top, rect.bottom - height)
