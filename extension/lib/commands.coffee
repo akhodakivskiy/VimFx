@@ -440,6 +440,22 @@ command_follow_prev = helper_follow_pattern.bind(undefined, 'prev')
 # Follow next page.
 command_follow_next = helper_follow_pattern.bind(undefined, 'next')
 
+# Focus last focused or first text input and enter text input mode.
+command_text_input = (vim, event, count) ->
+  { lastFocusedTextInput } = vim.state
+  inputs = Array.filter(
+    vim.window.document.querySelectorAll('input, textarea'), (element) ->
+      return utils.isTextInputElement(element) and utils.area(element) > 0
+  )
+  if lastFocusedTextInput and lastFocusedTextInput not in inputs
+    inputs.push(lastFocusedTextInput)
+  return unless inputs.length > 0
+  inputs.sort((a, b) -> a.tabIndex - b.tabIndex)
+  if count == 1 and lastFocusedTextInput
+    count = inputs.indexOf(lastFocusedTextInput) + 1
+  inputs[count - 1].select()
+  vim.enterMode('text-input', inputs)
+
 # Go up one level in the URL hierarchy.
 command_go_up_path = (vim, event, count) ->
   { pathname } = vim.window.location
@@ -584,6 +600,7 @@ commands = [
   new Command('browse', 'follow_multiple',       command_follow_multiple,       [['a', 'f']])
   new Command('browse', 'follow_previous',       command_follow_prev,           [['[']])
   new Command('browse', 'follow_next',           command_follow_next,           [[']']])
+  new Command('browse', 'text_input',            command_text_input,            [['g', 'i']])
   new Command('browse', 'go_up_path',            command_go_up_path,            [['g', 'u']])
   new Command('browse', 'go_to_root',            command_go_to_root,            [['g', 'U']])
   new Command('browse', 'back',                  command_back,                  [['H']])

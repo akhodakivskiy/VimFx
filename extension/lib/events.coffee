@@ -149,6 +149,10 @@ windowsListeners =
       vim.enterMode('find')
       return
 
+    if target.ownerDocument instanceof HTMLDocument and
+       utils.isTextInputElement(target)
+      vim.state.lastFocusedTextInput = target
+
     # If the user has interacted with the page and the `window` of the page gets
     # focus, it means that the user just switched back to the page from another
     # window or tab. If a text input was focused when the user focused _away_

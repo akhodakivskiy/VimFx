@@ -123,6 +123,33 @@ exports['insert'] =
   commands:
     exit: ['<s-escape>']
 
+exports['text-input'] =
+  onEnter: (vim, storage, inputs = []) ->
+    storage.inputs = inputs
+  onLeave: (vim, storage) ->
+    storage.inputs = null
+  onInput: (vim, storage, keyStr) ->
+    { inputs } = storage
+    index = inputs.indexOf(vim.window.document.activeElement)
+    switch
+      when index == -1
+        vim.enterMode('normal')
+        return false
+      when escapeCommand.match(keyStr)
+        utils.blurActiveElement(vim.window)
+        vim.enterMode('normal')
+        return true
+      # Override the built-in shortcuts <tab> and <s-tab> to switch between
+      # focusable inputs.
+      when keyStr == '<tab>'
+        index++
+      when keyStr == '<s-tab>'
+        index--
+      else
+        return false
+    inputs[index %% inputs.length].select()
+    return true
+
 exports['find'] =
   onEnter: ->
 
@@ -214,9 +241,7 @@ exports['hints'] =
     rotate_markers_backward: ['<s-space>']
     delete_hint_char:        ['<backspace>']
 
-for modeName of exports
-  mode = exports[modeName]
-  continue if Array.isArray(mode.commands)
+for modeName, mode of exports when not Array.isArray(mode.commands ? [])
   for commandName of mode.commands
     name = "mode_#{ modeName }_#{ commandName }"
     keys = mode.commands[commandName].map((key) -> [key])
