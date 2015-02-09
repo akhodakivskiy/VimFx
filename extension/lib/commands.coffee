@@ -101,8 +101,8 @@ command_stop_all = (vim) ->
     window.stop()
 
 axisMap =
-  x: ['left', 'clientWidth',  'horizontalScrollDistance',  5]
-  y: ['top',  'clientHeight', 'verticalScrollDistance',   20]
+  x: ['left', 'scrollLeftMax', 'clientWidth',  'horizontalScrollDistance',  5]
+  y: ['top',  'scrollTopMax',  'clientHeight', 'verticalScrollDistance',   20]
 helper_scroll = (method, type, axis, amount, vim, event, count = 1) ->
   frameDocument = event.target.ownerDocument
   element =
@@ -111,10 +111,10 @@ helper_scroll = (method, type, axis, amount, vim, event, count = 1) ->
     else
       frameDocument.documentElement
 
-  [ direction, dimension, distance, lineAmount ] = axisMap[axis]
+  [ direction, max, dimension, distance, lineAmount ] = axisMap[axis]
 
   if method == 'scrollTo'
-    amount = Math.min(amount, element.scrollTopMax)
+    amount = Math.min(amount, element[max])
   else
     unit = switch type
       when 'lines'
@@ -144,6 +144,10 @@ command_scroll_to_top =
   helper_scroll.bind(undefined, 'scrollTo', 'other', 'y', 0)
 command_scroll_to_bottom =
   helper_scroll.bind(undefined, 'scrollTo', 'other', 'y', Infinity)
+command_scroll_to_left =
+  helper_scroll.bind(undefined, 'scrollTo', 'other', 'x', 0)
+command_scroll_to_right =
+  helper_scroll.bind(undefined, 'scrollTo', 'other', 'x', Infinity)
 command_scroll_down =
   helper_scroll.bind(undefined, 'scrollBy', 'lines', 'y', +1)
 command_scroll_up =
@@ -589,6 +593,8 @@ commands = [
 
   new Command('nav',    'scroll_to_top',         command_scroll_to_top ,        [['g', 'g']])
   new Command('nav',    'scroll_to_bottom',      command_scroll_to_bottom,      [['G']])
+  new Command('nav',    'scroll_to_left',        command_scroll_to_left ,       [['0'], ['^']])
+  new Command('nav',    'scroll_to_right',       command_scroll_to_right,       [['$']])
   new Command('nav',    'scroll_down',           command_scroll_down,           [['j']])
   new Command('nav',    'scroll_up',             command_scroll_up,             [['k']])
   new Command('nav',    'scroll_left',           command_scroll_left,           [['h']])
