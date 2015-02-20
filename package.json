@@ -7,7 +7,9 @@
   },
   "license": "GPLv3",
   "private": true,
-  "scripts": {},
+  "scripts": {
+    "gulp": "gulp"
+  },
   "dependencies": {
     "n-ary-huffman": "^2.1.1",
     "vim-like-key-notation": "~0.1.3"
