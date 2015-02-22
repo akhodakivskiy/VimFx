@@ -91,7 +91,9 @@ Finally send a pull request to same branch as you based your topic branch on
 1. Install [Node.js].
 2. Run `npm install` to download dependencies and development dependencies.
 3. Run `npm install -g gulp` to be able to run [`gulp`][gulp] commands.
-   (Alternatively, you may use `./node_modules/.bin/gulp`.)
+   If you prefer not to install gulp globally, you can use `npm run gulp`
+   instead. For example, to create an .xpi: `npm run gulp -- xpi`. (Note that
+   you might need to update `npm` for this to run; try `npm update -g npm`.)
 4. Create a new Firefox profile for development.
 5. Install the [Extension Auto-Installer] add-on in your development profile.
 
