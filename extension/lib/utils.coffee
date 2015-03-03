@@ -94,7 +94,9 @@ blurActiveElement = (window) ->
     activeElement.blur()
 
 isProperLink = (element) ->
-  return element.hasAttribute('href') and
+  # `.getAttribute` is used below instead of `.hasAttribute` to exclude `<a
+  # href="">`s used as buttons on some sites.
+  return element.getAttribute('href') and
          (element instanceof HTMLAnchorElement or
           element.ownerDocument instanceof XULDocument) and
          not element.href.endsWith('#') and
