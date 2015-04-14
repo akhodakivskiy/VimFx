@@ -1,0 +1,22 @@
+<!ENTITY pref.hint_chars.title      "Caractères utilisés dans les marqueurs de liens">
+<!ENTITY pref.hint_chars.desc       "Par défaut: fjdkslaghrueiwovncm">
+
+<!ENTITY pref.black_list.title      "Liste noire">
+<!ENTITY pref.black_list.desc       "Liste d'adresses pour lesquelles VimFx doit être désactivé automatiquement, séparées par des virgules.
+Motifs autorisés: *, !. Exemple: *example.com*,*foobar.org*">
+
+<!ENTITY pref.prev_patterns.title   "Motifs des pages suivantes">
+<!ENTITY pref.prev_patterns.desc    "Liste de motifs séparés par des vigules qui correspondent aux liens des pages précédentes">
+
+<!ENTITY pref.next_patterns.title   "Motifs des pages précédents">
+<!ENTITY pref.next_patterns.desc    "Liste de motifs séparés par des vigules qui correspondent aux liens des pages suivantes">
+
+<!ENTITY pref.scroll_step_lines.title "Vitesse de défilement">
+
+<!ENTITY pref.hints_bloom_on.title "Positionnement intelligent des marqueurs">
+<!ENTITY pref.hints_bloom_on.desc  "Assigner des marqueurs plus courts aux liens fréquemment visités">
+
+<!ENTITY pref.prevent_autofocus.title "Éviter la prise de focus automatique par les entées de formulaires">
+
+<!ENTITY customizeButton.title "Raccourcis claviers">
+<!ENTITY customizeButton.label "Personaliser">

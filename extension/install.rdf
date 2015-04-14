@@ -95,5 +95,12 @@
         <em:description>Vimキーボードショートカット for Firefox</em:description>
       </Description>
     </em:localized>
+
+    <em:localized>
+      <Description>
+        <em:locale>fr</em:locale>
+        <em:description>Raccourcis claviers de Vim pour Firefox</em:description>
+      </Description>
+    </em:localized>
   </Description>
 </RDF>
