@@ -1,0 +1,27 @@
+<!ENTITY pref.hint_chars.title "Marqueurs de liens">
+<!ENTITY pref.hint_chars.desc "Par défaut: fjdkslaghrueiwovncm">
+
+<!ENTITY pref.black_list.title "Liste noire">
+<!ENTITY pref.black_list.desc "Liste d'adresses séparés par des virgules pour lesquelles VimFx sera désactivé. Motifs autorisés: *, !. Exemple: *example.com*,*foobar.org*.">
+
+<!ENTITY pref.prev_patterns.title "Motifs des pages précédentes">
+<!ENTITY pref.prev_patterns.desc "Liste de motifs séparés par des vigules qui correspondent aux liens des pages précédentes.">
+
+<!ENTITY pref.next_patterns.title "Motids des pages suivantes">
+<!ENTITY pref.next_patterns.desc "Liste de motifs séparés par des vigules qui correspondent aux liens des pages suivantes.">
+
+<!ENTITY pref.scroll_step_lines.title "Vitesse de défilement">
+
+<!ENTITY pref.prevent_autofocus.title "Éviter le focus automatique des entées de formulaires">
+
+<!ENTITY pref.autofocus_limit.title "Durée du focus automatique">
+<!ENTITY pref.autofocus_limit.desc "Utilisé quand « Éviter le focus automatique » est activé. Empêche les entrées de formulaires de prendre le focus avant que ce nombre de millisecondes ne se soit écoulé depuis votre dernière interaction avec la page.">
+
+<!ENTITY pref.ignore_keyboard_layout.title "Ignorer la disposition du clavier">
+<!ENTITY pref.ignore_keyboard_layout.desc "Faire comme si le clavier était un clavier QWERTY en-US.">
+
+<!ENTITY pref.keyboardevent.code.enabled.title "Activer l'utilisation de `KeyboardEvent.code`">
+<!ENTITY pref.keyboardevent.code.enabled.desc "Considéré comme « expérimental » par Firefox, mais fonctionne correctement. Requis par l'option « Ignorer la disposition du clavier ». Nécéssite un redémarage.">
+
+<!ENTITY customizeButton.title "Raccourcis claviers">
+<!ENTITY customizeButton.label "Personaliser">
