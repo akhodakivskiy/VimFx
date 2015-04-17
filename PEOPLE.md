@@ -11,6 +11,7 @@ Anton Khodakivskiy
 # Translators
 - Frank Hase (de)
 - Theodore Keloglou (el-GR)
+- Mickaël RAYBAUD-ROIG (fr)
 - Szabó Krisztián (hu)
 - Yoppy Halilintar (id)
 - Carlo Bertoldi (it)
