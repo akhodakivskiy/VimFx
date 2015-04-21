@@ -86,6 +86,7 @@ Press <kbd>?</kbd> or use the toolbar button to open it.
 ### Working with Tabs
 
     t            New tab
+    T  S         New Tab with Search Dialog focused
     J  gT        Previous tab
     K  gt        Next tab
     gJ           Move tab left
