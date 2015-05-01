@@ -105,7 +105,7 @@ Finally send a pull request to same branch as you based your topic branch on
   automatically install it. (No need to restart Firefox.)
 - `gulp clean` removes the `build/` directory.
 - `gulp lint` lints your code.
-- `gulp sync-locale` syncs all locales against the en-US locale. To sync against
+- `gulp sync-locales` syncs all locales against the en-US locale. To sync against
   for example the sv-SE locale instead, pass `--sv-SE` as an option. See also
   the “Syncing locales” section below.
 - Use the `--test` or `-t` option to include the unit test files. The output of
