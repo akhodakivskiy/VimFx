@@ -105,6 +105,9 @@ Finally send a pull request to same branch as you based your topic branch on
   automatically install it. (No need to restart Firefox.)
 - `gulp clean` removes the `build/` directory.
 - `gulp lint` lints your code.
+- `gulp faster` compiles `gulpfile.coffee` to `gulpfile.js`. If you run `gulp` a
+  lot and wish it ran faster, just tell it and it will! You’ll have to remember
+  to re-run it whenever gulpfile.coffee is updated, though.
 - `gulp sync-locales` syncs all locales against the en-US locale. To sync against
   for example the sv-SE locale instead, pass `--sv-SE` as an option. See also
   the “Syncing locales” section below.

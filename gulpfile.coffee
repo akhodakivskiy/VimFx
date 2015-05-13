@@ -172,6 +172,12 @@ gulp.task('release', ->
     )
 )
 
+gulp.task('faster', ->
+  gulp.src('gulpfile.coffee')
+    .pipe(coffee({bare: true}))
+    .pipe(gulp.dest('.'))
+)
+
 gulp.task('sync-locales', ->
   baseLocale = 'en-US'
   for arg in process.argv when arg[...2] == '--'
