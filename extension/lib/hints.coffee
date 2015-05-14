@@ -45,6 +45,7 @@ injectHints = (rootWindow, window, filter) ->
     bottom:  height
     width
     height
+    zoom: rootWindow.gBrowser.selectedBrowser.markupDocumentViewer.fullZoom
   }
 
   groups = {semantic: [], unsemantic: [], combined: []}

@@ -62,6 +62,10 @@ class Marker
     left = Math.max(left, viewport.left)
     top  = Math.max(top,  viewport.top)
 
+    # Take the current zoom into account.
+    left = Math.round(left * viewport.zoom)
+    top  = Math.round(top  * viewport.zoom)
+
     # The positioning is absolute.
     @markerElement.style.left = "#{ left }px"
     @markerElement.style.top  = "#{ top }px"
