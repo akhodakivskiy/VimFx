@@ -465,7 +465,6 @@ command_follow_next = helper_follow_pattern.bind(undefined, 'next')
 
 # Focus last focused or first text input and enter text input mode.
 command_text_input = (vim, event, count) ->
-  console.log count
   { lastFocusedTextInput } = vim.state
   inputs = Array.filter(
     vim.window.document.querySelectorAll('input, textarea'), (element) ->
