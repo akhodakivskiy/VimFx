@@ -8,9 +8,6 @@
 
 Read [CONTRIBUTING.md](CONTRIBUTING.md) before opening issues and pull requests.
 
-**Just upgraded to version 0.6.0?** Be sure to checkout the
-[changelog](CHANGELOG.md) to see what’s new, and what has changed.
-
 [vimfx@librelist.com]: mailto:vimfx@librelist.com?subject=Subscribe
 
 ## Overview
