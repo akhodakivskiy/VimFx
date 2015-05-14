@@ -1,25 +1,22 @@
-# VimFx - Vim keyboard shortcuts for Firefox
+# VimFx – Vim keyboard shortcuts for Firefox
 
-![VimFx Logo](icon-large.png)
-
-**Extension AMO page**: <https://addons.mozilla.org/firefox/addon/vimfx>.
-
-**Mailing list**: [vimfx@librelist.com] (just send an email to subscribe)
-
-Read [CONTRIBUTING.md](CONTRIBUTING.md) before opening issues and pull requests.
-
-[vimfx@librelist.com]: mailto:vimfx@librelist.com?subject=Subscribe
-
-## Overview
+<img src="icon-large.png" alt="" align="right">
 
 [VimFx] is a [Mozilla Firefox] extension which adds Vim-style keyboard shortcuts
 for browsing and navigation, significantly reducing the use of the mouse, and
 allowing your hands to rest on the home row.
 
 VimFx was inspired by [Vimperator] and designed after [Vimium] for [Google
-Chrome] preserving the shortcuts and behavior. If you are used to Vimium then
+Chrome], preserving the shortcuts and behavior. If you are used to Vimium then
 it will be easy to get started with VimFx.
 
+**Mailing list:** [vimfx@librelist.com] (just send an email to subscribe)
+
+Read [CONTRIBUTING.md](CONTRIBUTING.md) before opening issues and pull requests.
+
+VimFx is made by [these awesome people](PEOPLE.md).
+
+[vimfx@librelist.com]: mailto:vimfx@librelist.com?subject=Subscribe
 [VimFx]: https://addons.mozilla.org/firefox/addon/vimfx
 [Mozilla Firefox]: https://www.mozilla.org/firefox
 [Vimperator]: http://www.vimperator.org/vimperator
@@ -28,13 +25,15 @@ it will be easy to get started with VimFx.
 
 ## Why VimFx was created
 
-Even before Vimium there was Vimperator for Firefox. In my opinion the problem
-with Vimperator is that it has too many features and aggressively changes the
-default Firefox appearance and behavior. Vimium was developed for Google Chrome
-and it was exactly what I needed in terms of added functionality. That's why I
-decided to develop similar extension for Firefox.
-
-VimFx will be nice to your browser and to your habits. Promise.
+> Even before Vimium there was Vimperator for Firefox. In my opinion the problem
+> with Vimperator is that it has too many features and aggressively changes the
+> default Firefox appearance and behavior. Vimium was developed for Google Chrome
+> and it was exactly what I needed in terms of added functionality. That's why I
+> decided to develop similar extension for Firefox.
+>
+> VimFx will be nice to your browser and to your habits. Promise.
+>
+> <footer>– <cite>Anton Khodakivskiy</cite>, VimFx’s original author.</footer>
 
 ## Key Features
 
