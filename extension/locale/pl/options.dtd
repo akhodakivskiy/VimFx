@@ -18,8 +18,5 @@
 <!ENTITY pref.ignore_keyboard_layout.title "Ignore keyboard layout">
 <!ENTITY pref.ignore_keyboard_layout.desc "Pretend that the en-US QWERTY layout is always used">
 
-<!ENTITY pref.keyboardevent.code.enabled.title "Enable `KeyboardEvent.code` support">
-<!ENTITY pref.keyboardevent.code.enabled.desc "Considered &quot;experimental&quot; by Firefox, but works really well. Needed by the Ignore keyboard layout setting. Requires restart.">
-
 <!ENTITY customizeButton.title "Skróty klawiszowe">
 <!ENTITY customizeButton.label "Dostosuj">

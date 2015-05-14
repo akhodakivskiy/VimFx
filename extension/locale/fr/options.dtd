@@ -10,8 +10,6 @@
 <!ENTITY pref.next_patterns.title "Motids des pages suivantes">
 <!ENTITY pref.next_patterns.desc "Liste de motifs séparés par des vigules qui correspondent aux liens des pages suivantes.">
 
-<!ENTITY pref.scroll_step_lines.title "Vitesse de défilement">
-
 <!ENTITY pref.prevent_autofocus.title "Éviter le focus automatique des entées de formulaires">
 
 <!ENTITY pref.autofocus_limit.title "Durée du focus automatique">
@@ -19,9 +17,6 @@
 
 <!ENTITY pref.ignore_keyboard_layout.title "Ignorer la disposition du clavier">
 <!ENTITY pref.ignore_keyboard_layout.desc "Faire comme si le clavier était un clavier QWERTY en-US.">
-
-<!ENTITY pref.keyboardevent.code.enabled.title "Activer l'utilisation de `KeyboardEvent.code`">
-<!ENTITY pref.keyboardevent.code.enabled.desc "Considéré comme « expérimental » par Firefox, mais fonctionne correctement. Requis par l'option « Ignorer la disposition du clavier ». Nécéssite un redémarage.">
 
 <!ENTITY customizeButton.title "Raccourcis claviers">
 <!ENTITY customizeButton.label "Personaliser">
