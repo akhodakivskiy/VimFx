@@ -10,8 +10,6 @@
 <!ENTITY pref.next_patterns.title "下一頁符號比對模式">
 <!ENTITY pref.next_patterns.desc "符合連回下一頁的比對模式清單（以逗號分隔）">
 
-<!ENTITY pref.scroll_step_lines.title "捲動行數">
-
 <!ENTITY pref.prevent_autofocus.title "Prevent autofocus of text inputs">
 
 <!ENTITY pref.autofocus_limit.title "Autofocus limit">

@@ -10,8 +10,6 @@
 <!ENTITY pref.next_patterns.title "Następna strona - wzorce">
 <!ENTITY pref.next_patterns.desc "Wzorce (oddzielone przecinkami), które określają linki do następnej strony.">
 
-<!ENTITY pref.scroll_step_lines.title "Krok przewijania">
-
 <!ENTITY pref.prevent_autofocus.title "Wyłącz autofocus pól.">
 
 <!ENTITY pref.autofocus_limit.title "Autofocus limit">

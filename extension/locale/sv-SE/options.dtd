@@ -10,8 +10,6 @@
 <!ENTITY pref.next_patterns.title "Mönster för nästa sida">
 <!ENTITY pref.next_patterns.desc "Kommaseparerad lista av mönster som matchar länkar till nästa sida.">
 
-<!ENTITY pref.scroll_step_lines.title "Scrollsteg">
-
 <!ENTITY pref.prevent_autofocus.title "Hindra autofokus för textrutor">
 
 <!ENTITY pref.autofocus_limit.title "Autofokusgräns">

@@ -10,8 +10,6 @@
 <!ENTITY pref.next_patterns.title "Muster für die nächste Seite">
 <!ENTITY pref.next_patterns.desc "Muster für Links, die auf die nächste Seite verweisen; getrennt durch Kommas">
 
-<!ENTITY pref.scroll_step_lines.title "Scroll-Schrittweite">
-
 <!ENTITY pref.prevent_autofocus.title "Eingabefelder nicht automatische fokussieren">
 
 <!ENTITY pref.autofocus_limit.title "Autofocus limit">

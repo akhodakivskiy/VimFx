@@ -45,7 +45,8 @@ getBranchPref = (branch, key, defaultValue = undefined) ->
 isPrefSet = (key) ->
   return vimfxBranch.prefHasUserValue(key)
 
-getPref = getBranchPref.bind(undefined, vimfxBranch)
+getPref        = getBranchPref.bind(undefined, vimfxBranch)
+getFirefoxPref = getBranchPref.bind(undefined, prefs.getBranch(''))
 
 setBranchPref = (branch, key, value) ->
   switch typeof value
@@ -58,7 +59,14 @@ setBranchPref = (branch, key, value) ->
     else
       branch.clearUserPref(key)
 
-setPref = setBranchPref.bind(undefined, vimfxBranch)
+setPref        = setBranchPref.bind(undefined, vimfxBranch)
+setFirefoxPref = setBranchPref.bind(undefined, prefs.getBranch(''))
+
+withFirefoxPrefAs = (pref, temporaryValue, fn) ->
+  previousValue = getFirefoxPref(pref)
+  setFirefoxPref(pref, temporaryValue)
+  fn()
+  setFirefoxPref(pref, previousValue)
 
 setDefaultPrefs = ->
   baseUri = Services.io.newURI(__SCRIPT_URI_SPEC__, null, null)
@@ -70,5 +78,8 @@ setDefaultPrefs = ->
 
 exports.isPrefSet         = isPrefSet
 exports.getPref           = getPref
+exports.getFirefoxPref    = getFirefoxPref
 exports.setPref           = setPref
+exports.setFirefoxPref    = setFirefoxPref
+exports.withFirefoxPrefAs = withFirefoxPrefAs
 exports.setDefaultPrefs   = setDefaultPrefs

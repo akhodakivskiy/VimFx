@@ -10,8 +10,6 @@
 <!ENTITY pref.next_patterns.title "Шаблоны ссылок на предыдущую страницу">
 <!ENTITY pref.next_patterns.desc "Тексты ссылок на предыдущую страницу (разделенные запятой)">
 
-<!ENTITY pref.scroll_step_lines.title "Шаг прокрутки страницы">
-
 <!ENTITY pref.prevent_autofocus.title "Не фокусировать поля ввода автоматически">
 
 <!ENTITY pref.autofocus_limit.title "Autofocus limit">

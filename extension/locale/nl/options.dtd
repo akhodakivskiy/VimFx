@@ -10,8 +10,6 @@
 <!ENTITY pref.next_patterns.title "Next Page Patterns">
 <!ENTITY pref.next_patterns.desc "Comma separated list of patterns that match links to next page">
 
-<!ENTITY pref.scroll_step_lines.title "Scrollstapgrootte">
-
 <!ENTITY pref.prevent_autofocus.title "Prevent autofocus of text inputs">
 
 <!ENTITY pref.autofocus_limit.title "Autofocus limit">

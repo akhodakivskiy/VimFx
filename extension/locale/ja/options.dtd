@@ -10,8 +10,6 @@
 <!ENTITY pref.next_patterns.title "次のページへのリンクのパターン">
 <!ENTITY pref.next_patterns.desc "次のページへのリンクにマッチするパターンをカンマ区切りのリストで指定します">
 
-<!ENTITY pref.scroll_step_lines.title "スクロールの度合い">
-
 <!ENTITY pref.prevent_autofocus.title "入力欄によるフォーカスの奪取を妨害">
 
 <!ENTITY pref.autofocus_limit.title "Autofocus limit">
