@@ -12,24 +12,24 @@
   },
   "dependencies": {
     "n-ary-huffman": "^2.1.1",
-    "vim-like-key-notation": "~0.1.3"
+    "vim-like-key-notation": "^0.1.4"
   },
   "devDependencies": {
-    "coffee-script": "~1.9.0",
-    "coffeelint-forbidden-keywords": "~0.1.0",
-    "coffeelint-newline-at-eof": "~0.4.1",
-    "escape-string-regexp": "^1.0.2",
-    "gulp": "^3.8.10",
+    "coffee-script": "~1.9.2",
+    "coffeelint-forbidden-keywords": "^0.1.1",
+    "coffeelint-newline-at-eof": "^0.4.1",
+    "escape-string-regexp": "^1.0.3",
+    "gulp": "^3.8.11",
     "gulp-coffee": "^2.3.1",
-    "gulp-coffeelint": "~0.4.0",
-    "gulp-git": "~0.5.6",
+    "gulp-coffeelint": "^0.5.0",
+    "gulp-git": "^1.2.3",
     "gulp-header": "^1.2.2",
     "gulp-mustache": "^1.0.2",
-    "gulp-zip": "^2.0.2",
-    "merge2": "~0.3.1",
-    "request": "^2.53.0",
-    "require-precompute": "~0.2.0",
-    "rimraf": "^2.2.8",
-    "run-sequence": "^1.0.2"
+    "gulp-zip": "^3.0.2",
+    "merge2": "^0.3.5",
+    "request": "^2.55.0",
+    "require-precompute": "^0.2.0",
+    "rimraf": "^2.3.3",
+    "run-sequence": "^1.1.0"
   }
 }
