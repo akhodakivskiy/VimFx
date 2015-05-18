@@ -19,6 +19,7 @@ Anton Khodakivskiy
 - HJTP (nl)
 - Grzegorz Niewisiewicz (pl)
 - Anton Khodakivskiy (ru)
+- Nicholas Guriev (ru)
 - Zakhar Pilipchuk (ru)
 - Andreas Lindhé (sv-SE)
 - Simon Lydell (sv-SE)
