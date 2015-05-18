@@ -1,5 +1,6 @@
 {
   "arrow_spacing":                      {"level": "error"},
+  "braces_spacing":                     {"level": "ignore"},
   "camel_case_classes":                 {"level": "error"},
   "coffeescript_error":                 {"level": "error"},
   "colon_assignment_spacing":           {"level": "ignore"},
@@ -29,6 +30,8 @@
   "non_empty_constructor_needs_parens": {"level": "error"},
   "prefer_english_operator":            {"level": "ignore"},
   "space_operators":                    {"level": "error"},
+  "spacing_after_comma":                {"level": "error"},
+  "transform_messes_up_line_numbers":   {"level": "warn"},
 
   "forbidden_keywords": {
     "module": "coffeelint-forbidden-keywords",
