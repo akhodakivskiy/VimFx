@@ -190,7 +190,7 @@ tr = (cmd) ->
 
 table = (commands, modeName) ->
   """
-  <table #{ "data-commands='#{modeName}'" }>
+  <table data-commands="#{modeName}">
     #{ (tr(cmd) for cmd in commands).join('') }
   </table>
   """

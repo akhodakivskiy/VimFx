@@ -16,6 +16,7 @@
   },
   "devDependencies": {
     "coffee-script": "~1.9.2",
+    "coffeelint": "clutchski/coffeelint",
     "coffeelint-forbidden-keywords": "^0.1.1",
     "coffeelint-newline-at-eof": "^0.4.1",
     "escape-string-regexp": "^1.0.3",
