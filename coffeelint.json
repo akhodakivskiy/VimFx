@@ -43,11 +43,11 @@
         "!":    "not",
         "&&":   "and",
         "||":   "or"
-      },
-      "newline_at_eof": {
-        "module": "coffeelint-newline-at-eof",
-        "level": "error",
-        "behaviour": "require"
       }
+    },
+    "newline_at_eof": {
+      "module": "coffeelint-newline-at-eof",
+      "level": "error",
+      "behaviour": "require"
     }
 }
