@@ -157,7 +157,7 @@ gulp.task('lint', ->
     .pipe(coffeelint.reporter())
 )
 
-gulp.task('release', ->
+gulp.task('release', (callback) ->
   { version } = pkg
   message = "VimFx v#{ version }"
   today = new Date().toISOString()[...10]
@@ -169,7 +169,7 @@ gulp.task('release', ->
   ])
     .pipe(git.commit(message))
     .on('end', ->
-      git.tag("v#{ version }", message, (error) -> throw error if error)
+      git.tag("v#{ version }", message, callback)
     )
 )
 
