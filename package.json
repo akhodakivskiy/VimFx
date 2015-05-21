@@ -27,6 +27,7 @@
     "gulp-header": "^1.2.2",
     "gulp-mustache": "^1.0.2",
     "gulp-zip": "^3.0.2",
+    "marked": "^0.3.3",
     "merge2": "^0.3.5",
     "request": "^2.55.0",
     "require-precompute": "^0.2.0",

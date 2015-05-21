@@ -176,4 +176,8 @@ Before making a release, it might be wise to:
 4. Run `gulp xpi` to rebuild with the new version number.
 5. Push to github. Don’t forget to push the tag!
 6. Make a “release” out of the new tag on github, and attach VimFx.xpi to it.
-7. Publish on addons.mozilla.org. Add the release notes list as HTML.
+7. Publish on addons.mozilla.org. Add the release notes list as HTML. `gulp
+   changelog` prints the latest changelog entry as HTML. `gulp changelog -2`
+   prints the latest two (etc). The latter is useful if publishing a new version
+   before the last published version has been reviewed; then the new version
+   should contain both changelog entries.

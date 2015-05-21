@@ -27,6 +27,7 @@ git         = require('gulp-git')
 header      = require('gulp-header')
 mustache    = require('gulp-mustache')
 zip         = require('gulp-zip')
+marked      = require('marked')
 merge       = require('merge2')
 precompute  = require('require-precompute')
 request     = require('request')
@@ -172,6 +173,13 @@ gulp.task('release', ->
     )
 )
 
+gulp.task('changelog', ->
+  num = 1
+  num = Number(arg[1]) for arg in process.argv when /^-[1-9]$/.test(arg)
+  entries = read('CHANGELOG.md').split(/^### .+/m)[1..num].join('')
+  process.stdout.write(marked(entries))
+)
+
 gulp.task('faster', ->
   gulp.src('gulpfile.coffee')
     .pipe(coffee({bare: true}))
@@ -180,8 +188,7 @@ gulp.task('faster', ->
 
 gulp.task('sync-locales', ->
   baseLocale = 'en-US'
-  for arg in process.argv when arg[...2] == '--'
-    baseLocale = arg[2..]
+  baseLocale = arg[2..] for arg in process.argv when arg[...2] == '--'
   for file in fs.readdirSync(join(LOCALE, baseLocale))
     templateString = switch path.extname(file)
       when '.properties' then '%key=%value'
