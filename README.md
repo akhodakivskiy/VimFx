@@ -1,6 +1,6 @@
 # VimFx – Vim keyboard shortcuts for Firefox
 
-<img src="icon-large.png" alt="" align="right">
+<img src="https://raw.githubusercontent.com/akhodakivskiy/VimFx/develop/icon-large.png" alt="" align="right">
 
 [VimFx] is a [Mozilla Firefox] extension which adds Vim-style keyboard shortcuts
 for browsing and navigation, significantly reducing the use of the mouse, and
@@ -12,16 +12,18 @@ it will be easy to get started with VimFx.
 
 **Mailing list:** [vimfx@librelist.com] (just send an email to subscribe)
 
-Read [CONTRIBUTING.md](CONTRIBUTING.md) before opening issues and pull requests.
+Read [CONTRIBUTING.md] before opening issues and pull requests.
 
-VimFx is made by [these awesome people](PEOPLE.md).
+VimFx is made by [these awesome people][people].
 
-[vimfx@librelist.com]: mailto:vimfx@librelist.com?subject=Subscribe
 [VimFx]: https://addons.mozilla.org/firefox/addon/vimfx
 [Mozilla Firefox]: https://www.mozilla.org/firefox
 [Vimperator]: http://www.vimperator.org/vimperator
 [Vimium]: http://vimium.github.io/
 [Google Chrome]: https://www.google.com/chrome
+[vimfx@librelist.com]: mailto:vimfx@librelist.com?subject=Subscribe
+[CONTRIBUTING.md]: https://github.com/akhodakivskiy/VimFx/blob/develop/CONTRIBUTING.md
+[people]: https://github.com/akhodakivskiy/VimFx/blob/develop/PEOPLE.md
 
 ## Why VimFx was created
 
@@ -37,101 +39,29 @@ VimFx is made by [these awesome people](PEOPLE.md).
 
 ## Key Features
 
-- Concise shortcuts for most commonly performed actions.
-- Follow links, focus text inputs and click buttons on the page using hint
-  markers.
-- Easily accessible help dialog for the keyboard shortcuts.
-- Every keyboard shortcut is customizable.
-- Prefers native Firefox features over re-implementing similar functionality.
+VimFx has concise shortcuts for most commonly performed actions. Many simply
+invoke native Firefox features. That is preferred over re-implementing similar
+functionality.
 
-## Shortcuts
+Follow links, focus text inputs and click buttons using hint markers by pressing
+<kbd>f</kbd>. This command has many variations to for example copy links and
+open links in new tabs.
 
-This is a text representation of the keyboard shortcuts dialog within the
-extension, which helps you remember the shortcuts, and lets you customize them.
-Press <kbd>?</kbd> or use the toolbar button to open it.
+Search with <kbd>/</kbd> and cycle between matches with <kbd>n</kbd> and
+<kbd>N</kbd>.
 
-### Dealing with URLs
+Open a new tab with <kbd>t</kbd>, close it with <kbd>x</kbd>. Reopen it again
+with <kbd>X</kbd>. There are many more tab related commands, for example to
+change the currently selected tab.
 
-    o            Focus the Address Bar
-    O            Focus the Search Bar
-    p            Paste and go
-    P            Paste and go in a new tab
-    yf           Copy link url to the clipboard
-    vf           Focus element
-    yy           Copy link or text input value
-    r            Reload
-    R            Reload (override cache)
-    ar           Reload all tabs
-    aR           Reload all tabs (override cache)
-    s            Stop loading the page
-    as           Stop loading all tabs
+Scrolling left/down/up/right: <kbd>h</kbd>, <kbd>j</kbd>, <kbd>k</kbd>, <kbd>l</kbd>.  
+Top/Bottom: <kbd>gg</kbd>, <kbd>G</kbd>.  
+Page up/down: <kbd>space</kbd>, <kbd>shift-space</kbd>.  
+Half a page: <kbd>d</kbd>, <kbd>u</kbd>.
 
-### Navigating the Page
+There are of course many more shortcuts! Press <kbd>?</kbd> to see them all.
+That opens the keyboard shortcuts dialog, which helps you remember the
+shortcuts, and lets you customize every single one of them. You can also look at
+all default shortcuts [here][defaults].
 
-    gg           Scroll to top
-    G            Scroll to bottom
-    j            Scroll down
-    k            Scroll up
-    h            Scroll left
-    l            Scroll right
-    d            Scroll half a page down
-    u            Scroll half a page up
-    <space>      Scroll full page down
-    <s-space>    Scroll full page up
-
-### Working with Tabs
-
-    t            New tab
-    J  gT        Previous tab
-    K  gt        Next tab
-    gJ           Move tab left
-    gK           Move tab right
-    gh           Go to the Home Page
-    gH  g0       Go to the first tab
-    g^           Go to the first non-pinned tab
-    gL  g$       Go to the last tab
-    gp           Pin/Unpin tab
-    yt           Duplicate tab
-    gx$          Close tabs to the right
-    gxa          Close other tabs
-    x            Close tab
-    X            Restore closed tab
-
-### Browsing
-
-    f            Follow link, focus text input or click button
-    F            Follow link in a new tab
-    af           Follow a link on the current page in a new tab
-    [            Go to the next page
-    ]            Go to the previous page
-    gu           Go up one level in the URL
-    gU           Go to root in the URL
-    H            Go back in history
-    L            Go forward in history
-
-### Misc
-
-    /            Enter Find mode
-    a/           Enter Find mode highlighting all matches
-    n            Find next
-    N            Find previous
-    i            Enter insert mode: Ignore all commands
-    I            Pass next keypress through to the page
-    ?            Show this dialog
-    :            Open the Developer Toolbar
-    <escape>     Blur/close active element
-
-### Hints Mode
-
-    <escape>     Return to normal mode
-    <space>      Rotate overlapping markers forward
-    <s-space>    Rotate overlapping markers backward
-    <backspace>  Delete last typed hint character
-
-### Insert Mode
-
-    <s-escape>   Return to normal mode
-
-### Find Mode
-
-    <escape> <return> Close find bar
+[defaults]: https://github.com/akhodakivskiy/VimFx/blob/develop/extension/lib/defaults.coffee
