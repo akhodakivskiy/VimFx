@@ -19,7 +19,6 @@
 
 fs          = require('fs')
 path        = require('path')
-regexEscape = require('escape-string-regexp')
 gulp        = require('gulp')
 coffee      = require('gulp-coffee')
 coffeelint  = require('gulp-coffeelint')
@@ -191,27 +190,20 @@ gulp.task('sync-locales', ->
   baseLocale = 'en-US'
   for arg in process.argv when arg[...2] == '--'
     baseLocale = arg[2..]
-  for file in fs.readdirSync(join(LOCALE, baseLocale))
-    templateString = switch path.extname(file)
-      when '.properties' then '%key=%value'
-      when '.dtd'        then '<!ENTITY %key "%value">'
-    syncLocale(file, baseLocale, templateString) if templateString
+  fs.readdirSync(join(LOCALE, baseLocale))
+    .filter((file) -> path.extname(file) == '.properties')
+    .map(syncLocale.bind(undefined, baseLocale))
 )
 
-syncLocale = (fileName, baseLocaleName, templateString) ->
-  regex = ///^ #{
-    regexEscape(templateString)
-      .replace(/%key/,   '([^\\s=]+)')
-      .replace(/%value/, '(.+)')
-  } $///
+syncLocale = (baseLocaleName, fileName) ->
   basePath = join(LOCALE, baseLocaleName, fileName)
-  base = parseLocaleFile(read(basePath), regex)
+  base = parseLocaleFile(read(basePath))
   oldBasePath = "#{basePath}.old"
   if fs.existsSync(oldBasePath)
-    oldBase = parseLocaleFile(read(oldBasePath), regex)
+    oldBase = parseLocaleFile(read(oldBasePath))
   for localeName in fs.readdirSync(LOCALE) when localeName != baseLocaleName
     localePath = join(LOCALE, localeName, fileName)
-    locale = parseLocaleFile(read(localePath), regex)
+    locale = parseLocaleFile(read(localePath))
     newLocale = base.template.map((line) ->
       if Array.isArray(line)
         [ key ] = line
@@ -222,20 +214,20 @@ syncLocale = (fileName, baseLocaleName, templateString) ->
             base.keys[key]
           else
             locale.keys[key]
-        return templateString.replace(/%key/, key).replace(/%value/, value)
+        return "#{ key }=#{ value }"
       else
         return line
     )
     fs.writeFileSync(localePath, newLocale.join(base.newline))
   return
 
-parseLocaleFile = (fileContents, regex) ->
+parseLocaleFile = (fileContents) ->
   keys  = {}
   lines = []
   [ newline ] = fileContents.match(/\r?\n/)
   for line in fileContents.split(newline)
     line = line.trim()
-    [ match, key, value ] = line.match(regex) ? []
+    [ match, key, value ] = line.match(///^ ([^=]+) = (.*) $///) ? []
     if match
       keys[key] = value
       lines.push([key])

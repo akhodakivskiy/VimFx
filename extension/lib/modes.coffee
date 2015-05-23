@@ -120,8 +120,9 @@ exports['insert'] =
       else
         storage.count--
     return false
-  commands:
-    exit: ['<s-escape>']
+  commands: [
+    'exit'
+  ]
 
 exports['text-input'] =
   onEnter: (vim, storage, inputs = []) ->
@@ -164,8 +165,9 @@ exports['find'] =
       return true
     return false
 
-  commands:
-    exit: ['<escape>', '<enter>']
+  commands: [
+    'exit'
+  ]
 
 exports['hints'] =
   onEnter: (vim, storage, filter, callback) ->
@@ -235,14 +237,17 @@ exports['hints'] =
 
   timeout: 200
 
-  commands:
-    exit:                    ['<escape>']
-    rotate_markers_forward:  ['<space>']
-    rotate_markers_backward: ['<s-space>']
-    delete_hint_char:        ['<backspace>']
+  commands: [
+    'exit'
+    'rotate_markers_forward'
+    'rotate_markers_backward'
+    'delete_hint_char'
+  ]
 
-for modeName, mode of exports when not Array.isArray(mode.commands ? [])
-  for commandName of mode.commands
+for modeName, mode of exports
+  commandNames = mode.commands
+  continue if not commandNames or commandNames == commands
+  mode.commands = {}
+  for commandName in commandNames
     name = "mode_#{ modeName }_#{ commandName }"
-    keys = mode.commands[commandName].map((key) -> [key])
-    mode.commands[commandName] = new Command(null, name, null, keys)
+    mode.commands[commandName] = new Command(null, name, null)

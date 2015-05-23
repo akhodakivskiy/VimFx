@@ -18,18 +18,18 @@
 # along with VimFx.  If not, see <http://www.gnu.org/licenses/>.
 ###
 
-legacy        = require('./legacy')
-utils         = require('./utils')
-_             = require('./l10n')
+legacy      = require('./legacy')
+utils       = require('./utils')
+_           = require('./l10n')
 { getPref
-, setPref
-, isPrefSet } = require('./prefs')
+, setPref } = require('./prefs')
 
 class Command
-  constructor: (@group, @name, @func, keys) ->
+  constructor: (@group, @name, @func) ->
     @prefName = "commands.#{ @name }.keys"
+    keys = getPref(@prefName)
     @keyValues =
-      if isPrefSet(@prefName)
+      if typeof keys == 'string'
         try JSON.parse(getPref(@prefName))
         catch then []
       else
