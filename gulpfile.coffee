@@ -175,7 +175,8 @@ gulp.task('release', (callback) ->
 
 gulp.task('changelog', ->
   num = 1
-  num = Number(arg[1]) for arg in process.argv when /^-[1-9]$/.test(arg)
+  for arg in process.argv when /^-[1-9]$/.test(arg)
+    num = Number(arg[1])
   entries = read('CHANGELOG.md').split(/^### .+/m)[1..num].join('')
   process.stdout.write(marked(entries))
 )
@@ -188,7 +189,8 @@ gulp.task('faster', ->
 
 gulp.task('sync-locales', ->
   baseLocale = 'en-US'
-  baseLocale = arg[2..] for arg in process.argv when arg[...2] == '--'
+  for arg in process.argv when arg[...2] == '--'
+    baseLocale = arg[2..]
   for file in fs.readdirSync(join(LOCALE, baseLocale))
     templateString = switch path.extname(file)
       when '.properties' then '%key=%value'
