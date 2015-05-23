@@ -1,7 +1,6 @@
 ###
 # Copyright Anton Khodakivskiy 2012, 2013, 2014.
-# Copyright Simon Lydell 2013, 2014.
-# Copyright Wang Zhuochun 2013.
+# Copyright Simon Lydell 2013, 2014, 2015.
 #
 # This file is part of VimFx.
 #
@@ -19,34 +18,32 @@
 # along with VimFx.  If not, see <http://www.gnu.org/licenses/>.
 ###
 
+defaults = require('./defaults')
+
 { classes: Cc, interfaces: Ci } = Components
 
-PREF_BRANCH = 'extensions.VimFx.'
-DEFAULT_PREFS_FILE = 'defaults/preferences/defaults.js'
-
-# Default values for preferences are now specified in
-# defaults/preferences/defaults.js.
-
 prefs = Services.prefs
-vimfxBranch = prefs.getBranch(PREF_BRANCH)
+vimfxBranch = prefs.getBranch(defaults.BRANCH)
+vimfxDefaultBranch = prefs.getDefaultBranch(defaults.BRANCH)
 
-getBranchPref = (branch, key, defaultValue = undefined) ->
-  type = branch.getPrefType(key)
-  return switch type
+isPrefSet = (key) -> vimfxBranch.prefHasUserValue(key)
+
+getBranchPref = (branch, key) ->
+  return switch branch.getPrefType(key)
     when branch.PREF_BOOL
       branch.getBoolPref(key)
     when branch.PREF_INT
       branch.getIntPref(key)
     when branch.PREF_STRING
       branch.getComplexValue(key, Ci.nsISupportsString).data
-    else
-      defaultValue
 
-isPrefSet = (key) ->
-  return vimfxBranch.prefHasUserValue(key)
+getPref = (key) ->
+  if isPrefSet(key)
+    return getBranchPref(vimfxBranch, key)
+  else
+    return defaults.all[key]
 
-getPref        = getBranchPref.bind(undefined, vimfxBranch)
-getFirefoxPref = getBranchPref.bind(undefined, prefs.getBranch(''))
+getFirefoxPref = getBranchPref.bind(undefined, prefs)
 
 setBranchPref = (branch, key, value) ->
   switch typeof value
@@ -55,12 +52,16 @@ setBranchPref = (branch, key, value) ->
     when 'number'
       branch.setIntPref(key, value)
     when 'string'
-      branch.setCharPref(key, value)
+      str = Cc['@mozilla.org/supports-string;1']
+        .createInstance(Ci.nsISupportsString)
+      str.data = value
+      branch.setComplexValue(key, Ci.nsISupportsString, str)
     else
       branch.clearUserPref(key)
 
 setPref        = setBranchPref.bind(undefined, vimfxBranch)
-setFirefoxPref = setBranchPref.bind(undefined, prefs.getBranch(''))
+setDefaultPref = setBranchPref.bind(undefined, vimfxDefaultBranch)
+setFirefoxPref = setBranchPref.bind(undefined, prefs)
 
 withFirefoxPrefAs = (pref, temporaryValue, fn) ->
   previousValue = getFirefoxPref(pref)
@@ -69,12 +70,8 @@ withFirefoxPrefAs = (pref, temporaryValue, fn) ->
   setFirefoxPref(pref, previousValue)
 
 setDefaultPrefs = ->
-  baseUri = Services.io.newURI(__SCRIPT_URI_SPEC__, null, null)
-  uri = Services.io.newURI(DEFAULT_PREFS_FILE, null, baseUri)
-
-  branch = prefs.getDefaultBranch('')
-  scope = {pref: setBranchPref.bind(undefined, branch)}
-  Services.scriptloader.loadSubScript(uri.spec, scope)
+  setDefaultPref(key, value) for key, value of defaults.options
+  return
 
 exports.isPrefSet         = isPrefSet
 exports.getPref           = getPref

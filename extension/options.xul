@@ -1,44 +1,6 @@
-<?xml version="1.0"?>
-
 <!--
-Copyright Anton Khodakivskiy 2012-2013.
-Copyright Simon Lydell 2013-2014.
-Copyright Wang Zhuochun 2013.
-
-This file is part of VimFx.
-
-VimFx is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-VimFx is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with VimFx.  If not, see <http://www.gnu.org/licenses/>.
+Dummy file to enable inline options. All elements are added by
+lib/options.coffee. Include an empty element so that an 'no element found' error
+is not logged to the error console.
 -->
-
-<!DOCTYPE mydialog SYSTEM "chrome://vimfx/locale/options.dtd">
-
-<vbox xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
-    <setting pref="extensions.VimFx.hint_chars" type="string"
-        title="&pref.hint_chars.title;" desc="&pref.hint_chars.desc;" />
-    <setting pref="extensions.VimFx.black_list" type="string"
-        title="&pref.black_list.title;" desc="&pref.black_list.desc;" />
-    <setting pref="extensions.VimFx.prev_patterns" type="string"
-        title="&pref.prev_patterns.title;" desc="&pref.prev_patterns.desc;" />
-    <setting pref="extensions.VimFx.next_patterns" type="string"
-        title="&pref.next_patterns.title;" desc="&pref.next_patterns.desc;" />
-    <setting pref="extensions.VimFx.scroll_step_lines" type="integer"
-        title="&pref.prevent_autofocus.title;" />
-    <setting pref="extensions.VimFx.autofocus_limit" type="integer"
-        title="&pref.autofocus_limit.title;" desc="&pref.autofocus_limit.desc;" />
-    <setting pref="extensions.VimFx.ignore_keyboard_layout" type="bool"
-        title="&pref.ignore_keyboard_layout.title;" desc="&pref.ignore_keyboard_layout.desc;" />
-    <setting title="&customizeButton.title;" type="control">
-        <button id="customizeButton" label="&customizeButton.label;" />
-    </setting>
-</vbox>
+<vbox />

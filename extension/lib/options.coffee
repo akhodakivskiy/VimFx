@@ -18,33 +18,85 @@
 # along with VimFx.  If not, see <http://www.gnu.org/licenses/>.
 ###
 
-utils        = require('./utils')
-{ getPref }  = require('./prefs')
-help         = require('./help')
+utils    = require('./utils')
+defaults = require('./defaults')
+help     = require('./help')
+_        = require('./l10n')
 
 observe = ->
+  observer = new Observer(defaults, validators)
+  observer.hooks.injectSettings = setupCustomizeButton
+
   Services.obs.addObserver(observer, 'addon-options-displayed', false)
   Services.obs.addObserver(observer, 'addon-options-hidden',    false)
 
-observer =
-  observe: (document, topic, addon) ->
-    spec =
-      'setting[pref="extensions.VimFx.hint_chars"]':
-        change: filterChars
-      'setting[pref="extensions.VimFx.black_list"]':
-        change: utils.updateBlacklist
-      'setting[pref="extensions.VimFx.prev_patterns"]':
-        change: validatePatterns
-      'setting[pref="extensions.VimFx.next_patterns"]':
-        change: validatePatterns
-      '#customizeButton':
-        command: help.injectHelp.bind(undefined, document, require('./modes'))
+  module.onShutdown(->
+    Services.obs.removeObserver(observer, 'addon-options-displayed')
+    Services.obs.removeObserver(observer, 'addon-options-hidden')
+  )
 
+class Observer
+  constructor: (@defaults, @validators = {}) ->
+    @document  = null
+    @container = null
+    @listeners = []
+    @hooks     = {}
+
+  useCapture: false
+
+  listen: (element, event, action) ->
+    element.addEventListener(event, action, @useCapture)
+    @listeners.push([element, event, action, @useCapture])
+
+  unlisten: ->
+    for [element, event, action, useCapture] in @listeners
+      element.removeEventListener(event, action, useCapture)
+    @listeners.length = 0
+
+  typeMap:
+    string:  'string'
+    number:  'integer'
+    boolean: 'bool'
+
+  injectSettings: ->
+    @container = @document.getElementById('detail-rows')
+
+    for key, value of @defaults.options
+      desc = _("pref_#{ key }_desc")
+      if typeof value == 'string' and value != ''
+        desc += "\n#{ _('prefs_default', value) }"
+      setting = utils.createElement(@document, 'setting', {
+        pref:  "#{ @defaults.BRANCH }#{ key }"
+        type:  @typeMap[typeof value]
+        title: _("pref_#{ key }_title")
+        desc:  desc.trim()
+      })
+      @listen(setting, 'change', @validators[key]) if key of @validators
+      @container.appendChild(setting)
+
+    @hooks.injectSettings?.call(this)
+
+    @container.querySelector('setting').setAttribute('first-row', 'true')
+
+  observe: (@document, topic) ->
     switch topic
       when 'addon-options-displayed'
-        applySpec(document, spec, true)
+        @injectSettings()
       when 'addon-options-hidden'
-        applySpec(document, spec, false)
+        @unlisten()
+
+setupCustomizeButton = ->
+  shortcuts = utils.createElement(@document, 'setting', {
+    type: 'control',
+    title: _('prefs_customize_shortcuts_title')
+  })
+  button = utils.createElement(@document, 'button', {
+    label: _('prefs_customize_shortcuts_label')
+  })
+  shortcuts.appendChild(button)
+  @listen(button, 'command',
+          help.injectHelp.bind(undefined, @document, require('./modes')))
+  @container.appendChild(shortcuts)
 
 filterChars = (event) ->
   input = event.target
@@ -55,20 +107,14 @@ validatePatterns = (event) ->
   input = event.target
   input.value =
     utils.removeDuplicates(utils.splitListString(input.value))
-    .filter((pattern) -> pattern != '')
-    .join(',')
+      .filter((pattern) -> pattern != '')
+      .join(',')
   input.valueToPreference()
 
-applySpec = (document, spec, enable) ->
-  for selector, events of spec
-    element = document.querySelector(selector)
-    method = if enable then 'addEventListener' else 'removeEventListener'
-    for event, action of events
-      element[method](event, action, false)
-
-  module.onShutdown(->
-    Services.obs.removeObserver(observer, 'addon-options-displayed')
-    Services.obs.removeObserver(observer, 'addon-options-hidden')
-  )
+validators =
+  'hint_chars':    filterChars
+  'black_list':    utils.updateBlacklist
+  'prev_patterns': validatePatterns
+  'next_patterns': validatePatterns
 
 exports.observe = observe

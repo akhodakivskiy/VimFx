@@ -51,7 +51,7 @@ require = (path, moduleRoot = '.', dir = '.') ->
       require: (path) -> require(path, moduleRoot, "./#{ dirname(fullPath) }")
       module:  module
       exports: module.exports
-    Services.scriptloader.loadSubScript(fullPath, scope)
+    Services.scriptloader.loadSubScript(fullPath, scope, 'UTF-8')
 
   return require.scopes[fullPath].module.exports
 
