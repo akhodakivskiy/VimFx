@@ -60,7 +60,7 @@ helper_paste = (vim) ->
 # Go to or search for the contents of the system clipboard.
 command_paste = (vim) ->
   { url, postData } = helper_paste(vim)
-  vim.rootWindow.gBrowser.loadURIWithFlags(url, null, null, null, postData)
+  vim.rootWindow.gBrowser.loadURIWithFlags(url, {postData})
 
 # Go to or search for the contents of the system clipboard in a new tab.
 command_paste_tab = (vim) ->
