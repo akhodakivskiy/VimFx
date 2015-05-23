@@ -66,7 +66,7 @@ command_paste = (vim) ->
 command_paste_tab = (vim) ->
   { url, postData } = helper_paste(vim)
   vim.rootWindow.gBrowser.selectedTab =
-    vim.rootWindow.gBrowser.addTab(url, null, null, postData, null, false)
+    vim.rootWindow.gBrowser.addTab(url, {postData})
 
 # Copy the current URL to the system clipboard.
 command_yank = (vim) ->
