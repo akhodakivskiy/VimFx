@@ -62,7 +62,7 @@ gulp.task('node_modules', ->
   # Note! When installing or updating node modules, make sure that the following
   # glob does not include too much or too little!
   gulp.src("node_modules/+(#{ dependencies.join('|') })/\
-            {LICENSE,{,**/!(test)/}*.js}")
+            {LICENSE*,{,**/!(test|examples)/}!(*min|*test*|*bench*).js}")
     .pipe(gulp.dest("#{ DEST }/node_modules"))
 )
 
