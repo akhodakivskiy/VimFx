@@ -19,10 +19,9 @@
 # along with VimFx.  If not, see <http://www.gnu.org/licenses/>.
 ###
 
-notation = require('vim-like-key-notation')
+notation    = require('vim-like-key-notation')
 { getPref
-, setPref
-} = require('./prefs')
+, setPref } = require('./prefs')
 
 ADDON_ID = 'VimFx@akhodakivskiy.github.com'
 

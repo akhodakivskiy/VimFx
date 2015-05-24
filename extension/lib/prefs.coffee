@@ -37,12 +37,7 @@ getBranchPref = (branch, key) ->
     when branch.PREF_STRING
       branch.getComplexValue(key, Ci.nsISupportsString).data
 
-getPref = (key) ->
-  if isPrefSet(key)
-    return getBranchPref(vimfxBranch, key)
-  else
-    return defaults.all[key]
-
+getPref        = getBranchPref.bind(undefined, vimfxBranch)
 getFirefoxPref = getBranchPref.bind(undefined, prefs)
 
 setBranchPref = (branch, key, value) ->
@@ -70,7 +65,7 @@ withFirefoxPrefAs = (pref, temporaryValue, fn) ->
   setFirefoxPref(pref, previousValue)
 
 setDefaultPrefs = ->
-  setDefaultPref(key, value) for key, value of defaults.options
+  setDefaultPref(key, value) for key, value of defaults.all
   return
 
 exports.isPrefSet         = isPrefSet

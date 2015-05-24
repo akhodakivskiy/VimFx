@@ -249,5 +249,5 @@ for modeName, mode of exports
   continue if not commandNames or commandNames == commands
   mode.commands = {}
   for commandName in commandNames
-    name = "mode_#{ modeName }_#{ commandName }"
+    name = "mode.#{ modeName }.#{ commandName }"
     mode.commands[commandName] = new Command(null, name, null)

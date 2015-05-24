@@ -23,13 +23,13 @@ notation = require('vim-like-key-notation')
 
 shortcuts =
   'normal':
-    'o':          'focus'
-    'O':          'focus_search'
-    'p':          'paste'
-    'P':          'paste_tab'
-    'yf':         'marker_yank'
-    'vf':         'marker_focus'
-    'yy':         'yank'
+    'o':          'focus_location_bar'
+    'O':          'focus_search_bar'
+    'p':          'paste_and_go'
+    'P':          'paste_and_go_in_tab'
+    'yf':         'follow_copy'
+    'vf':         'follow_focus'
+    'yy':         'copy_current_url'
     'r':          'reload'
     'R':          'reload_force'
     'ar':         'reload_all'
@@ -50,21 +50,21 @@ shortcuts =
     '<space>':    'scroll_page_down'
     '<s-space>':  'scroll_page_up'
 
-    't':          'open_tab'
-    'J  gT':      'tab_prev'
-    'K  gt':      'tab_next'
-    'gJ':         'tab_move_left'
-    'gK':         'tab_move_right'
-    'gh':         'home'
-    'gH  g0':     'tab_first'
-    'g^':         'tab_first_non_pinned'
-    'gL  g$':     'tab_last'
-    'gp':         'toggle_pin_tab'
-    'yt':         'duplicate_tab'
-    'gx$':        'close_tabs_to_end'
-    'gxa':        'close_other_tabs'
-    'x':          'close_tab'
-    'X':          'restore_tab'
+    't':          'tab_new'
+    'J  gT':      'tab_select_previous'
+    'K  gt':      'tab_select_next'
+    'gJ':         'tab_move_backward'
+    'gK':         'tab_move_forward'
+    'gh':         'go_home'
+    'gH  g0':     'tab_select_first'
+    'g^':         'tab_select_first_non_pinned'
+    'gL  g$':     'tab_select_last'
+    'gp':         'tab_toggle_pinned'
+    'yt':         'tab_duplicate'
+    'gx$':        'tab_close_to_end'
+    'gxa':        'tab_close_other'
+    'x':          'tab_close'
+    'X':          'tab_restore'
 
     'f':          'follow'
     'F':          'follow_in_tab'
@@ -75,18 +75,18 @@ shortcuts =
     'gi':         'text_input'
     'gu':         'go_up_path'
     'gU':         'go_to_root'
-    'H':          'back'
-    'L':          'forward'
+    'H':          'history_back'
+    'L':          'history_forward'
 
     '/':          'find'
-    'a/':         'find_hl'
+    'a/':         'find_highlight_all'
     'n':          'find_next'
-    'N':          'find_prev'
-    'i':          'insert_mode'
+    'N':          'find_previous'
+    'i':          'enter_mode_insert'
     'I':          'quote'
     '?':          'help'
     ':':          'dev'
-    '<escape>':   'Esc'
+    '<escape>':   'esc'
 
   'insert':
     '<s-escape>':  'exit'
@@ -120,9 +120,7 @@ advanced_options =
 key_options = {}
 for modeName, modeShortcuts of shortcuts
   for keys, name of modeShortcuts
-    name = "mode_#{ modeName }_#{ name }" unless modeName == 'normal'
-    key_options["commands.#{ name }.keys"] =
-      keys.split(/\s+/).map(notation.parseSequence)
+    key_options["mode.#{ modeName }.#{ name }"] = keys
 
 all = Object.assign({}, options, advanced_options, key_options)
 

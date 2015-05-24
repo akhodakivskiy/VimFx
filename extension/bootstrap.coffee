@@ -58,6 +58,13 @@ require = (path, moduleRoot = '.', dir = '.') ->
 require.scopes = {}
 require.data   = require('./require-data')
 
+# Set default prefs and apply migrations as early as possible.
+{ setDefaultPrefs } = require('./lib/prefs')
+{ applyMigrations
+, migrations }      = require('./lib/migrations')
+setDefaultPrefs()
+applyMigrations(migrations)
+
 do (global = this) ->
 
   global.startup = require('./lib/main')

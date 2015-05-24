@@ -34,16 +34,11 @@ help       = require('./help')
 
 XULDocument  = Ci.nsIDOMXULDocument
 
-# “Selecting an element” means “focusing and selecting the text, if any, of an
-# element”.
-
-# Select the Address Bar.
-command_focus = (vim) ->
+command_focus_location_bar = (vim) ->
   # This function works even if the Address Bar has been removed.
   vim.rootWindow.focusAndSelectUrlBar()
 
-# Select the Search Bar.
-command_focus_search = (vim) ->
+command_focus_search_bar = (vim) ->
   # The `.webSearch()` method opens a search engine in a tab if the Search Bar
   # has been removed. Therefore we first check if it exists.
   if vim.rootWindow.BrowserSearch.searchBar
@@ -57,44 +52,35 @@ helper_paste = (vim) ->
     { postData } = submission
   return {url, postData}
 
-# Go to or search for the contents of the system clipboard.
-command_paste = (vim) ->
+command_paste_and_go = (vim) ->
   { url, postData } = helper_paste(vim)
   vim.rootWindow.gBrowser.loadURIWithFlags(url, {postData})
 
-# Go to or search for the contents of the system clipboard in a new tab.
-command_paste_tab = (vim) ->
+command_paste_and_go_in_tab = (vim) ->
   { url, postData } = helper_paste(vim)
   vim.rootWindow.gBrowser.selectedTab =
     vim.rootWindow.gBrowser.addTab(url, {postData})
 
-# Copy the current URL to the system clipboard.
-command_yank = (vim) ->
+command_copy_current_url = (vim) ->
   utils.writeToClipboard(vim.window.location.href)
 
-# Reload the current tab, possibly from cache.
 command_reload = (vim) ->
   vim.rootWindow.BrowserReload()
 
-# Reload the current tab, skipping cache.
 command_reload_force = (vim) ->
   vim.rootWindow.BrowserReloadSkipCache()
 
-# Reload all tabs, possibly from cache.
 command_reload_all = (vim) ->
   vim.rootWindow.gBrowser.reloadAllTabs()
 
-# Reload all tabs, skipping cache.
 command_reload_all_force = (vim) ->
   for tab in vim.rootWindow.gBrowser.visibleTabs
     window = tab.linkedBrowser.contentWindow
     window.location.reload(true)
 
-# Stop loading the current tab.
 command_stop = (vim) ->
   vim.window.stop()
 
-# Stop loading all tabs.
 command_stop_all = (vim) ->
   for tab in vim.rootWindow.gBrowser.visibleTabs
     window = tab.linkedBrowser.contentWindow
@@ -165,8 +151,7 @@ command_scroll_page_down =
 command_scroll_page_up =
   helper_scroll.bind(undefined, 'scrollBy', 'pages', 'y', -1)
 
-# Open a new tab and select the Address Bar.
-command_open_tab = (vim) ->
+command_tab_new = (vim) ->
   vim.rootWindow.BrowserOpenTab()
 
 absoluteTabIndex = (relativeIndex, gBrowser) ->
@@ -190,11 +175,9 @@ helper_switch_tab = (direction, vim, event, count = 1) ->
   { gBrowser } = vim.rootWindow
   gBrowser.selectTabAtIndex(absoluteTabIndex(direction * count, gBrowser))
 
-# Switch to the previous tab.
-command_tab_prev = helper_switch_tab.bind(undefined, -1)
+command_tab_select_previous = helper_switch_tab.bind(undefined, -1)
 
-# Switch to the next tab.
-command_tab_next = helper_switch_tab.bind(undefined, +1)
+command_tab_select_next = helper_switch_tab.bind(undefined, +1)
 
 helper_move_tab = (direction, vim, event, count = 1) ->
   { gBrowser }    = vim.rootWindow
@@ -210,31 +193,24 @@ helper_move_tab = (direction, vim, event, count = 1) ->
 
   gBrowser.moveTabTo(selectedTab, index)
 
-# Move the current tab backward.
-command_tab_move_left = helper_move_tab.bind(undefined, -1)
+command_tab_move_backward = helper_move_tab.bind(undefined, -1)
 
-# Move the current tab forward.
-command_tab_move_right = helper_move_tab.bind(undefined, +1)
+command_tab_move_forward = helper_move_tab.bind(undefined, +1)
 
-# Load the home page.
-command_home = (vim) ->
+command_go_home = (vim) ->
   vim.rootWindow.BrowserHome()
 
-# Switch to the first tab.
-command_tab_first = (vim) ->
+command_tab_select_first = (vim) ->
   vim.rootWindow.gBrowser.selectTabAtIndex(0)
 
-# Switch to the first non-pinned tab.
-command_tab_first_non_pinned = (vim) ->
+command_tab_select_first_non_pinned = (vim) ->
   firstNonPinned = vim.rootWindow.gBrowser._numPinnedTabs
   vim.rootWindow.gBrowser.selectTabAtIndex(firstNonPinned)
 
-# Switch to the last tab.
-command_tab_last = (vim) ->
+command_tab_select_last = (vim) ->
   vim.rootWindow.gBrowser.selectTabAtIndex(-1)
 
-# Toggle Pin Tab.
-command_toggle_pin_tab = (vim) ->
+command_tab_toggle_pinned = (vim) ->
   currentTab = vim.rootWindow.gBrowser.selectedTab
 
   if currentTab.pinned
@@ -242,31 +218,26 @@ command_toggle_pin_tab = (vim) ->
   else
     vim.rootWindow.gBrowser.pinTab(currentTab)
 
-# Duplicate current tab.
-command_duplicate_tab = (vim) ->
+command_tab_duplicate = (vim) ->
   { gBrowser } = vim.rootWindow
   gBrowser.duplicateTab(gBrowser.selectedTab)
 
-# Close all tabs from current to the end.
-command_close_tabs_to_end = (vim) ->
+command_tab_close_to_end = (vim) ->
   { gBrowser } = vim.rootWindow
   gBrowser.removeTabsToTheEndFrom(gBrowser.selectedTab)
 
-# Close all tabs except the current.
-command_close_other_tabs = (vim) ->
+command_tab_close_other = (vim) ->
   { gBrowser } = vim.rootWindow
   gBrowser.removeAllTabsBut(gBrowser.selectedTab)
 
-# Close current tab.
-command_close_tab = (vim, event, count = 1) ->
+command_tab_close = (vim, event, count = 1) ->
   { gBrowser } = vim.rootWindow
   return if gBrowser.selectedTab.pinned
   currentIndex = gBrowser.visibleTabs.indexOf(gBrowser.selectedTab)
   for tab in gBrowser.visibleTabs[currentIndex...(currentIndex + count)]
     gBrowser.removeTab(tab)
 
-# Restore last closed tab.
-command_restore_tab = (vim, event, count = 1) ->
+command_tab_restore = (vim, event, count = 1) ->
   vim.rootWindow.undoCloseTab() for [1..count]
 
 # Combine links with the same href.
@@ -392,7 +363,7 @@ command_follow_in_focused_tab = (vim, event, count = 1) ->
   command_follow_in_tab(vim, event, count, false)
 
 # Copy the URL or text of a markable element to the system clipboard.
-command_marker_yank = (vim) ->
+command_follow_copy = (vim) ->
   hrefs = {}
   filter = (element, getElementShape) ->
     type = switch
@@ -414,7 +385,7 @@ command_marker_yank = (vim) ->
   vim.enterMode('hints', filter, callback)
 
 # Focus element with hint markers.
-command_marker_focus = (vim) ->
+command_follow_focus = (vim) ->
   filter = (element, getElementShape) ->
     type = switch
       when element.tabIndex > -1
@@ -457,10 +428,8 @@ helper_follow_pattern = (type, vim) ->
   if matchingLink = utils.getBestPatternMatch(patterns, attrs, candidates)
     utils.simulateClick(matchingLink)
 
-# Follow previous page.
-command_follow_prev = helper_follow_pattern.bind(undefined, 'prev')
+command_follow_previous = helper_follow_pattern.bind(undefined, 'prev')
 
-# Follow next page.
 command_follow_next = helper_follow_pattern.bind(undefined, 'next')
 
 # Focus last focused or first text input and enter text input mode.
@@ -499,11 +468,9 @@ helper_go_history = (num, vim, event, count = 1) ->
   return if num == 0
   history.go(num)
 
-# Go back in history.
-command_back = helper_go_history.bind(undefined, -1)
+command_history_back = helper_go_history.bind(undefined, -1)
 
-# Go forward in history.
-command_forward = helper_go_history.bind(undefined, +1)
+command_history_forward = helper_go_history.bind(undefined, +1)
 
 findStorage = {lastSearchString: ''}
 
@@ -522,7 +489,7 @@ helper_find = (highlight, vim) ->
 command_find = helper_find.bind(undefined, false)
 
 # Open the find bar, making sure that hightlighting is on.
-command_find_hl = helper_find.bind(undefined, true)
+command_find_highlight_all = helper_find.bind(undefined, true)
 
 helper_find_again = (direction, vim) ->
   findBar = vim.rootWindow.gBrowser.getFindBar()
@@ -530,14 +497,11 @@ helper_find_again = (direction, vim) ->
     findBar._findField.value = findStorage.lastSearchString
     findBar.onFindAgainCommand(direction)
 
-# Search for the last pattern.
 command_find_next = helper_find_again.bind(undefined, false)
 
-# Search for the last pattern backwards.
-command_find_prev = helper_find_again.bind(undefined, true)
+command_find_previous = helper_find_again.bind(undefined, true)
 
-# Enter insert mode.
-command_insert_mode = (vim) ->
+command_enter_mode_insert = (vim) ->
   vim.enterMode('insert')
 
 # Quote next keypress (pass it through to the page).
@@ -548,11 +512,11 @@ command_quote = (vim, event, count = 1) ->
 command_help = (vim) ->
   help.injectHelp(vim.window.document, require('./modes'))
 
-# Open and select the Developer Toolbar.
+# Open and focus the Developer Toolbar.
 command_dev = (vim) ->
-  vim.rootWindow.DeveloperToolbar.show(true) # focus
+  vim.rootWindow.DeveloperToolbar.show(true) # `true` to focus.
 
-command_Esc = (vim, event) ->
+command_esc = (vim, event) ->
   utils.blurActiveElement(vim.window)
 
   # Blur active XUL control.
@@ -575,13 +539,13 @@ command_Esc = (vim, event) ->
 
 
 commands = [
-  new Command('urls',   'focus',                 command_focus)
-  new Command('urls',   'focus_search',          command_focus_search)
-  new Command('urls',   'paste',                 command_paste)
-  new Command('urls',   'paste_tab',             command_paste_tab)
-  new Command('urls',   'marker_yank',           command_marker_yank)
-  new Command('urls',   'marker_focus',          command_marker_focus)
-  new Command('urls',   'yank',                  command_yank)
+  new Command('urls',   'focus_location_bar',    command_focus_location_bar)
+  new Command('urls',   'focus_search_bar',      command_focus_search_bar)
+  new Command('urls',   'paste_and_go',          command_paste_and_go)
+  new Command('urls',   'paste_and_go_in_tab',   command_paste_and_go_in_tab)
+  new Command('urls',   'follow_copy',           command_follow_copy)
+  new Command('urls',   'follow_focus',          command_follow_focus)
+  new Command('urls',   'copy_current_url',      command_copy_current_url)
   new Command('urls',   'reload',                command_reload)
   new Command('urls',   'reload_force',          command_reload_force)
   new Command('urls',   'reload_all',            command_reload_all)
@@ -602,45 +566,46 @@ commands = [
   new Command('nav',    'scroll_page_down',      command_scroll_page_down)
   new Command('nav',    'scroll_page_up',        command_scroll_page_up)
 
-  new Command('tabs',   'open_tab',              command_open_tab)
-  new Command('tabs',   'tab_prev',              command_tab_prev)
-  new Command('tabs',   'tab_next',              command_tab_next)
-  new Command('tabs',   'tab_move_left',         command_tab_move_left)
-  new Command('tabs',   'tab_move_right',        command_tab_move_right)
-  new Command('tabs',   'home',                  command_home)
-  new Command('tabs',   'tab_first',             command_tab_first)
-  new Command('tabs',   'tab_first_non_pinned',  command_tab_first_non_pinned)
-  new Command('tabs',   'tab_last',              command_tab_last)
-  new Command('tabs',   'toggle_pin_tab',        command_toggle_pin_tab)
-  new Command('tabs',   'duplicate_tab',         command_duplicate_tab)
-  new Command('tabs',   'close_tabs_to_end',     command_close_tabs_to_end)
-  new Command('tabs',   'close_other_tabs',      command_close_other_tabs)
-  new Command('tabs',   'close_tab',             command_close_tab)
-  new Command('tabs',   'restore_tab',           command_restore_tab)
+  new Command('tabs',   'tab_new',               command_tab_new)
+  new Command('tabs',   'tab_select_previous',   command_tab_select_previous)
+  new Command('tabs',   'tab_select_next',       command_tab_select_next)
+  new Command('tabs',   'tab_move_backward',     command_tab_move_backward)
+  new Command('tabs',   'tab_move_forward',      command_tab_move_forward)
+  new Command('tabs',   'go_home',               command_go_home)
+  new Command('tabs',   'tab_select_first',      command_tab_select_first)
+  new Command('tabs',   'tab_select_first_non_pinned',
+                                            command_tab_select_first_non_pinned)
+  new Command('tabs',   'tab_select_last',       command_tab_select_last)
+  new Command('tabs',   'tab_toggle_pinned',     command_tab_toggle_pinned)
+  new Command('tabs',   'tab_duplicate',         command_tab_duplicate)
+  new Command('tabs',   'tab_close_to_end',      command_tab_close_to_end)
+  new Command('tabs',   'tab_close_other',       command_tab_close_other)
+  new Command('tabs',   'tab_close',             command_tab_close)
+  new Command('tabs',   'tab_restore',           command_tab_restore)
 
   new Command('browse', 'follow',                command_follow)
   new Command('browse', 'follow_in_tab',         command_follow_in_tab)
   new Command('browse', 'follow_in_focused_tab', command_follow_in_focused_tab)
   new Command('browse', 'follow_multiple',       command_follow_multiple)
-  new Command('browse', 'follow_previous',       command_follow_prev)
+  new Command('browse', 'follow_previous',       command_follow_previous)
   new Command('browse', 'follow_next',           command_follow_next)
   new Command('browse', 'text_input',            command_text_input)
   new Command('browse', 'go_up_path',            command_go_up_path)
   new Command('browse', 'go_to_root',            command_go_to_root)
-  new Command('browse', 'back',                  command_back)
-  new Command('browse', 'forward',               command_forward)
+  new Command('browse', 'history_back',          command_history_back)
+  new Command('browse', 'history_forward',       command_history_forward)
 
   new Command('misc',   'find',                  command_find)
-  new Command('misc',   'find_hl',               command_find_hl)
+  new Command('misc',   'find_highlight_all',    command_find_highlight_all)
   new Command('misc',   'find_next',             command_find_next)
-  new Command('misc',   'find_prev',             command_find_prev)
-  new Command('misc',   'insert_mode',           command_insert_mode)
+  new Command('misc',   'find_previous',         command_find_previous)
+  new Command('misc',   'enter_mode_insert',     command_enter_mode_insert)
   new Command('misc',   'quote',                 command_quote)
   new Command('misc',   'help',                  command_help)
   new Command('misc',   'dev',                   command_dev)
 
   escapeCommand =
-  new Command('misc',   'Esc',                   command_Esc)
+  new Command('misc',   'esc',                   command_esc)
 ]
 
 exports.commands      = commands

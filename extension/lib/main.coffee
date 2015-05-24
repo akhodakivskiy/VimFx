@@ -21,8 +21,6 @@
 { loadCss }             = require('./utils')
 { addEventListeners
 , vimBucket }           = require('./events')
-{ getPref
-, setDefaultPrefs }     = require('./prefs')
 { setButtonInstallPosition
 , addToolbarButton }    = require('./button')
 options                 = require('./options')
@@ -31,8 +29,6 @@ test                    = try require('../test/index')
 
 module.exports = (data, reason) ->
   test?()
-
-  setDefaultPrefs()
 
   if reason == ADDON_INSTALL
     # Position the toolbar button right before the default Bookmarks button.

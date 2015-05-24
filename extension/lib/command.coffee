@@ -18,7 +18,7 @@
 # along with VimFx.  If not, see <http://www.gnu.org/licenses/>.
 ###
 
-legacy      = require('./legacy')
+notation    = require('vim-like-key-notation')
 utils       = require('./utils')
 _           = require('./l10n')
 { getPref
@@ -26,25 +26,23 @@ _           = require('./l10n')
 
 class Command
   constructor: (@group, @name, @func) ->
-    @prefName = "commands.#{ @name }.keys"
-    keys = getPref(@prefName)
+    unless @name.startsWith('mode.')
+      @name = "mode.normal.#{ @name }"
+    keyString = getPref(@name).trim()
     @keyValues =
-      if typeof keys == 'string'
-        try JSON.parse(getPref(@prefName))
-        catch then []
+      if keyString == ''
+        []
       else
-        keys
-    for key, index in @keyValues when typeof key == 'string'
-      @keyValues[index] = legacy.convertKey(key)
+        keyString.split(/\s+/).map(notation.parseSequence)
 
   keys: (value) ->
     if value == undefined
       return @keyValues
     else
       @keyValues = value
-      setPref(@prefName, JSON.stringify(value))
+      setPref(@name, value.map((key) -> key.join('')).join('  '))
 
-  help: -> _("help_command_#{ @name }")
+  help: -> _(@name)
 
   match: (str, numbers = null) ->
     for key in @keys()
