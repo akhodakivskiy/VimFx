@@ -78,7 +78,8 @@ class Observer
 
     @container.querySelector('setting').setAttribute('first-row', 'true')
 
-  observe: (@document, topic) ->
+  observe: (@document, topic, addonId) ->
+    return unless addonId == utils.ADDON_ID
     switch topic
       when 'addon-options-displayed'
         @injectSettings()
