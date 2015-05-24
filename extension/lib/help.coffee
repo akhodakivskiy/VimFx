@@ -220,16 +220,17 @@ helpDialogHtml = (modeCommands) ->
 
     <div class="VimFxBody">
       <div class="VimFxColumn">
-        #{ section(_('help_section_urls'),   commands.filter((a) -> a.group == 'urls')) }
-        #{ section(_('help_section_nav'),    commands.filter((a) -> a.group == 'nav')) }
-        #{ section(_('help_section_misc'),   commands.filter((a) -> a.group == 'misc')) }
+        #{ section(_('category.location'),  commands.filter((a) -> a.group == 'location')) }
+        #{ section(_('category.scrolling'), commands.filter((a) -> a.group == 'scrolling')) }
+        #{ section(_('category.find'),      commands.filter((a) -> a.group == 'find')) }
+        #{ section(_('category.misc'),      commands.filter((a) -> a.group == 'misc')) }
       </div>
       <div class="VimFxColumn">
-        #{ section(_('help_section_tabs'),   commands.filter((a) -> a.group == 'tabs')) }
-        #{ section(_('help_section_browse'), commands.filter((a) -> a.group == 'browse')) }
-        #{ section(_('help_section_mode_hints'),  modeCommands['hints'],  'hints') }
-        #{ section(_('help_section_mode_insert'), modeCommands['insert'], 'insert') }
-        #{ section(_('help_section_mode_find'),   modeCommands['find'],   'find') }
+        #{ section(_('category.tabs'),      commands.filter((a) -> a.group == 'tabs')) }
+        #{ section(_('category.browsing'),  commands.filter((a) -> a.group == 'browsing')) }
+        #{ section(_('mode.hints'),         modeCommands['hints'],  'hints') }
+        #{ section(_('mode.insert'),        modeCommands['insert'], 'insert') }
+        #{ section(_('mode.find'),          modeCommands['find'],   'find') }
       </div>
       <div class="VimFxClearFix"></div>
     </div>

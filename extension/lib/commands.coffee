@@ -64,6 +64,33 @@ command_paste_and_go_in_tab = (vim) ->
 command_copy_current_url = (vim) ->
   utils.writeToClipboard(vim.window.location.href)
 
+# Go up one level in the URL hierarchy.
+command_go_up_path = (vim, event, count = 1) ->
+  { pathname } = vim.window.location
+  vim.window.location.pathname = pathname.replace(
+    /// (?: /[^/]+ ){1,#{ count }} /?$ ///, ''
+  )
+
+# Go up to root of the URL hierarchy.
+command_go_to_root = (vim) ->
+  vim.window.location.href = vim.window.location.origin
+
+command_go_home = (vim) ->
+  vim.rootWindow.BrowserHome()
+
+helper_go_history = (num, vim, event, count = 1) ->
+  { index } = vim.rootWindow.getWebNavigation().sessionHistory
+  { history } = vim.window
+  num *= count
+  num = Math.max(num, -index)
+  num = Math.min(num, history.length - 1 - index)
+  return if num == 0
+  history.go(num)
+
+command_history_back = helper_go_history.bind(undefined, -1)
+
+command_history_forward = helper_go_history.bind(undefined, +1)
+
 command_reload = (vim) ->
   vim.rootWindow.BrowserReload()
 
@@ -126,6 +153,22 @@ helper_scroll = (method, type, axis, amount, vim, event, count = 1) ->
         frameDocument.body?[method](options)
   )
 
+command_scroll_left =
+  helper_scroll.bind(undefined, 'scrollBy', 'lines', 'x', -1)
+command_scroll_right =
+  helper_scroll.bind(undefined, 'scrollBy', 'lines', 'x', +1)
+command_scroll_down =
+  helper_scroll.bind(undefined, 'scrollBy', 'lines', 'y', +1)
+command_scroll_up =
+  helper_scroll.bind(undefined, 'scrollBy', 'lines', 'y', -1)
+command_scroll_page_down =
+  helper_scroll.bind(undefined, 'scrollBy', 'pages', 'y', +1)
+command_scroll_page_up =
+  helper_scroll.bind(undefined, 'scrollBy', 'pages', 'y', -1)
+command_scroll_half_page_down =
+  helper_scroll.bind(undefined, 'scrollBy', 'pages', 'y', +0.5)
+command_scroll_half_page_up =
+  helper_scroll.bind(undefined, 'scrollBy', 'pages', 'y', -0.5)
 command_scroll_to_top =
   helper_scroll.bind(undefined, 'scrollTo', 'other', 'y', 0)
 command_scroll_to_bottom =
@@ -134,25 +177,13 @@ command_scroll_to_left =
   helper_scroll.bind(undefined, 'scrollTo', 'other', 'x', 0)
 command_scroll_to_right =
   helper_scroll.bind(undefined, 'scrollTo', 'other', 'x', Infinity)
-command_scroll_down =
-  helper_scroll.bind(undefined, 'scrollBy', 'lines', 'y', +1)
-command_scroll_up =
-  helper_scroll.bind(undefined, 'scrollBy', 'lines', 'y', -1)
-command_scroll_right =
-  helper_scroll.bind(undefined, 'scrollBy', 'lines', 'x', +1)
-command_scroll_left =
-  helper_scroll.bind(undefined, 'scrollBy', 'lines', 'x', -1)
-command_scroll_half_page_down =
-  helper_scroll.bind(undefined, 'scrollBy', 'pages', 'y', +0.5)
-command_scroll_half_page_up =
-  helper_scroll.bind(undefined, 'scrollBy', 'pages', 'y', -0.5)
-command_scroll_page_down =
-  helper_scroll.bind(undefined, 'scrollBy', 'pages', 'y', +1)
-command_scroll_page_up =
-  helper_scroll.bind(undefined, 'scrollBy', 'pages', 'y', -1)
 
 command_tab_new = (vim) ->
   vim.rootWindow.BrowserOpenTab()
+
+command_tab_duplicate = (vim) ->
+  { gBrowser } = vim.rootWindow
+  gBrowser.duplicateTab(gBrowser.selectedTab)
 
 absoluteTabIndex = (relativeIndex, gBrowser) ->
   tabs = gBrowser.visibleTabs
@@ -197,9 +228,6 @@ command_tab_move_backward = helper_move_tab.bind(undefined, -1)
 
 command_tab_move_forward = helper_move_tab.bind(undefined, +1)
 
-command_go_home = (vim) ->
-  vim.rootWindow.BrowserHome()
-
 command_tab_select_first = (vim) ->
   vim.rootWindow.gBrowser.selectTabAtIndex(0)
 
@@ -218,18 +246,6 @@ command_tab_toggle_pinned = (vim) ->
   else
     vim.rootWindow.gBrowser.pinTab(currentTab)
 
-command_tab_duplicate = (vim) ->
-  { gBrowser } = vim.rootWindow
-  gBrowser.duplicateTab(gBrowser.selectedTab)
-
-command_tab_close_to_end = (vim) ->
-  { gBrowser } = vim.rootWindow
-  gBrowser.removeTabsToTheEndFrom(gBrowser.selectedTab)
-
-command_tab_close_other = (vim) ->
-  { gBrowser } = vim.rootWindow
-  gBrowser.removeAllTabsBut(gBrowser.selectedTab)
-
 command_tab_close = (vim, event, count = 1) ->
   { gBrowser } = vim.rootWindow
   return if gBrowser.selectedTab.pinned
@@ -239,6 +255,14 @@ command_tab_close = (vim, event, count = 1) ->
 
 command_tab_restore = (vim, event, count = 1) ->
   vim.rootWindow.undoCloseTab() for [1..count]
+
+command_tab_close_to_end = (vim) ->
+  { gBrowser } = vim.rootWindow
+  gBrowser.removeTabsToTheEndFrom(gBrowser.selectedTab)
+
+command_tab_close_other = (vim) ->
+  { gBrowser } = vim.rootWindow
+  gBrowser.removeAllTabsBut(gBrowser.selectedTab)
 
 # Combine links with the same href.
 combine = (hrefs, marker) ->
@@ -335,10 +359,6 @@ command_follow = (vim, event, count = 1) ->
 
   vim.enterMode('hints', filter, callback)
 
-# Like command_follow but multiple times.
-command_follow_multiple = (vim, event) ->
-  command_follow(vim, event, Infinity)
-
 # Follow links in a new background tab with hint markers.
 command_follow_in_tab = (vim, event, count = 1, inBackground = true) ->
   hrefs = {}
@@ -361,6 +381,10 @@ command_follow_in_tab = (vim, event, count = 1, inBackground = true) ->
 # Follow links in a new foreground tab with hint markers.
 command_follow_in_focused_tab = (vim, event, count = 1) ->
   command_follow_in_tab(vim, event, count, false)
+
+# Like command_follow but multiple times.
+command_follow_multiple = (vim, event) ->
+  command_follow(vim, event, Infinity)
 
 # Copy the URL or text of a markable element to the system clipboard.
 command_follow_copy = (vim) ->
@@ -448,30 +472,6 @@ command_text_input = (vim, event, count) ->
   inputs[count - 1].select()
   vim.enterMode('text-input', inputs)
 
-# Go up one level in the URL hierarchy.
-command_go_up_path = (vim, event, count = 1) ->
-  { pathname } = vim.window.location
-  vim.window.location.pathname = pathname.replace(
-    /// (?: /[^/]+ ){1,#{ count }} /?$ ///, ''
-  )
-
-# Go up to root of the URL hierarchy.
-command_go_to_root = (vim) ->
-  vim.window.location.href = vim.window.location.origin
-
-helper_go_history = (num, vim, event, count = 1) ->
-  { index } = vim.rootWindow.getWebNavigation().sessionHistory
-  { history } = vim.window
-  num *= count
-  num = Math.max(num, -index)
-  num = Math.min(num, history.length - 1 - index)
-  return if num == 0
-  history.go(num)
-
-command_history_back = helper_go_history.bind(undefined, -1)
-
-command_history_forward = helper_go_history.bind(undefined, +1)
-
 findStorage = {lastSearchString: ''}
 
 helper_find = (highlight, vim) ->
@@ -538,75 +538,77 @@ command_esc = (vim, event) ->
     document.mozCancelFullScreen()
 
 
+# coffeelint: disable=max_line_length
 commands = [
-  new Command('urls',   'focus_location_bar',    command_focus_location_bar)
-  new Command('urls',   'focus_search_bar',      command_focus_search_bar)
-  new Command('urls',   'paste_and_go',          command_paste_and_go)
-  new Command('urls',   'paste_and_go_in_tab',   command_paste_and_go_in_tab)
-  new Command('urls',   'follow_copy',           command_follow_copy)
-  new Command('urls',   'follow_focus',          command_follow_focus)
-  new Command('urls',   'copy_current_url',      command_copy_current_url)
-  new Command('urls',   'reload',                command_reload)
-  new Command('urls',   'reload_force',          command_reload_force)
-  new Command('urls',   'reload_all',            command_reload_all)
-  new Command('urls',   'reload_all_force',      command_reload_all_force)
-  new Command('urls',   'stop',                  command_stop)
-  new Command('urls',   'stop_all',              command_stop_all)
+  new Command('location',  'focus_location_bar',    command_focus_location_bar)
+  new Command('location',  'focus_search_bar',      command_focus_search_bar)
+  new Command('location',  'paste_and_go',          command_paste_and_go)
+  new Command('location',  'paste_and_go_in_tab',   command_paste_and_go_in_tab)
+  new Command('location',  'copy_current_url',      command_copy_current_url)
+  new Command('location',  'go_up_path',            command_go_up_path)
+  new Command('location',  'go_to_root',            command_go_to_root)
+  new Command('location',  'go_home',               command_go_home)
+  new Command('location',  'history_back',          command_history_back)
+  new Command('location',  'history_forward',       command_history_forward)
+  new Command('location',  'reload',                command_reload)
+  new Command('location',  'reload_force',          command_reload_force)
+  new Command('location',  'reload_all',            command_reload_all)
+  new Command('location',  'reload_all_force',      command_reload_all_force)
+  new Command('location',  'stop',                  command_stop)
+  new Command('location',  'stop_all',              command_stop_all)
 
-  new Command('nav',    'scroll_to_top',         command_scroll_to_top )
-  new Command('nav',    'scroll_to_bottom',      command_scroll_to_bottom)
-  new Command('nav',    'scroll_to_left',        command_scroll_to_left )
-  new Command('nav',    'scroll_to_right',       command_scroll_to_right)
-  new Command('nav',    'scroll_down',           command_scroll_down)
-  new Command('nav',    'scroll_up',             command_scroll_up)
-  new Command('nav',    'scroll_left',           command_scroll_left)
-  new Command('nav',    'scroll_right',          command_scroll_right )
-  new Command('nav',    'scroll_half_page_down', command_scroll_half_page_down)
-  new Command('nav',    'scroll_half_page_up',   command_scroll_half_page_up)
-  new Command('nav',    'scroll_page_down',      command_scroll_page_down)
-  new Command('nav',    'scroll_page_up',        command_scroll_page_up)
+  new Command('scrolling', 'scroll_left',           command_scroll_left)
+  new Command('scrolling', 'scroll_right',          command_scroll_right )
+  new Command('scrolling', 'scroll_down',           command_scroll_down)
+  new Command('scrolling', 'scroll_up',             command_scroll_up)
+  new Command('scrolling', 'scroll_page_down',      command_scroll_page_down)
+  new Command('scrolling', 'scroll_page_up',        command_scroll_page_up)
+  new Command('scrolling', 'scroll_half_page_down', command_scroll_half_page_down)
+  new Command('scrolling', 'scroll_half_page_up',   command_scroll_half_page_up)
+  new Command('scrolling', 'scroll_to_top',         command_scroll_to_top )
+  new Command('scrolling', 'scroll_to_bottom',      command_scroll_to_bottom)
+  new Command('scrolling', 'scroll_to_left',        command_scroll_to_left )
+  new Command('scrolling', 'scroll_to_right',       command_scroll_to_right)
 
-  new Command('tabs',   'tab_new',               command_tab_new)
-  new Command('tabs',   'tab_select_previous',   command_tab_select_previous)
-  new Command('tabs',   'tab_select_next',       command_tab_select_next)
-  new Command('tabs',   'tab_move_backward',     command_tab_move_backward)
-  new Command('tabs',   'tab_move_forward',      command_tab_move_forward)
-  new Command('tabs',   'go_home',               command_go_home)
-  new Command('tabs',   'tab_select_first',      command_tab_select_first)
-  new Command('tabs',   'tab_select_first_non_pinned',
-                                            command_tab_select_first_non_pinned)
-  new Command('tabs',   'tab_select_last',       command_tab_select_last)
-  new Command('tabs',   'tab_toggle_pinned',     command_tab_toggle_pinned)
-  new Command('tabs',   'tab_duplicate',         command_tab_duplicate)
-  new Command('tabs',   'tab_close_to_end',      command_tab_close_to_end)
-  new Command('tabs',   'tab_close_other',       command_tab_close_other)
-  new Command('tabs',   'tab_close',             command_tab_close)
-  new Command('tabs',   'tab_restore',           command_tab_restore)
+  new Command('tabs',      'tab_new',               command_tab_new)
+  new Command('tabs',      'tab_duplicate',         command_tab_duplicate)
+  new Command('tabs',      'tab_select_previous',   command_tab_select_previous)
+  new Command('tabs',      'tab_select_next',       command_tab_select_next)
+  new Command('tabs',      'tab_move_backward',     command_tab_move_backward)
+  new Command('tabs',      'tab_move_forward',      command_tab_move_forward)
+  new Command('tabs',      'tab_select_first',      command_tab_select_first)
+  new Command('tabs',      'tab_select_first_non_pinned', command_tab_select_first_non_pinned)
+  new Command('tabs',      'tab_select_last',       command_tab_select_last)
+  new Command('tabs',      'tab_toggle_pinned',     command_tab_toggle_pinned)
+  new Command('tabs',      'tab_close',             command_tab_close)
+  new Command('tabs',      'tab_restore',           command_tab_restore)
+  new Command('tabs',      'tab_close_to_end',      command_tab_close_to_end)
+  new Command('tabs',      'tab_close_other',       command_tab_close_other)
 
-  new Command('browse', 'follow',                command_follow)
-  new Command('browse', 'follow_in_tab',         command_follow_in_tab)
-  new Command('browse', 'follow_in_focused_tab', command_follow_in_focused_tab)
-  new Command('browse', 'follow_multiple',       command_follow_multiple)
-  new Command('browse', 'follow_previous',       command_follow_previous)
-  new Command('browse', 'follow_next',           command_follow_next)
-  new Command('browse', 'text_input',            command_text_input)
-  new Command('browse', 'go_up_path',            command_go_up_path)
-  new Command('browse', 'go_to_root',            command_go_to_root)
-  new Command('browse', 'history_back',          command_history_back)
-  new Command('browse', 'history_forward',       command_history_forward)
+  new Command('browsing',  'follow',                command_follow)
+  new Command('browsing',  'follow_in_tab',         command_follow_in_tab)
+  new Command('browsing',  'follow_in_focused_tab', command_follow_in_focused_tab)
+  new Command('browsing',  'follow_multiple',       command_follow_multiple)
+  new Command('browsing',  'follow_copy',           command_follow_copy)
+  new Command('browsing',  'follow_focus',          command_follow_focus)
+  new Command('browsing',  'follow_previous',       command_follow_previous)
+  new Command('browsing',  'follow_next',           command_follow_next)
+  new Command('browsing',  'text_input',            command_text_input)
 
-  new Command('misc',   'find',                  command_find)
-  new Command('misc',   'find_highlight_all',    command_find_highlight_all)
-  new Command('misc',   'find_next',             command_find_next)
-  new Command('misc',   'find_previous',         command_find_previous)
-  new Command('misc',   'enter_mode_insert',     command_enter_mode_insert)
-  new Command('misc',   'quote',                 command_quote)
-  new Command('misc',   'help',                  command_help)
-  new Command('misc',   'dev',                   command_dev)
+  new Command('find',      'find',                  command_find)
+  new Command('find',      'find_highlight_all',    command_find_highlight_all)
+  new Command('find',      'find_next',             command_find_next)
+  new Command('find',      'find_previous',         command_find_previous)
+
+  new Command('misc',      'enter_mode_insert',     command_enter_mode_insert)
+  new Command('misc',      'quote',                 command_quote)
+  new Command('misc',      'help',                  command_help)
+  new Command('misc',      'dev',                   command_dev)
 
   escapeCommand =
   new Command('misc',   'esc',                   command_esc)
 ]
+# coffeelint: enable=max_line_length
 
 exports.commands      = commands
 exports.escapeCommand = escapeCommand
