@@ -180,6 +180,10 @@ gulp.task('changelog', ->
   process.stdout.write(marked(entries))
 )
 
+gulp.task('readme', ->
+  process.stdout.write(marked(read('README.md')))
+)
+
 gulp.task('faster', ->
   gulp.src('gulpfile.coffee')
     .pipe(coffee({bare: true}))

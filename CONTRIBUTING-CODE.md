@@ -181,3 +181,6 @@ Before making a release, it might be wise to:
    prints the latest two (etc). The latter is useful if publishing a new version
    before the last published version has been reviewed; then the new version
    should contain both changelog entries.
+
+The idea is to use the contents of the README as the add-on descripton on
+addons.mozilla.org. You can print it as HTML by runnning `gulp readme`.
