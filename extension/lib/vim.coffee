@@ -19,10 +19,9 @@
 ###
 
 utils = require('./utils')
-modes = require('./modes')
 
 module.exports = class Vim
-  constructor: (@window) ->
+  constructor: (@window, @parent) ->
     @rootWindow = utils.getRootWindow(@window) # For convenience.
     @storage = {}
     @resetState()
@@ -41,21 +40,22 @@ module.exports = class Vim
     # `args` is an array of arguments to be passed to the mode's `onEnter`
     # method.
 
-    if mode not of modes
+    if mode not of @parent.modes
       throw new Error("Not a valid VimFx mode to enter: #{ mode }")
 
     if @mode != mode
-      if @mode of modes
+      if @mode of @parent.modes
         @call('onLeave')
 
       @mode = mode
 
       @call('onEnter', args...)
+      @parent.emit('modechange', this)
 
   onInput: (keyStr, event) ->
     suppress = @call('onInput', keyStr, event)
     return suppress
 
   call: (method, args...) ->
-    currentMode = modes[@mode]
+    currentMode = @parent.modes[@mode]
     currentMode?[method].call(currentMode, this, @storage[@mode] ?= {}, args...)

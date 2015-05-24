@@ -23,8 +23,6 @@ notation    = require('vim-like-key-notation')
 { getPref
 , setPref } = require('./prefs')
 
-ADDON_ID = 'VimFx@akhodakivskiy.github.com'
-
 { classes: Cc, interfaces: Ci, utils: Cu } = Components
 
 Window              = Ci.nsIDOMWindow
@@ -43,19 +41,32 @@ XULMenuListElement  = Ci.nsIDOMXULMenuListElement
 XULTextBoxElement   = Ci.nsIDOMXULTextBoxElement
 
 class Bucket
-  constructor: (@newFunc) ->
+  constructor: (@newFunc, @observer = null) ->
     @bucket = new WeakMap()
 
   get: (obj) ->
     if @bucket.has(obj)
-      return @bucket.get(obj)
+      value = @bucket.get(obj)
     else
       value = @newFunc(obj)
       @bucket.set(obj, value)
-      return value
+    @observer.emit('bucket.get', value) if @observer
+    return value
 
   forget: (obj) ->
     @bucket.delete(obj)
+
+class EventEmitter
+  constructor: ->
+    @listeners = {}
+
+  on: (event, listener) ->
+    (@listeners[event] ?= []).push(listener)
+
+  emit: (event, data) ->
+    for listener in @listeners[event] ? []
+      listener(data)
+    return
 
 getEventWindow = (event) ->
   if event.originalTarget instanceof Window
@@ -281,18 +292,6 @@ getBestPatternMatch = (patterns, attrs, elements) ->
 
   return null
 
-# Get VimFx verion. AddonManager only provides async API to access addon data,
-# so it's a bit tricky...
-getVersion = do ->
-  version = null
-
-  scope = {}
-  Cu.import('resource://gre/modules/AddonManager.jsm', scope)
-  scope.AddonManager.getAddonByID(ADDON_ID, (addon) -> version = addon.version)
-
-  return ->
-    return version
-
 parseHTML = (document, html) ->
   parser = Cc['@mozilla.org/parserutils;1'].getService(Ci.nsIParserUtils)
   flags = parser.SanitizerAllowStyle
@@ -370,6 +369,7 @@ removeDuplicates = (array) ->
   # coffeelint: enable=no_backticks
 
 exports.Bucket                    = Bucket
+exports.EventEmitter              = EventEmitter
 exports.getEventWindow            = getEventWindow
 exports.getEventRootWindow        = getEventRootWindow
 exports.getEventCurrentTabWindow  = getEventCurrentTabWindow
@@ -399,7 +399,6 @@ exports.updateBlacklist           = updateBlacklist
 exports.splitListString           = splitListString
 exports.getBestPatternMatch       = getBestPatternMatch
 
-exports.getVersion                = getVersion
 exports.parseHTML                 = parseHTML
 exports.escapeHTML                = escapeHTML
 exports.createElement             = createElement
@@ -411,4 +410,3 @@ exports.getHintChars              = getHintChars
 exports.removeDuplicates          = removeDuplicates
 exports.removeDuplicateCharacters = removeDuplicateCharacters
 exports.getResourceURI            = getResourceURI
-exports.ADDON_ID                  = ADDON_ID

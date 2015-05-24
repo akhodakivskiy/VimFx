@@ -18,9 +18,10 @@
 # along with VimFx.  If not, see <http://www.gnu.org/licenses/>.
 ###
 
+VimFx                   = require('./vimfx')
+modes                   = require('./modes')
 { loadCss }             = require('./utils')
-{ addEventListeners
-, vimBucket }           = require('./events')
+{ addEventListeners }   = require('./events')
 { setButtonInstallPosition
 , addToolbarButton }    = require('./button')
 options                 = require('./options')
@@ -30,6 +31,8 @@ test                    = try require('../test/index')
 module.exports = (data, reason) ->
   test?()
 
+  vimfx = new VimFx(modes, data)
+
   if reason == ADDON_INSTALL
     # Position the toolbar button right before the default Bookmarks button.
     # If Bookmarks button is hidden the VimFx button will be appended to the
@@ -38,7 +41,7 @@ module.exports = (data, reason) ->
 
   loadCss('style')
 
-  options.observe()
+  options.observe(vimfx)
 
-  watchWindows(addEventListeners, 'navigator:browser')
-  watchWindows(addToolbarButton.bind(undefined, vimBucket), 'navigator:browser')
+  watchWindows(addEventListeners.bind(undefined, vimfx), 'navigator:browser')
+  watchWindows(addToolbarButton.bind(undefined, vimfx), 'navigator:browser')

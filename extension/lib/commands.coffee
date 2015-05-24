@@ -510,7 +510,7 @@ command_quote = (vim, event, count = 1) ->
 
 # Display the Help Dialog.
 command_help = (vim) ->
-  help.injectHelp(vim.window.document, require('./modes'))
+  help.injectHelp(vim.window.document, vim.parent)
 
 # Open and focus the Developer Toolbar.
 command_dev = (vim) ->

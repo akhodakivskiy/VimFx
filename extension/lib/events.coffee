@@ -20,16 +20,15 @@
 
 notation                = require('vim-like-key-notation')
 utils                   = require('./utils')
-Vim                     = require('./vim')
 { getPref }             = require('./prefs')
-{ updateToolbarButton } = require('./button')
 
 { interfaces: Ci } = Components
 
 HTMLDocument     = Ci.nsIDOMHTMLDocument
 HTMLInputElement = Ci.nsIDOMHTMLInputElement
 
-vimBucket = new utils.Bucket((window) -> new Vim(window))
+# Will be set by `addEventListeners`. It’s a bit hacky, but will do for now.
+vimBucket = null
 
 keyStrFromEvent = (event) ->
   return notation.stringify(event, {
@@ -77,12 +76,6 @@ markLastInteraction = (event, vim = null) ->
 removeVimFromTab = (tab, gBrowser) ->
   return unless browser = gBrowser.getBrowserForTab(tab)
   vimBucket.forget(browser.contentWindow)
-
-updateButton = (vim) ->
-  updateToolbarButton(vim.rootWindow, {
-    blacklisted: vim.state.blacklisted
-    insertMode:  vim.mode == 'insert'
-  })
 
 # The following listeners are installed on every top level Chrome window.
 windowsListeners =
@@ -245,12 +238,12 @@ windowsListeners =
     tab = event.originalTarget
     removeVimFromTab(tab, gBrowser)
 
-  # Update the toolbar button icon to reflect the blacklisted state.
   TabSelect: (event) ->
     return unless window = event.originalTarget?.linkedBrowser?.contentDocument
                            ?.defaultView
-    return unless vim = vimBucket.get(window)
-    updateButton(vim)
+    # Get the current vim in order to trigger an update event for the toolbar
+    # button.
+    vimBucket.get(window)
 
 
 # This listener works on individual tabs within Chrome Window.
@@ -266,9 +259,9 @@ tabsListener =
     # If only specific keys are blacklisted, remove blacklist state.
     if vim.state.blacklistedKeys.length > 0
       vim.state.blacklisted = false
-    updateButton(vim)
 
-addEventListeners = (window) ->
+addEventListeners = (vimfx, window) ->
+  { vimBucket } = vimfx
   for name, listener of windowsListeners
     window.addEventListener(name, listener, true)
 
@@ -282,4 +275,3 @@ addEventListeners = (window) ->
   )
 
 exports.addEventListeners = addEventListeners
-exports.vimBucket         = vimBucket

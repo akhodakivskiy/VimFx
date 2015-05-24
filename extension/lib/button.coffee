@@ -39,11 +39,11 @@ positions = {}
 setButtonInstallPosition = (toolbarId, beforeId) ->
   positions[BUTTON_ID] = {toolbarId, beforeId}
 
-addToolbarButton = (vimBucket, window) ->
+addToolbarButton = (vimfx, window) ->
   document = window.document
   win = document.querySelector('window')
 
-  button = createButton(vimBucket, window)
+  button = createButton(vimfx, window)
 
   # Namespace to put the VimFx state on, for example.
   button.VimFx = {}
@@ -52,15 +52,17 @@ addToolbarButton = (vimBucket, window) ->
 
   if tabWindow = utils.getCurrentTabWindow(window)
     blacklisted = utils.isBlacklisted(tabWindow.location.href)
-  disabled = getPref('disabled')
-  updateToolbarButton(window, {disabled, blacklisted})
+  updateToolbarButton({rootWindow: window, state: {blacklisted}})
+
+  vimfx.on('modechange', updateToolbarButton)
+  vimfx.on('bucket.get', updateToolbarButton)
 
   module.onShutdown(->
     button.remove()
     $(document, 'navigator-toolbox').palette.removeChild(button)
   )
 
-createButton = (vimBucket, window) ->
+createButton = (vimfx, window) ->
   document = window.document
 
   button = utils.createElement(document, 'toolbarbutton', {
@@ -70,7 +72,7 @@ createButton = (vimBucket, window) ->
     class: 'toolbarbutton-1'
   })
 
-  menupopup = createMenupopup(window, button)
+  menupopup = createMenupopup(vimfx, window, button)
 
   onButtonCommand = (event) ->
     switch
@@ -78,13 +80,13 @@ createButton = (vimBucket, window) ->
         menupopup.openPopup(button, 'after_start')
       when button.VimFx.insertMode
         return unless currentTabWindow = utils.getEventCurrentTabWindow(event)
-        return unless vim = vimBucket.get(currentTabWindow)
-        updateToolbarButton(window, {insertMode: false})
+        return unless vim = vimfx.vimBucket.get(currentTabWindow)
         vim.enterMode('normal')
       else
-        disabled = not getPref('disabled')
-        setPref('disabled', disabled)
-        updateToolbarButton(window, {disabled})
+        return unless currentTabWindow = utils.getEventCurrentTabWindow(event)
+        return unless vim = vimfx.vimBucket.get(currentTabWindow)
+        setPref('disabled', not getPref('disabled'))
+        updateToolbarButton(vim)
 
     event.stopPropagation()
 
@@ -92,7 +94,7 @@ createButton = (vimBucket, window) ->
 
   return button
 
-createMenupopup = (window, button) ->
+createMenupopup = (vimfx, window, button) ->
   document = window.document
 
   blacklistTextbox = utils.createElement(document, 'textbox', {
@@ -162,14 +164,14 @@ createMenupopup = (window, button) ->
     event.stopPropagation()
 
   onPreferencesCommand = (event) ->
-    id = encodeURIComponent(utils.ADDON_ID)
+    id = encodeURIComponent(vimfx.ID)
     window.BrowserOpenAddonsMgr("addons://detail/#{ id }/preferences")
 
     event.stopPropagation()
 
   onHelpCommand = (event) ->
     if tabWindow = utils.getCurrentTabWindow(window)
-      injectHelp(tabWindow.document, require('./modes'))
+      injectHelp(tabWindow.document, vimfx)
 
     event.stopPropagation()
 
@@ -219,12 +221,13 @@ persist = (document, toolbar, buttonId, beforeId) ->
   document.persist(toolbar.id, 'currentset')
   return [currentset, idx]
 
-updateToolbarButton = (window, { disabled, blacklisted, insertMode }) ->
+updateToolbarButton = (vim) ->
+  window = vim.rootWindow
   return unless button = $(window.document, BUTTON_ID)
 
-  button.VimFx.disabled    = disabled     if disabled?
-  button.VimFx.blacklisted = blacklisted  if blacklisted?
-  button.VimFx.insertMode  = insertMode   if insertMode?
+  button.VimFx.disabled    = getPref('disabled')
+  button.VimFx.blacklisted = vim.state.blacklisted
+  button.VimFx.insertMode  = (vim.mode == 'insert')
 
   [ icon, tooltip ] = switch
     when button.VimFx.disabled
@@ -246,4 +249,3 @@ iconUrl = (kind) ->
 
 exports.setButtonInstallPosition = setButtonInstallPosition
 exports.addToolbarButton         = addToolbarButton
-exports.updateToolbarButton      = updateToolbarButton

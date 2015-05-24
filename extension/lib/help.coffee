@@ -35,7 +35,8 @@ CONTAINER_ID = 'VimFxHelpDialogContainer'
 removeHelp = (document) ->
   document.getElementById(CONTAINER_ID)?.remove()
 
-injectHelp = (document, modes) ->
+injectHelp = (document, options) ->
+  { modes } = options
   if document.documentElement
     removeHelp(document)
 
@@ -51,7 +52,7 @@ injectHelp = (document, modes) ->
         else
           (cmds[commandName] for commandName of cmds)
 
-    container.appendChild(utils.parseHTML(document, helpDialogHtml(modeCommands)))
+    container.appendChild(utils.parseHTML(document, helpDialogHtml(modeCommands, options)))
     for element in container.getElementsByTagName('*')
       element.classList.add('VimFxReset')
 
@@ -201,7 +202,7 @@ section = (title, commands, modeName = 'normal') ->
   #{ table(commands, modeName) }
   """
 
-helpDialogHtml = (modeCommands) ->
+helpDialogHtml = (modeCommands, options) ->
   commands = modeCommands['normal']
   return """
   <div id="VimFxHelpDialog">
@@ -210,7 +211,7 @@ helpDialogHtml = (modeCommands) ->
         <span class="VimFxTitleVim">Vim</span><span class="VimFxTitleFx">Fx</span>
         <span>#{ _('help_title') }</span>
       </div>
-      <span class="VimFxVersion">#{ _('help_version') } #{ utils.getVersion() }</span>
+      <span class="VimFxVersion">#{ _('help_version') } #{ options.VERSION }</span>
       <a class="VimFxClose" id="VimFxClose" href="#">&#10006;</a>
       <div class="VimFxClearFix"></div>
       <p>Did you know that you can add/remove shortucts in this dialog?</p>

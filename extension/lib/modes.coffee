@@ -22,7 +22,6 @@
 utils                        = require('./utils')
 { injectHints }              = require('./hints')
 { rotateOverlappingMarkers } = require('./marker')
-{ updateToolbarButton }      = require('./button')
 Command                      = require('./command')
 { commands
 , escapeCommand
@@ -105,9 +104,7 @@ exports['normal'] =
 exports['insert'] =
   onEnter: (vim, storage, count = null) ->
     storage.count = count
-    updateToolbarButton(vim.rootWindow, {insertMode: true})
   onLeave: (vim) ->
-    updateToolbarButton(vim.rootWindow, {insertMode: false})
     utils.blurActiveElement(vim.window)
   onInput: (vim, storage, keyStr) ->
     switch storage.count

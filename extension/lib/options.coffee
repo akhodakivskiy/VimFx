@@ -23,8 +23,8 @@ defaults = require('./defaults')
 help     = require('./help')
 _        = require('./l10n')
 
-observe = ->
-  observer = new Observer(defaults, validators)
+observe = (options) ->
+  observer = new Observer(defaults, validators, options)
   observer.hooks.injectSettings = setupCustomizeButton
 
   Services.obs.addObserver(observer, 'addon-options-displayed', false)
@@ -36,7 +36,7 @@ observe = ->
   )
 
 class Observer
-  constructor: (@defaults, @validators = {}) ->
+  constructor: (@defaults, @validators, @options) ->
     @document  = null
     @container = null
     @listeners = []
@@ -79,7 +79,7 @@ class Observer
     @container.querySelector('setting').setAttribute('first-row', 'true')
 
   observe: (@document, topic, addonId) ->
-    return unless addonId == utils.ADDON_ID
+    return unless addonId == @options.ID
     switch topic
       when 'addon-options-displayed'
         @injectSettings()
@@ -96,7 +96,7 @@ setupCustomizeButton = ->
   })
   shortcuts.appendChild(button)
   @listen(button, 'command',
-          help.injectHelp.bind(undefined, @document, require('./modes')))
+          help.injectHelp.bind(undefined, @document, @options))
   @container.appendChild(shortcuts)
 
 filterChars = (event) ->
