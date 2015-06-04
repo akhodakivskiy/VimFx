@@ -18,16 +18,18 @@
 # along with VimFx.  If not, see <http://www.gnu.org/licenses/>.
 ###
 
-utils      = require('./utils')
-huffman    = require('n-ary-huffman')
+huffman = require('n-ary-huffman')
+utils   = require('./utils')
 
 { interfaces: Ci } = Components
+
+CONTAINER_ID = 'VimFxMarkersContainer'
 
 Element      = Ci.nsIDOMElement
 HTMLDocument = Ci.nsIDOMHTMLDocument
 XULDocument  = Ci.nsIDOMXULDocument
 
-injectHints = (rootWindow, window, filter) ->
+injectHints = (rootWindow, window, filter, options) ->
   {
     clientWidth, clientHeight # Viewport size excluding scrollbars, usually.
     scrollWidth, scrollHeight
@@ -68,12 +70,12 @@ injectHints = (rootWindow, window, filter) ->
 
   # The `markers` passed to this function have been sorted by `setZIndexes` in
   # advance, so we can skip sorting in the `huffman.createTree` function.
-  hintChars = utils.getHintChars()
+  hintChars = options.hint_chars
   createHuffmanTree = (markers) ->
     return huffman.createTree(markers, hintChars.length, {sorted: true})
 
   # Semantic elements should always get better hints and higher `z-index`:es
-  # than unsemantic ones, even if they are smaller. The latter is achieved by
+  # than unsemantic ones, even if they are smaller. The former is achieved by
   # putting the unsemantic elements in their own branch of the huffman tree.
   if unsemantic.length > 0
     if markers.length > hintChars.length
@@ -99,7 +101,7 @@ injectHints = (rootWindow, window, filter) ->
   markers.push(combined...)
 
   container = rootWindow.document.createElement('box')
-  container.classList.add('VimFxMarkersContainer')
+  container.id = CONTAINER_ID
   rootWindow.gBrowser.mCurrentBrowser.parentNode.appendChild(container)
 
   for marker in markers
@@ -358,10 +360,12 @@ getFirstNonCoveredPoint = (window, viewport, element, elementRect, parents) ->
   return nonCoveredPoint
 
 # In XUL documents there are “anonymous” elements, whose node names start with
-# `xul:` or `html:`. These are not never returned by `document.elementFromPoint`
-# but their closest non-anonymous parents are.
+# `xul:` or `html:`. These are never returned by `document.elementFromPoint` but
+# their closest non-anonymous parents are.
 getClosestNonAnonymousParent = (element) ->
   element = element.parentNode while element.prefix?
   return element
 
-exports.injectHints = injectHints
+module.exports = {
+  injectHints
+}

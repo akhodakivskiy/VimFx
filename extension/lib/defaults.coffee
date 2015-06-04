@@ -17,122 +17,181 @@
 # along with VimFx.  If not, see <http://www.gnu.org/licenses/>.
 ###
 
-notation = require('vim-like-key-notation')
-
-
-
 shortcuts =
   'normal':
-    # Location
-    'o':           'focus_location_bar'
-    'O':           'focus_search_bar'
-    'p':           'paste_and_go'
-    'P':           'paste_and_go_in_tab'
-    'yy':          'copy_current_url'
-    'gu':          'go_up_path'
-    'gU':          'go_to_root'
-    'gh':          'go_home'
-    'H':           'history_back'
-    'L':           'history_forward'
-    'r':           'reload'
-    'R':           'reload_force'
-    'ar':          'reload_all'
-    'aR':          'reload_all_force'
-    's':           'stop'
-    'as':          'stop_all'
+    'location':
+      'o':         'focus_location_bar'
+      'O':         'focus_search_bar'
+      'p':         'paste_and_go'
+      'P':         'paste_and_go_in_tab'
+      'yy':        'copy_current_url'
+      'gu':        'go_up_path'
+      'gU':        'go_to_root'
+      'gh':        'go_home'
+      'H':         'history_back'
+      'L':         'history_forward'
+      'r':         'reload'
+      'R':         'reload_force'
+      'ar':        'reload_all'
+      'aR':        'reload_all_force'
+      's':         'stop'
+      'as':        'stop_all'
 
-    # Scrolling
-    'h':           'scroll_left'
-    'l':           'scroll_right'
-    'j':           'scroll_down'
-    'k':           'scroll_up'
-    '<space>':     'scroll_page_down'
-    '<s-space>':   'scroll_page_up'
-    'd':           'scroll_half_page_down'
-    'u':           'scroll_half_page_up'
-    'gg':          'scroll_to_top'
-    'G':           'scroll_to_bottom'
-    '0  ^':        'scroll_to_left'
-    '$':           'scroll_to_right'
+    'scrolling':
+      'h':         'scroll_left'
+      'l':         'scroll_right'
+      'j':         'scroll_down'
+      'k':         'scroll_up'
+      '<space>':   'scroll_page_down'
+      '<s-space>': 'scroll_page_up'
+      'd':         'scroll_half_page_down'
+      'u':         'scroll_half_page_up'
+      'gg':        'scroll_to_top'
+      'G':         'scroll_to_bottom'
+      '0  ^':      'scroll_to_left'
+      '$':         'scroll_to_right'
 
-    # Tabs
-    't':           'tab_new'
-    'yt':          'tab_duplicate'
-    'J  gT':       'tab_select_previous'
-    'K  gt':       'tab_select_next'
-    'gJ':          'tab_move_backward'
-    'gK':          'tab_move_forward'
-    'gH  g0':      'tab_select_first'
-    'g^':          'tab_select_first_non_pinned'
-    'gL  g$':      'tab_select_last'
-    'gp':          'tab_toggle_pinned'
-    'x':           'tab_close'
-    'X':           'tab_restore'
-    'gx$':         'tab_close_to_end'
-    'gxa':         'tab_close_other'
+    'tabs':
+      't':         'tab_new'
+      'yt':        'tab_duplicate'
+      'J    gT':   'tab_select_previous'
+      'K    gt':   'tab_select_next'
+      'gJ':        'tab_move_backward'
+      'gK':        'tab_move_forward'
+      'g0':        'tab_select_first'
+      'g^':        'tab_select_first_non_pinned'
+      'g$':        'tab_select_last'
+      'gp':        'tab_toggle_pinned'
+      'x':         'tab_close'
+      'X':         'tab_restore'
+      'gx$':       'tab_close_to_end'
+      'gxa':       'tab_close_other'
 
-    # Browsing
-    'f':           'follow'
-    'F':           'follow_in_tab'
-    'gf':          'follow_in_focused_tab'
-    'af':          'follow_multiple'
-    'yf':          'follow_copy'
-    'vf':          'follow_focus'
-    '[':           'follow_previous'
-    ']':           'follow_next'
-    'gi':          'text_input'
+    'browsing':
+      'f':         'follow'
+      'F':         'follow_in_tab'
+      'gf':        'follow_in_focused_tab'
+      'af':        'follow_multiple'
+      'yf':        'follow_copy'
+      'vf':        'follow_focus'
+      '[':         'follow_previous'
+      ']':         'follow_next'
+      'gi':        'text_input'
 
-    # Find
-    '/':           'find'
-    'a/':          'find_highlight_all'
-    'n':           'find_next'
-    'N':           'find_previous'
+    'find':
+      '/':         'find'
+      'a/':        'find_highlight_all'
+      'n':         'find_next'
+      'N':         'find_previous'
 
-    # Misc
-    'i':           'enter_mode_insert'
-    'I':           'quote'
-    '?':           'help'
-    ':':           'dev'
-    '<escape>':    'esc'
-
-  'insert':
-    '<s-escape>':  'exit'
+    'misc':
+      'i':         'enter_mode_insert'
+      'I':         'quote'
+      '?':         'help'
+      ':':         'dev'
+      '<force><escape>': 'esc'
 
   'hints':
-    '<escape>':    'exit'
-    '<space>':     'rotate_markers_forward'
-    '<s-space>':   'rotate_markers_backward'
-    '<backspace>': 'delete_hint_char'
+    '':
+      '<escape>':        'exit'
+      '<space>':         'rotate_markers_forward'
+      '<s-space>':       'rotate_markers_backward'
+      '<backspace>':     'delete_hint_char'
+
+  'insert':
+    '':
+      '<s-escape>':      'exit'
+
+  'text_input':
+    '':
+      '<escape>':        'exit'
+      '<s-tab>':         'input_previous'
+      '<tab>':           'input_next'
 
   'find':
-    '<escape>  <enter>': 'exit'
+    '':
+      '<escape>    <enter>': 'exit'
 
 options =
   'hint_chars':             'fjdkslaghrueiwovncm'
-  'prev_patterns':          'prev,previous,‹,«,◀,←,<<,<,back,newer'
-  'next_patterns':          'next,›,»,▶,→,>>,>,more,older'
+  'prev_patterns':          'prev  previous  ‹  «  ◀  ←  <<  <  back  newer'
+  'next_patterns':          'next  ›  »  ▶  →  >>  >  more  older'
   'black_list':             ''
   'prevent_autofocus':      true
   'ignore_keyboard_layout': false
+  'timeout':                2000
 
 advanced_options =
+  'prevent_target_blank':               true
   'autofocus_limit':                    100
+  'hints_timeout':                      200
   'smoothScroll.lines.spring-constant': '1000'
   'smoothScroll.pages.spring-constant': '2500'
   'smoothScroll.other.spring-constant': '2500'
-  'translations':                       '{}'
+  'pattern_selector':                   'a, button'
+  'pattern_attrs':                      'rel  role  data-tooltip  aria-label'
+  'activatable_element_keys':           '<enter>'
+  'adjustable_element_keys':            '<arrowup>  <arrowdown>  <arrowleft>
+                                         <arrowright>  <space>  <enter>'
+  'options.key.quote':                  '<c-q>'
+  'options.key.insert_default':         '<c-d>'
+  'options.key.reset_default':          '<c-r>'
+
+parsed_options =
+  'translations': {}
+  'categories':   {} # Will be filled in below.
 
 
 
-key_options = {}
-for modeName, modeShortcuts of shortcuts
-  for keys, name of modeShortcuts
-    key_options["mode.#{ modeName }.#{ name }"] = keys
+translate = require('./l10n')
+utils     = require('./utils')
 
-all = Object.assign({}, options, advanced_options, key_options)
+addCategory = (category, order) ->
+  uncategorized = (category == '')
+  categoryName =
+    if uncategorized
+      -> ''
+    else
+      translate.bind(null, "category.#{ category }")
+  parsed_options.categories[category] = {
+    name:  categoryName
+    order: if uncategorized then 0 else order
+  }
 
-exports.options          = options
-exports.advanced_options = advanced_options
-exports.key_options      = key_options
-exports.all              = all
-exports.BRANCH           = 'extensions.VimFx.'
+shortcut_prefs = {}
+categoryMap    = {}
+mode_order     = {}
+command_order  = {}
+
+createCounter   = -> new utils.Counter({step: 100})
+modeCounter     = createCounter()
+categoryCounter = createCounter()
+
+for modeName, modeCategories of shortcuts
+  mode_order[modeName] = modeCounter.tick()
+  for categoryName, modeShortcuts of modeCategories
+    addCategory(categoryName, categoryCounter.tick())
+    commandIndex = createCounter()
+    for shortcut, commandName of modeShortcuts
+      pref = "mode.#{ modeName }.#{ commandName }"
+      shortcut_prefs[pref] = shortcut
+      command_order[pref] = commandIndex.tick()
+      categoryMap[pref] = categoryName
+
+# All options, excluding shortcut customizations.
+all_options = Object.assign({}, options, advanced_options, parsed_options)
+# All things that are saved in Firefox’s prefs system.
+all_prefs   = Object.assign({}, options, advanced_options, shortcut_prefs)
+
+module.exports = {
+  options
+  advanced_options
+  parsed_options
+  all_options
+  shortcut_prefs
+  all_prefs
+  categoryMap
+  mode_order
+  command_order
+  BRANCH: 'extensions.VimFx.'
+}

@@ -18,30 +18,50 @@
 # along with VimFx.  If not, see <http://www.gnu.org/licenses/>.
 ###
 
-VimFx                   = require('./vimfx')
-modes                   = require('./modes')
-{ loadCss }             = require('./utils')
-{ addEventListeners }   = require('./events')
-{ setButtonInstallPosition
-, addToolbarButton }    = require('./button')
-options                 = require('./options')
-{ watchWindows }        = require('./window-utils')
-test                    = try require('../test/index')
+createAPI             = require('./api')
+button                = require('./button')
+defaults              = require('./defaults')
+{ addEventListeners } = require('./events')
+modes                 = require('./modes')
+options               = require('./options')
+parsePref             = require('./parse-prefs')
+prefs                 = require('./prefs')
+utils                 = require('./utils')
+VimFx                 = require('./vimfx')
+{ watchWindows }      = require('./window-utils')
+test                  = try require('../test/index')
+
+{ utils: Cu } = Components
 
 module.exports = (data, reason) ->
-  test?()
+  parsedOptions = {}
+  for pref of defaults.all_options
+    parsedOptions[pref] = parsePref(pref)
+  vimfx = new VimFx(modes, parsedOptions)
+  vimfx.id      = data.id
+  vimfx.version = data.version
 
-  vimfx = new VimFx(modes, data)
+  # Setup the public API. The URL is encoded (which means that there will be
+  # only ASCII characters) so that the pref can be read using a simple
+  # `Services.prefs.getCharPref()` (which only supports ASCII characters).
+  api_url = encodeURI("#{ data.resourceURI.spec }lib/public.js")
+  { setAPI } = Cu.import(api_url, {})
+  setAPI(createAPI(vimfx))
+  module.onShutdown(-> Cu.unload(api_url))
+  prefs.set('api_url', api_url)
 
-  if reason == ADDON_INSTALL
-    # Position the toolbar button right before the default Bookmarks button.
-    # If Bookmarks button is hidden the VimFx button will be appended to the
-    # toolbar.
-    setButtonInstallPosition('nav-bar', 'bookmarks-menu-button-container')
+  test?(vimfx)
 
-  loadCss('style')
+  utils.loadCss('style')
 
   options.observe(vimfx)
 
-  watchWindows(addEventListeners.bind(undefined, vimfx), 'navigator:browser')
-  watchWindows(addToolbarButton.bind(undefined, vimfx), 'navigator:browser')
+  prefs.observe('', (pref) ->
+    if pref.startsWith('mode.') or pref.startsWith('custom.')
+      vimfx.createKeyTrees()
+    else if pref of defaults.all_options
+      vimfx.options[pref] = parsePref(pref)
+  )
+
+  watchWindows(button.injectButton.bind(null, vimfx), 'navigator:browser')
+  watchWindows(addEventListeners.bind(null, vimfx), 'navigator:browser')

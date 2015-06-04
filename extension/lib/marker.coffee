@@ -18,13 +18,14 @@
 # along with VimFx.  If not, see <http://www.gnu.org/licenses/>.
 ###
 
+utils = require('./utils')
+
 # Wraps the markable element and provides methods to manipulate the markers.
 class Marker
   # Creates the marker DOM node.
   constructor: (@element, @elementShape, { @semantic, @type }) ->
     document = @element.ownerDocument
-    @markerElement = document.createElement('div')
-    @markerElement.classList.add('VimFxHintMarker')
+    @markerElement = utils.createBox(document, 'marker')
     @weight = @elementShape.area
     @numChildren = 0
 
@@ -35,7 +36,7 @@ class Marker
   show: -> @setVisibility(true)
   hide: -> @setVisibility(false)
   setVisibility: (visible) ->
-    @markerElement.classList.toggle('VimFxHiddenHintMarker', not visible)
+    @markerElement.classList.toggle('marker--hidden', not visible)
 
   # To be called when the marker has been both assigned a hint and inserted
   # into the DOM, and thus gotten a height and width.
@@ -79,18 +80,10 @@ class Marker
 
   setHint: (@hint) ->
     @hintIndex = 0
-
     document = @element.ownerDocument
-
-    while @markerElement.hasChildNodes()
-      @markerElement.firstChild.remove()
-
+    @markerElement.firstChild.remove() while @markerElement.hasChildNodes()
     fragment = document.createDocumentFragment()
-    for char in @hint
-      charContainer = document.createElement('span')
-      charContainer.textContent = char
-      fragment.appendChild(charContainer)
-
+    utils.createBox(document, 'marker-char', fragment, char) for char in @hint
     @markerElement.appendChild(fragment)
 
   matchHintChar: (char) ->
@@ -107,12 +100,12 @@ class Marker
 
   toggleLastHintChar: (visible) ->
     @markerElement.children[@hintIndex]
-      .classList.toggle('VimFxCharMatch', visible)
+      .classList.toggle('marker-char--matched', visible)
 
   isMatched: -> (@hintIndex == @hint.length)
 
   markMatched: (matched) ->
-    @markerElement.classList.toggle('VimFxMatchedHintMarker', matched)
+    @markerElement.classList.toggle('marker--matched', matched)
 
 # Finds all stacks of markers that overlap each other (by using `getStackFor`)
 # (#1), and rotates their `z-index`:es (#2), thus alternating which markers are
@@ -172,5 +165,7 @@ getStackFor = (marker, markers) ->
 
   return stack
 
-exports.Marker                   = Marker
-exports.rotateOverlappingMarkers = rotateOverlappingMarkers
+module.exports = {
+  Marker
+  rotateOverlappingMarkers
+}

@@ -19,156 +19,93 @@
 # along with VimFx.  If not, see <http://www.gnu.org/licenses/>.
 ###
 
-utils                        = require('./utils')
-{ injectHints }              = require('./hints')
-{ rotateOverlappingMarkers } = require('./marker')
-Command                      = require('./command')
 { commands
-, escapeCommand
 , findStorage }              = require('./commands')
+defaults                     = require('./defaults')
+help                         = require('./help')
+hints                        = require('./hints')
+translate                    = require('./l10n')
+{ rotateOverlappingMarkers } = require('./marker')
+utils                        = require('./utils')
 
 { interfaces: Ci } = Components
 
 XULDocument = Ci.nsIDOMXULDocument
 
-exports['normal'] =
-  onEnter: (vim, storage) ->
-    storage.keys ?= []
-    storage.commands ?= {}
+# Helper to create modes in a DRY way.
+mode = (modeName, obj, commands) ->
+  obj.name  = translate.bind(null, "mode.#{ modeName }")
+  obj.order = defaults.mode_order[modeName]
+  obj.commands = {}
+  for commandName, fn of commands
+    pref = "mode.#{ modeName }.#{ commandName }"
+    obj.commands[commandName] =
+      pref:        defaults.BRANCH + pref
+      run:         fn
+      category:    defaults.categoryMap[pref]
+      description: translate.bind(null, pref)
+      order:       defaults.command_order[pref]
+  exports[modeName] = obj
 
-  onLeave: (vim, storage) ->
-    storage.keys.length = 0
 
-  onInput: (vim, storage, keyStr, event) ->
+
+mode('normal', {
+  onEnter: ->
+
+  onLeave: ({ vim }) ->
+    help.removeHelp(vim.rootWindow)
+
+  onInput: (args, match) ->
+    { vim, storage, event } = args
     target = event.originalTarget
     document = target.ownerDocument
 
+    { activatable_element_keys, adjustable_element_keys } = vim.parent.options
     autoInsertMode = \
       utils.isTextInputElement(target) or
       utils.isContentEditable(target) or
-      (utils.isActivatable(target) and keyStr == '<enter>') or
-      (utils.isAdjustable(target) and keyStr in [
-        '<arrowup>', '<arrowdown>', '<arrowleft>', '<arrowright>'
-        '<space>', '<enter>'
-      ]) or
+      (utils.isActivatable(target) and
+       match.keyStr in activatable_element_keys) or
+      (utils.isAdjustable(target) and
+       match.keyStr in adjustable_element_keys) or
       vim.rootWindow.TabView.isVisible() or
       document.fullscreenElement or document.mozFullScreenElement
 
-    storage.keys.push(keyStr)
+    return false if match.type == 'none' or (autoInsertMode and not match.force)
 
-    { match, exact, command, count } =
-      Command.searchForMatchingCommand(@commands, storage.keys)
+    match.command.run(args) if match.type == 'full'
 
-    if vim.state.blacklistedKeys and
-       storage.keys.join('') in vim.state.blacklistedKeys
-      match = false
-
-    if match
-
-      if autoInsertMode and command != escapeCommand
-        storage.keys.pop()
-        return false
-
-      if exact
-        command.func(vim, event, count)
-        storage.keys.length = 0
-
-      # Esc key is not suppressed, and passed to the browser in normal mode.
-      #
-      # - It allows for stopping the loading of the page.
-      # - It allows for closing many custom dialogs (and perhaps other things
-      #   -- Esc is a very commonly used key).
-      # - It is not passed if Esc is used for `command_Esc` and we’re blurring
-      #   an element. That allows for blurring an input in a custom dialog
-      #   without closing the dialog too.
-      # - There are two reasons we might suppress it in other modes. If some
-      #   custom dialog of a website is open, we should be able to cancel hint
-      #   markers on it without closing it. Secondly, otherwise cancelling hint
-      #   markers on Google causes its search bar to be focused.
-      # - It may only be suppressed in web pages, not in browser chrome. That
-      #   allows for reseting the location bar when blurring it, and closing
-      #   dialogs such as the “bookmark this page” dialog (<c-d>).
-      inBrowserChrome = (document instanceof XULDocument)
-      if keyStr == '<escape>' and (not autoInsertMode or inBrowserChrome)
-        return false
-
-      return true
-
-    else
-      storage.keys.length = 0 unless /^\d$/.test(keyStr)
-
+    # At this point the match is either full, partial or part of a count. Then
+    # we always want to suppress, except for one case: The Escape key.
+    #
+    # - It allows for stopping the loading of the page.
+    # - It allows for closing many custom dialogs (and perhaps other things
+    #   -- Esc is a very commonly used key).
+    # - It is not passed if Esc is used for `command_Esc` and we’re blurring
+    #   an element. That allows for blurring an input in a custom dialog
+    #   without closing the dialog too.
+    # - There are two reasons we might suppress it in other modes. If some
+    #   custom dialog of a website is open, we should be able to cancel hint
+    #   markers on it without closing it. Secondly, otherwise cancelling hint
+    #   markers on Google causes its search bar to be focused.
+    # - It may only be suppressed in web pages, not in browser chrome. That
+    #   allows for reseting the location bar when blurring it, and closing
+    #   dialogs such as the “bookmark this page” dialog (<c-d>).
+    inBrowserChrome = (document instanceof XULDocument)
+    if match.keyStr == '<escape>' and (not autoInsertMode or inBrowserChrome)
       return false
 
-  commands: commands
-
-exports['insert'] =
-  onEnter: (vim, storage, count = null) ->
-    storage.count = count
-  onLeave: (vim) ->
-    utils.blurActiveElement(vim.window)
-  onInput: (vim, storage, keyStr) ->
-    switch storage.count
-      when null
-        if @commands['exit'].match(keyStr)
-          vim.enterMode('normal')
-          return true
-      when 1
-        vim.enterMode('normal')
-      else
-        storage.count--
-    return false
-  commands: [
-    'exit'
-  ]
-
-exports['text-input'] =
-  onEnter: (vim, storage, inputs = []) ->
-    storage.inputs = inputs
-  onLeave: (vim, storage) ->
-    storage.inputs = null
-  onInput: (vim, storage, keyStr) ->
-    { inputs } = storage
-    index = inputs.indexOf(vim.window.document.activeElement)
-    switch
-      when index == -1
-        vim.enterMode('normal')
-        return false
-      when escapeCommand.match(keyStr)
-        utils.blurActiveElement(vim.window)
-        vim.enterMode('normal')
-        return true
-      # Override the built-in shortcuts <tab> and <s-tab> to switch between
-      # focusable inputs.
-      when keyStr == '<tab>'
-        index++
-      when keyStr == '<s-tab>'
-        index--
-      else
-        return false
-    inputs[index %% inputs.length].select()
     return true
 
-exports['find'] =
-  onEnter: ->
+}, commands)
 
-  onLeave: (vim) ->
-    findBar = vim.rootWindow.gBrowser.getFindBar()
-    findStorage.lastSearchString = findBar._findField.value
 
-  onInput: (vim, storage, keyStr) ->
-    findBar = vim.rootWindow.gBrowser.getFindBar()
-    if @commands['exit'].match(keyStr)
-      findBar.close()
-      return true
-    return false
 
-  commands: [
-    'exit'
-  ]
-
-exports['hints'] =
-  onEnter: (vim, storage, filter, callback) ->
-    [ markers, container ] = injectHints(vim.rootWindow, vim.window, filter)
+mode('hints', {
+  onEnter: ({ vim, storage, args: [ filter, callback ] }) ->
+    [ markers, container ] = hints.injectHints(
+      vim.rootWindow, vim.window, filter, vim.parent.options
+    )
     if markers.length > 0
       storage.markers   = markers
       storage.container = container
@@ -177,74 +114,137 @@ exports['hints'] =
     else
       vim.enterMode('normal')
 
-  onLeave: (vim, storage) ->
+  onLeave: ({ vim, storage }) ->
     { container } = storage
     vim.rootWindow.setTimeout((->
       container?.remove()
-    ), @timeout)
+    ), vim.parent.options.hints_timeout)
     for key of storage
       storage[key] = null
 
-  onInput: (vim, storage, keyStr, event) ->
+  onInput: (args, match) ->
+    { vim, storage } = args
     { markers, callback } = storage
 
-    switch
-      when @commands['exit'].match(keyStr)
-        # Remove the hints immediately.
-        storage.container?.remove()
-        vim.enterMode('normal')
-        return true
+    if match.type == 'full'
+      match.command.run(args)
+    else if match.keyStr in vim.parent.options.hint_chars
+      matchedMarkers = []
 
-      when @commands['rotate_markers_forward'].match(keyStr)
-        rotateOverlappingMarkers(markers, true)
-      when @commands['rotate_markers_backward'].match(keyStr)
-        rotateOverlappingMarkers(markers, false)
+      for marker in markers when marker.hintIndex == storage.numEnteredChars
+        matched = marker.matchHintChar(match.keyStr)
+        marker.hide() unless matched
+        if marker.isMatched()
+          marker.markMatched(true)
+          matchedMarkers.push(marker)
 
-      when @commands['delete_hint_char'].match(keyStr)
-        for marker in markers
-          switch marker.hintIndex - storage.numEnteredChars
-            when  0 then marker.deleteHintChar()
-            when -1 then marker.show()
-        storage.numEnteredChars-- unless storage.numEnteredChars == 0
-
+      if matchedMarkers.length > 0
+        again = callback(matchedMarkers[0])
+        if again
+          vim.rootWindow.setTimeout((->
+            marker.markMatched(false) for marker in matchedMarkers
+          ), vim.parent.options.hints_timeout)
+          marker.reset() for marker in markers
+          storage.numEnteredChars = 0
+        else
+          vim.enterMode('normal')
       else
-        if keyStr not in utils.getHintChars()
-          return true
-        matchedMarkers = []
-        for marker in markers when marker.hintIndex == storage.numEnteredChars
-          match = marker.matchHintChar(keyStr)
-          marker.hide() unless match
-          if marker.isMatched()
-            marker.markMatched(true)
-            matchedMarkers.push(marker)
-        if matchedMarkers.length > 0
-          again = callback(matchedMarkers[0])
-          if again
-            vim.rootWindow.setTimeout((->
-              marker.markMatched(false) for marker in matchedMarkers
-            ), @timeout)
-            marker.reset() for marker in markers
-            storage.numEnteredChars = 0
-          else
-            vim.enterMode('normal')
-          return true
         storage.numEnteredChars++
 
     return true
 
-  timeout: 200
+}, {
+  exit: ({ vim, storage }) ->
+    # The hints are removed automatically when leaving the mode, but after a
+    # timeout. When aborting the mode we should remove the hints immediately.
+    storage.container?.remove()
+    vim.enterMode('normal')
 
-  commands: [
-    'exit'
-    'rotate_markers_forward'
-    'rotate_markers_backward'
-    'delete_hint_char'
-  ]
+  rotate_markers_forward: ({ storage }) ->
+    rotateOverlappingMarkers(storage.markers, true)
 
-for modeName, mode of exports
-  commandNames = mode.commands
-  continue if not commandNames or commandNames == commands
-  mode.commands = {}
-  for commandName in commandNames
-    name = "mode.#{ modeName }.#{ commandName }"
-    mode.commands[commandName] = new Command(null, name, null)
+  rotate_markers_backward: ({ storage }) ->
+    rotateOverlappingMarkers(storage.markers, false)
+
+  delete_hint_char: ({ storage }) ->
+    for marker in storage.markers
+      switch marker.hintIndex - storage.numEnteredChars
+        when  0 then marker.deleteHintChar()
+        when -1 then marker.show()
+    storage.numEnteredChars-- unless storage.numEnteredChars == 0
+})
+
+
+
+mode('insert', {
+  onEnter: ({ vim, storage, args: [ count ] }) ->
+    storage.count = count ? null
+
+  onLeave: ({ vim }) ->
+    utils.blurActiveElement(vim.window)
+
+  onInput: (args, match) ->
+    { vim, storage } = args
+    switch storage.count
+      when null
+        if match.type == 'full'
+          match.command.run(args)
+          return true
+      when 1
+        vim.enterMode('normal')
+      else
+        storage.count--
+    return false
+
+}, {
+  exit: ({ vim }) -> vim.enterMode('normal')
+})
+
+
+
+mode('text_input', {
+  onEnter: ({ vim, storage, args: [ inputs ] }) ->
+    storage.inputs = inputs
+
+  onLeave: ({ vim, storage }) ->
+    storage.inputs = null
+
+  onInput: (args, match) ->
+    { vim, storage: { inputs } } = args
+    index = inputs.indexOf(vim.window.document.activeElement)
+    if index == -1
+      vim.enterMode('normal')
+      return false
+    return false unless match.type == 'full'
+    diff = match.command.run(args)
+    inputs[(index + diff) %% inputs.length].select() unless diff == 0
+    return true
+
+}, {
+  exit: ({ vim }) ->
+    utils.blurActiveElement(vim.window)
+    vim.enterMode('normal')
+    return 0
+  input_previous: -> -1
+  input_next:     -> +1
+})
+
+
+
+mode('find', {
+  onEnter: ->
+
+  onLeave: ({ vim }) ->
+    findBar = vim.rootWindow.gBrowser.getFindBar()
+    findStorage.lastSearchString = findBar._findField.value
+
+  onInput: (args, match) ->
+    args.findBar = args.vim.rootWindow.gBrowser.getFindBar()
+    if match.type == 'full'
+      match.command.run(args)
+      return true
+    return false
+
+}, {
+  exit: ({ findBar }) -> findBar.close()
+})

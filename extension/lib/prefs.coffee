@@ -22,13 +22,17 @@ defaults = require('./defaults')
 
 { classes: Cc, interfaces: Ci } = Components
 
-prefs = Services.prefs
-vimfxBranch = prefs.getBranch(defaults.BRANCH)
-vimfxDefaultBranch = prefs.getDefaultBranch(defaults.BRANCH)
+{ prefs } = Services
 
-isPrefSet = (key) -> vimfxBranch.prefHasUserValue(key)
+branches =
+  addon:
+    user:    prefs.getBranch(defaults.BRANCH)
+    default: prefs.getDefaultBranch(defaults.BRANCH)
+  root:
+    user:    prefs
+    default: prefs.getDefaultBranch('')
 
-getBranchPref = (branch, key) ->
+get = (branch, key) ->
   return switch branch.getPrefType(key)
     when branch.PREF_BOOL
       branch.getBoolPref(key)
@@ -37,41 +41,58 @@ getBranchPref = (branch, key) ->
     when branch.PREF_STRING
       branch.getComplexValue(key, Ci.nsISupportsString).data
 
-getPref        = getBranchPref.bind(undefined, vimfxBranch)
-getFirefoxPref = getBranchPref.bind(undefined, prefs)
-
-setBranchPref = (branch, key, value) ->
+set = (branch, key, value) ->
   switch typeof value
     when 'boolean'
       branch.setBoolPref(key, value)
     when 'number'
-      branch.setIntPref(key, value)
+      branch.setIntPref(key, value) # `value` will be `Math.floor`ed.
     when 'string'
       str = Cc['@mozilla.org/supports-string;1']
         .createInstance(Ci.nsISupportsString)
       str.data = value
       branch.setComplexValue(key, Ci.nsISupportsString, str)
     else
-      branch.clearUserPref(key)
+      if value == null
+        branch.clearUserPref(key)
+      else
+        throw new Error("VimFx: Prefs may only be set to a boolean, number,
+                         string or null. Got: #{ typeof value }")
 
-setPref        = setBranchPref.bind(undefined, vimfxBranch)
-setDefaultPref = setBranchPref.bind(undefined, vimfxDefaultBranch)
-setFirefoxPref = setBranchPref.bind(undefined, prefs)
+has = (branch, key) ->
+  branch.prefHasUserValue(key)
 
-withFirefoxPrefAs = (pref, temporaryValue, fn) ->
-  previousValue = getFirefoxPref(pref)
-  setFirefoxPref(pref, temporaryValue)
+tmp = (branch, pref, temporaryValue, fn) ->
+  previousValue = if has(branch, pref) then get(branch, pref) else null
+  set(branch, pref, temporaryValue)
   fn()
-  setFirefoxPref(pref, previousValue)
+  set(branch, pref, previousValue)
 
-setDefaultPrefs = ->
-  setDefaultPref(key, value) for key, value of defaults.all
-  return
+observe = (branch, domain, callback) ->
+  observer = {observe: (branch, topic, changedPref) -> callback(changedPref)}
+  branch.addObserver(domain, observer, false)
+  module.onShutdown(->
+    branch.removeObserver(domain, observer)
+  )
 
-exports.isPrefSet         = isPrefSet
-exports.getPref           = getPref
-exports.getFirefoxPref    = getFirefoxPref
-exports.setPref           = setPref
-exports.setFirefoxPref    = setFirefoxPref
-exports.withFirefoxPrefAs = withFirefoxPrefAs
-exports.setDefaultPrefs   = setDefaultPrefs
+module.exports =
+  get: get.bind(null, branches.addon.user)
+  set: set.bind(null, branches.addon.user)
+  has: has.bind(null, branches.addon.user)
+  tmp: tmp.bind(null, branches.addon.user)
+  observe: observe.bind(null, branches.addon.user)
+  default:
+    get: get.bind(null, branches.addon.default)
+    set: set.bind(null, branches.addon.default)
+    _init: ->
+      @set(key, value) for key, value of defaults.all_prefs
+      return
+  root:
+    get: get.bind(null, branches.root.user)
+    set: set.bind(null, branches.root.user)
+    has: has.bind(null, branches.root.user)
+    tmp: tmp.bind(null, branches.root.user)
+    default:
+      get: get.bind(null, branches.root.default)
+      set: set.bind(null, branches.root.default)
+  unbound: {get, set, has, tmp, observe}

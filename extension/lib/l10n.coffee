@@ -19,8 +19,8 @@
 
 PROPERTIES_FILE = 'vimfx.properties'
 
-# Randomize URI to work around bug 719376.
 stringBundle = Services.strings.createBundle(
+  # Randomize URI to work around bug 719376.
   "chrome://vimfx/locale/#{ PROPERTIES_FILE }?#{ Math.random() }"
 )
 

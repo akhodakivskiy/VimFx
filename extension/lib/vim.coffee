@@ -20,42 +20,53 @@
 
 utils = require('./utils')
 
-module.exports = class Vim
+class Vim
   constructor: (@window, @parent) ->
     @rootWindow = utils.getRootWindow(@window) # For convenience.
     @storage = {}
-    @resetState()
-    @enterMode('normal')
+    @resetState(true)
 
-  resetState: ->
+  resetState: (force = false) ->
     @state =
-      blacklisted: false
-      blacklistedKeys: null
       lastInteraction: null
       lastAutofocusPrevention: null
       scrollableElements: new WeakMap()
       lastFocusedTextInput: null
 
+    if @isBlacklisted()
+      @enterMode('insert')
+    else
+      @enterMode('normal') if force or @mode == 'insert'
+
+    @parent.emit('DOMContentLoaded', {vim: this, location: @window.location})
+
+  isBlacklisted: ->
+    url = @rootWindow.gBrowser.currentURI.spec
+    return @parent.options.black_list.some((regex) -> regex.test(url))
+
+  # `args` is an array of arguments to be passed to the mode's `onEnter` method.
   enterMode: (mode, args...) ->
-    # `args` is an array of arguments to be passed to the mode's `onEnter`
-    # method.
+    return if @mode == mode
 
-    if mode not of @parent.modes
-      throw new Error("Not a valid VimFx mode to enter: #{ mode }")
+    unless utils.has(@parent.modes, mode)
+      modes = Object.keys(@parent.modes).join(', ')
+      throw new Error("VimFx: Unknown mode. Available modes are: #{ modes }.
+                       Got: #{ mode }")
 
-    if @mode != mode
-      if @mode of @parent.modes
-        @call('onLeave')
+    @call('onLeave')
+    @mode = mode
+    @call('onEnter', {args})
+    @parent.emit('modeChange', this)
 
-      @mode = mode
-
-      @call('onEnter', args...)
-      @parent.emit('modechange', this)
-
-  onInput: (keyStr, event) ->
-    suppress = @call('onInput', keyStr, event)
+  onInput: (event) ->
+    match = @parent.consumeKeyEvent(event, @mode)
+    return false unless match
+    suppress = @call('onInput', {event, count: match.count}, match)
     return suppress
 
-  call: (method, args...) ->
+  call: (method, data = {}, extraArgs...) ->
     currentMode = @parent.modes[@mode]
-    currentMode?[method].call(currentMode, this, @storage[@mode] ?= {}, args...)
+    args = Object.assign({vim: this, storage: @storage[@mode] ?= {}}, data)
+    currentMode?[method].call(currentMode, args, extraArgs...)
+
+module.exports = Vim

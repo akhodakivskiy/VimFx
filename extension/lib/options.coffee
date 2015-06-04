@@ -1,6 +1,5 @@
 ###
-# Copyright Simon Lydell 2013, 2014.
-# Copyright Wang Zhuochun 2013.
+# Copyright Simon Lydell 2015.
 #
 # This file is part of VimFx.
 #
@@ -18,31 +17,33 @@
 # along with VimFx.  If not, see <http://www.gnu.org/licenses/>.
 ###
 
-utils    = require('./utils')
-defaults = require('./defaults')
-help     = require('./help')
-_        = require('./l10n')
+defaults  = require('./defaults')
+translate = require('./l10n')
+prefs     = require('./prefs')
+utils     = require('./utils')
+
+
+TYPE_MAP =
+  string:  'string'
+  number:  'integer'
+  boolean: 'bool'
 
 observe = (options) ->
-  observer = new Observer(defaults, validators, options)
-  observer.hooks.injectSettings = setupCustomizeButton
-
-  Services.obs.addObserver(observer, 'addon-options-displayed', false)
-  Services.obs.addObserver(observer, 'addon-options-hidden',    false)
-
+  observer = new Observer(options)
+  utils.observe('addon-options-displayed', observer)
+  utils.observe('addon-options-hidden',    observer)
   module.onShutdown(->
-    Services.obs.removeObserver(observer, 'addon-options-displayed')
-    Services.obs.removeObserver(observer, 'addon-options-hidden')
+    observer.destroy()
   )
 
-class Observer
-  constructor: (@defaults, @validators, @options) ->
+# Generalized observer.
+class BaseObserver
+  constructor: (@options) ->
     @document  = null
     @container = null
     @listeners = []
-    @hooks     = {}
 
-  useCapture: false
+  useCapture: true
 
   listen: (element, event, action) ->
     element.addEventListener(event, action, @useCapture)
@@ -53,69 +54,161 @@ class Observer
       element.removeEventListener(event, action, useCapture)
     @listeners.length = 0
 
-  typeMap:
-    string:  'string'
-    number:  'integer'
-    boolean: 'bool'
+  type: (value) -> TYPE_MAP[typeof value]
 
   injectSettings: ->
-    @container = @document.getElementById('detail-rows')
 
-    for key, value of @defaults.options
-      desc = _("pref_#{ key }_desc")
-      if typeof value == 'string' and value != ''
-        desc += "\n#{ _('prefs_default', value) }"
-      setting = utils.createElement(@document, 'setting', {
-        pref:  "#{ @defaults.BRANCH }#{ key }"
-        type:  @typeMap[typeof value]
-        title: _("pref_#{ key }_title")
-        desc:  desc.trim()
-      })
-      @listen(setting, 'change', @validators[key]) if key of @validators
-      @container.appendChild(setting)
-
-    @hooks.injectSettings?.call(this)
-
-    @container.querySelector('setting').setAttribute('first-row', 'true')
+  appendSetting: (attributes) ->
+    setting = @document.createElement('setting')
+    utils.setAttributes(setting, attributes)
+    @container.appendChild(setting)
+    return setting
 
   observe: (@document, topic, addonId) ->
-    return unless addonId == @options.ID
+    return unless addonId == @options.id
     switch topic
       when 'addon-options-displayed'
-        @injectSettings()
+        @init()
       when 'addon-options-hidden'
-        @unlisten()
+        @destroy()
 
-setupCustomizeButton = ->
-  shortcuts = utils.createElement(@document, 'setting', {
-    type: 'control',
-    title: _('prefs_customize_shortcuts_title')
-  })
-  button = utils.createElement(@document, 'button', {
-    label: _('prefs_customize_shortcuts_label')
-  })
-  shortcuts.appendChild(button)
-  @listen(button, 'command',
-          help.injectHelp.bind(undefined, @document, @options))
-  @container.appendChild(shortcuts)
+  init: ->
+    @container = @document.getElementById('detail-rows')
+    @injectSettings()
 
-filterChars = (event) ->
-  input = event.target
-  input.value = utils.removeDuplicateCharacters(input.value).replace(/\s/g, '')
-  input.valueToPreference()
+  destroy: ->
+    @unlisten()
 
-validatePatterns = (event) ->
-  input = event.target
-  input.value =
-    utils.removeDuplicates(utils.splitListString(input.value))
-      .filter((pattern) -> pattern != '')
-      .join(',')
-  input.valueToPreference()
+# VimFx specific observer.
+class Observer extends BaseObserver
+  constructor: (@vimfx) ->
+    super({id: @vimfx.id})
 
-validators =
-  'hint_chars':    filterChars
-  'black_list':    utils.updateBlacklist
-  'prev_patterns': validatePatterns
-  'next_patterns': validatePatterns
+  injectSettings: ->
+    @injectInstructions()
+    @injectOptions()
+    @injectShortcuts()
+    @setupKeybindings()
+    @setupValidation()
 
-exports.observe = observe
+  injectInstructions: ->
+    @appendSetting({
+      type:        'control'
+      title:       translate('prefs_instructions_title')
+      desc:        translate('prefs_instructions_desc',
+                     @vimfx.options['options.key.quote'],
+                     @vimfx.options['options.key.insert_default'],
+                     @vimfx.options['options.key.reset_default'],
+                     '<c-z>')
+      'first-row': 'true'
+    })
+
+  injectOptions: ->
+    for key, value of defaults.options
+      setting = @appendSetting({
+        pref:  "#{ defaults.BRANCH }#{ key }"
+        type:  @type(value)
+        title: translate("pref_#{ key }_title")
+        desc:  translate("pref_#{ key }_desc")
+      })
+    return
+
+  injectShortcuts: ->
+    for mode in @vimfx.getGroupedCommands()
+      @appendSetting({
+        type:        'control'
+        title:       mode.name
+        'first-row': 'true'
+      })
+
+      for category in mode.categories
+        if category.name
+          @appendSetting({
+            type:        'control'
+            title:       category.name
+            'first-row': 'true'
+          })
+
+        for { command } in category.commands
+          @appendSetting({
+            pref:  command.pref
+            type:  'string'
+            title: command.description()
+            desc:  @generateErrorMessage(command.pref)
+            class: 'is-shortcut'
+          })
+
+    return
+
+  generateErrorMessage: (pref) ->
+    commandErrors = @vimfx.errors[pref] ? []
+    return commandErrors.map(({ id, context, subject }) ->
+      return translate("error_#{ id }", context ? subject, subject)
+    ).join('\n')
+
+  setupKeybindings: ->
+    quote = false
+    @listen(@container, 'keydown', (event) =>
+      setting = event.target
+      isString = (setting.type == 'string')
+
+      { input, pref } = setting
+      keyString = @vimfx.stringifyKeyEvent(event)
+
+      # Some shortcuts only make sense for string settings. We still match
+      # those shortcuts and suppress the default behavior for _all_ types of
+      # settings for consistency. For example, pressing <c-d> in a number input
+      # (which looks like a text input) would otherwise bookmark the page, and
+      # <c-q> would close the window!
+      switch
+        when not keyString
+          return
+        when quote
+          break unless isString
+          utils.insertText(input, keyString)
+          quote = false
+        when keyString == @vimfx.options['options.key.quote']
+          break unless isString
+          quote = true
+        when keyString == @vimfx.options['options.key.insert_default']
+          break unless isString
+          utils.insertText(input, prefs.root.default.get(pref))
+        when keyString == @vimfx.options['options.key.reset_default']
+          prefs.root.set(pref, null)
+        else
+          return
+
+      event.preventDefault()
+      setting.valueToPreference()
+      @refreshShortcutErrors()
+    )
+    @listen(@container, 'blur', -> quote = false)
+
+  setupValidation: ->
+    @listen(@container, 'input', (event) =>
+      setting = event.target
+      # Disable default behavior of updating the pref of the setting on each
+      # input. Do it on the 'change' event instead (see below), because all
+      # settings are validated and auto-adjusted as soon as the pref changes.
+      event.stopPropagation()
+      if setting.classList.contains('is-shortcut')
+        # However, for the shortcuts we _do_ want live validation, because they
+        # cannot be auto-adjusted. Instead an error message is shown.
+        setting.valueToPreference()
+        @refreshShortcutErrors()
+    )
+    @listen(@container, 'change', (event) ->
+      setting = event.target
+      unless setting.classList.contains('is-shortcut')
+        setting.valueToPreference()
+    )
+
+
+  refreshShortcutErrors: ->
+    for setting in @container.getElementsByClassName('is-shortcut')
+      setting.setAttribute('desc', @generateErrorMessage(setting.pref))
+    return
+
+module.exports = {
+  observe
+}

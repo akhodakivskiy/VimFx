@@ -103,6 +103,9 @@ Finally send a pull request to same branch as you based your topic branch on
 - `gulp sync-locales` syncs all locales against the en-US locale. To sync against
   for example the sv-SE locale instead, pass `--sv-SE` as an option. See also
   the “Syncing locales” section below.
+- `gulp help.html` dumps VimFx’s Keyboard Shortcuts dialog into help.html. You
+  can then open up help.html in Firefox and style it live using the Style
+  Editor! You can even press the “Save” button when done to save your changes!
 - Use the `--test` or `-t` option to include the unit test files. The output of
   the tests are `console.log`ed. See the browser console, or start Firefox from
   the command line to see it.

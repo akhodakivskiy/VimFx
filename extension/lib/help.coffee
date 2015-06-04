@@ -1,6 +1,5 @@
 ###
-# Copyright Anton Khodakivskiy 2012, 2013.
-# Copyright Simon Lydell 2013, 2014.
+# Copyright Simon Lydell 2015.
 #
 # This file is part of VimFx.
 #
@@ -18,240 +17,75 @@
 # along with VimFx.  If not, see <http://www.gnu.org/licenses/>.
 ###
 
-notation = require('vim-like-key-notation')
-legacy   = require('./legacy')
-utils    = require('./utils')
-prefs    = require('./prefs')
-_        = require('./l10n')
-
-{ classes: Cc, interfaces: Ci, utils: Cu } = Components
-
-XULDocument  = Ci.nsIDOMXULDocument
+translate = require('./l10n')
+utils     = require('./utils')
 
 CONTAINER_ID = 'VimFxHelpDialogContainer'
 
-# coffeelint: disable=max_line_length
+injectHelp = (rootWindow, vimfx) ->
+  removeHelp(rootWindow)
 
-removeHelp = (document) ->
-  document.getElementById(CONTAINER_ID)?.remove()
+  { document } = rootWindow
 
-injectHelp = (document, options) ->
-  { modes } = options
-  if document.documentElement
-    removeHelp(document)
+  container = document.createElement('box')
+  container.id = CONTAINER_ID
 
-    type = if document instanceof XULDocument then 'box' else 'div'
-    container = utils.createElement(document, type, {id: CONTAINER_ID})
+  header = createHeader(document, vimfx)
+  container.appendChild(header)
 
-    modeCommands = {}
-    for modeName of modes
-      cmds = modes[modeName].commands
-      modeCommands[modeName] =
-        if Array.isArray(cmds)
-          cmds
-        else
-          (cmds[commandName] for commandName of cmds)
+  content = createContent(document, vimfx)
+  container.appendChild(content)
 
-    container.appendChild(utils.parseHTML(document, helpDialogHtml(modeCommands, options)))
-    for element in container.getElementsByTagName('*')
-      element.classList.add('VimFxReset')
+  rootWindow.gBrowser.mCurrentBrowser.parentNode.appendChild(container)
 
-    document.documentElement.appendChild(container)
+  # Uncomment this line if you want to use `gulp help.html`!
+  # utils.writeToClipboard(container.outerHTML)
 
-    for element in container.querySelectorAll('[data-commands]')
-      elementCommands = modeCommands[element.dataset.commands]
-      element.addEventListener('click',
-        removeHandler.bind(undefined, document, elementCommands), false)
-      element.addEventListener('click',
-        addHandler.bind(undefined, document, elementCommands), false)
+removeHelp = (rootWindow) ->
+  rootWindow.document.getElementById(CONTAINER_ID)?.remove()
 
-    if button = document.getElementById('VimFxClose')
-      clickHandler = (event) ->
-        event.stopPropagation()
-        event.preventDefault()
-        removeHelp(document)
-      button.addEventListener('click', clickHandler, false)
+createHeader = (document, vimfx) ->
+  $ = utils.createBox.bind(null, document)
 
-promptService = Cc['@mozilla.org/embedcomp/prompt-service;1']
-  .getService(Ci.nsIPromptService)
+  header = $('header')
 
-removeHandler = (document, commands, event) ->
-  return unless event.target.classList.contains('VimFxKeyLink')
-  event.preventDefault()
-  event.stopPropagation()
-  key = event.target.getAttribute('data-key')
-  name = event.target.getAttribute('data-command')
-  if cmd = commands.reduce(((m, v) -> if (v.name == name) then v else m), null)
-    title = _('help_remove_shortcut_title')
-    text = _('help_remove_shortcut_text')
-    if promptService.confirm(document.defaultView, title, text)
-      cmd.keys(cmd.keys().filter((a) -> utils.normalizedKey(a) != key))
-      event.target.remove()
+  mainHeading = $('heading-main', header)
+  $('name',  mainHeading, 'VimFx')
+  $('title', mainHeading, translate('help_title'))
 
-addHandler = (document, commands, event) ->
-  return unless event.target.classList.contains('VimFxAddShortcutLink')
-  event.preventDefault()
-  event.stopPropagation()
-  name = event.target.getAttribute('data-command')
-  if cmd = commands.reduce(((m, v) -> if (v.name == name) then v else m), null)
-    errorText = ''
-    loop
-      title = _('help_add_shortcut_title')
-      text = errorText + _('help_add_shortcut_text')
-      value = {value: null}
-      check = {value: null}
-      if promptService.prompt(document.defaultView, title, text, value, null, check)
-        input = value.value.trim()
-        return if input.length == 0
-        key = notation.parseSequence(input)
-        try
-          if name.startsWith('mode_') and key.length > 1
-            throw {id: 'single_keystrokes_only'}
-          normalizedKey = utils.normalizedKey(key)
-        catch {id, context, subject}
-          if /^\s$/.test(subject) then id = 'invalid_whitespace'
-          errorText = _("error_#{ id }", context ? subject, subject) + '\n'
-          continue
-        conflicts = getConflicts(commands, normalizedKey)
-        if conflicts.length == 0 or overwriteCmd(document, conflicts, key)
-          cmd.keys(cmd.keys().concat([key]))
-          for div in document.getElementsByClassName('VimFxKeySequence')
-            if div.getAttribute('data-command') == cmd.name
-              div.insertAdjacentHTML('beforeend', hint(cmd, key))
-      break
-  return
+  closeButton = $('close-button', header, '×')
+  closeButton.onclick = removeHelp.bind(null, document.defaultView)
 
-getConflicts = (commands, value) ->
-  conflicts = []
-  for command in commands
-    conflictingKeys = []
-    for key in command.keys()
-      normalizedKey = utils.normalizedKey(key)
-      shortest = Math.min(value.length, normalizedKey.length)
-      if value[...shortest] == normalizedKey[...shortest]
-        conflictingKeys.push(key)
-    if conflictingKeys.length > 0
-      conflicts.push({command, conflictingKeys})
-  return conflicts
+  return header
 
-overwriteCmd = (document, conflicts, key) ->
-  title = _('help_add_shortcut_title')
-  conflictSummary = conflicts.map((conflict) ->
-    conflictingKeys = conflict.conflictingKeys
-      .map((key) -> key.join('')).join('  ')
-    return "#{ conflict.command.help() }:  #{ conflictingKeys }"
-  ).join('\n')
-  text = """
-    #{ _('help_add_shortcut_text_overwrite', key.join('')) }
+createContent = (document, vimfx) ->
+  $ = utils.createBox.bind(null, document)
 
-    #{ conflictSummary }
-  """
-  if promptService.confirm(document.defaultView, title, text)
-    for { command, conflictingKeys } in conflicts
-      normalizedKeys = conflictingKeys.map((key) -> utils.normalizedKey(key))
-      command.keys(command.keys().filter((key) ->
-        return utils.normalizedKey(key) not in normalizedKeys
-      ))
-      for key in normalizedKeys
-        document.querySelector("a[data-key='#{ key }']").remove()
-    return true
-  else
-    return false
+  content = $('content')
 
-td = (text, klass = '') ->
-  """<td class="#{ klass }">#{ text }</td>"""
+  for mode in vimfx.getGroupedCommands({enabledOnly: true})
+    modeHeading = $('heading-mode', null, mode.name)
 
-hint = (cmd, key) ->
-  normalizedKey = utils.escapeHTML(utils.normalizedKey(key))
-  displayKey = utils.escapeHTML(key.join(''))
-  """<a href="#" class="VimFxReset VimFxKeyLink" title="#{ _('help_remove_shortcut') }" \
-          data-command="#{ cmd.name }" data-key="#{ normalizedKey }">#{ displayKey }</a>"""
+    for category, index in mode.categories
+      categoryContainer = $('category', content)
 
-tr = (cmd) ->
-  hints = """
-    <div class="VimFxKeySequence" data-command="#{ cmd.name }">
-      #{ (hint(cmd, key) for key in cmd.keys()).join('\n') }
-    </div>
-  """
-  dot = '<span class="VimFxDot">&#8729;</span>'
-  a = """#{ cmd.help() }"""
-  add = """
-    <a href="#" data-command="#{ cmd.name }"
-        class="VimFxAddShortcutLink" title="#{ _('help_add_shortcut') }">&#8862;</a>
-  """
+      # Append the mode heading inside the first category container, rather than
+      # before it, for layout purposes.
+      if index == 0
+        categoryContainer.appendChild(modeHeading)
+        categoryContainer.classList.add('first')
 
-  return """
-    <tr>
-        #{ td(hints) }
-        #{ td(add) }
-        #{ td(dot) }
-        #{ td(a) }
-    </tr>
-  """
+      $('heading-category', categoryContainer, category.name) if category.name
 
-table = (commands, modeName) ->
-  """
-  <table data-commands="#{modeName}">
-    #{ (tr(cmd) for cmd in commands).join('') }
-  </table>
-  """
+      for { command, enabledSequences } in category.commands
+        commandContainer = $('command', categoryContainer)
+        for sequence in enabledSequences
+          $('key-sequence', commandContainer, sequence)
+        $('description', commandContainer, command.description())
 
-section = (title, commands, modeName = 'normal') ->
-  """
-  <div class="VimFxSectionTitle">#{ title }</div>
-  #{ table(commands, modeName) }
-  """
+  return content
 
-helpDialogHtml = (modeCommands, options) ->
-  commands = modeCommands['normal']
-  return """
-  <div id="VimFxHelpDialog">
-    <div class="VimFxHeader">
-      <div class="VimFxTitle">
-        <span class="VimFxTitleVim">Vim</span><span class="VimFxTitleFx">Fx</span>
-        <span>#{ _('help_title') }</span>
-      </div>
-      <span class="VimFxVersion">#{ _('help_version') } #{ options.VERSION }</span>
-      <a class="VimFxClose" id="VimFxClose" href="#">&#10006;</a>
-      <div class="VimFxClearFix"></div>
-      <p>Did you know that you can add/remove shortucts in this dialog?</p>
-      <div class="VimFxClearFix"></div>
-      <p>Click the shortcut to remove it, and click &#8862; to add new shortcut!</p>
-    </div>
-
-    <div class="VimFxBody">
-      <div class="VimFxColumn">
-        #{ section(_('category.location'),  commands.filter((a) -> a.group == 'location')) }
-        #{ section(_('category.scrolling'), commands.filter((a) -> a.group == 'scrolling')) }
-        #{ section(_('category.find'),      commands.filter((a) -> a.group == 'find')) }
-        #{ section(_('category.misc'),      commands.filter((a) -> a.group == 'misc')) }
-      </div>
-      <div class="VimFxColumn">
-        #{ section(_('category.tabs'),      commands.filter((a) -> a.group == 'tabs')) }
-        #{ section(_('category.browsing'),  commands.filter((a) -> a.group == 'browsing')) }
-        #{ section(_('mode.hints'),         modeCommands['hints'],  'hints') }
-        #{ section(_('mode.insert'),        modeCommands['insert'], 'insert') }
-        #{ section(_('mode.find'),          modeCommands['find'],   'find') }
-      </div>
-      <div class="VimFxClearFix"></div>
-    </div>
-
-    <div class="VimFxFooter">
-      <p>
-        #{ _('help_found_bug') }
-        <a target="_blank" href="https://github.com/akhodakivskiy/VimFx/issues">
-          #{ _('help_report_bug') }
-        </a>
-      </p>
-      <p>
-        #{ _('help_enjoying') }
-        <a target="_blank" href="https://addons.mozilla.org/en-US/firefox/addon/vimfx/">
-          #{ _('help_feedback') }
-        </a>
-      </p>
-    </div>
-  </div>
-  """
-
-exports.injectHelp = injectHelp
-exports.removeHelp = removeHelp
+module.exports = {
+  injectHelp
+  removeHelp
+}

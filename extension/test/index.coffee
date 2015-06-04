@@ -25,7 +25,7 @@ utils = require('../lib/utils')
 Cu.import('resource://specialpowers/Assert.jsm')
 assert = new Assert()
 
-module.exports = ->
+module.exports = (vimfx) ->
   report = []
   passed = 0
   total  = 0
@@ -37,7 +37,7 @@ module.exports = ->
       total++
       error = null
       try
-        fn(assert)
+        fn(assert, vimfx)
         passed++
       catch error
       report.push("  #{ if error then '✘' else '✔' } #{ key }")

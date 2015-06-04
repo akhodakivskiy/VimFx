@@ -18,6 +18,18 @@
 ###
 
 notation = require('vim-like-key-notation')
+prefs    = require('./prefs')
+utils    = require('./utils')
+
+applyMigrations = (migrations) ->
+  for migration, index in migrations
+    pref = "migration.#{ index }.applied"
+    # This allows to manually choose migrations to apply. Be careful, though,
+    # since some migrations might have to run in order!
+    unless prefs.has(pref) and prefs.get(pref)
+      migration()
+      prefs.set(pref, true)
+  return
 
 commaSeparatedList = /.[^,]*,?/g
 
@@ -43,4 +55,18 @@ convertKey = (keyStr) ->
     })
   )
 
-exports.convertKey = convertKey
+convertPattern = (pattern) ->
+  return utils.regexpEscape(pattern)
+    .replace(/\\\*/g, '.*')
+    .replace(/!/g,    '.')
+    .replace(/\s+/g,  '\\s+')
+
+splitListString = (str) ->
+  return str.split(/\s*,[\s,]*/)
+
+module.exports = {
+  applyMigrations
+  convertKey
+  convertPattern
+  splitListString
+}

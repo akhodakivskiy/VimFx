@@ -18,19 +18,7 @@
 ###
 
 legacy = require('./legacy')
-{ getPref
-, setPref
-, isPrefSet} = require('./prefs')
-
-applyMigrations = (migrations) ->
-  for migration, index in migrations
-    pref = "migration.#{ index }.applied"
-    # This allows to manually choose migrations to apply. Be careful, though,
-    # since some migrations might have to run in order!
-    unless isPrefSet(pref) and getPref(pref)
-      migration()
-      setPref(pref, true)
-  return
+prefs  = require('./prefs')
 
 migrations = []
 
@@ -117,12 +105,29 @@ migrations[0] = ->
       catch then []
     for key, index in keys when typeof key == 'string'
       keys[index] = legacy.convertKey(key)
-    return keys.map((key) -> key.join('')).join('  ')
+    return keys.map((key) -> key.join('')).join('    ')
 
   for name, newName of conversions
     pref = "commands.#{ name }.keys"
-    setPref("mode.#{ newName }", convert(getPref(pref))) if isPrefSet(pref)
+    prefs.set("mode.#{ newName }", convert(prefs.get(pref))) if prefs.has(pref)
   return
 
-exports.applyMigrations = applyMigrations
-exports.migrations      = migrations
+migrations[1] = ->
+  pref = 'black_list'
+  return unless prefs.has(pref)
+  blacklist = prefs.get(pref)
+  prefs.set(pref, legacy.splitListString(blacklist).join('  '))
+
+migrations[2] = ->
+  convert = (pref) ->
+    return unless prefs.has(pref)
+    patterns = prefs.get(pref)
+    converted = legacy.splitListString(patterns)
+      .map(legacy.convertPattern)
+      .join('  ')
+    prefs.set(pref, converted)
+
+  convert('prev_patterns')
+  convert('next_patterns')
+
+module.exports = migrations

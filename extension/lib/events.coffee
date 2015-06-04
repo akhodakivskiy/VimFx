@@ -18,9 +18,8 @@
 # along with VimFx.  If not, see <http://www.gnu.org/licenses/>.
 ###
 
-notation                = require('vim-like-key-notation')
-utils                   = require('./utils')
-{ getPref }             = require('./prefs')
+button = require('./button')
+utils  = require('./utils')
 
 { interfaces: Ci } = Components
 
@@ -28,19 +27,8 @@ HTMLDocument     = Ci.nsIDOMHTMLDocument
 HTMLInputElement = Ci.nsIDOMHTMLInputElement
 
 # Will be set by `addEventListeners`. It’s a bit hacky, but will do for now.
+vimfx     = null
 vimBucket = null
-
-keyStrFromEvent = (event) ->
-  return notation.stringify(event, {
-    # Check that `event.code` really is available before using the
-    # 'ignore_keyboard_layout' option. If not `event.key` will be used anyway,
-    # and the user needs to enable `event.code` support (which can be done from
-    # VimFx’s settings page).
-    ignoreKeyboardLayout: getPref('ignore_keyboard_layout') and event.code?
-    # Advanced setting for advanced users. Currently requires you to modifiy it
-    # from about:config and check the error console for errors.
-    translations: JSON.parse(getPref('translations'))
-  })
 
 # When a menu or panel is shown VimFx should temporarily stop processing
 # keyboard input, allowing accesskeys to be used.
@@ -56,14 +44,10 @@ suppressEvent = (event) ->
   event.preventDefault()
   event.stopPropagation()
 
-# Returns the appropriate vim instance for `event`, but only if it’s okay to do
-# so. VimFx must not be disabled or blacklisted.
+# Returns the appropriate vim instance for `event`.
 getVimFromEvent = (event) ->
-  return if getPref('disabled')
   return unless window = utils.getEventCurrentTabWindow(event)
   return unless vim = vimBucket.get(window)
-  return if vim.state.blacklisted
-
   return vim
 
 # Save the time of the last user interaction. This is used to determine whether
@@ -112,21 +96,13 @@ windowsListeners =
 
       markLastInteraction(event, vim)
 
-      return unless keyStr = keyStrFromEvent(event)
-      suppress = vim.onInput(keyStr, event)
+      suppress = vim.onInput(event)
 
       suppressEvent(event) if suppress
 
     catch error
       console.error(utils.formatError(error))
 
-  # Note that the below event listeners can suppress the event even in
-  # blacklisted sites. That's intentional. For example, if you press 'x' to
-  # close the current tab, it will close before keyup fires. So keyup (and
-  # perhaps keypress) will fire in another tab. Even if that particular tab is
-  # blacklisted, we must suppress the event, so that 'x' isn't sent to the page.
-  # The rule is simple: If the `suppress` flag is `true`, the event should be
-  # suppressed, no matter what. It has the highest priority.
   keypress: (event) -> suppressEvent(event) if suppress
   keyup:    (event) -> suppressEvent(event) if suppress
 
@@ -171,12 +147,12 @@ windowsListeners =
     # buttons which inserts a `<textarea>` when clicked (which might take up to
     # a second) and then focuses the `<textarea>`. Such focus events should
     # _not_ be blurred.
-    if getPref('prevent_autofocus') and
+    if vimfx.options.prevent_autofocus and
         vim.mode != 'insert' and
         target.ownerDocument instanceof HTMLDocument and
         target instanceof HTMLInputElement and
         (vim.state.lastInteraction == null or
-         Date.now() - vim.state.lastInteraction > getPref('autofocus_limit'))
+         Date.now() - vim.state.lastInteraction > vimfx.options.autofocus_limit)
       vim.state.lastAutofocusPrevention = Date.now()
       target.blur()
 
@@ -207,7 +183,11 @@ windowsListeners =
     # text input, then that input will be focused, but you can’t type in it
     # (instead markers will be matched). So if the user clicks anything in hints
     # mode it’s better to leave it.
-    if vim.mode == 'hints' and not utils.isEventSimulated(event)
+    if vim.mode == 'hints' and not utils.isEventSimulated(event) and
+       # Exclude the VimFx button, though, since clicking it returns to normal
+       # mode. Otherwise we’d first returned to normal mode and then the button
+       # would have opened the help dialog.
+       target != vim.rootWindow.getElementById(button.BUTTON_ID)
       vim.enterMode('normal')
       return
 
@@ -250,18 +230,11 @@ windowsListeners =
 tabsListener =
   onLocationChange: (browser, webProgress, request, location) ->
     return unless vim = vimBucket.get(browser.contentWindow)
-
     vim.resetState()
 
-    # Update the blacklist state.
-    vim.state.blacklisted = utils.isBlacklisted(location.spec)
-    vim.state.blacklistedKeys = utils.getBlacklistedKeys(location.spec)
-    # If only specific keys are blacklisted, remove blacklist state.
-    if vim.state.blacklistedKeys.length > 0
-      vim.state.blacklisted = false
-
-addEventListeners = (vimfx, window) ->
-  { vimBucket } = vimfx
+addEventListeners = (_vimfx, window) ->
+  vimfx = _vimfx
+  { vimBucket } = _vimfx
   for name, listener of windowsListeners
     window.addEventListener(name, listener, true)
 
@@ -274,4 +247,6 @@ addEventListeners = (vimfx, window) ->
     window.gBrowser.removeTabsProgressListener(tabsListener)
   )
 
-exports.addEventListeners = addEventListeners
+module.exports = {
+  addEventListeners
+}

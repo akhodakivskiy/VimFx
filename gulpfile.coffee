@@ -25,6 +25,7 @@ coffeelint  = require('gulp-coffeelint')
 git         = require('gulp-git')
 header      = require('gulp-header')
 mustache    = require('gulp-mustache')
+tap         = require('gulp-tap')
 zip         = require('gulp-zip')
 marked      = require('marked')
 merge       = require('merge2')
@@ -196,7 +197,7 @@ gulp.task('sync-locales', ->
     baseLocale = arg[2..]
   fs.readdirSync(join(LOCALE, baseLocale))
     .filter((file) -> path.extname(file) == '.properties')
-    .map(syncLocale.bind(undefined, baseLocale))
+    .map(syncLocale.bind(null, baseLocale))
 )
 
 syncLocale = (baseLocaleName, fileName) ->
@@ -238,3 +239,34 @@ parseLocaleFile = (fileContents) ->
     else
       lines.push(line)
   return {keys, template: lines, newline}
+
+helpHTMLFile = 'help.html'
+gulp.task(helpHTMLFile, ->
+  unless fs.existsSync(helpHTMLFile)
+    console.log("""
+      First enable the “Copy to clipboard” line in help.coffee, show the help
+      dialog and finally dump the clipboard into #{ helpHTMLFile }.
+    """)
+    return
+  gulp.src('help.html')
+    .pipe(tap((file) ->
+      file.contents = new Buffer(generateHelpHTML(file.contents.toString()))
+    ))
+    .pipe(gulp.dest('.'))
+)
+
+helpHTMLPrelude = '''
+  <!doctype html>
+  <meta charset=utf-8>
+  <title>VimFx help</title>
+  <style>
+    * { margin: 0; }
+    html { font-size: 10px; }
+  </style>
+  <link rel=stylesheet href=extension/resources/style.css>
+'''
+
+generateHelpHTML = (dumpedHTML) ->
+  return helpHTMLPrelude + dumpedHTML
+    .replace(/^<\w+ xmlns="[^"]+"/, '<div')
+    .replace(/\w+>$/, 'div>')

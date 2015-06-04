@@ -59,10 +59,11 @@ require.scopes = {}
 require.data   = require('./require-data')
 
 # Set default prefs and apply migrations as early as possible.
-{ setDefaultPrefs } = require('./lib/prefs')
-{ applyMigrations
-, migrations }      = require('./lib/migrations')
-setDefaultPrefs()
+{ applyMigrations } = require('./lib/legacy')
+migrations          = require('./lib/migrations')
+prefs               = require('./lib/prefs')
+
+prefs.default._init()
 applyMigrations(migrations)
 
 do (global = this) ->

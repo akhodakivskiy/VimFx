@@ -64,6 +64,8 @@ watchWindows = (callback, winType) ->
   # Make sure to stop watching for windows if we're unloading.
   module.onShutdown(-> Services.ww.unregisterNotification(windowWatcher))
 
-exports.runOnLoad    = runOnLoad
-exports.runOnWindows = runOnWindows
-exports.watchWindows = watchWindows
+module.exports = {
+  runOnLoad
+  runOnWindows
+  watchWindows
+}

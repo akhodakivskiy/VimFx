@@ -1,6 +1,6 @@
 # VimFx – Vim keyboard shortcuts for Firefox
 
-<img src="https://raw.githubusercontent.com/akhodakivskiy/VimFx/develop/icon-large.png" alt="" align="right">
+<img src="https://raw.githubusercontent.com/akhodakivskiy/VimFx/develop/extension/skin/icon128.png" alt="" align="right">
 
 [VimFx] is a [Mozilla Firefox] extension which adds Vim-style keyboard shortcuts
 for browsing and navigation, significantly reducing the use of the mouse, and
@@ -65,3 +65,12 @@ shortcuts, and lets you customize every single one of them. You can also look at
 all default shortcuts [here][defaults].
 
 [defaults]: https://github.com/akhodakivskiy/VimFx/blob/develop/extension/lib/defaults.coffee
+
+## Feedback
+
+Enjoying VimFx? [Write a review][review]!
+
+Found a bug? Report it in the [issue tracker]!
+
+[review]: https://addons.mozilla.org/firefox/addon/vimfx/reviews/add
+[issue tracker]: https://github.com/akhodakivskiy/VimFx/issues

@@ -19,10 +19,6 @@
 # along with VimFx.  If not, see <http://www.gnu.org/licenses/>.
 ###
 
-notation    = require('vim-like-key-notation')
-{ getPref
-, setPref } = require('./prefs')
-
 { classes: Cc, interfaces: Ci, utils: Cu } = Components
 
 Window              = Ci.nsIDOMWindow
@@ -156,20 +152,17 @@ area = (element) ->
 getSessionStore = ->
   Cc['@mozilla.org/browser/sessionstore;1'].getService(Ci.nsISessionStore)
 
-loadCss = do ->
+loadCss = (name) ->
   sss = Cc['@mozilla.org/content/style-sheet-service;1']
     .getService(Ci.nsIStyleSheetService)
-  return (name) ->
-    uri = getResourceURI("resources/#{ name }.css")
-    # `AGENT_SHEET` is used to override userContent.css and Stylish. Custom
-    # website themes installed by users often make the hint markers unreadable,
-    # for example. Just using `!important` in the CSS is not enough.
-    unless sss.sheetRegistered(uri, sss.AGENT_SHEET)
-      sss.loadAndRegisterSheet(uri, sss.AGENT_SHEET)
+  uri = Services.io.newURI("chrome://vimfx/skin/#{ name }.css", null, null)
+  method = sss.AUTHOR_SHEET
+  unless sss.sheetRegistered(uri, method)
+    sss.loadAndRegisterSheet(uri, method)
 
-    module.onShutdown(->
-      sss.unregisterSheet(uri, sss.AGENT_SHEET)
-    )
+  module.onShutdown(->
+    sss.unregisterSheet(uri, method)
+  )
 
 # Store events that we’ve simulated. A `WeakMap` is used in order not to leak
 # memory. This approach is better than for example setting `event.simulated =
@@ -208,114 +201,23 @@ timeIt = (func, name) ->
   console.timeEnd(name)
   return result
 
-isBlacklisted = (str) ->
-  matchingRules = getMatchingBlacklistRules(str)
-  return (matchingRules.length != 0)
+createBox = (document, className, parent = null, text = null) ->
+  box = document.createElement('box')
+  box.className = className
+  box.textContent = text if text?
+  parent.appendChild(box) if parent?
+  return box
 
-# Returns all blacklisted keys in matching rules.
-getBlacklistedKeys = (str) ->
-  matchingRules = getMatchingBlacklistRules(str)
-  blacklistedKeys = []
-  for rule in matchingRules when /##/.test(rule)
-    blacklistedKeys.push(x) for x in rule.split('##')[1].split('#')
-  return blacklistedKeys
-
-# Returns all rules in the blacklist that match the provided string.
-getMatchingBlacklistRules = (str) ->
-  return getBlacklist().filter((rule) ->
-    /// ^#{ simpleWildcards(rule.split('##')[0]) }$ ///i.test(str)
-  )
-
-getBlacklist = ->
-  return splitListString(getPref('black_list'))
-
-setBlacklist = (blacklist) ->
-  setPref('black_list', blacklist.join(','))
-
-updateBlacklist = ({ add, remove } = {}) ->
-  blacklist = getBlacklist()
-
-  if add
-    blacklist.push(splitListString(add)...)
-
-  blacklist = blacklist.filter((rule) -> rule != '')
-  blacklist = removeDuplicates(blacklist)
-
-  if remove
-    for rule in splitListString(remove) when rule in blacklist
-      blacklist.splice(blacklist.indexOf(rule), 1)
-
-  setBlacklist(blacklist)
-
-# Splits a comma/space separated list into an array.
-splitListString = (str) ->
-  return str.split(/\s*,[\s,]*/)
-
-# Prepares a string to be used in a regexp, where "*" matches zero or more
-# characters and "!" matches one character.
-simpleWildcards = (string) ->
-  return regexpEscape(string).replace(/\\\*/g, '.*').replace(/!/g, '.')
-
-# Returns the first element that matches a pattern, favoring earlier patterns.
-# The patterns are case insensitive `simpleWildcards`s and must match either in
-# the beginning or at the end of a string. Moreover, a pattern does not match
-# in the middle of words, so "previous" does not match "previously". If that is
-# desired, a pattern such as "previous*" can be used instead. Note: We cannot
-# use `\b` word boundaries, because they don’t work well with non-English
-# characters. Instead we match a space as word boundary. Therefore we normalize
-# the whitespace and add spaces at the edges of the element text.
-getBestPatternMatch = (patterns, attrs, elements) ->
-  regexps = []
-  for pattern in patterns
-    wildcarded = simpleWildcards(pattern)
-    regexps.push(/// ^\s(?:#{ wildcarded })\s | \s(?:#{ wildcarded })\s$ ///i)
-
-  # Helper function that matches a string against all the patterns.
-  matches = (text) ->
-    normalizedText = " #{ text } ".replace(/\s+/g, ' ')
-    for re in regexps
-      if re.test(normalizedText)
-        return true
-    return false
-
-  # First search in attributes (favoring earlier attributes) as it's likely
-  # that they are more specific than text contexts.
-  for attr in attrs
-    for element in elements
-      if matches(element.getAttribute(attr))
-        return element
-
-  # Then search in element contents.
-  for element in elements
-    if matches(element.textContent)
-      return element
-
-  return null
-
-parseHTML = (document, html) ->
-  parser = Cc['@mozilla.org/parserutils;1'].getService(Ci.nsIParserUtils)
-  flags = parser.SanitizerAllowStyle
-  return parser.parseFragment(html, flags, false, null,
-                              document.documentElement)
-
-escapeHTML = (s) ->
-  return s
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&apos;')
-
-createElement = (document, type, attributes = {}) ->
-  element = document.createElement(type)
-
+setAttributes = (element, attributes) ->
   for attribute, value of attributes
     element.setAttribute(attribute, value)
+  return
 
-  if document instanceof HTMLDocument
-    element.classList.add('VimFxReset')
-
-  return element
+insertText = (input, value) ->
+  { selectionStart, selectionEnd } = input
+  input.value =
+    input.value[0...selectionStart] + value + input.value[selectionEnd..]
+  input.selectionStart = input.selectionEnd = selectionStart + value.length
 
 isURL = (str) ->
   try
@@ -340,25 +242,9 @@ openTab = (rootWindow, url, options) ->
   rootWindow.TreeStyleTabService?.readyToOpenChildTab(gBrowser.selectedTab)
   gBrowser.loadOneTab(url, options)
 
-normalizedKey = (key) -> key.map(notation.normalize).join('')
-
-# Get hint characters, convert them to lower case, and filter duplicates.
-getHintChars = ->
-  hintChars = getPref('hint_chars')
-  # Make sure that hint chars contain at least two characters.
-  if not hintChars or hintChars.length < 2
-    hintChars = 'fj'
-
-  return removeDuplicateCharacters(hintChars)
-
 # Remove duplicate characters from string (case insensitive).
 removeDuplicateCharacters = (str) ->
   return removeDuplicates( str.toLowerCase().split('') ).join('')
-
-# Return URI to some file in the extension packaged as resource.
-getResourceURI = do ->
-  baseURI = Services.io.newURI(__SCRIPT_URI_SPEC__, null, null)
-  return (path) -> return Services.io.newURI(path, null, baseURI)
 
 # Escape a string to render it usable in regular expressions.
 regexpEscape = (s) -> s and s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')
@@ -376,46 +262,57 @@ formatError = (error) ->
     .join('\n')
   return "#{ error }\n#{ stack }"
 
-exports.Bucket                    = Bucket
-exports.EventEmitter              = EventEmitter
-exports.getEventWindow            = getEventWindow
-exports.getEventRootWindow        = getEventRootWindow
-exports.getEventCurrentTabWindow  = getEventCurrentTabWindow
-exports.getRootWindow             = getRootWindow
-exports.getCurrentTabWindow       = getCurrentTabWindow
+observe = (topic, observer) ->
+  observer = {observe: observer} if typeof observer == 'function'
+  Services.obs.addObserver(observer, topic, false)
+  module.onShutdown(->
+    Services.obs.removeObserver(observer, topic, false)
+  )
 
-exports.blurActiveElement         = blurActiveElement
-exports.isProperLink              = isProperLink
-exports.isTextInputElement        = isTextInputElement
-exports.isContentEditable         = isContentEditable
-exports.isActivatable             = isActivatable
-exports.isAdjustable              = isAdjustable
-exports.area                      = area
-exports.getSessionStore           = getSessionStore
+has = Function::call.bind(Object::hasOwnProperty)
 
-exports.loadCss                   = loadCss
+class Counter
+  constructor: ({start, step}) ->
+    @value = start ? 0
+    @step  = step  ? 1
+  tick: -> @value += @step
 
-exports.simulateClick             = simulateClick
-exports.isEventSimulated          = isEventSimulated
-exports.writeToClipboard          = writeToClipboard
-exports.timeIt                    = timeIt
+module.exports = {
+  Bucket
+  EventEmitter
+  getEventWindow
+  getEventRootWindow
+  getEventCurrentTabWindow
+  getRootWindow
+  getCurrentTabWindow
 
-exports.getMatchingBlacklistRules = getMatchingBlacklistRules
-exports.isBlacklisted             = isBlacklisted
-exports.getBlacklistedKeys        = getBlacklistedKeys
-exports.updateBlacklist           = updateBlacklist
-exports.splitListString           = splitListString
-exports.getBestPatternMatch       = getBestPatternMatch
+  blurActiveElement
+  isProperLink
+  isTextInputElement
+  isContentEditable
+  isActivatable
+  isAdjustable
+  area
+  getSessionStore
 
-exports.parseHTML                 = parseHTML
-exports.escapeHTML                = escapeHTML
-exports.createElement             = createElement
-exports.isURL                     = isURL
-exports.browserSearchSubmission   = browserSearchSubmission
-exports.openTab                   = openTab
-exports.normalizedKey             = normalizedKey
-exports.getHintChars              = getHintChars
-exports.removeDuplicates          = removeDuplicates
-exports.removeDuplicateCharacters = removeDuplicateCharacters
-exports.getResourceURI            = getResourceURI
-exports.formatError               = formatError
+  loadCss
+
+  simulateClick
+  isEventSimulated
+  writeToClipboard
+  timeIt
+
+  createBox
+  setAttributes
+  insertText
+  isURL
+  browserSearchSubmission
+  openTab
+  regexpEscape
+  removeDuplicates
+  removeDuplicateCharacters
+  formatError
+  observe
+  has
+  Counter
+}

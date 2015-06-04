@@ -1,5 +1,5 @@
 ###
-# Copyright Simon Lydell 2014.
+# Copyright Simon Lydell 2015.
 #
 # This file is part of VimFx.
 #
@@ -17,12 +17,24 @@
 # along with VimFx.  If not, see <http://www.gnu.org/licenses/>.
 ###
 
-utils = require('../lib/utils')
+EXPORTED_SYMBOLS = ['getAPI']
 
-{ classes: Cc, interfaces: Ci } = Components
+# Will be set by main.coffee. By passing the API in we make sure that all
+# consumers get an up-to-date version. It is also needed to be able to access
+# the global `VimFx` instance.
+api = null
 
-exports['test removeDuplicates'] = (assert) ->
-  assert.deepEqual(utils.removeDuplicates([1, 1, 2, 1, 3, 2]),
-                                          [1, 2, 3])
-  assert.deepEqual(utils.removeDuplicates(['a', 'b', 'c', 'b', 'd', 'a']),
-                                          ['a', 'b', 'c', 'd'])
+callbacks = []
+
+setAPI = (passed_api) ->
+  api = passed_api
+  callback(api) for callback in callbacks
+  callbacks.length = 0
+
+getAPI = (callback) ->
+  if api == null
+    # If this module is imported before main.coffee has set `api`, push the
+    # callback to the queue.
+    callbacks.push(callback)
+  else
+    callback(api)

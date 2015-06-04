@@ -1,0 +1,204 @@
+/*
+ * Copyright Simon Lydell 2015.
+ *
+ * This file is part of VimFx.
+ *
+ * VimFx is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * VimFx is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with VimFx.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/* Allow file:/// prefix for testing using `gulp help.html`. */
+@-moz-document url(chrome://browser/content/browser.xul), url-prefix(file:///)
+{
+
+/***** Button *****/
+
+#VimFxButton {
+    list-style-image: url(icon16.png);
+}
+
+#VimFxButton[cui-areatype="menu-panel"],
+toolbarpaletteitem[place="palette"] > #VimFxButton {
+    list-style-image: url(icon32.png);
+}
+
+@media (min-resolution: 2dppx) {
+  #VimFxButton {
+      list-style-image: url(icon32.png);
+  }
+
+  #VimFxButton[cui-areatype="menu-panel"],
+  toolbarpaletteitem[place="palette"] > #VimFxButton {
+      list-style-image: url(icon64.png);
+  }
+}
+
+#VimFxButton[vimfx-mode="insert"] {
+    filter: grayscale(100%);
+}
+
+
+
+/* All styles below are intentionally very generic to fit with the user’s system
+ * and preferences. */
+
+
+
+/***** Markers *****/
+
+#VimFxMarkersContainer {
+  position: absolute;
+}
+
+/* Marker styles should be kept simple for performance. */
+#VimFxMarkersContainer .marker {
+  position: absolute;
+  padding: 0.2em;
+  border: solid 1px #ad810c;
+  background-color: #ffd76e;
+  color: #302505;
+  line-height: 1;
+  font-family: sans-serif;
+  font-weight: bold;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+#VimFxMarkersContainer .marker-char {} /* Keep as documentation. */
+
+#VimFxMarkersContainer .marker--matched,
+#VimFxMarkersContainer .marker-char--matched {
+  color: #ffa22a;
+}
+
+#VimFxMarkersContainer .marker--hidden {
+  display: none;
+}
+
+
+
+/***** Help Dialog *****/
+
+#VimFxHelpDialogContainer {
+  position: absolute;
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  opacity: 0.92;
+  background-color: Window;
+  color: WindowText;
+  font-size: 1.6em;
+
+  --page-padding: 3em;
+  --gutter: 1em;
+  padding-top: calc(var(--page-padding) / 2);
+  padding-left: calc(var(--page-padding) - var(--gutter));
+  padding-right: var(--page-padding);
+}
+
+  #VimFxHelpDialogContainer * {
+    display: block;
+    -moz-user-select: text;
+  }
+
+  #VimFxHelpDialogContainer :-moz-any([class^="heading"], .key-sequence) {
+    font-weight: bold;
+  }
+
+
+#VimFxHelpDialogContainer .header {
+  position: relative;
+  margin-left: var(--gutter);
+  margin-bottom: calc(var(--page-padding) / 4);
+}
+
+  #VimFxHelpDialogContainer .heading-main {
+    font-size: 4.2em;
+    /* Add space for the close button. */
+    margin-right: 0.4em;
+  }
+
+    #VimFxHelpDialogContainer .name {
+      display: inline;
+      margin-left: -0.45ch;
+      margin-right: 0.5ch;
+    }
+
+    #VimFxHelpDialogContainer .title {
+      display: inline;
+      font-size: 1.4ex;
+      line-height: 1.2;
+    }
+
+  #VimFxHelpDialogContainer .close-button {
+    position: absolute;
+    right: 0;
+    top: 0;
+    font-size: 3em;
+    -moz-user-select: none;
+  }
+
+    #VimFxHelpDialogContainer .close-button:hover {
+      cursor: pointer;
+    }
+
+#VimFxHelpDialogContainer .content {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+  #VimFxHelpDialogContainer .category {
+    flex: 1 16em;
+    margin-left: var(--gutter);
+    margin-bottom: calc(var(--page-padding) / 2);
+  }
+
+  #VimFxHelpDialogContainer .heading-mode,
+  #VimFxHelpDialogContainer .category:not(.first)::before {
+    font-size: 2em;
+  }
+
+  #VimFxHelpDialogContainer .category:not(.first)::before {
+    /* Insert newline the same size as a `.heading-mode` to vertically align all
+     * `.heading-category`s. */
+    content: "\A";
+    white-space: pre;
+  }
+
+  #VimFxHelpDialogContainer .heading-category {
+    font-size: 1.5em;
+  }
+
+  #VimFxHelpDialogContainer .command {
+    float: left;
+    clear: left;
+    width: 100%;
+    margin-top: 0.2em;
+  }
+
+    #VimFxHelpDialogContainer .key-sequence {
+      float: left;
+      margin-right: 1.7ch;
+    }
+
+      #VimFxHelpDialogContainer .key-sequence:last-of-type {
+        margin-right: 0.7ch;
+      }
+
+    #VimFxHelpDialogContainer .description {
+      float: right;
+      /* The space to the left should be wide enough to fit `<c-w>`. */
+      width: calc(100% - 3.5em);
+    }
+
+}
