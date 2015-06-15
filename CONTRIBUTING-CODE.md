@@ -167,7 +167,7 @@ Before making a release, it might be wise to:
 
 1. Add a list of changes since the last version at the top of CHANGELOG.md.
 2. Update the version in package.json (see above about versioning), and, if
-   needed, the min and max Firefox versions.
+   needed, the minimum Firefox version.
 3. Run `gulp release`, which does the following for you:
   - Adds a heading with the new version number and today’s date at the top of
     CHANGELOG.md.
