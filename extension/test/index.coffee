@@ -17,9 +17,12 @@
 # along with VimFx.  If not, see <http://www.gnu.org/licenses/>.
 ###
 
-list = require('./tests-list')
+list  = require('./tests-list')
+utils = require('../lib/utils')
 
-Components.utils.import('resource://specialpowers/Assert.jsm')
+{ utils: Cu } = Components
+
+Cu.import('resource://specialpowers/Assert.jsm')
 assert = new Assert()
 
 module.exports = ->
@@ -32,12 +35,13 @@ module.exports = ->
     report.push(name)
     for key, fn of tests when key.startsWith('test')
       total++
+      error = null
       try
         fn(assert)
         passed++
       catch error
-      report.push("  #{ if error then '\u2718' else '\u2714' } #{ key }")
-      report.push(error.toString().replace(/^/gm, '  ')) if error
+      report.push("  #{ if error then '✘' else '✔' } #{ key }")
+      report.push(utils.formatError(error).replace(/^/gm, '    ')) if error
 
   report.push("#{ passed }/#{ total } tests passed.")
   console.log("\n#{ report.join('\n') }")

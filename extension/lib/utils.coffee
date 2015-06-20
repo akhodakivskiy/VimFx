@@ -368,6 +368,14 @@ removeDuplicates = (array) ->
   return `[...new Set(array)]`
   # coffeelint: enable=no_backticks
 
+formatError = (error) ->
+  stack = String(error.stack?.formattedStack ? error.stack ? '')
+    .split('\n')
+    .filter((line) -> line.contains('.xpi!'))
+    .map((line) -> '  ' + line.replace(/(?:\/<)*@.+\.xpi!/g, '@'))
+    .join('\n')
+  return "#{ error }\n#{ stack }"
+
 exports.Bucket                    = Bucket
 exports.EventEmitter              = EventEmitter
 exports.getEventWindow            = getEventWindow
@@ -410,3 +418,4 @@ exports.getHintChars              = getHintChars
 exports.removeDuplicates          = removeDuplicates
 exports.removeDuplicateCharacters = removeDuplicateCharacters
 exports.getResourceURI            = getResourceURI
+exports.formatError               = formatError

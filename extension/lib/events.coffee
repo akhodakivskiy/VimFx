@@ -118,7 +118,7 @@ windowsListeners =
       suppressEvent(event) if suppress
 
     catch error
-      console.error("#{ error }\n#{ error.stack?.replace(/@.+-> /g, '@') }")
+      console.error(utils.formatError(error))
 
   # Note that the below event listeners can suppress the event even in
   # blacklisted sites. That's intentional. For example, if you press 'x' to
