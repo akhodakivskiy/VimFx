@@ -4,4 +4,6 @@
   Provide an example **URL** where it happens. Also, **did it use to work before?**
 - Feature requests: Include a specific detailed **use case** example.
 
-Contributing code? See [CONTRIBUTING-CODE.md](CONTRIBUTING-CODE.md).
+Contributing code? See [documentation/CONTRIBUTING-CODE.md][code-contrib]
+
+[code-contrib]: documentation/CONTRIBUTING-CODE.md
