@@ -1,0 +1,26 @@
+The source code is available at https://github.com/akhodakivskiy/VimFx.
+The source code is licensed as follows:
+
+All `.coffee` files are licensed with GPL-3.0+. That’s also explicitly noted at
+the top of each file. A copy of the license is included in the file `COPYING`.
+
+All `.tmpl`, `.xul` and `.json` files are in the public domain. So are all `.md`
+files, except the ones in the `documentation/` directory.
+
+All files in the `documentation/` directory are licensed with GFDL-1.3+.
+That’s also explicitly noted at the top of each file. A copy of the license is
+included in the file `documentation/GNU Free Documentation License`.
+
+All files in the `extension/locale/` directory and its subdirectories are in the
+public domain. Translators are credited in `PEOPLE.md` and the “About” dialog of
+the extension.
+
+All images are copyrighted by Heidi Xu 2013. They may be distributed as part of
+this extension.
+
+VimFx has a few dependencies, listed in `package.json`. They can be downloaded
+into the `node_modules/` directory by running `npm install`. Each of them have
+their own license and instructions on where to get their source code.
+
+Instructions on how to build VimFx from source are available in the
+`documentation/tools.md` file.
