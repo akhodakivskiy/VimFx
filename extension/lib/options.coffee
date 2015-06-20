@@ -94,8 +94,8 @@ class Observer extends BaseObserver
   injectInstructions: ->
     @appendSetting({
       type:        'control'
-      title:       translate('prefs_instructions_title')
-      desc:        translate('prefs_instructions_desc',
+      title:       translate('prefs.instructions.title')
+      desc:        translate('prefs.instructions.desc',
                      @vimfx.options['options.key.quote'],
                      @vimfx.options['options.key.insert_default'],
                      @vimfx.options['options.key.reset_default'],
@@ -108,8 +108,8 @@ class Observer extends BaseObserver
       setting = @appendSetting({
         pref:  "#{ defaults.BRANCH }#{ key }"
         type:  @type(value)
-        title: translate("pref_#{ key }_title")
-        desc:  translate("pref_#{ key }_desc")
+        title: translate("pref.#{ key }.title")
+        desc:  translate("pref.#{ key }.desc")
       })
     return
 
@@ -143,7 +143,7 @@ class Observer extends BaseObserver
   generateErrorMessage: (pref) ->
     commandErrors = @vimfx.errors[pref] ? []
     return commandErrors.map(({ id, context, subject }) ->
-      return translate("error_#{ id }", context ? subject, subject)
+      return translate("error.#{ id }", context ? subject, subject)
     ).join('\n')
 
   setupKeybindings: ->
