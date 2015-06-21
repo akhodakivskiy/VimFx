@@ -92,7 +92,7 @@ class Observer extends BaseObserver
     @setupValidation()
 
   injectInstructions: ->
-    @appendSetting({
+    setting = @appendSetting({
       type:        'control'
       title:       translate('prefs.instructions.title')
       desc:        translate('prefs.instructions.desc',
@@ -102,6 +102,15 @@ class Observer extends BaseObserver
                      '<c-z>')
       'first-row': 'true'
     })
+    href = "#{ @vimfx.info.homepageURL }/tree/master/documentation"
+    docsLink = @document.createElement('label')
+    utils.setAttributes(docsLink, {
+      value: translate('prefs.documentation')
+      href
+      crop:  'end'
+      class: 'text-link'
+    })
+    setting.appendChild(docsLink)
 
   injectOptions: ->
     for key, value of defaults.options

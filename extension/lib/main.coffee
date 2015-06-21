@@ -33,6 +33,8 @@ test                  = try require('../test/index')
 
 { utils: Cu } = Components
 
+Cu.import('resource://gre/modules/AddonManager.jsm')
+
 module.exports = (data, reason) ->
   parsedOptions = {}
   for pref of defaults.all_options
@@ -40,6 +42,7 @@ module.exports = (data, reason) ->
   vimfx = new VimFx(modes, parsedOptions)
   vimfx.id      = data.id
   vimfx.version = data.version
+  AddonManager.getAddonByID(vimfx.id, (info) -> vimfx.info = info)
 
   # Setup the public API. The URL is encoded (which means that there will be
   # only ASCII characters) so that the pref can be read using a simple
