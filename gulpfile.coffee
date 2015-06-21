@@ -54,7 +54,7 @@ gulp.task('clean', (callback) ->
 )
 
 gulp.task('copy', ->
-  gulp.src(['extension/**/!(*.coffee|*.tmpl)', 'COPYING'])
+  gulp.src(['extension/**/!(*.coffee|*.tmpl)', 'COPYING', 'LICENSE'])
     .pipe(gulp.dest(DEST))
 )
 
