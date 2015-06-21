@@ -38,7 +38,7 @@ class Vim
     else
       @enterMode('normal') if force or @mode == 'insert'
 
-    @parent.emit('DOMContentLoaded', {vim: this, location: @window.location})
+    @parent.emit('load', {vim: this, location: @window.location})
 
   isBlacklisted: ->
     url = @rootWindow.gBrowser.currentURI.spec

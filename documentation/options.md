@@ -6,6 +6,15 @@ See the file README.md for copying conditions.
 
 # Options
 
+VimFx has many options that can be configured, but they all have nice defaults
+so you shouldn’t need to.
+
+You might also be interested [styling] VimFx and writing a [config file].
+
+[styling]: styling.md
+[config file]: config-file.md
+
+
 ## Regular options
 
 These options are available in VimFx’s settings page in the Add-ons Manager.
