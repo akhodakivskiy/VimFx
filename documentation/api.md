@@ -216,20 +216,20 @@ A mode is an object with the follwing properties:
 
 The `on*` methods are called with an object with the following properties:
 
-- `vim`: An object with state for the current tab. Note: This property is
+- vim: An object with state for the current tab. Note: This property is
   subject to change. For now, have a look at the [vim.coffee].
-- `storage`: An object unique to the `vim` instance and to the current mode.
+- storage: An object unique to the `vim` instance and to the current mode.
   Allows to share things between commands of the same mode.
 
 The object passed to `onEnter` also has the following properties:
 
-- `args`: `Array`. An array of extra arguments passed when entering the mode.
+- args: `Array`. An array of extra arguments passed when entering the mode.
 
 The object passed to `onInput` also has the following properties:
 
-- `event`: The `keydown` event that activated the command. Note: This property
+- event: The `keydown` event that activated the command. Note: This property
   is subject to change.
-- `count`: `match.count`. `match` is defined below.
+- count: `match.count`. `match` is defined below.
 
 It also receives a `match` as the second argument. A `match` has the following
 properties:
@@ -243,7 +243,7 @@ properties:
   - `'none'`: The current keypress is not part of a command shortcut and does
     not contribute to a count.
 
-- `command`: `null` unless `type` is `'full'`. Then it is the matched command.
+- command: `null` unless `type` is `'full'`. Then it is the matched command.
 
   This command should usually be run at this point. It is suitable to pass on
   the object passed to `onInput` to the command. Some modes might choose to add
@@ -253,12 +253,12 @@ properties:
 
   Usually the return value of the command isn’t used, but that’s up to the mode.
 
-- `count`: `Number`. The count for the command. `undefined` if no count.
+- count: `Number`. The count for the command. `undefined` if no count.
 
-- `force`: `Boolean`. Indicates if the current key sequence started with
+- force: `Boolean`. Indicates if the current key sequence started with
   `<force>`.
 
-- `keyStr`: `String`. The current keypress represented as a string.
+- keyStr: `String`. The current keypress represented as a string.
 
 `onInput` should return `true` if the current keypress should not be passed on
 to the browser and web pages, or `false` otherwise.
