@@ -15,6 +15,7 @@ License"](GNU%20Free%20Documentation%20License).
 - [Commands](commands.md)
 - [Styling](styling.md)
 - [Handy standard Firefox features](handy-standard-firefox-features.md)
+- [Questions & Answers](questions-and-answers.md)
 - [Configuration file](config-file.md)
 - [Public API](api.md)
 - [Contributing code](CONTRIBUTING-CODE.md)
