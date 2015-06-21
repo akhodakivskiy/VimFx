@@ -22,7 +22,9 @@ These options are available in VimFx’s settings page in the Add-ons Manager.
 ### Hint chars
 
 The characters used for the hints in Hints mode, which can be entered using one
-of the many `f` commands.
+of the many `f` commands. See also [The `f` commands].
+
+[The `f` commands]: commands.md#the-f-commands-1
 
 ### Previous/Next page patterns
 
