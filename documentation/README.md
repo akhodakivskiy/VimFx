@@ -7,9 +7,14 @@ under the terms of the GNU Free Documentation License, Version 1.3
 or any later version published by the Free Software Foundation;
 with no Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.
 A copy of the license is included in the file ["GNU Free Documentation
-License"][license].
+License"](GNU%20Free%20Documentation%20License).
 
-This documentation is split into several section, each in its own file. You can
-read them in any order.
+## Contents
 
-[license]: GNU%20Free%20Documentation%20License
+- [Options](options.md)
+- [Commands](commands.md)
+- [Styling](styling.md)
+- [Configuration file](config-file.md)
+- [Public API](api.md)
+- [Contributing code](CONTRIBUTING-CODE.md)
+- [Tools](tools.md)
