@@ -12,8 +12,6 @@ it will be easy to get started with VimFx.
 
 **Mailing list:** [vimfx@librelist.com] (just send an email to subscribe)
 
-Read [CONTRIBUTING.md] before opening issues and pull requests.
-
 VimFx is made by [these awesome people][people].
 
 [VimFx]: https://addons.mozilla.org/firefox/addon/vimfx
@@ -22,7 +20,6 @@ VimFx is made by [these awesome people][people].
 [Vimium]: http://vimium.github.io/
 [Google Chrome]: https://www.google.com/chrome
 [vimfx@librelist.com]: mailto:vimfx@librelist.com?subject=Subscribe
-[CONTRIBUTING.md]: https://github.com/akhodakivskiy/VimFx/blob/develop/CONTRIBUTING.md
 [people]: https://github.com/akhodakivskiy/VimFx/blob/develop/PEOPLE.md
 
 ## Why VimFx was created
@@ -72,5 +69,8 @@ Enjoying VimFx? [Write a review][review]!
 
 Found a bug? Report it in the [issue tracker]!
 
+Read the [contribution tips] before opening issues and pull requests.
+
 [review]: https://addons.mozilla.org/firefox/addon/vimfx/reviews/add
 [issue tracker]: https://github.com/akhodakivskiy/VimFx/issues
+[contribution tips]: https://github.com/akhodakivskiy/VimFx/blob/develop/CONTRIBUTING.md
