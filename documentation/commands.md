@@ -178,3 +178,16 @@ accept a count itself.
 The `vf` and `yf` commands do not accept counts.
 
 [hint chars]: options.md#hint-chars
+
+
+## Ex commands
+
+vim has something called “ex” commands. Want something similar in VimFx? True to
+its spirit, VimFx embraces a standard Firefox feature for this purpose: The
+[Developer Toolbar]. That link also includes instructions on how to extend it
+with your own commands.
+
+In the future VimFx might even ship with a few extra “ex” commands by default.
+We’re open for suggestions!
+
+[Developer Toolbar]: https://developer.mozilla.org/en-US/docs/Tools/GCLI
