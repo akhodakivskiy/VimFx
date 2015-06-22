@@ -151,7 +151,7 @@ exports['test addCommand order'] = (assert, passed_vimfx) -> getAPI((vimfx) ->
     name:        'test_command'
     description: 'Test command'
     order:       0
-  }, ->)
+  }, Function.prototype)
   vimfx.set('custom.mode.normal.test_command', 'ö')
 
   modes = passed_vimfx.getGroupedCommands()
