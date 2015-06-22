@@ -18,6 +18,7 @@ Anton Khodakivskiy
 - pluser (ja)
 - HJTP (nl)
 - Grzegorz Niewisiewicz (pl)
+- Átila Camurça Alves (pt-BR)
 - Anton Khodakivskiy (ru)
 - Nicholas Guriev (ru)
 - Zakhar Pilipchuk (ru)
