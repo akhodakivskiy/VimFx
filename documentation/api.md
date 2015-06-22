@@ -243,6 +243,22 @@ properties:
   - `'none'`: The current keypress is not part of a command shortcut and does
     not contribute to a count.
 
+- focus: `String` or `null`. The type of currently focused element (_element_)
+  plus current pressed key (_key_) combo. You might not want to run commands and
+  suppress the event if this value is anything other than null. It has one of
+  the following values:
+
+  - `'editable'`: element: a text input or a `contenteditable` element.
+    key: anything.
+  - `'activatable'`: element: an “activatable” element (link or button).
+    key: see the [`activatable_element_keys`] option.
+  - `'adjustable'`: element: an “adjustable” element (form control or video
+    player). key: see the [`adjustable_element_keys`] option.
+  - `'other'`: element: some other kind of element that can receive keystrokes,
+    for example an element in fullscreen mode. key: anything.
+  - `null`: the currently focused element does not appear to respond to
+    keystrokes in any special way.
+
 - command: `null` unless `type` is `'full'`. Then it is the matched command.
 
   This command should usually be run at this point. It is suitable to pass on
@@ -312,6 +328,8 @@ vimfx.refresh()
 
 Have a look at [modes.coffee] and [commands.coffee] for more information.
 
+[`activatable_element_keys`]: options.md#activatable_element_keys
+[`adjustable_element_keys`]: options.md#adjustable_element_keys
 [vim.coffee]: ../extension/lib/vim.coffee
 [modes.coffee]: ../extension/lib/modes.coffee
 [commands.coffee]: ../extension/lib/commands.coffee

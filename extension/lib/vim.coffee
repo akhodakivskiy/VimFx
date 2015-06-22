@@ -59,7 +59,7 @@ class Vim
     @parent.emit('modeChange', this)
 
   onInput: (event) ->
-    match = @parent.consumeKeyEvent(event, @mode)
+    match = @parent.consumeKeyEvent(event, this)
     return false unless match
     suppress = @call('onInput', {event, count: match.count}, match)
     return suppress

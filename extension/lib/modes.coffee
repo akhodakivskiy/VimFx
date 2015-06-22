@@ -57,21 +57,10 @@ mode('normal', {
 
   onInput: (args, match) ->
     { vim, storage, event } = args
-    target = event.originalTarget
-    document = target.ownerDocument
 
-    { activatable_element_keys, adjustable_element_keys } = vim.parent.options
-    autoInsertMode = \
-      utils.isTextInputElement(target) or
-      utils.isContentEditable(target) or
-      (utils.isActivatable(target) and
-       match.keyStr in activatable_element_keys) or
-      (utils.isAdjustable(target) and
-       match.keyStr in adjustable_element_keys) or
-      vim.rootWindow.TabView.isVisible() or
-      document.fullscreenElement or document.mozFullScreenElement
-
-    return false if match.type == 'none' or (autoInsertMode and not match.force)
+    autoInsertMode = (match.focus != null)
+    if match.type == 'none' or (autoInsertMode and not match.force)
+      return false
 
     match.command.run(args) if match.type == 'full'
 
@@ -91,6 +80,7 @@ mode('normal', {
     # - It may only be suppressed in web pages, not in browser chrome. That
     #   allows for reseting the location bar when blurring it, and closing
     #   dialogs such as the “bookmark this page” dialog (<c-d>).
+    document = event.originalTarget.ownerDocument
     inBrowserChrome = (document instanceof XULDocument)
     if match.keyStr == '<escape>' and (not autoInsertMode or inBrowserChrome)
       return false

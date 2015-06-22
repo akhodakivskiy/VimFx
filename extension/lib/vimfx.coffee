@@ -56,7 +56,8 @@ class VimFx extends utils.EventEmitter
       translations: @options.translations
     })
 
-  consumeKeyEvent: (event, mode) ->
+  consumeKeyEvent: (event, vim) ->
+    { mode } = vim
     return unless keyStr = @stringifyKeyEvent(event)
 
     now = Date.now()
@@ -93,8 +94,30 @@ class VimFx extends utils.EventEmitter
 
     count = if @count == '' then undefined else Number(@count)
     force = if command then (command.pref of @forceCommands) else false
+    focus = @getFocusType(vim, event, keyStr)
     @reset(mode) if type == 'full'
-    return {type, command, count, force, keyStr}
+    return {type, focus, command, count, force, keyStr }
+
+  getFocusType: (vim, event, keyStr) ->
+    target   = event.originalTarget
+    document = target.ownerDocument
+
+    { activatable_element_keys, adjustable_element_keys } = @options
+    return switch
+      when utils.isTextInputElement(target) or
+           utils.isContentEditable(target)
+        'editable'
+      when (utils.isActivatable(target) and
+            keyStr in activatable_element_keys)
+        'activatable'
+      when (utils.isAdjustable(target) and
+            keyStr in adjustable_element_keys)
+        'adjustable'
+      when vim.rootWindow.TabView.isVisible() or
+           document.fullscreenElement or document.mozFullScreenElement
+        'other'
+      else
+        null
 
   getGroupedCommands: (options = {}) ->
     modes = {}
