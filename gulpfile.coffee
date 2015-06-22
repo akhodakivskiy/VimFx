@@ -263,7 +263,7 @@ helpHTMLPrelude = '''
     * { margin: 0; }
     html { font-size: 10px; }
   </style>
-  <link rel=stylesheet href=extension/resources/style.css>
+  <link rel=stylesheet href=extension/skin/style.css>
 '''
 
 generateHelpHTML = (dumpedHTML) ->
