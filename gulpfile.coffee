@@ -270,3 +270,4 @@ generateHelpHTML = (dumpedHTML) ->
   return helpHTMLPrelude + dumpedHTML
     .replace(/^<\w+ xmlns="[^"]+"/, '<div')
     .replace(/\w+>$/, 'div>')
+    .replace(/<(\w+)([^>]*)\/>/g, '<$1$2></$1>')

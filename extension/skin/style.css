@@ -128,11 +128,27 @@ toolbarpaletteitem[place="palette"] > #VimFxButton {
     margin-right: 0.4em;
   }
 
-    #VimFxHelpDialogContainer .name {
+    #VimFxHelpDialogContainer .logo {
       display: inline;
-      margin-left: -0.45ch;
       margin-right: 0.5ch;
+      color: #349938;
+      font-style: italic;
+      letter-spacing: -0.06em;
+      text-shadow: 0.04em 0.02em black;
     }
+
+      #VimFxHelpDialogContainer .logo::before {
+        content: 'ım';
+        margin-left: -0.15em;
+        padding-left: 0.9em;
+        background: url(icon128.png) no-repeat;
+        background-size: contain;
+      }
+
+      #VimFxHelpDialogContainer .logo::after {
+         content: 'Fx';
+         color: #d37826;
+      }
 
     #VimFxHelpDialogContainer .title {
       display: inline;

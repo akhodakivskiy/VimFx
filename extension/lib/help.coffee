@@ -65,7 +65,7 @@ createHeader = (document, vimfx) ->
   header = $('header')
 
   mainHeading = $('heading-main', header)
-  $('name',  mainHeading, 'VimFx')
+  $('logo',  mainHeading) # Content is added by CSS.
   $('title', mainHeading, translate('help.title'))
 
   closeButton = $('close-button', header, '×')
