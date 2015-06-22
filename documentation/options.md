@@ -137,6 +137,10 @@ you dislike that, disable this option.
 If `prevent_autofocus` is enabled, all focus events except those that occur
 within this number of milliseconds after a user interaction are suppressed.
 
+### `prevent_autofocus_modes`
+
+Space separated list of modes where `prevent_autofocus` should be used.
+
 ### `hints_timeout`
 
 The number of milliseconds a matched hint marker should stay on screen before

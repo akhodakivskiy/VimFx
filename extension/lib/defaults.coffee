@@ -124,6 +124,7 @@ options =
 advanced_options =
   'prevent_target_blank':               true
   'autofocus_limit':                    100
+  'prevent_autofocus_modes':            'normal'
   'hints_timeout':                      200
   'smoothScroll.lines.spring-constant': '1000'
   'smoothScroll.pages.spring-constant': '2500'

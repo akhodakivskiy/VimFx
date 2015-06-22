@@ -84,6 +84,8 @@ parsers =
     )
     return result
 
+  prevent_autofocus_modes:  parseSpaceDelimitedString
+
   adjustable_element_keys:  parseSpaceDelimitedString
   activatable_element_keys: parseSpaceDelimitedString
 
