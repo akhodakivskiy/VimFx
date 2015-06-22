@@ -261,7 +261,6 @@ helpHTMLPrelude = '''
   <title>VimFx help</title>
   <style>
     * { margin: 0; }
-    html { font-size: 10px; }
   </style>
   <link rel=stylesheet href=extension/skin/style.css>
 '''

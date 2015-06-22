@@ -67,8 +67,8 @@ toolbarpaletteitem[place="palette"] > #VimFxButton {
   border: solid 1px #ad810c;
   background-color: #ffd76e;
   color: #302505;
+  font: menu;
   line-height: 1;
-  font-family: sans-serif;
   font-weight: bold;
   text-transform: uppercase;
   white-space: nowrap;
@@ -97,6 +97,7 @@ toolbarpaletteitem[place="palette"] > #VimFxButton {
   opacity: 0.92;
   background-color: Window;
   color: WindowText;
+  font: menu;
   font-size: 1.6em;
 
   --page-padding: 3em;
