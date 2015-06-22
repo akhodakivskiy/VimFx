@@ -98,7 +98,6 @@ toolbarpaletteitem[place="palette"] > #VimFxButton {
   background-color: Window;
   color: WindowText;
   font: menu;
-  font-size: 1.6em;
 
   --page-padding: 3em;
   --gutter: 1em;

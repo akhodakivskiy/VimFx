@@ -20,7 +20,8 @@
 translate = require('./l10n')
 utils     = require('./utils')
 
-CONTAINER_ID = 'VimFxHelpDialogContainer'
+CONTAINER_ID  = 'VimFxHelpDialogContainer'
+MAX_FONT_SIZE = 20
 
 injectHelp = (rootWindow, vimfx) ->
   removeHelp(rootWindow)
@@ -30,13 +31,27 @@ injectHelp = (rootWindow, vimfx) ->
   container = document.createElement('box')
   container.id = CONTAINER_ID
 
+  wrapper = document.createElement('box')
+  container.appendChild(wrapper)
+
   header = createHeader(document, vimfx)
-  container.appendChild(header)
+  wrapper.appendChild(header)
 
   content = createContent(document, vimfx)
-  container.appendChild(content)
+  wrapper.appendChild(content)
 
   rootWindow.gBrowser.mCurrentBrowser.parentNode.appendChild(container)
+
+  # The font size of menu items is used by default, which is usually quite
+  # small. Try to increase it without causing a scrollbar.
+  computedStyle = rootWindow.getComputedStyle(container)
+  fontSize = originalFontSize =
+    parseFloat(computedStyle.getPropertyValue('font-size'))
+  while wrapper.clientHeight < container.clientHeight and
+        fontSize <= MAX_FONT_SIZE
+    fontSize++
+    container.style.fontSize = "#{ fontSize }px"
+  container.style.fontSize = "#{ Math.max(fontSize - 1, originalFontSize) }px"
 
   # Uncomment this line if you want to use `gulp help.html`!
   # utils.writeToClipboard(container.outerHTML)
