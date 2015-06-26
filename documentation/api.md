@@ -276,6 +276,10 @@ properties:
 
 - keyStr: `String`. The current keypress represented as a string.
 
+- toplevel: `Boolean`. Whether or not the match was a toplevel match in the
+  shortcut key tree. This is `true` unless the match is part of the tail of a
+  multi-key shortcut.
+
 `onInput` should return `true` if the current keypress should not be passed on
 to the browser and web pages, or `false` otherwise.
 
