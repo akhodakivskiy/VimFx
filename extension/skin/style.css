@@ -140,7 +140,7 @@ toolbarpaletteitem[place="palette"] > #VimFxButton {
       #VimFxHelpDialogContainer .logo::before {
         content: 'ım';
         margin-left: -0.15em;
-        padding-left: 0.9em;
+        padding-left: 1.34ch;
         background: url(icon128.png) no-repeat;
         background-size: contain;
       }
