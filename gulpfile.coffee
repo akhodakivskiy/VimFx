@@ -195,9 +195,18 @@ gulp.task('sync-locales', ->
   baseLocale = 'en-US'
   for arg in process.argv when arg[...2] == '--'
     baseLocale = arg[2..]
-  fs.readdirSync(join(LOCALE, baseLocale))
+  results = fs.readdirSync(join(LOCALE, baseLocale))
     .filter((file) -> path.extname(file) == '.properties')
     .map(syncLocale.bind(null, baseLocale))
+  if baseLocale == 'en-US'
+    report = []
+    for {fileName, translatedCount, total} in results
+      report.push("#{ fileName }:")
+      for localeName, count of translatedCount
+        paddedName = "#{ localeName }:   "[...6]
+        percentage = Math.round((count / total) * 100)
+        report.push("  #{ paddedName } #{ percentage }%")
+    process.stdout.write(report.join('\n') + '\n')
 )
 
 syncLocale = (baseLocaleName, fileName) ->
@@ -206,9 +215,11 @@ syncLocale = (baseLocaleName, fileName) ->
   oldBasePath = "#{basePath}.old"
   if fs.existsSync(oldBasePath)
     oldBase = parseLocaleFile(read(oldBasePath))
+  translatedCount = {}
   for localeName in fs.readdirSync(LOCALE) when localeName != baseLocaleName
     localePath = join(LOCALE, localeName, fileName)
     locale = parseLocaleFile(read(localePath))
+    translatedCount[localeName] = 0
     newLocale = base.template.map((line) ->
       if Array.isArray(line)
         [ key ] = line
@@ -219,12 +230,13 @@ syncLocale = (baseLocaleName, fileName) ->
             base.keys[key]
           else
             locale.keys[key]
+        translatedCount[localeName]++ if value != base.keys[key] or value == ''
         return "#{ key }=#{ value }"
       else
         return line
     )
     fs.writeFileSync(localePath, newLocale.join(base.newline))
-  return
+  return {fileName, translatedCount, total: Object.keys(base.keys).length}
 
 parseLocaleFile = (fileContents) ->
   keys  = {}
