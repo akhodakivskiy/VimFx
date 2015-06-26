@@ -188,7 +188,7 @@ be used to replace the blacklist option).
 ```js
 vimfx.on('load', ({vim, location}) => {
   if (location.hostname === 'example.com') {
-    vim.enterMode('insert')
+    vim.enterMode('ignore')
   }
 })
 ```

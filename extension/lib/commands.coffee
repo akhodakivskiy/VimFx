@@ -552,12 +552,12 @@ commands.find_previous = helper_find_again.bind(null, true)
 
 
 
-commands.enter_mode_insert = ({ vim }) ->
-  vim.enterMode('insert')
+commands.enter_mode_ignore = ({ vim }) ->
+  vim.enterMode('ignore')
 
 # Quote next keypress (pass it through to the page).
 commands.quote = ({ vim, count }) ->
-  vim.enterMode('insert', count ? 1)
+  vim.enterMode('ignore', count ? 1)
 
 # Display the Help Dialog.
 commands.help = ({ vim }) ->

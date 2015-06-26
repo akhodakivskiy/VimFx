@@ -34,9 +34,9 @@ class Vim
       lastFocusedTextInput: null
 
     if @isBlacklisted()
-      @enterMode('insert')
+      @enterMode('ignore')
     else
-      @enterMode('normal') if force or @mode == 'insert'
+      @enterMode('normal') if force or @mode == 'ignore'
 
     @parent.emit('load', {vim: this, location: @window.location})
 

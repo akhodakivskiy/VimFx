@@ -182,7 +182,7 @@ mode('hints', {
 
 
 
-mode('insert', {
+mode('ignore', {
   onEnter: ({ vim, storage, args: [ count ] }) ->
     storage.count = count ? null
 

@@ -87,7 +87,7 @@ shortcuts =
       'N':         'find_previous'
 
     'misc':
-      'i':         'enter_mode_insert'
+      'i':         'enter_mode_ignore'
       'I':         'quote'
       '?':         'help'
       ':':         'dev'
@@ -100,7 +100,7 @@ shortcuts =
       '<s-space>':       'rotate_markers_backward'
       '<backspace>':     'delete_hint_char'
 
-  'insert':
+  'ignore':
     '':
       '<s-escape>':      'exit'
 

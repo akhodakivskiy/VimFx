@@ -83,13 +83,13 @@ migrations[0] = ->
     'find_hl':     'normal.find_highlight_all'
     'find_next':   'normal.find_next'
     'find_prev':   'normal.find_previous'
-    'insert_mode': 'normal.enter_mode_insert'
+    'insert_mode': 'normal.enter_mode_ignore'
     'quote':       'normal.quote'
     'help':        'normal.help'
     'dev':         'normal.dev'
     'Esc':         'normal.esc'
 
-    'mode_insert_exit': 'insert.exit'
+    'mode_insert_exit': 'ignore.exit'
 
     'mode_hints_exit':                    'hints.exit'
     'mode_hints_rotate_markers_forward':  'hints.rotate_markers_forward'

@@ -43,7 +43,7 @@ toolbarpaletteitem[place="palette"] > #VimFxButton {
   }
 }
 
-#VimFxButton[vimfx-mode="insert"] {
+#VimFxButton[vimfx-mode="ignore"] {
     filter: grayscale(100%);
 }
 

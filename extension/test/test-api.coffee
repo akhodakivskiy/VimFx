@@ -71,11 +71,11 @@ exports['test customization'] = (assert, passed_vimfx) -> getAPI((vimfx) ->
   }
   vimfx.addCommand({
     name:        'test_command'
-    description: 'Test insert mode command'
-    mode:        'insert'
+    description: 'Test ignore mode command'
+    mode:        'ignore'
     category:    'new_category'
   }, -> nonce)
-  vimfx.set('custom.mode.insert.test_command', 'ö  <ö>  <c-c-invalid>')
+  vimfx.set('custom.mode.ignore.test_command', 'ö  <ö>  <c-c-invalid>')
 
   # Test that the new simple command can be run.
   passed_vimfx.reset('normal')
@@ -84,8 +84,8 @@ exports['test customization'] = (assert, passed_vimfx) -> getAPI((vimfx) ->
   assert.equal(match.command.run(), nonce)
 
   # Test that the new complex command can be run.
-  passed_vimfx.reset('insert')
-  match = passed_vimfx.consumeKeyEvent(event, 'insert')
+  passed_vimfx.reset('ignore')
+  match = passed_vimfx.consumeKeyEvent(event, 'ignore')
   assert.equal(match.type, 'full')
   assert.equal(match.command.run(), nonce)
 
@@ -100,16 +100,16 @@ exports['test customization'] = (assert, passed_vimfx) -> getAPI((vimfx) ->
   assert.equal(test_command.description(), 'Test command')
 
   # Test that the new complex command can show up in the help dialog.
-  mode_insert = modes.find((mode) -> mode._name == 'insert')
-  [ category_new ] = mode_insert.categories
+  mode_ignore = modes.find((mode) -> mode._name == 'ignore')
+  [ category_new ] = mode_ignore.categories
   assert.equal(category_new.name, 'New category')
   [ test_command ] = category_new.commands
-  assert.equal(test_command.command.description(), 'Test insert mode command')
+  assert.equal(test_command.command.description(), 'Test ignore mode command')
   assert.deepEqual(test_command.enabledSequences, ['<ö>'])
 
   # Remove the added commands.
   delete vimfx.modes.normal.commands.test_command
-  delete vimfx.modes.insert.commands.test_command
+  delete vimfx.modes.ignore.commands.test_command
   vimfx.refresh()
 
   # Test that the new simple command cannot be run.
@@ -120,8 +120,8 @@ exports['test customization'] = (assert, passed_vimfx) -> getAPI((vimfx) ->
     assert.notEqual(value, nonce)
 
   # Test that the new complex command cannot be run.
-  passed_vimfx.reset('insert')
-  match = passed_vimfx.consumeKeyEvent(event, 'insert')
+  passed_vimfx.reset('ignore')
+  match = passed_vimfx.consumeKeyEvent(event, 'ignore')
   if match.type == 'full'
     value = try match.command.run() catch then null
     assert.notEqual(value, nonce)
@@ -137,8 +137,8 @@ exports['test customization'] = (assert, passed_vimfx) -> getAPI((vimfx) ->
   assert.notEqual(last_command.description(), 'Test command')
 
   # Test that the new complex command cannot show up in the help dialog.
-  mode_insert = modes.find((mode) -> mode._name == 'insert')
-  [ first_category ] = mode_insert.categories
+  mode_ignore = modes.find((mode) -> mode._name == 'ignore')
+  [ first_category ] = mode_ignore.categories
   assert.notEqual(first_category.name, 'New category')
 
   # Restore original values.
@@ -205,7 +205,7 @@ exports['test addKeyOverrides'] = (assert, passed_vimfx) -> getAPI((vimfx) ->
       ['j', '<c-foobar>']
     ],
     [
-      (location, mode) -> mode == 'insert' and location.href == 'about:blank'
+      (location, mode) -> mode == 'ignore' and location.href == 'about:blank'
       ['<escape>']
     ]
   )
@@ -213,7 +213,7 @@ exports['test addKeyOverrides'] = (assert, passed_vimfx) -> getAPI((vimfx) ->
   prefs.tmp('mode.normal.scroll_to_bottom', '<foobar>j', ->
     passed_vimfx.reset('normal')
 
-    match = passed_vimfx.consumeKeyEvent({key: 'j'}, 'insert')
+    match = passed_vimfx.consumeKeyEvent({key: 'j'}, 'ignore')
     assert.ok(match)
 
     passed_vimfx.currentVim =
@@ -237,12 +237,12 @@ exports['test addKeyOverrides'] = (assert, passed_vimfx) -> getAPI((vimfx) ->
     assert.equal(match.type, 'full')
     assert.strictEqual(match.count, undefined)
 
-    passed_vimfx.reset('insert')
+    passed_vimfx.reset('ignore')
 
-    match = passed_vimfx.consumeKeyEvent({key: 'j'}, 'insert')
+    match = passed_vimfx.consumeKeyEvent({key: 'j'}, 'ignore')
     assert.ok(match)
 
-    match = passed_vimfx.consumeKeyEvent({key: 'escape'}, 'insert')
+    match = passed_vimfx.consumeKeyEvent({key: 'escape'}, 'ignore')
     assert.ok(not match)
   )
 
