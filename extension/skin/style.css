@@ -151,7 +151,7 @@ toolbarpaletteitem[place="palette"] > #VimFxButton {
       }
 
     #VimFxHelpDialogContainer .title {
-      display: inline;
+      display: inline-block;
       font-size: 1.4ex;
       line-height: 1.2;
     }
