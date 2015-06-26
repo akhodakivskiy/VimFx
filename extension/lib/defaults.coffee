@@ -76,7 +76,9 @@ shortcuts =
       'vf':        'follow_focus'
       '[':         'follow_previous'
       ']':         'follow_next'
-      'gi':        'text_input'
+      'gi':        'focus_text_input'
+      '<force><tab>':    'focus_next'
+      '<force><s-tab>':  'focus_previous'
 
     'find':
       '/':         'find'
@@ -101,12 +103,6 @@ shortcuts =
   'insert':
     '':
       '<s-escape>':      'exit'
-
-  'text_input':
-    '':
-      '<escape>':        'exit'
-      '<s-tab>':         'input_previous'
-      '<tab>':           'input_next'
 
   'find':
     '':

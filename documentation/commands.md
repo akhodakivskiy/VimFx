@@ -97,7 +97,7 @@ entire page is scrolled.
 You can focus scrollable elements using the `vf` command.
 
 
-## `gi`—Text Input mode
+## `gi`
 
 `gi` focuses the text input you last used, or the first one on the page. Note
 that a [prevented autofocus] still counts as having focused and used a text
@@ -108,12 +108,16 @@ autofocus prevention, and type `gi` when you wish you hadn’t.
 that `gi` and `1gi` are different: The latter _always_ focuses the first input
 of the page, regradless of which input you used last.
 
-Typing `gi` also enters Text Input mode. That’s mostly an implementation detail.
-What it means is that `<tab>` will only switch between text inputs on the page,
-as opposed to between all focusable elements (such as links, buttons and
-checkboxes) as it does otherwise.
-
 [prevented autofocus]: options.md#prevent-autofocus
+
+
+## Focus next/previous element
+
+The default shorcuts are `<tab>` and `<s-tab>`, respectively. They work just
+like `<tab>` works normally, except that if you focused a text input using the
+`gi` command they will only switch between text inputs on thee page, as opposed
+to between all focusable elements (such as links, buttons and checkboxes) as
+they do otherwise.
 
 
 ## The `f` commands

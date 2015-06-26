@@ -475,8 +475,8 @@ commands.follow_previous = helper_follow_pattern.bind(null, 'prev')
 
 commands.follow_next     = helper_follow_pattern.bind(null, 'next')
 
-# Focus last focused or first text input and enter text input mode.
-commands.text_input = ({ vim, count }) ->
+# Focus last focused or first text input.
+commands.focus_text_input = ({ vim, storage, count }) ->
   { lastFocusedTextInput } = vim.state
   inputs = Array.filter(
     vim.window.document.querySelectorAll('input, textarea'), (element) ->
@@ -494,7 +494,31 @@ commands.text_input = ({ vim, count }) ->
         1
   index = Math.min(count, inputs.length) - 1
   utils.focusElement(inputs[index], {select: true})
-  vim.enterMode('text_input', inputs)
+  storage.inputs = inputs
+
+# Switch between text inputs or simulate `<tab>`.
+helper_move_focus = (direction, { vim, storage }) ->
+  if storage.inputs
+    { inputs } = storage
+    nextInput = inputs[(storage.inputIndex + direction) %% inputs.length]
+    utils.focusElement(nextInput, {select: true})
+  else
+    focusManager = Cc['@mozilla.org/focus-manager;1']
+      .getService(Ci.nsIFocusManager)
+    direction =
+      if direction == -1
+        focusManager.MOVEFOCUS_BACKWARD
+      else
+        focusManager.MOVEFOCUS_FORWARD
+    focusManager.moveFocus(
+      null, # Use current window.
+      null, # Move relative to the currently focused element.
+      direction,
+      focusManager.FLAG_BYKEY
+    )
+
+commands.focus_next     = helper_move_focus.bind(null, +1)
+commands.focus_previous = helper_move_focus.bind(null, -1)
 
 
 

@@ -52,17 +52,33 @@ mode = (modeName, obj, commands) ->
 mode('normal', {
   onEnter: ->
 
-  onLeave: ({ vim }) ->
+  onLeave: ({ vim, storage }) ->
+    storage.inputs = null
     help.removeHelp(vim.rootWindow)
 
   onInput: (args, match) ->
     { vim, storage, event } = args
+    { keyStr } = match
+
+    if storage.inputs
+      index = storage.inputs.indexOf(vim.window.document.activeElement)
+      if index >= 0
+        storage.inputIndex = index
+      else
+        storage.inputs = null
 
     autoInsertMode = (match.focus != null)
     if match.type == 'none' or (autoInsertMode and not match.force)
       return false
 
-    match.command.run(args) if match.type == 'full'
+    if match.type == 'full'
+      { command } = match
+      # Rely on the default `<tab>` behavior, since it allows web pages to
+      # provide tab completion, for example, inside text inputs.
+      unless match.toplevel and not storage.inputs and
+             ((command.run == commands.focus_previous and keyStr == '<tab>') or
+              (command.run == commands.focus_next     and keyStr == '<s-tab>'))
+        command.run(args)
 
     # At this point the match is either full, partial or part of a count. Then
     # we always want to suppress, except for one case: The Escape key.
@@ -82,7 +98,7 @@ mode('normal', {
     #   dialogs such as the “bookmark this page” dialog (<c-d>).
     document = event.originalTarget.ownerDocument
     inBrowserChrome = (document instanceof XULDocument)
-    if match.keyStr == '<escape>' and (not autoInsertMode or inBrowserChrome)
+    if keyStr == '<escape>' and (not autoInsertMode or inBrowserChrome)
       return false
 
     return true
@@ -188,37 +204,6 @@ mode('insert', {
 
 }, {
   exit: ({ vim }) -> vim.enterMode('normal')
-})
-
-
-
-mode('text_input', {
-  onEnter: ({ vim, storage, args: [ inputs ] }) ->
-    storage.inputs = inputs
-
-  onLeave: ({ vim, storage }) ->
-    storage.inputs = null
-
-  onInput: (args, match) ->
-    { vim, storage: { inputs } } = args
-    index = inputs.indexOf(vim.window.document.activeElement)
-    if index == -1
-      vim.enterMode('normal')
-      return false
-    return false unless match.type == 'full'
-    diff = match.command.run(args)
-    unless diff == 0
-      nextInput = inputs[(index + diff) %% inputs.length]
-      utils.focusElement(nextInput, {select: true})
-    return true
-
-}, {
-  exit: ({ vim }) ->
-    utils.blurActiveElement(vim.window)
-    vim.enterMode('normal')
-    return 0
-  input_previous: -> -1
-  input_next:     -> +1
 })
 
 
