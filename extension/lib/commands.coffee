@@ -340,7 +340,7 @@ commands.follow = ({ vim, count }) ->
 
   callback = (marker) ->
     { element } = marker
-    element.focus()
+    utils.focusElement(element)
     last = (count == 1)
     if not last and marker.type == 'link'
       utils.openTab(vim.rootWindow, element.href, {
@@ -424,8 +424,7 @@ commands.follow_focus = ({ vim }) ->
 
   callback = (marker) ->
     { element } = marker
-    element.focus()
-    element.select?()
+    utils.focusElement(element, {select: true})
 
   vim.enterMode('hints', filter, callback)
 
@@ -494,7 +493,7 @@ commands.text_input = ({ vim, count }) ->
       else
         1
   index = Math.min(count, inputs.length) - 1
-  inputs[index].select()
+  utils.focusElement(inputs[index], {select: true})
   vim.enterMode('text_input', inputs)
 
 
@@ -505,8 +504,7 @@ helper_find = (highlight, { vim }) ->
   findBar = vim.rootWindow.gBrowser.getFindBar()
 
   findBar.onFindCommand()
-  findBar._findField.focus()
-  findBar._findField.select()
+  utils.focusElement(findBar._findField, {select: true})
 
   return unless highlightButton = findBar.getElement('highlight')
   if highlightButton.checked != highlight

@@ -137,6 +137,14 @@ you dislike that, disable this option.
 If `prevent_autofocus` is enabled, all focus events except those that occur
 within this number of milliseconds after a user interaction are suppressed.
 
+If you set i to 0, _all_ programmaticly invoked focus events in web pages will
+be prevented. Only focus events as the result of you clicking or pressing a key
+are allowed. Some sites automatically focuses inputs after clicking some button,
+which might make this undesireable.
+
+Setting it to a very large value basically has the same effact as turning of
+`prevent_autofocus`.
+
 ### `prevent_autofocus_modes`
 
 Space separated list of modes where `prevent_autofocus` should be used.

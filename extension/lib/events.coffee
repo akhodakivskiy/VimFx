@@ -142,15 +142,20 @@ windowsListeners =
     # doesn’t like any automatic focusing, right? This is actually useful on
     # devdocs.io). There is a slight risk that the user presses a key just
     # before an autofocus, causing it not to be blurred, but that’s not likely.
-    # Lastly, the autofocus prevention is restricted to `<input>` elements,
-    # since only such elements are commonly autofocused.  Many sites have
-    # buttons which inserts a `<textarea>` when clicked (which might take up to
-    # a second) and then focuses the `<textarea>`. Such focus events should
-    # _not_ be blurred.
+    # Autofocus prevention is also restricted to `<input>` elements, since only
+    # such elements are commonly autofocused.  Many sites have buttons which
+    # inserts a `<textarea>` when clicked (which might take up to a second) and
+    # then focuses the `<textarea>`. Such focus events should _not_ be blurred.
+    # There are also many buttons that do the same thing but insert an `<input>`
+    # element. There is sadly always a risk that those events are blurred.
+    focusManager = Cc['@mozilla.org/focus-manager;1']
+      .getService(Ci.nsIFocusManager)
     if vimfx.options.prevent_autofocus and
         vim.mode in vimfx.options.prevent_autofocus_modes and
         target.ownerDocument instanceof HTMLDocument and
         target instanceof HTMLInputElement and
+        # Only blur programmatic events (not caused by clicks or keypresses).
+        focusManager.getLastFocusMethod(null) == 0 and
         (vim.state.lastInteraction == null or
          Date.now() - vim.state.lastInteraction > vimfx.options.autofocus_limit)
       vim.state.lastAutofocusPrevention = Date.now()

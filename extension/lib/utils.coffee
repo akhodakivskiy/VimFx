@@ -99,6 +99,14 @@ blurActiveElement = (window) ->
   if activeElement and activeElement.tabIndex > -1
     activeElement.blur()
 
+# Focus an element and tell Firefox that the focus happened because of a user
+# keypress (not just because some random programmatic focus).
+focusElement = (element, options = {}) ->
+  focusManager = Cc['@mozilla.org/focus-manager;1']
+    .getService(Ci.nsIFocusManager)
+  focusManager.setFocus(element, focusManager.FLAG_BYKEY)
+  element.select?() if options.select
+
 isProperLink = (element) ->
   # `.getAttribute` is used below instead of `.hasAttribute` to exclude `<a
   # href="">`s used as buttons on some sites.
@@ -287,6 +295,7 @@ module.exports = {
   getCurrentTabWindow
 
   blurActiveElement
+  focusElement
   isProperLink
   isTextInputElement
   isContentEditable

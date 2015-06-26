@@ -207,7 +207,9 @@ mode('text_input', {
       return false
     return false unless match.type == 'full'
     diff = match.command.run(args)
-    inputs[(index + diff) %% inputs.length].select() unless diff == 0
+    unless diff == 0
+      nextInput = inputs[(index + diff) %% inputs.length]
+      utils.focusElement(nextInput, {select: true})
     return true
 
 }, {
