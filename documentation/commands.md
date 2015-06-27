@@ -158,10 +158,15 @@ other more important elements suffer by getting longer ones. Therefore VimFx
 favors semantic elements over unsemantic ones and takes that into account when
 deciding the hint length for elements.
 
-One more thing about hints: Some hint characters are easier to type than others.
-The ones on the home row are of course the best. When customizing the [hint
-chars] option you should put the best keys to the left and the worst ones to the
-right. VimFx favors keys to the left, so that should give you the optimal hints.
+Some hint characters are easier to type than others. The ones on the home row
+are of course the best. When customizing the [hint chars] option you should put
+the best keys to the left and the worst ones to the right. VimFx favors keys to
+the left, so that should give you the optimal hints.
+
+Hints are added on top of the corresponding element. If they obscure the display
+too much you can hold shift to make them transparent. (See [Styling] if you’d
+like to change that.) The hints can also sometimes cover each other. Press
+`<space>` and `<s-space>` to switch which one should be on top.
 
 When giving a count to an `f` command, all markers will be re-shown after you’ve
 typed the hint characters of one of them, _count_ minus one times. All but the
@@ -182,6 +187,7 @@ accept a count itself.
 The `vf` and `yf` commands do not accept counts.
 
 [hint chars]: options.md#hint-chars
+[Styling]: styling.md
 
 
 ## Ex commands

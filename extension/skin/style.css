@@ -85,6 +85,11 @@ toolbarpaletteitem[place="palette"] > #VimFxButton {
   display: none;
 }
 
+/* alt, ctrl and meta can also be targeted. */
+#main-window[vimfx-held-modifiers~="shift"] #VimFxMarkersContainer {
+  opacity: 0.2;
+}
+
 
 
 /***** Help Dialog *****/

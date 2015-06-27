@@ -61,6 +61,14 @@ removeVimFromTab = (tab, gBrowser) ->
   return unless browser = gBrowser.getBrowserForTab(tab)
   vimBucket.forget(browser.contentWindow)
 
+attribute = 'vimfx-held-modifiers'
+setHeldModifiers = (vim, event, modifiers = null) ->
+  mainWindow = vim.rootWindow.document.documentElement
+  modifiers ?= mainWindow.getAttribute(attribute)
+  isHeld = (modifier) -> event["#{ modifier }Key"]
+  mainWindow.setAttribute(attribute,
+                          modifiers.split(' ').filter(isHeld).join(' '))
+
 # The following listeners are installed on every top level Chrome window.
 windowsListeners =
   keydown: (event) ->
@@ -98,13 +106,19 @@ windowsListeners =
 
       suppress = vim.onInput(event)
 
+      setHeldModifiers(vim, event, 'alt ctrl meta shift') if suppress == null
+
       suppressEvent(event) if suppress
 
     catch error
       console.error(utils.formatError(error))
 
   keypress: (event) -> suppressEvent(event) if suppress
-  keyup:    (event) -> suppressEvent(event) if suppress
+
+  keyup: (event) ->
+    suppressEvent(event) if suppress
+    return unless vim = getVimFromEvent(event)
+    setHeldModifiers(vim, event)
 
   popupshown:  checkPassthrough
   popuphidden: checkPassthrough
