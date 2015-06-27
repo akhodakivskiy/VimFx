@@ -106,7 +106,8 @@ windowsListeners =
 
       suppress = vim.onInput(event)
 
-      setHeldModifiers(vim, event, 'alt ctrl meta shift') if suppress == null
+      modifiers = if suppress == null then 'alt ctrl meta shift' else ''
+      setHeldModifiers(vim, event, modifiers)
 
       suppressEvent(event) if suppress
 
