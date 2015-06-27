@@ -190,6 +190,34 @@ The `vf` and `yf` commands do not accept counts.
 [Styling]: styling.md
 
 
+## Ignore mode `<s-f1>`
+
+Ignore mode is all about ignoring VimFx commands and sending the keys to the
+page instead. Sometimes, though, you might want to run some VimFx command even
+when in Insert mode.
+
+One way of doing that is to press `<s-escape>` to exit Ignore mode, run your
+command and then enter Ignore mode again using `i`. However, it might be
+inconvenient having to remember to re-enter Ignore mode, and sometimes that’s
+not even possible, such as if you ran the `K` command to get to the next tab.
+
+Another way is to press `<s-f1>` followed by the Normal mode command you wanted
+to run. (`<s-f1>` is essentially the inverse of the `I` command, which passes
+the next keypress on to the page. Internally they’re called “quote” and
+“unquote.”) This is handy if you’d like to switch away from a [blacklisted]
+page: Just press for example `<s-f1>K`.
+
+`<s-f1>` was chosen as the default shortcut because on a typical keyboard `<f1>`
+is located just beside `<escape>`, which makes it very similar to `<s-escape>`,
+which is used to exit Ignore mode. Both of those are uncommonly used by web
+pages, so they shouldn’t be in the way. If you ever actually do need to send any
+of those to the page, you can prefix them with `<s-f1>`, because if the key you
+press after `<s-f1>` is not part of any Normal mode command, the key is sent to
+the page. (Another way is for example `<s-f1>I<s-escape>`.)
+
+[blacklisted]: options.md#blacklist
+
+
 ## Ex commands
 
 vim has something called “ex” commands. Want something similar in VimFx? True to

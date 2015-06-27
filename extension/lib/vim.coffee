@@ -56,7 +56,7 @@ class Vim
     @call('onLeave')
     @mode = mode
     @call('onEnter', {args})
-    @parent.emit('modeChange', this)
+    @parent.emit('modeChange', this) if @parent.currentVim == this
 
   onInput: (event) ->
     match = @parent.consumeKeyEvent(event, this)

@@ -50,7 +50,12 @@ mode = (modeName, obj, commands) ->
 
 
 mode('normal', {
-  onEnter: ->
+  onEnter: ({ vim, storage, args: [enterMode] }) ->
+    if enterMode
+      storage.enterMode = enterMode
+    else if storage.enterMode
+      vim.enterMode(storage.enterMode)
+      storage.enterMode = null
 
   onLeave: ({ vim, storage }) ->
     storage.inputs = null
@@ -69,6 +74,9 @@ mode('normal', {
 
     autoInsertMode = (match.focus != null)
     if match.type == 'none' or (autoInsertMode and not match.force)
+      if storage.enterMode
+        vim.enterMode(storage.enterMode)
+        storage.enterMode = null
       return false
 
     if match.type == 'full'
@@ -79,6 +87,12 @@ mode('normal', {
              ((command.run == commands.focus_previous and keyStr == '<tab>') or
               (command.run == commands.focus_next     and keyStr == '<s-tab>'))
         command.run(args)
+
+        # If the command changed the mode, wait until coming back from that mode
+        # before switching to `storage.enterMode` if any (see `onEnter` above).
+        if storage.enterMode and vim.mode == 'normal'
+          vim.enterMode(storage.enterMode)
+          storage.enterMode = null
 
     # At this point the match is either full, partial or part of a count. Then
     # we always want to suppress, except for one case: The Escape key.
@@ -203,7 +217,8 @@ mode('ignore', {
     return false
 
 }, {
-  exit: ({ vim }) -> vim.enterMode('normal')
+  exit:    ({ vim }) -> vim.enterMode('normal')
+  unquote: ({ vim }) -> vim.enterMode('normal', 'ignore')
 })
 
 

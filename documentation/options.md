@@ -57,11 +57,15 @@ Note: If you need to include a space in your pattern, use `\s`. For example:
 
 ### Blacklist
 
-Space separated list of URLs where VimFx should automatically enter Insert mode.
+Space separated list of URLs where VimFx should automatically enter Ignore mode.
 
 Note that the URLs in the list must match the current URL _entirely_ for it to
 apply. Therefore it is easiest to always use the `*` wildcard (which matches
 zero or more characters).
+
+You might also want to read about the [Ignore mode `<s-f1>` command][s-f1].
+
+[s-f1]: commands.md#ignore-mode-s-f1
 
 ### Prevent autofocus
 

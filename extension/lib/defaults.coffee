@@ -103,6 +103,7 @@ shortcuts =
   'ignore':
     '':
       '<s-escape>':      'exit'
+      '<s-f1>':          'unquote'
 
   'find':
     '':
