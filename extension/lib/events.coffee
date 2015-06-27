@@ -207,7 +207,7 @@ windowsListeners =
        # Exclude the VimFx button, though, since clicking it returns to normal
        # mode. Otherwise we’d first returned to normal mode and then the button
        # would have opened the help dialog.
-       target != vim.rootWindow.getElementById(button.BUTTON_ID)
+       target != vim.rootWindow.document.getElementById(button.BUTTON_ID)
       vim.enterMode('normal')
       return
 
