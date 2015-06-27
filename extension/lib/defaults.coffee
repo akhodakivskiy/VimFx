@@ -73,7 +73,7 @@ shortcuts =
       'gf':        'follow_in_focused_tab'
       'af':        'follow_multiple'
       'yf':        'follow_copy'
-      'vf':        'follow_focus'
+      'zf':        'follow_focus'
       '[':         'follow_previous'
       ']':         'follow_next'
       'gi':        'focus_text_input'
