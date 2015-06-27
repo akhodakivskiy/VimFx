@@ -204,8 +204,8 @@ mode('ignore', {
   onEnter: ({ vim, storage, args: [ count ] }) ->
     storage.count = count ? null
 
-  onLeave: ({ vim }) ->
-    utils.blurActiveElement(vim.window)
+  onLeave: ({ vim, storage }) ->
+    utils.blurActiveElement(vim.window) unless storage.count?
 
   onInput: (args, match) ->
     { vim, storage } = args
