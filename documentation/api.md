@@ -276,6 +276,8 @@ properties:
 
 - keyStr: `String`. The current keypress represented as a string.
 
+- unmodifiedKey: `String`. `keyStr` without modifiers.
+
 - toplevel: `Boolean`. Whether or not the match was a toplevel match in the
   shortcut key tree. This is `true` unless the match is part of the tail of a
   multi-key shortcut.

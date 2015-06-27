@@ -203,6 +203,18 @@ A CSS selector that targets candidates for a previous/next page link.
 A space-separated list of attributes that the previous/next page patterns should
 be matched against.
 
+### `hints_toggle_in_tab`
+
+If the keypress that matched a hint starts with this string, toggle whether to
+open the matched link in the current tab or a new tab. See [The `f` commands]
+for more information.
+
+### `hints_toggle_in_background`
+
+If the keypress that matched a hint starts with this string, open the matched
+link in a new tab and toggle whether to open that tab in the background or
+foreground. See [The `f` commands] for more information.
+
 ### `activatable_element_keys`
 
 Keys that should not trigger VimFx commands but be sent through to the page if

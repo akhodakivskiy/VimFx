@@ -275,9 +275,45 @@ combine = (hrefs, marker) ->
       hrefs[href] = marker
   return marker
 
+follow_callback = (vim, { inTab, inBackground }, marker, count, keyStr) ->
+  isLast = (count == 1)
+  isLink = (marker.type == 'link')
+
+  switch
+    when keyStr.startsWith(vim.parent.options.hints_toggle_in_tab)
+      inTab = not inTab
+    when keyStr.startsWith(vim.parent.options.hints_toggle_in_background)
+      inTab = true
+      inBackground = not inBackground
+    else
+      unless isLast
+        inTab = true
+        inBackground = true
+
+  inTab = false unless isLink
+
+  if marker.type == 'text' or (isLink and not (inTab and inBackground))
+    isLast = true
+
+  { element } = marker
+  utils.focusElement(element)
+
+  if inTab
+    utils.openTab(vim.rootWindow, element.href, {
+      inBackground
+      relatedToCurrent: true
+    })
+  else
+    if element.target == '_blank' and vim.parent.options.prevent_target_blank
+      targetReset = element.target
+      element.target = ''
+    utils.simulateClick(element)
+    element.target = targetReset if targetReset
+
+  return not isLast
+
 # Follow links, focus text inputs and click buttons with hint markers.
 commands.follow = ({ vim, count }) ->
-  count ?= 1
   hrefs = {}
   filter = (element, getElementShape) ->
     document = element.ownerDocument
@@ -338,45 +374,22 @@ commands.follow = ({ vim, count }) ->
     return unless shape = getElementShape(element)
     return combine(hrefs, new Marker(element, shape, {semantic, type}))
 
-  callback = (marker) ->
-    { element } = marker
-    utils.focusElement(element)
-    last = (count == 1)
-    if not last and marker.type == 'link'
-      utils.openTab(vim.rootWindow, element.href, {
-        inBackground: true
-        relatedToCurrent: true
-      })
-    else
-      if element.target == '_blank' and vim.parent.options.prevent_target_blank
-        targetReset = element.target
-        element.target = ''
-      utils.simulateClick(element)
-      element.target = targetReset if targetReset
-    count--
-    return (not last and marker.type != 'text')
+  callback = follow_callback.bind(null, vim, {inTab: false, inBackground: true})
 
-  vim.enterMode('hints', filter, callback)
+  vim.enterMode('hints', filter, callback, count)
 
 # Follow links in a new background tab with hint markers.
 commands.follow_in_tab = ({ vim, count }, inBackground = true) ->
-  count ?= 1
   hrefs = {}
   filter = (element, getElementShape) ->
     return unless isProperLink(element)
     return unless shape = getElementShape(element)
-    return combine(hrefs, new Marker(element, shape, {semantic: true}))
+    return combine(hrefs, new Marker(element, shape,
+                                     {semantic: true, type: 'link'}))
 
-  callback = (marker) ->
-    last = (count == 1)
-    utils.openTab(vim.rootWindow, marker.element.href, {
-      inBackground: if last then inBackground else true
-      relatedToCurrent: true
-    })
-    count--
-    return not last
+  callback = follow_callback.bind(null, vim, {inTab: true, inBackground})
 
-  vim.enterMode('hints', filter, callback)
+  vim.enterMode('hints', filter, callback, count)
 
 # Follow links in a new foreground tab with hint markers.
 commands.follow_in_focused_tab = (args) ->

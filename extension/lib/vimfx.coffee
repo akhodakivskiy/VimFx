@@ -95,8 +95,9 @@ class VimFx extends utils.EventEmitter
     count = if @count == '' then undefined else Number(@count)
     force = if command then (command.pref of @forceCommands) else false
     focus = @getFocusType(vim, event, keyStr)
+    unmodifiedKey = notation.parse(keyStr).key
     @reset(mode) if type == 'full'
-    return {type, focus, command, count, force, keyStr, toplevel }
+    return {type, focus, command, count, force, keyStr, unmodifiedKey, toplevel}
 
   getFocusType: (vim, event, keyStr) ->
     return unless target = event.originalTarget # For the tests.

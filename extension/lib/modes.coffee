@@ -122,7 +122,7 @@ mode('normal', {
 
 
 mode('hints', {
-  onEnter: ({ vim, storage, args: [ filter, callback ] }) ->
+  onEnter: ({ vim, storage, args: [ filter, callback, count ] }) ->
     [ markers, container ] = hints.injectHints(
       vim.rootWindow, vim.window, filter, vim.parent.options
     )
@@ -130,6 +130,7 @@ mode('hints', {
       storage.markers   = markers
       storage.container = container
       storage.callback  = callback
+      storage.count     = count ? 1
       storage.numEnteredChars = 0
     else
       vim.enterMode('normal')
@@ -148,18 +149,19 @@ mode('hints', {
 
     if match.type == 'full'
       match.command.run(args)
-    else if match.keyStr in vim.parent.options.hint_chars
+    else if match.unmodifiedKey in vim.parent.options.hint_chars
       matchedMarkers = []
 
       for marker in markers when marker.hintIndex == storage.numEnteredChars
-        matched = marker.matchHintChar(match.keyStr)
+        matched = marker.matchHintChar(match.unmodifiedKey)
         marker.hide() unless matched
         if marker.isMatched()
           marker.markMatched(true)
           matchedMarkers.push(marker)
 
       if matchedMarkers.length > 0
-        again = callback(matchedMarkers[0])
+        again = callback(matchedMarkers[0], storage.count, match.keyStr)
+        storage.count--
         if again
           vim.rootWindow.setTimeout((->
             marker.markMatched(false) for marker in matchedMarkers
@@ -192,6 +194,8 @@ mode('hints', {
         when  0 then marker.deleteHintChar()
         when -1 then marker.show()
     storage.numEnteredChars-- unless storage.numEnteredChars == 0
+
+  increase_count: ({ storage }) -> storage.count++
 })
 
 

@@ -186,6 +186,22 @@ accept a count itself.
 
 The `vf` and `yf` commands do not accept counts.
 
+Press `<enter>` to increase the count by one. This is useful when you’ve already
+entered Hints mode but realize that you want to interact with yet a marker. This
+can be faster than going into Hints mode once more.
+
+If you’ve pressed `f` but realize that you’d rather open a link in a new tab you
+can hold ctrl while typing the last hint character. This is similar to how you
+can press `<c-enter>` on a focused link to open it in a new tab (while just
+`<enter>` would have opened it in the same tab). Hold alt to open in a new
+foreground tab. In other words, holding ctrl works as if you’d pressed `F` from
+the beginning, and holding alt works as if you’d pressed `gf`.
+
+For the `F` and `gf` commands, holding ctrl makes them open links in the same
+tab instead, as if you’d used the `f` command. Holding alt toggles whether to
+open tabs in the background or foreground—it makes `F` work like `gf`, and `gf`
+like `F`.
+
 [hint chars]: options.md#hint-chars
 [Styling]: styling.md
 

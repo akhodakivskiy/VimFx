@@ -99,6 +99,7 @@ shortcuts =
       '<space>':         'rotate_markers_forward'
       '<s-space>':       'rotate_markers_backward'
       '<backspace>':     'delete_hint_char'
+      '<enter>':         'increase_count'
 
   'ignore':
     '':
@@ -128,6 +129,8 @@ advanced_options =
   'smoothScroll.other.spring-constant': '2500'
   'pattern_selector':                   'a, button'
   'pattern_attrs':                      'rel  role  data-tooltip  aria-label'
+  'hints_toggle_in_tab':                '<c-'
+  'hints_toggle_in_background':         '<a-'
   'activatable_element_keys':           '<enter>'
   'adjustable_element_keys':            '<arrowup>  <arrowdown>  <arrowleft>
                                          <arrowright>  <space>  <enter>'
