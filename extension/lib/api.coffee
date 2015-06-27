@@ -26,7 +26,7 @@ counter = new utils.Counter({start: 10000, step: 100})
 createAPI = (vimfx) ->
   get: (pref) -> switch
     when pref of defaults.parsed_options
-      vimfx.defaults.parsed_options[pref]
+      defaults.parsed_options[pref]
     when pref of defaults.all_prefs or pref?.startsWith('custom.')
       prefs.get(pref)
     else
@@ -103,7 +103,6 @@ createAPI = (vimfx) ->
   on:         vimfx.on.bind(vimfx)
   refresh:    vimfx.createKeyTrees.bind(vimfx)
   modes:      vimfx.modes
-  categories: vimfx.options.categories
 
 getOverrides = (rules, args...) ->
   for [match, overrides] in rules

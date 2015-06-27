@@ -51,10 +51,14 @@ Gets the value of the VimFx pref `pref`.
 
 You can see all prefs in [defaults.coffee].
 
+You might also want to read more about the special pref [categories].
+
 ```js
 vimfx.get('hint_chars')
 vimfx.get('modes.normal.follow')
 ```
+
+[categories]: vimfxgetcategories
 
 ### `vimfx.set(pref)`
 
@@ -86,7 +90,7 @@ to extend VimFx. They should add commands manually to `vimfx.modes` instead.
   value has to be one of the keys of `vimfx.modes`.
 - category: `String`. Defaults to `'misc'` for Normal mode and `''`
   (uncategorized) otherwise. The category to add the command to. The
-  value has to be one of the keys of `vimfx.categories`.
+  value has to be one of the keys of `vimfx.get('categories')`.
 - order: `Number`. Defaults to putting the command at the end of the category.
   The first of the default commands has the order `100` and then they increase
   by `100` per command. This allows to put new commands between two already
@@ -292,7 +296,7 @@ A command is an object with the following properties:
 - description: `Function`. Returns a description of the command, shown in the
   help dialog and VimFx’s settings page in the Add-ons Manager.
 - category: `String`. The category to add the command to. The value has to be
-  one of the keys of `vimfx.categories`.
+  one of the keys of `vimfx.get('categories')`.
 - order: `Number`. The first of the default commands has the order `100` and
   then they increase by `100` per command. This allows to put new commands
   between two already existing ones.
@@ -340,7 +344,7 @@ Have a look at [modes.coffee] and [commands.coffee] for more information.
 [modes.coffee]: ../extension/lib/modes.coffee
 [commands.coffee]: ../extension/lib/commands.coffee
 
-### `vimfx.categories`
+### `vimfx.get('categories')`
 
 An object whose keys are category names and whose values are categories.
 
@@ -355,7 +359,7 @@ A category is an object with the follwing properties:
   This allows to put new categories between two already existing ones.
 
 ```js
-let {categories} = vimfx
+let categories = vimfx.get('categories')
 
 // Add new category.
 categories.custom = {

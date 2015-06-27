@@ -35,7 +35,6 @@ exports['test exports'] = (assert, passed_vimfx) -> getAPI((vimfx) ->
   assert.equal(typeof vimfx.on, 'function', 'on')
   assert.equal(typeof vimfx.refresh, 'function', 'refresh')
   assert.equal(vimfx.modes, passed_vimfx.modes, 'modes')
-  assert.equal(vimfx.categories, passed_vimfx.options.categories, 'categories')
 )
 
 exports['test get'] = (assert, passed_vimfx) -> getAPI((vimfx) ->
@@ -65,7 +64,7 @@ exports['test customization'] = (assert, passed_vimfx) -> getAPI((vimfx) ->
   vimfx.set('custom.mode.normal.test_command', 'ö')
 
   # Add a slightly more complex command.
-  vimfx.categories['new_category'] = {
+  vimfx.get('categories')['new_category'] = {
     name:  -> 'New category'
     order: -100
   }
