@@ -99,7 +99,7 @@ class VimFx extends utils.EventEmitter
     return {type, focus, command, count, force, keyStr, toplevel }
 
   getFocusType: (vim, event, keyStr) ->
-    target   = event.originalTarget
+    return unless target = event.originalTarget # For the tests.
     document = target.ownerDocument
 
     { activatable_element_keys, adjustable_element_keys } = @options
