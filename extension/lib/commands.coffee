@@ -61,7 +61,7 @@ commands.paste_and_go_in_tab = ({ vim }) ->
     vim.rootWindow.gBrowser.addTab(url, {postData})
 
 commands.copy_current_url = ({ vim }) ->
-  utils.writeToClipboard(vim.window.location.href)
+  utils.writeToClipboard(vim.rootWindow.gBrowser.currentURI.spec)
 
 # Go up one level in the URL hierarchy.
 commands.go_up_path = ({ vim, count }) ->
