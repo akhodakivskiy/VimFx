@@ -582,10 +582,7 @@ commands.dev = ({ vim }) ->
 
 commands.esc = ({ vim, event }) ->
   utils.blurActiveElement(vim.window)
-
-  # Blur active XUL control.
-  callback = -> event.originalTarget?.ownerDocument?.activeElement?.blur()
-  vim.window.setTimeout(callback, 0)
+  utils.blurActiveElement(vim.rootWindow)
 
   help.removeHelp(vim.rootWindow)
 
