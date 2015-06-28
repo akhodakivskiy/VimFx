@@ -43,22 +43,14 @@ commands.focus_search_bar = ({ vim }) ->
   if vim.rootWindow.BrowserSearch.searchBar
     vim.rootWindow.BrowserSearch.webSearch()
 
-helper_paste = (vim) ->
-  url = vim.rootWindow.readFromClipboard()
-  postData = null
-  if not utils.isURL(url) and submission = utils.browserSearchSubmission(url)
-    url = submission.uri.spec
-    { postData } = submission
-  return {url, postData}
+helper_paste_and_go = (event, { vim }) ->
+  { gURLBar, goDoCommand } = vim.rootWindow
+  gURLBar.value = vim.rootWindow.readFromClipboard()
+  gURLBar.handleCommand(event)
 
-commands.paste_and_go = ({ vim }) ->
-  { url, postData } = helper_paste(vim)
-  vim.rootWindow.gBrowser.loadURIWithFlags(url, {postData})
+commands.paste_and_go = helper_paste_and_go.bind(null, null)
 
-commands.paste_and_go_in_tab = ({ vim }) ->
-  { url, postData } = helper_paste(vim)
-  vim.rootWindow.gBrowser.selectedTab =
-    vim.rootWindow.gBrowser.addTab(url, {postData})
+commands.paste_and_go_in_tab = helper_paste_and_go.bind(null, {altKey: true})
 
 commands.copy_current_url = ({ vim }) ->
   utils.writeToClipboard(vim.rootWindow.gBrowser.currentURI.spec)

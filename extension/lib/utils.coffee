@@ -227,24 +227,6 @@ insertText = (input, value) ->
     input.value[0...selectionStart] + value + input.value[selectionEnd..]
   input.selectionStart = input.selectionEnd = selectionStart + value.length
 
-isURL = (str) ->
-  try
-    url = Cc['@mozilla.org/network/io-service;1']
-      .getService(Ci.nsIIOService)
-      .newURI(str, null, null)
-      .QueryInterface(Ci.nsIURL)
-    return true
-  catch err
-    return false
-
-# Use Firefox services to search for a given string.
-browserSearchSubmission = (str) ->
-  ss = Cc['@mozilla.org/browser/search-service;1']
-    .getService(Ci.nsIBrowserSearchService)
-
-  engine = ss.currentEngine or ss.defaultEngine
-  return engine.getSubmission(str, null)
-
 openTab = (rootWindow, url, options) ->
   { gBrowser } = rootWindow
   rootWindow.TreeStyleTabService?.readyToOpenChildTab(gBrowser.selectedTab)
@@ -314,8 +296,6 @@ module.exports = {
   createBox
   setAttributes
   insertText
-  isURL
-  browserSearchSubmission
   openTab
   regexpEscape
   removeDuplicates
