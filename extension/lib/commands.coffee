@@ -111,8 +111,7 @@ commands.stop = ({ vim }) ->
 
 commands.stop_all = ({ vim }) ->
   for tab in vim.rootWindow.gBrowser.visibleTabs
-    window = tab.linkedBrowser.contentWindow
-    window.stop()
+    tab.linkedBrowser.stop()
   return
 
 
