@@ -17,22 +17,11 @@
 # along with VimFx.  If not, see <http://www.gnu.org/licenses/>.
 ###
 
-# This file is the equivalent of main.coffee, but for frame scripts.
+stub = (obj, method, fn) ->
+  originalFn = obj[method]
+  obj[method] = fn
+  return -> obj[method] = originalFn
 
-commands          = require('./commands-frame')
-FrameEventManager = require('./events-frame')
-messageManager    = require('./message-manager')
-VimFrame          = require('./vim-frame')
-
-module.exports = ->
-  { content } = FRAME_SCRIPT_ENVIRONMENT
-  vim = new VimFrame(content)
-  storage = {}
-
-  eventManager = new FrameEventManager(vim)
-  eventManager.addListeners()
-
-  messageManager.listen('runCommand', ({ name, data }, { callback }) ->
-    result = commands[name](Object.assign({vim, storage}, data))
-    messageManager.send(callback, result) if callback?
-  )
+module.exports = {
+  stub
+}

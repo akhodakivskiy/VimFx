@@ -18,19 +18,26 @@
 # along with VimFx.  If not, see <http://www.gnu.org/licenses/>.
 ###
 
-# Expose `Components` shortcuts a well as `Services` and `console` in all
-# modules.
-{ classes: Cc, interfaces: Ci, utils: Cu } = Components
+# This file boots the main VimFx process, as well as each frame script. It tries
+# to do the minimum amount of things to run main.coffee, or main-frame.coffee
+# for frame scripts. It defines a few global variables, and sets up a
+# Node.js-style `require` module loader.
+
+# Expose `Components` shortcuts a well as `Services`, `console` and
+# `IS_FRAME_SCRIPT` in all modules. The `@`s are needed for frame scripts.
+{ classes: @Cc, interfaces: @Ci, utils: @Cu } = Components
 
 Cu.import('resource://gre/modules/Services.jsm')
 Cu.import('resource://gre/modules/devtools/Console.jsm')
 
-do (global = this) ->
-  isFrameScript = (typeof content != 'undefined')
+@IS_FRAME_SCRIPT = (typeof content != 'undefined')
 
-  if isFrameScript
+do (global = this) ->
+
+  if IS_FRAME_SCRIPT
     [ global.__SCRIPT_URI_SPEC__ ] = sendSyncMessage('VimFx:tabCreated')
     return if __SCRIPT_URI_SPEC__ == false
+    global.FRAME_SCRIPT_ENVIRONMENT = global
 
   shutdownHandlers = []
 
@@ -67,7 +74,7 @@ do (global = this) ->
   require.scopes = {}
   require.data   = require('./require-data')
 
-  unless isFrameScript
+  unless IS_FRAME_SCRIPT
     # Set default prefs and apply migrations as early as possible.
     { applyMigrations } = require('./lib/legacy')
     migrations          = require('./lib/migrations')
@@ -76,17 +83,18 @@ do (global = this) ->
     prefs.default._init()
     applyMigrations(migrations)
 
-  main = if isFrameScript then './lib/main-frame' else './lib/main'
+  main = if IS_FRAME_SCRIPT then './lib/main-frame' else './lib/main'
   global.startup = require(main)
 
-  global.shutdown = (data, reason) ->
+  global.shutdown = ->
+    require('./lib/message-manager').send('shutdown') unless IS_FRAME_SCRIPT
+
     for shutdownHandler in shutdownHandlers
       try
         shutdownHandler()
       catch error
         Cu.reportError(error)
     shutdownHandlers = null
-    removeEventListener('unload', shutdown, true) if isFrameScript
 
     # Release everything in `require`d modules. This must be done _after_ all
     # shutdownHandlers, since they use variables in these scopes.
@@ -95,10 +103,10 @@ do (global = this) ->
         scope[name] = null
     require.scopes = null
 
-  global.install = (data, reason) ->
+  global.install = ->
 
-  global.uninstall = (data, reason) ->
+  global.uninstall = ->
 
-  if isFrameScript
-    addEventListener('unload', shutdown, true)
+  if IS_FRAME_SCRIPT
+    require('./lib/message-manager').listenOnce('shutdown', shutdown)
     startup()

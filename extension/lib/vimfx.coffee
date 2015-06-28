@@ -17,6 +17,11 @@
 # along with VimFx.  If not, see <http://www.gnu.org/licenses/>.
 ###
 
+# This file defines a top-level object to hold global state for VimFx. It keeps
+# track of all `Vim` instances (vim.coffee), all options and all keyboard
+# shortcuts. It can consume key presses according to its commands, and return
+# the commands for UI presentation. There is only one `VimFx` instance.
+
 notation = require('vim-like-key-notation')
 prefs    = require('./prefs')
 utils    = require('./utils')
@@ -28,24 +33,20 @@ FORCE_KEY = '<force>'
 class VimFx extends utils.EventEmitter
   constructor: (@modes, @options) ->
     super()
-    @vimBucket = new utils.Bucket(((window) => new Vim(window, this)), this)
+    @vims = new WeakMap()
     @createKeyTrees()
     @reset()
     @on('modechange', ({mode}) => @reset(mode))
-    @currentVim = null
-    @on('bucket.get', (vim) =>
-      return if @currentVim == vim
-      @currentVim = vim
-      @emit('currentVimChange', vim)
-    )
-    @customCommandCounter = 0
+
+  addVim: (browser) ->
+    @vims.set(browser, new Vim(browser, this))
+
+  getCurrentVim: (window) -> @vims.get(window.gBrowser.selectedBrowser)
 
   reset: (mode = null) ->
     @currentKeyTree = if mode then @keyTrees[mode] else {}
     @lastInputTime = 0
     @count = ''
-
-  getCurrentLocation: -> @currentVim?.window.location
 
   createKeyTrees: ->
     {@keyTrees, @forceCommands, @errors} = createKeyTrees(@modes)
@@ -56,7 +57,7 @@ class VimFx extends utils.EventEmitter
       translations: @options.translations
     })
 
-  consumeKeyEvent: (event, vim) ->
+  consumeKeyEvent: (event, vim, focusType) ->
     { mode } = vim
     return unless keyStr = @stringifyKeyEvent(event)
 
@@ -75,6 +76,11 @@ class VimFx extends utils.EventEmitter
     command = null
 
     switch
+      when toplevel and DIGIT.test(keyStr) and
+           not (keyStr == '0' and @count == '')
+        @count += keyStr
+        type = 'count'
+
       when keyStr of @currentKeyTree
         next = @currentKeyTree[keyStr]
         if next instanceof Leaf
@@ -84,41 +90,28 @@ class VimFx extends utils.EventEmitter
           @currentKeyTree = next
           type = 'partial'
 
-      when toplevel and DIGIT.test(keyStr) and
-           not (keyStr == '0' and @count == '')
-        @count += keyStr
-        type = 'count'
-
       else
         @reset(mode)
 
     count = if @count == '' then undefined else Number(@count)
     force = if command then (command.pref of @forceCommands) else false
-    focus = @getFocusType(vim, event, keyStr)
+    focus = @adjustFocusType(event, vim, focusType, keyStr)
     unmodifiedKey = notation.parse(keyStr).key
     @reset(mode) if type == 'full'
     return {type, focus, command, count, force, keyStr, unmodifiedKey, toplevel}
 
-  getFocusType: (vim, event, keyStr) ->
-    return unless target = event.originalTarget # For the tests.
-    document = target.ownerDocument
+  adjustFocusType: (event, vim, focusType, keyStr) ->
+    # Frame scripts and the tests don’t pass in `originalTarget`.
+    document = event.originalTarget?.ownerDocument
+    if focusType == null and document and
+       (vim.window.TabView.isVisible() or
+        document.fullscreenElement or document.mozFullScreenElement)
+      return 'other'
 
-    { activatable_element_keys, adjustable_element_keys } = @options
-    return switch
-      when utils.isTextInputElement(target) or
-           utils.isContentEditable(target)
-        'editable'
-      when (utils.isActivatable(target) and
-            keyStr in activatable_element_keys)
-        'activatable'
-      when (utils.isAdjustable(target) and
-            keyStr in adjustable_element_keys)
-        'adjustable'
-      when vim.rootWindow.TabView.isVisible() or
-           document.fullscreenElement or document.mozFullScreenElement
-        'other'
-      else
-        null
+    keys = @options["#{ focusType }_element_keys"]
+    return null if keys and keyStr not in keys
+
+    return focusType
 
   getGroupedCommands: (options = {}) ->
     modes = {}

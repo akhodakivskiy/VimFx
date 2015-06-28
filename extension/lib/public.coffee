@@ -17,6 +17,9 @@
 # along with VimFx.  If not, see <http://www.gnu.org/licenses/>.
 ###
 
+# This file provides VimFx’s public API (defined in api.coffee) for public
+# consumption.
+
 EXPORTED_SYMBOLS = ['getAPI']
 
 # Will be set by main.coffee. By passing the API in we make sure that all

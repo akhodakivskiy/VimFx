@@ -17,11 +17,12 @@
 # along with VimFx.  If not, see <http://www.gnu.org/licenses/>.
 ###
 
+# This file constructs VimFx’s options UI in the Add-ons Manager.
+
 defaults  = require('./defaults')
 translate = require('./l10n')
 prefs     = require('./prefs')
 utils     = require('./utils')
-
 
 TYPE_MAP =
   string:  'string'
@@ -93,13 +94,13 @@ class Observer extends BaseObserver
 
   injectInstructions: ->
     setting = @appendSetting({
-      type:        'control'
-      title:       translate('prefs.instructions.title')
-      desc:        translate('prefs.instructions.desc',
-                     @vimfx.options['options.key.quote'],
-                     @vimfx.options['options.key.insert_default'],
-                     @vimfx.options['options.key.reset_default'],
-                     '<c-z>')
+      type:  'control'
+      title: translate('prefs.instructions.title')
+      desc:  translate('prefs.instructions.desc',
+               @vimfx.options['options.key.quote'],
+               @vimfx.options['options.key.insert_default'],
+               @vimfx.options['options.key.reset_default'],
+               '<c-z>')
       'first-row': 'true'
     })
     href = "#{ @vimfx.info.homepageURL }/tree/master/documentation"
@@ -180,7 +181,7 @@ class Observer extends BaseObserver
           break unless isString
           quote = true
           # Override `<force>` commands (such as `<escape>` and `<tab>`).
-          vim = @vimfx.currentVim
+          vim = @vimfx.getCurrentVim(utils.getCurrentWindow())
           @vimfx.modes.normal.commands.quote.run({vim, count: 1})
         when keyString == @vimfx.options['options.key.insert_default']
           break unless isString
@@ -209,12 +210,12 @@ class Observer extends BaseObserver
         setting.valueToPreference()
         @refreshShortcutErrors()
     )
+
     @listen(@container, 'change', (event) ->
       setting = event.target
       unless setting.classList.contains('is-shortcut')
         setting.valueToPreference()
     )
-
 
   refreshShortcutErrors: ->
     for setting in @container.getElementsByClassName('is-shortcut')

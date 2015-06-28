@@ -19,36 +19,22 @@
 # along with VimFx.  If not, see <http://www.gnu.org/licenses/>.
 ###
 
-Window              = Ci.nsIDOMWindow
-ChromeWindow        = Ci.nsIDOMChromeWindow
-Element             = Ci.nsIDOMElement
-HTMLDocument        = Ci.nsIDOMHTMLDocument
+# This file contains lots of different helper functions.
+
 HTMLAnchorElement   = Ci.nsIDOMHTMLAnchorElement
 HTMLButtonElement   = Ci.nsIDOMHTMLButtonElement
 HTMLInputElement    = Ci.nsIDOMHTMLInputElement
 HTMLTextAreaElement = Ci.nsIDOMHTMLTextAreaElement
 HTMLSelectElement   = Ci.nsIDOMHTMLSelectElement
+HTMLFrameElement    = Ci.nsIDOMHTMLFrameElement
+HTMLIFrameElement   = Ci.nsIDOMHTMLIFrameElement
 XULDocument         = Ci.nsIDOMXULDocument
 XULButtonElement    = Ci.nsIDOMXULButtonElement
 XULControlElement   = Ci.nsIDOMXULControlElement
 XULMenuListElement  = Ci.nsIDOMXULMenuListElement
 XULTextBoxElement   = Ci.nsIDOMXULTextBoxElement
 
-class Bucket
-  constructor: (@newFunc, @observer = null) ->
-    @bucket = new WeakMap()
-
-  get: (obj) ->
-    if @bucket.has(obj)
-      value = @bucket.get(obj)
-    else
-      value = @newFunc(obj)
-      @bucket.set(obj, value)
-    @observer.emit('bucket.get', value) if @observer
-    return value
-
-  forget: (obj) ->
-    @bucket.delete(obj)
+USE_CAPTURE = true
 
 class EventEmitter
   constructor: ->
@@ -62,40 +48,20 @@ class EventEmitter
       listener(data)
     return
 
-getEventWindow = (event) ->
-  if event.originalTarget instanceof Window
-    return event.originalTarget
-  else
-    doc = event.originalTarget.ownerDocument or event.originalTarget
-    if doc instanceof HTMLDocument or doc instanceof XULDocument
-      return doc.defaultView
-
-getEventRootWindow = (event) ->
-  return unless window = getEventWindow(event)
-  return getRootWindow(window)
-
-getEventCurrentTabWindow = (event) ->
-  return unless rootWindow = getEventRootWindow(event)
-  return getCurrentTabWindow(rootWindow)
-
-getRootWindow = (window) ->
-  return window
-    .QueryInterface(Ci.nsIInterfaceRequestor)
-    .getInterface(Ci.nsIWebNavigation)
-    .QueryInterface(Ci.nsIDocShellTreeItem)
-    .rootTreeItem
-    .QueryInterface(Ci.nsIInterfaceRequestor)
-    .getInterface(Window)
-
-getCurrentTabWindow = (window) ->
-  return window.gBrowser.selectedTab.linkedBrowser.contentWindow
-
 blurActiveElement = (window, { force = false } = {}) ->
   # Only blur focusable elements, in order to interfere with the browser as
   # little as possible.
-  { activeElement } = window.document
+  activeElement = getActiveElement(window)
   if activeElement and (activeElement.tabIndex > -1 or force)
     activeElement.blur()
+
+getActiveElement = (window) ->
+  { activeElement } = window.document
+  if activeElement instanceof HTMLFrameElement or
+     activeElement instanceof HTMLIFrameElement
+    return getActiveElement(activeElement.contentWindow)
+  else
+    return activeElement
 
 # Focus an element and tell Firefox that the focus happened because of a user
 # keypress (not just because some random programmatic focus).
@@ -152,11 +118,20 @@ isAdjustable = (element) ->
          element.classList?.contains('html5-video-player') or
          element.classList?.contains('ytp-button')
 
+getFocusType = (event) ->
+  target = event.originalTarget
+  return switch
+    when isTextInputElement(target) or isContentEditable(target)
+      'editable'
+    when isActivatable(target)
+      'activatable'
+    when isAdjustable(target)
+      'adjustable'
+    else
+      null
+
 area = (element) ->
   return element.clientWidth * element.clientHeight
-
-getSessionStore = ->
-  Cc['@mozilla.org/browser/sessionstore;1'].getService(Ci.nsISessionStore)
 
 loadCss = (name) ->
   sss = Cc['@mozilla.org/content/style-sheet-service;1']
@@ -170,17 +145,12 @@ loadCss = (name) ->
     sss.unregisterSheet(uri, method)
   )
 
-# Store events that we’ve simulated. A `WeakMap` is used in order not to leak
-# memory. This approach is better than for example setting `event.simulated =
-# true`, since that tells the sites that the click was simulated, and allows
-# sites to spoof it.
-simulated_events = new WeakMap()
-
 # Simulate mouse click with a full chain of events. ('command' is for XUL
 # elements.)
 eventSequence = ['mouseover', 'mousedown', 'mouseup', 'click', 'command']
 simulateClick = (element) ->
   window = element.ownerDocument.defaultView
+  simulatedEvents = {}
   for type in eventSequence
     mouseEvent = new window.MouseEvent(type, {
       # Let the event bubble in order to trigger delegated event listeners.
@@ -190,9 +160,18 @@ simulateClick = (element) ->
       cancelable: true
     })
     element.dispatchEvent(mouseEvent)
+    simulatedEvents[type] = mouseEvent
+  return simulatedEvents
 
-isEventSimulated = (event) ->
-  return simulated_events.has(event)
+listen = (element, eventName, listener) ->
+  element.addEventListener(eventName, listener, USE_CAPTURE)
+  module.onShutdown(->
+    element.removeEventListener(eventName, listener, USE_CAPTURE)
+  )
+
+suppressEvent = (event) ->
+  event.preventDefault()
+  event.stopPropagation()
 
 # Write a string to the system clipboard.
 writeToClipboard = (text) ->
@@ -225,9 +204,9 @@ insertText = (input, value) ->
     input.value[0...selectionStart] + value + input.value[selectionEnd..]
   input.selectionStart = input.selectionEnd = selectionStart + value.length
 
-openTab = (rootWindow, url, options) ->
-  { gBrowser } = rootWindow
-  rootWindow.TreeStyleTabService?.readyToOpenChildTab(gBrowser.selectedTab)
+openTab = (window, url, options) ->
+  { gBrowser } = window
+  window.TreeStyleTabService?.readyToOpenChildTab(gBrowser.selectedTab)
   gBrowser.loadOneTab(url, options)
 
 # Remove duplicate characters from string (case insensitive).
@@ -245,7 +224,7 @@ removeDuplicates = (array) ->
 formatError = (error) ->
   stack = String(error.stack?.formattedStack ? error.stack ? '')
     .split('\n')
-    .filter((line) -> line.contains('.xpi!'))
+    .filter((line) -> line.includes('.xpi!'))
     .map((line) -> '  ' + line.replace(/(?:\/<)*@.+\.xpi!/g, '@'))
     .join('\n')
   return "#{ error }\n#{ stack }"
@@ -265,29 +244,34 @@ class Counter
     @step  = step  ? 1
   tick: -> @value += @step
 
+getCurrentWindow = ->
+  windowMediator = Cc['@mozilla.org/appshell/window-mediator;1']
+    .getService(Components.interfaces.nsIWindowMediator)
+  return windowMediator.getMostRecentWindow('navigator:browser')
+
+getCurrentLocation = (browser = null) ->
+  browser = getCurrentWindow().gBrowser.selectedBrowser unless browser?
+  return new browser.ownerGlobal.URL(browser.currentURI.spec)
+
 module.exports = {
-  Bucket
   EventEmitter
-  getEventWindow
-  getEventRootWindow
-  getEventCurrentTabWindow
-  getRootWindow
-  getCurrentTabWindow
 
   blurActiveElement
+  getActiveElement
   focusElement
   isProperLink
   isTextInputElement
   isContentEditable
   isActivatable
   isAdjustable
+  getFocusType
   area
-  getSessionStore
 
   loadCss
 
   simulateClick
-  isEventSimulated
+  listen
+  suppressEvent
   writeToClipboard
   timeIt
 
@@ -302,4 +286,6 @@ module.exports = {
   observe
   has
   Counter
+  getCurrentWindow
+  getCurrentLocation
 }

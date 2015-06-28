@@ -18,16 +18,18 @@
 # along with VimFx.  If not, see <http://www.gnu.org/licenses/>.
 ###
 
+# This file contains an abstraction for hint markers. It creates the UI for a
+# marker and provides methods to manipulate the markers.
+
 utils = require('./utils')
 
-# Wraps the markable element and provides methods to manipulate the markers.
 class Marker
-  # Creates the marker DOM node.
-  constructor: (@element, @elementShape, { @semantic, @type }) ->
-    document = @element.ownerDocument
-    @markerElement = utils.createBox(document, 'marker')
+  # `@wrapper` is a stand-in for the element that the marker represents. See
+  # `injectHints` in hints.coffee for more information.
+  constructor: (@wrapper, @document) ->
+    @elementShape = @wrapper.shape
+    @markerElement = utils.createBox(@document, 'marker')
     @weight = @elementShape.area
-    @numChildren = 0
 
   reset: ->
     @setHint(@hint)
@@ -40,7 +42,7 @@ class Marker
 
   # To be called when the marker has been both assigned a hint and inserted
   # into the DOM, and thus gotten a height and width.
-  setPosition: (viewport) ->
+  setPosition: (viewport, zoom) ->
     {
       markerElement: { clientHeight: height, clientWidth: width }
       elementShape: { nonCoveredPoint: { x: left, y: top, offset, rect } }
@@ -64,8 +66,8 @@ class Marker
     top  = Math.max(top,  viewport.top)
 
     # Take the current zoom into account.
-    left = Math.round(left * viewport.zoom)
-    top  = Math.round(top  * viewport.zoom)
+    left = Math.round(left * zoom)
+    top  = Math.round(top  * zoom)
 
     # The positioning is absolute.
     @markerElement.style.left = "#{ left }px"
@@ -80,10 +82,9 @@ class Marker
 
   setHint: (@hint) ->
     @hintIndex = 0
-    document = @element.ownerDocument
     @markerElement.firstChild.remove() while @markerElement.hasChildNodes()
-    fragment = document.createDocumentFragment()
-    utils.createBox(document, 'marker-char', fragment, char) for char in @hint
+    fragment = @document.createDocumentFragment()
+    utils.createBox(@document, 'marker-char', fragment, char) for char in @hint
     @markerElement.appendChild(fragment)
 
   matchHintChar: (char) ->

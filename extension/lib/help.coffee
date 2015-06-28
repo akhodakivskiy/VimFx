@@ -17,16 +17,18 @@
 # along with VimFx.  If not, see <http://www.gnu.org/licenses/>.
 ###
 
+# This file creates VimFx’s Keyboard Shortcuts help screen.
+
 translate = require('./l10n')
 utils     = require('./utils')
 
 CONTAINER_ID  = 'VimFxHelpDialogContainer'
 MAX_FONT_SIZE = 20
 
-injectHelp = (rootWindow, vimfx) ->
-  removeHelp(rootWindow)
+injectHelp = (window, vimfx) ->
+  removeHelp(window)
 
-  { document } = rootWindow
+  { document } = window
 
   container = document.createElement('box')
   container.id = CONTAINER_ID
@@ -40,11 +42,11 @@ injectHelp = (rootWindow, vimfx) ->
   content = createContent(document, vimfx)
   wrapper.appendChild(content)
 
-  rootWindow.gBrowser.mCurrentBrowser.parentNode.appendChild(container)
+  window.gBrowser.mCurrentBrowser.parentNode.appendChild(container)
 
   # The font size of menu items is used by default, which is usually quite
   # small. Try to increase it without causing a scrollbar.
-  computedStyle = rootWindow.getComputedStyle(container)
+  computedStyle = window.getComputedStyle(container)
   fontSize = originalFontSize =
     parseFloat(computedStyle.getPropertyValue('font-size'))
   while wrapper.clientHeight < container.clientHeight and
@@ -56,8 +58,8 @@ injectHelp = (rootWindow, vimfx) ->
   # Uncomment this line if you want to use `gulp help.html`!
   # utils.writeToClipboard(container.outerHTML)
 
-removeHelp = (rootWindow) ->
-  rootWindow.document.getElementById(CONTAINER_ID)?.remove()
+removeHelp = (window) ->
+  window.document.getElementById(CONTAINER_ID)?.remove()
 
 createHeader = (document, vimfx) ->
   $ = utils.createBox.bind(null, document)

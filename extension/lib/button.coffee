@@ -17,8 +17,11 @@
 # along with VimFx.  If not, see <http://www.gnu.org/licenses/>.
 ###
 
+# This file creates VimFx’s toolbar button.
+
 help      = require('./help')
 translate = require('./l10n')
+utils     = require('./utils')
 
 BUTTON_ID = 'VimFxButton'
 
@@ -35,24 +38,32 @@ injectButton = (vimfx, window) ->
       if mode == 'normal'
         help.injectHelp(window, vimfx)
       else
-        vimfx.currentVim.enterMode('normal')
+        vimfx.getCurrentVim(window).enterMode('normal')
     onCreated: (node) ->
       button = node
       button.setAttribute('vimfx-mode', 'normal')
-      vimfx.on('modeChange',       updateButton.bind(null, button))
-      vimfx.on('currentVimChange', updateButton.bind(null, button))
+
+      updateButton = ->
+        # - The 'modeChange' event provides the `vim` object that changed mode,
+        #   but it might not be the current `vim` anymore, so always get the
+        #   current instance.
+        # - A 'TabSelect' event fires for the current tab when Firefox starts.
+        #   By then a `vim` object for that tab might not have been constructed
+        #   yet. If so, simply do nothing.
+        return unless vim = vimfx.getCurrentVim(window)
+        button.setAttribute('vimfx-mode', vim.mode)
+        tooltip =
+          if vim.mode == 'normal'
+            translate('button.tooltip.normal')
+          else
+            translate('button.tooltip.other_mode',
+                      translate("mode.#{ vim.mode }"), translate('mode.normal'))
+        button.setAttribute('tooltiptext', tooltip)
+
+      vimfx.on('modeChange', updateButton)
+      utils.listen(window, 'TabSelect', updateButton)
   })
   module.onShutdown(cui.destroyWidget.bind(cui, BUTTON_ID))
-
-updateButton = (button, { mode }) ->
-  button.setAttribute('vimfx-mode', mode)
-  tooltip =
-    if mode == 'normal'
-      translate('button.tooltip.normal')
-    else
-      translate('button.tooltip.other_mode', translate("mode.#{ mode }"),
-                translate('mode.normal'))
-  button.setAttribute('tooltiptext', tooltip)
 
 module.exports = {
   injectButton

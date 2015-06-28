@@ -17,20 +17,21 @@
 # along with VimFx.  If not, see <http://www.gnu.org/licenses/>.
 ###
 
+# This file provides an API a bit more easy to use than the very low-level
+# Firefox message manager APIs. “Message Management” is all about sending
+# messages between the main process and frame scripts. There is one frame script
+# per tab, and only them can access web page content.
+
 namespace = (name) -> "VimFx:#{ name }"
 
-globalMM = Cc['@mozilla.org/globalmessagemanager;1']
-  .getService(Ci.nsIMessageListenerManager)
+defaultMM =
+  if IS_FRAME_SCRIPT
+    FRAME_SCRIPT_ENVIRONMENT
+  else
+    Cc['@mozilla.org/globalmessagemanager;1']
+      .getService(Ci.nsIMessageListenerManager)
 
-getMessageManager = (obj) -> switch
-  when obj == 'global'
-    globalMM
-  when obj.selectedBrowser # `obj == window.gBrowser`
-    selectedBrowser.messageManager
-  else # `obj == window`
-    obj.messageManager
-
-load = (messageManager = globalMM, name) ->
+load = (name, messageManager = defaultMM) ->
   # Randomize URI to work around bug 1051238.
   url = "chrome://vimfx/content/#{ name }.js?#{ Math.random() }"
   messageManager.loadFrameScript(url, true)
@@ -38,31 +39,55 @@ load = (messageManager = globalMM, name) ->
     messageManager.removeDelayedFrameScript(url)
   )
 
-listen = (messageManager = globalMM, name, listener) ->
+listen = (name, listener, messageManager = defaultMM) ->
   namespacedName = namespace(name)
-  messageManager.addMessageListener(namespacedName, listener)
+  fn = invokeListener.bind(null, listener)
+  messageManager.addMessageListener(namespacedName, fn)
   module.onShutdown(->
-    messageManager.removeMessageListener(namespacedName, listener)
+    messageManager.removeMessageListener(namespacedName, fn)
   )
 
-listenOnce = (messageManager = globalMM, name, listener) ->
+listenOnce = (name, listener, messageManager = defaultMM) ->
   namespacedName = namespace(name)
   fn = (data) ->
     messageManager.removeMessageListener(namespacedName, fn)
-    listener(data)
+    invokeListener(listener, data)
   messageManager.addMessageListener(namespacedName, fn)
 
-send = (messageManager = globalMM, name, data = null, callback = null) ->
-  namespacedName = namespace(name)
+callbackCounter = 0
+send = (name, data = null, messageManager = defaultMM, callback = null) ->
+  if typeof messageManager == 'function'
+    callback = messageManager
+    messageManager = defaultMM
+
+  callbackName = null
   if callback
-    listenOnce(messageManager, "#{ namespacedName }:callback", callback)
+    callbackName = "#{ name }:callback:#{ callbackCounter }"
+    callbackCounter++
+    listenOnce(callbackName, callback, messageManager)
+
+  namespacedName = namespace(name)
+  wrappedData = {data, callback: callbackName}
   if messageManager.broadcastAsyncMessage
-    messageManager.broadcastAsyncMessage(namespacedName, data)
+    messageManager.broadcastAsyncMessage(namespacedName, wrappedData)
   else
-    messageManager.sendAsyncMessage(namespacedName, data)
+    messageManager.sendAsyncMessage(namespacedName, wrappedData)
+
+# Unwraps the data from `send` and invokes `listener` with it.
+invokeListener = (listener, { name, data: { data, callback } = {}, target }) ->
+  listener(data, {name, target, callback})
+
+# Note: This is a synchronous call. It should only be used when absolutely
+# needed, such as in an event listener which needs to suppress the event based
+# on the return value.
+get = (name, data) ->
+  [ result ] = defaultMM.sendSyncMessage(namespace(name), {data})
+  return result
 
 module.exports = {
   load
   listen
+  listenOnce
   send
+  get
 }

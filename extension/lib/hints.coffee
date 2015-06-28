@@ -18,39 +18,36 @@
 # along with VimFx.  If not, see <http://www.gnu.org/licenses/>.
 ###
 
-huffman = require('n-ary-huffman')
-utils   = require('./utils')
+# This file contains functions for getting markable elements, and related data,
+# as well as for creating and inserting markers for markable elements.
+
+huffman    = require('n-ary-huffman')
+{ Marker } = require('./marker')
+utils      = require('./utils')
 
 CONTAINER_ID = 'VimFxMarkersContainer'
 
-Element      = Ci.nsIDOMElement
-HTMLDocument = Ci.nsIDOMHTMLDocument
-XULDocument  = Ci.nsIDOMXULDocument
+Element     = Ci.nsIDOMElement
+XULDocument = Ci.nsIDOMXULDocument
 
-injectHints = (rootWindow, window, filter, options) ->
-  {
-    clientWidth, clientHeight # Viewport size excluding scrollbars, usually.
-    scrollWidth, scrollHeight
-  } = window.document.documentElement
-  { innerWidth, innerHeight } = window # Viewport size including scrollbars.
-  # We don’t want markers to cover the scrollbars, so we should use
-  # `clientWidth` and `clientHeight`. However, when there are no scrollbars
-  # those might be too small. Then we use `innerWidth` and `innerHeight`.
-  width  = if scrollWidth  > innerWidth  then clientWidth  else innerWidth
-  height = if scrollHeight > innerHeight then clientHeight else innerHeight
-  viewport = {
-    left:    0
-    top:     0
-    right:   width
-    bottom:  height
-    width
-    height
-    zoom: rootWindow.gBrowser.selectedBrowser.markupDocumentViewer.fullZoom
-  }
+# Create `Marker`s for every element (represented by a regular object of data
+# about the element—a “wrapper,” a stand-in for the real element, which is only
+# accessible in frame scripts) in `wrappers`, and insert them into `window`.
+injectHints = (window, wrappers, viewport, options) ->
+  semantic   = []
+  unsemantic = []
+  combined   = []
+  markerMap  = {}
 
-  groups = {semantic: [], unsemantic: [], combined: []}
-  createMarkers(window, viewport, groups, filter)
-  { semantic, unsemantic, combined } = groups
+  for wrapper in wrappers
+    marker = new Marker(wrapper, window.document)
+    group = switch
+      when wrapper.parentIndex? then combined
+      when wrapper.semantic     then semantic
+      else unsemantic
+    group.push(marker)
+    markerMap[wrapper.elementIndex] = marker
+
   markers = semantic.concat(unsemantic)
 
   return [[], null] if markers.length == 0
@@ -63,8 +60,8 @@ injectHints = (rootWindow, window, filter, options) ->
     markers.sort((a, b) -> a.weight - b.weight)
     for marker in markers when marker not instanceof huffman.BranchPoint
       marker.markerElement.style.zIndex = zIndex++
-      # Add `z-index` space for all the children of the marker (usually 0).
-      zIndex += marker.numChildren
+      # Add `z-index` space for all the children of the marker.
+      zIndex += marker.wrapper.numChildren if marker.wrapper.numChildren?
 
   # The `markers` passed to this function have been sorted by `setZIndexes` in
   # advance, so we can skip sorting in the `huffman.createTree` function.
@@ -93,42 +90,63 @@ injectHints = (rootWindow, window, filter, options) ->
   # combined weight), but in case any of them cover another they still get a
   # unique `z-index` (space for this was added in `setZIndexes`).
   for marker in combined
-    { parent } = marker
+    parent = markerMap[marker.wrapper.parentIndex]
     marker.markerElement.style.zIndex = parent.markerElement.style.zIndex++
     marker.setHint(parent.hint)
   markers.push(combined...)
 
-  container = rootWindow.document.createElement('box')
+  container = window.document.createElement('box')
   container.id = CONTAINER_ID
-  rootWindow.gBrowser.mCurrentBrowser.parentNode.appendChild(container)
+  window.gBrowser.mCurrentBrowser.parentNode.appendChild(container)
 
+  zoom = window.ZoomManager.getZoomForBrowser(window.gBrowser.selectedBrowser)
   for marker in markers
     container.appendChild(marker.markerElement)
     # Must be done after the hints have been inserted into the DOM (see
     # marker.coffee).
-    marker.setPosition(viewport)
+    marker.setPosition(viewport, zoom)
 
   return [markers, container]
 
+
+getMarkableElementsAndViewport = (window, filter) ->
+  {
+    clientWidth, clientHeight # Viewport size excluding scrollbars, usually.
+    scrollWidth, scrollHeight
+  } = window.document.documentElement
+  { innerWidth, innerHeight } = window # Viewport size including scrollbars.
+  # We don’t want markers to cover the scrollbars, so we should use
+  # `clientWidth` and `clientHeight`. However, when there are no scrollbars
+  # those might be too small. Then we use `innerWidth` and `innerHeight`.
+  width  = if scrollWidth  > innerWidth  then clientWidth  else innerWidth
+  height = if scrollHeight > innerHeight then clientHeight else innerHeight
+  viewport = {
+    left:   0
+    top:    0
+    right:  width
+    bottom: height
+    width
+    height
+  }
+
+  wrappers = []
+  getMarkableElements(window, viewport, wrappers, filter)
+  return {wrappers, viewport}
+
 # `filter` is a function that is given every element in every frame of the page.
-# It should return new `Marker`s for markable elements and a falsy value for all
-# other elements. All returned `Marker`s are added to `groups`. `groups` is
-# modified instead of using return values to avoid array concatenation for each
-# frame. It might sound expensive to go through _every_ element, but that’s
+# It should return wrapper objects for markable elements and a falsy value for
+# all other elements. All returned wrappers are added to `wrappers`. `wrappers`
+# is modified instead of using return values to avoid array concatenation for
+# each frame. It might sound expensive to go through _every_ element, but that’s
 # actually what other methods like using XPath or CSS selectors would need to do
 # anyway behind the scenes.
-createMarkers = (window, viewport, groups, filter, parents = []) ->
+getMarkableElements = (window, viewport, wrappers, filter, parents = []) ->
   { document } = window
 
   localGetElementShape = getElementShape.bind(null, window, viewport, parents)
   for element in getElements(document, viewport) when element instanceof Element
-    continue unless marker = filter(element, localGetElementShape)
-    if marker.parent
-      groups.combined.push(marker)
-    else if marker.semantic
-      groups.semantic.push(marker)
-    else
-      groups.unsemantic.push(marker)
+    continue unless wrapper = filter(element, localGetElementShape)
+    wrappers.push(wrapper)
 
   for frame in window.frames
     rect = frame.frameElement.getBoundingClientRect() # Frames only have one.
@@ -153,31 +171,18 @@ createMarkers = (window, viewport, groups, filter, parents = []) ->
         parseFloat(computedStyle.getPropertyValue('border-top-width')) +
         parseFloat(computedStyle.getPropertyValue('padding-top'))
 
-    createMarkers(frame, frameViewport, groups, filter,
-                  parents.concat({ window, offset }))
+    getMarkableElements(frame, frameViewport, wrappers, filter,
+                        parents.concat({ window, offset }))
 
   return
 
 # Returns a suitable set of elements in `document` that could possibly get
 # markers.
-getElements = (document, viewport) -> switch
-  # In HTML documents we can use a super-fast Firefox API to get all elements in
-  # the viewport.
-  when document instanceof HTMLDocument
-    windowUtils = document.defaultView
-      .QueryInterface(Ci.nsIInterfaceRequestor)
-      .getInterface(Ci.nsIDOMWindowUtils)
-    return windowUtils.nodesFromRect(
-      viewport.left, viewport.top, # Rect coordinates, relative to the viewport.
-      # Distances to expand in all directions: top, right, bottom, left.
-      0, viewport.right, viewport.bottom, 0,
-      true, # Unsure what this does. Toggling it seems to make no difference.
-      true  # Ensure that the list of matching elements is fully up to date.
-    )
+getElements = (document, viewport) ->
   # In XUL documents we have to resort to get every single element in the entire
   # document, because there are lots of complicated “anonymous” elements, which
   # `windowUtils.nodesFromRect()` does not catch.
-  when document instanceof XULDocument
+  if document instanceof XULDocument
     elements = []
     getAllRegular = (element) ->
       for child in element.getElementsByTagName('*')
@@ -192,12 +197,22 @@ getElements = (document, viewport) -> switch
       return
     getAllRegular(document.documentElement)
     return elements
+  # In other documents we can use a super-fast Firefox API to get all elements
+  # in the viewport.
+  else
+    windowUtils = document.defaultView
+      .QueryInterface(Ci.nsIInterfaceRequestor)
+      .getInterface(Ci.nsIDOMWindowUtils)
+    return windowUtils.nodesFromRect(
+      viewport.left, viewport.top, # Rect coordinates, relative to the viewport.
+      # Distances to expand in all directions: top, right, bottom, left.
+      0, viewport.right, viewport.bottom, 0,
+      true, # Unsure what this does. Toggling it seems to make no difference.
+      true  # Ensure that the list of matching elements is fully up to date.
+    )
 
 # Returns the “shape” of `element`:
 #
-# - `rects`: Its `.getClientRects()` rectangles.
-# - `visibleRects`: The parts of rectangles out of the above that are inside
-#   `viewport`.
 # - `nonCoveredPoint`: The coordinates of the first point of `element` that
 #   isn’t covered by another element (except children of `element`). It also
 #   contains the offset needed to make those coordinates relative to the top
@@ -250,7 +265,7 @@ getElementShape = (window, viewport, parents, element) ->
   return null unless nonCoveredPoint
 
   return {
-    rects, visibleRects, nonCoveredPoint, area: totalArea
+    nonCoveredPoint, area: totalArea
   }
 
 
@@ -366,4 +381,5 @@ getClosestNonAnonymousParent = (element) ->
 
 module.exports = {
   injectHints
+  getMarkableElementsAndViewport
 }

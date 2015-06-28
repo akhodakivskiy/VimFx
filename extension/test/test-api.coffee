@@ -17,7 +17,9 @@
 # along with VimFx.  If not, see <http://www.gnu.org/licenses/>.
 ###
 
-prefs = require('../lib/prefs')
+testUtils = require('./utils')
+prefs     = require('../lib/prefs')
+utils     = require('../lib/utils')
 
 { utils: Cu } = Components
 
@@ -38,9 +40,9 @@ exports['test exports'] = (assert, passed_vimfx) -> getAPI((vimfx) ->
 )
 
 exports['test get'] = (assert, passed_vimfx) -> getAPI((vimfx) ->
-  prefs.tmp('hint_chars', 'abcd', ->
-    assert.equal(vimfx.get('hint_chars'), 'abcd')
-  )
+  reset = prefs.tmp('hint_chars', 'abcd')
+  assert.equal(vimfx.get('hint_chars'), 'abcd')
+  reset()
 )
 
 exports['test customization'] = (assert, passed_vimfx) -> getAPI((vimfx) ->
@@ -78,13 +80,13 @@ exports['test customization'] = (assert, passed_vimfx) -> getAPI((vimfx) ->
 
   # Test that the new simple command can be run.
   passed_vimfx.reset('normal')
-  match = passed_vimfx.consumeKeyEvent(event, {mode: 'normal'})
+  match = passed_vimfx.consumeKeyEvent(event, {mode: 'normal'}, null)
   assert.equal(match.type, 'full')
   assert.equal(match.command.run(), nonce)
 
   # Test that the new complex command can be run.
   passed_vimfx.reset('ignore')
-  match = passed_vimfx.consumeKeyEvent(event, {mode: 'ignore'})
+  match = passed_vimfx.consumeKeyEvent(event, {mode: 'ignore'}, null)
   assert.equal(match.type, 'full')
   assert.equal(match.command.run(), nonce)
 
@@ -113,14 +115,14 @@ exports['test customization'] = (assert, passed_vimfx) -> getAPI((vimfx) ->
 
   # Test that the new simple command cannot be run.
   passed_vimfx.reset('normal')
-  match = passed_vimfx.consumeKeyEvent(event, {mode: 'normal'})
+  match = passed_vimfx.consumeKeyEvent(event, {mode: 'normal'}, null)
   if match.type == 'full'
     value = try match.command.run() catch then null
     assert.notEqual(value, nonce)
 
   # Test that the new complex command cannot be run.
   passed_vimfx.reset('ignore')
-  match = passed_vimfx.consumeKeyEvent(event, {mode: 'ignore'})
+  match = passed_vimfx.consumeKeyEvent(event, {mode: 'ignore'}, null)
   if match.type == 'full'
     value = try match.command.run() catch then null
     assert.notEqual(value, nonce)
@@ -180,12 +182,13 @@ exports['test addOptionOverrides'] = (assert, passed_vimfx) -> getAPI((vimfx) ->
 
   assert.equal(passed_vimfx.options.prevent_autofocus, true)
 
-  passed_vimfx.currentVim =
-    window:
-      location: {hostname: 'example.com'}
+  reset = testUtils.stub(utils, 'getCurrentLocation', -> {
+    hostname: 'example.com'
+  })
 
   assert.equal(passed_vimfx.options.prevent_autofocus, false)
 
+  reset()
   passed_vimfx.options = originalOptions
   passed_vimfx.optionOverrides = originalOptionOverrides
 )
@@ -209,42 +212,46 @@ exports['test addKeyOverrides'] = (assert, passed_vimfx) -> getAPI((vimfx) ->
     ]
   )
 
-  prefs.tmp('mode.normal.scroll_to_bottom', '<foobar>j', ->
-    passed_vimfx.reset('normal')
+  resetScrollToBottom = prefs.tmp('mode.normal.scroll_to_bottom', '<foobar>j')
+  passed_vimfx.reset('normal')
 
-    match = passed_vimfx.consumeKeyEvent({key: 'j'}, {mode: 'ignore'})
-    assert.ok(match)
+  match = passed_vimfx.consumeKeyEvent({key: 'j'}, {mode: 'ignore'}, null)
+  assert.ok(match)
 
-    passed_vimfx.currentVim =
-      window:
-        location: {hostname: 'example.co', href: 'about:blank'}
+  resetGetCurrentLocation = testUtils.stub(utils, 'getCurrentLocation', -> {
+    hostname: 'example.co'
+    href: 'about:blank'
+  })
 
-    match = passed_vimfx.consumeKeyEvent({key: '1'}, {mode: 'normal'})
-    assert.equal(match.type, 'count')
-    assert.equal(match.count, 1)
+  match = passed_vimfx.consumeKeyEvent({key: '1'}, {mode: 'normal'}, null)
+  assert.equal(match.type, 'count')
+  assert.equal(match.count, 1)
 
-    match = passed_vimfx.consumeKeyEvent({key: 'j'}, {mode: 'normal'})
-    assert.ok(not match)
+  match = passed_vimfx.consumeKeyEvent({key: 'j'}, {mode: 'normal'}, null)
+  assert.ok(not match)
 
-    match = passed_vimfx.consumeKeyEvent({key: 'foobar', ctrlKey: true},
-                                         {mode: 'normal'})
-    assert.ok(not match)
+  match = passed_vimfx.consumeKeyEvent({key: 'foobar', ctrlKey: true},
+                                       {mode: 'normal'}, null)
+  assert.ok(not match)
 
-    match = passed_vimfx.consumeKeyEvent({key: 'foobar'}, {mode: 'normal'})
-    assert.equal(match.type, 'partial')
-    match = passed_vimfx.consumeKeyEvent({key: 'j'}, {mode: 'normal'})
-    assert.equal(match.type, 'full')
-    assert.strictEqual(match.count, undefined)
+  match = passed_vimfx.consumeKeyEvent({key: 'foobar'}, {mode: 'normal'},
+                                       null)
+  assert.equal(match.type, 'partial')
+  match = passed_vimfx.consumeKeyEvent({key: 'j'}, {mode: 'normal'}, null)
+  assert.equal(match.type, 'full')
+  assert.strictEqual(match.count, undefined)
 
-    passed_vimfx.reset('ignore')
+  passed_vimfx.reset('ignore')
 
-    match = passed_vimfx.consumeKeyEvent({key: 'j'}, {mode: 'ignore'})
-    assert.ok(match)
+  match = passed_vimfx.consumeKeyEvent({key: 'j'}, {mode: 'ignore'}, null)
+  assert.ok(match)
 
-    match = passed_vimfx.consumeKeyEvent({key: 'escape'}, {mode: 'ignore'})
-    assert.ok(not match)
-  )
+  match = passed_vimfx.consumeKeyEvent({key: 'escape'}, {mode: 'ignore'},
+                                       null)
+  assert.ok(not match)
 
+  resetScrollToBottom()
+  resetGetCurrentLocation()
   passed_vimfx.options = originalOptions
   passed_vimfx.keyOverrides = originalKeyOverrides
 )

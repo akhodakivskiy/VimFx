@@ -19,6 +19,9 @@
 # along with VimFx.  If not, see <http://www.gnu.org/licenses/>.
 ###
 
+# This file defines VimFx’s modes, and their respective commands. The Normal
+# mode commands are defined in commands.coffee, though.
+
 { commands
 , findStorage }              = require('./commands')
 defaults                     = require('./defaults')
@@ -27,8 +30,6 @@ hints                        = require('./hints')
 translate                    = require('./l10n')
 { rotateOverlappingMarkers } = require('./marker')
 utils                        = require('./utils')
-
-XULDocument = Ci.nsIDOMXULDocument
 
 # Helper to create modes in a DRY way.
 mode = (modeName, obj, commands) ->
@@ -48,49 +49,44 @@ mode = (modeName, obj, commands) ->
 
 
 mode('normal', {
-  onEnter: ({ vim, storage, args: [enterMode] }) ->
-    if enterMode
-      storage.enterMode = enterMode
-    else if storage.enterMode
-      vim.enterMode(storage.enterMode)
-      storage.enterMode = null
+  onEnter: ({ vim, storage }, options = {}) ->
+    if options.returnTo
+      storage.returnTo = options.returnTo
+    else if storage.returnTo
+      vim.enterMode(storage.returnTo)
+      storage.returnTo = null
 
-  onLeave: ({ vim, storage }) ->
-    storage.inputs = null
-    help.removeHelp(vim.rootWindow)
+  onLeave: ({ vim }) ->
+    vim._run('clear_inputs')
+    help.removeHelp(vim.window)
 
   onInput: (args, match) ->
-    { vim, storage, event } = args
+    { vim, storage, isFrameEvent } = args
     { keyStr } = match
-
-    if storage.inputs
-      index = storage.inputs.indexOf(vim.window.document.activeElement)
-      if index >= 0
-        storage.inputIndex = index
-      else
-        storage.inputs = null
 
     autoInsertMode = (match.focus != null)
     if match.type == 'none' or (autoInsertMode and not match.force)
-      if storage.enterMode
-        vim.enterMode(storage.enterMode)
-        storage.enterMode = null
+      if storage.returnTo
+        vim.enterMode(storage.returnTo)
+        storage.returnTo = null
       return false
 
     if match.type == 'full'
       { command } = match
       # Rely on the default `<tab>` behavior, since it allows web pages to
       # provide tab completion, for example, inside text inputs.
-      unless match.toplevel and not storage.inputs and
-             ((command.run == commands.focus_previous and keyStr == '<tab>') or
-              (command.run == commands.focus_next     and keyStr == '<s-tab>'))
-        command.run(args)
+      args._skipMoveFocus = (
+        match.toplevel and
+        ((command.run == commands.focus_previous and keyStr == '<tab>') or
+         (command.run == commands.focus_next     and keyStr == '<s-tab>'))
+      )
+      command.run(args)
 
-        # If the command changed the mode, wait until coming back from that mode
-        # before switching to `storage.enterMode` if any (see `onEnter` above).
-        if storage.enterMode and vim.mode == 'normal'
-          vim.enterMode(storage.enterMode)
-          storage.enterMode = null
+      # If the command changed the mode, wait until coming back from that mode
+      # before switching to `storage.returnTo` if any (see `onEnter` above).
+      if storage.returnTo and vim.mode == 'normal'
+        vim.enterMode(storage.returnTo)
+        storage.returnTo = null
 
     # At this point the match is either full, partial or part of a count. Then
     # we always want to suppress, except for one case: The Escape key.
@@ -98,7 +94,7 @@ mode('normal', {
     # - It allows for stopping the loading of the page.
     # - It allows for closing many custom dialogs (and perhaps other things
     #   -- Esc is a very commonly used key).
-    # - It is not passed if Esc is used for `command_Esc` and we’re blurring
+    # - It is not passed if Esc is used for `command.esc` and we’re blurring
     #   an element. That allows for blurring an input in a custom dialog
     #   without closing the dialog too.
     # - There are two reasons we might suppress it in other modes. If some
@@ -108,21 +104,16 @@ mode('normal', {
     # - It may only be suppressed in web pages, not in browser chrome. That
     #   allows for reseting the location bar when blurring it, and closing
     #   dialogs such as the “bookmark this page” dialog (<c-d>).
-    document = event.originalTarget.ownerDocument
-    inBrowserChrome = (document instanceof XULDocument)
-    if keyStr == '<escape>' and (not autoInsertMode or inBrowserChrome)
-      return false
-
-    return true
+    return not (keyStr == '<escape>' and not autoInsertMode and isFrameEvent)
 
 }, commands)
 
 
 
 mode('hints', {
-  onEnter: ({ vim, storage, args: [ filter, callback, count ] }) ->
+  onEnter: ({ vim, storage }, wrappers, viewport, callback, count = 1) ->
     [ markers, container ] = hints.injectHints(
-      vim.rootWindow, vim.window, filter, vim.parent.options
+      vim.window, wrappers, viewport, vim.options
     )
     if markers.length > 0
       storage.markers   = markers
@@ -135,9 +126,9 @@ mode('hints', {
 
   onLeave: ({ vim, storage }) ->
     { container } = storage
-    vim.rootWindow.setTimeout((->
+    vim.window.setTimeout((->
       container?.remove()
-    ), vim.parent.options.hints_timeout)
+    ), vim.options.hints_timeout)
     for key of storage
       storage[key] = null
 
@@ -147,7 +138,7 @@ mode('hints', {
 
     if match.type == 'full'
       match.command.run(args)
-    else if match.unmodifiedKey in vim.parent.options.hint_chars
+    else if match.unmodifiedKey in vim.options.hint_chars
       matchedMarkers = []
 
       for marker in markers when marker.hintIndex == storage.numEnteredChars
@@ -161,9 +152,9 @@ mode('hints', {
         again = callback(matchedMarkers[0], storage.count, match.keyStr)
         storage.count--
         if again
-          vim.rootWindow.setTimeout((->
+          vim.window.setTimeout((->
             marker.markMatched(false) for marker in matchedMarkers
-          ), vim.parent.options.hints_timeout)
+          ), vim.options.hints_timeout)
           marker.reset() for marker in markers
           storage.numEnteredChars = 0
         else
@@ -199,11 +190,11 @@ mode('hints', {
 
 
 mode('ignore', {
-  onEnter: ({ vim, storage, args: [ count ] }) ->
-    storage.count = count ? null
+  onEnter: ({ vim, storage }, count = null) ->
+    storage.count = count
 
   onLeave: ({ vim, storage }) ->
-    utils.blurActiveElement(vim.window) unless storage.count?
+    vim._run('blur_active_element') unless storage.count?
 
   onInput: (args, match) ->
     { vim, storage } = args
@@ -220,7 +211,7 @@ mode('ignore', {
 
 }, {
   exit:    ({ vim }) -> vim.enterMode('normal')
-  unquote: ({ vim }) -> vim.enterMode('normal', 'ignore')
+  unquote: ({ vim }) -> vim.enterMode('normal', {returnTo: 'ignore'})
 })
 
 
@@ -229,11 +220,11 @@ mode('find', {
   onEnter: ->
 
   onLeave: ({ vim }) ->
-    findBar = vim.rootWindow.gBrowser.getFindBar()
+    findBar = vim.window.gBrowser.getFindBar()
     findStorage.lastSearchString = findBar._findField.value
 
   onInput: (args, match) ->
-    args.findBar = args.vim.rootWindow.gBrowser.getFindBar()
+    args.findBar = args.vim.window.gBrowser.getFindBar()
     if match.type == 'full'
       match.command.run(args)
       return true

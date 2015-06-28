@@ -18,6 +18,9 @@
 # along with VimFx.  If not, see <http://www.gnu.org/licenses/>.
 ###
 
+# This file provides an API a bit more easy to use than the very low-level
+# Firefox prefs APIs.
+
 defaults = require('./defaults')
 
 { prefs } = Services
@@ -60,11 +63,10 @@ set = (branch, key, value) ->
 has = (branch, key) ->
   branch.prefHasUserValue(key)
 
-tmp = (branch, pref, temporaryValue, fn) ->
+tmp = (branch, pref, temporaryValue) ->
   previousValue = if has(branch, pref) then get(branch, pref) else null
   set(branch, pref, temporaryValue)
-  fn()
-  set(branch, pref, previousValue)
+  return -> set(branch, pref, previousValue)
 
 observe = (branch, domain, callback) ->
   observer = {observe: (branch, topic, changedPref) -> callback(changedPref)}

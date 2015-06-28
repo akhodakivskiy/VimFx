@@ -19,13 +19,13 @@
 # along with VimFx.  If not, see <http://www.gnu.org/licenses/>.
 ###
 
-help       = require('./help')
-{ Marker } = require('./marker')
-utils      = require('./utils')
+# This file defines all Normal mode commands. Commands that need to interact
+# with web page content do so by running `vim._run(name)`, which invokes `name`
+# in commands-frame.coffee.
 
-{ isProperLink, isTextInputElement, isContentEditable } = utils
-
-XULDocument = Ci.nsIDOMXULDocument
+help  = require('./help')
+prefs = require('./prefs')
+utils = require('./utils')
 
 commands = {}
 
@@ -33,17 +33,17 @@ commands = {}
 
 commands.focus_location_bar = ({ vim }) ->
   # This function works even if the Address Bar has been removed.
-  vim.rootWindow.focusAndSelectUrlBar()
+  vim.window.focusAndSelectUrlBar()
 
-commands.focus_search_bar = ({ vim }) ->
+commands.focus_search_bar = ({ vim, count }) ->
   # The `.webSearch()` method opens a search engine in a tab if the Search Bar
   # has been removed. Therefore we first check if it exists.
-  if vim.rootWindow.BrowserSearch.searchBar
-    vim.rootWindow.BrowserSearch.webSearch()
+  if vim.window.BrowserSearch.searchBar
+    vim.window.BrowserSearch.webSearch()
 
 helper_paste_and_go = (event, { vim }) ->
-  { gURLBar, goDoCommand } = vim.rootWindow
-  gURLBar.value = vim.rootWindow.readFromClipboard()
+  { gURLBar } = vim.window
+  gURLBar.value = vim.window.readFromClipboard()
   gURLBar.handleCommand(event)
 
 commands.paste_and_go = helper_paste_and_go.bind(null, null)
@@ -51,45 +51,43 @@ commands.paste_and_go = helper_paste_and_go.bind(null, null)
 commands.paste_and_go_in_tab = helper_paste_and_go.bind(null, {altKey: true})
 
 commands.copy_current_url = ({ vim }) ->
-  utils.writeToClipboard(vim.rootWindow.gBrowser.currentURI.spec)
+  utils.writeToClipboard(vim.window.gBrowser.currentURI.spec)
 
-# Go up one level in the URL hierarchy.
-commands.go_up_path = ({ vim, count = 1 }) ->
-  { pathname } = vim.window.location
-  vim.window.location.pathname = pathname.replace(
-    /// (?: /[^/]+ ){1,#{ count }} /?$ ///, ''
-  )
+commands.go_up_path = ({ vim, count }) ->
+  vim._run('go_up_path', {count})
 
 # Go up to root of the URL hierarchy.
 commands.go_to_root = ({ vim }) ->
-  vim.window.location.href = vim.window.location.origin
+  vim._run('go_to_root')
 
 commands.go_home = ({ vim }) ->
-  vim.rootWindow.BrowserHome()
+  vim.window.BrowserHome()
 
 helper_go_history = (num, { vim, count = 1 }) ->
-  { gBrowser } = vim.rootWindow
-  { index, count: length } = gBrowser.sessionHistory
-  newIndex = index + num * count
-  newIndex = Math.max(newIndex, 0)
-  newIndex = Math.min(newIndex, length - 1)
-  gBrowser.gotoIndex(newIndex) unless newIndex == index
+  { SessionStore, gBrowser } = vim.window
+  SessionStore.getSessionHistory(gBrowser.selectedTab, (sessionHistory) ->
+    { index } = sessionHistory
+    newIndex = index + num * count
+    newIndex = Math.max(newIndex, 0)
+    newIndex = Math.min(newIndex, sessionHistory.entries.length - 1)
+    gBrowser.gotoIndex(newIndex) unless newIndex == index
+  )
 
 commands.history_back    = helper_go_history.bind(null, -1)
 
 commands.history_forward = helper_go_history.bind(null, +1)
 
 commands.reload = ({ vim }) ->
-  vim.rootWindow.BrowserReload()
+  vim.window.BrowserReload()
 
 commands.reload_force = ({ vim }) ->
-  vim.rootWindow.BrowserReloadSkipCache()
+  vim.window.BrowserReloadSkipCache()
 
 commands.reload_all = ({ vim }) ->
-  vim.rootWindow.gBrowser.reloadAllTabs()
+  vim.window.gBrowser.reloadAllTabs()
 
 commands.reload_all_force = ({ vim }) ->
-  for tab in vim.rootWindow.gBrowser.visibleTabs
+  for tab in vim.window.gBrowser.visibleTabs
     gBrowser = tab.linkedBrowser
     consts = gBrowser.webNavigation
     flags = consts.LOAD_FLAGS_BYPASS_PROXY | consts.LOAD_FLAGS_BYPASS_CACHE
@@ -97,78 +95,64 @@ commands.reload_all_force = ({ vim }) ->
   return
 
 commands.stop = ({ vim }) ->
-  vim.rootWindow.BrowserStop()
+  vim.window.BrowserStop()
 
 commands.stop_all = ({ vim }) ->
-  for tab in vim.rootWindow.gBrowser.visibleTabs
+  for tab in vim.window.gBrowser.visibleTabs
     tab.linkedBrowser.stop()
   return
 
 
 
-axisMap =
-  x: ['left', 'scrollLeftMax', 'clientWidth',  'horizontalScrollDistance',  5]
-  y: ['top',  'scrollTopMax',  'clientHeight', 'verticalScrollDistance',   20]
-
-helper_scroll = (method, type, axis, amount, { vim, event, count = 1 }) ->
-  frameDocument = event.target.ownerDocument
-  element =
-    if vim.state.scrollableElements.has(event.target)
-      event.target
-    else
-      frameDocument.documentElement
-
-  [ direction, max, dimension, distance, lineAmount ] = axisMap[axis]
-
-  if method == 'scrollTo'
-    amount = Math.min(amount, element[max])
-  else
-    unit = switch type
-      when 'lines'
-        prefs.root.get("toolkit.scrollbox.#{ distance }") * lineAmount
-      when 'pages'
-        element[dimension]
-    amount *= unit * count
-
-  options = {}
-  options[direction] = amount
-  if prefs.root.get('general.smoothScroll') and
-     prefs.root.get("general.smoothScroll.#{ type }")
-    options.behavior = 'smooth'
-
-  prefs.root.tmp(
+helper_scroll = (vim, method, type, direction, amount, property = null) ->
+  args = {
+    method, type, direction, amount, property
+    smooth: (prefs.root.get('general.smoothScroll') and
+             prefs.root.get("general.smoothScroll.#{ type }"))
+  }
+  reset = prefs.root.tmp(
     'layout.css.scroll-behavior.spring-constant',
-    vim.parent.options["smoothScroll.#{ type }.spring-constant"],
-    ->
-      element[method](options)
-      # When scrolling the whole page, the body sometimes needs to be scrolled
-      # too.
-      if element == frameDocument.documentElement
-        frameDocument.body?[method](options)
+    vim.options["smoothScroll.#{ type }.spring-constant"]
   )
+  vim._run('scroll', args, reset)
 
-scroll = Function::bind.bind(helper_scroll, null)
+helper_scrollByLinesX = (amount, { vim, count = 1 }) ->
+  distance = prefs.root.get('toolkit.scrollbox.horizontalScrollDistance')
+  helper_scroll(vim, 'scrollBy', 'lines', 'left', amount * distance * count * 5)
 
-commands.scroll_left           = scroll('scrollBy', 'lines', 'x', -1)
-commands.scroll_right          = scroll('scrollBy', 'lines', 'x', +1)
-commands.scroll_down           = scroll('scrollBy', 'lines', 'y', +1)
-commands.scroll_up             = scroll('scrollBy', 'lines', 'y', -1)
-commands.scroll_page_down      = scroll('scrollBy', 'pages', 'y', +1)
-commands.scroll_page_up        = scroll('scrollBy', 'pages', 'y', -1)
-commands.scroll_half_page_down = scroll('scrollBy', 'pages', 'y', +0.5)
-commands.scroll_half_page_up   = scroll('scrollBy', 'pages', 'y', -0.5)
-commands.scroll_to_top         = scroll('scrollTo', 'other', 'y', 0)
-commands.scroll_to_bottom      = scroll('scrollTo', 'other', 'y', Infinity)
-commands.scroll_to_left        = scroll('scrollTo', 'other', 'x', 0)
-commands.scroll_to_right       = scroll('scrollTo', 'other', 'x', Infinity)
+helper_scrollByLinesY = (amount, { vim, count = 1 }) ->
+  distance = prefs.root.get('toolkit.scrollbox.verticalScrollDistance')
+  helper_scroll(vim, 'scrollBy', 'lines', 'top', amount * distance * count * 20)
+
+helper_scrollByPagesY = (amount, { vim, count = 1 }) ->
+  helper_scroll(vim, 'scrollBy', 'pages', 'top', amount * count, 'clientHeight')
+
+helper_scrollToX = (amount, { vim }) ->
+  helper_scroll(vim, 'scrollTo', 'other', 'left', amount, 'scrollLeftMax')
+
+helper_scrollToY = (amount, { vim }) ->
+  helper_scroll(vim, 'scrollTo', 'other', 'top', amount, 'scrollTopMax')
+
+commands.scroll_left           = helper_scrollByLinesX.bind(null, -1)
+commands.scroll_right          = helper_scrollByLinesX.bind(null, +1)
+commands.scroll_down           = helper_scrollByLinesY.bind(null, +1)
+commands.scroll_up             = helper_scrollByLinesY.bind(null, -1)
+commands.scroll_page_down      = helper_scrollByPagesY.bind(null, +1)
+commands.scroll_page_up        = helper_scrollByPagesY.bind(null, -1)
+commands.scroll_half_page_down = helper_scrollByPagesY.bind(null, +0.5)
+commands.scroll_half_page_up   = helper_scrollByPagesY.bind(null, -0.5)
+commands.scroll_to_top         = helper_scrollToY.bind(null, 0)
+commands.scroll_to_bottom      = helper_scrollToY.bind(null, Infinity)
+commands.scroll_to_left        = helper_scrollToX.bind(null, 0)
+commands.scroll_to_right       = helper_scrollToX.bind(null, Infinity)
 
 
 
 commands.tab_new = ({ vim }) ->
-  vim.rootWindow.BrowserOpenTab()
+  vim.window.BrowserOpenTab()
 
 commands.tab_duplicate = ({ vim }) ->
-  { gBrowser } = vim.rootWindow
+  { gBrowser } = vim.window
   gBrowser.duplicateTab(gBrowser.selectedTab)
 
 absoluteTabIndex = (relativeIndex, gBrowser) ->
@@ -189,7 +173,7 @@ absoluteTabIndex = (relativeIndex, gBrowser) ->
   return absoluteIndex
 
 helper_switch_tab = (direction, { vim, count = 1 }) ->
-  { gBrowser } = vim.rootWindow
+  { gBrowser } = vim.window
   gBrowser.selectTabAtIndex(absoluteTabIndex(direction * count, gBrowser))
 
 commands.tab_select_previous = helper_switch_tab.bind(null, -1)
@@ -197,7 +181,7 @@ commands.tab_select_previous = helper_switch_tab.bind(null, -1)
 commands.tab_select_next     = helper_switch_tab.bind(null, +1)
 
 helper_move_tab = (direction, { vim, count = 1 }) ->
-  { gBrowser }    = vim.rootWindow
+  { gBrowser }    = vim.window
   { selectedTab } = gBrowser
   { pinned }      = selectedTab
 
@@ -215,24 +199,24 @@ commands.tab_move_backward = helper_move_tab.bind(null, -1)
 commands.tab_move_forward  = helper_move_tab.bind(null, +1)
 
 commands.tab_select_first = ({ vim }) ->
-  vim.rootWindow.gBrowser.selectTabAtIndex(0)
+  vim.window.gBrowser.selectTabAtIndex(0)
 
 commands.tab_select_first_non_pinned = ({ vim }) ->
-  firstNonPinned = vim.rootWindow.gBrowser._numPinnedTabs
-  vim.rootWindow.gBrowser.selectTabAtIndex(firstNonPinned)
+  firstNonPinned = vim.window.gBrowser._numPinnedTabs
+  vim.window.gBrowser.selectTabAtIndex(firstNonPinned)
 
 commands.tab_select_last = ({ vim }) ->
-  vim.rootWindow.gBrowser.selectTabAtIndex(-1)
+  vim.window.gBrowser.selectTabAtIndex(-1)
 
 commands.tab_toggle_pinned = ({ vim }) ->
-  currentTab = vim.rootWindow.gBrowser.selectedTab
+  currentTab = vim.window.gBrowser.selectedTab
   if currentTab.pinned
-    vim.rootWindow.gBrowser.unpinTab(currentTab)
+    vim.window.gBrowser.unpinTab(currentTab)
   else
-    vim.rootWindow.gBrowser.pinTab(currentTab)
+    vim.window.gBrowser.pinTab(currentTab)
 
-commands.tab_close = ({ vim, count = 1 }) ->
-  { gBrowser } = vim.rootWindow
+commands.tab_close = ({ vim, count = 1}) ->
+  { gBrowser } = vim.window
   return if gBrowser.selectedTab.pinned
   currentIndex = gBrowser.visibleTabs.indexOf(gBrowser.selectedTab)
   for tab in gBrowser.visibleTabs[currentIndex...(currentIndex + count)]
@@ -240,150 +224,74 @@ commands.tab_close = ({ vim, count = 1 }) ->
   return
 
 commands.tab_restore = ({ vim, count = 1 }) ->
-  vim.rootWindow.undoCloseTab() for [1..count] by 1
+  vim.window.undoCloseTab() for [1..count] by 1
 
 commands.tab_close_to_end = ({ vim }) ->
-  { gBrowser } = vim.rootWindow
+  { gBrowser } = vim.window
   gBrowser.removeTabsToTheEndFrom(gBrowser.selectedTab)
 
 commands.tab_close_other = ({ vim }) ->
-  { gBrowser } = vim.rootWindow
+  { gBrowser } = vim.window
   gBrowser.removeAllTabsBut(gBrowser.selectedTab)
 
 
 
-# Combine links with the same href.
-combine = (hrefs, marker) ->
-  if marker.type == 'link'
-    { href } = marker.element
-    if href of hrefs
-      parent = hrefs[href]
-      marker.parent = parent
-      parent.weight += marker.weight
-      parent.numChildren++
-    else
-      hrefs[href] = marker
-  return marker
+helper_follow = (name, vim, callback, count = null) ->
+  vim._run(name, null, ({ wrappers, viewport }) ->
+    vim.enterMode('hints', wrappers, viewport, callback, count)
+  )
 
-follow_callback = (vim, { inTab, inBackground }, marker, count, keyStr) ->
-  isLast = (count == 1)
-  isLink = (marker.type == 'link')
+helper_follow_clickable = ({ inTab, inBackground }, { vim, count = 1 }) ->
+  callback = (marker, timesLeft, keyStr) ->
+    isLast = (timesLeft == 1)
+    isLink = (marker.wrapper.type == 'link')
 
-  switch
-    when keyStr.startsWith(vim.parent.options.hints_toggle_in_tab)
-      inTab = not inTab
-    when keyStr.startsWith(vim.parent.options.hints_toggle_in_background)
-      inTab = true
-      inBackground = not inBackground
-    else
-      unless isLast
+    switch
+      when keyStr.startsWith(vim.options.hints_toggle_in_tab)
+        inTab = not inTab
+      when keyStr.startsWith(vim.options.hints_toggle_in_background)
         inTab = true
-        inBackground = true
+        inBackground = not inBackground
+      else
+        unless isLast
+          inTab = true
+          inBackground = true
 
-  inTab = false unless isLink
+    inTab = false unless isLink
 
-  if marker.type == 'text' or (isLink and not (inTab and inBackground))
-    isLast = true
+    if marker.type == 'text' or (isLink and not (inTab and inBackground))
+      isLast = true
 
-  { element } = marker
-  utils.focusElement(element)
+    { elementIndex } = marker.wrapper
+    vim._focusMarkerElement(elementIndex)
 
-  if inTab
-    utils.openTab(vim.rootWindow, element.href, {
-      inBackground
-      relatedToCurrent: true
-    })
-  else
-    if element.target == '_blank' and vim.parent.options.prevent_target_blank
-      targetReset = element.target
-      element.target = ''
-    utils.simulateClick(element)
-    element.target = targetReset if targetReset
+    if inTab
+      utils.openTab(vim.window, marker.wrapper.href, {
+        inBackground
+        relatedToCurrent: true
+      })
+    else
+      vim._run('click_marker_element', {
+        elementIndex
+        preventTargetBlank: vim.options.prevent_target_blank
+      })
 
-  return not isLast
+    return not isLast
+
+  name = if inTab then 'follow_in_tab' else 'follow'
+  helper_follow(name, vim, callback, count)
 
 # Follow links, focus text inputs and click buttons with hint markers.
-commands.follow = ({ vim, count = 1 }) ->
-  hrefs = {}
-  filter = (element, getElementShape) ->
-    document = element.ownerDocument
-    isXUL = (document instanceof XULDocument)
-    semantic = true
-    switch
-      when isProperLink(element)
-        type = 'link'
-      when isTextInputElement(element) or isContentEditable(element)
-        type = 'text'
-      when element.tabIndex > -1 and
-           not (isXUL and element.nodeName.endsWith('box'))
-        type = 'clickable'
-        unless isXUL or element.nodeName in ['A', 'INPUT', 'BUTTON']
-          semantic = false
-      when element != document.documentElement and
-           vim.state.scrollableElements.has(element)
-        type = 'scrollable'
-      when element.hasAttribute('onclick') or
-           element.hasAttribute('onmousedown') or
-           element.hasAttribute('onmouseup') or
-           element.hasAttribute('oncommand') or
-           element.getAttribute('role') in ['link', 'button'] or
-           # Twitter special-case.
-           element.classList.contains('js-new-tweets-bar') or
-           # Feedly special-case.
-           element.hasAttribute('data-app-action') or
-           element.hasAttribute('data-uri') or
-           element.hasAttribute('data-page-action')
-        type = 'clickable'
-        semantic = false
-      # Putting markers on `<label>` elements is generally redundant, because
-      # its `<input>` gets one. However, some sites hide the actual `<input>`
-      # but keeps the `<label>` to click, either for styling purposes or to keep
-      # the `<input>` hidden until it is used. In those cases we should add a
-      # marker for the `<label>`.
-      when element.nodeName == 'LABEL'
-        if element.htmlFor
-          input = document.getElementById(element.htmlFor)
-          if input and not getElementShape(input)
-            type = 'clickable'
-      # Elements that have “button” somewhere in the class might be clickable,
-      # unless they contain a real link or button or yet an element with
-      # “button” somewhere in the class, in which case they likely are
-      # “button-wrapper”s. (`<SVG element>.className` is not a string!)
-      when not isXUL and typeof element.className == 'string' and
-           element.className.toLowerCase().contains('button')
-        unless element.querySelector('a, button, [class*=button]')
-          type = 'clickable'
-          semantic = false
-      # When viewing an image it should get a marker to toggle zoom.
-      when document.body?.childElementCount == 1 and
-           element.nodeName == 'IMG' and
-           (element.classList.contains('overflowing') or
-            element.classList.contains('shrinkToFit'))
-        type = 'clickable'
-    return unless type
-    return unless shape = getElementShape(element)
-    return combine(hrefs, new Marker(element, shape, {semantic, type}))
-
-  callback = follow_callback.bind(null, vim, {inTab: false, inBackground: true})
-
-  vim.enterMode('hints', filter, callback, count)
+commands.follow =
+  helper_follow_clickable.bind(null, {inTab: false, inBackground: true})
 
 # Follow links in a new background tab with hint markers.
-commands.follow_in_tab = ({ vim, count = 1 }, inBackground = true) ->
-  hrefs = {}
-  filter = (element, getElementShape) ->
-    return unless isProperLink(element)
-    return unless shape = getElementShape(element)
-    return combine(hrefs, new Marker(element, shape,
-                                     {semantic: true, type: 'link'}))
-
-  callback = follow_callback.bind(null, vim, {inTab: true, inBackground})
-
-  vim.enterMode('hints', filter, callback, count)
+commands.follow_in_tab =
+  helper_follow_clickable.bind(null, {inTab: true, inBackground: true})
 
 # Follow links in a new foreground tab with hint markers.
-commands.follow_in_focused_tab = (args) ->
-  commands.follow_in_tab(args, false)
+commands.follow_in_focused_tab =
+  helper_follow_clickable.bind(null, {inTab: true, inBackground: false})
 
 # Like command_follow but multiple times.
 commands.follow_multiple = (args) ->
@@ -392,133 +300,39 @@ commands.follow_multiple = (args) ->
 
 # Copy the URL or text of a markable element to the system clipboard.
 commands.follow_copy = ({ vim }) ->
-  hrefs = {}
-  filter = (element, getElementShape) ->
-    type = switch
-      when isProperLink(element)       then 'link'
-      when isTextInputElement(element) then 'textInput'
-      when isContentEditable(element)  then 'contenteditable'
-    return unless type
-    return unless shape = getElementShape(element)
-    return combine(hrefs, new Marker(element, shape, {semantic: true, type}))
-
   callback = (marker) ->
-    { element } = marker
-    text = switch marker.type
-      when 'link'            then element.href
-      when 'textInput'       then element.value
-      when 'contenteditable' then element.textContent
-    utils.writeToClipboard(text)
-
-  vim.enterMode('hints', filter, callback)
+    { elementIndex } = marker.wrapper
+    property = switch marker.wrapper.type
+      when 'link'            then 'href'
+      when 'textInput'       then 'value'
+      when 'contenteditable' then 'textContent'
+    vim._run('copy_marker_element', {elementIndex, property})
+  helper_follow('follow_copy', vim, callback)
 
 # Focus element with hint markers.
 commands.follow_focus = ({ vim }) ->
-  filter = (element, getElementShape) ->
-    type = switch
-      when element.tabIndex > -1
-        'focusable'
-      when element != element.ownerDocument.documentElement and
-           vim.state.scrollableElements.has(element)
-        'scrollable'
-    return unless type
-    return unless shape = getElementShape(element)
-    return new Marker(element, shape, {semantic: true, type})
-
   callback = (marker) ->
-    { element } = marker
-    utils.focusElement(element, {select: true})
-
-  vim.enterMode('hints', filter, callback)
+    vim._focusMarkerElement(marker.wrapper.elementIndex, {select: true})
+  return helper_follow('follow_focus', vim, callback)
 
 helper_follow_pattern = (type, { vim }) ->
-  { document } = vim.window
-
-  # If there’s a `<link rel=prev/next>` element we use that.
-  for link in document.head?.getElementsByTagName('link')
-    # Also support `rel=previous`, just like Google.
-    if type == link.rel.toLowerCase().replace(/^previous$/, 'prev')
-      vim.rootWindow.gBrowser.loadURI(link.href)
-      return
-
-  # Otherwise we look for a link or button on the page that seems to go to the
-  # previous or next page.
-  candidates = document.querySelectorAll(vim.parent.options.pattern_selector)
-
-  # Note: Earlier patterns should be favored.
-  patterns = vim.parent.options["#{ type }_patterns"]
-
-  # Search for the prev/next patterns in the following attributes of the
-  # element. `rel` should be kept as the first attribute, since the standard way
-  # of marking up prev/next links (`rel="prev"` and `rel="next"`) should be
-  # favored. Even though some of these attributes only allow a fixed set of
-  # keywords, we pattern-match them anyways since lots of sites don’t follow the
-  # spec and use the attributes arbitrarily.
-  attrs = vim.parent.options.pattern_attrs
-
-  matchingLink = do ->
-    # Helper function that matches a string against all the patterns.
-    matches = (text) -> patterns.some((regex) -> regex.test(text))
-
-    # First search in attributes (favoring earlier attributes) as it's likely
-    # that they are more specific than text contexts.
-    for attr in attrs
-      for element in candidates
-        return element if matches(element.getAttribute(attr))
-
-    # Then search in element contents.
-    for element in candidates
-      return element if matches(element.textContent)
-
-    return null
-
-  utils.simulateClick(matchingLink) if matchingLink
+  options =
+    pattern_selector: vim.options.pattern_selector
+    pattern_attrs:    vim.options.pattern_attrs
+    patterns:         vim.options["#{ type }_patterns"]
+  vim._run('follow_pattern', {type, options})
 
 commands.follow_previous = helper_follow_pattern.bind(null, 'prev')
 
 commands.follow_next     = helper_follow_pattern.bind(null, 'next')
 
 # Focus last focused or first text input.
-commands.focus_text_input = ({ vim, storage, count = null }) ->
-  { lastFocusedTextInput } = vim.state
-  inputs = Array.filter(
-    vim.window.document.querySelectorAll('input, textarea'), (element) ->
-      return utils.isTextInputElement(element) and utils.area(element) > 0
-  )
-  if lastFocusedTextInput and lastFocusedTextInput not in inputs
-    inputs.push(lastFocusedTextInput)
-  return unless inputs.length > 0
-  inputs.sort((a, b) -> a.tabIndex - b.tabIndex)
-  unless count?
-    count =
-      if lastFocusedTextInput
-        inputs.indexOf(lastFocusedTextInput) + 1
-      else
-        1
-  index = Math.min(count, inputs.length) - 1
-  utils.focusElement(inputs[index], {select: true})
-  storage.inputs = inputs
+commands.focus_text_input = ({ vim, count }) ->
+  vim._run('focus_text_input', {count})
 
 # Switch between text inputs or simulate `<tab>`.
-helper_move_focus = (direction, { vim, storage }) ->
-  if storage.inputs
-    { inputs } = storage
-    nextInput = inputs[(storage.inputIndex + direction) %% inputs.length]
-    utils.focusElement(nextInput, {select: true})
-  else
-    focusManager = Cc['@mozilla.org/focus-manager;1']
-      .getService(Ci.nsIFocusManager)
-    direction =
-      if direction == -1
-        focusManager.MOVEFOCUS_BACKWARD
-      else
-        focusManager.MOVEFOCUS_FORWARD
-    focusManager.moveFocus(
-      null, # Use current window.
-      null, # Move relative to the currently focused element.
-      direction,
-      focusManager.FLAG_BYKEY
-    )
+helper_move_focus = (direction, { vim, _skipMoveFocus }) ->
+  vim._run('move_focus', {direction, skip: _skipMoveFocus})
 
 commands.focus_next     = helper_move_focus.bind(null, +1)
 commands.focus_previous = helper_move_focus.bind(null, -1)
@@ -528,7 +342,7 @@ commands.focus_previous = helper_move_focus.bind(null, -1)
 findStorage = {lastSearchString: ''}
 
 helper_find = (highlight, { vim }) ->
-  findBar = vim.rootWindow.gBrowser.getFindBar()
+  findBar = vim.window.gBrowser.getFindBar()
 
   findBar.onFindCommand()
   utils.focusElement(findBar._findField, {select: true})
@@ -544,7 +358,7 @@ commands.find = helper_find.bind(null, false)
 commands.find_highlight_all = helper_find.bind(null, true)
 
 helper_find_again = (direction, { vim }) ->
-  findBar = vim.rootWindow.gBrowser.getFindBar()
+  findBar = vim.window.gBrowser.getFindBar()
   if findStorage.lastSearchString.length > 0
     findBar._findField.value = findStorage.lastSearchString
     findBar.onFindAgainCommand(direction)
@@ -566,32 +380,21 @@ commands.quote = ({ vim, count = 1 }) ->
 
 # Display the Help Dialog.
 commands.help = ({ vim }) ->
-  help.injectHelp(vim.rootWindow, vim.parent)
+  help.injectHelp(vim.window, vim._parent)
 
 # Open and focus the Developer Toolbar.
 commands.dev = ({ vim }) ->
-  vim.rootWindow.DeveloperToolbar.show(true) # `true` to focus.
+  vim.window.DeveloperToolbar.show(true) # `true` to focus.
 
-commands.esc = ({ vim, event }) ->
-  utils.blurActiveElement(vim.window)
-
+commands.esc = ({ vim }) ->
+  vim._run('esc')
   # Some browser UI elements, such as the web console, are not marked as
   # focusable, so we need to force the blur.
-  utils.blurActiveElement(vim.rootWindow, {force: true})
-
-  help.removeHelp(vim.rootWindow)
-
-  vim.rootWindow.DeveloperToolbar.hide()
-
-  vim.rootWindow.gBrowser.getFindBar().close()
-
-  vim.rootWindow.TabView.hide()
-
-  { document } = vim.window
-  if document.exitFullscreen
-    document.exitFullscreen()
-  else
-    document.mozCancelFullScreen()
+  utils.blurActiveElement(vim.window, {force: true})
+  help.removeHelp(vim.window)
+  vim.window.DeveloperToolbar.hide()
+  vim.window.gBrowser.getFindBar().close()
+  vim.window.TabView.hide()
 
 
 

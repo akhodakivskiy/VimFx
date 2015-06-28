@@ -17,6 +17,9 @@
 # along with VimFx.  If not, see <http://www.gnu.org/licenses/>.
 ###
 
+# This file provides a simple function for getting the localized version of a
+# string of text.
+
 PROPERTIES_FILE = 'vimfx.properties'
 
 stringBundle = Services.strings.createBundle(
