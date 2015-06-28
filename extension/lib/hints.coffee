@@ -21,8 +21,6 @@
 huffman = require('n-ary-huffman')
 utils   = require('./utils')
 
-{ interfaces: Ci } = Components
-
 CONTAINER_ID = 'VimFxMarkersContainer'
 
 Element      = Ci.nsIDOMElement

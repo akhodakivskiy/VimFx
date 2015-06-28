@@ -28,8 +28,6 @@ translate                    = require('./l10n')
 { rotateOverlappingMarkers } = require('./marker')
 utils                        = require('./utils')
 
-{ interfaces: Ci } = Components
-
 XULDocument = Ci.nsIDOMXULDocument
 
 # Helper to create modes in a DRY way.

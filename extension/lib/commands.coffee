@@ -25,8 +25,6 @@ utils      = require('./utils')
 
 { isProperLink, isTextInputElement, isContentEditable } = utils
 
-{ classes: Cc, interfaces: Ci, utils: Cu } = Components
-
 XULDocument = Ci.nsIDOMXULDocument
 
 commands = {}

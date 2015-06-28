@@ -21,8 +21,6 @@
 button = require('./button')
 utils  = require('./utils')
 
-{ interfaces: Ci } = Components
-
 HTMLDocument     = Ci.nsIDOMHTMLDocument
 HTMLInputElement = Ci.nsIDOMHTMLInputElement
 

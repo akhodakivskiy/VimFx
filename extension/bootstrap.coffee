@@ -18,57 +18,66 @@
 # along with VimFx.  If not, see <http://www.gnu.org/licenses/>.
 ###
 
+# Expose `Components` shortcuts a well as `Services` and `console` in all
+# modules.
 { classes: Cc, interfaces: Ci, utils: Cu } = Components
 
 Cu.import('resource://gre/modules/Services.jsm')
 Cu.import('resource://gre/modules/devtools/Console.jsm')
 
-shutdownHandlers = []
-
-createURI = (path, base = null) -> Services.io.newURI(path, null, base)
-baseURI   = createURI(__SCRIPT_URI_SPEC__)
-
-# Everything up to the first `!` is the absolute path to the .xpi.
-dirname = (uri) -> uri.match(///^ [^!]+!/ (.+) /[^/]+ $///)[1]
-
-require = (path, moduleRoot = '.', dir = '.') ->
-  unless path[0] == '.'
-    # Allow `require('module/lib/foo')` in additon to just `require('module')`.
-    [ match, name, subPath ] = path.match(///^ ([^/]+) (?: /(.+) )? ///)
-    base = require.data[moduleRoot]?[name] ? moduleRoot
-    dir  = "#{ base }/node_modules/#{ name }"
-    main = require.data[dir]?['']
-    path = subPath ? main ? 'index'
-    moduleRoot = dir
-
-  fullPath = createURI("#{ dir }/#{ path }.js", baseURI).spec
-
-  unless require.scopes[fullPath]?
-    module =
-      exports:    {}
-      onShutdown: Function::call.bind(Array::push, shutdownHandlers)
-    require.scopes[fullPath] = scope =
-      require: (path) -> require(path, moduleRoot, "./#{ dirname(fullPath) }")
-      module:  module
-      exports: module.exports
-    Services.scriptloader.loadSubScript(fullPath, scope, 'UTF-8')
-
-  return require.scopes[fullPath].module.exports
-
-require.scopes = {}
-require.data   = require('./require-data')
-
-# Set default prefs and apply migrations as early as possible.
-{ applyMigrations } = require('./lib/legacy')
-migrations          = require('./lib/migrations')
-prefs               = require('./lib/prefs')
-
-prefs.default._init()
-applyMigrations(migrations)
-
 do (global = this) ->
+  isFrameScript = (typeof content != 'undefined')
 
-  global.startup = require('./lib/main')
+  if isFrameScript
+    [ global.__SCRIPT_URI_SPEC__ ] = sendSyncMessage('VimFx:tabCreated')
+    return if __SCRIPT_URI_SPEC__ == false
+
+  shutdownHandlers = []
+
+  createURI = (path, base = null) -> Services.io.newURI(path, null, base)
+  baseURI   = createURI(__SCRIPT_URI_SPEC__)
+
+  # Everything up to the first `!` is the absolute path to the .xpi.
+  dirname = (uri) -> uri.match(///^ [^!]+!/ (.+) /[^/]+ $///)[1]
+
+  require = (path, moduleRoot = '.', dir = '.') ->
+    unless path[0] == '.'
+      # Allow `require('module/lib/foo')` in additon to `require('module')`.
+      [ match, name, subPath ] = path.match(///^ ([^/]+) (?: /(.+) )? ///)
+      base = require.data[moduleRoot]?[name] ? moduleRoot
+      dir  = "#{ base }/node_modules/#{ name }"
+      main = require.data[dir]?['']
+      path = subPath ? main ? 'index'
+      moduleRoot = dir
+
+    fullPath = createURI("#{ dir }/#{ path }.js", baseURI).spec
+
+    unless require.scopes[fullPath]?
+      module =
+        exports:    {}
+        onShutdown: Function::call.bind(Array::push, shutdownHandlers)
+      require.scopes[fullPath] = scope =
+        require: (path) -> require(path, moduleRoot, "./#{ dirname(fullPath) }")
+        module:  module
+        exports: module.exports
+      Services.scriptloader.loadSubScript(fullPath, scope, 'UTF-8')
+
+    return require.scopes[fullPath].module.exports
+
+  require.scopes = {}
+  require.data   = require('./require-data')
+
+  unless isFrameScript
+    # Set default prefs and apply migrations as early as possible.
+    { applyMigrations } = require('./lib/legacy')
+    migrations          = require('./lib/migrations')
+    prefs               = require('./lib/prefs')
+
+    prefs.default._init()
+    applyMigrations(migrations)
+
+  main = if isFrameScript then './lib/main-frame' else './lib/main'
+  global.startup = require(main)
 
   global.shutdown = (data, reason) ->
     for shutdownHandler in shutdownHandlers
@@ -77,6 +86,7 @@ do (global = this) ->
       catch error
         Cu.reportError(error)
     shutdownHandlers = null
+    removeEventListener('unload', shutdown, true) if isFrameScript
 
     # Release everything in `require`d modules. This must be done _after_ all
     # shutdownHandlers, since they use variables in these scopes.
@@ -88,3 +98,7 @@ do (global = this) ->
   global.install = (data, reason) ->
 
   global.uninstall = (data, reason) ->
+
+  if isFrameScript
+    addEventListener('unload', shutdown, true)
+    startup()

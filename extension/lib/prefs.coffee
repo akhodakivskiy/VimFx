@@ -20,8 +20,6 @@
 
 defaults = require('./defaults')
 
-{ classes: Cc, interfaces: Ci } = Components
-
 { prefs } = Services
 
 branches =

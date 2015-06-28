@@ -22,16 +22,14 @@ createAPI             = require('./api')
 button                = require('./button')
 defaults              = require('./defaults')
 { addEventListeners } = require('./events')
+messageManager        = require('./message-manager')
 modes                 = require('./modes')
 options               = require('./options')
 parsePref             = require('./parse-prefs')
 prefs                 = require('./prefs')
 utils                 = require('./utils')
 VimFx                 = require('./vimfx')
-{ watchWindows }      = require('./window-utils')
 test                  = try require('../test/index')
-
-{ utils: Cu } = Components
 
 Cu.import('resource://gre/modules/AddonManager.jsm')
 
@@ -51,6 +49,8 @@ module.exports = (data, reason) ->
   module.onShutdown(-> Cu.unload(apiUrl))
   prefs.set('apiUrl', apiUrl)
 
+  vimfx.windows = new WeakSet()
+
   test?(vimfx)
 
   utils.loadCss('style')
@@ -64,5 +64,15 @@ module.exports = (data, reason) ->
       vimfx.options[pref] = parsePref(pref)
   )
 
-  watchWindows(button.injectButton.bind(null, vimfx), 'navigator:browser')
-  watchWindows(addEventListeners.bind(null, vimfx), 'navigator:browser')
+  messageManager.listen(null, 'tabCreated', ({ target }) ->
+    return false unless target.getAttribute('messagemanagergroup') == 'browsers'
+
+    window = target.ownerGlobal
+    unless vimfx.windows.has(window)
+      vimfx.windows.add(window)
+      button.injectButton(vimfx, window)
+      addEventListeners(vimfx, window)
+
+    return __SCRIPT_URI_SPEC__
+  )
+  messageManager.load(null, 'bootstrap')

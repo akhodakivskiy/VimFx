@@ -18,6 +18,7 @@
 ###
 
 defaults = require('./defaults')
+prefs    = require('./prefs')
 utils    = require('./utils')
 
 MIN_NUM_HINT_CHARS = 2

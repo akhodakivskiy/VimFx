@@ -19,8 +19,6 @@
 # along with VimFx.  If not, see <http://www.gnu.org/licenses/>.
 ###
 
-{ classes: Cc, interfaces: Ci, utils: Cu } = Components
-
 Window              = Ci.nsIDOMWindow
 ChromeWindow        = Ci.nsIDOMChromeWindow
 Element             = Ci.nsIDOMElement
