@@ -107,7 +107,7 @@ commands.reload_all_force = ({ vim }) ->
   return
 
 commands.stop = ({ vim }) ->
-  vim.window.stop()
+  vim.rootWindow.BrowserStop()
 
 commands.stop_all = ({ vim }) ->
   for tab in vim.rootWindow.gBrowser.visibleTabs
