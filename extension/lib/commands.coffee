@@ -78,13 +78,12 @@ commands.go_home = ({ vim }) ->
   vim.rootWindow.BrowserHome()
 
 helper_go_history = (num, { vim, count }) ->
-  { index } = vim.rootWindow.getWebNavigation().sessionHistory
-  { history } = vim.window
-  num *= count ? 1
-  num = Math.max(num, -index)
-  num = Math.min(num, history.length - 1 - index)
-  return if num == 0
-  history.go(num)
+  { gBrowser } = vim.rootWindow
+  { index, count: length } = gBrowser.sessionHistory
+  newIndex = index + num * (count ? 1)
+  newIndex = Math.max(newIndex, 0)
+  newIndex = Math.min(newIndex, length - 1)
+  gBrowser.gotoIndex(newIndex) unless newIndex == index
 
 commands.history_back    = helper_go_history.bind(null, -1)
 
