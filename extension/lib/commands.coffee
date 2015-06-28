@@ -100,8 +100,10 @@ commands.reload_all = ({ vim }) ->
 
 commands.reload_all_force = ({ vim }) ->
   for tab in vim.rootWindow.gBrowser.visibleTabs
-    window = tab.linkedBrowser.contentWindow
-    window.location.reload(true)
+    gBrowser = tab.linkedBrowser
+    consts = gBrowser.webNavigation
+    flags = consts.LOAD_FLAGS_BYPASS_PROXY | consts.LOAD_FLAGS_BYPASS_CACHE
+    gBrowser.reload(flags)
   return
 
 commands.stop = ({ vim }) ->
