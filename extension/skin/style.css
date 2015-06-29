@@ -113,7 +113,6 @@ toolbarpaletteitem[place="palette"] > #VimFxButton {
 
   #VimFxHelpDialogContainer * {
     display: block;
-    -moz-user-select: text;
   }
 
   #VimFxHelpDialogContainer :-moz-any([class^="heading"], .key-sequence) {
