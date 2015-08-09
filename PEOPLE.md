@@ -27,3 +27,4 @@ Anton Khodakivskiy
 - Wang Zhuochun (zh-CN)
 - mozillazg (zh-CN)
 - Robert (zh-TW)
+- Salas (zh-TW)
