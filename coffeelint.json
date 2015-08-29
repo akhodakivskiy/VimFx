@@ -7,6 +7,8 @@
   "cyclomatic_complexity":              {"level": "ignore"},
   "duplicate_key":                      {"level": "error"},
   "empty_constructor_needs_parens":     {"level": "error"},
+  "ensure_comprehensions":              {"level": "error"},
+  "eol_last":                           {"level": "error"},
   "indentation":                        {"level": "error", "value": 2},
   "line_endings":                       {"level": "error", "value": "unix"},
   "max_line_length":                    {"level": "warn", "value": 80},
@@ -19,7 +21,9 @@
   "no_implicit_braces":                 {"level": "ignore"},
   "no_implicit_parens":                 {"level": "error"},
   "no_interpolation_in_single_quotes":  {"level": "error"},
+  "no_nested_string_interpolation":     {"level": "error"},
   "no_plusplus":                        {"level": "ignore"},
+  "no_private_function_fat_arrows":     {"level": "error"},
   "no_stand_alone_at":                  {"level": "error"},
   "no_tabs":                            {"level": "error"},
   "no_throwing_strings":                {"level": "error"},
@@ -47,10 +51,5 @@
       "&&":   "and",
       "||":   "or"
     }
-  },
-  "newline_at_eof": {
-    "module": "coffeelint-newline-at-eof",
-    "level": "error",
-    "behaviour": "require"
   }
 }
