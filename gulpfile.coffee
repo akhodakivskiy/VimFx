@@ -40,6 +40,8 @@ XPI    = 'VimFx.xpi'
 LOCALE = 'extension/locale'
 TEST   = 'extension/test'
 
+BASE_LOCALE = 'en-US'
+
 test = '--test' in process.argv or '-t' in process.argv
 ifTest = (value) -> if test then [value] else []
 
@@ -91,6 +93,7 @@ gulp.task('install.rdf', ->
   getDescription = (locale) -> read(join(LOCALE, locale, 'description')).trim()
 
   descriptions = fs.readdirSync(LOCALE)
+    .filter((locale) -> locale != BASE_LOCALE)
     .map((locale) -> {
       locale: locale
       description: getDescription(locale)
@@ -102,7 +105,7 @@ gulp.task('install.rdf', ->
       minVersion: pkg.firefoxVersions.min
       maxVersion: pkg.firefoxVersions.max
       creator, developers, contributors, translators
-      defaultDescription: getDescription('en-US')
+      defaultDescription: getDescription(BASE_LOCALE)
       descriptions
     }))
     .pipe(gulp.dest(DEST))
@@ -192,13 +195,13 @@ gulp.task('faster', ->
 )
 
 gulp.task('sync-locales', ->
-  baseLocale = 'en-US'
+  baseLocale = BASE_LOCALE
   for arg in process.argv when arg[...2] == '--'
     baseLocale = arg[2..]
   results = fs.readdirSync(join(LOCALE, baseLocale))
     .filter((file) -> path.extname(file) == '.properties')
     .map(syncLocale.bind(null, baseLocale))
-  if baseLocale == 'en-US'
+  if baseLocale == BASE_LOCALE
     report = []
     for {fileName, translatedCount, total} in results
       report.push("#{ fileName }:")
