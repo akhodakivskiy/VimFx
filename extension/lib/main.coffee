@@ -44,14 +44,12 @@ module.exports = (data, reason) ->
   vimfx.version = data.version
   AddonManager.getAddonByID(vimfx.id, (info) -> vimfx.info = info)
 
-  # Setup the public API. The URL is encoded (which means that there will be
-  # only ASCII characters) so that the pref can be read using a simple
-  # `Services.prefs.getCharPref()` (which only supports ASCII characters).
-  api_url = encodeURI("#{ data.resourceURI.spec }lib/public.js")
-  { setAPI } = Cu.import(api_url, {})
+  # Setup the public API.
+  apiUrl = "#{ data.resourceURI.spec }lib/public.js"
+  { setAPI } = Cu.import(apiUrl, {})
   setAPI(createAPI(vimfx))
-  module.onShutdown(-> Cu.unload(api_url))
-  prefs.set('api_url', api_url)
+  module.onShutdown(-> Cu.unload(apiUrl))
+  prefs.set('apiUrl', apiUrl)
 
   test?(vimfx)
 

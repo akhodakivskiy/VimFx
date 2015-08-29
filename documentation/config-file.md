@@ -113,10 +113,12 @@ Here is a boilerplate that you can copy as is:
 
 ```js
 function startup() {
-  Components.utils.import('resource://gre/modules/Services.jsm')
-  Components.utils.import('resource://gre/modules/devtools/Console.jsm')
-  let api_url = Services.prefs.getCharPref('extensions.VimFx.api_url')
-  Components.utils.import(api_url, {}).getAPI(vimfx => {
+  let {classes: Cc, interfaces: Ci, utils: Cu} = Components
+  Cu.import('resource://gre/modules/Services.jsm')
+  Cu.import('resource://gre/modules/devtools/Console.jsm')
+  let apiPref = 'extensions.VimFx.apiUrl'
+  let apiUrl = Services.prefs.getComplexValue(apiPref, Ci.nsISupportsString).data
+  Cu.import(apiUrl, {}).getAPI(vimfx => {
 
     // Do things with the `vimfx` object between this line
     console.log('Hello, word! This is vimfx:', vimfx)
