@@ -116,7 +116,7 @@ function startup() {
   let {classes: Cc, interfaces: Ci, utils: Cu} = Components
   Cu.import('resource://gre/modules/Services.jsm')
   Cu.import('resource://gre/modules/devtools/Console.jsm')
-  let apiPref = 'extensions.VimFx.apiUrl'
+  let apiPref = 'extensions.VimFx.api_url'
   let apiUrl = Services.prefs.getComplexValue(apiPref, Ci.nsISupportsString).data
   Cu.import(apiUrl, {}).getAPI(vimfx => {
 
