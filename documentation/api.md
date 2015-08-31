@@ -23,9 +23,11 @@ VimFx users who use the public API should write a so-called [config file].
 ## Getting the API
 
 ```js
-Components.utils.import('resource://gre/modules/Services.jsm')
-let api_url = Services.prefs.getCharPref('extensions.VimFx.api_url')
-Components.utils.import(api_url, {}).getAPI(vimfx => {
+let {classes: Cc, interfaces: Ci, utils: Cu} = Components
+Cu.import('resource://gre/modules/Services.jsm')
+let apiPref = 'extensions.VimFx.api_url'
+let apiUrl = Services.prefs.getComplexValue(apiPref, Ci.nsISupportsString).data
+Cu.import(apiUrl, {}).getAPI(vimfx => {
 
   // Do things with the `vimfx` object here.
 
