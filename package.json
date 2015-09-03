@@ -15,7 +15,7 @@
     "vim-like-key-notation": "^0.1.4"
   },
   "devDependencies": {
-    "coffee-script": "~1.9.3",
+    "coffee-script": "~1.10.0",
     "coffeelint": "^1.11.1",
     "coffeelint-forbidden-keywords": "^0.1.1",
     "gulp": "^3.9.0",

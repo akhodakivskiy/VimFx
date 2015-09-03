@@ -56,10 +56,10 @@ commands.copy_current_url = ({ vim }) ->
   utils.writeToClipboard(vim.rootWindow.gBrowser.currentURI.spec)
 
 # Go up one level in the URL hierarchy.
-commands.go_up_path = ({ vim, count }) ->
+commands.go_up_path = ({ vim, count = 1 }) ->
   { pathname } = vim.window.location
   vim.window.location.pathname = pathname.replace(
-    /// (?: /[^/]+ ){1,#{ count ? 1 }} /?$ ///, ''
+    /// (?: /[^/]+ ){1,#{ count }} /?$ ///, ''
   )
 
 # Go up to root of the URL hierarchy.
@@ -69,10 +69,10 @@ commands.go_to_root = ({ vim }) ->
 commands.go_home = ({ vim }) ->
   vim.rootWindow.BrowserHome()
 
-helper_go_history = (num, { vim, count }) ->
+helper_go_history = (num, { vim, count = 1 }) ->
   { gBrowser } = vim.rootWindow
   { index, count: length } = gBrowser.sessionHistory
-  newIndex = index + num * (count ? 1)
+  newIndex = index + num * count
   newIndex = Math.max(newIndex, 0)
   newIndex = Math.min(newIndex, length - 1)
   gBrowser.gotoIndex(newIndex) unless newIndex == index
@@ -112,7 +112,7 @@ axisMap =
   x: ['left', 'scrollLeftMax', 'clientWidth',  'horizontalScrollDistance',  5]
   y: ['top',  'scrollTopMax',  'clientHeight', 'verticalScrollDistance',   20]
 
-helper_scroll = (method, type, axis, amount, { vim, event, count }) ->
+helper_scroll = (method, type, axis, amount, { vim, event, count = 1 }) ->
   frameDocument = event.target.ownerDocument
   element =
     if vim.state.scrollableElements.has(event.target)
@@ -130,7 +130,7 @@ helper_scroll = (method, type, axis, amount, { vim, event, count }) ->
         prefs.root.get("toolkit.scrollbox.#{ distance }") * lineAmount
       when 'pages'
         element[dimension]
-    amount *= unit * (count ? 1)
+    amount *= unit * count
 
   options = {}
   options[direction] = amount
@@ -190,20 +190,20 @@ absoluteTabIndex = (relativeIndex, gBrowser) ->
 
   return absoluteIndex
 
-helper_switch_tab = (direction, { vim, count }) ->
+helper_switch_tab = (direction, { vim, count = 1 }) ->
   { gBrowser } = vim.rootWindow
-  gBrowser.selectTabAtIndex(absoluteTabIndex(direction * (count ? 1), gBrowser))
+  gBrowser.selectTabAtIndex(absoluteTabIndex(direction * count, gBrowser))
 
 commands.tab_select_previous = helper_switch_tab.bind(null, -1)
 
 commands.tab_select_next     = helper_switch_tab.bind(null, +1)
 
-helper_move_tab = (direction, { vim, count }) ->
+helper_move_tab = (direction, { vim, count = 1 }) ->
   { gBrowser }    = vim.rootWindow
   { selectedTab } = gBrowser
   { pinned }      = selectedTab
 
-  index = absoluteTabIndex(direction * (count ? 1), gBrowser)
+  index = absoluteTabIndex(direction * count, gBrowser)
 
   if index < gBrowser._numPinnedTabs
     gBrowser.pinTab(selectedTab) unless pinned
@@ -233,16 +233,16 @@ commands.tab_toggle_pinned = ({ vim }) ->
   else
     vim.rootWindow.gBrowser.pinTab(currentTab)
 
-commands.tab_close = ({ vim, count }) ->
+commands.tab_close = ({ vim, count = 1 }) ->
   { gBrowser } = vim.rootWindow
   return if gBrowser.selectedTab.pinned
   currentIndex = gBrowser.visibleTabs.indexOf(gBrowser.selectedTab)
-  for tab in gBrowser.visibleTabs[currentIndex...(currentIndex + (count ? 1))]
+  for tab in gBrowser.visibleTabs[currentIndex...(currentIndex + count)]
     gBrowser.removeTab(tab)
   return
 
-commands.tab_restore = ({ vim, count }) ->
-  vim.rootWindow.undoCloseTab() for [1..count ? 1] by 1
+commands.tab_restore = ({ vim, count = 1 }) ->
+  vim.rootWindow.undoCloseTab() for [1..count] by 1
 
 commands.tab_close_to_end = ({ vim }) ->
   { gBrowser } = vim.rootWindow
@@ -305,7 +305,7 @@ follow_callback = (vim, { inTab, inBackground }, marker, count, keyStr) ->
   return not isLast
 
 # Follow links, focus text inputs and click buttons with hint markers.
-commands.follow = ({ vim, count }) ->
+commands.follow = ({ vim, count = 1 }) ->
   hrefs = {}
   filter = (element, getElementShape) ->
     document = element.ownerDocument
@@ -371,7 +371,7 @@ commands.follow = ({ vim, count }) ->
   vim.enterMode('hints', filter, callback, count)
 
 # Follow links in a new background tab with hint markers.
-commands.follow_in_tab = ({ vim, count }, inBackground = true) ->
+commands.follow_in_tab = ({ vim, count = 1 }, inBackground = true) ->
   hrefs = {}
   filter = (element, getElementShape) ->
     return unless isProperLink(element)
@@ -481,7 +481,7 @@ commands.follow_previous = helper_follow_pattern.bind(null, 'prev')
 commands.follow_next     = helper_follow_pattern.bind(null, 'next')
 
 # Focus last focused or first text input.
-commands.focus_text_input = ({ vim, storage, count }) ->
+commands.focus_text_input = ({ vim, storage, count = null }) ->
   { lastFocusedTextInput } = vim.state
   inputs = Array.filter(
     vim.window.document.querySelectorAll('input, textarea'), (element) ->
@@ -561,8 +561,8 @@ commands.enter_mode_ignore = ({ vim }) ->
   vim.enterMode('ignore')
 
 # Quote next keypress (pass it through to the page).
-commands.quote = ({ vim, count }) ->
-  vim.enterMode('ignore', count ? 1)
+commands.quote = ({ vim, count = 1 }) ->
+  vim.enterMode('ignore', count)
 
 # Display the Help Dialog.
 commands.help = ({ vim }) ->

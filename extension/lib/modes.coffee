@@ -130,7 +130,7 @@ mode('hints', {
       storage.markers   = markers
       storage.container = container
       storage.callback  = callback
-      storage.count     = count ? 1
+      storage.count     = count
       storage.numEnteredChars = 0
     else
       vim.enterMode('normal')
