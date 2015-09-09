@@ -92,11 +92,11 @@ getRootWindow = (window) ->
 getCurrentTabWindow = (window) ->
   return window.gBrowser.selectedTab.linkedBrowser.contentWindow
 
-blurActiveElement = (window) ->
+blurActiveElement = (window, { force = false } = {}) ->
   # Only blur focusable elements, in order to interfere with the browser as
   # little as possible.
   { activeElement } = window.document
-  if activeElement and activeElement.tabIndex > -1
+  if activeElement and (activeElement.tabIndex > -1 or force)
     activeElement.blur()
 
 # Focus an element and tell Firefox that the focus happened because of a user

@@ -574,7 +574,10 @@ commands.dev = ({ vim }) ->
 
 commands.esc = ({ vim, event }) ->
   utils.blurActiveElement(vim.window)
-  utils.blurActiveElement(vim.rootWindow)
+
+  # Some browser UI elements, such as the web console, are not marked as
+  # focusable, so we need to force the blur.
+  utils.blurActiveElement(vim.rootWindow, {force: true})
 
   help.removeHelp(vim.rootWindow)
 
