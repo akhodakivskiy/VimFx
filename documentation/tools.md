@@ -16,7 +16,7 @@ This section describes how to install and use the tools needed to:
 
 ## Installation
 
-1. Install [Node.js] or [io.js].
+1. Install [Node.js].
 
 2. Run `npm install` to download dependencies and development dependencies.
 
@@ -27,7 +27,6 @@ This section describes how to install and use the tools needed to:
    you might need to update `npm` for this to run; try `npm update -g npm`.)
 
 [Node.js]: http://nodejs.org/
-[io.js]: https://iojs.org/
 [gulp]: https://github.com/gulpjs/gulp
 
 ## Getting started
