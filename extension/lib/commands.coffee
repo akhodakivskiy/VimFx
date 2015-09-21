@@ -550,6 +550,8 @@ helper_find_again = (direction, { vim }) ->
   if findStorage.lastSearchString.length > 0
     findBar._findField.value = findStorage.lastSearchString
     findBar.onFindAgainCommand(direction)
+    message = findBar._findStatusDesc.textContent
+    vim.notify(message) if message
 
 commands.find_next     = helper_find_again.bind(null, false)
 
