@@ -69,4 +69,10 @@ class Vim
     args = Object.assign({vim: this, storage: @storage[@mode] ?= {}}, data)
     currentMode?[method].call(currentMode, args, extraArgs...)
 
+  notify: (title, options = {}) ->
+    new @rootWindow.Notification(title, Object.assign({
+      icon: 'chrome://vimfx/skin/icon128.png'
+      tag: 'VimFx-notification'
+    }, options))
+
 module.exports = Vim
