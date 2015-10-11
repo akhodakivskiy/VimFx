@@ -106,7 +106,7 @@ exports['test customization'] = (assert, passed_vimfx) -> getAPI((vimfx) ->
   assert.equal(category_new.name, 'New category')
   [ test_command ] = category_new.commands
   assert.equal(test_command.command.description(), 'Test ignore mode command')
-  assert.deepEqual(test_command.enabledSequences, ['<ö>'])
+  assert.deepEqual(test_command.enabledSequences, ['ö'])
 
   # Remove the added commands.
   delete vimfx.modes.normal.commands.test_command

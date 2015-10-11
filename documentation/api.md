@@ -68,7 +68,26 @@ Sets the value of the VimFx pref `pref` to `value`.
 // Set the value of the Hint chars option:
 vimfx.set('hint_chars', 'abcdefghijklmnopqrstuvwxyz')
 // Add yet a keyboard shortcut for the `f` command:
-vimfx.set('modes.normal.follow', vimfx.get('modes.normal.follow') + '  e');
+vimfx.set('modes.normal.follow', vimfx.get('modes.normal.follow') + '  e')
+```
+
+Note: If you produce conflicting keyboard shortcuts, the order of your code does
+not matter. The command that comes first in VimFx’s settings page in the Add-ons
+Manager (and in the help dialog) gets the shortcut; the other one(s) do(es) not.
+See the notes about order in [mode object], [category object] and [command
+object] for more information about order.
+
+```js
+// Even though we set the shortcut for focusing the search bar last, the command
+// for focusing the location bar “wins”, because it comes first in VimFx’s
+// settings page in the Add-ons Manager.
+vimfx.set('modes.normal.focus_location_bar', 'ö')
+vimfx.set('modes.normal.focus_search_bar', 'ö')
+
+// Swapping their orders also swaps the “winner”.
+let {commands} = vimfx.modes.normal
+;[commands.focus_location_bar.order, commands.focus_search_bar.order] =
+  [commands.focus_search_bar.order, commands.focus_location_bar.order]
 ```
 
 ### `vimfx.addCommand(options, fn)`
@@ -280,8 +299,8 @@ categories.custom = {
 }
 
 // Swap the order of the Location and Tabs categories.
-;[categories.location.order, categories.tabs.order] =
-  [categories.tabs.order, categories.location.order]
+;[commands.focus_location_bar.order, categories.tabs.order] =
+  [categories.tabs.order, commands.focus_location_bar.order]
 ```
 
 ### Mode object
@@ -393,7 +412,8 @@ A `match` object has the following properties:
   the currently focused element does not appear to respond to keystrokes in any
   special way.
 
-- command: `null` unless `type` is `'full'`. Then it is the matched command.
+- command: `null` unless `type` is `'full'`. Then it is the matched command (a
+  [command object]).
 
   The matched command should usually be run at this point. It is suitable to
   pass on the object passed to [onInput] to the command. Some modes might choose

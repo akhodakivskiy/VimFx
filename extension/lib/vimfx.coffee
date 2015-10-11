@@ -49,7 +49,7 @@ class VimFx extends utils.EventEmitter
     @count = ''
 
   createKeyTrees: ->
-    {@keyTrees, @forceCommands, @errors} = createKeyTrees(@modes)
+    {@keyTrees, @forceCommands, @errors} = createKeyTrees(@getGroupedCommands())
 
   stringifyKeyEvent: (event) ->
     return notation.stringify(event, {
@@ -156,7 +156,7 @@ byOrder = (a, b) -> a.order - b.order
 class Leaf
   constructor: (@command, @originalSequence) ->
 
-createKeyTrees = (modes) ->
+createKeyTrees = (groupedCommands) ->
   keyTrees = {}
   errors = {}
   forceCommands = {}
@@ -165,13 +165,12 @@ createKeyTrees = (modes) ->
     (errors[command.pref] ?= []).push(error)
 
   pushOverrideErrors = (command, tree) ->
-    for { command: overriddenCommand, originalSequence } in getLeaves(tree)
-      error =
-        id:      'overridden_by'
-        subject: command.description()
-        context: originalSequence
-      pushError(error, overriddenCommand)
-    return
+    { command: overridingCommand, originalSequence } = getFirstLeaf(tree)
+    error =
+      id:      'overridden_by'
+      subject: overridingCommand.description()
+      context: originalSequence
+    pushError(error, command)
 
   pushForceKeyError = (command, originalSequence) ->
     error =
@@ -180,41 +179,47 @@ createKeyTrees = (modes) ->
       context: originalSequence
     pushError(error, command)
 
-  for modeName, { commands } of modes
-    keyTrees[modeName] = {}
-    for commandName, command of commands
+  for mode in groupedCommands
+    keyTrees[mode._name] = {}
+    for category in mode.categories then for { command } in category.commands
       { shortcuts, errors: parseErrors } = parseShortcutPref(command.pref)
       pushError(error, command) for error in parseErrors
       command._sequences = []
 
       for shortcut in shortcuts
         [ prefixKeys..., lastKey ] = shortcut.normalized
-        tree = keyTrees[modeName]
+        tree = keyTrees[mode._name]
         command._sequences.push(shortcut.original)
 
+        errored = false
         for prefixKey, index in prefixKeys
           if prefixKey == FORCE_KEY
             if index == 0
               forceCommands[command.pref] = true
+              continue
             else
               pushForceKeyError(command, shortcut.original)
-            continue
+              errored = true
+              break
 
           if prefixKey of tree
             next = tree[prefixKey]
             if next instanceof Leaf
               pushOverrideErrors(command, next)
-              tree = tree[prefixKey] = {}
+              errored = true
+              break
             else
               tree = next
           else
             tree = tree[prefixKey] = {}
+        continue if errored
 
         if lastKey == FORCE_KEY
           pushForceKeyError(command, shortcut.original)
           continue
         if lastKey of tree
           pushOverrideErrors(command, tree[lastKey])
+          continue
         tree[lastKey] = new Leaf(command, shortcut.original)
 
   return {keyTrees, forceCommands, errors}
@@ -242,6 +247,12 @@ parseShortcutPref = (pref) ->
       shortcuts.push({normalized: shortcut, original: sequence}) unless errored
 
   return {shortcuts, errors}
+
+getFirstLeaf = (node) ->
+  if node instanceof Leaf
+    return node
+  for key, value of node
+    return getFirstLeaf(value)
 
 getLeaves = (node) ->
   if node instanceof Leaf
