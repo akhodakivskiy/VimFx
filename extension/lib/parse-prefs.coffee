@@ -60,7 +60,7 @@ parsePatterns = (value) ->
       try
         RegExp(pattern).source
       catch
-        utils.regexpEscape(pattern)
+        utils.regexEscape(pattern)
     return ///
       ^\s*     (?:#{ patternRegex }) (?:\s|$)
       |
@@ -83,7 +83,7 @@ parsers =
   black_list: (value) ->
     result = parseSpaceDelimitedString(value)
     result.parsed = result.parsed.map((pattern) ->
-      return ///^#{ utils.regexpEscape(pattern).replace(/\\\*/g, '.*') }$///i
+      return ///^#{ utils.regexEscape(pattern).replace(/\\\*/g, '.*') }$///i
     )
     return result
 

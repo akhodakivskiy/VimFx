@@ -36,40 +36,33 @@ XULTextBoxElement   = Ci.nsIDOMXULTextBoxElement
 
 USE_CAPTURE = true
 
-class EventEmitter
-  constructor: ->
-    @listeners = {}
 
-  on: (event, listener) ->
-    (@listeners[event] ?= []).push(listener)
 
-  emit: (event, data) ->
-    for listener in @listeners[event] ? []
-      listener(data)
-    return
+# Element classification helpers
 
-blurActiveElement = (window, { force = false } = {}) ->
-  # Only blur focusable elements, in order to interfere with the browser as
-  # little as possible.
-  activeElement = getActiveElement(window)
-  if activeElement and (activeElement.tabIndex > -1 or force)
-    activeElement.blur()
+isActivatable = (element) ->
+  return element instanceof HTMLAnchorElement or
+         element instanceof HTMLButtonElement or
+         (element instanceof HTMLInputElement and element.type in [
+           'button', 'submit', 'reset', 'image'
+         ]) or
+         element instanceof XULButtonElement
 
-getActiveElement = (window) ->
-  { activeElement } = window.document
-  if activeElement instanceof HTMLFrameElement or
-     activeElement instanceof HTMLIFrameElement
-    return getActiveElement(activeElement.contentWindow)
-  else
-    return activeElement
+isAdjustable = (element) ->
+  return element instanceof HTMLInputElement and element.type in [
+           'checkbox', 'radio', 'file', 'color'
+           'date', 'time', 'datetime', 'datetime-local', 'month', 'week'
+         ] or
+         element instanceof XULControlElement or
+         # Youtube special case.
+         element.classList?.contains('html5-video-player') or
+         element.classList?.contains('ytp-button')
 
-# Focus an element and tell Firefox that the focus happened because of a user
-# keypress (not just because some random programmatic focus).
-focusElement = (element, options = {}) ->
-  focusManager = Cc['@mozilla.org/focus-manager;1']
-    .getService(Ci.nsIFocusManager)
-  focusManager.setFocus(element, focusManager.FLAG_BYKEY)
-  element.select?() if options.select
+isContentEditable = (element) ->
+  return element.isContentEditable or
+         # `g_editable` is a non-standard attribute commonly used by Google.
+         element.getAttribute?('g_editable') == 'true' or
+         element.ownerDocument.body?.getAttribute('g_editable') == 'true'
 
 isProperLink = (element) ->
   # `.getAttribute` is used below instead of `.hasAttribute` to exclude `<a
@@ -91,32 +84,32 @@ isTextInputElement = (element) ->
          element instanceof XULMenuListElement or
          element instanceof XULTextBoxElement
 
-isContentEditable = (element) ->
-  return element.isContentEditable or
-         isGoogleEditable(element)
 
-isGoogleEditable = (element) ->
-  # `g_editable` is a non-standard attribute commonly used by Google.
-  return element.getAttribute?('g_editable') == 'true' or
-         element.ownerDocument.body?.getAttribute('g_editable') == 'true'
 
-isActivatable = (element) ->
-  return element instanceof HTMLAnchorElement or
-         element instanceof HTMLButtonElement or
-         (element instanceof HTMLInputElement and element.type in [
-           'button', 'submit', 'reset', 'image'
-         ]) or
-         element instanceof XULButtonElement
+# Active/focused element helpers
 
-isAdjustable = (element) ->
-  return element instanceof HTMLInputElement and element.type in [
-           'checkbox', 'radio', 'file', 'color'
-           'date', 'time', 'datetime', 'datetime-local', 'month', 'week'
-         ] or
-         element instanceof XULControlElement or
-         # Youtube special case.
-         element.classList?.contains('html5-video-player') or
-         element.classList?.contains('ytp-button')
+getActiveElement = (window) ->
+  { activeElement } = window.document
+  if activeElement instanceof HTMLFrameElement or
+     activeElement instanceof HTMLIFrameElement
+    return getActiveElement(activeElement.contentWindow)
+  else
+    return activeElement
+
+blurActiveElement = (window, { force = false } = {}) ->
+  # Only blur focusable elements, in order to interfere with the browser as
+  # little as possible.
+  activeElement = getActiveElement(window)
+  if activeElement and (activeElement.tabIndex > -1 or force)
+    activeElement.blur()
+
+# Focus an element and tell Firefox that the focus happened because of a user
+# keypress (not just because some random programmatic focus).
+focusElement = (element, options = {}) ->
+  focusManager = Cc['@mozilla.org/focus-manager;1']
+    .getService(Ci.nsIFocusManager)
+  focusManager.setFocus(element, focusManager.FLAG_BYKEY)
+  element.select?() if options.select
 
 getFocusType = (event) ->
   target = event.originalTarget
@@ -130,20 +123,19 @@ getFocusType = (event) ->
     else
       null
 
-area = (element) ->
-  return element.clientWidth * element.clientHeight
 
-loadCss = (name) ->
-  sss = Cc['@mozilla.org/content/style-sheet-service;1']
-    .getService(Ci.nsIStyleSheetService)
-  uri = Services.io.newURI("chrome://vimfx/skin/#{ name }.css", null, null)
-  method = sss.AUTHOR_SHEET
-  unless sss.sheetRegistered(uri, method)
-    sss.loadAndRegisterSheet(uri, method)
 
+# Event helpers
+
+listen = (element, eventName, listener) ->
+  element.addEventListener(eventName, listener, USE_CAPTURE)
   module.onShutdown(->
-    sss.unregisterSheet(uri, method)
+    element.removeEventListener(eventName, listener, USE_CAPTURE)
   )
+
+suppressEvent = (event) ->
+  event.preventDefault()
+  event.stopPropagation()
 
 # Simulate mouse click with a full chain of events. ('command' is for XUL
 # elements.)
@@ -163,28 +155,12 @@ simulateClick = (element) ->
     simulatedEvents[type] = mouseEvent
   return simulatedEvents
 
-listen = (element, eventName, listener) ->
-  element.addEventListener(eventName, listener, USE_CAPTURE)
-  module.onShutdown(->
-    element.removeEventListener(eventName, listener, USE_CAPTURE)
-  )
 
-suppressEvent = (event) ->
-  event.preventDefault()
-  event.stopPropagation()
 
-# Write a string to the system clipboard.
-writeToClipboard = (text) ->
-  clipboardHelper = Cc['@mozilla.org/widget/clipboardhelper;1']
-    .getService(Ci.nsIClipboardHelper)
-  clipboardHelper.copyString(text)
+# DOM helpers
 
-# Executes function `func` and measures how much time it took.
-timeIt = (func, name) ->
-  console.time(name)
-  result = func()
-  console.timeEnd(name)
-  return result
+area = (element) ->
+  return element.clientWidth * element.clientHeight
 
 createBox = (document, className, parent = null, text = null) ->
   box = document.createElement('box')
@@ -193,33 +169,53 @@ createBox = (document, className, parent = null, text = null) ->
   parent.appendChild(box) if parent?
   return box
 
-setAttributes = (element, attributes) ->
-  for attribute, value of attributes
-    element.setAttribute(attribute, value)
-  return
-
 insertText = (input, value) ->
   { selectionStart, selectionEnd } = input
   input.value =
     input.value[0...selectionStart] + value + input.value[selectionEnd..]
   input.selectionStart = input.selectionEnd = selectionStart + value.length
 
-openTab = (window, url, options) ->
-  { gBrowser } = window
-  window.TreeStyleTabService?.readyToOpenChildTab(gBrowser.selectedTab)
-  gBrowser.loadOneTab(url, options)
+setAttributes = (element, attributes) ->
+  for attribute, value of attributes
+    element.setAttribute(attribute, value)
+  return
 
-# Remove duplicate characters from string (case insensitive).
-removeDuplicateCharacters = (str) ->
-  return removeDuplicates( str.toLowerCase().split('') ).join('')
 
-# Escape a string to render it usable in regular expressions.
-regexpEscape = (s) -> s and s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')
+
+# Language helpers
+
+class Counter
+  constructor: ({ start: @value = 0, @step = 1 }) ->
+  tick: -> @value += @step
+
+class EventEmitter
+  constructor: ->
+    @listeners = {}
+
+  on: (event, listener) ->
+    (@listeners[event] ?= []).push(listener)
+
+  emit: (event, data) ->
+    for listener in @listeners[event] ? []
+      listener(data)
+    return
+
+has = Function::call.bind(Object::hasOwnProperty)
+
+regexEscape = (s) -> s.replace(/[|\\{}()[\]^$+*?.]/g, '\\$&')
 
 removeDuplicates = (array) ->
   # coffeelint: disable=no_backticks
   return `[...new Set(array)]`
   # coffeelint: enable=no_backticks
+
+# Remove duplicate characters from string (case insensitive).
+removeDuplicateCharacters = (str) ->
+  return removeDuplicates( str.toLowerCase().split('') ).join('')
+
+
+
+# Misc helpers
 
 formatError = (error) ->
   stack = String(error.stack?.formattedStack ? error.stack ? '')
@@ -229,6 +225,26 @@ formatError = (error) ->
     .join('\n')
   return "#{ error }\n#{ stack }"
 
+getCurrentLocation = (browser = null) ->
+  browser ?= getCurrentWindow().gBrowser.selectedBrowser
+  return new browser.ownerGlobal.URL(browser.currentURI.spec)
+
+getCurrentWindow = ->
+  windowMediator = Cc['@mozilla.org/appshell/window-mediator;1']
+    .getService(Components.interfaces.nsIWindowMediator)
+  return windowMediator.getMostRecentWindow('navigator:browser')
+
+loadCss = (name) ->
+  sss = Cc['@mozilla.org/content/style-sheet-service;1']
+    .getService(Ci.nsIStyleSheetService)
+  uri = Services.io.newURI("chrome://vimfx/skin/#{ name }.css", null, null)
+  method = sss.AUTHOR_SHEET
+  unless sss.sheetRegistered(uri, method)
+    sss.loadAndRegisterSheet(uri, method)
+  module.onShutdown(->
+    sss.unregisterSheet(uri, method)
+  )
+
 observe = (topic, observer) ->
   observer = {observe: observer} if typeof observer == 'function'
   Services.obs.addObserver(observer, topic, false)
@@ -236,56 +252,59 @@ observe = (topic, observer) ->
     Services.obs.removeObserver(observer, topic, false)
   )
 
-has = Function::call.bind(Object::hasOwnProperty)
+openTab = (window, url, options) ->
+  { gBrowser } = window
+  window.TreeStyleTabService?.readyToOpenChildTab(gBrowser.selectedTab)
+  gBrowser.loadOneTab(url, options)
 
-class Counter
-  constructor: ({start, step}) ->
-    @value = start ? 0
-    @step  = step  ? 1
-  tick: -> @value += @step
+# Executes `fn` and measures how much time it took.
+timeIt = (fn, name) ->
+  console.time(name)
+  result = fn()
+  console.timeEnd(name)
+  return result
 
-getCurrentWindow = ->
-  windowMediator = Cc['@mozilla.org/appshell/window-mediator;1']
-    .getService(Components.interfaces.nsIWindowMediator)
-  return windowMediator.getMostRecentWindow('navigator:browser')
+writeToClipboard = (text) ->
+  clipboardHelper = Cc['@mozilla.org/widget/clipboardhelper;1']
+    .getService(Ci.nsIClipboardHelper)
+  clipboardHelper.copyString(text)
 
-getCurrentLocation = (browser = null) ->
-  browser = getCurrentWindow().gBrowser.selectedBrowser unless browser?
-  return new browser.ownerGlobal.URL(browser.currentURI.spec)
+
 
 module.exports = {
-  EventEmitter
-
-  blurActiveElement
-  getActiveElement
-  focusElement
-  isProperLink
-  isTextInputElement
-  isContentEditable
   isActivatable
   isAdjustable
+  isContentEditable
+  isProperLink
+  isTextInputElement
+
+  getActiveElement
+  blurActiveElement
+  focusElement
   getFocusType
-  area
 
-  loadCss
-
-  simulateClick
   listen
   suppressEvent
-  writeToClipboard
-  timeIt
+  simulateClick
 
+  area
   createBox
-  setAttributes
   insertText
-  openTab
-  regexpEscape
+  setAttributes
+
+  Counter
+  EventEmitter
+  has
+  regexEscape
   removeDuplicates
   removeDuplicateCharacters
+
   formatError
-  observe
-  has
-  Counter
-  getCurrentWindow
   getCurrentLocation
+  getCurrentWindow
+  loadCss
+  observe
+  openTab
+  timeIt
+  writeToClipboard
 }

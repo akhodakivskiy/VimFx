@@ -59,7 +59,7 @@ convertKey = (keyStr) ->
   )
 
 convertPattern = (pattern) ->
-  return utils.regexpEscape(pattern)
+  return utils.regexEscape(pattern)
     .replace(/\\\*/g, '.*')
     .replace(/!/g,    '.')
     .replace(/\s+/g,  '\\s+')
