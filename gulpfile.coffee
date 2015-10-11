@@ -94,10 +94,7 @@ gulp.task('install.rdf', ->
 
   descriptions = fs.readdirSync(LOCALE)
     .filter((locale) -> locale != BASE_LOCALE)
-    .map((locale) -> {
-      locale: locale
-      description: getDescription(locale)
-    })
+    .map((locale) -> {locale, description: getDescription(locale)})
 
   gulp.src('extension/install.rdf.tmpl')
     .pipe(template({
@@ -151,7 +148,7 @@ gulp.task('xpi', ['build'], ->
 
 gulp.task('push', ['xpi'], ->
   body = fs.readFileSync(join(DEST, XPI))
-  request.post({url: 'http://localhost:8888', body })
+  request.post({url: 'http://localhost:8888', body})
 )
 
 gulp.task('lint', ->
