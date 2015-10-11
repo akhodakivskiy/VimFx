@@ -17,6 +17,9 @@
 # along with VimFx.  If not, see <http://www.gnu.org/licenses/>.
 ###
 
+# This file contains a list of functions that upgrade certain parts of VimFx
+# from an old format to a new one, without breaking backwards compatibility.
+
 legacy = require('./legacy')
 prefs  = require('./prefs')
 

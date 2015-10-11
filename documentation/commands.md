@@ -53,7 +53,7 @@ Closes the current tab and _count_ minus one of the following tabs.
 
 Restores the _count_ last closed tabs.
 
-### `q`
+### `I`
 
 Passes on the next _count_ keypresses to the page, without activating VimFx
 commands.
@@ -91,7 +91,7 @@ space by default. VimFx provides similar scrolling commands (and actually
 overrides space), but they work a little bit differently.
 
 They scroll _the currently focused element._ If the currently focused element
-isn’t scrollable, or there are no (apparent) currently focused element, the
+isn’t scrollable, or there is no (apparent) currently focused element, the
 entire page is scrolled.
 
 You can focus scrollable elements using the `zf` command.

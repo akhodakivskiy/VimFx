@@ -18,61 +18,104 @@
 # along with VimFx.  If not, see <http://www.gnu.org/licenses/>.
 ###
 
-utils = require('./utils')
+# This file defines the `vim` API, available to all modes and commands. There is
+# one `Vim` instance for each tab. Most importantly, it provides access to the
+# owning Firefox window and the current mode, and allows you to change mode.
+# `vim` objects are exposed by the Public API. Underscored names are private and
+# should not be used by API consumers.
+
+messageManager = require('./message-manager')
+utils          = require('./utils')
 
 class Vim
-  constructor: (@window, @parent) ->
-    @rootWindow = utils.getRootWindow(@window) # For convenience.
-    @storage = {}
-    @resetState(true)
+  constructor: (@browser, @_parent) ->
+    @window = @browser.ownerGlobal
+    @_messageManager = @browser.messageManager
+    @_storage = {}
 
-  resetState: (force = false) ->
-    @state =
-      lastInteraction: null
-      lastAutofocusPrevention: null
-      scrollableElements: new WeakMap()
-      lastFocusedTextInput: null
+    Object.defineProperty(this, 'options', {
+      get: => @_parent.options
+      enumerable: true
+    })
 
-    if @isBlacklisted()
-      @enterMode('ignore')
-    else
-      @enterMode('normal') if force or @mode == 'ignore'
+    location = utils.getCurrentLocation(@browser)
+    @enterMode(if @isBlacklisted(location.href) then 'ignore' else 'normal')
+    @_parent.emit('load', {vim: this, location})
 
-    @parent.emit('load', {vim: this, location: @window.location})
+    # Require the subset of the options needed to be listed explicitly (as
+    # opposed to sending _all_ options) for performance. Each option access
+    # might trigger an optionOverride.
+    @_listen('options', ({ prefs }) =>
+      options = {}
+      for pref in prefs
+        options[pref] = @options[pref]
+      return options
+    )
 
-  isBlacklisted: ->
-    url = @rootWindow.gBrowser.currentURI.spec
-    return @parent.options.black_list.some((regex) -> regex.test(url))
+    @_listen('vimMethod', ({ method, args = [] }, { callback = null }) =>
+      result = @[method](args...)
+      @_send(callback, result) if callback
+    )
+
+    @_listen('vimMethodSync', ({ method, args = [] }) =>
+      return @[method](args...)
+    )
+
+  isBlacklisted: (url) -> @options.black_list.some((regex) -> regex.test(url))
+
+  isFrameEvent: (event) ->
+    return (event.originalTarget == @window.gBrowser.selectedBrowser)
 
   # `args` is an array of arguments to be passed to the mode's `onEnter` method.
   enterMode: (mode, args...) ->
-    return if @mode == mode
+    return false if @mode == mode
 
-    unless utils.has(@parent.modes, mode)
-      modes = Object.keys(@parent.modes).join(', ')
+    unless utils.has(@_parent.modes, mode)
+      modes = Object.keys(@_parent.modes).join(', ')
       throw new Error("VimFx: Unknown mode. Available modes are: #{ modes }.
                        Got: #{ mode }")
 
-    @call('onLeave')
+    @_call('onLeave') if @mode?
     @mode = mode
-    @call('onEnter', {args})
-    @parent.emit('modeChange', this) if @parent.currentVim == this
+    @_call('onEnter', null, args...)
+    @_parent.emit('modeChange', this) if utils.getCurrentWindow() == @window
+    @_send('modeChange', {mode})
+    return true
 
-  onInput: (event) ->
-    match = @parent.consumeKeyEvent(event, this)
+  _onInput: (event, focusType, { isFrameEvent = false } = {}) ->
+    match = @_parent.consumeKeyEvent(event, this, focusType)
     return null unless match
-    suppress = @call('onInput', {event, count: match.count}, match)
+    suppress = @_call('onInput', {isFrameEvent, count: match.count}, match)
     return suppress
 
-  call: (method, data = {}, extraArgs...) ->
-    currentMode = @parent.modes[@mode]
-    args = Object.assign({vim: this, storage: @storage[@mode] ?= {}}, data)
-    currentMode?[method].call(currentMode, args, extraArgs...)
+  _call: (method, data = {}, extraArgs...) ->
+    args = Object.assign({vim: this, storage: @_storage[@mode] ?= {}}, data)
+    currentMode = @_parent.modes[@mode]
+    currentMode[method].call(currentMode, args, extraArgs...)
+
+  _run: (name, data = {}, callback = null) ->
+    @_send('runCommand', {name, data}, callback)
+
+  _listen: (name, listener) ->
+    messageManager.listen(name, listener, @_messageManager)
+
+  _listenOnce: (name, listener) ->
+    messageManager.listenOnce(name, listener, @_messageManager)
+
+  _send: (name, data, callback = null) ->
+    messageManager.send(name, data, @_messageManager, callback)
 
   notify: (title, options = {}) ->
-    new @rootWindow.Notification(title, Object.assign({
+    new @window.Notification(title, Object.assign({
       icon: 'chrome://vimfx/skin/icon128.png'
       tag: 'VimFx-notification'
     }, options))
+
+  _focusMarkerElement: (elementIndex, options = {}) ->
+    # If you, for example, focus the location bar, unfocus it by pressing
+    # `<esc>` and then try to focus a link or text input in a web page the focus
+    # won’t work unless `@browser` is focused first.
+    @browser.focus()
+    @_run('focus_marker_element', {elementIndex, options})
 
 module.exports = Vim

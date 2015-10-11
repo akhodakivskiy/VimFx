@@ -17,7 +17,10 @@
 # along with VimFx.  If not, see <http://www.gnu.org/licenses/>.
 ###
 
+# This file parses string prefs into more easily used data structures.
+
 defaults = require('./defaults')
+prefs    = require('./prefs')
 utils    = require('./utils')
 
 MIN_NUM_HINT_CHARS = 2

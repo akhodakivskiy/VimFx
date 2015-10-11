@@ -18,20 +18,21 @@
 # along with VimFx.  If not, see <http://www.gnu.org/licenses/>.
 ###
 
-createAPI             = require('./api')
-button                = require('./button')
-defaults              = require('./defaults')
-{ addEventListeners } = require('./events')
-modes                 = require('./modes')
-options               = require('./options')
-parsePref             = require('./parse-prefs')
-prefs                 = require('./prefs')
-utils                 = require('./utils')
-VimFx                 = require('./vimfx')
-{ watchWindows }      = require('./window-utils')
-test                  = try require('../test/index')
+# This file pulls in all the different parts of VimFx, initializes them, and
+# stiches them together.
 
-{ utils: Cu } = Components
+createAPI      = require('./api')
+button         = require('./button')
+defaults       = require('./defaults')
+UIEventManager = require('./events')
+messageManager = require('./message-manager')
+modes          = require('./modes')
+options        = require('./options')
+parsePref      = require('./parse-prefs')
+prefs          = require('./prefs')
+utils          = require('./utils')
+VimFx          = require('./vimfx')
+test           = try require('../test/index')
 
 Cu.import('resource://gre/modules/AddonManager.jsm')
 
@@ -51,8 +52,6 @@ module.exports = (data, reason) ->
   module.onShutdown(-> Cu.unload(apiUrl))
   prefs.set('apiUrl', apiUrl)
 
-  test?(vimfx)
-
   utils.loadCss('style')
 
   options.observe(vimfx)
@@ -61,8 +60,26 @@ module.exports = (data, reason) ->
     if pref.startsWith('mode.') or pref.startsWith('custom.')
       vimfx.createKeyTrees()
     else if pref of defaults.all_options
-      vimfx.options[pref] = parsePref(pref)
+      value = parsePref(pref)
+      vimfx.options[pref] = value
   )
 
-  watchWindows(button.injectButton.bind(null, vimfx), 'navigator:browser')
-  watchWindows(addEventListeners.bind(null, vimfx), 'navigator:browser')
+  test?(vimfx)
+
+  windows = new WeakSet()
+  messageManager.listen('tabCreated', (data, { target }) ->
+    return false unless target.getAttribute('messagemanagergroup') == 'browsers'
+
+    window = target.ownerGlobal
+    vimfx.addVim(target)
+
+    unless windows.has(window)
+      windows.add(window)
+      button.injectButton(vimfx, window)
+      eventManager = new UIEventManager(vimfx, window)
+      eventManager.addListeners(vimfx, window)
+
+    return __SCRIPT_URI_SPEC__
+  )
+
+  messageManager.load('bootstrap')

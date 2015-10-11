@@ -17,6 +17,8 @@
 # along with VimFx.  If not, see <http://www.gnu.org/licenses/>.
 ###
 
+# This file defines VimFx’s public API.
+
 defaults = require('./defaults')
 prefs    = require('./prefs')
 utils    = require('./utils')
@@ -79,11 +81,8 @@ createAPI = (vimfx) ->
       vimfx.optionOverrides = []
       vimfx.options = new Proxy(vimfx.options, {
         get: (options, pref) ->
-          location = vimfx.getCurrentLocation()
-          # If there is no current location available yet, simply ignore the
-          # overrides.
-          if location
-            overrides = getOverrides(vimfx.optionOverrides, location)
+          location = utils.getCurrentLocation()
+          overrides = getOverrides(vimfx.optionOverrides, location)
           return overrides?[pref] ? options[pref]
       })
     vimfx.optionOverrides.push(rules...)
@@ -92,17 +91,14 @@ createAPI = (vimfx) ->
     unless vimfx.keyOverrides
       vimfx.keyOverrides = []
       vimfx.options.keyValidator = (keyStr, mode) ->
-        location = vimfx.getCurrentLocation()
-        # If there is no current location available yet, simply ignore the
-        # overrides.
-        if location
-          overrides = getOverrides(vimfx.keyOverrides, location, mode)
+        location = utils.getCurrentLocation()
+        overrides = getOverrides(vimfx.keyOverrides, location, mode)
         return keyStr not in (overrides ? [])
     vimfx.keyOverrides.push(rules...)
 
-  on:         vimfx.on.bind(vimfx)
-  refresh:    vimfx.createKeyTrees.bind(vimfx)
-  modes:      vimfx.modes
+  on:      vimfx.on.bind(vimfx)
+  refresh: vimfx.createKeyTrees.bind(vimfx)
+  modes:   vimfx.modes
 
 getOverrides = (rules, args...) ->
   for [match, overrides] in rules

@@ -17,27 +17,22 @@
 # along with VimFx.  If not, see <http://www.gnu.org/licenses/>.
 ###
 
-# This file provides VimFx’s public API (defined in api.coffee) for public
-# consumption.
+# This file is the equivalent of main.coffee, but for frame scripts.
 
-EXPORTED_SYMBOLS = ['getAPI']
+commands          = require('./commands-frame')
+FrameEventManager = require('./events-frame')
+messageManager    = require('./message-manager')
+VimFrame          = require('./vim-frame')
 
-# Will be set by main.coffee. By passing the API in we make sure that all
-# consumers get an up-to-date version. It is also needed to be able to access
-# the global `VimFx` instance.
-api = null
+module.exports = ->
+  { content } = FRAME_SCRIPT_ENVIRONMENT
+  vim = new VimFrame(content)
+  storage = {}
 
-callbacks = []
+  eventManager = new FrameEventManager(vim)
+  eventManager.addListeners()
 
-setAPI = (passed_api) ->
-  api = passed_api
-  callback(api) for callback in callbacks
-  callbacks.length = 0
-
-getAPI = (callback) ->
-  if api == null
-    # If this module is imported before main.coffee has set `api`, push the
-    # callback to the queue.
-    callbacks.push(callback)
-  else
-    callback(api)
+  messageManager.listen('runCommand', ({ name, data }, { callback }) ->
+    result = commands[name](Object.assign({vim, storage}, data))
+    messageManager.send(callback, result) if callback?
+  )

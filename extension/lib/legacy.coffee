@@ -17,6 +17,9 @@
 # along with VimFx.  If not, see <http://www.gnu.org/licenses/>.
 ###
 
+# This file contains functions helping to upgrade to a newer version of VimFx
+# without breaking backwards-compatibility. These are used in migrations.coffee.
+
 notation = require('vim-like-key-notation')
 prefs    = require('./prefs')
 utils    = require('./utils')

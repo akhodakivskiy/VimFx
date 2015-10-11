@@ -1,5 +1,5 @@
 ###
-# Copyright Simon Lydell 2014.
+# Copyright Simon Lydell 2015.
 #
 # This file is part of VimFx.
 #
@@ -17,15 +17,11 @@
 # along with VimFx.  If not, see <http://www.gnu.org/licenses/>.
 ###
 
-# This file provides a simple function for getting the localized version of a
-# string of text.
+stub = (obj, method, fn) ->
+  originalFn = obj[method]
+  obj[method] = fn
+  return -> obj[method] = originalFn
 
-PROPERTIES_FILE = 'vimfx.properties'
-
-stringBundle = Services.strings.createBundle(
-  # Randomize URI to work around bug 719376.
-  "chrome://vimfx/locale/#{ PROPERTIES_FILE }?#{ Math.random() }"
-)
-
-module.exports = (name, values...) ->
-  return stringBundle.formatStringFromName(name, values, values.length)
+module.exports = {
+  stub
+}

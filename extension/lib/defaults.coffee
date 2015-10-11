@@ -17,6 +17,8 @@
 # along with VimFx.  If not, see <http://www.gnu.org/licenses/>.
 ###
 
+# This file defines all VimFx’s options in an easy-to-read way.
+
 shortcuts =
   'normal':
     'location':
@@ -143,6 +145,9 @@ parsed_options =
   'categories':   {} # Will be filled in below.
 
 
+
+# The above easy-to-read data is transformed in to easy-to-consume (for
+# computers) formats below.
 
 translate = require('./l10n')
 utils     = require('./utils')

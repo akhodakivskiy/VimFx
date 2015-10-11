@@ -88,6 +88,7 @@ feel like it):
     <!-- ... to here (if you feel like it). -->
 
     <em:bootstrap>true</em:bootstrap>
+    <em:multiprocessCompatible>true</em:multiprocessCompatible>
     <em:type>2</em:type>
     <em:targetApplication>
       <Description>
@@ -121,7 +122,7 @@ function startup() {
   Cu.import(apiUrl, {}).getAPI(vimfx => {
 
     // Do things with the `vimfx` object between this line
-    console.log('Hello, word! This is vimfx:', vimfx)
+    console.log('Hello, world! This is vimfx:', vimfx)
     // and this line.
 
   })
