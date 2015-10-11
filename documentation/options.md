@@ -78,11 +78,25 @@ For this reason VimFx can prevent autofocus. It’s not enabled by default,
 though, since one of VimFx’s key features is to be nice to your browser and your
 habits.
 
-Preventing autofocus might seem like a simple feature, but, in fact, it is not.
-What most people mean by autofocus, is when some text input is automatically
-focused already when the page has first loaded. It’s incredibly hard to tell
-when (or if) a page has loaded, though. Instead, any and all focusing is
-prevented until you interact with the page.
+If enabled, all focusing that occurs on page load, or after you’ve just switched
+back to a tab from another, until you interact with the page is prevented.
+
+#### Technical notes and trivia
+
+Autofocus on page load and when coming back to a tab are the two most common
+cases. Some sites, though, automatically focus a text input in other cases as
+well. Trying to catch those cases as well, VimFx used to prevent all focusing
+that didn’t occur within a fixed number of milliseconds after your last
+interaction (click or keypress). However, this proved to be too aggressive,
+preventing too much focusing. In other words, the time-based check was not
+sufficent to distinguish between inteded focusing and automatic unwanted
+focusing. It made things worse more than it helped. Since these cases are so
+difficult (if not impossible) to detect, it is better to leave them. Thankfully
+they are not very common.
+
+On page load or when coming back to a tab, before you have interacted with the
+page in any way, we can be _sure_ that any focusing is automatic (not caused by
+you), which makes it safe to prevent all focusing in those time spans.
 
 ### Ignore keyboard layout
 

@@ -44,6 +44,7 @@ class VimFrame
       hasInteraction:       false
       scrollableElements:   new WeakSet()
       lastFocusedTextInput: null
+      shouldRefocus:        false
 
   options: (prefs) -> messageManager.get('options', {prefs})
 

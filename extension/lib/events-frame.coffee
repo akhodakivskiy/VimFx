@@ -31,12 +31,9 @@ class FrameEventManager
   addListeners: ->
     @listen('DOMWindowCreated', @vim.resetState.bind(@vim))
 
-    @listen('keydown', (event) =>
-      suppress = @vim.onInput(event)
-      # If the event wasn’t suppressed, it’s on obvious interaction with the
-      # page. If it _was_ suppressed, though, it’s an interaction depending on
-      # the command triggered; if it calls `vim.markPageInteraction()` or not.
-      @vim.markPageInteraction() unless suppress
+    @listen('click', (event) =>
+      if @vim.mode == 'hints' and event.isTrusted
+        messageManager.send('enterMode', {mode: 'normal'})
     )
 
     @listen('overflow', (event) =>
@@ -49,43 +46,87 @@ class FrameEventManager
       @vim.state.scrollableElements.delete(event.target)
     )
 
+    @listen('keydown', (event) =>
+      suppress = @vim.onInput(event)
+
+      # From this line on, the rest of the code in `addListeners` is more or
+      # less devoted to autofocus prevention. When enabled, focus events that
+      # occur before the user has interacted with page are prevented.
+      #
+      # If this keydown event wasn’t suppressed (`not suppress`), it’s an
+      # obvious interaction with the page. If it _was_ suppressed, though, it’s
+      # an interaction depending on the command triggered; if it calls
+      # `vim.markPageInteraction()` or not.
+      @vim.markPageInteraction() unless suppress
+    )
+
+    # Clicks are always counted as page interaction. Listen for 'mousedown'
+    # instead of 'click' to mark the interaction as soon as possible.
+    @listen('mousedown', (event) => @vim.markPageInteraction())
+
     @listen('focus', (event) =>
       target = event.originalTarget
 
       options = @vim.options(['prevent_autofocus', 'prevent_autofocus_modes'])
 
+      # Save the last focused text input regardless of whether that input might
+      # be blurred because of autofocus prevention.
       if utils.isTextInputElement(target)
         @vim.state.lastFocusedTextInput = target
 
-      # Autofocus prevention. Strictly speaking, autofocus may only happen
-      # during page load, which means that we should only prevent focus events
-      # during page load. However, it is very difficult to reliably determine
-      # when the page load ends. Moreover, a page may load very slowly. Then it
-      # is likely that the user tries to focus something before the page has
-      # loaded fully. Therefore any and all focus events that fire before the
-      # user has interacted with the page (clicked or pressed a key) are blurred
-      # (regardless of whether the page is loaded or not).
       focusManager = Cc['@mozilla.org/focus-manager;1']
         .getService(Ci.nsIFocusManager)
-      if options.prevent_autofocus and not @vim.state.hasInteraction and
+
+      # Blur the focus target, if autofocus prevention is enabled…
+      if options.prevent_autofocus and
           @vim.mode in options.prevent_autofocus_modes and
-          # Only blur programmatic events (not caused by clicks or keypresses).
+          # …and the user has interacted with the page…
+          not @vim.state.hasInteraction and
+          # …and the event is programmatic (not caused by clicks or keypresses)…
           focusManager.getLastFocusMethod(null) == 0 and
-          # Only blur elements that may steal most keystrokes.
+          # …and the target may steal most keystrokes.
           (utils.isTextInputElement(target) or utils.isContentEditable(target))
         # Some sites (such as icloud.com) re-focuses inputs if they are blurred,
         # causing an infinite loop of autofocus prevention and re-focusing.
-        # Therefore we suppress blur events that happen just after an autofocus
-        # prevention.
+        # Therefore, blur events that happen just after an autofocus prevention
+        # are suppressed.
         @listenOnce('blur', utils.suppressEvent)
         target.blur()
     )
 
-    @listen('mousedown', (event) => @vim.markPageInteraction())
+    @listen('blur', (event) =>
+      target = event.originalTarget
 
-    @listen('click', (event) =>
-      if @vim.mode == 'hints' and event.isTrusted
-        messageManager.send('enterMode', {mode: 'normal'})
+      # If a text input is blurred in a background tab, it most likely means
+      # that the user switched tab, for example by pressing `<c-tab>`, while the
+      # text input was focused. The 'TabSelect' event fires first, then the
+      # 'blur' event. In this case, when switching back to that tab, the text
+      # input will be re-focused (because it was focused when you left the tab).
+      # This case is kept track of so that the autofocus prevention does not
+      # catch it.
+      if utils.isTextInputElement(target) or utils.isContentEditable(target)
+        messageManager.send('vimMethod', {method: 'isCurrent'}, (isCurrent) =>
+          @vim.state.shouldRefocus = not isCurrent
+          # Note that when switching to a non-Firefox window, blur events happen
+          # as usual, but `isCurrent` will be `true`. (`@vim` is still the
+          # current vim object in the current Firefox window, but the current
+          # Firefox window is not the current OS window). `shouldRefocus` should
+          # still be `true` in this case, though. However, it doesn’t matter
+          # that it isn’t, because it is only used in the 'TabSelect' event,
+          # which does not fire when returning from another window.
+        )
+    )
+
+    messageManager.listen('TabSelect', =>
+      # Reset `hasInteraction` when (re-)selecting a tab, in order to prevent
+      # the common “automatically re-focus when switching back to the tab”
+      # behaviour many sites have, unless a text input _should_ be re-focused
+      # when coming back to the tab (see above).
+      if @vim.state.shouldRefocus
+        @vim.state.hasInteraction = true
+        @vim.state.shouldRefocus = false
+      else
+        @vim.state.hasInteraction = false
     )
 
 module.exports = FrameEventManager

@@ -125,6 +125,11 @@ class UIEventManager
         vim.enterMode('normal')
     )
 
+    @listen('TabSelect', (event) =>
+      vim = @vimfx.getCurrentVim(@window)
+      vim._send('TabSelect')
+    )
+
   setHeldModifiers: (event, { filterCurrentOnly = false } = {}) ->
     mainWindow = @window.document.documentElement
     modifiers =
