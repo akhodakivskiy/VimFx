@@ -237,3 +237,9 @@ Manager nor in [about:config]. The only way to change them is by using the
 See the description of the `translations` option in [vim-like-key-notation].
 
 [vim-like-key-notation]: https://github.com/lydell/vim-like-key-notation#api
+
+### `categories`
+
+See the documentation for [`vimfx.get('categories')`][categories].
+
+[categories]: api.md#vimfxgetcategories
