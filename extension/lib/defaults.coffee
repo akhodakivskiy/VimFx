@@ -117,7 +117,7 @@ options =
   'prev_patterns':          'prev  previous  ‹  «  ◀  ←  <<  <  back  newer'
   'next_patterns':          'next  ›  »  ▶  →  >>  >  more  older'
   'black_list':             ''
-  'prevent_autofocus':      true
+  'prevent_autofocus':      false
   'ignore_keyboard_layout': false
   'timeout':                2000
 
