@@ -20,3 +20,5 @@ License"](GNU%20Free%20Documentation%20License).
 - [Public API](api.md)
 - [Contributing code](CONTRIBUTING-CODE.md)
 - [Tools](tools.md)
+
+Also check out the [wiki](https://github.com/akhodakivskiy/VimFx/wiki)!
