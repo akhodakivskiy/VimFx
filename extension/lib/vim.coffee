@@ -111,6 +111,9 @@ class Vim
       tag: 'VimFx-notification'
     }, options))
 
+  markPageInteraction: ->
+    @_send('markPageInteraction')
+
   _focusMarkerElement: (elementIndex, options = {}) ->
     # If you, for example, focus the location bar, unfocus it by pressing
     # `<esc>` and then try to focus a link or text input in a web page the focus

@@ -466,6 +466,10 @@ A `vim` object has the following properties:
   `title` (a `String`). If you need more text than a title, use `options.body`.
   See [`Notification`] for more information.
 
+- markPageInteraction(): `Function`. Marks that the user has interacted with the
+  page. After that [autofocus prevention] is not done anymore. Commands
+  interacting with web page content might want to do this.
+
 **Warning:** There are also properties starting with an underscore on `vim`
 objects. They are private, and not supposed to be used outside of VimFx’s own
 source code. They may change at any time.
@@ -522,6 +526,7 @@ and won’t be broken until VimFx 2.0.0.
 [special options]: options.md#special-options
 [config file]: config-file.md
 [bootstrap.js]: config-file.md#bootstrapjs
+[autofocus prevention]: options.md#prevent-autofocus
 [`activatable_element_keys`]: options.md#activatable_element_keys
 [`adjustable_element_keys`]: options.md#adjustable_element_keys
 
