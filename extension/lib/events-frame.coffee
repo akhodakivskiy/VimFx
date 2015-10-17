@@ -36,7 +36,7 @@ class FrameEventManager
     if @vim.content.document.readyState == 'complete'
       messageManager.send('DOMWindowCreated')
     else
-      @listen('DOMWindowCreated', (event) =>
+      @listen('DOMWindowCreated', (event) ->
         messageManager.send('DOMWindowCreated')
       )
 
