@@ -137,7 +137,9 @@ class UIEventManager
     progressListener =
       onLocationChange: (progress, request, location, flags) =>
         unless flags & Ci.nsIWebProgressListener.LOCATION_CHANGE_SAME_DOCUMENT
-          vim = @vimfx.getCurrentVim(@window)
+          # `onLocationChange` might fire before a vim object has been created
+          # for the current tab.
+          return unless vim = @vimfx.getCurrentVim(@window)
           vim._onLocationChange(location.spec)
 
     @window.gBrowser.addProgressListener(progressListener)
