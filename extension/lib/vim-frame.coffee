@@ -37,7 +37,8 @@ class VimFrame
       @mode = mode
     )
 
-    messageManager.listen('markPageInteraction', @markPageInteraction.bind(this))
+    messageManager.listen('markPageInteraction',
+                          @markPageInteraction.bind(this))
 
   resetState: ->
     @state =
