@@ -1,30 +1,31 @@
 # Creator
-Anton Khodakivskiy
+Anton Khodakivskiy (@akhodakivskiy)
 
 # Developers
-- Simon Lydell
+- Simon Lydell (@lydell)
 
 # Contributors
-- Wang Zhuochun
-- Heidi Xu (icon design)
+- Wang Zhuochun (@zhuochun)
+- Heidi Xu – icon design
 
 # Translators
-- Frank Hase (de)
-- Theodore Keloglou (el-GR)
-- Mickaël RAYBAUD-ROIG (fr)
-- Szabó Krisztián (hu)
-- Yoppy Halilintar (id)
-- Carlo Bertoldi (it)
-- pluser (ja)
-- HJTP (nl)
-- Grzegorz Niewisiewicz (pl)
-- Átila Camurça Alves (pt-BR)
-- Anton Khodakivskiy (ru)
-- Nicholas Guriev (ru)
-- Zakhar Pilipchuk (ru)
-- Andreas Lindhé (sv-SE)
-- Simon Lydell (sv-SE)
-- Wang Zhuochun (zh-CN)
-- mozillazg (zh-CN)
-- Robert (zh-TW)
-- Salas (zh-TW)
+- Frank Hase (@Kambfhase) – de
+- Theodore Keloglou (@sirodoht) – el-GR
+- Mickaël RAYBAUD-ROIG (@m-r-r) – fr
+- Szabó Krisztián (@thenonameguy) – hu
+- Yoppy Halilintar (@comepradz) – id
+- Carlo Bertoldi (@cbertoldi) – it
+- @pluser – ja
+- @HJTP – nl
+- Greg Navis (@grn) – pl
+- @morethanoneanimal – pl
+- Átila Camurça Alves (@atilacamurca) – pt-BR
+- Anton Khodakivskiy (@akhodakivskiy) – ru
+- Nicholas Guriev (@mymedia2) – ru
+- Zakhar Pilipchuk (@harius) – ru
+- Andreas Lindhé (@lindhe) – sv-SE
+- Simon Lydell (@lydell) – sv-SE
+- Wang Zhuochun (@zhuochun) – zh-CN
+- @mozillazg – zh-CN
+- Robert Wang (@cyberrob) – zh-TW
+- Salas (@leVirve) – zh-TW
