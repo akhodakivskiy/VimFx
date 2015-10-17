@@ -85,11 +85,6 @@ class UIEventManager
           @setHeldModifiers(event)
           utils.suppressEvent(event) if @suppress
 
-        # The command might have closed the current tab. If so, it is an error
-        # trying to communicate with the its frame scripts.
-        if @window.gBrowser.getTabForBrowser(vim.browser)
-          vim._send('keydown', {@suppress})
-
       catch error
         console.error(utils.formatError(error))
     )
@@ -124,10 +119,15 @@ class UIEventManager
       # hints mode it’s better to leave it.
       if vim.mode == 'hints' and not vim.isFrameEvent(event) and
          # Exclude the VimFx button, though, since clicking it returns to normal
-         # mode. Otherwise we’d first returned to normal mode and then the
-         # button would have opened the help dialog.
+         # mode. Otherwise we’d first return to normal mode and then the button
+         # would open the help dialog.
          target != @window.document.getElementById(button.BUTTON_ID)
         vim.enterMode('normal')
+    )
+
+    @listen('TabSelect', (event) =>
+      vim = @vimfx.getCurrentVim(@window)
+      vim._send('TabSelect')
     )
 
   setHeldModifiers: (event, { filterCurrentOnly = false } = {}) ->

@@ -31,18 +31,20 @@ class VimFrame
   constructor: (@content) ->
     @mode = 'normal'
 
+    @resetState()
+
     messageManager.listen('modeChange', ({ mode }) ->
       @mode = mode
     )
 
-    @resetState()
+    messageManager.listen('markPageInteraction', @markPageInteraction.bind(this))
 
   resetState: ->
     @state =
-      lastInteraction:          null
-      lastAutofocusPrevention:  null
-      scrollableElements:       new WeakSet()
-      lastFocusedTextInput:     null
+      hasInteraction:       false
+      scrollableElements:   new WeakSet()
+      lastFocusedTextInput: null
+      shouldRefocus:        false
 
   options: (prefs) -> messageManager.get('options', {prefs})
 
@@ -60,8 +62,11 @@ class VimFrame
     suppress = messageManager.get('vimMethodSync', {method: '_onInput', args})
     utils.suppressEvent(event) if suppress
     messageManager.send('onInput-frame', { suppress })
+    return suppress
 
   notify: (args...) ->
     messageManager.send('vimMethod', {method: 'notify', args})
+
+  markPageInteraction: -> @state.hasInteraction = true
 
 module.exports = VimFrame

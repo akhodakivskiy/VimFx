@@ -74,18 +74,29 @@ browsing using the keyboard, as you do with VimFx, because it often feels like
 VimFx isn’t responding, until you realize that you are typing in a text box—not
 running VimFx commands!
 
-For this reason VimFx prevents autofocus. If you dislike that, or think the
-prevention is too aggressive, you may disable it, returning to the standard
-behavior.
+For this reason VimFx can prevent autofocus. It’s not enabled by default,
+though, since one of VimFx’s key features is to be nice to your browser and your
+habits.
 
-What is meant by “aggressive”? Well, in fact it is very hard to tell if a focus
-was an “autofocus” or a “regular focus” caused by you. VimFx prevents all
-focusing that doesn’t happen reasonably close (200ms by default) to an
-interaction by you (such as clicking something or using one of the `f`
-commands). (You may change what “reasonably close” means through the advanced
-setting [`autofocus_limit`]).
+If enabled, all focusing that occurs on page load, or after you’ve just switched
+back to a tab from another, until you interact with the page is prevented.
 
-[`autofocus_limit`]: #autofocus_limit
+#### Technical notes and trivia
+
+Autofocus on page load and when coming back to a tab are the two most common
+cases. Some sites, though, automatically focus a text input in other cases as
+well. Trying to catch those cases as well, VimFx used to prevent all focusing
+that didn’t occur within a fixed number of milliseconds after your last
+interaction (click or keypress). However, this proved to be too aggressive,
+preventing too much focusing. In other words, the time-based check was not
+sufficent to distinguish between inteded focusing and automatic unwanted
+focusing. It made things worse more than it helped. Since these cases are so
+difficult (if not impossible) to detect, it is better to leave them. Thankfully
+they are not very common.
+
+On page load or when coming back to a tab, before you have interacted with the
+page in any way, we can be _sure_ that any focusing is automatic (not caused by
+you), which makes it safe to prevent all focusing in those time spans.
 
 ### Ignore keyboard layout
 
@@ -135,19 +146,6 @@ see them all in [defaults.coffee].)
 You might have noticed that some links open in new tabs when you click them.
 That is not the case if you “click” them using VimFx’s `f` command, though. If
 you dislike that, disable this option.
-
-### `autofocus_limit`
-
-If `prevent_autofocus` is enabled, all focus events except those that occur
-within this number of milliseconds after a user interaction are suppressed.
-
-If you set i to 0, _all_ programmaticly invoked focus events in web pages will
-be prevented. Only focus events as the result of you clicking or pressing a key
-are allowed. Some sites automatically focuses inputs after clicking some button,
-which might make this undesireable.
-
-Setting it to a very large value basically has the same effact as turning of
-`prevent_autofocus`.
 
 ### `prevent_autofocus_modes`
 

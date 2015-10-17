@@ -462,9 +462,18 @@ A `vim` object has the following properties:
 - isFrameEvent(event): `Function`. Returns `true` if `event` occurred in web
   page content, and `false` otherwise (if it occurred in Firefox’s UI).
 
+- isCurrent(): `Function`. Returns whether this vim object is the currently used
+  one. In other words, if the tab that this vim object manages is the currently
+  selected tab in the current Firefox window. Note, though, that the current
+  Firefox window is not necessarily the current window of your operating system.
+
 - notify(title, options = {}): `Function`. Display a notification with the title
   `title` (a `String`). If you need more text than a title, use `options.body`.
   See [`Notification`] for more information.
+
+- markPageInteraction(): `Function`. Marks that the user has interacted with the
+  page. After that [autofocus prevention] is not done anymore. Commands
+  interacting with web page content might want to do this.
 
 **Warning:** There are also properties starting with an underscore on `vim`
 objects. They are private, and not supposed to be used outside of VimFx’s own
@@ -522,6 +531,7 @@ and won’t be broken until VimFx 2.0.0.
 [special options]: options.md#special-options
 [config file]: config-file.md
 [bootstrap.js]: config-file.md#bootstrapjs
+[autofocus prevention]: options.md#prevent-autofocus
 [`activatable_element_keys`]: options.md#activatable_element_keys
 [`adjustable_element_keys`]: options.md#adjustable_element_keys
 

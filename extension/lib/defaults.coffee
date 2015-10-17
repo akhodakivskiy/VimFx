@@ -117,13 +117,12 @@ options =
   'prev_patterns':          'prev  previous  ‹  «  ◀  ←  <<  <  back  newer'
   'next_patterns':          'next  ›  »  ▶  →  >>  >  more  older'
   'black_list':             ''
-  'prevent_autofocus':      true
+  'prevent_autofocus':      false
   'ignore_keyboard_layout': false
   'timeout':                2000
 
 advanced_options =
   'prevent_target_blank':               true
-  'autofocus_limit':                    100
   'prevent_autofocus_modes':            'normal'
   'hints_timeout':                      200
   'smoothScroll.lines.spring-constant': '1000'

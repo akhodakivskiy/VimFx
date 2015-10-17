@@ -133,6 +133,12 @@ listen = (element, eventName, listener) ->
     element.removeEventListener(eventName, listener, USE_CAPTURE)
   )
 
+listenOnce = (element, eventName, listener) ->
+  fn = (event) ->
+    listener(event)
+    element.removeEventListener(eventName, fn, USE_CAPTURE)
+  listen(element, eventName, fn)
+
 suppressEvent = (event) ->
   event.preventDefault()
   event.stopPropagation()
@@ -284,6 +290,7 @@ module.exports = {
   getFocusType
 
   listen
+  listenOnce
   suppressEvent
   simulateClick
 

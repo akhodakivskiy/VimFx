@@ -66,6 +66,8 @@ class Vim
   isFrameEvent: (event) ->
     return (event.originalTarget == @window.gBrowser.selectedBrowser)
 
+  isCurrent: -> @_parent.getCurrentVim(utils.getCurrentWindow()) == this
+
   # `args` is an array of arguments to be passed to the mode's `onEnter` method.
   enterMode: (mode, args...) ->
     return false if @mode == mode
@@ -110,6 +112,9 @@ class Vim
       icon: 'chrome://vimfx/skin/icon128.png'
       tag: 'VimFx-notification'
     }, options))
+
+  markPageInteraction: ->
+    @_send('markPageInteraction')
 
   _focusMarkerElement: (elementIndex, options = {}) ->
     # If you, for example, focus the location bar, unfocus it by pressing

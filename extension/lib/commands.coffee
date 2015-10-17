@@ -237,6 +237,7 @@ commands.tab_close_other = ({ vim }) ->
 
 
 helper_follow = (name, vim, callback, count = null) ->
+  vim.markPageInteraction()
   vim._run(name, null, ({ wrappers, viewport }) ->
     vim.enterMode('hints', wrappers, viewport, callback, count)
   )
@@ -328,10 +329,12 @@ commands.follow_next     = helper_follow_pattern.bind(null, 'next')
 
 # Focus last focused or first text input.
 commands.focus_text_input = ({ vim, count }) ->
+  vim.markPageInteraction()
   vim._run('focus_text_input', {count})
 
 # Switch between text inputs or simulate `<tab>`.
 helper_move_focus = (direction, { vim, _skipMoveFocus }) ->
+  vim.markPageInteraction()
   vim._run('move_focus', {direction, skip: _skipMoveFocus})
 
 commands.focus_next     = helper_move_focus.bind(null, +1)
