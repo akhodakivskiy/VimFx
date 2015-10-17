@@ -33,8 +33,7 @@ class Vim
     @_messageManager = @browser.messageManager
     @_storage = {}
 
-    @_frameCanReceiveEvents = false
-    @_listen('DOMWindowCreated', => @_frameCanReceiveEvents = true)
+    @_resetState()
 
     Object.defineProperty(this, 'options', {
       get: => @_parent.options
@@ -62,10 +61,17 @@ class Vim
       return @[method](args...)
     )
 
+    @_listen('DOMWindowCreated', => @_state.frameCanReceiveEvents = true)
+
+  _resetState: ->
+    @_state =
+      frameCanReceiveEvents: false
+      lastUrl:               null
+
   _isBlacklisted: (url) -> @options.black_list.some((regex) -> regex.test(url))
 
   isFrameEvent: (event) ->
-    return (@_frameCanReceiveEvents and
+    return (@_state.frameCanReceiveEvents and
             event.originalTarget == @window.gBrowser.selectedBrowser)
 
   isCurrent: -> @_parent.getCurrentVim(utils.getCurrentWindow()) == this
@@ -93,6 +99,8 @@ class Vim
     return suppress
 
   _onLocationChange: (url) ->
+    return if url == @_state.lastUrl
+    @_state.lastUrl = url
     @enterMode(if @_isBlacklisted(url) then 'ignore' else 'normal')
     @_parent.emit('locationChange', {vim: this, location: new @window.URL(url)})
     @_send('locationChange')
