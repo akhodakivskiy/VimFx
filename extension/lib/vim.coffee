@@ -39,7 +39,7 @@ class Vim
     })
 
     location = utils.getCurrentLocation(@browser)
-    @enterMode(if @isBlacklisted(location.href) then 'ignore' else 'normal')
+    @enterMode(if @_isBlacklisted(location.href) then 'ignore' else 'normal')
     @_parent.emit('load', {vim: this, location})
 
     # Require the subset of the options needed to be listed explicitly (as
@@ -61,7 +61,7 @@ class Vim
       return @[method](args...)
     )
 
-  isBlacklisted: (url) -> @options.black_list.some((regex) -> regex.test(url))
+  _isBlacklisted: (url) -> @options.black_list.some((regex) -> regex.test(url))
 
   isFrameEvent: (event) ->
     return (event.originalTarget == @window.gBrowser.selectedBrowser)

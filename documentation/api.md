@@ -462,9 +462,6 @@ A `vim` object has the following properties:
   `...args` to the mode. It is up to every mode to do whatever it wants to with
   `...args`.
 
-- isBlacklisted(): `Function`. Returns `true` if the current URL is
-  [blacklisted], and `false` otherwise.
-
 - isFrameEvent(event): `Function`. Returns `true` if `event` occurred in web
   page content, and `false` otherwise (if it occurred in Firefox’s UI).
 
