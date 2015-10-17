@@ -65,13 +65,20 @@ commands.go_home = ({ vim }) ->
 
 helper_go_history = (num, { vim, count = 1 }) ->
   { SessionStore, gBrowser } = vim.window
-  SessionStore.getSessionHistory(gBrowser.selectedTab, (sessionHistory) ->
-    { index } = sessionHistory
-    newIndex = index + num * count
-    newIndex = Math.max(newIndex, 0)
-    newIndex = Math.min(newIndex, sessionHistory.entries.length - 1)
-    gBrowser.gotoIndex(newIndex) unless newIndex == index
-  )
+
+  # TODO: When Firefox 43 is released, only use the `.getSessionHistory`
+  # version and bump the minimut Firefox version.
+  if SessionStore.getSessionHistory
+    SessionStore.getSessionHistory(gBrowser.selectedTab, (sessionHistory) ->
+      { index } = sessionHistory
+      newIndex = index + num * count
+      newIndex = Math.max(newIndex, 0)
+      newIndex = Math.min(newIndex, sessionHistory.entries.length - 1)
+      gBrowser.gotoIndex(newIndex) unless newIndex == index
+    )
+  else
+    # Until then, fall back to a no-count version.
+    if num < 0 then gBrowser.goBack() else gBrowser.goForward()
 
 commands.history_back    = helper_go_history.bind(null, -1)
 
