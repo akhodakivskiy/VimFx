@@ -126,7 +126,9 @@ class UIEventManager
     )
 
     @listen('TabSelect', (event) =>
-      vim = @vimfx.getCurrentVim(@window)
+      # The initial 'TabSelect' when the browser starts fires before a vim
+      # object has been created for that tab.
+      return unless vim = @vimfx.getCurrentVim(@window)
       vim._send('TabSelect')
     )
 
