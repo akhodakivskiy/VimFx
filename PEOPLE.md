@@ -10,6 +10,7 @@ Anton Khodakivskiy (@akhodakivskiy)
 
 # Translators
 - Frank Hase (@Kambfhase) – de
+- Benedikt (@benediktg) – de
 - Theodore Keloglou (@sirodoht) – el-GR
 - Mickaël RAYBAUD-ROIG (@m-r-r) – fr
 - Szabó Krisztián (@thenonameguy) – hu
