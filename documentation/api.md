@@ -194,10 +194,10 @@ vimfx.addKeyOverrides(
 
 Runs `listener(data)` when `eventName` is fired.
 
-#### The `load` event
+#### The `locationChange` event
 
-Occurs when opening a new tab or navigating to a new URL. The data passed to
-listeners is an object with the following properties:
+Occurs when opening a new tab or navigating to a new URL causing a full page
+load. The data passed to listeners is an object with the following properties:
 
 - vim: The current [vim object].
 - location: A [location object].

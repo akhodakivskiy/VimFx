@@ -231,9 +231,9 @@ formatError = (error) ->
     .join('\n')
   return "#{ error }\n#{ stack }"
 
-getCurrentLocation = (browser = null) ->
-  browser ?= getCurrentWindow().gBrowser.selectedBrowser
-  return new browser.ownerGlobal.URL(browser.currentURI.spec)
+getCurrentLocation = ->
+  window = getCurrentWindow()
+  return new window.URL(window.gBrowser.selectedBrowser.currentURI.spec)
 
 getCurrentWindow = ->
   windowMediator = Cc['@mozilla.org/appshell/window-mediator;1']

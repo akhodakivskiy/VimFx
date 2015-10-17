@@ -134,6 +134,17 @@ class UIEventManager
       vim._send('TabSelect')
     )
 
+    progressListener =
+      onLocationChange: (progress, request, location, flags) =>
+        unless flags & Ci.nsIWebProgressListener.LOCATION_CHANGE_SAME_DOCUMENT
+          vim = @vimfx.getCurrentVim(@window)
+          vim._onLocationChange(location.spec)
+
+    @window.gBrowser.addProgressListener(progressListener)
+    module.onShutdown(=>
+      @window.gBrowser.removeProgressListener(progressListener)
+    )
+
   setHeldModifiers: (event, { filterCurrentOnly = false } = {}) ->
     mainWindow = @window.document.documentElement
     modifiers =

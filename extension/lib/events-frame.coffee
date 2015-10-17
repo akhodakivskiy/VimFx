@@ -29,7 +29,7 @@ class FrameEventManager
   listenOnce: utils.listenOnce.bind(null, FRAME_SCRIPT_ENVIRONMENT)
 
   addListeners: ->
-    @listen('DOMWindowCreated', @vim.resetState.bind(@vim))
+    messageManager.listen('locationChange', @vim.resetState.bind(@vim))
 
     @listen('click', (event) =>
       if @vim.mode == 'hints' and event.isTrusted

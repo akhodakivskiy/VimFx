@@ -38,9 +38,7 @@ class Vim
       enumerable: true
     })
 
-    location = utils.getCurrentLocation(@browser)
-    @enterMode(if @_isBlacklisted(location.href) then 'ignore' else 'normal')
-    @_parent.emit('load', {vim: this, location})
+    @enterMode('normal')
 
     # Require the subset of the options needed to be listed explicitly (as
     # opposed to sending _all_ options) for performance. Each option access
@@ -89,6 +87,11 @@ class Vim
     return null unless match
     suppress = @_call('onInput', {isFrameEvent, count: match.count}, match)
     return suppress
+
+  _onLocationChange: (url) ->
+    @enterMode(if @_isBlacklisted(url) then 'ignore' else 'normal')
+    @_parent.emit('locationChange', {vim: this, location: new @window.URL(url)})
+    @_send('locationChange')
 
   _call: (method, data = {}, extraArgs...) ->
     args = Object.assign({vim: this, storage: @_storage[@mode] ?= {}}, data)

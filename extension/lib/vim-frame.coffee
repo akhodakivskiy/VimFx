@@ -33,7 +33,7 @@ class VimFrame
 
     @resetState()
 
-    messageManager.listen('modeChange', ({ mode }) ->
+    messageManager.listen('modeChange', ({ mode }) =>
       @mode = mode
     )
 
