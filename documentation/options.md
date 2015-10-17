@@ -28,7 +28,7 @@ of the many `f` commands. See also [The `f` commands].
 
 ### Previous/Next page patterns
 
-Space separated lists of patterns that match links to the previous/next page.
+Comma separated lists of patterns that match links to the previous/next page.
 Used by the `[` and `]` commands.
 
 There is a standardized way for websites to tell browsers the URLs to the
