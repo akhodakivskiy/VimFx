@@ -80,7 +80,7 @@ class Vim
     @_call('onLeave') if @mode?
     @mode = mode
     @_call('onEnter', null, args...)
-    @_parent.emit('modeChange', this) if utils.getCurrentWindow() == @window
+    @_parent.emit('modeChange', this)
     @_send('modeChange', {mode})
     return true
 

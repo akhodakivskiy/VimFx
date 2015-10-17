@@ -226,6 +226,12 @@ vimfx.on('modeChange', vim => {
 })
 ```
 
+#### The `TabSelect` event
+
+Occurs whenever any tab in any window is selected. This is also fired when
+Firefox starts for the currently selected tab. The data passed to listeners is
+the `event` object passed to the standard Firefox [TabSelect] event.
+
 ### `vimfx.refresh()`
 
 If you make changes to [`vimfx.modes`] directly you need to call
@@ -546,5 +552,6 @@ and won’t be broken until VimFx 2.0.0.
 [`Notification`]: https://developer.mozilla.org/en-US/docs/Web/API/Notification
 [`window.location`]: https://developer.mozilla.org/en-US/docs/Web/API/Location
 [`URL`]: https://developer.mozilla.org/en-US/docs/Web/API/URL
+[TabSelect]: https://developer.mozilla.org/en-US/docs/Web/Events/TabSelect
 [web console]: https://developer.mozilla.org/en-US/docs/Tools/Web_Console
 [about:config]: http://kb.mozillazine.org/About:config

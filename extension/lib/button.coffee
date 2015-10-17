@@ -23,27 +23,31 @@ help      = require('./help')
 translate = require('./l10n')
 utils     = require('./utils')
 
+cui = Cu.import('resource:///modules/CustomizableUI.jsm', {}).CustomizableUI
+
 BUTTON_ID = 'VimFxButton'
 
-injectButton = (vimfx, window) ->
-  cui = window.CustomizableUI
-  button = null
+injectButton = (vimfx) ->
   cui.createWidget({
     id: BUTTON_ID
     defaultArea: cui.AREA_NAVBAR
     label: 'VimFx'
     tooltiptext: translate('button.tooltip.normal')
     onCommand: ->
+      window = utils.getCurrentWindow()
+      button = getButton(window)
       mode = button.getAttribute('vimfx-mode')
       if mode == 'normal'
         help.injectHelp(window, vimfx)
       else
         vimfx.getCurrentVim(window).enterMode('normal')
     onCreated: (node) ->
-      button = node
-      button.setAttribute('vimfx-mode', 'normal')
+      node.setAttribute('vimfx-mode', 'normal')
 
       updateButton = ->
+        window = utils.getCurrentWindow()
+        button = getButton(window)
+
         # - The 'modeChange' event provides the `vim` object that changed mode,
         #   but it might not be the current `vim` anymore, so always get the
         #   current instance.
@@ -51,6 +55,7 @@ injectButton = (vimfx, window) ->
         #   By then a `vim` object for that tab might not have been constructed
         #   yet. If so, simply do nothing.
         return unless vim = vimfx.getCurrentVim(window)
+
         button.setAttribute('vimfx-mode', vim.mode)
         tooltip =
           if vim.mode == 'normal'
@@ -61,11 +66,13 @@ injectButton = (vimfx, window) ->
         button.setAttribute('tooltiptext', tooltip)
 
       vimfx.on('modeChange', updateButton)
-      utils.listen(window, 'TabSelect', updateButton)
+      vimfx.on('TabSelect', updateButton)
   })
   module.onShutdown(cui.destroyWidget.bind(cui, BUTTON_ID))
 
+getButton = (window) -> window.document.getElementById(BUTTON_ID)
+
 module.exports = {
   injectButton
-  BUTTON_ID
+  getButton
 }

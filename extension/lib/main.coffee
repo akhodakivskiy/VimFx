@@ -64,6 +64,8 @@ module.exports = (data, reason) ->
       vimfx.options[pref] = value
   )
 
+  button.injectButton(vimfx)
+
   test?(vimfx)
 
   windows = new WeakSet()
@@ -75,7 +77,6 @@ module.exports = (data, reason) ->
 
     unless windows.has(window)
       windows.add(window)
-      button.injectButton(vimfx, window)
       eventManager = new UIEventManager(vimfx, window)
       eventManager.addListeners(vimfx, window)
 

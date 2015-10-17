@@ -121,11 +121,13 @@ class UIEventManager
          # Exclude the VimFx button, though, since clicking it returns to normal
          # mode. Otherwise we’d first return to normal mode and then the button
          # would open the help dialog.
-         target != @window.document.getElementById(button.BUTTON_ID)
+         target != button.getButton(@window)
         vim.enterMode('normal')
     )
 
     @listen('TabSelect', (event) =>
+      @vimfx.emit('TabSelect', event)
+
       # The initial 'TabSelect' when the browser starts fires before a vim
       # object has been created for that tab.
       return unless vim = @vimfx.getCurrentVim(@window)
