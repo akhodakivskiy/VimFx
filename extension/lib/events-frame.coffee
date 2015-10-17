@@ -31,6 +31,10 @@ class FrameEventManager
   addListeners: ->
     messageManager.listen('locationChange', @vim.resetState.bind(@vim))
 
+    @listen('DOMWindowCreated', (event) =>
+      messageManager.send('DOMWindowCreated')
+    )
+
     @listen('click', (event) =>
       if @vim.mode == 'hints' and event.isTrusted
         messageManager.send('enterMode', {mode: 'normal'})

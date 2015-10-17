@@ -33,6 +33,9 @@ class Vim
     @_messageManager = @browser.messageManager
     @_storage = {}
 
+    @_frameCanReceiveEvents = false
+    @_listen('DOMWindowCreated', => @_frameCanReceiveEvents = true)
+
     Object.defineProperty(this, 'options', {
       get: => @_parent.options
       enumerable: true
@@ -62,7 +65,8 @@ class Vim
   _isBlacklisted: (url) -> @options.black_list.some((regex) -> regex.test(url))
 
   isFrameEvent: (event) ->
-    return (event.originalTarget == @window.gBrowser.selectedBrowser)
+    return (@_frameCanReceiveEvents and
+            event.originalTarget == @window.gBrowser.selectedBrowser)
 
   isCurrent: -> @_parent.getCurrentVim(utils.getCurrentWindow()) == this
 
