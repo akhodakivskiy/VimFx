@@ -96,12 +96,26 @@ getActiveElement = (window) ->
   else
     return activeElement
 
-blurActiveElement = (window, { force = false } = {}) ->
+blurActiveElement = (window) ->
   # Only blur focusable elements, in order to interfere with the browser as
   # little as possible.
   activeElement = getActiveElement(window)
-  if activeElement and (activeElement.tabIndex > -1 or force)
+  if activeElement and activeElement.tabIndex > -1
     activeElement.blur()
+
+blurActiveBrowserElement = (window) ->
+  # - Some browser UI elements, such as the web console, are not marked as
+  #   focusable, so we can’t check if the element is focusable as in
+  #   `blurActiveElement`.
+  # - Blurring in the next tick allows to pass `<escape>` to the location bar to
+  #   reset it, for example.
+  # - Focusing the current browser afterwards allows to pass `<escape>` as well
+  #   as unbound keys to the page.
+  activeElement = getActiveElement(window)
+  callback = ->
+    activeElement.blur()
+    window.gBrowser.selectedBrowser.focus()
+  window.setTimeout(callback, 0)
 
 # Focus an element and tell Firefox that the focus happened because of a user
 # keypress (not just because some random programmatic focus).
@@ -286,6 +300,7 @@ module.exports = {
 
   getActiveElement
   blurActiveElement
+  blurActiveBrowserElement
   focusElement
   getFocusType
 

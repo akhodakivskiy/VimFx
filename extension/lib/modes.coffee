@@ -102,9 +102,9 @@ mode('normal', {
     #   markers on it without closing it. Secondly, otherwise cancelling hint
     #   markers on Google causes its search bar to be focused.
     # - It may only be suppressed in web pages, not in browser chrome. That
-    #   allows for reseting the location bar when blurring it, and closing
+    #   allows for resetting the location bar when blurring it, and closing
     #   dialogs such as the “bookmark this page” dialog (<c-d>).
-    return not (keyStr == '<escape>' and not autoInsertMode and isFrameEvent)
+    return not (keyStr == '<escape>' and not (isFrameEvent and autoInsertMode))
 
 }, commands)
 
