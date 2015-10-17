@@ -2,21 +2,21 @@
 <!ENTITY pref.hint_chars.desc       "Standaard: fjdkslaghrueiwovncm">
 
 <!ENTITY pref.black_list.title      "Zwarte lijst">
-<!ENTITY pref.black_list.desc       "Door komma's gescheiden lijst van adressen waarop VimFx automatisch uitgeschakeld moet worden.
-Speciale tekens toegestaan: *, !. Example: *example.com*,*foobar.org*">
+<!ENTITY pref.black_list.desc       "Kommagescheiden lijst van adressen waarop VimFx automatisch uitgeschakeld moet worden.
+Speciale tekens zijn toegestaan: *, !. Example: *example.com*,*foobar.org*">
 
-<!ENTITY pref.prev_patterns.title   "Previous Page Patterns">
-<!ENTITY pref.prev_patterns.desc    "Comma separated list of patterns that match links to previous page">
+<!ENTITY pref.prev_patterns.title   "Vorige pagina patroon">
+<!ENTITY pref.prev_patterns.desc    "Kommagescheiden lijst van woorden die een link naar de vorige pagina aangeven">
 
-<!ENTITY pref.next_patterns.title   "Next Page Patterns">
+<!ENTITY pref.next_patterns.title   "Volgende pagina patroon">
 <!ENTITY pref.next_patterns.desc    "Comma separated list of patterns that match links to next page">
 
 <!ENTITY pref.scroll_step_lines.title   "Scrollstapgrootte">
 
-<!ENTITY pref.hints_bloom_on.title "Smart hint assignment (needs translation)">
-<!ENTITY pref.hints_bloom_on.desc  "Assign shorter hints to the links that users visit most often (needs translation)">
+<!ENTITY pref.hints_bloom_on.title "Slimme karaktertoewijzing">
+<!ENTITY pref.hints_bloom_on.desc  "Wijs kortere snelkoppelingen toe aan links die gebruikers vaak bezoeken">
 
-<!ENTITY pref.prevent_autofocus.title "Prevent auto focusing inputs">
+<!ENTITY pref.prevent_autofocus.title "Voorkom autofocus op invoervelden">
 
-<!ENTITY customizeButton.title "Keyboard Shortcuts">
-<!ENTITY customizeButton.label "Customize">
+<!ENTITY customizeButton.title "Sneltoetsen">
+<!ENTITY customizeButton.label "Aanpassen">
