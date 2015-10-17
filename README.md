@@ -9,8 +9,8 @@ browsing and navigation, significantly reducing the use of the mouse.
 - Easy for beginners, powerful for advanced users. Not just for Vim fanatics.
 - Modeled after [Vimium] for Chrome.
 
-**New to VimFx?** Check out [Questions & Answers]!  
-Power user? Make a [config file]!  
+**New to VimFx?** Check out [Questions & Answers]!
+Power user? Make a [config file]!
 In either case, have look at the the [documentation] and the [wiki].
 
 VimFx is made by [these awesome people][people].
@@ -53,9 +53,9 @@ Open a new tab with <kbd>t</kbd>, close it with <kbd>x</kbd>. Reopen it again
 with <kbd>X</kbd>. Switch between tabs with <kbd>J</kbd> and <kbd>K</kbd>, or
 some of the several other tab commands.
 
-Scrolling left/down/up/right: <kbd>h</kbd>, <kbd>j</kbd>, <kbd>k</kbd>, <kbd>l</kbd>.  
-Top/Bottom: <kbd>gg</kbd>, <kbd>G</kbd>.  
-Page up/down: <kbd>space</kbd>, <kbd>shift-space</kbd>.  
+Scrolling left/down/up/right: <kbd>h</kbd>, <kbd>j</kbd>, <kbd>k</kbd>, <kbd>l</kbd>.
+Top/Bottom: <kbd>gg</kbd>, <kbd>G</kbd>.
+Page up/down: <kbd>space</kbd>, <kbd>shift-space</kbd>.
 Half a page: <kbd>d</kbd>, <kbd>u</kbd>.
 
 There are of course many more shortcuts! Press <kbd>?</kbd> to see them all, and
