@@ -41,7 +41,7 @@ class Vim
       enumerable: true
     })
 
-    @enterMode('normal')
+    @_onLocationChange(@browser.currentURI.spec)
 
     # Require the subset of the options needed to be listed explicitly (as
     # opposed to sending _all_ options) for performance. Each option access
