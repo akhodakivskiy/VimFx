@@ -22,7 +22,7 @@ VimFx is made by [these awesome people][people].
 [Vimium]: http://vimium.github.io/
 [Google Chrome]: https://www.google.com/chrome
 [vimfx@librelist.com]: mailto:vimfx@librelist.com?subject=Subscribe
-[documentation]: https://github.com/akhodakivskiy/VimFx/tree/master/documentation
+[documentation]: https://github.com/akhodakivskiy/VimFx/tree/develop/documentation
 [wiki]: https://github.com/akhodakivskiy/VimFx/wiki
 [people]: https://github.com/akhodakivskiy/VimFx/blob/develop/PEOPLE.md
 
@@ -55,9 +55,9 @@ Open a new tab with <kbd>t</kbd>, close it with <kbd>x</kbd>. Reopen it again
 with <kbd>X</kbd>. There are many more tab related commands, for example to
 change the currently selected tab.
 
-Scrolling left/down/up/right: <kbd>h</kbd>, <kbd>j</kbd>, <kbd>k</kbd>, <kbd>l</kbd>.  
-Top/Bottom: <kbd>gg</kbd>, <kbd>G</kbd>.  
-Page up/down: <kbd>space</kbd>, <kbd>shift-space</kbd>.  
+Scrolling left/down/up/right: <kbd>h</kbd>, <kbd>j</kbd>, <kbd>k</kbd>, <kbd>l</kbd>.
+Top/Bottom: <kbd>gg</kbd>, <kbd>G</kbd>.
+Page up/down: <kbd>space</kbd>, <kbd>shift-space</kbd>.
 Half a page: <kbd>d</kbd>, <kbd>u</kbd>.
 
 There are of course many more shortcuts! Press <kbd>?</kbd> to see them all.
