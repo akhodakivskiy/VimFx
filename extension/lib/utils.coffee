@@ -62,7 +62,7 @@ isContentEditable = (element) ->
   return element.isContentEditable or
          # `g_editable` is a non-standard attribute commonly used by Google.
          element.getAttribute?('g_editable') == 'true' or
-         element.ownerDocument.body?.getAttribute('g_editable') == 'true'
+         element.ownerDocument?.body?.getAttribute('g_editable') == 'true'
 
 isProperLink = (element) ->
   # `.getAttribute` is used below instead of `.hasAttribute` to exclude `<a
