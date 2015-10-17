@@ -70,7 +70,7 @@ All of this also help you understand why hints may be slow on some pages:
 
 ### “Previous”/“Next” link patterns
 
-Space separated lists of patterns that match links to the previous/next page.
+Comma separated lists of patterns that match links to the previous/next page.
 Used by the `[` and `]` commands.
 
 There is a standardized way for websites to tell browsers the URLs to the
