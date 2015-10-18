@@ -117,6 +117,7 @@ toolbarpaletteitem[place="palette"] > #VimFxButton {
 
   #VimFxHelpDialogContainer :-moz-any([class^="heading"], .key-sequence) {
     font-weight: bold;
+    white-space: nowrap;
   }
 
 
