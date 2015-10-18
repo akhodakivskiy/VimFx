@@ -16,7 +16,7 @@ Anton Khodakivskiy (@akhodakivskiy)
 - Szabó Krisztián (@thenonameguy) – hu
 - Yoppy Halilintar (@comepradz) – id
 - Carlo Bertoldi (@cbertoldi) – it
-- @pluser – ja
+- Kaoru Esashika (@pluser) – ja
 - @HJTP – nl
 - Greg Navis (@grn) – pl
 - @morethanoneanimal – pl
