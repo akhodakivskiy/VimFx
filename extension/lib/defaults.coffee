@@ -79,8 +79,8 @@ shortcuts =
       '[':         'follow_previous'
       ']':         'follow_next'
       'gi':        'focus_text_input'
-      '<force><tab>':    'focus_next'
-      '<force><s-tab>':  'focus_previous'
+      '<force><late><tab>':   'focus_next'
+      '<force><late><s-tab>': 'focus_previous'
 
     'find':
       '/':         'find'

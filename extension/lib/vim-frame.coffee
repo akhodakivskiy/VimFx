@@ -56,13 +56,8 @@ class VimFrame
     })
 
   onInput: (event) ->
-    eventSubset = {}
-    for key in ['key', 'code', 'altKey', 'ctrlKey', 'metaKey', 'shiftKey']
-      eventSubset[key] = event[key]
-    args = [eventSubset, utils.getFocusType(event), {isFrameEvent: true}]
-    suppress = messageManager.get('vimMethodSync', {method: '_onInput', args})
-    utils.suppressEvent(event) if suppress
-    messageManager.send('onInput-frame', { suppress })
+    focusType = utils.getFocusType(event)
+    suppress = messageManager.get('consumeKeyEvent', {focusType})
     return suppress
 
   notify: (args...) ->

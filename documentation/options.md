@@ -17,7 +17,10 @@ You might also be interested [styling] VimFx and writing a [config file].
 
 ## Regular options
 
-These options are available in VimFx’s settings page in the Add-ons Manager.
+These options are available in VimFx’s settings page in the Add-ons Manager
+(where you can also customize all [keyboard shortcuts]).
+
+[keyboard shortcuts]: shortcuts.md
 
 ### Hint chars
 

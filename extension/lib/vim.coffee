@@ -92,9 +92,10 @@ class Vim
     @_send('modeChange', {mode})
     return true
 
-  _onInput: (event, focusType, { isFrameEvent = false } = {}) ->
-    match = @_parent.consumeKeyEvent(event, this, focusType)
-    return null unless match
+  _consumeKeyEvent: (event, focusType) ->
+    return @_parent.consumeKeyEvent(event, this, focusType)
+
+  _onInput: (match, { isFrameEvent = false } = {}) ->
     suppress = @_call('onInput', {isFrameEvent, count: match.count}, match)
     return suppress
 

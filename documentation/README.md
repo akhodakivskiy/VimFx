@@ -13,6 +13,7 @@ License"](GNU%20Free%20Documentation%20License).
 
 - [Options](options.md)
 - [Commands](commands.md)
+- [Shortcuts](shortcuts.md)
 - [Styling](styling.md)
 - [Handy standard Firefox features](handy-standard-firefox-features.md)
 - [Questions & Answers](questions-and-answers.md)
