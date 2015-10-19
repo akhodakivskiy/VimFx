@@ -134,13 +134,17 @@ class UIEventManager
       vim._send('TabSelect')
     )
 
+    lastUrl = null
     progressListener =
       onLocationChange: (progress, request, location, flags) =>
+        url     = location.spec
+        refresh = (url == lastUrl)
+        lastUrl = url
         unless flags & Ci.nsIWebProgressListener.LOCATION_CHANGE_SAME_DOCUMENT
           # `onLocationChange` might fire before a vim object has been created
           # for the current tab.
           return unless vim = @vimfx.getCurrentVim(@window)
-          vim._onLocationChange(location.spec)
+          vim._onLocationChange(url, {refresh})
 
     @window.gBrowser.addProgressListener(progressListener)
     module.onShutdown(=>

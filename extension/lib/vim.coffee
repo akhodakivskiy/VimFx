@@ -98,8 +98,8 @@ class Vim
     suppress = @_call('onInput', {isFrameEvent, count: match.count}, match)
     return suppress
 
-  _onLocationChange: (url) ->
-    return if url == @_state.lastUrl
+  _onLocationChange: (url, { refresh = false } = {}) ->
+    return if url == @_state.lastUrl and not refresh
     @_state.lastUrl = url
     @enterMode(if @_isBlacklisted(url) then 'ignore' else 'normal')
     @_parent.emit('locationChange', {vim: this, location: new @window.URL(url)})
