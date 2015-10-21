@@ -74,7 +74,9 @@ class Vim
     return (@_state.frameCanReceiveEvents and
             event.originalTarget == @window.gBrowser.selectedBrowser)
 
-  isCurrent: -> @_parent.getCurrentVim(utils.getCurrentWindow()) == this
+  isCurrent: ->
+    return (@_parent.getCurrentVim(utils.getCurrentWindow()) == this and
+            @window.document.hasFocus())
 
   # `args` is an array of arguments to be passed to the mode's `onEnter` method.
   enterMode: (mode, args...) ->

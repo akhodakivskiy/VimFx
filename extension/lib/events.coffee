@@ -40,6 +40,12 @@ class UIEventManager
     @popupPassthrough = false
 
   addListeners: ->
+    # NOTE: When the browser starts, many events may fire before a `vim` object
+    # has been created for the current tab. Therefore always use the following
+    # snippet when getting the current `vim`:
+    #
+    #     return unless vim = @vimfx.getCurrentVim(@window)
+
     checkPassthrough = (value, event) =>
       if event.target.nodeName in ['menupopup', 'panel']
         @popupPassthrough = value
@@ -75,7 +81,7 @@ class UIEventManager
             return if popup.state == 'open'
           @popupPassthrough = false # No popup was actually open.
 
-        vim = @vimfx.getCurrentVim(@window)
+        return unless vim = @vimfx.getCurrentVim(@window)
 
         if vim.isFrameEvent(event)
           vim._listenOnce('consumeKeyEvent', ({ focusType }) =>
@@ -100,15 +106,24 @@ class UIEventManager
       target = event.originalTarget
       findBar = @window.gBrowser.getFindBar()
       if target == findBar._findField.mInputField
-        vim = @vimfx.getCurrentVim(@window)
+        return unless vim = @vimfx.getCurrentVim(@window)
         vim.enterMode(mode)
 
-    @listen('focus', checkFindbar.bind(null, 'find'))
-    @listen('blur',  checkFindbar.bind(null, 'normal'))
+    @listen('focus', (event) =>
+      target = event.originalTarget
+
+      if target == @window
+        return unless vim = @vimfx.getCurrentVim(@window)
+        vim._send('TabSelect')
+        return
+
+      checkFindbar('find', event)
+    )
+    @listen('blur', checkFindbar.bind(null, 'normal'))
 
     @listen('click', (event) =>
       target = event.originalTarget
-      vim = @vimfx.getCurrentVim(@window)
+      return unless vim = @vimfx.getCurrentVim(@window)
 
       # If the user clicks the reload button or a link when in hints mode, we’re
       # going to end up in hints mode without any markers. Or if the user clicks
@@ -126,8 +141,6 @@ class UIEventManager
     @listen('TabSelect', (event) =>
       @vimfx.emit('TabSelect', event)
 
-      # The initial 'TabSelect' when the browser starts fires before a vim
-      # object has been created for that tab.
       return unless vim = @vimfx.getCurrentVim(@window)
       vim._send('TabSelect')
     )
@@ -139,8 +152,6 @@ class UIEventManager
         refresh = (url == lastUrl)
         lastUrl = url
         unless flags & Ci.nsIWebProgressListener.LOCATION_CHANGE_SAME_DOCUMENT
-          # `onLocationChange` might fire before a vim object has been created
-          # for the current tab.
           return unless vim = @vimfx.getCurrentVim(@window)
           vim._onLocationChange(url, {refresh})
 

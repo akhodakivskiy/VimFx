@@ -472,8 +472,8 @@ A `vim` object has the following properties:
 
 - isCurrent(): `Function`. Returns whether this vim object is the currently used
   one. In other words, if the tab that this vim object manages is the currently
-  selected tab in the current Firefox window. Note, though, that the current
-  Firefox window is not necessarily the current window of your operating system.
+  selected tab in the current Firefox window. The current Firefox also has to be
+  the current window of your operating system.
 
 - notify(title, options = {}): `Function`. Display a notification with the title
   `title` (a `String`). If you need more text than a title, use `options.body`.

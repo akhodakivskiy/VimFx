@@ -140,21 +140,14 @@ class FrameEventManager
       if utils.isTextInputElement(target) or utils.isContentEditable(target)
         messageManager.send('vimMethod', {method: 'isCurrent'}, (isCurrent) =>
           @vim.state.shouldRefocus = not isCurrent
-          # Note that when switching to a non-Firefox window, blur events happen
-          # as usual, but `isCurrent` will be `true`. (`@vim` is still the
-          # current vim object in the current Firefox window, but the current
-          # Firefox window is not the current OS window). `shouldRefocus` should
-          # still be `true` in this case, though. However, it doesn’t matter
-          # that it isn’t, because it is only used in the 'TabSelect' event,
-          # which does not fire when returning from another window.
         )
     )
 
     messageManager.listen('TabSelect', =>
-      # Reset `hasInteraction` when (re-)selecting a tab, in order to prevent
-      # the common “automatically re-focus when switching back to the tab”
-      # behaviour many sites have, unless a text input _should_ be re-focused
-      # when coming back to the tab (see above).
+      # Reset `hasInteraction` when (re-)selecting a tab, or coming back from
+      # another window, in order to prevent the common “automatically re-focus
+      # when switching back to the tab” behaviour many sites have, unless a text
+      # input _should_ be re-focused when coming back to the tab (see above).
       if @vim.state.shouldRefocus
         @vim.state.hasInteraction = true
         @vim.state.shouldRefocus = false
