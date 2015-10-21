@@ -24,6 +24,7 @@ utils          = require('./utils')
 
 class FrameEventManager
   constructor: (@vim) ->
+    @numFocusToSuppress = 0
 
   listen: utils.listen.bind(null, FRAME_SCRIPT_ENVIRONMENT)
   listenOnce: utils.listenOnce.bind(null, FRAME_SCRIPT_ENVIRONMENT)
@@ -85,8 +86,19 @@ class FrameEventManager
     # instead of 'click' to mark the interaction as soon as possible.
     @listen('mousedown', (event) => @vim.markPageInteraction())
 
+    messageManager.listen('browserRefocus', =>
+      # Suppress the next two focus events (for `document` and `window`; see
+      # `blurActiveBrowserElement`).
+      @numFocusToSuppress = 2
+    )
+
     @listen('focus', (event) =>
       target = event.originalTarget
+
+      if @numFocusToSuppress > 0
+        utils.suppressEvent(event)
+        @numFocusToSuppress--
+        return
 
       options = @vim.options(['prevent_autofocus', 'prevent_autofocus_modes'])
 

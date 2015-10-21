@@ -401,7 +401,7 @@ commands.dev = ({ vim }) ->
 
 commands.esc = ({ vim }) ->
   vim._run('esc')
-  utils.blurActiveBrowserElement(vim.window)
+  utils.blurActiveBrowserElement(vim)
   help.removeHelp(vim.window)
   vim.window.DeveloperToolbar.hide()
   vim.window.gBrowser.getFindBar().close()

@@ -103,15 +103,20 @@ blurActiveElement = (window) ->
   if activeElement and activeElement.tabIndex > -1
     activeElement.blur()
 
-blurActiveBrowserElement = (window) ->
+blurActiveBrowserElement = (vim) ->
   # - Some browser UI elements, such as the web console, are not marked as
   #   focusable, so we can’t check if the element is focusable as in
   #   `blurActiveElement`.
   # - Blurring in the next tick allows to pass `<escape>` to the location bar to
   #   reset it, for example.
   # - Focusing the current browser afterwards allows to pass `<escape>` as well
-  #   as unbound keys to the page.
+  #   as unbound keys to the page. However, focusing the browser also triggers
+  #   focus events on `document` and `window` in the current page. Many pages
+  #   re-focus some text input on those events, making it impossible to blur
+  #   those! Therefore we tell the frame script to suppress those events.
+  { window } = vim
   activeElement = getActiveElement(window)
+  vim._send('browserRefocus')
   callback = ->
     activeElement.blur()
     window.gBrowser.selectedBrowser.focus()
