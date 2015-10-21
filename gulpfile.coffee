@@ -255,7 +255,7 @@ parseLocaleFile = (fileContents) ->
 helpHTMLFile = 'help.html'
 gulp.task(helpHTMLFile, ->
   unless fs.existsSync(helpHTMLFile)
-    console.log("""
+    process.stdout.write("""
       First enable the “Copy to clipboard” line in help.coffee, show the help
       dialog and finally dump the clipboard into #{ helpHTMLFile }.
     """)
