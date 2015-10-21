@@ -65,22 +65,15 @@ mode('normal', {
     { keyStr } = match
 
     autoInsertMode = (match.focus != null)
-    if match.type == 'none' or (autoInsertMode and not match.force)
+    if match.type == 'none' or
+       (autoInsertMode and not match.specialKeys['<force>'])
       if storage.returnTo
         vim.enterMode(storage.returnTo)
         storage.returnTo = null
       return false
 
     if match.type == 'full'
-      { command } = match
-      # Rely on the default `<tab>` behavior, since it allows web pages to
-      # provide tab completion, for example, inside text inputs.
-      args._skipMoveFocus = (
-        match.toplevel and
-        ((command.run == commands.focus_previous and keyStr == '<tab>') or
-         (command.run == commands.focus_next     and keyStr == '<s-tab>'))
-      )
-      command.run(args)
+      match.command.run(args)
 
       # If the command changed the mode, wait until coming back from that mode
       # before switching to `storage.returnTo` if any (see `onEnter` above).

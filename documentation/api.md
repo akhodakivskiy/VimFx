@@ -431,8 +431,13 @@ A `match` object has the following properties:
 
 - count: `Number`. The count for the command. `undefined` if no count.
 
-- force: `Boolean`. Indicates if the current key sequence started with
-  `<force>`.
+- specialKeys: `Object`. The keys may be any of the following:
+
+  - `<force>`
+  - `<late>`
+
+  If a key exists, its value is always `true`. The keys that exist indicate the
+  [special keys] for the sequence used for the matched command (if any).
 
 - keyStr: `String`. The current keypress represented as a string.
 
@@ -537,6 +542,8 @@ and won’t be broken until VimFx 2.0.0.
 [autofocus prevention]: options.md#prevent-autofocus
 [`activatable_element_keys`]: options.md#activatable_element_keys
 [`adjustable_element_keys`]: options.md#adjustable_element_keys
+
+[special keys]: shortcuts.md#special-keys
 
 [defaults.coffee]: ../extension/lib/defaults.coffee
 [parse-prefs.coffee]: ../extension/lib/parse-prefs.coffee

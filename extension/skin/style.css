@@ -216,6 +216,16 @@ toolbarpaletteitem[place="palette"] > #VimFxButton {
         margin-right: 0.7ch;
       }
 
+      #VimFxHelpDialogContainer .key-sequence-special-keys {
+        /* The special keys are not helpful in the help dialog. If somebody
+         * disagrees, they can simply re-show them with custom CSS. */
+        display: none;
+      }
+
+      #VimFxHelpDialogContainer .key-sequence-rest {
+        display: inline;
+      }
+
     #VimFxHelpDialogContainer .description {
       float: right;
       /* The space to the left should be wide enough to fit `<c-w>`. */

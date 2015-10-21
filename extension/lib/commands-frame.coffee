@@ -274,7 +274,7 @@ commands.focus_text_input = ({ vim, storage, count = null }) ->
 commands.clear_inputs = ({ storage }) ->
   storage.inputs = null
 
-commands.move_focus = ({ vim, storage, direction, skip }) ->
+commands.move_focus = ({ vim, storage, direction }) ->
   if storage.inputs
     index = storage.inputs.indexOf(utils.getActiveElement(vim.content))
     if index == -1
@@ -285,21 +285,7 @@ commands.move_focus = ({ vim, storage, direction, skip }) ->
       utils.focusElement(nextInput, {select: true})
       return
 
-  return if skip
-
-  focusManager = Cc['@mozilla.org/focus-manager;1']
-    .getService(Ci.nsIFocusManager)
-  directionFlag =
-    if direction == -1
-      focusManager.MOVEFOCUS_BACKWARD
-    else
-      focusManager.MOVEFOCUS_FORWARD
-  focusManager.moveFocus(
-    null, # Use current window.
-    null, # Move relative to the currently focused element.
-    directionFlag,
-    focusManager.FLAG_BYKEY
-  )
+  utils.moveFocus(direction)
 
 commands.esc = ({ vim }) ->
   utils.blurActiveElement(vim.content)

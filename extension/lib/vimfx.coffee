@@ -28,7 +28,6 @@ utils    = require('./utils')
 Vim      = require('./vim')
 
 DIGIT     = /^\d$/
-FORCE_KEY = '<force>'
 
 class VimFx extends utils.EventEmitter
   constructor: (@modes, @options) ->
@@ -37,6 +36,8 @@ class VimFx extends utils.EventEmitter
     @createKeyTrees()
     @reset()
     @on('modechange', ({mode}) => @reset(mode))
+
+  SPECIAL_KEYS: ['<force>', '<late>']
 
   addVim: (browser) ->
     @vims.set(browser, new Vim(browser, this))
@@ -49,7 +50,11 @@ class VimFx extends utils.EventEmitter
     @count = ''
 
   createKeyTrees: ->
-    {@keyTrees, @forceCommands, @errors} = createKeyTrees(@getGroupedCommands())
+    {
+      @keyTrees
+      @commandsWithSpecialKeys
+      @errors
+    } = createKeyTrees(@getGroupedCommands(), @SPECIAL_KEYS)
 
   stringifyKeyEvent: (event) ->
     return notation.stringify(event, {
@@ -94,11 +99,13 @@ class VimFx extends utils.EventEmitter
         @reset(mode)
 
     count = if @count == '' then undefined else Number(@count)
-    force = if command then (command.pref of @forceCommands) else false
+    specialKeys = @commandsWithSpecialKeys[command?.pref] ? {}
     focus = @adjustFocusType(event, vim, focusType, keyStr)
     unmodifiedKey = notation.parse(keyStr).key
     @reset(mode) if type == 'full'
-    return {type, focus, command, count, force, keyStr, unmodifiedKey, toplevel}
+    return {
+      type, focus, command, count, specialKeys, keyStr, unmodifiedKey, toplevel
+    }
 
   adjustFocusType: (event, vim, focusType, keyStr) ->
     # Frame scripts and the tests don’t pass in `originalTarget`.
@@ -156,10 +163,10 @@ byOrder = (a, b) -> a.order - b.order
 class Leaf
   constructor: (@command, @originalSequence) ->
 
-createKeyTrees = (groupedCommands) ->
+createKeyTrees = (groupedCommands, specialKeys) ->
   keyTrees = {}
   errors = {}
-  forceCommands = {}
+  commandsWithSpecialKeys = {}
 
   pushError = (error, command) ->
     (errors[command.pref] ?= []).push(error)
@@ -172,10 +179,10 @@ createKeyTrees = (groupedCommands) ->
       context: originalSequence
     pushError(error, command)
 
-  pushForceKeyError = (command, originalSequence) ->
+  pushSpecialKeyError = (command, originalSequence, key) ->
     error =
-      id: 'illegal_force_key'
-      subject: FORCE_KEY
+      id: 'illegal_special_key'
+      subject: key
       context: originalSequence
     pushError(error, command)
 
@@ -190,17 +197,20 @@ createKeyTrees = (groupedCommands) ->
         [ prefixKeys..., lastKey ] = shortcut.normalized
         tree = keyTrees[mode._name]
         command._sequences.push(shortcut.original)
+        seenNonSpecialKey = false
 
         errored = false
         for prefixKey, index in prefixKeys
-          if prefixKey == FORCE_KEY
-            if index == 0
-              forceCommands[command.pref] = true
-              continue
-            else
-              pushForceKeyError(command, shortcut.original)
+          if prefixKey in specialKeys
+            if seenNonSpecialKey
+              pushSpecialKeyError(command, shortcut.original, prefixKey)
               errored = true
               break
+            else
+              (commandsWithSpecialKeys[command.pref] ?= {})[prefixKey] = true
+              continue
+          else
+            seenNonSpecialKey = true
 
           if prefixKey of tree
             next = tree[prefixKey]
@@ -214,15 +224,16 @@ createKeyTrees = (groupedCommands) ->
             tree = tree[prefixKey] = {}
         continue if errored
 
-        if lastKey == FORCE_KEY
-          pushForceKeyError(command, shortcut.original)
+        if lastKey in specialKeys
+          subject = if seenNonSpecialKey then lastKey else shortcut.original
+          pushSpecialKeyError(command, shortcut.original, subject)
           continue
         if lastKey of tree
           pushOverrideErrors(command, tree[lastKey])
           continue
         tree[lastKey] = new Leaf(command, shortcut.original)
 
-  return {keyTrees, forceCommands, errors}
+  return {keyTrees, commandsWithSpecialKeys, errors}
 
 parseShortcutPref = (pref) ->
   shortcuts = []

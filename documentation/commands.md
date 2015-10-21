@@ -9,6 +9,11 @@ See the file README.md for copying conditions.
 Most of VimFx’s commands are straight-forward enough to not need any
 documentation. For some commands, though, there is a bit more to know.
 
+In this document, many commands are referred to by their default shortcut. You
+can of course [change those] if you like.
+
+[change those]: shortcuts.md
+
 ## Counts
 
 Some commands support _counts._ That means that you can type a number before a
@@ -67,23 +72,6 @@ Explained in the their own section below.
 Explained in its own section below.
 
 
-## `<force>` commands
-
-By putting the special “key” `<force>` at the beginning of a shortcut the
-shortcut will work exactly as it would without `<force>`, except that it will
-also be available in text inputs.
-
-VimFx enters a kind of “automatic insert mode” when you focus a text input,
-allowing you to type text into it without triggering VimFx commands. The `esc`
-command, however, is still available, allowing you to blur the text input by
-pressing `<escape>`. The reason it is available is because the default shortcut
-is `<force><escape>`.
-
-Using `<force>` allows you to run other commands in text inputs as well. For
-example, you could use `<force><a-j>` and `<force><a-k>` to be able to select
-tab backward and forward regardless if you happen to be in a text input or not.
-
-
 ## Scrolling commands
 
 Firefox lets you scroll with the arrow keys, page down, page up, home, end and
@@ -113,11 +101,13 @@ of the page, regradless of which input you used last.
 
 ## Focus next/previous element
 
-The default shorcuts are `<tab>` and `<s-tab>`, respectively. They work just
-like `<tab>` works normally, except that if you focused a text input using the
-`gi` command they will only switch between text inputs on thee page, as opposed
-to between all focusable elements (such as links, buttons and checkboxes) as
-they do otherwise.
+The default shorcuts are `<tab>` and `<s-tab>`, respectively (to be precise,
+they also include [special keys]). They work just like `<tab>` works normally,
+except that if you focused a text input using the `gi` command they will only
+switch between text inputs on thee page, as opposed to between all focusable
+elements (such as links, buttons and checkboxes) as they do otherwise.
+
+[special keys]: shortcuts.md#special-keys
 
 
 ## The `f` commands
