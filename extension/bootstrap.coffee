@@ -35,8 +35,15 @@ Cu.import('resource://gre/modules/devtools/Console.jsm')
 do (global = this) ->
 
   if IS_FRAME_SCRIPT
-    [ global.__SCRIPT_URI_SPEC__ ] = sendSyncMessage('VimFx:tabCreated')
-    return if __SCRIPT_URI_SPEC__ == false
+    # Tell the main process that this frame script was created, and get data
+    # back that only the main process has access to.
+    [ data ] = sendSyncMessage('VimFx:tabCreated')
+
+    # The main process told this frame script not to do anything (or there was
+    # an error and no message was received at all).
+    return unless data
+
+    [ global.__SCRIPT_URI_SPEC__, global.MULTI_PROCESS_ENABLED ] = data
     global.FRAME_SCRIPT_ENVIRONMENT = global
 
   shutdownHandlers = []
@@ -80,6 +87,8 @@ do (global = this) ->
     migrations          = require('./lib/migrations')
     prefs               = require('./lib/prefs')
 
+    global.MULTI_PROCESS_ENABLED =
+      prefs.root.get('browser.tabs.remote.autostart')
     prefs.default._init()
     applyMigrations(migrations)
 
