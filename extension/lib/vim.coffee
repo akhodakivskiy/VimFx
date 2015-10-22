@@ -71,8 +71,12 @@ class Vim
   _isBlacklisted: (url) -> @options.black_list.some((regex) -> regex.test(url))
 
   isFrameEvent: (event) ->
-    return (@_state.frameCanReceiveEvents and
-            event.originalTarget == @window.gBrowser.selectedBrowser)
+    target = event.originalTarget
+    return @_state.frameCanReceiveEvents and
+      if MULTI_PROCESS_ENABLED
+        (target == @window.gBrowser.selectedBrowser)
+      else
+        not (target.ownerGlobal == @window)
 
   isCurrent: ->
     return (@_parent.getCurrentVim(utils.getCurrentWindow()) == this and
