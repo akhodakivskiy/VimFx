@@ -122,6 +122,6 @@ do (global = this) ->
     # When updating the add-on, the previous version is going to shut down at
     # the same time as the new version starts up. Add the shutdown listener in
     # the next tick to prevent the previous version from triggering it.
-    setTimeout((->
+    content.setTimeout((->
       require('./lib/message-manager').listenOnce('shutdown', shutdown)
     ), 0)
