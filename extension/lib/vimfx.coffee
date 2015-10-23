@@ -42,6 +42,12 @@ class VimFx extends utils.EventEmitter
   addVim: (browser) ->
     @vims.set(browser, new Vim(browser, this))
 
+  # NOTE: This method is often called in event handlers. Many events may fire
+  # before a `vim` object has been created for the current tab yet (such as when
+  # the browser is starting up). Therefore always check if anything was
+  # returned, such as:
+  #
+  #     return unless vim = @vimfx.getCurrentVim(@window)
   getCurrentVim: (window) -> @vims.get(window.gBrowser.selectedBrowser)
 
   reset: (mode = null) ->

@@ -40,12 +40,6 @@ class UIEventManager
     @popupPassthrough = false
 
   addListeners: ->
-    # NOTE: When the browser starts, many events may fire before a `vim` object
-    # has been created for the current tab. Therefore always use the following
-    # snippet when getting the current `vim`:
-    #
-    #     return unless vim = @vimfx.getCurrentVim(@window)
-
     checkPassthrough = (value, event) =>
       if event.target.nodeName in ['menupopup', 'panel']
         @popupPassthrough = value

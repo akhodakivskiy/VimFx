@@ -40,7 +40,8 @@ injectButton = (vimfx) ->
       if mode == 'normal'
         help.injectHelp(window, vimfx)
       else
-        vimfx.getCurrentVim(window).enterMode('normal')
+        return unless vim = vimfx.getCurrentVim(window)
+        vim.enterMode('normal')
     onCreated: (node) ->
       node.setAttribute('vimfx-mode', 'normal')
 
@@ -48,12 +49,9 @@ injectButton = (vimfx) ->
         window = utils.getCurrentWindow()
         button = getButton(window)
 
-        # - The 'modeChange' event provides the `vim` object that changed mode,
-        #   but it might not be the current `vim` anymore, so always get the
-        #   current instance.
-        # - A 'TabSelect' event fires for the current tab when Firefox starts.
-        #   By then a `vim` object for that tab might not have been constructed
-        #   yet. If so, simply do nothing.
+        # The 'modeChange' event provides the `vim` object that changed mode,
+        # but it might not be the current `vim` anymore, so always get the
+        # current instance.
         return unless vim = vimfx.getCurrentVim(window)
 
         button.setAttribute('vimfx-mode', vim.mode)

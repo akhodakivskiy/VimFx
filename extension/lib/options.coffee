@@ -181,7 +181,7 @@ class Observer extends BaseObserver
           break unless isString
           quote = true
           # Override `<force>` commands (such as `<escape>` and `<tab>`).
-          vim = @vimfx.getCurrentVim(utils.getCurrentWindow())
+          return unless vim = @vimfx.getCurrentVim(utils.getCurrentWindow())
           @vimfx.modes.normal.commands.quote.run({vim, count: 1})
         when keyString == @vimfx.options['options.key.insert_default']
           break unless isString
