@@ -25,6 +25,7 @@ coffeelint  = require('gulp-coffeelint')
 git         = require('gulp-git')
 header      = require('gulp-header')
 mustache    = require('gulp-mustache')
+sloc        = require('gulp-sloc')
 tap         = require('gulp-tap')
 zip         = require('gulp-zip')
 marked      = require('marked')
@@ -155,6 +156,14 @@ gulp.task('lint', ->
   gulp.src(['extension/**/*.coffee', 'gulpfile.coffee'])
     .pipe(coffeelint())
     .pipe(coffeelint.reporter())
+)
+
+gulp.task('sloc', ->
+  gulp.src([
+    'extension/bootstrap.coffee'
+    'extension/lib/!(migrations|legacy).coffee']
+  )
+    .pipe(sloc())
 )
 
 gulp.task('release', (callback) ->

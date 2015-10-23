@@ -94,6 +94,8 @@ internally by other tasks.)
 
 - `gulp lint` lints all `.coffee` files.
 
+- `gulp sloc` prints comment and source code line counts.
+
 - `gulp sync-locales` syncs locales. See the [“Syncing locales”][sync-locales]
   section below for more information.
 
