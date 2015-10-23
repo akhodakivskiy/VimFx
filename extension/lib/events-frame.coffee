@@ -32,9 +32,9 @@ class FrameEventManager
   addListeners: ->
     messageManager.listen('locationChange', @vim.resetState.bind(@vim))
 
-    # If the page already was fully loaded when VimFx was initialized, send the
+    # If the page already was loaded when VimFx was initialized, send the
     # 'DOMWindowCreated' message straight away.
-    if @vim.content.document.readyState == 'complete'
+    if @vim.content.document.readyState in ['interactive', 'complete']
       messageManager.send('DOMWindowCreated')
     else
       @listen('DOMWindowCreated', (event) ->
@@ -102,6 +102,19 @@ class FrameEventManager
         @numFocusToSuppress--
         return
 
+      # Reset `hasInteraction` when (re-)selecting a tab, or coming back from
+      # another window, in order to prevent the common “automatically re-focus
+      # when switching back to the tab” behaviour many sites have, unless a text
+      # input _should_ be re-focused when coming back to the tab (see the 'blur'
+      # event below).
+      if target == @vim.content.document
+        if @vim.state.shouldRefocus
+          @vim.state.hasInteraction = true
+          @vim.state.shouldRefocus = false
+        else
+          @vim.state.hasInteraction = false
+        return
+
       options = @vim.options(['prevent_autofocus', 'prevent_autofocus_modes'])
 
       # Save the last focused text input regardless of whether that input might
@@ -140,21 +153,7 @@ class FrameEventManager
       # This case is kept track of so that the autofocus prevention does not
       # catch it.
       if utils.isTextInputElement(target) or utils.isContentEditable(target)
-        messageManager.send('vimMethod', {method: 'isCurrent'}, (isCurrent) =>
-          @vim.state.shouldRefocus = not isCurrent
-        )
-    )
-
-    messageManager.listen('TabSelect', =>
-      # Reset `hasInteraction` when (re-)selecting a tab, or coming back from
-      # another window, in order to prevent the common “automatically re-focus
-      # when switching back to the tab” behaviour many sites have, unless a text
-      # input _should_ be re-focused when coming back to the tab (see above).
-      if @vim.state.shouldRefocus
-        @vim.state.hasInteraction = true
-        @vim.state.shouldRefocus = false
-      else
-        @vim.state.hasInteraction = false
+        @vim.state.shouldRefocus = not @vim.content.document.hasFocus()
     )
 
 module.exports = FrameEventManager

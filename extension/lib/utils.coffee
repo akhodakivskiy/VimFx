@@ -117,10 +117,10 @@ blurActiveBrowserElement = (vim) ->
   { window } = vim
   activeElement = getActiveElement(window)
   vim._send('browserRefocus')
-  callback = ->
+  nextTick(window, ->
     activeElement.blur()
     window.gBrowser.selectedBrowser.focus()
-  window.setTimeout(callback, 0)
+  )
 
 # Focus an element and tell Firefox that the focus happened because of a user
 # keypress (not just because some random programmatic focus).
@@ -242,6 +242,8 @@ class EventEmitter
 
 has = Function::call.bind(Object::hasOwnProperty)
 
+nextTick = (window, fn) -> window.setTimeout(fn, 0)
+
 regexEscape = (s) -> s.replace(/[|\\{}()[\]^$+*?.]/g, '\\$&')
 
 removeDuplicates = (array) ->
@@ -338,6 +340,7 @@ module.exports = {
   Counter
   EventEmitter
   has
+  nextTick
   regexEscape
   removeDuplicates
   removeDuplicateCharacters

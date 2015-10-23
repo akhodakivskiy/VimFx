@@ -70,6 +70,8 @@ module.exports = (data, reason) ->
 
   windows = new WeakSet()
   messageManager.listen('tabCreated', (data, { target }) ->
+    # Frame script are run in more places than we need. Tell those not to do
+    # anything.
     return false unless target.getAttribute('messagemanagergroup') == 'browsers'
 
     window = target.ownerGlobal
@@ -80,7 +82,7 @@ module.exports = (data, reason) ->
       eventManager = new UIEventManager(vimfx, window)
       eventManager.addListeners(vimfx, window)
 
-    return __SCRIPT_URI_SPEC__
+    return [__SCRIPT_URI_SPEC__, MULTI_PROCESS_ENABLED]
   )
 
   messageManager.load('bootstrap')
