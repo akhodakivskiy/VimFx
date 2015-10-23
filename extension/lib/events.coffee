@@ -104,17 +104,8 @@ class UIEventManager
         return unless vim = @vimfx.getCurrentVim(@window)
         vim.enterMode(mode)
 
-    @listen('focus', (event) =>
-      target = event.originalTarget
-
-      if target == @window
-        return unless vim = @vimfx.getCurrentVim(@window)
-        vim._send('TabSelect')
-        return
-
-      checkFindbar('find', event)
-    )
-    @listen('blur', checkFindbar.bind(null, 'normal'))
+    @listen('focus', checkFindbar.bind(null, 'find'))
+    @listen('blur',  checkFindbar.bind(null, 'normal'))
 
     @listen('click', (event) =>
       target = event.originalTarget
@@ -133,12 +124,7 @@ class UIEventManager
         vim.enterMode('normal')
     )
 
-    @listen('TabSelect', (event) =>
-      @vimfx.emit('TabSelect', event)
-
-      return unless vim = @vimfx.getCurrentVim(@window)
-      vim._send('TabSelect')
-    )
+    @listen('TabSelect', @vimfx.emit.bind(@vimfx, 'TabSelect'))
 
     lastUrl = null
     progressListener =

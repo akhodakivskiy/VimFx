@@ -78,10 +78,6 @@ class Vim
       else
         not (target.ownerGlobal == @window)
 
-  isCurrent: ->
-    return (@_parent.getCurrentVim(utils.getCurrentWindow()) == this and
-            @window.document.hasFocus())
-
   # `args` is an array of arguments to be passed to the mode's `onEnter` method.
   enterMode: (mode, args...) ->
     return false if @mode == mode

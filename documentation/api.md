@@ -470,11 +470,6 @@ A `vim` object has the following properties:
 - isFrameEvent(event): `Function`. Returns `true` if `event` occurred in web
   page content, and `false` otherwise (if it occurred in Firefox’s UI).
 
-- isCurrent(): `Function`. Returns whether this vim object is the currently used
-  one. In other words, if the tab that this vim object manages is the currently
-  selected tab in the current Firefox window. The current Firefox also has to be
-  the current window of your operating system.
-
 - notify(title, options = {}): `Function`. Display a notification with the title
   `title` (a `String`). If you need more text than a title, use `options.body`.
   See [`Notification`] for more information.
