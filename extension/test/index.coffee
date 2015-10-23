@@ -39,7 +39,7 @@ module.exports = (vimfx) ->
       try
         fn(assert, vimfx)
         passed++
-      catch error
+      catch error then null
       report.push("  #{ if error then '✘' else '✔' } #{ key }")
       report.push(utils.formatError(error).replace(/^/gm, '    ')) if error
 
