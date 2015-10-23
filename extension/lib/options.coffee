@@ -157,6 +157,8 @@ class Observer extends BaseObserver
     ).join('\n')
 
   setupKeybindings: ->
+    # Note that `setting = event.originalTarget` does _not_ return the correct
+    # element in these listeners!
     quote = false
     @listen(@container, 'keydown', (event) =>
       setting = event.target

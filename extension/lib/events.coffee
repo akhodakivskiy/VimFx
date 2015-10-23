@@ -41,7 +41,8 @@ class UIEventManager
 
   addListeners: ->
     checkPassthrough = (value, event) =>
-      if event.target.nodeName in ['menupopup', 'panel']
+      target = event.originalTarget
+      if target.nodeName in ['menupopup', 'panel']
         @popupPassthrough = value
 
     @listen('popupshown',  checkPassthrough.bind(null, true))
