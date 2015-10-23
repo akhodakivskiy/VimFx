@@ -23,6 +23,9 @@
 # with web page content do so by running `vim._run(name)`, which invokes `name`
 # in commands-frame.coffee.
 
+# NOTE: Most tab related commands need to do their actual tab manipulations in
+# the next tick (`utils.nextTick`) to work around bug 1200334.
+
 help  = require('./help')
 prefs = require('./prefs')
 utils = require('./utils')
@@ -156,11 +159,15 @@ commands.scroll_to_right       = helper_scrollToX.bind(null, Infinity)
 
 
 commands.tab_new = ({ vim }) ->
-  vim.window.BrowserOpenTab()
+  utils.nextTick(vim.window, ->
+    vim.window.BrowserOpenTab()
+  )
 
 commands.tab_duplicate = ({ vim }) ->
   { gBrowser } = vim.window
-  gBrowser.duplicateTab(gBrowser.selectedTab)
+  utils.nextTick(vim.window, ->
+    gBrowser.duplicateTab(gBrowser.selectedTab)
+  )
 
 absoluteTabIndex = (relativeIndex, gBrowser) ->
   tabs = gBrowser.visibleTabs
@@ -181,7 +188,9 @@ absoluteTabIndex = (relativeIndex, gBrowser) ->
 
 helper_switch_tab = (direction, { vim, count = 1 }) ->
   { gBrowser } = vim.window
-  gBrowser.selectTabAtIndex(absoluteTabIndex(direction * count, gBrowser))
+  utils.nextTick(vim.window, ->
+    gBrowser.selectTabAtIndex(absoluteTabIndex(direction * count, gBrowser))
+  )
 
 commands.tab_select_previous = helper_switch_tab.bind(null, -1)
 
@@ -199,21 +208,29 @@ helper_move_tab = (direction, { vim, count = 1 }) ->
   else
     gBrowser.unpinTab(selectedTab) if pinned
 
-  gBrowser.moveTabTo(selectedTab, index)
+  utils.nextTick(vim.window, ->
+    gBrowser.moveTabTo(selectedTab, index)
+  )
 
 commands.tab_move_backward = helper_move_tab.bind(null, -1)
 
 commands.tab_move_forward  = helper_move_tab.bind(null, +1)
 
 commands.tab_select_first = ({ vim }) ->
-  vim.window.gBrowser.selectTabAtIndex(0)
+  utils.nextTick(vim.window, ->
+    vim.window.gBrowser.selectTabAtIndex(0)
+  )
 
 commands.tab_select_first_non_pinned = ({ vim }) ->
   firstNonPinned = vim.window.gBrowser._numPinnedTabs
-  vim.window.gBrowser.selectTabAtIndex(firstNonPinned)
+  utils.nextTick(vim.window, ->
+    vim.window.gBrowser.selectTabAtIndex(firstNonPinned)
+  )
 
 commands.tab_select_last = ({ vim }) ->
-  vim.window.gBrowser.selectTabAtIndex(-1)
+  utils.nextTick(vim.window, ->
+    vim.window.gBrowser.selectTabAtIndex(-1)
+  )
 
 commands.tab_toggle_pinned = ({ vim }) ->
   currentTab = vim.window.gBrowser.selectedTab
@@ -226,12 +243,17 @@ commands.tab_close = ({ vim, count = 1}) ->
   { gBrowser } = vim.window
   return if gBrowser.selectedTab.pinned
   currentIndex = gBrowser.visibleTabs.indexOf(gBrowser.selectedTab)
-  for tab in gBrowser.visibleTabs[currentIndex...(currentIndex + count)]
-    gBrowser.removeTab(tab)
-  return
+  utils.nextTick(vim.window, ->
+    for tab in gBrowser.visibleTabs[currentIndex...(currentIndex + count)]
+      gBrowser.removeTab(tab)
+    return
+  )
 
 commands.tab_restore = ({ vim, count = 1 }) ->
-  vim.window.undoCloseTab() for [1..count] by 1
+  utils.nextTick(vim.window, ->
+    vim.window.undoCloseTab() for [1..count] by 1
+    return
+  )
 
 commands.tab_close_to_end = ({ vim }) ->
   { gBrowser } = vim.window
@@ -274,10 +296,12 @@ helper_follow_clickable = ({ inTab, inBackground }, { vim, count = 1 }) ->
     vim._focusMarkerElement(elementIndex)
 
     if inTab
-      utils.openTab(vim.window, marker.wrapper.href, {
-        inBackground
-        relatedToCurrent: true
-      })
+      utils.nextTick(vim.window, ->
+        utils.openTab(vim.window, marker.wrapper.href, {
+          inBackground
+          relatedToCurrent: true
+        })
+      )
     else
       vim._run('click_marker_element', {
         elementIndex
