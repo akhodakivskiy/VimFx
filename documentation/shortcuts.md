@@ -89,7 +89,7 @@ Using `<force>` allows you to run other commands in text inputs as well. For
 example, you could use `<force><a-j>` and `<force><a-k>` to be able to select
 tab backward and forward regardless if you happen to be in a text input or not.
 
-### `late`
+### `<late>`
 
 The `<late>` special key makes the shortcut in question run _after_ the handling
 of key presses in the current page, allowing the current page to override it.
