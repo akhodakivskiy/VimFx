@@ -6,6 +6,13 @@ See the file README.md for copying conditions.
 
 # Questions & Answers
 
+## How do i re-map `<escape>` to blur text inputs?
+
+The default shortcut is actually `<force><escape>`! Don’t forget [`<force>`] at
+the beginning, and your new shortcut should work fine.
+
+[`<force>`]: shortcuts.md#force
+
 ## What does `<force><late><tab>` mean?
 
 - `<force>`: The shortcut works even in text inputs.
