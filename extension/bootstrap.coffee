@@ -117,5 +117,11 @@ do (global = this) ->
   global.uninstall = ->
 
   if IS_FRAME_SCRIPT
-    require('./lib/message-manager').listenOnce('shutdown', shutdown)
     startup()
+
+    # When updating the add-on, the previous version is going to shut down at
+    # the same time as the new version starts up. Add the shutdown listener in
+    # the next tick to prevent the previous version from triggering it.
+    setTimeout((->
+      require('./lib/message-manager').listenOnce('shutdown', shutdown)
+    ), 0)

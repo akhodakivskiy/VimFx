@@ -32,9 +32,9 @@ class FrameEventManager
   addListeners: ->
     messageManager.listen('locationChange', @vim.resetState.bind(@vim))
 
-    # If the page already was fully loaded when VimFx was initialized, send the
+    # If the page already was loaded when VimFx was initialized, send the
     # 'DOMWindowCreated' message straight away.
-    if @vim.content.document.readyState == 'complete'
+    if @vim.content.document.readyState in ['interactive', 'complete']
       messageManager.send('DOMWindowCreated')
     else
       @listen('DOMWindowCreated', (event) ->
