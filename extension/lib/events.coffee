@@ -35,6 +35,10 @@ class UIEventManager
     # This flag controls whether to suppress the various key events or not.
     @suppress = false
 
+    # If a matched shortcut has the `<late>` special key, this flag is set to
+    # `true`.
+    @late = false
+
     # When a menu or panel is shown VimFx should temporarily stop processing
     # keyboard input, allowing accesskeys to be used.
     @popupPassthrough = false
@@ -50,9 +54,13 @@ class UIEventManager
 
     @listen('keydown', (event) =>
       try
-        # No matter what, always reset the `suppress` flag, so we don't suppress
-        # more than intended.
+        # No matter what, always reset the `@suppress` flag, so we don't
+        # suppress more than intended.
         @suppress = false
+
+        # Reset the `@late` flag, telling any late listeners for the previous
+        # event not to run.
+        @late = false
 
         if @popupPassthrough
           # The `@popupPassthrough` flag is set a bit unreliably. Sometimes it
@@ -155,11 +163,16 @@ class UIEventManager
 
   consumeLateKeydown: (vim, event, match, options) ->
     { isFrameEvent = false } = options
+    @late = true
 
     # The passed in `event` is the regular non-late browser UI keydown event.
     # It is only used to set held keys. This is easier than sending an event
     # subset from frame scripts.
     listener = ({ defaultPrevented }) =>
+      # `@late` is reset on every keydown. If it is no longer `true`, it means
+      # that the page called `event.stopPropagation()`, which prevented this
+      # listener from running for that event.
+      return unless @late
       @suppress =
         if defaultPrevented
           false
