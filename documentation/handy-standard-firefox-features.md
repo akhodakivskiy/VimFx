@@ -19,7 +19,7 @@ powerful. Other than simply entering URLs, you can also use it to:
 
 - Search through bookmarks.
 - Search through history.
-- Serach through open tabs.
+- Search through open tabs.
 - Search using search engines.
 
 Type a lone `*` to restrict the results to bookmarks only. Use `<c-enter>` to
