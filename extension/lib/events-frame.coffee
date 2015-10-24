@@ -145,15 +145,17 @@ class FrameEventManager
     @listen('blur', (event) =>
       target = event.originalTarget
 
-      # If a text input is blurred in a background tab, it most likely means
-      # that the user switched tab, for example by pressing `<c-tab>`, while the
-      # text input was focused. The 'TabSelect' event fires first, then the
-      # 'blur' event. In this case, when switching back to that tab, the text
-      # input will be re-focused (because it was focused when you left the tab).
-      # This case is kept track of so that the autofocus prevention does not
-      # catch it.
+      # If a text input is blurred immediately before the document loses focus,
+      # it most likely means that the user switched tab, for example by pressing
+      # `<c-tab>`, or switched to another window, while the text input was
+      # focused. In this case, when switching back to that tab, the text input
+      # will, and should, be re-focused (because it was focused when you left
+      # the tab). This case is kept track of so that the autofocus prevention
+      # does not catch it.
       if utils.isTextInputElement(target) or utils.isContentEditable(target)
-        @vim.state.shouldRefocus = not @vim.content.document.hasFocus()
+        utils.nextTick(@vim.content, =>
+          @vim.state.shouldRefocus = not @vim.content.document.hasFocus()
+        )
     )
 
 module.exports = FrameEventManager
