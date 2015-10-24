@@ -34,6 +34,10 @@ Cu.import(apiUrl, {}).getAPI(vimfx => {
 You might also want to take a look at the [config file bootstrap.js
 example][bootstrap.js].
 
+Note that the callback passed to `getAPI` is called once every time VimFx starts
+up, not once per Firefox session! This means that if you update VimFx (or
+disable and then enable it), the callback is re-run with the new version.
+
 
 ## API
 

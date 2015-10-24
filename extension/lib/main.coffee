@@ -45,11 +45,11 @@ module.exports = (data, reason) ->
   vimfx.version = data.version
   AddonManager.getAddonByID(vimfx.id, (info) -> vimfx.info = info)
 
-  # Setup the public API.
+  # Setup the public API. See public.coffee for more information.
   apiUrl = "#{ data.resourceURI.spec }lib/public.js"
-  { setAPI } = Cu.import(apiUrl, {})
+  { setAPI, removeAPI } = Cu.import(apiUrl, {})
   setAPI(createAPI(vimfx))
-  module.onShutdown(-> Cu.unload(apiUrl))
+  module.onShutdown(removeAPI)
   prefs.set('apiUrl', apiUrl)
 
   utils.loadCss('style')
