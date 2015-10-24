@@ -116,10 +116,13 @@ commands.follow = ({ vim, storage }) ->
       # the `<input>` hidden until it is used. In those cases we should add a
       # marker for the `<label>`.
       when element.nodeName == 'LABEL'
-        if element.htmlFor
-          input = document.getElementById(element.htmlFor)
-          if input and not getElementShape(input)
-            type = 'clickable'
+        input =
+          if element.htmlFor
+            document.getElementById(element.htmlFor)
+          else
+            element.querySelector('input, textarea, select')
+        if input and not getElementShape(input)
+          type = 'clickable'
       # Elements that have “button” somewhere in the class might be clickable,
       # unless they contain a real link or button or yet an element with
       # “button” somewhere in the class, in which case they likely are
