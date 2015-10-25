@@ -66,7 +66,10 @@ module.exports = (data, reason) ->
 
   button.injectButton(vimfx)
 
-  test?(vimfx)
+  if test
+    test(vimfx)
+    # Unload the public API after tests to avoid errors on next install.
+    Cu.unload(apiUrl)
 
   windows = new WeakSet()
   messageManager.listen('tabCreated', (data, { target }) ->
