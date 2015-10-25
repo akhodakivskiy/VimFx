@@ -23,9 +23,9 @@ utils     = require('../lib/utils')
 
 { utils: Cu } = Components
 
-{ getAPI } = Cu.import(
-  Services.prefs.getCharPref('extensions.VimFx.api_url'), {}
-)
+apiPref = 'extensions.VimFx.api_url'
+apiUrl  = Services.prefs.getComplexValue(apiPref, Ci.nsISupportsString).data
+{ getAPI } = Cu.import(apiUrl, {})
 
 exports['test exports'] = (assert, passed_vimfx) -> getAPI((vimfx) ->
   assert.equal(typeof vimfx.get, 'function', 'get')
