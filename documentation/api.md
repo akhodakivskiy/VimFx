@@ -44,9 +44,9 @@ disable and then enable it), the callback is re-run with the new version.
 The following sub-sections assume that you store VimFx’s public API in a
 variable called `vimfx`.
 
-### `vimfx.get(pref)` and `vimfx.set(pref, value)`
+### `vimfx.get(pref)`, `vimfx.getDefault(pref)` and `vimfx.set(pref, value)`
 
-Gets or sets the value of the VimFx pref `pref`.
+Gets or sets the (default) value of the VimFx pref `pref`.
 
 You can see all prefs in [defaults.coffee], or by opening [about:config] and
 filtering by `extensions.vimfx`. Note that you can also access the [special
@@ -64,6 +64,12 @@ vimfx.get('hint_chars')
 vimfx.get('modes.normal.follow')
 ```
 
+#### `vimfx.getDefault(pref)`
+
+Gets the default value of the VimFx pref `pref`.
+
+Useful when you wish to extend a default, rather than replacing it. See below.
+
 #### `vimfx.set(pref, value)`
 
 Sets the value of the VimFx pref `pref` to `value`.
@@ -72,8 +78,15 @@ Sets the value of the VimFx pref `pref` to `value`.
 // Set the value of the Hint chars option:
 vimfx.set('hint_chars', 'abcdefghijklmnopqrstuvwxyz')
 // Add yet a keyboard shortcut for the `f` command:
-vimfx.set('modes.normal.follow', vimfx.get('modes.normal.follow') + '  e')
+vimfx.set('modes.normal.follow', vimfx.getDefault('modes.normal.follow') + '  e')
 ```
+
+When extending a pref (as in the second example above), be sure to use
+`vimfx.getDefault` rather than `vimfx.get`. Otherwise you get a multiplying
+effect. In the above example, after starting Firefox a few times the pref would
+be `f  e  e  e  e`. Also, if you find that example very verbose: Remember that
+you’re using a programming language! Write a small helper function that suits
+your needs.
 
 Note: If you produce conflicting keyboard shortcuts, the order of your code does
 not matter. The command that comes first in VimFx’s settings page in the Add-ons

@@ -34,6 +34,14 @@ createAPI = (vimfx) ->
     else
       throw new Error("VimFx: Unknown pref: #{ pref }")
 
+  getDefault: (pref) -> switch
+    when pref of defaults.parsed_options or pref?.startsWith('custom.')
+      throw new Error("VimFx: No default for pref: #{ pref }")
+    when pref of defaults.all_prefs
+      defaults.all_prefs[pref]
+    else
+      throw new Error("VimFx: Unknown pref: #{ pref }")
+
   set: (pref, value) -> switch
     when pref of defaults.parsed_options
       vimfx.options[pref] = value

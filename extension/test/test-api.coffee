@@ -29,6 +29,7 @@ utils     = require('../lib/utils')
 
 exports['test exports'] = (assert, passed_vimfx) -> getAPI((vimfx) ->
   assert.equal(typeof vimfx.get, 'function', 'get')
+  assert.equal(typeof vimfx.getDefault, 'function', 'getDefault')
   assert.equal(typeof vimfx.set, 'function', 'set')
   assert.equal(typeof vimfx.addCommand, 'function', 'addCommand')
   assert.equal(typeof vimfx.addOptionOverrides, 'function',
@@ -42,6 +43,13 @@ exports['test exports'] = (assert, passed_vimfx) -> getAPI((vimfx) ->
 exports['test get'] = (assert, passed_vimfx) -> getAPI((vimfx) ->
   reset = prefs.tmp('hint_chars', 'abcd')
   assert.equal(vimfx.get('hint_chars'), 'abcd')
+  reset()
+)
+
+exports['test getDefault'] = (assert, passed_vimfx) -> getAPI((vimfx) ->
+  default_hint_chars = passed_vimfx.options.hint_chars
+  reset = prefs.tmp('hint_chars', 'abcd')
+  assert.equal(vimfx.getDefault('hint_chars'), default_hint_chars)
   reset()
 )
 
@@ -256,9 +264,13 @@ exports['test addKeyOverrides'] = (assert, passed_vimfx) -> getAPI((vimfx) ->
   passed_vimfx.keyOverrides = originalKeyOverrides
 )
 
-exports['test vimfx.[gs]et errors'] = (assert) -> getAPI((vimfx) ->
+exports['test vimfx.[gs]et(Default)? errors'] = (assert) -> getAPI((vimfx) ->
   throws(assert, /unknown pref/i, 'undefined', ->
     vimfx.get()
+  )
+
+  throws(assert, /unknown pref/i, 'undefined', ->
+    vimfx.getDefault()
   )
 
   throws(assert, /unknown pref/i, 'undefined', ->
@@ -267,6 +279,18 @@ exports['test vimfx.[gs]et errors'] = (assert) -> getAPI((vimfx) ->
 
   throws(assert, /unknown pref/i, 'unknown_pref', ->
     vimfx.get('unknown_pref')
+  )
+
+  throws(assert, /unknown pref/i, 'unknown_pref', ->
+    vimfx.getDefault('unknown_pref')
+  )
+
+  throws(assert, /no default/i, 'custom.mode.normal.foo', ->
+    vimfx.getDefault('custom.mode.normal.foo')
+  )
+
+  throws(assert, /no default/i, 'translations', ->
+    vimfx.getDefault('translations')
   )
 
   throws(assert, /unknown pref/i, 'unknown_pref', ->
