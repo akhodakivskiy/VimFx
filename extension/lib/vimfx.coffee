@@ -142,7 +142,9 @@ class VimFx extends utils.EventEmitter
           continue if enabledSequences.length == 0
         categories = modes[modeName] ?= {}
         category = categories[command.category] ?= []
-        category.push({command, enabledSequences, order: command.order})
+        category.push(
+          {command, enabledSequences, order: command.order, name: commandName}
+        )
 
     modesSorted = []
     for modeName, categories of modes

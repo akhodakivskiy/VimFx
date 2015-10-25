@@ -85,6 +85,12 @@ createContent = (document, vimfx) ->
 
     for category, index in mode.categories
       categoryContainer = $('category', content)
+      # `data-` attributes are currently unused by VimFx, but provide a great
+      # way to customize the help dialog with custom CSS.
+      utils.setAttributes(categoryContainer, {
+        'data-mode':     mode._name
+        'data-category': category._name
+      })
 
       # Append the mode heading inside the first category container, rather than
       # before it, for layout purposes.
@@ -94,8 +100,10 @@ createContent = (document, vimfx) ->
 
       $('heading-category', categoryContainer, category.name) if category.name
 
-      for { command, enabledSequences } in category.commands
+      for { command, name, enabledSequences } in category.commands
         commandContainer = $('command', categoryContainer)
+        utils.setAttributes(commandContainer, {'data-command': command.name})
+        commandContainer.setAttribute('data-command', name)
         for sequence in enabledSequences
           keySequence = $('key-sequence', commandContainer)
           [specialKeys, rest] = splitSequence(sequence, vimfx.SPECIAL_KEYS)
