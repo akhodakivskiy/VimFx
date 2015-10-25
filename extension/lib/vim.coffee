@@ -28,9 +28,8 @@ messageManager = require('./message-manager')
 utils          = require('./utils')
 
 class Vim
-  constructor: (@browser, @_parent) ->
-    @window = @browser.ownerGlobal
-    @_messageManager = @browser.messageManager
+  constructor: (browser, @_parent) ->
+    @_setBrowser(browser)
     @_storage = {}
 
     @_resetState()
@@ -40,7 +39,12 @@ class Vim
       enumerable: true
     })
 
-    @_onLocationChange(@browser.currentURI.spec)
+    # Since this is done in the constructor, defer location change handling to
+    # the next tick so that this `vim` instance is saved in `vimfx.vims` first.
+    # This allows 'locationChange' listeners to use `@vimfx.getCurrentVim()`.
+    utils.nextTick(@window, =>
+      @_onLocationChange(@browser.currentURI.spec)
+    )
 
     # Require the subset of the options needed to be listed explicitly (as
     # opposed to sending _all_ options) for performance. Each option access
@@ -63,6 +67,10 @@ class Vim
 
     @_listen('DOMWindowCreated', => @_state.frameCanReceiveEvents = true)
 
+  _setBrowser: (@browser) ->
+    @window = @browser.ownerGlobal
+    @_messageManager = @browser.messageManager
+
   _resetState: ->
     @_state =
       frameCanReceiveEvents: false
@@ -78,7 +86,7 @@ class Vim
       else
         not (target.ownerGlobal == @window)
 
-  # `args` is an array of arguments to be passed to the mode's `onEnter` method.
+  # `args...` is passed to the mode's `onEnter` method.
   enterMode: (mode, args...) ->
     return false if @mode == mode
 

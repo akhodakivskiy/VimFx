@@ -43,6 +43,10 @@ class UIEventManager
     # keyboard input, allowing accesskeys to be used.
     @popupPassthrough = false
 
+    @locationState =
+      lastUrl:   null
+      numToSkip: 0
+
   addListeners: ->
     checkPassthrough = (value, event) =>
       target = event.originalTarget
@@ -134,12 +138,53 @@ class UIEventManager
 
     @listen('TabSelect', @vimfx.emit.bind(@vimfx, 'TabSelect'))
 
-    lastUrl = null
+    @listen('TabOpen', (event) =>
+      browser = @window.gBrowser.getBrowserForTab(event.originalTarget)
+
+      if MULTI_PROCESS_ENABLED
+        unless @vimfx.vims.has(browser)
+          # If a tab is opened, but there’s no `vim` instance for it, it means
+          # that the tab has been dragged from another window. In such cases, a
+          # new `<browser>` is created but the page is not refreshed and the
+          # same frame script is re-used. The window the tab was dragged _from_
+          # is still the current window, and the tab’s `vim` instance is the
+          # current one there. Grab it and update its `.browser`.
+          vim = @vimfx.getCurrentVim(utils.getCurrentWindow())
+          vim._setBrowser(browser)
+          @vimfx.vims.set(browser, vim)
+
+          # For some reason, three 'onLocationChange' events will fire for this
+          # tab now, all of which are unwanted because the location didn’t
+          # really change. Otherwise another mode might be entered based on the
+          # “changed” URL. The mode should not change when dragging a tab to
+          # another window.
+          @locationState.numToSkip = 3
+      else
+        # In non-multi-process, a new frame script is created, which means that
+        # a new `vim` instance is created as well, and also that all state for
+        # the page is lost. The best we can do is to copy over the mode.
+        vim = @vimfx.vims.get(browser)
+
+        # If the new tab was opened in a background window it most likely means
+        # that a tab was dragged there.
+        unless @window == utils.getCurrentWindow()
+          oldVim = @vimfx.getCurrentVim(utils.getCurrentWindow())
+          vim._state.lastUrl = oldVim._state.lastUrl
+          vim.enterMode(oldVim.mode)
+          # In non-multi-process, the magic number seems to be four.
+          @locationState.numToSkip = 4
+    )
+
     progressListener =
       onLocationChange: (progress, request, location, flags) =>
-        url     = location.spec
-        refresh = (url == lastUrl)
-        lastUrl = url
+        if @locationState.numToSkip > 0
+          @locationState.numToSkip--
+          return
+
+        url = location.spec
+        refresh = (url == @locationState.lastUrl)
+        @locationState.lastUrl = url
+
         unless flags & Ci.nsIWebProgressListener.LOCATION_CHANGE_SAME_DOCUMENT
           return unless vim = @vimfx.getCurrentVim(@window)
           vim._onLocationChange(url, {refresh})

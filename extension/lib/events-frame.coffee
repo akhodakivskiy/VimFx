@@ -115,8 +115,6 @@ class FrameEventManager
           @vim.state.hasInteraction = false
         return
 
-      options = @vim.options(['prevent_autofocus', 'prevent_autofocus_modes'])
-
       # Save the last focused text input regardless of whether that input might
       # be blurred because of autofocus prevention.
       if utils.isTextInputElement(target)
@@ -124,6 +122,12 @@ class FrameEventManager
 
       focusManager = Cc['@mozilla.org/focus-manager;1']
         .getService(Ci.nsIFocusManager)
+
+      # When moving a tab to another window, there is a short period of time
+      # when there’s no listener for this call.
+      return unless options = @vim.options(
+        ['prevent_autofocus', 'prevent_autofocus_modes']
+      )
 
       # Blur the focus target, if autofocus prevention is enabled…
       if options.prevent_autofocus and

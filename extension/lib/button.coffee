@@ -33,9 +33,9 @@ injectButton = (vimfx) ->
     defaultArea: cui.AREA_NAVBAR
     label: 'VimFx'
     tooltiptext: translate('button.tooltip.normal')
-    onCommand: ->
-      window = utils.getCurrentWindow()
-      button = getButton(window)
+    onCommand: (event) ->
+      button = event.originalTarget
+      window = button.ownerGlobal
       mode = button.getAttribute('vimfx-mode')
       if mode == 'normal'
         help.injectHelp(window, vimfx)
@@ -45,8 +45,8 @@ injectButton = (vimfx) ->
     onCreated: (node) ->
       node.setAttribute('vimfx-mode', 'normal')
 
-      updateButton = ->
-        window = utils.getCurrentWindow()
+      updateButton = (vimOrEvent) ->
+        window = vimOrEvent.window ? vimOrEvent.originalTarget.ownerGlobal
         button = getButton(window)
 
         # The 'modeChange' event provides the `vim` object that changed mode,
