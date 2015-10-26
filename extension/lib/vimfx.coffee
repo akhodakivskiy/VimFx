@@ -35,7 +35,7 @@ class VimFx extends utils.EventEmitter
     @vims = new WeakMap()
     @createKeyTrees()
     @reset()
-    @on('modechange', ({mode}) => @reset(mode))
+    @on('modeChange', ({mode}) => @reset(mode))
 
   SPECIAL_KEYS: ['<force>', '<late>']
 
