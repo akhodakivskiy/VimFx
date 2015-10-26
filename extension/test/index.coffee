@@ -43,7 +43,7 @@ module.exports = (vimfx) ->
         passed++
       catch error then null
       finally
-        fn() for fn in teardowns
+        (try fn()) for fn in teardowns
       report.push("  #{ if error then '✘' else '✔' } #{ key }")
       report.push(utils.formatError(error).replace(/^/gm, '    ')) if error
 

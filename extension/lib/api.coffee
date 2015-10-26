@@ -82,7 +82,6 @@ createAPI = (vimfx) ->
     vimfx.modes[mode].commands[name] = {
       pref, category, order, run: fn, description: -> description
     }
-    vimfx.createKeyTrees()
 
   addOptionOverrides: (rules...) ->
     unless vimfx.optionOverrides
@@ -105,7 +104,6 @@ createAPI = (vimfx) ->
     vimfx.keyOverrides.push(rules...)
 
   on:      vimfx.on.bind(vimfx)
-  refresh: vimfx.createKeyTrees.bind(vimfx)
   modes:   vimfx.modes
 
 getOverrides = (rules, args...) ->

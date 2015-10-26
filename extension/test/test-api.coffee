@@ -25,8 +25,8 @@ utils     = require('../lib/utils')
 
 apiPref = 'extensions.VimFx.api_url'
 apiUrl  = Services.prefs.getComplexValue(apiPref, Ci.nsISupportsString).data
-# Hack: Also import `callbacks` so callbacks added by tests can be `.pop()`ed.
-{ getAPI, callbacks } = Cu.import(apiUrl, {})
+# Hack: Also import `_callbacks` so callbacks added by tests can be `.pop()`ed.
+{ getAPI, _callbacks: callbacks } = Cu.import(apiUrl, {})
 
 # In the tests, `vimfx` refers to the API object, while `$vimfx` refers to the
 # passed in `VimFx` instance.
@@ -42,14 +42,13 @@ exports['test exports'] = (assert, $vimfx, teardown) -> getAPI((vimfx) ->
                'addOptionOverrides')
   assert.equal(typeof vimfx.addKeyOverrides, 'function', 'addKeyOverrides')
   assert.equal(typeof vimfx.on, 'function', 'on')
-  assert.equal(typeof vimfx.refresh, 'function', 'refresh')
   assert.equal(vimfx.modes, $vimfx.modes, 'modes')
 )
 
 exports['test get'] = (assert, $vimfx, teardown) -> getAPI((vimfx) ->
   reset = prefs.tmp('hint_chars', 'abcd')
   teardown(->
-    reset()
+    reset?()
     callbacks.pop()
   )
 
@@ -60,7 +59,7 @@ exports['test getDefault'] = (assert, $vimfx, teardown) -> getAPI((vimfx) ->
   default_hint_chars = $vimfx.options.hint_chars
   reset = prefs.tmp('hint_chars', 'abcd')
   teardown(->
-    reset()
+    reset?()
     callbacks.pop()
   )
 
@@ -104,6 +103,8 @@ exports['test customization'] = (assert, $vimfx, teardown) -> getAPI((vimfx) ->
   }, -> nonce)
   vimfx.set('custom.mode.ignore.test_command', 'ö  <ö>  <c-c-invalid>')
 
+  $vimfx.createKeyTrees()
+
   # Test that the new simple command can be run.
   $vimfx.reset('normal')
   match = $vimfx.consumeKeyEvent(event, {mode: 'normal'}, null)
@@ -137,7 +138,7 @@ exports['test customization'] = (assert, $vimfx, teardown) -> getAPI((vimfx) ->
   # Remove the added commands.
   delete vimfx.modes.normal.commands.test_command
   delete vimfx.modes.ignore.commands.test_command
-  vimfx.refresh()
+  $vimfx.createKeyTrees()
 
   # Test that the new simple command cannot be run.
   $vimfx.reset('normal')
@@ -199,7 +200,7 @@ exports['test addOptionOverrides'] = \
   $vimfx.optionOverrides = null
   $vimfx.options.prevent_autofocus = true
   teardown(->
-    reset() # Defined below.
+    reset?() # Defined below.
     $vimfx.options = originalOptions
     $vimfx.optionOverrides = originalOptionOverrides
     callbacks.pop()
@@ -229,8 +230,8 @@ exports['test addKeyOverrides'] = \
   $vimfx.options.ignore_keyboard_layout = false
   $vimfx.options.translations = {}
   teardown(->
-    resetScrollToBottom() # Defined below.
-    resetGetCurrentLocation() # Defined below.
+    resetScrollToBottom?() # Defined below.
+    resetGetCurrentLocation?() # Defined below.
     $vimfx.options = originalOptions
     $vimfx.keyOverrides = originalKeyOverrides
     callbacks.pop()
@@ -248,6 +249,7 @@ exports['test addKeyOverrides'] = \
   )
 
   resetScrollToBottom = prefs.tmp('mode.normal.scroll_to_bottom', '<foobar>j')
+  $vimfx.createKeyTrees()
   $vimfx.reset('normal')
 
   match = $vimfx.consumeKeyEvent({key: 'j'}, {mode: 'ignore'}, null)
@@ -266,7 +268,7 @@ exports['test addKeyOverrides'] = \
   assert.ok(not match)
 
   match = $vimfx.consumeKeyEvent({key: 'foobar', ctrlKey: true},
-                                       {mode: 'normal'}, null)
+                                 {mode: 'normal'}, null)
   assert.ok(not match)
 
   match = $vimfx.consumeKeyEvent({key: 'foobar'}, {mode: 'normal'}, null)

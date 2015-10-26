@@ -18,38 +18,25 @@
 ###
 
 # This file provides VimFx’s public API (defined in api.coffee) for public
-# consumption.
+# consumption. It is kept as short as possible on purpose to reduce the need to
+# update it. When VimFx updates, consumers of this module do not get updates to
+# this module until the next Firefox restart.
 
 EXPORTED_SYMBOLS = ['getAPI']
 
 # Once VimFx has been installed, this file will be available on the file system,
 # and the `api_url` pref will be available in Firefox’s prefs system. That’s all
 # that is needed to `Cu.import` this file, regardless of whether VimFx has
-# loaded or not. When VimFx _is_ loaded, `api` (which requires access to the
-# global `VimFx` instance) is set by main.coffee and passed to all consumers.
-api = null
+# loaded or not. When VimFx _is_ loaded, `_invokeCallback` (which requires
+# access to the global `VimFx` instance) is set by main.coffee.
+_invokeCallback = null
 
 # All requests for the API are stored here.
-callbacks = []
-
-# Any time the API is set (when Firefox starts, when VimFx is updated or when
-# VimFx is disabled and then enabled), call all callbacks with the new API. This
-# takes care of API-consuming add-ons that happen to load before VimFx, as well
-# as the case where VimFx is updated in the middle of the session (see below).
-setAPI = (passed_api) ->
-  api = passed_api
-  callback(api) for callback in callbacks
-  return
+_callbacks = []
 
 # All callbacks are always stored, in case they need to be re-run in the future.
-# If the API is already available, pass it back immediately.
+# If main.coffee already has set `_invokeCallback` then run it. Otherwise let
+# main.coffee take care of the queue in `_callbacks` when it loads.
 getAPI = (callback) ->
-  callbacks.push(callback)
-  callback(api) unless api == null
-
-# main.coffee calls this function on shutdown instead of `Cu.unload(apiUrl)`.
-# This means that if VimFx is updated (or disabled and then enabled), all
-# `getAPI` calls for the old version are re-run with the new version. Otherwise
-# you’d have to either restart Firefox, or disable and enable every add-on using
-# the API in order for them to take effect.
-removeAPI = -> api = null
+  _callbacks.push(callback)
+  _invokeCallback?(callback)

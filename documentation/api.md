@@ -249,11 +249,6 @@ Occurs whenever any tab in any window is selected. This is also fired when
 Firefox starts for the currently selected tab. The data passed to listeners is
 the `event` object passed to the standard Firefox [TabSelect] event.
 
-### `vimfx.refresh()`
-
-If you make changes to [`vimfx.modes`] directly you need to call
-`vimfx.refresh()` for your changes to take effect.
-
 ### `vimfx.modes`
 
 An object whose keys are mode names and whose values are [mode object]s.
@@ -301,10 +296,6 @@ This is a very low-level part of the API. It allows to:
     },
   }
   ```
-
-When you’re done modifying `vimfx.modes` directly, you need to call
-`vimfx.refresh()`. (That’s taken care of automatically in the
-`vimfx.addCommand()` helper.)
 
 Have a look at [modes.coffee] and [commands.coffee] for more information.
 

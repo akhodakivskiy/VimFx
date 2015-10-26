@@ -45,26 +45,49 @@ module.exports = (data, reason) ->
   vimfx.version = data.version
   AddonManager.getAddonByID(vimfx.id, (info) -> vimfx.info = info)
 
-  # Setup the public API. See public.coffee for more information.
-  apiUrl = "#{ data.resourceURI.spec }lib/public.js"
-  { setAPI, removeAPI } = Cu.import(apiUrl, {})
-  setAPI(createAPI(vimfx))
-  module.onShutdown(removeAPI)
-  prefs.set('api_url', apiUrl)
-
   utils.loadCss('style')
 
   options.observe(vimfx)
 
+  skipCreateKeyTrees = false
   prefs.observe('', (pref) ->
     if pref.startsWith('mode.') or pref.startsWith('custom.')
-      vimfx.createKeyTrees()
+      vimfx.createKeyTrees() unless skipCreateKeyTrees
     else if pref of defaults.all_options
       value = parsePref(pref)
       vimfx.options[pref] = value
   )
 
   button.injectButton(vimfx)
+
+  # Setup the public API. See public.coffee for more information. This is done
+  # _after_ the prefs observing setup, so that option prefs get validated and
+  # used when calling `vimfx.set()`.
+  apiUrl = "#{ data.resourceURI.spec }lib/public.js"
+  prefs.set('api_url', apiUrl)
+  publicScope = Cu.import(apiUrl, {})
+  api = createAPI(vimfx)
+  publicScope._invokeCallback = (callback) ->
+    # Calling `vimfx.createKeyTrees()` after each `vimfx.set()` that modifies a
+    # shortcut is absolutely redundant and may make Firefox start slower. Do it
+    # once instead.
+    skipCreateKeyTrees = true
+    callback(api)
+    skipCreateKeyTrees = false
+    vimfx.createKeyTrees()
+  module.onShutdown(-> publicScope._invokeCallbacks = null)
+
+  # Pass the API to add-ons that loaded before VimFx, either because they just
+  # happened to do so when Firefox started, or because VimFx was updated (or
+  # disabled and then enabled) in the middle of the session. Because of the
+  # latter case, `Cu.unload(apiUrl)` is not called on shutdown. Otherwise you’d
+  # have to either restart Firefox, or disable and enable every add-on using the
+  # API in order for them to take effect again.
+  if publicScope._callbacks.length > 0
+    publicScope._invokeCallback((api) ->
+      callback(api) for callback in publicScope._callbacks
+      return
+    )
 
   test?(vimfx)
 
