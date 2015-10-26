@@ -25,9 +25,15 @@ utils     = require('../lib/utils')
 
 apiPref = 'extensions.VimFx.api_url'
 apiUrl  = Services.prefs.getComplexValue(apiPref, Ci.nsISupportsString).data
-{ getAPI } = Cu.import(apiUrl, {})
+# Hack: Also import `callbacks` so callbacks added by tests can be `.pop()`ed.
+{ getAPI, callbacks } = Cu.import(apiUrl, {})
 
-exports['test exports'] = (assert, passed_vimfx) -> getAPI((vimfx) ->
+# In the tests, `vimfx` refers to the API object, while `$vimfx` refers to the
+# passed in `VimFx` instance.
+
+exports['test exports'] = (assert, $vimfx, teardown) -> getAPI((vimfx) ->
+  teardown(-> callbacks.pop())
+
   assert.equal(typeof vimfx.get, 'function', 'get')
   assert.equal(typeof vimfx.getDefault, 'function', 'getDefault')
   assert.equal(typeof vimfx.set, 'function', 'set')
@@ -37,31 +43,43 @@ exports['test exports'] = (assert, passed_vimfx) -> getAPI((vimfx) ->
   assert.equal(typeof vimfx.addKeyOverrides, 'function', 'addKeyOverrides')
   assert.equal(typeof vimfx.on, 'function', 'on')
   assert.equal(typeof vimfx.refresh, 'function', 'refresh')
-  assert.equal(vimfx.modes, passed_vimfx.modes, 'modes')
+  assert.equal(vimfx.modes, $vimfx.modes, 'modes')
 )
 
-exports['test get'] = (assert, passed_vimfx) -> getAPI((vimfx) ->
+exports['test get'] = (assert, $vimfx, teardown) -> getAPI((vimfx) ->
   reset = prefs.tmp('hint_chars', 'abcd')
+  teardown(->
+    reset()
+    callbacks.pop()
+  )
+
   assert.equal(vimfx.get('hint_chars'), 'abcd')
-  reset()
 )
 
-exports['test getDefault'] = (assert, passed_vimfx) -> getAPI((vimfx) ->
-  default_hint_chars = passed_vimfx.options.hint_chars
+exports['test getDefault'] = (assert, $vimfx, teardown) -> getAPI((vimfx) ->
+  default_hint_chars = $vimfx.options.hint_chars
   reset = prefs.tmp('hint_chars', 'abcd')
+  teardown(->
+    reset()
+    callbacks.pop()
+  )
+
   assert.equal(vimfx.getDefault('hint_chars'), default_hint_chars)
-  reset()
 )
 
-exports['test customization'] = (assert, passed_vimfx) -> getAPI((vimfx) ->
-  # Save some values that need to be temporarily changed below.
-  originalOptions = Object.assign({}, passed_vimfx.options)
-  originalCategories = Object.assign({}, passed_vimfx.options.categories)
-
-  # Setup some settings for testing.
-  passed_vimfx.options.keyValidator = null
-  passed_vimfx.options.ignore_keyboard_layout = true
+exports['test customization'] = (assert, $vimfx, teardown) -> getAPI((vimfx) ->
+  originalOptions = Object.assign({}, $vimfx.options)
+  originalCategories = Object.assign({}, $vimfx.options.categories)
+  $vimfx.options.keyValidator = null
+  $vimfx.options.ignore_keyboard_layout = true
   vimfx.set('translations', {KeyQ: ['ö', 'Ö']})
+  teardown(->
+    $vimfx.options = originalOptions
+    $vimfx.options.categories = originalCategories
+    delete $vimfx.modes.normal.commands.test_command
+    delete $vimfx.modes.ignore.commands.test_command
+    callbacks.pop()
+  )
 
   nonce = {}
   event = {code: 'KeyQ'}
@@ -87,18 +105,18 @@ exports['test customization'] = (assert, passed_vimfx) -> getAPI((vimfx) ->
   vimfx.set('custom.mode.ignore.test_command', 'ö  <ö>  <c-c-invalid>')
 
   # Test that the new simple command can be run.
-  passed_vimfx.reset('normal')
-  match = passed_vimfx.consumeKeyEvent(event, {mode: 'normal'}, null)
+  $vimfx.reset('normal')
+  match = $vimfx.consumeKeyEvent(event, {mode: 'normal'}, null)
   assert.equal(match.type, 'full')
   assert.equal(match.command.run(), nonce)
 
   # Test that the new complex command can be run.
-  passed_vimfx.reset('ignore')
-  match = passed_vimfx.consumeKeyEvent(event, {mode: 'ignore'}, null)
+  $vimfx.reset('ignore')
+  match = $vimfx.consumeKeyEvent(event, {mode: 'ignore'}, null)
   assert.equal(match.type, 'full')
   assert.equal(match.command.run(), nonce)
 
-  modes = passed_vimfx.getGroupedCommands({enabledOnly: true})
+  modes = $vimfx.getGroupedCommands({enabledOnly: true})
 
   # Test that the new simple command can show up in the help dialog.
   mode_normal = modes.find((mode) -> mode._name == 'normal')
@@ -122,20 +140,20 @@ exports['test customization'] = (assert, passed_vimfx) -> getAPI((vimfx) ->
   vimfx.refresh()
 
   # Test that the new simple command cannot be run.
-  passed_vimfx.reset('normal')
-  match = passed_vimfx.consumeKeyEvent(event, {mode: 'normal'}, null)
+  $vimfx.reset('normal')
+  match = $vimfx.consumeKeyEvent(event, {mode: 'normal'}, null)
   if match.type == 'full'
     value = try match.command.run() catch then null
     assert.notEqual(value, nonce)
 
   # Test that the new complex command cannot be run.
-  passed_vimfx.reset('ignore')
-  match = passed_vimfx.consumeKeyEvent(event, {mode: 'ignore'}, null)
+  $vimfx.reset('ignore')
+  match = $vimfx.consumeKeyEvent(event, {mode: 'ignore'}, null)
   if match.type == 'full'
     value = try match.command.run() catch then null
     assert.notEqual(value, nonce)
 
-  modes = passed_vimfx.getGroupedCommands({enabledOnly: true})
+  modes = $vimfx.getGroupedCommands({enabledOnly: true})
 
   # Test that the new simple command cannot show up in the help dialog.
   mode_normal = modes.find((mode) -> mode._name == 'normal')
@@ -149,13 +167,15 @@ exports['test customization'] = (assert, passed_vimfx) -> getAPI((vimfx) ->
   mode_ignore = modes.find((mode) -> mode._name == 'ignore')
   [ first_category ] = mode_ignore.categories
   assert.notEqual(first_category.name, 'New category')
-
-  # Restore original values.
-  passed_vimfx.options = originalOptions
-  passed_vimfx.options.categories = originalCategories
 )
 
-exports['test addCommand order'] = (assert, passed_vimfx) -> getAPI((vimfx) ->
+exports['test addCommand order'] = \
+(assert, $vimfx, teardown) -> getAPI((vimfx) ->
+  teardown(->
+    delete vimfx.modes.normal.commands.test_command
+    callbacks.pop()
+  )
+
   vimfx.addCommand({
     name:        'test_command'
     description: 'Test command'
@@ -163,23 +183,27 @@ exports['test addCommand order'] = (assert, passed_vimfx) -> getAPI((vimfx) ->
   }, Function.prototype)
   vimfx.set('custom.mode.normal.test_command', 'ö')
 
-  modes = passed_vimfx.getGroupedCommands()
+  modes = $vimfx.getGroupedCommands()
   mode_normal = modes.find((mode) -> mode._name == 'normal')
   category_misc = mode_normal.categories.find(
     (category) -> category._name == 'misc'
   )
   [ { command: first_command } ] = category_misc.commands
   assert.equal(first_command.description(), 'Test command')
-
-  delete vimfx.modes.normal.commands.test_command
 )
 
-exports['test addOptionOverrides'] = (assert, passed_vimfx) -> getAPI((vimfx) ->
-  originalOptions = Object.assign({}, passed_vimfx.options)
-  originalOptionOverrides = Object.assign({}, passed_vimfx.optionOverrides)
-
-  passed_vimfx.optionOverrides = null
-  passed_vimfx.options.prevent_autofocus = true
+exports['test addOptionOverrides'] = \
+(assert, $vimfx, teardown) -> getAPI((vimfx) ->
+  originalOptions = Object.assign({}, $vimfx.options)
+  originalOptionOverrides = Object.assign({}, $vimfx.optionOverrides)
+  $vimfx.optionOverrides = null
+  $vimfx.options.prevent_autofocus = true
+  teardown(->
+    reset() # Defined below.
+    $vimfx.options = originalOptions
+    $vimfx.optionOverrides = originalOptionOverrides
+    callbacks.pop()
+  )
 
   vimfx.addOptionOverrides(
     [
@@ -188,26 +212,29 @@ exports['test addOptionOverrides'] = (assert, passed_vimfx) -> getAPI((vimfx) ->
     ]
   )
 
-  assert.equal(passed_vimfx.options.prevent_autofocus, true)
+  assert.equal($vimfx.options.prevent_autofocus, true)
 
   reset = testUtils.stub(utils, 'getCurrentLocation', -> {
     hostname: 'example.com'
   })
 
-  assert.equal(passed_vimfx.options.prevent_autofocus, false)
-
-  reset()
-  passed_vimfx.options = originalOptions
-  passed_vimfx.optionOverrides = originalOptionOverrides
+  assert.equal($vimfx.options.prevent_autofocus, false)
 )
 
-exports['test addKeyOverrides'] = (assert, passed_vimfx) -> getAPI((vimfx) ->
-  originalOptions = Object.assign({}, passed_vimfx.options)
-  originalKeyOverrides = Object.assign({}, passed_vimfx.keyOverrides)
-
-  passed_vimfx.options.keyValidator = null
-  passed_vimfx.options.ignore_keyboard_layout = false
-  passed_vimfx.options.translations = {}
+exports['test addKeyOverrides'] = \
+(assert, $vimfx, teardown) -> getAPI((vimfx) ->
+  originalOptions = Object.assign({}, $vimfx.options)
+  originalKeyOverrides = Object.assign({}, $vimfx.keyOverrides)
+  $vimfx.options.keyValidator = null
+  $vimfx.options.ignore_keyboard_layout = false
+  $vimfx.options.translations = {}
+  teardown(->
+    resetScrollToBottom() # Defined below.
+    resetGetCurrentLocation() # Defined below.
+    $vimfx.options = originalOptions
+    $vimfx.keyOverrides = originalKeyOverrides
+    callbacks.pop()
+  )
 
   vimfx.addKeyOverrides(
     [
@@ -221,9 +248,9 @@ exports['test addKeyOverrides'] = (assert, passed_vimfx) -> getAPI((vimfx) ->
   )
 
   resetScrollToBottom = prefs.tmp('mode.normal.scroll_to_bottom', '<foobar>j')
-  passed_vimfx.reset('normal')
+  $vimfx.reset('normal')
 
-  match = passed_vimfx.consumeKeyEvent({key: 'j'}, {mode: 'ignore'}, null)
+  match = $vimfx.consumeKeyEvent({key: 'j'}, {mode: 'ignore'}, null)
   assert.ok(match)
 
   resetGetCurrentLocation = testUtils.stub(utils, 'getCurrentLocation', -> {
@@ -231,40 +258,36 @@ exports['test addKeyOverrides'] = (assert, passed_vimfx) -> getAPI((vimfx) ->
     href: 'about:blank'
   })
 
-  match = passed_vimfx.consumeKeyEvent({key: '1'}, {mode: 'normal'}, null)
+  match = $vimfx.consumeKeyEvent({key: '1'}, {mode: 'normal'}, null)
   assert.equal(match.type, 'count')
   assert.equal(match.count, 1)
 
-  match = passed_vimfx.consumeKeyEvent({key: 'j'}, {mode: 'normal'}, null)
+  match = $vimfx.consumeKeyEvent({key: 'j'}, {mode: 'normal'}, null)
   assert.ok(not match)
 
-  match = passed_vimfx.consumeKeyEvent({key: 'foobar', ctrlKey: true},
+  match = $vimfx.consumeKeyEvent({key: 'foobar', ctrlKey: true},
                                        {mode: 'normal'}, null)
   assert.ok(not match)
 
-  match = passed_vimfx.consumeKeyEvent({key: 'foobar'}, {mode: 'normal'},
-                                       null)
+  match = $vimfx.consumeKeyEvent({key: 'foobar'}, {mode: 'normal'}, null)
   assert.equal(match.type, 'partial')
-  match = passed_vimfx.consumeKeyEvent({key: 'j'}, {mode: 'normal'}, null)
+  match = $vimfx.consumeKeyEvent({key: 'j'}, {mode: 'normal'}, null)
   assert.equal(match.type, 'full')
   assert.strictEqual(match.count, undefined)
 
-  passed_vimfx.reset('ignore')
+  $vimfx.reset('ignore')
 
-  match = passed_vimfx.consumeKeyEvent({key: 'j'}, {mode: 'ignore'}, null)
+  match = $vimfx.consumeKeyEvent({key: 'j'}, {mode: 'ignore'}, null)
   assert.ok(match)
 
-  match = passed_vimfx.consumeKeyEvent({key: 'escape'}, {mode: 'ignore'},
-                                       null)
+  match = $vimfx.consumeKeyEvent({key: 'escape'}, {mode: 'ignore'}, null)
   assert.ok(not match)
-
-  resetScrollToBottom()
-  resetGetCurrentLocation()
-  passed_vimfx.options = originalOptions
-  passed_vimfx.keyOverrides = originalKeyOverrides
 )
 
-exports['test vimfx.[gs]et(Default)? errors'] = (assert) -> getAPI((vimfx) ->
+exports['test vimfx.[gs]et(Default)? errors'] = \
+(assert, $vimfx, teardown) -> getAPI((vimfx) ->
+  teardown(-> callbacks.pop())
+
   throws(assert, /unknown pref/i, 'undefined', ->
     vimfx.get()
   )
@@ -306,7 +329,10 @@ exports['test vimfx.[gs]et(Default)? errors'] = (assert) -> getAPI((vimfx) ->
   )
 )
 
-exports['test vimfx.addCommand errors'] = (assert) -> getAPI((vimfx) ->
+exports['test vimfx.addCommand errors'] = \
+(assert, $vimfx, teardown) -> getAPI((vimfx) ->
+  teardown(-> callbacks.pop())
+
   throws(assert, /name.+string.+required/i, 'undefined', ->
     vimfx.addCommand()
   )

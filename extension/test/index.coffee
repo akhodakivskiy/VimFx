@@ -36,10 +36,14 @@ module.exports = (vimfx) ->
     for key, fn of tests when key.startsWith('test')
       total++
       error = null
+      teardowns = []
+      teardown = (fn) -> teardowns.push(fn)
       try
-        fn(assert, vimfx)
+        fn(assert, vimfx, teardown)
         passed++
       catch error then null
+      finally
+        fn() for fn in teardowns
       report.push("  #{ if error then '✘' else '✔' } #{ key }")
       report.push(utils.formatError(error).replace(/^/gm, '    ')) if error
 
