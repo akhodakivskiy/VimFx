@@ -61,7 +61,7 @@ Gets the value of the VimFx pref `pref`.
 // Get the value of the Hint chars option:
 vimfx.get('hint_chars')
 // Get all keyboard shortcuts (as a string) for the `f` command:
-vimfx.get('modes.normal.follow')
+vimfx.get('mode.normal.follow')
 ```
 
 #### `vimfx.getDefault(pref)`
@@ -78,7 +78,7 @@ Sets the value of the VimFx pref `pref` to `value`.
 // Set the value of the Hint chars option:
 vimfx.set('hint_chars', 'abcdefghijklmnopqrstuvwxyz')
 // Add yet a keyboard shortcut for the `f` command:
-vimfx.set('modes.normal.follow', vimfx.getDefault('modes.normal.follow') + '  e')
+vimfx.set('mode.normal.follow', vimfx.getDefault('mode.normal.follow') + '  e')
 ```
 
 When extending a pref (as in the second example above), be sure to use
@@ -98,8 +98,8 @@ object] for more information about order.
 // Even though we set the shortcut for focusing the search bar last, the command
 // for focusing the location bar “wins”, because it comes first in VimFx’s
 // settings page in the Add-ons Manager.
-vimfx.set('modes.normal.focus_location_bar', 'ö')
-vimfx.set('modes.normal.focus_search_bar', 'ö')
+vimfx.set('mode.normal.focus_location_bar', 'ö')
+vimfx.set('mode.normal.focus_search_bar', 'ö')
 
 // Swapping their orders also swaps the “winner”.
 let {commands} = vimfx.modes.normal
