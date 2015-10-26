@@ -50,7 +50,7 @@ module.exports = (data, reason) ->
   { setAPI, removeAPI } = Cu.import(apiUrl, {})
   setAPI(createAPI(vimfx))
   module.onShutdown(removeAPI)
-  prefs.set('apiUrl', apiUrl)
+  prefs.set('api_url', apiUrl)
 
   utils.loadCss('style')
 
