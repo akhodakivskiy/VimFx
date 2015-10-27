@@ -27,9 +27,18 @@
     list-style-image: url(icon16.png);
 }
 
+#VimFxButton[vimfx-mode="ignore"] {
+    list-style-image: url(icon16-red.png);
+}
+
 #VimFxButton[cui-areatype="menu-panel"],
 toolbarpaletteitem[place="palette"] > #VimFxButton {
     list-style-image: url(icon32.png);
+}
+
+#VimFxButton[cui-areatype="menu-panel"][vimfx-mode="ignore"],
+toolbarpaletteitem[place="palette"] > #VimFxButton[vimfx-mode="ignore"] {
+    list-style-image: url(icon32-red.png);
 }
 
 @media (min-resolution: 2dppx) {
@@ -37,14 +46,19 @@ toolbarpaletteitem[place="palette"] > #VimFxButton {
       list-style-image: url(icon32.png);
   }
 
+  #VimFxButton[vimfx-mode="ignore"] {
+      list-style-image: url(icon32-red.png);
+  }
+
   #VimFxButton[cui-areatype="menu-panel"],
   toolbarpaletteitem[place="palette"] > #VimFxButton {
       list-style-image: url(icon64.png);
   }
-}
 
-#VimFxButton[vimfx-mode="ignore"] {
-    filter: grayscale(100%);
+  #VimFxButton[cui-areatype="menu-panel"][vimfx-mode="ignore"],
+  toolbarpaletteitem[place="palette"] > #VimFxButton[vimfx-mode="ignore"] {
+      list-style-image: url(icon64-red.png);
+  }
 }
 
 
