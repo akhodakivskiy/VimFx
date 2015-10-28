@@ -27,6 +27,7 @@
 # the next tick (`utils.nextTick`) to work around bug 1200334.
 
 help  = require('./help')
+hints = require('./hints')
 prefs = require('./prefs')
 utils = require('./utils')
 
@@ -267,8 +268,24 @@ commands.tab_close_other = ({ vim }) ->
 
 helper_follow = (name, vim, callback, count = null) ->
   vim.markPageInteraction()
+
+  # Enter hints mode immediately, with an empty set of markers. The user might
+  # press keys before the `vim._run` callback is invoked. Those key presses
+  # should be handled in hints mode, not normal mode.
+  initialMarkers = []
+  storage = vim.enterMode('hints', initialMarkers, callback, count)
+
   vim._run(name, null, ({ wrappers, viewport }) ->
-    vim.enterMode('hints', wrappers, viewport, callback, count)
+    # The user might have exited hints mode (and perhaps even entered it again)
+    # before this callback is invoked. If so, `storage.markers` has been
+    # cleared, or set to a new value. Only proceed if it is unchanged.
+    return unless storage.markers == initialMarkers
+
+    if wrappers.length > 0
+      markers = hints.injectHints(vim.window, wrappers, viewport, vim.options)
+      storage.markers = markers
+    else
+      vim.enterMode('normal')
   )
 
 helper_follow_clickable = ({ inTab, inBackground }, { vim, count = 1 }) ->
@@ -430,6 +447,7 @@ commands.esc = ({ vim }) ->
   vim.window.DeveloperToolbar.hide()
   vim.window.gBrowser.getFindBar().close()
   vim.window.TabView.hide()
+  hints.removeHints(vim.window) # Better safe than sorry.
 
 
 

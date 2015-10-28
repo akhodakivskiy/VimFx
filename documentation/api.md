@@ -358,6 +358,9 @@ This method is called with an object as mentioned above, and after that there
 may be any number of arguments (`args` in `vim.enterMode(modeName, ...args)`)
 that the mode is free to do whatever it wants with.
 
+Whatever is returned from `onEnter` will be returned from
+`vim.enterMode(modeName, ...args)`.
+
 ##### onInput
 
 The object passed to this method (see above) also has the following properties:
@@ -483,7 +486,9 @@ A `vim` object has the following properties:
 
 - enterMode(modeName, ...args): `Function`. Enter mode `modeName`, passing
   `...args` to the mode. It is up to every mode to do whatever it wants to with
-  `...args`.
+  `...args`. If `modeName` was already the current mode, nothing is done and
+  `undefined` is returned. Otherwise it us up to the mode to return whatever it
+  wants to.
 
 - isFrameEvent(event): `Function`. Returns `true` if `event` occurred in web
   page content, and `false` otherwise (if it occurred in Firefox’s UI).

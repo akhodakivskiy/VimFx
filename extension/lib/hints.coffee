@@ -30,6 +30,14 @@ CONTAINER_ID = 'VimFxMarkersContainer'
 Element     = Ci.nsIDOMElement
 XULDocument = Ci.nsIDOMXULDocument
 
+# For some time we used to return the hints container from `injectHints`, and
+# use that reference to remove the hints when needed. That’s fine in theory, but
+# in case anything breaks we might loose that reference and end up with
+# unremovable hints on the screen. Explicitly looking for an element with the
+# container ID is more fail-safe.
+removeHints = (window) ->
+  window.document.getElementById(CONTAINER_ID)?.remove()
+
 # Create `Marker`s for every element (represented by a regular object of data
 # about the element—a “wrapper,” a stand-in for the real element, which is only
 # accessible in frame scripts) in `wrappers`, and insert them into `window`.
@@ -50,7 +58,7 @@ injectHints = (window, wrappers, viewport, options) ->
 
   markers = semantic.concat(unsemantic)
 
-  return [[], null] if markers.length == 0
+  return null if markers.length == 0
 
   # Each marker gets a unique `z-index`, so that it can be determined if a
   # marker overlaps another. Put more important markers (higher weight) at the
@@ -95,6 +103,7 @@ injectHints = (window, wrappers, viewport, options) ->
     marker.setHint(parent.hint)
   markers.push(combined...)
 
+  removeHints(window) # Better safe than sorry.
   container = window.document.createElement('box')
   container.id = CONTAINER_ID
   window.gBrowser.mCurrentBrowser.parentNode.appendChild(container)
@@ -106,7 +115,7 @@ injectHints = (window, wrappers, viewport, options) ->
     # marker.coffee).
     marker.setPosition(viewport, zoom)
 
-  return [markers, container]
+  return markers
 
 
 getMarkableElementsAndViewport = (window, filter) ->
@@ -380,6 +389,7 @@ getClosestNonAnonymousParent = (element) ->
   return element
 
 module.exports = {
+  removeHints
   injectHints
   getMarkableElementsAndViewport
 }

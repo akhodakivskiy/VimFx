@@ -88,7 +88,7 @@ class Vim
 
   # `args...` is passed to the mode's `onEnter` method.
   enterMode: (mode, args...) ->
-    return false if @mode == mode
+    return if @mode == mode
 
     unless utils.has(@_parent.modes, mode)
       modes = Object.keys(@_parent.modes).join(', ')
@@ -97,10 +97,10 @@ class Vim
 
     @_call('onLeave') if @mode?
     @mode = mode
-    @_call('onEnter', null, args...)
+    result = @_call('onEnter', null, args...)
     @_parent.emit('modeChange', this)
     @_send('modeChange', {mode})
-    return true
+    return result
 
   _consumeKeyEvent: (event, focusType) ->
     return @_parent.consumeKeyEvent(event, this, focusType)
@@ -119,7 +119,7 @@ class Vim
   _call: (method, data = {}, extraArgs...) ->
     args = Object.assign({vim: this, storage: @_storage[@mode] ?= {}}, data)
     currentMode = @_parent.modes[@mode]
-    currentMode[method].call(currentMode, args, extraArgs...)
+    return currentMode[method].call(currentMode, args, extraArgs...)
 
   _run: (name, data = {}, callback = null) ->
     @_send('runCommand', {name, data}, callback)

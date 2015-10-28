@@ -104,26 +104,22 @@ mode('normal', {
 
 
 mode('hints', {
-  onEnter: ({ vim, storage }, wrappers, viewport, callback, count = 1) ->
-    [ markers, container ] = hints.injectHints(
-      vim.window, wrappers, viewport, vim.options
-    )
-    if markers.length > 0
-      storage.markers   = markers
-      storage.container = container
-      storage.callback  = callback
-      storage.count     = count
-      storage.numEnteredChars = 0
-    else
-      vim.enterMode('normal')
+  onEnter: ({ vim, storage }, markers, callback, count = 1) ->
+    storage.markers  = markers
+    storage.callback = callback
+    storage.count    = count
+    storage.numEnteredChars = 0
+
+    # Expose the storage so asynchronously computed markers can be set
+    # retroactively.
+    return storage
 
   onLeave: ({ vim, storage }) ->
-    { container } = storage
-    vim.window.setTimeout((->
-      container?.remove()
-    ), vim.options.hints_timeout)
+    vim.window.setTimeout(hints.removeHints.bind(null, vim.window),
+                          vim.options.hints_timeout)
     for key of storage
       storage[key] = null
+    return
 
   onInput: (args, match) ->
     { vim, storage } = args
@@ -131,7 +127,7 @@ mode('hints', {
 
     if match.type == 'full'
       match.command.run(args)
-    else if match.unmodifiedKey in vim.options.hint_chars
+    else if match.unmodifiedKey in vim.options.hint_chars and markers.length > 0
       matchedMarkers = []
 
       for marker in markers when marker.hintIndex == storage.numEnteredChars
@@ -161,7 +157,7 @@ mode('hints', {
   exit: ({ vim, storage }) ->
     # The hints are removed automatically when leaving the mode, but after a
     # timeout. When aborting the mode we should remove the hints immediately.
-    storage.container?.remove()
+    hints.removeHints(vim.window)
     vim.enterMode('normal')
 
   rotate_markers_forward: ({ storage }) ->
