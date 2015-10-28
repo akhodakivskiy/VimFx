@@ -36,37 +36,27 @@ injectButton = (vimfx) ->
     onCommand: (event) ->
       button = event.originalTarget
       window = button.ownerGlobal
-      mode = button.getAttribute('vimfx-mode')
-      if mode == 'normal'
+      return unless vim = vimfx.getCurrentVim(window)
+
+      if vim.mode == 'normal'
         help.injectHelp(window, vimfx)
       else
-        return unless vim = vimfx.getCurrentVim(window)
         vim.enterMode('normal')
-    onCreated: (node) ->
-      node.setAttribute('vimfx-mode', 'normal')
-
-      updateButton = (vimOrEvent) ->
-        window = vimOrEvent.window ? vimOrEvent.originalTarget.ownerGlobal
-        button = getButton(window)
-
-        # The 'modeChange' event provides the `vim` object that changed mode,
-        # but it might not be the current `vim` anymore, so always get the
-        # current instance.
-        return unless vim = vimfx.getCurrentVim(window)
-
-        button.setAttribute('vimfx-mode', vim.mode)
-        tooltip =
-          if vim.mode == 'normal'
-            translate('button.tooltip.normal')
-          else
-            translate('button.tooltip.other_mode',
-                      translate("mode.#{ vim.mode }"), translate('mode.normal'))
-        button.setAttribute('tooltiptext', tooltip)
-
-      vimfx.on('modeChange', updateButton)
-      vimfx.on('TabSelect', updateButton)
   })
   module.onShutdown(cui.destroyWidget.bind(cui, BUTTON_ID))
+
+  vimfx.on('modeDisplayChange', (vim) ->
+    { window } = vim
+    button = getButton(window)
+
+    tooltip =
+      if vim.mode == 'normal'
+        translate('button.tooltip.normal')
+      else
+        translate('button.tooltip.other_mode',
+                  translate("mode.#{ vim.mode }"), translate('mode.normal'))
+    button.setAttribute('tooltiptext', tooltip)
+  )
 
 getButton = (window) -> window.document.getElementById(BUTTON_ID)
 

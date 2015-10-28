@@ -23,7 +23,8 @@ In Ignore mode, the icon also turns red, like this: ![VimFx button icon red].
 whole point of Ignore mode is to “ignore” all of VimFx’s commands, passing your
 key presses to the page instead. It is helpful to know that you’re really in
 Ignore mode, so you can be confident that your key presses do what you expect
-them to.
+them to. (See [Styling] if you’d like to highlight Ignore mode, or any mode for
+that matter, some other way.)
 
 Other modes are easily detectable. You know that you’re in Find mode if the find
 bar is focued. If there are hint markers visible for the page, you’re in Hints
@@ -35,3 +36,4 @@ going on, look for VimFx’s toolbar button.** It can often help you.
 [VimFx button icon]: ../extension/skin/icon16.png
 [VimFx button icon red]: ../extension/skin/icon16-red.png
 [Blacklisted]: options.md#blacklist
+[Styling]: styling.md

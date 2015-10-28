@@ -60,6 +60,19 @@ module.exports = (data, reason) ->
 
   button.injectButton(vimfx)
 
+  onModeDisplayChange = (vimOrEvent) ->
+    window = vimOrEvent.window ? vimOrEvent.originalTarget.ownerGlobal
+
+    # The 'modeChange' event provides the `vim` object that changed mode, but it
+    # might not be the current `vim` anymore, so always get the current one.
+    return unless vim = vimfx.getCurrentVim(window)
+
+    window.document.documentElement.setAttribute('vimfx-mode', vim.mode)
+    vimfx.emit('modeDisplayChange', vim)
+
+  vimfx.on('modeChange', onModeDisplayChange)
+  vimfx.on('TabSelect',  onModeDisplayChange)
+
   # Setup the public API. See public.coffee for more information. This is done
   # _after_ the prefs observing setup, so that option prefs get validated and
   # used when calling `vimfx.set()`.
@@ -104,6 +117,7 @@ module.exports = (data, reason) ->
       windows.add(window)
       eventManager = new UIEventManager(vimfx, window)
       eventManager.addListeners(vimfx, window)
+      window.document.documentElement.setAttribute('vimfx-mode', 'normal')
 
     return [__SCRIPT_URI_SPEC__, MULTI_PROCESS_ENABLED]
   )

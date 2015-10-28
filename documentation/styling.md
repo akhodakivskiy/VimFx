@@ -63,3 +63,17 @@ To make the hint markers look like they did in version 0.5.x:
   color: #FFA22A !important;
 }
 ```
+
+Making the address bar red when in ignore mode (you may substiute “ignore” with
+any mode name below):
+
+```css
+#main-window[vimfx-mode="ignore"] #urlbar {
+    background: red !important;
+}
+```
+
+(While speaking of highlighting the current mode, you might be interested in
+reading about the [the `modeDisplayChange` event].)
+
+[the `modeDisplayChange` event]: api.md#the-modedisplaychange-event

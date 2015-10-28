@@ -27,7 +27,7 @@
     list-style-image: url(icon16.png);
 }
 
-#VimFxButton[vimfx-mode="ignore"] {
+#main-window[vimfx-mode="ignore"] #VimFxButton {
     list-style-image: url(icon16-red.png);
 }
 
@@ -36,8 +36,8 @@ toolbarpaletteitem[place="palette"] > #VimFxButton {
     list-style-image: url(icon32.png);
 }
 
-#VimFxButton[cui-areatype="menu-panel"][vimfx-mode="ignore"],
-toolbarpaletteitem[place="palette"] > #VimFxButton[vimfx-mode="ignore"] {
+#main-window[vimfx-mode="ignore"] #VimFxButton[cui-areatype="menu-panel"],
+#main-window[vimfx-mode="ignore"] toolbarpaletteitem[place="palette"] > #VimFxButton {
     list-style-image: url(icon32-red.png);
 }
 
@@ -46,7 +46,7 @@ toolbarpaletteitem[place="palette"] > #VimFxButton[vimfx-mode="ignore"] {
       list-style-image: url(icon32.png);
   }
 
-  #VimFxButton[vimfx-mode="ignore"] {
+  #main-window[vimfx-mode="ignore"] #VimFxButton {
       list-style-image: url(icon32-red.png);
   }
 
@@ -55,8 +55,8 @@ toolbarpaletteitem[place="palette"] > #VimFxButton[vimfx-mode="ignore"] {
       list-style-image: url(icon64.png);
   }
 
-  #VimFxButton[cui-areatype="menu-panel"][vimfx-mode="ignore"],
-  toolbarpaletteitem[place="palette"] > #VimFxButton[vimfx-mode="ignore"] {
+  #main-window[vimfx-mode="ignore"] #VimFxButton[cui-areatype="menu-panel"],
+  #main-window[vimfx-mode="ignore"] toolbarpaletteitem[place="palette"] > #VimFxButton {
       list-style-image: url(icon64-red.png);
   }
 }

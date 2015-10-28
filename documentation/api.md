@@ -249,6 +249,16 @@ Occurs whenever any tab in any window is selected. This is also fired when
 Firefox starts for the currently selected tab. The data passed to listeners is
 the `event` object passed to the standard Firefox [TabSelect] event.
 
+### The `modeDisplayChange` event
+
+This is basically a combination of the `modeChange` and the `TabSelect` events.
+The event is useful for knowing when to update UI showing the current mode. (In
+fact, VimFx itself uses it to update the toolbar [button]!) The data passed to
+listeners is the current [vim object].
+
+You can also highlight the current mode using [styling].
+
+
 ### `vimfx.modes`
 
 An object whose keys are mode names and whose values are [mode object]s.
@@ -546,7 +556,9 @@ and won’t be broken until VimFx 2.0.0.
 [`activatable_element_keys`]: options.md#activatable_element_keys
 [`adjustable_element_keys`]: options.md#adjustable_element_keys
 
+[button]: button.md
 [special keys]: shortcuts.md#special-keys
+[styling]: styling.md
 
 [defaults.coffee]: ../extension/lib/defaults.coffee
 [parse-prefs.coffee]: ../extension/lib/parse-prefs.coffee
