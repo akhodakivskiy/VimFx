@@ -27,6 +27,8 @@
 messageManager = require('./message-manager')
 utils          = require('./utils')
 
+ChromeWindow = Ci.nsIDOMChromeWindow
+
 class Vim
   constructor: (browser, @_parent) ->
     @_setBrowser(browser)
@@ -78,13 +80,13 @@ class Vim
 
   _isBlacklisted: (url) -> @options.black_list.some((regex) -> regex.test(url))
 
-  isFrameEvent: (event) ->
+  isUIEvent: (event) ->
     target = event.originalTarget
     return @_state.frameCanReceiveEvents and
       if MULTI_PROCESS_ENABLED
-        (target == @window.gBrowser.selectedBrowser)
+        (target != @window.gBrowser.selectedBrowser)
       else
-        not (target.ownerGlobal == @window)
+        (target.ownerGlobal instanceof ChromeWindow)
 
   # `args...` is passed to the mode's `onEnter` method.
   enterMode: (mode, args...) ->
@@ -105,8 +107,8 @@ class Vim
   _consumeKeyEvent: (event, focusType) ->
     return @_parent.consumeKeyEvent(event, this, focusType)
 
-  _onInput: (match, { isFrameEvent = false } = {}) ->
-    suppress = @_call('onInput', {isFrameEvent, count: match.count}, match)
+  _onInput: (match, uiEvent = false) ->
+    suppress = @_call('onInput', {uiEvent, count: match.count}, match)
     return suppress
 
   _onLocationChange: (url, { refresh = false } = {}) ->

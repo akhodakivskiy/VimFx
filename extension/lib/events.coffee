@@ -90,15 +90,15 @@ class UIEventManager
 
         return unless vim = @vimfx.getCurrentVim(@window)
 
-        if vim.isFrameEvent(event)
-          vim._listenOnce('consumeKeyEvent', ({ focusType }) =>
-            @consumeKeyEvent(vim, event, focusType, { isFrameEvent: true })
-            return @suppress
-          )
-        else
-          @consumeKeyEvent(vim, event, utils.getFocusType(event))
+        if vim.isUIEvent(event)
+          @consumeKeyEvent(vim, event, utils.getFocusType(event), event)
           # This also suppresses the 'keypress' event.
           utils.suppressEvent(event) if @suppress
+        else
+          vim._listenOnce('consumeKeyEvent', ({ focusType }) =>
+            @consumeKeyEvent(vim, event, focusType)
+            return @suppress
+          )
 
       catch error
         console.error(utils.formatError(error))
@@ -128,7 +128,7 @@ class UIEventManager
       # a text input, then that input will be focused, but you can’t type in it
       # (instead markers will be matched). So if the user clicks anything in
       # hints mode it’s better to leave it.
-      if vim.mode == 'hints' and not vim.isFrameEvent(event) and
+      if vim.mode == 'hints' and vim.isUIEvent(event) and
          # Exclude the VimFx button, though, since clicking it returns to normal
          # mode. Otherwise we’d first return to normal mode and then the button
          # would open the help dialog.
@@ -194,20 +194,19 @@ class UIEventManager
       @window.gBrowser.removeProgressListener(progressListener)
     )
 
-  consumeKeyEvent: (vim, event, focusType, options = {}) ->
+  consumeKeyEvent: (vim, event, focusType, uiEvent = false) ->
     match = vim._consumeKeyEvent(event, focusType)
     switch
       when not match
         @suppress = null
       when match.specialKeys['<late>']
         @suppress = false
-        @consumeLateKeydown(vim, event, match, options)
+        @consumeLateKeydown(vim, event, match, uiEvent)
       else
-        @suppress = vim._onInput(match, options)
+        @suppress = vim._onInput(match, uiEvent)
     @setHeldModifiers(event)
 
-  consumeLateKeydown: (vim, event, match, options) ->
-    { isFrameEvent = false } = options
+  consumeLateKeydown: (vim, event, match, uiEvent) ->
     @late = true
 
     # The passed in `event` is the regular non-late browser UI keydown event.
@@ -222,19 +221,19 @@ class UIEventManager
         if defaultPrevented
           false
         else
-          vim._onInput(match, options)
+          vim._onInput(match, uiEvent)
       @setHeldModifiers(event)
       return @suppress
 
-    if isFrameEvent
-      vim._listenOnce('lateKeydown', listener)
-    else
+    if uiEvent
       @listenOnce('keydown', ((lateEvent) =>
         listener(lateEvent)
         if @suppress
           utils.suppressEvent(lateEvent)
           @listenOnce('keyup', utils.suppressEvent, false)
       ), false)
+    else
+      vim._listenOnce('lateKeydown', listener)
 
   setHeldModifiers: (event, { filterCurrentOnly = false } = {}) ->
     mainWindow = @window.document.documentElement

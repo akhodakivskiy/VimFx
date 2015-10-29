@@ -61,7 +61,7 @@ mode('normal', {
     help.removeHelp(vim.window)
 
   onInput: (args, match) ->
-    { vim, storage, isFrameEvent } = args
+    { vim, storage, uiEvent } = args
     { keyStr } = match
 
     autoInsertMode = (match.focus != null)
@@ -83,21 +83,29 @@ mode('normal', {
 
     # At this point the match is either full, partial or part of a count. Then
     # we always want to suppress, except for one case: The Escape key.
-    #
-    # - It allows for stopping the loading of the page.
-    # - It allows for closing many custom dialogs (and perhaps other things
-    #   -- Esc is a very commonly used key).
-    # - It is not passed if Esc is used for `command.esc` and we’re blurring
-    #   an element. That allows for blurring an input in a custom dialog
-    #   without closing the dialog too.
-    # - There are two reasons we might suppress it in other modes. If some
-    #   custom dialog of a website is open, we should be able to cancel hint
-    #   markers on it without closing it. Secondly, otherwise cancelling hint
-    #   markers on Google causes its search bar to be focused.
-    # - It may only be suppressed in web pages, not in browser chrome. That
-    #   allows for resetting the location bar when blurring it, and closing
-    #   dialogs such as the “bookmark this page” dialog (<c-d>).
-    return not (keyStr == '<escape>' and not (isFrameEvent and autoInsertMode))
+    return true unless keyStr == '<escape>'
+
+    # Passing Escape through allows for stopping the loading of the page and
+    # closing many custom dialogs (and perhaps other things; Escape is a very
+    # commonly used key).
+    if uiEvent
+      # In browser UI the biggest reasons are allowing to reset the location bar
+      # when blurring it, and closing dialogs such as the “bookmark this page”
+      # dialog (<c-d>). However, an exception is made for the dev tools (<c-K>).
+      # There, trying to unfocus the dev tools using Escape would annoyingly
+      # open the split console.
+      return uiEvent.originalTarget.ownerGlobal.DevTools?
+    else
+      # In web pages content, an exception is made if we’re in autoInsertMode.
+      # That allows for blurring an input in a custom dialog without closing the
+      # dialog too.
+      return autoInsertMode
+
+    # Note that this special handling of Escape is only used in normal mode.
+    # There are two reasons we might suppress it in other modes. If some custom
+    # dialog of a website is open, we should be able to cancel hint markers on
+    # it without closing it. Secondly, otherwise cancelling hint markers on
+    # Google causes its search bar to be focused.
 
 }, commands)
 

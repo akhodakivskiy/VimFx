@@ -365,8 +365,8 @@ Whatever is returned from `onEnter` will be returned from
 
 The object passed to this method (see above) also has the following properties:
 
-- isFrameEvent: `Boolean`. `true` if the event occured in web page content,
-  `false` otherwise (if the event occured in the browser UI).
+- uiEvent: `Event` or `false`. The keydown event object if the event occured in
+  the browser UI, `false` otherwise (if the event occured in web page content).
 - count: `Number`. The count for the command. `undefined` if no count. (This is
   simply a copy of `match.count`. `match` is defined below.)
 
@@ -490,8 +490,8 @@ A `vim` object has the following properties:
   `undefined` is returned. Otherwise it us up to the mode to return whatever it
   wants to.
 
-- isFrameEvent(event): `Function`. Returns `true` if `event` occurred in web
-  page content, and `false` otherwise (if it occurred in Firefox’s UI).
+- isUIEvent(event): `Function`. Returns `true` if `event` occurred in the
+  browser UI, and `false` otherwise (if it occurred in web page content).
 
 - notify(title, options = {}): `Function`. Display a notification with the title
   `title` (a `String`). If you need more text than a title, use `options.body`.
