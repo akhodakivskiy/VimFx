@@ -95,8 +95,9 @@ module.exports = (data, reason) ->
   # disabled and then enabled) in the middle of the session. Because of the
   # latter case, `Cu.unload(apiUrl)` is not called on shutdown. Otherwise you’d
   # have to either restart Firefox, or disable and enable every add-on using the
-  # API in order for them to take effect again.
-  if publicScope._callbacks.length > 0
+  # API in order for them to take effect again. (`_callbacks` should always
+  # exist, but it’s better to be safe than sorry.)
+  if publicScope._callbacks?.length > 0
     publicScope._invokeCallback((api) ->
       callback(api) for callback in publicScope._callbacks
       return
