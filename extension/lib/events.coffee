@@ -140,39 +140,43 @@ class UIEventManager
 
     @listen('TabOpen', (event) =>
       browser = @window.gBrowser.getBrowserForTab(event.originalTarget)
+      focusedWindow = utils.getCurrentWindow()
+
+      # If a tab is opened in another window than the focused window, it might
+      # mean that a tab has been dragged to it from the focused window. Unless
+      # that’s the case, do nothing.
+      return if @window == focusedWindow
 
       if MULTI_PROCESS_ENABLED
-        unless @vimfx.vims.has(browser)
-          # If a tab is opened, but there’s no `vim` instance for it, it means
-          # that the tab has been dragged from another window. In such cases, a
-          # new `<browser>` is created but the page is not refreshed and the
-          # same frame script is re-used. The window the tab was dragged _from_
-          # is still the current window, and the tab’s `vim` instance is the
-          # current one there. Grab it and update its `.browser`.
-          vim = @vimfx.getCurrentVim(utils.getCurrentWindow())
-          vim._setBrowser(browser)
-          @vimfx.vims.set(browser, vim)
+        # In multi-process, tabs dragged to new windows re-use the frame script.
+        # This means that no new `vim` instance is created (which is good since
+        # state is kept). A new `<browser>` is created, though. So if we’re
+        # already tracking this `<browser>` there’s nothing to do.
+        return if @vimfx.vims.has(browser)
 
-          # For some reason, three 'onLocationChange' events will fire for this
-          # tab now, all of which are unwanted because the location didn’t
-          # really change. Otherwise another mode might be entered based on the
-          # “changed” URL. The mode should not change when dragging a tab to
-          # another window.
-          @locationState.numToSkip = 3
+        # Grab the current `vim` (which corresponds to the dragged tab) from the
+        # focused window and update its `.browser`.
+        vim = @vimfx.getCurrentVim(focusedWindow)
+        vim._setBrowser(browser)
+        @vimfx.vims.set(browser, vim)
+
+        # For some reason, three 'onLocationChange' events will fire for this
+        # tab now, all of which are unwanted because the location didn’t really
+        # change. Otherwise another mode might be entered based on the “changed”
+        # URL. The mode should not change when dragging a tab to another window.
+        @locationState.numToSkip = 3
+
       else
-        # In non-multi-process, a new frame script is created, which means that
-        # a new `vim` instance is created as well, and also that all state for
-        # the page is lost. The best we can do is to copy over the mode.
+        # In non-multi-process, a new frame script _is_ created, which means
+        # that a new `vim` instance is created as well, and also that all state
+        # for the page is lost. The best we can do is to copy over the mode.
         vim = @vimfx.vims.get(browser)
+        oldVim = @vimfx.getCurrentVim(focusedWindow)
+        vim._state.lastUrl = oldVim._state.lastUrl
+        vim.enterMode(oldVim.mode)
 
-        # If the new tab was opened in a background window it most likely means
-        # that a tab was dragged there.
-        unless @window == utils.getCurrentWindow()
-          oldVim = @vimfx.getCurrentVim(utils.getCurrentWindow())
-          vim._state.lastUrl = oldVim._state.lastUrl
-          vim.enterMode(oldVim.mode)
-          # In non-multi-process, the magic number seems to be four.
-          @locationState.numToSkip = 4
+        # In non-multi-process, the magic number seems to be four.
+        @locationState.numToSkip = 4
     )
 
     progressListener =
