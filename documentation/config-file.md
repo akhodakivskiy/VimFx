@@ -28,12 +28,12 @@ add-on, that makes use of VimFx’s [public API].
 ## Setup
 
 1. Create a directory for your config file to live in. Actually, there will be
-   _two_ files that will live in it.
+   _three_ files that will live in it.
 
 2. Create an [install.rdf] file in your directory. Inside that file there is an
    extension ID; take note of it.
 
-3. Create a [bootstrap.js] file in your directory.
+3. Create a [bootstrap.js] and a [vimfx.js] file in your directory.
 
 4. Find the `extensions/` directory in your [profile directory].
 
@@ -50,8 +50,9 @@ add-on, that makes use of VimFx’s [public API].
 
 6. Restart Firefox.
 
-7. Open the [browser console]. If you copied the bootstrap.js template below,
-   you should see a greeting and an inspection of VimFx’s public API.
+7. Open the [browser console]. If you copied the [bootstrap.js] and [vimfx.js]
+   templates below, you should see a greeting and an inspection of VimFx’s
+   public API.
 
 Any time you make changes to any of your add-on files you need to restart
 Firefox to make the changes take effect.
@@ -61,6 +62,7 @@ Commands] wiki page.
 
 [install.rdf]: #installrdf
 [bootstrap.js]: #bootstrapjs
+[vimfx.js]: #vimfxjs
 [profile directory]: https://support.mozilla.org/en-US/kb/profiles-where-firefox-stores-user-data
 [proxy files]: https://developer.mozilla.org/en-US/Add-ons/Setting_up_extension_development_environment#Firefox_extension_proxy_file
 [browser console]: https://developer.mozilla.org/en-US/docs/Tools/Browser_Console
@@ -108,9 +110,12 @@ You might also want to read the [install.rdf documentation].
 
 ## bootstrap.js
 
-This is the actual config file, written in JavaScript.
+This file starts up your add-on. Just like [install.rdf], you’ll probably look
+at this once and not touch it again.
 
-Here is a boilerplate that you can copy as is:
+Here is a boilerplate that you can copy as is. All it does is loading VimFx’s
+public API, as well as some very commonly used Firefox APIs, and passing those
+to [vimfx.js].
 
 ```js
 function startup() {
@@ -120,14 +125,21 @@ function startup() {
   let apiPref = 'extensions.VimFx.api_url'
   let apiUrl = Services.prefs.getComplexValue(apiPref, Ci.nsISupportsString).data
   Cu.import(apiUrl, {}).getAPI(vimfx => {
-
-    // Do things with the `vimfx` object between this line
-    console.log('Hello, world! This is vimfx:', vimfx)
-    // and this line.
-
+    let path = __SCRIPT_URI_SPEC__.replace('bootstrap.js', 'vimfx.js')
+    let scope = {Cc, Ci, Cu, vimfx}
+    Services.scriptloader.loadSubScript(path, scope, 'UTF-8')
   })
 }
 function shutdown() {}
 function install() {}
 function uninstall() {}
+```
+
+
+## vimfx.js
+
+This is the actual config file, written in JavaScript.
+
+```js
+console.log('Hello, world! This is vimfx:', vimfx)
 ```
