@@ -118,8 +118,8 @@ public API, as well as some very commonly used Firefox APIs, and passing those
 to [vimfx.js].
 
 ```js
+let {classes: Cc, interfaces: Ci, utils: Cu} = Components
 function startup() {
-  let {classes: Cc, interfaces: Ci, utils: Cu} = Components
   Cu.import('resource://gre/modules/Services.jsm')
   Cu.import('resource://gre/modules/devtools/Console.jsm')
   let apiPref = 'extensions.VimFx.api_url'
@@ -142,4 +142,75 @@ This is the actual config file, written in JavaScript.
 
 ```js
 console.log('Hello, world! This is vimfx:', vimfx)
+```
+
+
+## Custom commands that access web page content
+
+If you plan to add custom commands that need to access web page content, you
+have to add two more files and make an adjustment to bootstrap.js.
+
+### bootstrap.js adjustment
+
+In bootstrap.js there is one function called `startup` and one called
+`shutdown`. At the end of the `startup` function, add the following:
+
+```js
+Cc['@mozilla.org/globalmessagemanager;1']
+  .getService(Ci.nsIMessageListenerManager)
+  .loadFrameScript('chrome://vimfx-custom/content/frame.js', true)
+```
+
+Inside the `shutdown` function, add the following:
+
+```js
+Cc['@mozilla.org/globalmessagemanager;1']
+  .getService(Ci.nsIMessageListenerManager)
+  .removeDelayedFrameScript('chrome://vimfx-custom/content/frame.js')
+```
+
+That will load a so called “frame script,” named [frame.js] in our case, and
+unload it when your add-on shuts down.
+
+[frame.js]: #framejs
+
+### chrome.manifest
+
+In order for Firefox to be able to find [frame.js], you need to add a file
+called `chrome.manifest` with the following contents:
+
+```js
+content vimfx-custom ./
+```
+
+[frame.js]: #framejs
+
+### frame.js
+
+Finally you of course need to add the file frame.js itself. Add any code that
+needs access web page content inside this file.
+
+### Example
+
+Here’s a typical pattern used in custom commands that communicate with a frame
+script:
+
+```js
+let {messageManager} = vim.window.gBrowser.selectedBrowser
+let callback = ({data: {selection}}) => {
+  messageManager.removeMessageListener('VimFx-custom:selection', callback)
+  console.log('Currently selected text:', selection)
+}
+messageManager.addMessageListener('VimFx-custom:selection', callback)
+messageManager.sendAsyncMessage('VimFx-custom:getSelection', {exampleValue: 1337})
+```
+
+And here’s some accompaning frame script code:
+
+```js
+addMessageListener('VimFx-custom:getSelection', ({data: {exampleValue}}) => {
+  console.log('exampleValue should be 5:', exampleValue)
+  let selection = content.getSelection().toString()
+  sendAsyncMessage('VimFx-custom:selection', {selection})
+})
 ```
