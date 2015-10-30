@@ -47,7 +47,8 @@ injectButton = (vimfx) ->
 
   vimfx.on('modeDisplayChange', (vim) ->
     { window } = vim
-    button = getButton(window)
+    # When the browser starts, the button might not be available yet.
+    return unless button = getButton(window)
 
     tooltip =
       if vim.mode == 'normal'
