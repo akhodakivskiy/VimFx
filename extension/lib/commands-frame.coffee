@@ -90,7 +90,8 @@ commands.follow = ({ vim, storage }) ->
       when isTextInputElement(element) or isContentEditable(element)
         type = 'text'
       when element.tabIndex > -1 and
-           not (isXUL and element.nodeName.endsWith('box'))
+           not (isXUL and element.nodeName.endsWith('box') and
+                element.nodeName != 'checkbox')
         type = 'clickable'
         unless isXUL or element.nodeName in ['A', 'INPUT', 'BUTTON']
           semantic = false
