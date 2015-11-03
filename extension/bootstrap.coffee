@@ -23,16 +23,15 @@
 # for frame scripts. It defines a few global variables, and sets up a
 # Node.js-style `require` module loader.
 
-# Expose `Components` shortcuts a well as `Services`, `console` and
-# `IS_FRAME_SCRIPT` in all modules. The `@`s are needed for frame scripts.
-{ classes: @Cc, interfaces: @Ci, utils: @Cu } = Components
-
-Cu.import('resource://gre/modules/Services.jsm')
-Cu.import('resource://gre/modules/devtools/Console.jsm')
-
-@IS_FRAME_SCRIPT = (typeof content != 'undefined')
+# `bootstrap.js` files of different add-ons do _not_ share scope. However, frame
+# scripts for the same `<browser>` but from different add-ons _do_ share scope.
+# In order not to pollute that global scope in frame scripts, everything is done
+# in an IIFE here, and the `global` variable is handled with care.
 
 do (global = this) ->
+
+  { classes: Cc, interfaces: Ci, utils: Cu } = Components
+  IS_FRAME_SCRIPT = (typeof content != 'undefined')
 
   if IS_FRAME_SCRIPT
     # Tell the main process that this frame script was created, and get data
@@ -43,13 +42,24 @@ do (global = this) ->
     # an error and no message was received at all).
     return unless data
 
-    [ global.__SCRIPT_URI_SPEC__, global.MULTI_PROCESS_ENABLED ] = data
-    global.FRAME_SCRIPT_ENVIRONMENT = global
+    FRAME_SCRIPT_ENVIRONMENT = global
+    global = {}
+    [ global.__SCRIPT_URI_SPEC__, MULTI_PROCESS_ENABLED ] = data
+
+  else
+    # Make `Services` and `console` available globally, just like they are in
+    # frame scripts by default.
+    Cu.import('resource://gre/modules/Services.jsm')
+    Cu.import('resource://gre/modules/devtools/Console.jsm')
+
+    FRAME_SCRIPT_ENVIRONMENT = null
+    MULTI_PROCESS_ENABLED =
+      Services.prefs.getBoolPref('browser.tabs.remote.autostart')
 
   shutdownHandlers = []
 
   createURI = (path, base = null) -> Services.io.newURI(path, null, base)
-  baseURI   = createURI(__SCRIPT_URI_SPEC__)
+  baseURI   = createURI(global.__SCRIPT_URI_SPEC__)
 
   # Everything up to the first `!` is the absolute path to the .xpi.
   dirname = (uri) -> uri.match(///^ [^!]+!/ (.+) /[^/]+ $///)[1]
@@ -70,10 +80,12 @@ do (global = this) ->
       module =
         exports:    {}
         onShutdown: Function::call.bind(Array::push, shutdownHandlers)
-      require.scopes[fullPath] = scope =
+      require.scopes[fullPath] = scope = {
         require: (path) -> require(path, moduleRoot, "./#{ dirname(fullPath) }")
-        module:  module
-        exports: module.exports
+        module, exports: module.exports
+        Cc, Ci, Cu
+        MULTI_PROCESS_ENABLED, IS_FRAME_SCRIPT, FRAME_SCRIPT_ENVIRONMENT
+      }
       Services.scriptloader.loadSubScript(fullPath, scope, 'UTF-8')
 
     return require.scopes[fullPath].module.exports
@@ -87,8 +99,6 @@ do (global = this) ->
     migrations          = require('./lib/migrations')
     prefs               = require('./lib/prefs')
 
-    global.MULTI_PROCESS_ENABLED =
-      prefs.root.get('browser.tabs.remote.autostart')
     prefs.default._init()
     applyMigrations(migrations)
 
@@ -117,11 +127,11 @@ do (global = this) ->
   global.uninstall = ->
 
   if IS_FRAME_SCRIPT
-    startup()
+    global.startup()
 
     # When updating the add-on, the previous version is going to shut down at
     # the same time as the new version starts up. Add the shutdown listener in
     # the next tick to prevent the previous version from triggering it.
     content.setTimeout((->
-      require('./lib/message-manager').listenOnce('shutdown', shutdown)
+      require('./lib/message-manager').listenOnce('shutdown', global.shutdown)
     ), 0)
