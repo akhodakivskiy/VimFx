@@ -291,16 +291,16 @@ commands.move_focus = ({ vim, storage, direction }) ->
 
   utils.moveFocus(direction)
 
-commands.esc = ({ vim }) ->
-  utils.blurActiveElement(vim.content)
+commands.esc = (args) ->
+  commands.blur_active_element(args)
 
-  { document } = vim.content
+  { document } = args.vim.content
   if document.exitFullscreen
     document.exitFullscreen()
   else
     document.mozCancelFullScreen()
 
 commands.blur_active_element = ({ vim }) ->
-  utils.blurActiveElement(vim.content)
+  utils.blurActiveElement(vim.content, vim.state.scrollableElements)
 
 module.exports = commands

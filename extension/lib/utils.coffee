@@ -96,11 +96,12 @@ getActiveElement = (window) ->
   else
     return activeElement
 
-blurActiveElement = (window) ->
+blurActiveElement = (window, extraAllowedElements = null) ->
   # Only blur focusable elements, in order to interfere with the browser as
   # little as possible.
   activeElement = getActiveElement(window)
-  if activeElement and activeElement.tabIndex > -1
+  if activeElement and
+     (activeElement.tabIndex > -1 or extraAllowedElements?.has(activeElement))
     activeElement.blur()
 
 blurActiveBrowserElement = (vim) ->
