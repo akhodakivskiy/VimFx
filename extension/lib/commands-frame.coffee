@@ -43,9 +43,13 @@ commands.scroll = (args) ->
   { vim, method, type, direction, amount, property, smooth } = args
   activeElement = utils.getActiveElement(vim.content)
   document = activeElement.ownerDocument
-  element =
-    if vim.state.scrollableElements.has(activeElement)
+  element = switch
+    when vim.state.scrollableElements.has(activeElement)
       activeElement
+    # In quirks mode (when the page lacks a doctype) `<body>` is considered the
+    # root element rather than `<html>`.
+    when document.compatMode == 'BackCompat' and document.body?
+      document.body
     else
       document.documentElement
 
@@ -57,10 +61,6 @@ commands.scroll = (args) ->
   options.behavior = 'smooth' if smooth
 
   element[method](options)
-  # When scrolling the whole page, the body sometimes needs to be scrolled
-  # too.
-  if element == document.documentElement
-    document.body?[method](options)
 
 # Combine links with the same href.
 combine = (hrefs, element, wrapper) ->
