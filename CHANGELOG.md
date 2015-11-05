@@ -1,3 +1,193 @@
+### 0.6.0 (Unreleased)
+
+##### Most important (breaking) changes
+
+- VimFx now works properly with **any keyboard layout.** Users of **multiple
+  layouts** should enable the **[ignore keyboard layout] option.** #249 #259
+
+- Features related to disabling VimFx, and to the [toolbar button]:
+
+  - **Insert Mode** has been renamed to **_Ignore_ mode.**
+  - **[Blacklisted][blacklist] sites** now **enter Ignore mode automatically,**
+    instead of being specially handled.
+  - The feature to click the toolbar button (or press `<a-V>`) to **disable
+    VimFx** has been **removed.** Use **Ignore mode** (`i`) and the
+    **[blacklist] instead.**
+  - The **toolbar button** is now **red in Ignore mode** (which also means that
+    it is red on blacklisted sites) and green otherwise (never grey anymore).
+  - The toolbar button no longer offers to (un-)blacklist the current domain.
+    (Head into VimFx’s settings page in the Add-ons Manager and add
+    `*currentdomain.com*` to the [blacklist] option yourself instead.)
+
+  (See [commit 3552282] for more information.)
+
+- **Some default shortcuts have changed,** mostly because they conflicted with
+  standard Firefox shortcuts: #308
+
+  - `<c-J>` → `gJ`
+
+  - `<c-K>` → `gK`
+
+  - `g^` and `gH` → `g0`
+
+    `g^` now selects the first _non pinned_ tab instead, while `g0`
+    selects the first tab regardless of whether it is pinned or not. #317
+
+  - `<c-e>` (alias for `j`) and `<c-y>` (alias for `k`) have been removed.
+
+  - `<c-f>` → `<space>` and `<c-b>` → `<s-space>`
+
+  - `vf` → `zf`
+
+    This frees up `v` for future shortcuts (instead making `z` a
+    “namespace” key, just like in Vim).
+
+  - To **exit Ignore mode:** `<escape>` → `<s-escape>`. This is because Ignore
+    mode has replaced the disable feature, as well as the special blacklist
+    state (see above). Sites are likely to use `<escape>` but not `<s-escape>`.
+    (In a way, this new role of Ignore mode also means that the old (many times
+    broken) shortcut to disable VimFx (`<a-V>`) has been replaced by `i`.) #64
+    \#375 #432
+
+- VimFx’s Keyboard Shortcuts help dialog is now help only, and more accessible.
+  To **customize keyboard shortcuts,** go to VimFx’s settings page **in the
+  Add-ons Manager,** just like you would to customize other settings. Also,
+  **commas** between every key are **no longer needed:** Type `gJ` instead of
+  `g,J`.
+
+- For performance reasons, **Hint markers** are now placed vertically **centered
+  instead of at the top** of the element. Don’t be surprised if you see the same
+  hint repeated several times**—links that go to the same place now get the same
+  hint.** The “Smart hints” option has been removed—hints are _always_ smart
+  now, and a lot smarter than before. Finally, hints now also work in the new
+  tab page, the Add-ons Manager and the preferences page. If you want to, you
+  can read more about [the `f` commands]. \#51 #60 #176 #320 #325 #468 #471 #475
+
+- The **`F`** command now _always_ opens tabs in new **background** tabs, while
+  **`gf`** has been added to open tabs in new **foreground** tabs. #227 #464
+
+- **Autofocus prevention** is now **off by default.** One of VimFx’s core
+  philosophies is to be nice to your browser habits. Some find autofocus
+  prevention too big a change. Turn it on again if you like it! By the way,
+  autofocus prevention now works much more reliably and should not cause issues
+  with other extensions. #497 #541
+
+- The **“Scroll step”** option has been **removed**. The scrolling commands that
+  used it now **work like the arrow keys instead,** and are customized just like
+  them. See [scrolling prefs] for more information.
+
+- Speaking of scrolling, **which elements scrolls** when you use VimFx’s
+  scrolling commands **has changed.** See [scrolling commands] for more
+  information.
+
+##### New features
+
+- New commands:
+
+  - `gp` pins or unpins the current tab. (Also see `g^` and `g0` mentioned
+    above.) #121
+  - `yt` duplicates the current tab. #121
+  - `0` and `^` scroll to the far left, and `$` scrolls to the far right.
+  - [`gi`] has finally been implemented. #47
+  - [Ignore mode `<s-f1>`] let you run a Normal mode command without exiting
+    Ignore mode.
+
+- In Hints mode you can now hold ctrl and alt to change behavior of the matched
+  marker. Hold shift to temporarily make the hints see-through. See [the `f`
+  commands] for more information. #220 #421 #484
+
+- Some commands now accept [counts]. #374
+
+- It is now possible to create shortcuts that work inside text inputs. See the
+  [`<force>`] key for more information. #258
+
+- It is now possible to create shortcuts that the page can override. See the
+  [`<late>`] key for more information.
+
+- A number of [advanced options] have been added. Rather than listing everything
+  regarding them here, follow that link if you’re interested. #452 #489
+
+- You may now, if you want to, configure VimFx through a [config file], using
+  the new [public API]. Customizing VimFx through a config file also gives extra
+  abilites, such as [site-specific options][option-overrides] and [disabling
+  certain commands on certain sites][key-overrides]. It also allows to add
+  [custom commands] \(and other extensions to extend VimFx). #158 #235 #255 #261
+  \#300 #408 #445 #490 #515
+
+- It is now easier to customize VimFx through custom [styling]. An example is
+  changing the way hint markers look. #220 #233 #424 #432 #465
+
+- VimFx now has [documentation] and a [wiki].
+
+- A few new locales were added:
+
+  - fr. Thanks to Mickaël RAYBAUD-ROIG (@m-r-r)!
+  - pt-BR. Thanks to Átila Camurça Alves (@atilacamurca)!
+  - sv-SE. Thanks to Andreas Lindhé (@lindhe)!
+
+##### Improvements
+
+- VimFx is now multi-process/Electrolysis/e10s compatible! This means that you
+  can run VimFx on a version of Firefox with multi-process enabled without
+  issues, and that we’re future proof for the day when Firefox becomes
+  multi-process by default. Best of all, it also made VimFx more reliable in
+  non-multi-process (“regular”) Firefox. #378
+
+- The `[` and `]` commands are now smarter, recognizing more links to the
+  previous/next page correctly. You may read more about [previous/next page
+  patterns]. #396
+
+- The `n` and `N` commands now notify you when they wrap around the page, or the
+  phrase you searched for could not be found. #398
+
+- _All_ shortcuts in _all modes_ can now be customized. For example, this allows
+  you to disable VimFx’s Vim-style `<enter>` behavior in the find bar. #222 #390
+  \#421
+
+- The `p` and `P` commands are now smarter regarding whether to treat the
+  clipboard contents as a URL or a search, by working exactly like pasting in
+  the address bar. They also now read the selection clipboard, if available.
+  \#353 #382
+
+- VimFx’s toolbar button is now properly implemented. #303 #349 #383
+
+- Most locales were updated. Thanks to our awesome [translators]!
+
+##### Minor bug fixes
+
+- VimFx now works correctly in tabs dragged to other windows. #57
+- The `p` command is no longer broken. #494
+- Non-ASCII shortcut keys now work properly. #433
+- The Keyboard Shortcuts help dialog can no longer be covered by page elements.
+  \#477
+- Hint markers can no longer be covered by page elements.
+- VimFx no longer causes scripts on icloud.com to get stuck in an infinite loop.
+  \#389
+
+[advanced options]: https://github.com/akhodakivskiy/VimFx/blob/c790b0fc1127c66bb7b33ccbaf4c0e8090e5530b/documentation/options.md#advanced-options
+[blacklist]: https://github.com/akhodakivskiy/VimFx/blob/c790b0fc1127c66bb7b33ccbaf4c0e8090e5530b/documentation/options.md#blacklist
+[ignore keyboard layout]: https://github.com/akhodakivskiy/VimFx/blob/c790b0fc1127c66bb7b33ccbaf4c0e8090e5530b/documentation/options.md#ignore-keyboard-layout
+[previous/next page patterns]: https://github.com/akhodakivskiy/VimFx/blob/c790b0fc1127c66bb7b33ccbaf4c0e8090e5530b/documentation/options.md#previousnext-page-patterns
+[scrolling prefs]: https://github.com/akhodakivskiy/VimFx/blob/c790b0fc1127c66bb7b33ccbaf4c0e8090e5530b/documentation/options.md#scrolling-prefs
+[counts]: https://github.com/akhodakivskiy/VimFx/blob/c790b0fc1127c66bb7b33ccbaf4c0e8090e5530b/documentation/commands.md#counts
+[`gi`]: https://github.com/akhodakivskiy/VimFx/blob/c790b0fc1127c66bb7b33ccbaf4c0e8090e5530b/documentation/commands.md#gi-1
+[Ignore mode `<s-f1>`]: https://github.com/akhodakivskiy/VimFx/blob/c790b0fc1127c66bb7b33ccbaf4c0e8090e5530b/documentation/commands.md#ignore-mode-s-f1
+[scrolling commands]: https://github.com/akhodakivskiy/VimFx/blob/c790b0fc1127c66bb7b33ccbaf4c0e8090e5530b/documentation/commands.md#scrolling-commands-1
+[the `f` commands]: https://github.com/akhodakivskiy/VimFx/blob/c790b0fc1127c66bb7b33ccbaf4c0e8090e5530b/documentation/commands.md#the-f-commands-1
+[`<force>`]: https://github.com/akhodakivskiy/VimFx/blob/c790b0fc1127c66bb7b33ccbaf4c0e8090e5530b/documentation/shortcuts.md#force
+[`<late>`]: https://github.com/akhodakivskiy/VimFx/blob/c790b0fc1127c66bb7b33ccbaf4c0e8090e5530b/documentation/shortcuts.md#late
+[config file]: https://github.com/akhodakivskiy/VimFx/blob/c790b0fc1127c66bb7b33ccbaf4c0e8090e5530b/documentation/config-file.md
+[public api]: https://github.com/akhodakivskiy/VimFx/blob/c790b0fc1127c66bb7b33ccbaf4c0e8090e5530b/documentation/api.md
+[option-overrides]: https://github.com/akhodakivskiy/VimFx/blob/c790b0fc1127c66bb7b33ccbaf4c0e8090e5530b/documentation/api.md#vimfxaddoptionoverridesrules
+[key-overrides]: https://github.com/akhodakivskiy/VimFx/blob/c790b0fc1127c66bb7b33ccbaf4c0e8090e5530b/documentation/api.md#vimfxaddkeyoverridesrules
+[styling]: https://github.com/akhodakivskiy/VimFx/blob/c790b0fc1127c66bb7b33ccbaf4c0e8090e5530b/documentation/styling.md
+[toolbar button]: https://github.com/akhodakivskiy/VimFx/blob/c790b0fc1127c66bb7b33ccbaf4c0e8090e5530b/documentation/styling.md
+[translators]: https://github.com/akhodakivskiy/VimFx/blob/c790b0fc1127c66bb7b33ccbaf4c0e8090e5530b/PEOPLE.md#translators
+[documentation]: https://github.com/akhodakivskiy/VimFx/blob/c790b0fc1127c66bb7b33ccbaf4c0e8090e5530b/documentation/
+[wiki]: https://github.com/akhodakivskiy/VimFx/wiki/
+[custom commands]: https://github.com/akhodakivskiy/VimFx/wiki/Custom-Commands
+[commit 3552282]: https://github.com/akhodakivskiy/VimFx/commit/355228217d7e7a61f5e1edbb9efbfb0f3e4ef81c
+
 ### 0.5.17 (2015-01-23)
 
 - Fixed: The hints generation no longer crashes on some pages (regression since
