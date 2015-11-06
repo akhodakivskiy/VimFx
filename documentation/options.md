@@ -106,13 +106,14 @@ you), which makes it safe to prevent all focusing in those time spans.
 If you use more than one keyboard layout, you probably want to enable this
 option.
 
-People who use a keyboard layout without the letters A-Z usually also use the
+People who use a keyboard layout _without_ the letters A–Z usually also use the
 standard en-US QWERTY layout as well.
 
 This option makes VimFx ignore your current layout and pretend that the standard
-en-US QWERTY layout is always used. This way the default shortcuts work even if
-your layout doesn’t contain the letters A-Z and all shorcuts can be typed by the
-same physical keys on your keyboard regardless of your current keyboard layout.
+en-US QWERTY layout is _always_ used. This way the default shortcuts work even
+if your layout doesn’t contain the letters A–Z and all shorcuts can be typed by
+the same physical keys on your keyboard regardless of your current keyboard
+layout.
 
 (If you’d like VimFx to pretend that some other keyboard layout than the
 standard en-US QWERTY is always used, you may do so with the special option

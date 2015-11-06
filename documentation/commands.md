@@ -76,7 +76,7 @@ Explained in its own section below.
 
 Firefox lets you scroll with the arrow keys, page down, page up, home, end and
 space by default. VimFx provides similar scrolling commands (and actually
-overrides space), but they work a little bit differently.
+overrides `<space>`), but they work a little bit differently.
 
 They scroll _the currently focused element._ If the currently focused element
 isn’t scrollable, or there is no (apparent) currently focused element, the
@@ -192,8 +192,13 @@ tab instead, as if you’d used the `f` command. Holding alt toggles whether to
 open tabs in the background or foreground—it makes `F` work like `gf`, and `gf`
 like `F`.
 
+(Also see the advanced prefs [hints\_toggle\_in\_tab] and
+[hints\_toggle\_in\_background].)
+
 [hint chars]: options.md#hint-chars
 [Styling]: styling.md
+[hints\_toggle\_in\_tab]: options.md#hints_toggle_in_tab
+[hints\_toggle\_in\_background]: options.md#hints_toggle_in_background
 
 
 ## Ignore mode `<s-f1>`

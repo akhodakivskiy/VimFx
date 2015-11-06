@@ -541,7 +541,7 @@ might break with new VimFx versions.
 As soon as VimFx 1.0.0 is released backwards compatibility will be a priority
 and won’t be broken until VimFx 2.0.0.
 
-[option overrides]: #vimfxaddOptionOverridesrules
+[option overrides]: #vimfxaddoptionoverridesrules
 [categories]: #vimfxgetcategories
 [`vimfx.modes`]: #vimfxmodes
 [onInput]: #oninput
