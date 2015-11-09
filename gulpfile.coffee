@@ -171,7 +171,7 @@ gulp.task('release', (callback) ->
   message = "VimFx v#{ version }"
   today = new Date().toISOString()[...10]
   merge([
-    gulp.src('package.json'),
+    gulp.src('package.json')
     gulp.src('CHANGELOG.md')
       .pipe(header("### #{ version } (#{ today })\n\n"))
       .pipe(gulp.dest('.'))
@@ -180,6 +180,7 @@ gulp.task('release', (callback) ->
     .on('end', ->
       git.tag("v#{ version }", message, callback)
     )
+  return
 )
 
 gulp.task('changelog', ->
