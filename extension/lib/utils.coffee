@@ -239,7 +239,7 @@ class EventEmitter
       listener(data)
     return
 
-has = Function::call.bind(Object::hasOwnProperty)
+has = (obj, prop) -> Object::hasOwnProperty.call(obj, prop)
 
 nextTick = (window, fn) -> window.setTimeout(fn, 0)
 

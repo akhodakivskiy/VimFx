@@ -79,7 +79,7 @@ do (global = this) ->
     unless require.scopes[fullPath]?
       module =
         exports:    {}
-        onShutdown: Function::call.bind(Array::push, shutdownHandlers)
+        onShutdown: (fn) -> shutdownHandlers.push(fn)
       require.scopes[fullPath] = scope = {
         require: (path) -> require(path, moduleRoot, "./#{ dirname(fullPath) }")
         module, exports: module.exports
