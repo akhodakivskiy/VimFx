@@ -536,10 +536,12 @@ location object by opening the [web console] and entering `location`.
 ## Stability
 
 The public API is currently **experimental** and therefore **unstable.** Things
-might break with new VimFx versions.
+might break with new VimFx versions. However, no breaking changes are planned,
+and will be avoided if feasible.
 
-As soon as VimFx 1.0.0 is released backwards compatibility will be a priority
-and won’t be broken until VimFx 2.0.0.
+As soon as VimFx 1.0.0 (which does not seem to be too far away) is released
+backwards compatibility will be a priority and won’t be broken until VimFx
+2.0.0.
 
 [option overrides]: #vimfxaddoptionoverridesrules
 [categories]: #vimfxgetcategories
