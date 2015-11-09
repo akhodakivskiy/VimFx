@@ -27,7 +27,7 @@ prefs    = require('./prefs')
 utils    = require('./utils')
 Vim      = require('./vim')
 
-DIGIT     = /^\d$/
+DIGIT = /^\d$/
 
 class VimFx extends utils.EventEmitter
   constructor: (@modes, @options) ->

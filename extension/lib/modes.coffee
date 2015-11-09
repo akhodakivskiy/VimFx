@@ -101,7 +101,7 @@ mode('normal', {
       # dialog too.
       return autoInsertMode
 
-    # Note that this special handling of Escape is only used in normal mode.
+    # Note that this special handling of Escape is only used in Normal mode.
     # There are two reasons we might suppress it in other modes. If some custom
     # dialog of a website is open, we should be able to cancel hint markers on
     # it without closing it. Secondly, otherwise cancelling hint markers on
