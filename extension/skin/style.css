@@ -86,6 +86,9 @@ toolbarpaletteitem[place="palette"] > #VimFxButton {
   font-weight: bold;
   text-transform: uppercase;
   white-space: nowrap;
+  /* Some light-weight themes set a `text-shadow` that the hint markers inherit,
+   * making them almost unreadable. */
+  text-shadow: none;
 }
 
 #VimFxMarkersContainer .marker-char {} /* Keep as documentation. */
