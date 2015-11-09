@@ -1,6 +1,6 @@
 # VimFx – Vim keyboard shortcuts for Firefox
 
-<img src="https://raw.githubusercontent.com/akhodakivskiy/VimFx/master/extension/skin/icon128.png" alt="" align="right">
+<img src="extension/skin/icon128.png" alt="" align="right">
 
 [VimFx] is a [Mozilla Firefox] extension which adds Vim-style keyboard shortcuts
 for browsing and navigation, significantly reducing the use of the mouse, and
@@ -36,7 +36,7 @@ VimFx is made by [these awesome people][people].
 >
 > VimFx will be nice to your browser and to your habits. Promise.
 >
-> <footer>– <cite>Anton Khodakivskiy</cite>, VimFx’s original author.</footer>
+> – _Anton Khodakivskiy,_ VimFx’s original author.
 
 ## Key Features
 

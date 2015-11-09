@@ -188,12 +188,26 @@ gulp.task('changelog', ->
   for arg in process.argv when /^-[1-9]$/.test(arg)
     num = Number(arg[1])
   entries = read('CHANGELOG.md').split(/^### .+/m)[1..num].join('')
-  process.stdout.write(marked(entries))
+  process.stdout.write(html(entries))
 )
 
 gulp.task('readme', ->
-  process.stdout.write(marked(read('README.md')))
+  process.stdout.write(html(read('README.md')))
 )
+
+# Reduce markdown to the small subset of HTML that AMO allows. Note that AMO
+# converts newlines to `<br>`.
+html = (string) ->
+  return marked(string)
+    .replace(/// <h\d [^>]*> ([^<>]+) </h\d> ///g, '\n\n<b>$1</b>')
+    .replace(///\s* <p> ((?: [^<] | <(?!/p>) )+) </p>///g, (match, text) ->
+      return "\n#{ text.replace(/\s*\n\s*/g, ' ') }\n\n"
+    )
+    .replace(/<br>/g, '\n')
+    .replace(///<(/?)kbd>///g, '<$1code>')
+    .replace(/<img[^>]*>\s*/g, '')
+    .replace(/\n\s*\n/g, '\n\n')
+    .trim() + '\n'
 
 gulp.task('faster', ->
   gulp.src('gulpfile.coffee')
