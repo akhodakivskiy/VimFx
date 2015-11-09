@@ -3,7 +3,7 @@
   "version": "0.5.18",
   "firefoxVersions": {
     "min": "40.0",
-    "max": "*"
+    "max": "44.*"
   },
   "license": "GPL-3.0+",
   "private": true,
