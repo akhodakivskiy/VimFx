@@ -70,6 +70,7 @@ injectHints = (window, wrappers, viewport, options) ->
       marker.markerElement.style.zIndex = zIndex++
       # Add `z-index` space for all the children of the marker.
       zIndex += marker.wrapper.numChildren if marker.wrapper.numChildren?
+    return
 
   # The `markers` passed to this function have been sorted by `setZIndexes` in
   # advance, so we can skip sorting in the `huffman.createTree` function.

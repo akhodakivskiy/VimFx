@@ -151,6 +151,7 @@ mode('hints', {
         if again
           vim.window.setTimeout((->
             marker.markMatched(false) for marker in matchedMarkers
+            return
           ), vim.options.hints_timeout)
           marker.reset() for marker in markers
           storage.numEnteredChars = 0
