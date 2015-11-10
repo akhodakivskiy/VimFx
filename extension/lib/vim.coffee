@@ -108,6 +108,15 @@ class Vim
     return @_parent.consumeKeyEvent(event, this, focusType)
 
   _onInput: (match, uiEvent = false) ->
+    # In the location bar, `<tab>` is used to cycle between autocomplete
+    # results. In the dev tools, `<tab>` autocompletes what you’re typing. The
+    # only way to preverve this important behavior seems to be special casing.
+    { focus_previous, focus_next } = @_parent.modes.normal.commands
+    if uiEvent and
+      ((match.command == focus_previous and match.keyStr == '<s-tab>') or
+       (match.command == focus_next     and match.keyStr == '<tab>'))
+      return false
+
     suppress = @_call('onInput', {uiEvent, count: match.count}, match)
     return suppress
 
