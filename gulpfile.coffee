@@ -203,6 +203,9 @@ html = (string) ->
     .replace(///\s* <p> ((?: [^<] | <(?!/p>) )+) </p>///g, (match, text) ->
       return "\n#{ text.replace(/\s*\n\s*/g, ' ') }\n\n"
     )
+    .replace(///<li> ((?: [^<] | <(?!/li>) )+) </li>///g, (match, text) ->
+      return "<li>#{ text.replace(/\s*\n\s*/g, ' ') }</li>"
+    )
     .replace(/<br>/g, '\n')
     .replace(///<(/?)kbd>///g, '<$1code>')
     .replace(/<img[^>]*>\s*/g, '')
