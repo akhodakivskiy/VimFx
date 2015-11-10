@@ -133,4 +133,12 @@ migrations[2] = ->
   convert('prev_patterns')
   convert('next_patterns')
 
+migrations[3] = ->
+  pref = 'mode.normal.esc'
+  return unless prefs.has(pref)
+  prefs.set(pref, prefs.get(pref).replace(
+    /(^|\s)(?!(?:<late>)?<force>)(?=\S)/g,
+    '$1<force>'
+  ))
+
 module.exports = migrations
