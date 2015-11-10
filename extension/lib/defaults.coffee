@@ -122,6 +122,7 @@ options =
   'timeout':                2000
 
 advanced_options =
+  'notifications_enabled':              true
   'prevent_target_blank':               true
   'prevent_autofocus_modes':            'normal'
   'hints_timeout':                      200

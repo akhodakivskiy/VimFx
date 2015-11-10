@@ -136,6 +136,7 @@ class Vim
     messageManager.send(name, data, @_messageManager, callback)
 
   notify: (title, options = {}) ->
+    return unless @options.notifications_enabled
     new @window.Notification(title, Object.assign({
       icon: 'chrome://vimfx/skin/icon128.png'
       tag: 'VimFx-notification'

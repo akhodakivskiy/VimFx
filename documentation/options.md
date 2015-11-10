@@ -145,6 +145,12 @@ see them all in [defaults.coffee].)
 [public API]: api.md
 [defaults.coffee]: ../extension/lib/defaults.coffee
 
+### `notifications_enabled`
+
+Some commands may show a notification, such as the `n` and `N` commands which
+tell when they wrap around the page, or the phrase you searched for could not be
+found. Set this option to `false` to disable such notifications.
+
 ### `prevent_target_blank`
 
 You might have noticed that some links open in new tabs when you click them.
