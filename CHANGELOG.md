@@ -1,3 +1,14 @@
+### 0.6.1 (2015-11-10)
+
+- Fixed: If you customized the “esc” command before VimFx 0.6.0 it should now
+  work as expected.
+- Fixed: `<tab>` now works as expected in the address bar and in the dev tools.
+- Fixed: Light-weight themes can no longer make VimFx’s Keyboard Shortcuts help
+  dialog and hint markers unreadable.
+- Added: The [notifications\_enabled] option.
+
+[notifications\_enabled]: https://github.com/akhodakivskiy/VimFx/blob/56c4b7c514ea8b58d2cdcecf3d2654648c48ca31/documentation/options.md#notifications_enabled
+
 ### 0.6.0 (2015-11-09)
 
 ##### Most important (breaking) changes
