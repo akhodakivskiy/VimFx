@@ -82,7 +82,7 @@ class Vim
 
   isUIEvent: (event) ->
     target = event.originalTarget
-    return @_state.frameCanReceiveEvents and
+    return not @_state.frameCanReceiveEvents or
       if MULTI_PROCESS_ENABLED
         (target != @window.gBrowser.selectedBrowser)
       else
