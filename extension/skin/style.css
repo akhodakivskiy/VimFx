@@ -42,6 +42,10 @@ toolbarpaletteitem[place="palette"] > #VimFxButton {
 }
 
 @media (min-resolution: 2dppx) {
+  #VimFxButton image {
+      width: 32px;
+  }
+
   #VimFxButton {
       list-style-image: url(icon32.png);
   }
