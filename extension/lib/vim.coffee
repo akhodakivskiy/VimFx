@@ -148,12 +148,11 @@ class Vim
   _send: (name, data, callback = null) ->
     messageManager.send(name, data, @_messageManager, callback)
 
-  notify: (title, options = {}) ->
-    return unless @options.notifications_enabled
-    new @window.Notification(title, Object.assign({
-      icon: 'chrome://vimfx/skin/icon128.png'
-      tag: 'VimFx-notification'
-    }, options))
+  notify: (message) ->
+    @_parent.emit('notification', {vim: this, message})
+
+  hideNotification: ->
+    @_parent.emit('hideNotification', {vim: this})
 
   markPageInteraction: ->
     @_send('markPageInteraction')

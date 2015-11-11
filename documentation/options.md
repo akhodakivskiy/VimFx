@@ -149,9 +149,13 @@ see them all in [defaults.coffee].)
 
 ### `notifications_enabled`
 
-Some commands may show a notification, such as the `n` and `N` commands which
-tell when they wrap around the page, or the phrase you searched for could not be
-found. Set this option to `false` to disable such notifications.
+Controls whether [notifications] should be shown or not.
+
+You can also choose to show notifications any way you want by listening for the
+[the `notification` and `hideNotification` events][notification-events].
+
+[notifications]: notifications.md
+[notification-events]: api.md#the-notification-and-hidenotification-events
 
 ### `prevent_target_blank`
 
