@@ -87,12 +87,8 @@ class VimFx extends utils.EventEmitter
     command = null
 
     switch
-      when toplevel and DIGIT.test(keyStr) and
-           not (keyStr == '0' and @count == '')
-        @count += keyStr
-        type = 'count'
-
-      when keyStr of @currentKeyTree
+      when keyStr of @currentKeyTree and
+           not (keyStr == '0' and @count != '')
         next = @currentKeyTree[keyStr]
         if next instanceof Leaf
           type = 'full'
@@ -100,6 +96,11 @@ class VimFx extends utils.EventEmitter
         else
           @currentKeyTree = next
           type = 'partial'
+
+      when toplevel and DIGIT.test(keyStr) and
+           not (keyStr == '0' and @count == '')
+        @count += keyStr
+        type = 'count'
 
       else
         @reset(mode)
