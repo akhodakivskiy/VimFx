@@ -109,7 +109,14 @@ injectHints = (window, wrappers, viewport, options) ->
   container.id = CONTAINER_ID
   window.gBrowser.mCurrentBrowser.parentNode.appendChild(container)
 
-  zoom = window.ZoomManager.getZoomForBrowser(window.gBrowser.selectedBrowser)
+  zoom =
+    if window.ZoomManager.useFullZoom
+      window.ZoomManager.getZoomForBrowser(window.gBrowser.selectedBrowser)
+    else
+      # If “full zoom” is not used, it means that “Zoom text only” is enabled.
+      # If so, that “zoom” does not need to be taken into account.
+      1
+
   for marker in markers
     container.appendChild(marker.markerElement)
     # Must be done after the hints have been inserted into the DOM (see
