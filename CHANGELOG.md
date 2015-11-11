@@ -1,3 +1,14 @@
+### 0.6.2 (2015-11-11)
+
+- Improved: If the entire page isn’t scrollable, the largest scrollable element
+  is scrolled instead.
+- Fixed: VimFx’s keyboard shortcuts now works on slowly loading pages.
+- Fixed: Numbers may now be used as shortcut keys (overriding counts).
+- Fixed: The toolbar button’s icon is now correctly sized in high DPI.
+- Fixed: Hint markers are now correctly positioned when zooming using the “Zoom
+  text only” option.
+- Fixed: The `P` command now works with the InstantFox add-on.
+
 ### 0.6.1 (2015-11-10)
 
 - Fixed: If you customized the “esc” command before VimFx 0.6.0 it should now
