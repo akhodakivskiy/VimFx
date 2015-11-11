@@ -51,11 +51,20 @@ class FrameEventManager
       return unless computedStyle = @vim.content.getComputedStyle(target)
       return if computedStyle.getPropertyValue('overflow') == 'hidden'
       @vim.state.scrollableElements.add(target)
+
+      if not @vim.state.largestScrollableElement or
+         utils.area(target) > utils.area(@vim.state.largestScrollableElement)
+        @vim.state.largestScrollableElement = target
     )
 
     @listen('underflow', (event) =>
       target = event.originalTarget
       @vim.state.scrollableElements.delete(target)
+
+      # The largest scrollable element is very unlikely to stop being
+      # scrollable, so don’t bother finding a replacement for it.
+      if @vim.state.largestScrollableElement == target
+        @vim.state.largestScrollableElement = null
     )
 
     @listen('keydown', (event) =>

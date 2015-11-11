@@ -42,10 +42,11 @@ class VimFrame
 
   resetState: ->
     @state =
-      hasInteraction:       false
-      scrollableElements:   new WeakSet()
-      lastFocusedTextInput: null
-      shouldRefocus:        false
+      hasInteraction:           false
+      scrollableElements:       new WeakSet()
+      largestScrollableElement: null
+      lastFocusedTextInput:     null
+      shouldRefocus:            false
 
   options: (prefs) -> messageManager.get('options', {prefs})
 

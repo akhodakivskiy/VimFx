@@ -43,15 +43,22 @@ commands.scroll = (args) ->
   { vim, method, type, direction, amount, property, smooth } = args
   activeElement = utils.getActiveElement(vim.content)
   document = activeElement.ownerDocument
-  element = switch
-    when vim.state.scrollableElements.has(activeElement)
-      activeElement
-    # In quirks mode (when the page lacks a doctype) `<body>` is considered the
-    # root element rather than `<html>`.
-    when document.compatMode == 'BackCompat' and document.body?
-      document.body
-    else
-      document.documentElement
+
+  if vim.state.scrollableElements.has(activeElement)
+    element = activeElement
+  else
+    element =
+      # In quirks mode (when the page lacks a doctype) `<body>` is considered
+      # the root element rather than `<html>`.
+      if document.compatMode == 'BackCompat' and document.body?
+        document.body
+      else
+        document.documentElement
+    # If the entire page isn’t scrollable, scroll the largest scrollable element
+    # instead (if any).
+    if element.scrollHeight <= element.clientHeight and
+       vim.state.largestScrollableElement
+      element = vim.state.largestScrollableElement
 
   options = {}
   options[direction] = switch type
