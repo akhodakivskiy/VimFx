@@ -24,44 +24,44 @@
 /***** Button *****/
 
 #VimFxButton {
-    list-style-image: url(icon16.png);
+  list-style-image: url(icon16.png);
 }
 
 #main-window[vimfx-mode="ignore"] #VimFxButton {
-    list-style-image: url(icon16-red.png);
+  list-style-image: url(icon16-red.png);
 }
 
 #VimFxButton[cui-areatype="menu-panel"],
 toolbarpaletteitem[place="palette"] > #VimFxButton {
-    list-style-image: url(icon32.png);
+  list-style-image: url(icon32.png);
 }
 
 #main-window[vimfx-mode="ignore"] #VimFxButton[cui-areatype="menu-panel"],
 #main-window[vimfx-mode="ignore"] toolbarpaletteitem[place="palette"] > #VimFxButton {
-    list-style-image: url(icon32-red.png);
+  list-style-image: url(icon32-red.png);
 }
 
 @media (min-resolution: 2dppx) {
   #VimFxButton image {
-      width: 32px;
+    width: 32px;
   }
 
   #VimFxButton {
-      list-style-image: url(icon32.png);
+    list-style-image: url(icon32.png);
   }
 
   #main-window[vimfx-mode="ignore"] #VimFxButton {
-      list-style-image: url(icon32-red.png);
+    list-style-image: url(icon32-red.png);
   }
 
   #VimFxButton[cui-areatype="menu-panel"],
   toolbarpaletteitem[place="palette"] > #VimFxButton {
-      list-style-image: url(icon64.png);
+    list-style-image: url(icon64.png);
   }
 
   #main-window[vimfx-mode="ignore"] #VimFxButton[cui-areatype="menu-panel"],
   #main-window[vimfx-mode="ignore"] toolbarpaletteitem[place="palette"] > #VimFxButton {
-      list-style-image: url(icon64-red.png);
+    list-style-image: url(icon64-red.png);
   }
 }
 
