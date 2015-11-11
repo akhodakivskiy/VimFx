@@ -45,10 +45,10 @@ commands.focus_search_bar = ({ vim, count }) ->
   if vim.window.BrowserSearch.searchBar
     vim.window.BrowserSearch.webSearch()
 
-helper_paste_and_go = (event, { vim }) ->
+helper_paste_and_go = (props, { vim }) ->
   { gURLBar } = vim.window
   gURLBar.value = vim.window.readFromClipboard()
-  gURLBar.handleCommand(event)
+  gURLBar.handleCommand(new vim.window.KeyboardEvent('keydown', props))
 
 commands.paste_and_go = helper_paste_and_go.bind(null, null)
 
