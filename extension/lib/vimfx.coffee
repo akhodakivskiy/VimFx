@@ -118,7 +118,8 @@ class VimFx extends utils.EventEmitter
     # Frame scripts and the tests don’t pass in `originalTarget`.
     document = event.originalTarget?.ownerDocument
     if focusType == null and document and
-       (vim.window.TabView.isVisible() or
+       # TODO: Remove when Tab Groups have been removed.
+       (vim.window.TabView?.isVisible() or
         document.fullscreenElement or document.mozFullScreenElement)
       return 'other'
 

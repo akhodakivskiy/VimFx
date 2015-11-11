@@ -446,7 +446,8 @@ commands.esc = ({ vim }) ->
   help.removeHelp(vim.window)
   vim.window.DeveloperToolbar.hide()
   vim.window.gBrowser.getFindBar().close()
-  vim.window.TabView.hide()
+  # TODO: Remove when Tab Groups have been removed.
+  vim.window.TabView?.hide()
   hints.removeHints(vim.window) # Better safe than sorry.
 
 
