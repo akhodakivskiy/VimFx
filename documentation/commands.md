@@ -80,7 +80,8 @@ overrides `<space>`), but they work a little bit differently.
 
 They scroll _the currently focused element._ If the currently focused element
 isn’t scrollable, or there is no (apparent) currently focused element, the
-entire page is scrolled.
+entire page is scrolled. Finally, if the entire page isn’t scrollable, the
+largest scrollable element on the page (if any) is scrolled.
 
 You can focus scrollable elements using the `zf` command.
 
