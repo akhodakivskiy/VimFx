@@ -32,7 +32,9 @@ of the many `f` commands. See also [The `f` commands].
 ### Previous/Next page patterns
 
 Space separated lists of patterns that match links to the previous/next page.
-Used by the `[` and `]` commands.
+Used by the `[` and `]` commands. Example:
+
+    *example.com*  http://example.org/editor/*
 
 There is a standardized way for websites to tell browsers the URLs to the
 previous and next page. VimFx looks for that information in the first place.
