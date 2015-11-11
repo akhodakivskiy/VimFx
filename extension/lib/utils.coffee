@@ -71,6 +71,7 @@ isProperLink = (element) ->
          (element instanceof HTMLAnchorElement or
           element.ownerDocument instanceof XULDocument) and
          not element.href.endsWith('#') and
+         not element.href.endsWith('#?') and
          not element.href.startsWith('javascript:')
 
 isTextInputElement = (element) ->
