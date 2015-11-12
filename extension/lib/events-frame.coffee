@@ -146,7 +146,7 @@ class FrameEventManager
           # …and the event is programmatic (not caused by clicks or keypresses)…
           focusManager.getLastFocusMethod(null) == 0 and
           # …and the target may steal most keystrokes.
-          (utils.isTextInputElement(target) or utils.isContentEditable(target))
+          (utils.isTypingElement(target) or utils.isContentEditable(target))
         # Some sites (such as icloud.com) re-focuses inputs if they are blurred,
         # causing an infinite loop of autofocus prevention and re-focusing.
         # Therefore, blur events that happen just after an autofocus prevention
@@ -165,7 +165,7 @@ class FrameEventManager
       # will, and should, be re-focused (because it was focused when you left
       # the tab). This case is kept track of so that the autofocus prevention
       # does not catch it.
-      if utils.isTextInputElement(target) or utils.isContentEditable(target)
+      if utils.isTypingElement(target) or utils.isContentEditable(target)
         utils.nextTick(@vim.content, =>
           @vim.state.shouldRefocus = not @vim.content.document.hasFocus()
         )

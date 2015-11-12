@@ -79,11 +79,14 @@ isTextInputElement = (element) ->
            'text', 'search', 'tel', 'url', 'email', 'password', 'number'
          ]) or
          element instanceof HTMLTextAreaElement or
+         element instanceof XULTextBoxElement
+
+isTypingElement = (element) ->
+  return isTextInputElement(element) or
          # `<select>` elements can also receive text input: You may type the
          # text of an item to select it.
          element instanceof HTMLSelectElement or
-         element instanceof XULMenuListElement or
-         element instanceof XULTextBoxElement
+         element instanceof XULMenuListElement
 
 
 
@@ -319,6 +322,7 @@ module.exports = {
   isContentEditable
   isProperLink
   isTextInputElement
+  isTypingElement
 
   getActiveElement
   blurActiveElement

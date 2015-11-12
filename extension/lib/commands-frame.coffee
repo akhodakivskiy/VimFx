@@ -25,7 +25,7 @@
 hints = require('./hints')
 utils = require('./utils')
 
-{ isProperLink, isTextInputElement, isContentEditable } = utils
+{ isProperLink, isTextInputElement, isTypingElement, isContentEditable } = utils
 
 XULDocument = Ci.nsIDOMXULDocument
 
@@ -94,7 +94,7 @@ commands.follow = ({ vim, storage }) ->
     switch
       when isProperLink(element)
         type = 'link'
-      when isTextInputElement(element) or isContentEditable(element)
+      when isTypingElement(element) or isContentEditable(element)
         type = 'text'
       when element.tabIndex > -1 and
            not (isXUL and element.nodeName.endsWith('box') and
@@ -173,9 +173,9 @@ commands.follow_copy = ({ vim, storage }) ->
   storage.markerElements = []
   filter = (element, getElementShape) ->
     type = switch
-      when isProperLink(element)       then 'link'
-      when isTextInputElement(element) then 'textInput'
-      when isContentEditable(element)  then 'contenteditable'
+      when isProperLink(element)      then 'link'
+      when isTypingElement(element)   then 'typing'
+      when isContentEditable(element) then 'contenteditable'
     return unless type
     return unless shape = getElementShape(element)
     length = storage.markerElements.push(element)
@@ -263,7 +263,7 @@ commands.focus_text_input = ({ vim, storage, count = null }) ->
   { lastFocusedTextInput } = vim.state
   inputs = Array.filter(
     vim.content.document.querySelectorAll('input, textarea'), (element) ->
-      return utils.isTextInputElement(element) and utils.area(element) > 0
+      return isTextInputElement(element) and utils.area(element) > 0
   )
   if lastFocusedTextInput and lastFocusedTextInput not in inputs
     inputs.push(lastFocusedTextInput)

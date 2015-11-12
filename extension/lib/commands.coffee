@@ -353,7 +353,7 @@ commands.follow_copy = ({ vim }) ->
     { elementIndex } = marker.wrapper
     property = switch marker.wrapper.type
       when 'link'            then 'href'
-      when 'textInput'       then 'value'
+      when 'typing'          then 'value'
       when 'contenteditable' then 'textContent'
     vim._run('copy_marker_element', {elementIndex, property})
   helper_follow('follow_copy', vim, callback)
