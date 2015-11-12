@@ -116,18 +116,13 @@ autofocus prevention, and type `gi` when you wish you hadn’t.
 that `gi` and `1gi` are different: The latter _always_ focuses the first input
 of the page, regradless of which input you used last.
 
+After having focused a text input using `gi`, `<tab>` and `<s-tab>` will _only
+cycle between text inputs,_ instead of moving the focus between _all_ focusable
+elements as they usually do. (See also the [`focus_previous_key` and
+`focus_next_key`] advanced options.)
+
 [prevented autofocus]: options.md#prevent-autofocus
-
-
-## Focus next/previous element
-
-The default shorcuts are `<tab>` and `<s-tab>`, respectively (to be precise,
-they also include [special keys]). They work just like `<tab>` works normally,
-except that if you focused a text input using the `gi` command they will only
-switch between text inputs on thee page, as opposed to between all focusable
-elements (such as links, buttons and checkboxes) as they do otherwise.
-
-[special keys]: shortcuts.md#special-keys
+[`focus_previous_key` and `focus_next_key`]: options.md#focus_previous_key-and-focus_next_key
 
 
 ## The `f` commands

@@ -19,6 +19,8 @@
 
 # This file is the equivalent to events.coffee, but for frame scripts.
 
+notation       = require('vim-like-key-notation')
+commands       = require('./commands-frame')
 messageManager = require('./message-manager')
 utils          = require('./utils')
 
@@ -94,10 +96,27 @@ class FrameEventManager
       @vim.markPageInteraction() unless suppress
     )
 
-    @listen('keydown', ((event) ->
+    @listen('keydown', ((event) =>
       suppress = messageManager.get('lateKeydown', {
         defaultPrevented: event.defaultPrevented
       })
+
+      if @vim.state.inputs and @vim.mode == 'normal' and not suppress and
+         not event.defaultPrevented
+        # There is no need to take `ignore_keyboard_layout` and `translations`
+        # into account here, since we want to override the _native_ `<tab>`
+        # behavior. Then, `event.key` is the way to go. (Unless the prefs are
+        # customized. YAGNI until requested.)
+        keyStr = notation.stringify(event)
+        options = @vim.options(['focus_previous_key', 'focus_next_key'])
+        direction = switch keyStr
+          when '' then null
+          when options.focus_previous_key then -1
+          when options.focus_next_key     then +1
+          else null
+        if direction?
+          suppress = commands.move_focus({@vim, direction})
+
       utils.suppressEvent(event) if suppress
     ), false)
 

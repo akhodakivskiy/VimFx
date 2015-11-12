@@ -235,6 +235,14 @@ an “activatable” element (link or button) is focused.
 Keys that should not trigger VimFx commands but be sent through to the page if
 an “adjustable” element (form control or video player) is focused.
 
+### `focus_previous_key` and `focus_next_key`
+
+The default values are `<s-tab` and `<tab>`, respectively. Those keys are
+specially handled after focusing a text input using [`gi`]. To disable this
+special handling, set the prefs to the empty string.
+
+[`gi`]: commands.md#gi-1
+
 
 ## Special options
 

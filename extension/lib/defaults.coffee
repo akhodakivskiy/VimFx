@@ -79,8 +79,6 @@ shortcuts =
       '[':         'follow_previous'
       ']':         'follow_next'
       'gi':        'focus_text_input'
-      '<force><late><tab>':   'focus_next'
-      '<force><late><s-tab>': 'focus_previous'
 
     'find':
       '/':         'find'
@@ -136,6 +134,8 @@ advanced_options =
   'activatable_element_keys':           '<enter>'
   'adjustable_element_keys':            '<arrowup>  <arrowdown>  <arrowleft>
                                          <arrowright>  <space>  <enter>'
+  'focus_previous_key':                 '<s-tab>'
+  'focus_next_key':                     '<tab>'
   'options.key.quote':                  '<c-q>'
   'options.key.insert_default':         '<c-d>'
   'options.key.reset_default':          '<c-r>'

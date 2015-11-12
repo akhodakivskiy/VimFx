@@ -384,17 +384,6 @@ commands.focus_text_input = ({vim, count}) ->
   vim.markPageInteraction()
   vim._run('focus_text_input', {count})
 
-# Switch between text inputs or simulate `<tab>`.
-helper_move_focus = (direction, {vim, uiEvent}) ->
-  if uiEvent
-    utils.moveFocus(direction)
-  else
-    vim.markPageInteraction()
-    vim._run('move_focus', {direction})
-
-commands.focus_next     = helper_move_focus.bind(null, +1)
-commands.focus_previous = helper_move_focus.bind(null, -1)
-
 
 
 findStorage = {lastSearchString: ''}

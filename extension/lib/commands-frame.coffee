@@ -294,20 +294,19 @@ commands.clear_inputs = ({vim}) ->
   vim.state.inputs = null
 
 commands.move_focus = ({vim, direction}) ->
-  if vim.state.inputs
-    index = vim.state.inputs.indexOf(utils.getActiveElement(vim.content))
-    # If there’s only one input, `<tab>` would cycle to itself, making it feel
-    # like `<tab>` was not working. Then it’s better to let `<tab>` work as it
-    # usually does.
-    if index == -1 or vim.state.inputs.length <= 1
-      vim.state.inputs = null
-    else
-      {inputs} = vim.state
-      nextInput = inputs[(index + direction) %% inputs.length]
-      utils.focusElement(nextInput, {select: true})
-      return
-
-  utils.moveFocus(direction)
+  return false unless vim.state.inputs
+  index = vim.state.inputs.indexOf(utils.getActiveElement(vim.content))
+  # If there’s only one input, `<tab>` would cycle to itself, making it feel
+  # like `<tab>` was not working. Then it’s better to let `<tab>` work as it
+  # usually does.
+  if index == -1 or vim.state.inputs.length <= 1
+    vim.state.inputs = null
+    return false
+  else
+    {inputs} = vim.state
+    nextInput = inputs[(index + direction) %% inputs.length]
+    utils.focusElement(nextInput, {select: true})
+    return true
 
 commands.esc = (args) ->
   commands.blur_active_element(args)
