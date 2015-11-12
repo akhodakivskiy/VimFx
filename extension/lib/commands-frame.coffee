@@ -245,18 +245,17 @@ commands.follow_pattern = ({ vim, type, options }) ->
   attrs = options.pattern_attrs
 
   matchingLink = do ->
-    # Helper function that matches a string against all the patterns.
-    matches = (text) -> patterns.some((regex) -> regex.test(text))
-
     # First search in attributes (favoring earlier attributes) as it's likely
     # that they are more specific than text contexts.
     for attr in attrs
-      for element in candidates
-        return element if matches(element.getAttribute(attr))
+      for regex in patterns
+        for element in candidates
+          return element if regex.test(element.getAttribute(attr))
 
     # Then search in element contents.
-    for element in candidates
-      return element if matches(element.textContent)
+    for regex in patterns
+      for element in candidates
+        return element if regex.test(element.textContent)
 
     return null
 
