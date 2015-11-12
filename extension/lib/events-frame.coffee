@@ -27,6 +27,7 @@ utils          = require('./utils')
 class FrameEventManager
   constructor: (@vim) ->
     @numFocusToSuppress = 0
+    @keepInputs = false
 
   listen: utils.listen.bind(null, FRAME_SCRIPT_ENVIRONMENT)
   listenOnce: utils.listenOnce.bind(null, FRAME_SCRIPT_ENVIRONMENT)
@@ -78,6 +79,8 @@ class FrameEventManager
     )
 
     @listen('keydown', (event) =>
+      @keepInputs = false
+
       suppress = @vim.onInput(event)
 
       # This also suppresses the 'keypress' and 'keyup' events. (Yes, in frame
@@ -116,13 +119,21 @@ class FrameEventManager
           else null
         if direction?
           suppress = commands.move_focus({@vim, direction})
+          @keepInputs = true
 
       utils.suppressEvent(event) if suppress
     ), false)
 
-    # Clicks are always counted as page interaction. Listen for 'mousedown'
-    # instead of 'click' to mark the interaction as soon as possible.
-    @listen('mousedown', @vim.markPageInteraction.bind(@vim))
+    @listen('mousedown', (event) =>
+      # Allow clicking on another text input without exiting “gi mode”. Listen
+      # for 'mousedown' instead of 'click', because only the former runs before
+      # the 'blur' event. Also, `event.originalTarget` does _not_ work here.
+      @keepInputs = (@vim.state.inputs and event.target in @vim.state.inputs)
+
+      # Clicks are always counted as page interaction. Listen for 'mousedown'
+      # instead of 'click' to mark the interaction as soon as possible.
+      @vim.markPageInteraction()
+    )
 
     messageManager.listen('browserRefocus', =>
       # Suppress the next two focus events (for `document` and `window`; see
@@ -195,6 +206,11 @@ class FrameEventManager
       if utils.isTypingElement(target) or utils.isContentEditable(target)
         utils.nextTick(@vim.content, =>
           @vim.state.shouldRefocus = not @vim.content.document.hasFocus()
+
+          # “gi mode” ends when blurring a text input, unless `<tab>` was just
+          # pressed.
+          unless @vim.state.shouldRefocus or @keepInputs
+            commands.clear_inputs({@vim})
         )
     )
 
