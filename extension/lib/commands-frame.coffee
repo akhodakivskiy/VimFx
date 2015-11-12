@@ -102,7 +102,8 @@ commands.follow = ({ vim, storage }) ->
         type = 'clickable'
         unless isXUL or element.nodeName in ['A', 'INPUT', 'BUTTON']
           semantic = false
-      when vim.state.scrollableElements.has(element)
+      when element != document.documentElement and
+           vim.state.scrollableElements.has(element)
         type = 'scrollable'
       when element.hasAttribute('onclick') or
            element.hasAttribute('onmousedown') or
@@ -191,7 +192,8 @@ commands.follow_focus = ({ vim, storage }) ->
     type = switch
       when element.tabIndex > -1
         'focusable'
-      when vim.state.scrollableElements.has(element)
+      when element != element.ownerDocument.documentElement and
+           vim.state.scrollableElements.has(element)
         'scrollable'
     return unless type
     return unless shape = getElementShape(element)
