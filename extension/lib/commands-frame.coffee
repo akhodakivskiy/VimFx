@@ -285,7 +285,10 @@ commands.clear_inputs = ({ storage }) ->
 commands.move_focus = ({ vim, storage, direction }) ->
   if storage.inputs
     index = storage.inputs.indexOf(utils.getActiveElement(vim.content))
-    if index == -1
+    # If there’s only one input, `<tab>` would cycle to itself, making it feel
+    # like `<tab>` was not working. Then it’s better to let `<tab>` work as it
+    # usually does.
+    if index == -1 or storage.inputs.length <= 1
       storage.inputs = null
     else
       { inputs } = storage
