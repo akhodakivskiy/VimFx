@@ -69,6 +69,8 @@ class Vim
 
     @_listen('DOMWindowCreated', => @_state.frameCanReceiveEvents = true)
 
+    @_listen('locationChange', @_onLocationChange.bind(this))
+
   _setBrowser: (@browser) ->
     @window = @browser.ownerGlobal
     @_messageManager = @browser.messageManager
@@ -76,7 +78,6 @@ class Vim
   _resetState: ->
     @_state =
       frameCanReceiveEvents: false
-      lastUrl:               null
 
   _isBlacklisted: (url) -> @options.black_list.some((regex) -> regex.test(url))
 
@@ -120,12 +121,9 @@ class Vim
     suppress = @_call('onInput', {uiEvent, count: match.count}, match)
     return suppress
 
-  _onLocationChange: (url, { refresh = false } = {}) ->
-    return if url == @_state.lastUrl and not refresh
-    @_state.lastUrl = url
+  _onLocationChange: (url) ->
     @enterMode(if @_isBlacklisted(url) then 'ignore' else 'normal')
     @_parent.emit('locationChange', {vim: this, location: new @window.URL(url)})
-    @_send('locationChange')
 
   _call: (method, data = {}, extraArgs...) ->
     args = Object.assign({vim: this, storage: @_storage[@mode] ?= {}}, data)

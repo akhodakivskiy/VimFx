@@ -30,8 +30,6 @@ class FrameEventManager
   listenOnce: utils.listenOnce.bind(null, FRAME_SCRIPT_ENVIRONMENT)
 
   addListeners: ->
-    messageManager.listen('locationChange', @vim.resetState.bind(@vim))
-
     # If the page already was loaded when VimFx was initialized, send the
     # 'DOMWindowCreated' message straight away.
     if @vim.content.document.readyState in ['interactive', 'complete']
@@ -40,6 +38,15 @@ class FrameEventManager
       @listen('DOMWindowCreated', (event) ->
         messageManager.send('DOMWindowCreated')
       )
+
+    @listen('readystatechange', (event) =>
+      window = @vim.content
+      # Only handle 'readystatechange' for the top-most window, not for frames,
+      # and only before any state about the page has been collected.
+      if window.document.readyState == 'interactive'
+        @vim.resetState()
+        messageManager.send('locationChange', window.location.href)
+    )
 
     @listen('click', (event) =>
       if @vim.mode == 'hints' and event.isTrusted

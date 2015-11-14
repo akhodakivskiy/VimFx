@@ -43,10 +43,6 @@ class UIEventManager
     # keyboard input, allowing accesskeys to be used.
     @popupPassthrough = false
 
-    @locationState =
-      lastUrl:   null
-      numToSkip: 0
-
   addListeners: ->
     checkPassthrough = (value, event) =>
       target = event.originalTarget
@@ -160,42 +156,20 @@ class UIEventManager
         vim._setBrowser(browser)
         @vimfx.vims.set(browser, vim)
 
-        # For some reason, three 'onLocationChange' events will fire for this
-        # tab now, all of which are unwanted because the location didn’t really
-        # change. Otherwise another mode might be entered based on the “changed”
-        # URL. The mode should not change when dragging a tab to another window.
-        @locationState.numToSkip = 3
-
       else
         # In non-multi-process, a new frame script _is_ created, which means
         # that a new `vim` instance is created as well, and also that all state
         # for the page is lost. The best we can do is to copy over the mode.
         vim = @vimfx.vims.get(browser)
         oldVim = @vimfx.getCurrentVim(focusedWindow)
-        vim._state.lastUrl = oldVim._state.lastUrl
         vim.enterMode(oldVim.mode)
 
-        # In non-multi-process, the magic number seems to be four.
-        @locationState.numToSkip = 4
-    )
-
-    progressListener =
-      onLocationChange: (progress, request, location, flags) =>
-        if @locationState.numToSkip > 0
-          @locationState.numToSkip--
-          return
-
-        url = location.spec
-        refresh = (url == @locationState.lastUrl)
-        @locationState.lastUrl = url
-
-        unless flags & Ci.nsIWebProgressListener.LOCATION_CHANGE_SAME_DOCUMENT
-          return unless vim = @vimfx.getCurrentVim(@window)
-          vim._onLocationChange(url, {refresh})
-
-    @window.gBrowser.addProgressListener(progressListener)
-    module.onShutdown(=>
-      @window.gBrowser.removeProgressListener(progressListener)
+        # When a new `vim` object is created, `._onLocationChange` is run in the
+        # next tick. In this case, we _don’t_ want that to happen. This is a
+        # hack, but it doesn’t matter since it will be removed when
+        # multi-process is enabled by default.
+        { _onLocationChange } = vim
+        vim._onLocationChange = -> vim._onLocationChange = _onLocationChange
     )
 
   consumeKeyEvent: (vim, event, focusType, uiEvent = false) ->
