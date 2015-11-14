@@ -88,7 +88,7 @@ class VimFx extends utils.EventEmitter
 
     switch
       when keyStr of @currentKeyTree and
-           not (keyStr == '0' and @count != '')
+           not (toplevel and keyStr == '0' and @count != '')
         next = @currentKeyTree[keyStr]
         if next instanceof Leaf
           type = 'full'
