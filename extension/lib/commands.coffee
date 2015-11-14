@@ -184,12 +184,17 @@ absoluteTabIndex = (relativeIndex, gBrowser, { pinnedSeparate }) ->
     when selectedTab.pinned  then [numPinnedTabs, 0]
     else [numTabsTotal - numPinnedTabs, numPinnedTabs]
 
-  wrap = (Math.abs(relativeIndex) == 1)
-  if wrap
-    absoluteIndex = min + (absoluteIndex - min) %% numTabs
-  else
-    absoluteIndex = Math.max(min, absoluteIndex)
-    absoluteIndex = Math.min(absoluteIndex, min + numTabs - 1)
+  # Wrap _once_ if at one of the ends of the tab bar and cannot move in the
+  # current direction.
+  if (relativeIndex < 0 and currentIndex == min) or
+     (relativeIndex > 0 and currentIndex == min + numTabs - 1)
+    if absoluteIndex < min
+      absoluteIndex += numTabs
+    else if absoluteIndex >= min + numTabs
+      absoluteIndex -= numTabs
+
+  absoluteIndex = Math.max(min, absoluteIndex)
+  absoluteIndex = Math.min(absoluteIndex, min + numTabs - 1)
 
   return absoluteIndex
 
