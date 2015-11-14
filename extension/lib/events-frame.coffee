@@ -52,6 +52,18 @@ class FrameEventManager
       return if computedStyle.getPropertyValue('overflow') == 'hidden'
       @vim.state.scrollableElements.add(target)
 
+      # Unfortunately, the 'underflow' event is not triggered when a scrollable
+      # element is removed from the DOM, so that needs to be tracked separately.
+      mutationObserver = new @vim.content.MutationObserver((changes) =>
+        for change in changes then for element in change.removedNodes
+          if element == target
+            removeScrollableElement(target)
+            mutationObserver.disconnect()
+            return
+      )
+      mutationObserver.observe(target.parentNode, {childList: true})
+      module.onShutdown(mutationObserver.disconnect.bind(mutationObserver))
+
       if not @vim.state.largestScrollableElement or
          utils.area(target) > utils.area(@vim.state.largestScrollableElement)
         @vim.state.largestScrollableElement = target
@@ -59,13 +71,23 @@ class FrameEventManager
 
     @listen('underflow', (event) =>
       target = event.originalTarget
+      removeScrollableElement(target)
+    )
+
+    removeScrollableElement = (target) =>
       @vim.state.scrollableElements.delete(target)
 
-      # The largest scrollable element is very unlikely to stop being
-      # scrollable, so don’t bother finding a replacement for it.
       if @vim.state.largestScrollableElement == target
         @vim.state.largestScrollableElement = null
-    )
+
+        # Find a new largest scrollable element (if there are any left).
+        largestArea = -1
+        @vim.state.scrollableElements.forEach((element) =>
+          area = utils.area(element)
+          if area > largestArea
+            @vim.state.largestScrollableElement = element
+            largestArea = area
+        )
 
     @listen('keydown', (event) =>
       suppress = @vim.onInput(event)

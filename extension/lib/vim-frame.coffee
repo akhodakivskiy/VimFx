@@ -43,7 +43,7 @@ class VimFrame
   resetState: ->
     @state =
       hasInteraction:           false
-      scrollableElements:       new WeakSet()
+      scrollableElements:       new Set()
       largestScrollableElement: null
       lastFocusedTextInput:     null
       shouldRefocus:            false
