@@ -50,6 +50,11 @@ Moves the current tab _count_ tabs forward/backward.
 If the count is greater than one they don’t wrap around when reaching the ends
 of the tab bar.
 
+As opposed to `J` and `K`, pinned and non-pinned tabs are handled separately.
+The first non-pinned tab wraps to the last tab, and the last tab wraps to the
+first non-pinned tab, and vice versa for non-pinned tabs. Use `gp` to move a tab
+between the pinned and non-pinned parts of the tab bar.
+
 ### `g0`, `g^`, `g$`
 
 `g0` selects the tab at index _count,_ counting from the start.
