@@ -29,6 +29,7 @@ class Marker
   constructor: (@wrapper, @document) ->
     @elementShape = @wrapper.shape
     @markerElement = utils.createBox(@document, 'marker')
+    @markerElement.setAttribute('data-type', @wrapper.type)
     @weight = @elementShape.area
 
   reset: ->
