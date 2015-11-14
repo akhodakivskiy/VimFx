@@ -83,7 +83,9 @@ isn’t scrollable, or there is no (apparent) currently focused element, the
 entire page is scrolled. Finally, if the entire page isn’t scrollable, the
 largest scrollable element on the page (if any) is scrolled.
 
-You can focus scrollable elements using the `zf` command.
+You can focus scrollable elements using the `zf` command (or the `f` command).
+The right border of hint markers for scrollable elements is styled to remind of
+a scroll bar, making them easier to recognize among hints for links.
 
 
 ## `gi`

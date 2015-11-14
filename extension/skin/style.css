@@ -81,8 +81,11 @@ toolbarpaletteitem[place="palette"] > #VimFxButton {
 /* Marker styles should be kept simple for performance. */
 #VimFxMarkersContainer .marker {
   position: absolute;
-  padding: 0.2em;
-  border: solid 1px #ad810c;
+  --padding: 0.2em;
+  padding: var(--padding);
+  --border-color: #ad810c;
+  --border-width: 1px;
+  border: solid var(--border-width) var(--border-color);
   background-color: #ffd76e;
   color: #302505;
   font: menu;
@@ -110,6 +113,28 @@ toolbarpaletteitem[place="palette"] > #VimFxButton {
 #main-window[vimfx-held-modifiers~="shift"] #VimFxMarkersContainer {
   opacity: 0.2;
 }
+
+#VimFxMarkersContainer .marker[data-type="scrollable"] {
+  --width: 1px;
+  padding-right: calc(var(--padding) + var(--border-width) +var(--width));
+}
+
+  #VimFxMarkersContainer .marker[data-type="scrollable"]::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    height: 100%;
+    width: var(--width);
+    border-left: inherit;
+    background-image: linear-gradient(
+      to bottom,
+      transparent 15%,
+      var(--border-color) 0,
+      var(--border-color) 75%,
+      transparent 0
+    );
+  }
 
 
 
