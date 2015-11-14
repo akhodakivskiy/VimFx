@@ -40,12 +40,22 @@ class FrameEventManager
       )
 
     @listen('readystatechange', (event) =>
-      window = @vim.content
-      # Only handle 'readystatechange' for the top-most window, not for frames,
-      # and only before any state about the page has been collected.
-      if window.document.readyState == 'interactive'
+      target = event.originalTarget
+
+      # When the page starts loading `.readyState` changes to 'interactive'.
+      return unless target.readyState == 'interactive'
+
+      # If the topmost document starts loading, it means that we have navigated
+      # to a new page or refreshed the page.
+      if target == @vim.content.document
         @vim.resetState()
-        messageManager.send('locationChange', window.location.href)
+        messageManager.send('locationChange', @vim.content.location.href)
+      else
+        # If the target isn’t the topmost document, it means that a frame has
+        # started loading. Some sites change the `src` attribute of `<iframe>`s
+        # dynamically. Any scrollable elements for the old frame `src` then
+        # become dead and need to be filtered out.
+        @vim.state.scrollableElements.reject(Cu.isDeadWrapper)
     )
 
     @listen('click', (event) =>
@@ -58,43 +68,12 @@ class FrameEventManager
       return unless computedStyle = @vim.content.getComputedStyle(target)
       return if computedStyle.getPropertyValue('overflow') == 'hidden'
       @vim.state.scrollableElements.add(target)
-
-      # Unfortunately, the 'underflow' event is not triggered when a scrollable
-      # element is removed from the DOM, so that needs to be tracked separately.
-      mutationObserver = new @vim.content.MutationObserver((changes) ->
-        for change in changes then for element in change.removedNodes
-          if element == target
-            removeScrollableElement(target)
-            mutationObserver.disconnect()
-            return
-      )
-      mutationObserver.observe(target.parentNode, {childList: true})
-      module.onShutdown(mutationObserver.disconnect.bind(mutationObserver))
-
-      if not @vim.state.largestScrollableElement or
-         utils.area(target) > utils.area(@vim.state.largestScrollableElement)
-        @vim.state.largestScrollableElement = target
     )
 
     @listen('underflow', (event) ->
       target = event.originalTarget
-      removeScrollableElement(target)
-    )
-
-    removeScrollableElement = (target) =>
       @vim.state.scrollableElements.delete(target)
-
-      if @vim.state.largestScrollableElement == target
-        @vim.state.largestScrollableElement = null
-
-        # Find a new largest scrollable element (if there are any left).
-        largestArea = -1
-        @vim.state.scrollableElements.forEach((element) =>
-          area = utils.area(element)
-          if area > largestArea
-            @vim.state.largestScrollableElement = element
-            largestArea = area
-        )
+    )
 
     @listen('keydown', (event) =>
       suppress = @vim.onInput(event)

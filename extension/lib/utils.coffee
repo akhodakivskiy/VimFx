@@ -178,6 +178,17 @@ listenOnce = (element, eventName, listener, useCapture = true) ->
     element.removeEventListener(eventName, fn, useCapture)
   listen(element, eventName, fn, useCapture)
 
+onRemoved = (window, element, fn) ->
+  mutationObserver = new window.MutationObserver((changes) ->
+    for change in changes then for removedElement in change.removedNodes
+      if removedElement == element
+        mutationObserver.disconnect()
+        fn()
+        return
+  )
+  mutationObserver.observe(element.parentNode, {childList: true})
+  module.onShutdown(mutationObserver.disconnect.bind(mutationObserver))
+
 suppressEvent = (event) ->
   event.preventDefault()
   event.stopPropagation()
@@ -222,6 +233,14 @@ setAttributes = (element, attributes) ->
   for attribute, value of attributes
     element.setAttribute(attribute, value)
   return
+
+windowContainsDeep = (window, element) ->
+  parent = element.ownerDocument.defaultView
+  loop
+    return true if parent == window
+    break if parent.top == parent
+    parent = parent.parent
+  return false
 
 
 
@@ -326,6 +345,7 @@ module.exports = {
 
   listen
   listenOnce
+  onRemoved
   suppressEvent
   simulateClick
 
@@ -333,6 +353,7 @@ module.exports = {
   createBox
   insertText
   setAttributes
+  windowContainsDeep
 
   Counter
   EventEmitter
