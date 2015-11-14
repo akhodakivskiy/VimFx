@@ -223,7 +223,7 @@ This can be used to enter a different mode by default on some pages (which can
 be used to replace the blacklist option).
 
 ```js
-vimfx.on('load', ({vim, location}) => {
+vimfx.on('locationChange', ({vim, location}) => {
   if (location.hostname === 'example.com') {
     vim.enterMode('ignore')
   }
