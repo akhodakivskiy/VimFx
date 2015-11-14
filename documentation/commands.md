@@ -50,6 +50,14 @@ Moves the current tab _count_ tabs forward/backward.
 If the count is greater than one they don’t wrap around when reaching the ends
 of the tab bar.
 
+### `g0`, `g^`, `g$`
+
+`g0` selects the tab at index _count,_ counting from the start.
+
+`g^` selects the tab at index _count,_ counting from the first non-pinned tab.
+
+`g$` selects the tab at index _count,_ counting from the end.
+
 ### `x`
 
 Closes the current tab and _count_ minus one of the following tabs.

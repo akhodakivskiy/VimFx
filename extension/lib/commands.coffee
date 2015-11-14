@@ -217,20 +217,20 @@ commands.tab_move_backward = helper_move_tab.bind(null, -1)
 
 commands.tab_move_forward  = helper_move_tab.bind(null, +1)
 
-commands.tab_select_first = ({ vim }) ->
+commands.tab_select_first = ({ vim, count = 1 }) ->
   utils.nextTick(vim.window, ->
-    vim.window.gBrowser.selectTabAtIndex(0)
+    vim.window.gBrowser.selectTabAtIndex(count - 1)
   )
 
-commands.tab_select_first_non_pinned = ({ vim }) ->
+commands.tab_select_first_non_pinned = ({ vim, count = 1 }) ->
   firstNonPinned = vim.window.gBrowser._numPinnedTabs
   utils.nextTick(vim.window, ->
-    vim.window.gBrowser.selectTabAtIndex(firstNonPinned)
+    vim.window.gBrowser.selectTabAtIndex(firstNonPinned + count - 1)
   )
 
-commands.tab_select_last = ({ vim }) ->
+commands.tab_select_last = ({ vim, count = 1 }) ->
   utils.nextTick(vim.window, ->
-    vim.window.gBrowser.selectTabAtIndex(-1)
+    vim.window.gBrowser.selectTabAtIndex(-count)
   )
 
 commands.tab_toggle_pinned = ({ vim }) ->
