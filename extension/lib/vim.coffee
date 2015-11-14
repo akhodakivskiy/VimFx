@@ -48,6 +48,9 @@ class Vim
       @_onLocationChange(@browser.currentURI.spec)
     )
 
+    @_addListeners()
+
+  _addListeners: ->
     # Require the subset of the options needed to be listed explicitly (as
     # opposed to sending _all_ options) for performance. Each option access
     # might trigger an optionOverride.
@@ -71,9 +74,12 @@ class Vim
 
     @_listen('locationChange', @_onLocationChange.bind(this))
 
-  _setBrowser: (@browser) ->
+  _setBrowser: (browser) ->
+    refresh = @browser?
+    @browser = browser
     @window = @browser.ownerGlobal
     @_messageManager = @browser.messageManager
+    @_addListeners() if refresh
 
   _resetState: ->
     @_state =
