@@ -61,7 +61,7 @@ class FrameEventManager
 
       # Unfortunately, the 'underflow' event is not triggered when a scrollable
       # element is removed from the DOM, so that needs to be tracked separately.
-      mutationObserver = new @vim.content.MutationObserver((changes) =>
+      mutationObserver = new @vim.content.MutationObserver((changes) ->
         for change in changes then for element in change.removedNodes
           if element == target
             removeScrollableElement(target)
@@ -76,7 +76,7 @@ class FrameEventManager
         @vim.state.largestScrollableElement = target
     )
 
-    @listen('underflow', (event) =>
+    @listen('underflow', (event) ->
       target = event.originalTarget
       removeScrollableElement(target)
     )
