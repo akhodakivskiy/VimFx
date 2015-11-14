@@ -302,13 +302,6 @@ openTab = (window, url, options) ->
   window.TreeStyleTabService?.readyToOpenChildTab(gBrowser.selectedTab)
   gBrowser.loadOneTab(url, options)
 
-# Executes `fn` and measures how much time it took.
-timeIt = (fn, name) ->
-  console.time(name)
-  result = fn()
-  console.timeEnd(name)
-  return result
-
 writeToClipboard = (text) ->
   clipboardHelper = Cc['@mozilla.org/widget/clipboardhelper;1']
     .getService(Ci.nsIClipboardHelper)
@@ -355,6 +348,5 @@ module.exports = {
   loadCss
   observe
   openTab
-  timeIt
   writeToClipboard
 }
