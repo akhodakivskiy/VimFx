@@ -84,8 +84,9 @@ module.exports =
   default:
     get: get.bind(null, branches.addon.default)
     set: set.bind(null, branches.addon.default)
-    _init: ->
-      @set(key, value) for key, value of defaults.all_prefs
+    init: ->
+      for key, value of defaults.all_prefs
+        module.exports.default.set(key, value)
       return
   root:
     get: get.bind(null, branches.root.user)

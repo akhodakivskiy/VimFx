@@ -99,7 +99,7 @@ do (global = this) ->
     migrations          = require('./lib/migrations')
     prefs               = require('./lib/prefs')
 
-    prefs.default._init()
+    prefs.default.init()
     applyMigrations(migrations)
 
   main = if IS_FRAME_SCRIPT then './lib/main-frame' else './lib/main'
