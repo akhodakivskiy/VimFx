@@ -267,10 +267,7 @@ nextTick = (window, fn) -> window.setTimeout(fn, 0)
 
 regexEscape = (s) -> s.replace(/[|\\{}()[\]^$+*?.]/g, '\\$&')
 
-removeDuplicates = (array) ->
-  # coffeelint: disable=no_backticks
-  return `[...new Set(array)]`
-  # coffeelint: enable=no_backticks
+removeDuplicates = (array) -> Array.from(new Set(array))
 
 # Remove duplicate characters from string (case insensitive).
 removeDuplicateCharacters = (str) ->
