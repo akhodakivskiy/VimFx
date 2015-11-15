@@ -323,6 +323,7 @@ helper_follow_clickable = ({ inTab, inBackground }, { vim, count = 1 }) ->
       vim._run('click_marker_element', {
         elementIndex
         preventTargetBlank: vim.options.prevent_target_blank
+        type: marker.type
       })
 
     return not isLast

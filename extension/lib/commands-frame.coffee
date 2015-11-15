@@ -114,8 +114,6 @@ commands.follow = ({ vim, storage }) ->
            element.hasAttribute('onmouseup') or
            element.hasAttribute('oncommand') or
            element.getAttribute('role') in ['link', 'button'] or
-           # Facebook special-case (comment fields).
-           element.parentElement?.classList.contains('UFIInputContainer') or
            # Twitter special-case.
            element.classList.contains('js-new-tweets-bar') or
            # Feedly special-case.
@@ -124,6 +122,9 @@ commands.follow = ({ vim, storage }) ->
            element.hasAttribute('data-page-action')
         type = 'clickable'
         semantic = false
+      # Facebook special-case (comment fields).
+      when element.parentElement?.classList.contains('UFIInputContainer')
+        type = 'clickable-special'
       # Putting markers on `<label>` elements is generally redundant, because
       # its `<input>` gets one. However, some sites hide the actual `<input>`
       # but keeps the `<label>` to click, either for styling purposes or to keep
@@ -213,12 +214,15 @@ commands.focus_marker_element = ({ storage, elementIndex, options }) ->
   utils.focusElement(element, options)
 
 commands.click_marker_element = (args) ->
-  { vim, storage, elementIndex, preventTargetBlank } = args
+  { vim, storage, elementIndex, preventTargetBlank, type } = args
   element = storage.markerElements[elementIndex]
   if element.target == '_blank' and preventTargetBlank
     targetReset = element.target
     element.target = ''
-  utils.simulateClick(element)
+  if type == 'clickable-special'
+    element.click()
+  else
+    utils.simulateClick(element)
   element.target = targetReset if targetReset
 
 commands.copy_marker_element = ({ storage, elementIndex, property }) ->
