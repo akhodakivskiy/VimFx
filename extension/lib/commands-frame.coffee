@@ -274,7 +274,7 @@ commands.follow_pattern = ({ vim, type, options }) ->
 commands.focus_text_input = ({ vim, storage, count = null }) ->
   { lastFocusedTextInput } = vim.state
   inputs = Array.filter(
-    vim.content.document.querySelectorAll('input, textarea'), (element) ->
+    utils.querySelectorAllDeep(vim.content, 'input, textarea'), (element) ->
       return isTextInputElement(element) and utils.area(element) > 0
   )
   if lastFocusedTextInput and lastFocusedTextInput not in inputs

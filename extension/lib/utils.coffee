@@ -222,6 +222,12 @@ insertText = (input, value) ->
     input.value[0...selectionStart] + value + input.value[selectionEnd..]
   input.selectionStart = input.selectionEnd = selectionStart + value.length
 
+querySelectorAllDeep = (window, selector) ->
+  elements = Array.from(window.document.querySelectorAll(selector))
+  for frame in window.frames
+    elements.push(querySelectorAllDeep(frame, selector)...)
+  return elements
+
 setAttributes = (element, attributes) ->
   for attribute, value of attributes
     element.setAttribute(attribute, value)
@@ -345,6 +351,7 @@ module.exports = {
   area
   createBox
   insertText
+  querySelectorAllDeep
   setAttributes
   windowContainsDeep
 
