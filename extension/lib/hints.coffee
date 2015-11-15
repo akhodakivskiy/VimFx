@@ -21,9 +21,9 @@
 # This file contains functions for getting markable elements, and related data,
 # as well as for creating and inserting markers for markable elements.
 
-huffman    = require('n-ary-huffman')
-{ Marker } = require('./marker')
-utils      = require('./utils')
+huffman  = require('n-ary-huffman')
+{Marker} = require('./marker')
+utils    = require('./utils')
 
 CONTAINER_ID = 'VimFxMarkersContainer'
 
@@ -131,7 +131,7 @@ getMarkableElementsAndViewport = (window, filter) ->
     clientWidth, clientHeight # Viewport size excluding scrollbars, usually.
     scrollWidth, scrollHeight
   } = window.document.documentElement
-  { innerWidth, innerHeight } = window # Viewport size including scrollbars.
+  {innerWidth, innerHeight} = window # Viewport size including scrollbars.
   # We don’t want markers to cover the scrollbars, so we should use
   # `clientWidth` and `clientHeight`. However, when there are no scrollbars
   # those might be too small. Then we use `innerWidth` and `innerHeight`.
@@ -158,7 +158,7 @@ getMarkableElementsAndViewport = (window, filter) ->
 # actually what other methods like using XPath or CSS selectors would need to do
 # anyway behind the scenes.
 getMarkableElements = (window, viewport, wrappers, filter, parents = []) ->
-  { document } = window
+  {document} = window
 
   for element in getAllElements(document) when element instanceof Element
     # `getRects` is fast and filters out most elements, so run it first of all.
@@ -174,7 +174,7 @@ getMarkableElements = (window, viewport, wrappers, filter, parents = []) ->
     continue unless isInsideViewport(rect, viewport)
 
     # Calculate the visible part of the frame, according to the parent.
-    { clientWidth, clientHeight } = frame.document.documentElement
+    {clientWidth, clientHeight} = frame.document.documentElement
     frameViewport =
       left:   Math.max(viewport.left - rect.left, 0)
       top:    Math.max(viewport.top  - rect.top,  0)
@@ -193,7 +193,7 @@ getMarkableElements = (window, viewport, wrappers, filter, parents = []) ->
         parseFloat(computedStyle.getPropertyValue('padding-top'))
 
     getMarkableElements(frame, frameViewport, wrappers, filter,
-                        parents.concat({ window, offset }))
+                        parents.concat({window, offset}))
 
   return
 
@@ -247,7 +247,7 @@ getElementShape = (window, viewport, rects, parents, element) ->
 
   if visibleRects.length == 0
     if rects.length == 1 and totalArea == 0
-      [ rect ] = rects
+      [rect] = rects
       if rect.width > 0 or rect.height > 0
         # If we get here, it means that everything inside `element` is floated
         # and/or absolutely positioned (and that `element` hasn’t been made to
@@ -374,7 +374,7 @@ getFirstNonCoveredPoint = (window, viewport, element, elementRect, parents) ->
   #
   # It is safer to try points at least one pixel into the element from the
   # edges, hence the `+1`.
-  { left, top, bottom, height } = elementRect
+  {left, top, bottom, height} = elementRect
   nonCoveredPoint = tryPoint(left, +1, Math.floor(top + height / 2), 0, 1)
 
   return nonCoveredPoint

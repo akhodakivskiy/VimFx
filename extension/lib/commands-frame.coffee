@@ -25,22 +25,21 @@
 hints = require('./hints')
 utils = require('./utils')
 
-{ isProperLink, isTextInputElement, isTypingElement, isContentEditable } = utils
+{isProperLink, isTextInputElement, isTypingElement, isContentEditable} = utils
 
 XULDocument = Ci.nsIDOMXULDocument
 
 commands = {}
 
-commands.go_up_path = ({ vim, count = 1 }) ->
+commands.go_up_path = ({vim, count = 1}) ->
   vim.content.location.pathname = vim.content.location.pathname.replace(
-    /// (?: /[^/]+ ){1,#{ count }} /?$ ///, ''
+    /// (?: /[^/]+ ){1,#{count}} /?$ ///, ''
   )
 
-commands.go_to_root = ({ vim }) ->
+commands.go_to_root = ({vim}) ->
   vim.content.location.href = vim.content.location.origin
 
-commands.scroll = (args) ->
-  { vim, method, type, direction, amount, property, smooth } = args
+commands.scroll = ({vim, method, type, direction, amount, property, smooth}) ->
   activeElement = utils.getActiveElement(vim.content)
   document = activeElement.ownerDocument
 
@@ -50,7 +49,7 @@ commands.scroll = (args) ->
     # If the currently focused element isn’t scrollable, scroll the largest
     # scrollable element instead, which usually means `<html>`.
     when vim.state.scrollableElements.largest
-      { scrollableElements } = vim.state
+      {scrollableElements} = vim.state
       # In quirks mode (when the page lacks a doctype) `<body>` is considered
       # the root element rather than `<html>`. The 'overflow' event is triggered
       # for `<html>` though (_not_ `<body>`!).
@@ -76,7 +75,7 @@ commands.scroll = (args) ->
 # Combine links with the same href.
 combine = (hrefs, element, wrapper) ->
   if wrapper.type == 'link'
-    { href } = element
+    {href} = element
     wrapper.href = href
     if href of hrefs
       parent = hrefs[href]
@@ -88,7 +87,7 @@ combine = (hrefs, element, wrapper) ->
       hrefs[href] = wrapper
   return wrapper
 
-commands.follow = ({ vim, storage }) ->
+commands.follow = ({vim, storage}) ->
   hrefs = {}
   storage.markerElements = []
   filter = (element, getElementShape) ->
@@ -162,7 +161,7 @@ commands.follow = ({ vim, storage }) ->
 
   return hints.getMarkableElementsAndViewport(vim.content, filter)
 
-commands.follow_in_tab = ({ vim, storage }) ->
+commands.follow_in_tab = ({vim, storage}) ->
   hrefs = {}
   storage.markerElements = []
   filter = (element, getElementShape) ->
@@ -176,7 +175,7 @@ commands.follow_in_tab = ({ vim, storage }) ->
 
   return hints.getMarkableElementsAndViewport(vim.content, filter)
 
-commands.follow_copy = ({ vim, storage }) ->
+commands.follow_copy = ({vim, storage}) ->
   hrefs = {}
   storage.markerElements = []
   filter = (element, getElementShape) ->
@@ -193,7 +192,7 @@ commands.follow_copy = ({ vim, storage }) ->
 
   return hints.getMarkableElementsAndViewport(vim.content, filter)
 
-commands.follow_focus = ({ vim, storage }) ->
+commands.follow_focus = ({vim, storage}) ->
   storage.markerElements = []
   filter = (element, getElementShape) ->
     type = switch
@@ -209,12 +208,12 @@ commands.follow_focus = ({ vim, storage }) ->
 
   return hints.getMarkableElementsAndViewport(vim.content, filter)
 
-commands.focus_marker_element = ({ storage, elementIndex, options }) ->
+commands.focus_marker_element = ({storage, elementIndex, options}) ->
   element = storage.markerElements[elementIndex]
   utils.focusElement(element, options)
 
 commands.click_marker_element = (args) ->
-  { vim, storage, elementIndex, preventTargetBlank, type } = args
+  {vim, storage, elementIndex, preventTargetBlank, type} = args
   element = storage.markerElements[elementIndex]
   if element.target == '_blank' and preventTargetBlank
     targetReset = element.target
@@ -225,12 +224,12 @@ commands.click_marker_element = (args) ->
     utils.simulateClick(element)
   element.target = targetReset if targetReset
 
-commands.copy_marker_element = ({ storage, elementIndex, property }) ->
+commands.copy_marker_element = ({storage, elementIndex, property}) ->
   element = storage.markerElements[elementIndex]
   utils.writeToClipboard(element[property])
 
-commands.follow_pattern = ({ vim, type, options }) ->
-  { document } = vim.content
+commands.follow_pattern = ({vim, type, options}) ->
+  {document} = vim.content
 
   # If there’s a `<link rel=prev/next>` element we use that.
   for link in document.head?.getElementsByTagName('link')
@@ -244,7 +243,7 @@ commands.follow_pattern = ({ vim, type, options }) ->
   candidates = document.querySelectorAll(options.pattern_selector)
 
   # Note: Earlier patterns should be favored.
-  { patterns } = options
+  {patterns} = options
 
   # Search for the prev/next patterns in the following attributes of the
   # element. `rel` should be kept as the first attribute, since the standard way
@@ -271,8 +270,8 @@ commands.follow_pattern = ({ vim, type, options }) ->
 
   utils.simulateClick(matchingLink) if matchingLink
 
-commands.focus_text_input = ({ vim, storage, count = null }) ->
-  { lastFocusedTextInput } = vim.state
+commands.focus_text_input = ({vim, storage, count = null}) ->
+  {lastFocusedTextInput} = vim.state
   inputs = Array.filter(
     utils.querySelectorAllDeep(vim.content, 'input, textarea'), (element) ->
       return isTextInputElement(element) and utils.area(element) > 0
@@ -291,10 +290,10 @@ commands.focus_text_input = ({ vim, storage, count = null }) ->
   utils.focusElement(inputs[index], {select: true})
   storage.inputs = inputs
 
-commands.clear_inputs = ({ storage }) ->
+commands.clear_inputs = ({storage}) ->
   storage.inputs = null
 
-commands.move_focus = ({ vim, storage, direction }) ->
+commands.move_focus = ({vim, storage, direction}) ->
   if storage.inputs
     index = storage.inputs.indexOf(utils.getActiveElement(vim.content))
     # If there’s only one input, `<tab>` would cycle to itself, making it feel
@@ -303,7 +302,7 @@ commands.move_focus = ({ vim, storage, direction }) ->
     if index == -1 or storage.inputs.length <= 1
       storage.inputs = null
     else
-      { inputs } = storage
+      {inputs} = storage
       nextInput = inputs[(index + direction) %% inputs.length]
       utils.focusElement(nextInput, {select: true})
       return
@@ -313,13 +312,13 @@ commands.move_focus = ({ vim, storage, direction }) ->
 commands.esc = (args) ->
   commands.blur_active_element(args)
 
-  { document } = args.vim.content
+  {document} = args.vim.content
   if document.exitFullscreen
     document.exitFullscreen()
   else
     document.mozCancelFullScreen()
 
-commands.blur_active_element = ({ vim }) ->
+commands.blur_active_element = ({vim}) ->
   utils.blurActiveElement(vim.content)
 
 module.exports = commands

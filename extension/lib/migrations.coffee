@@ -111,8 +111,8 @@ migrations[0] = ->
     return keys.map((key) -> key.join('')).join('    ')
 
   for name, newName of conversions
-    pref = "commands.#{ name }.keys"
-    prefs.set("mode.#{ newName }", convert(prefs.get(pref))) if prefs.has(pref)
+    pref = "commands.#{name}.keys"
+    prefs.set("mode.#{newName}", convert(prefs.get(pref))) if prefs.has(pref)
   return
 
 migrations[1] = ->

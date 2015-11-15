@@ -28,7 +28,7 @@ MAX_FONT_SIZE = 20
 injectHelp = (window, vimfx) ->
   removeHelp(window)
 
-  { document } = window
+  {document} = window
 
   container = document.createElement('box')
   container.id = CONTAINER_ID
@@ -52,8 +52,8 @@ injectHelp = (window, vimfx) ->
   while wrapper.clientHeight < container.clientHeight and
         fontSize <= MAX_FONT_SIZE
     fontSize++
-    container.style.fontSize = "#{ fontSize }px"
-  container.style.fontSize = "#{ Math.max(fontSize - 1, originalFontSize) }px"
+    container.style.fontSize = "#{fontSize}px"
+  container.style.fontSize = "#{Math.max(fontSize - 1, originalFontSize)}px"
 
   # Uncomment this line if you want to use `gulp help.html`!
   # utils.writeToClipboard(container.outerHTML)
@@ -100,7 +100,7 @@ createContent = (document, vimfx) ->
 
       $('heading-category', categoryContainer, category.name) if category.name
 
-      for { command, name, enabledSequences } in category.commands
+      for {command, name, enabledSequences} in category.commands
         commandContainer = $('command', categoryContainer)
         utils.setAttributes(commandContainer, {'data-command': command.name})
         commandContainer.setAttribute('data-command', name)

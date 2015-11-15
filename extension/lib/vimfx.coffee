@@ -69,7 +69,7 @@ class VimFx extends utils.EventEmitter
     })
 
   consumeKeyEvent: (event, vim, focusType) ->
-    { mode } = vim
+    {mode} = vim
     return unless keyStr = @stringifyKeyEvent(event)
 
     now = Date.now()
@@ -123,7 +123,7 @@ class VimFx extends utils.EventEmitter
         document.fullscreenElement or document.mozFullScreenElement)
       return 'other'
 
-    keys = @options["#{ focusType }_element_keys"]
+    keys = @options["#{focusType}_element_keys"]
     return null if keys and keyStr not in keys
 
     return focusType
@@ -182,7 +182,7 @@ createKeyTrees = (groupedCommands, specialKeys) ->
     (errors[command.pref] ?= []).push(error)
 
   pushOverrideErrors = (command, tree) ->
-    { command: overridingCommand, originalSequence } = getFirstLeaf(tree)
+    {command: overridingCommand, originalSequence} = getFirstLeaf(tree)
     error =
       id:      'overridden_by'
       subject: overridingCommand.description()
@@ -198,13 +198,13 @@ createKeyTrees = (groupedCommands, specialKeys) ->
 
   for mode in groupedCommands
     keyTrees[mode._name] = {}
-    for category in mode.categories then for { command } in category.commands
-      { shortcuts, errors: parseErrors } = parseShortcutPref(command.pref)
+    for category in mode.categories then for {command} in category.commands
+      {shortcuts, errors: parseErrors} = parseShortcutPref(command.pref)
       pushError(error, command) for error in parseErrors
       command._sequences = []
 
       for shortcut in shortcuts
-        [ prefixKeys..., lastKey ] = shortcut.normalized
+        [prefixKeys..., lastKey] = shortcut.normalized
         tree = keyTrees[mode._name]
         command._sequences.push(shortcut.original)
         seenNonSpecialKey = false

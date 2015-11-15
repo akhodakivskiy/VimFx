@@ -45,8 +45,8 @@ class Marker
   # into the DOM, and thus gotten a height and width.
   setPosition: (viewport, zoom) ->
     {
-      markerElement: { clientHeight: height, clientWidth: width }
-      elementShape: { nonCoveredPoint: { x: left, y: top, offset, rect } }
+      markerElement: {clientHeight: height, clientWidth: width}
+      elementShape:  {nonCoveredPoint: {x: left, y: top, offset, rect}}
     } = this
 
     # Center the marker vertically on the non-covered point.
@@ -71,8 +71,8 @@ class Marker
     top  = Math.round(top  * zoom)
 
     # The positioning is absolute.
-    @markerElement.style.left = "#{ left }px"
-    @markerElement.style.top  = "#{ top }px"
+    @markerElement.style.left = "#{left}px"
+    @markerElement.style.top  = "#{top}px"
 
     # For quick access.
     @position = {
@@ -147,7 +147,7 @@ rotateOverlappingMarkers = (originalMarkers, forward) ->
 getStackFor = (marker, markers) ->
   stack = [marker]
 
-  { top, bottom, left, right } = marker.position
+  {top, bottom, left, right} = marker.position
 
   index = 0
   while index < markers.length

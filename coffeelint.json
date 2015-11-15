@@ -1,6 +1,6 @@
 {
   "arrow_spacing":                      {"level": "error"},
-  "braces_spacing":                     {"level": "ignore"},
+  "braces_spacing":                     {"level": "error"},
   "camel_case_classes":                 {"level": "error"},
   "coffeescript_error":                 {"level": "error"},
   "colon_assignment_spacing":           {"level": "ignore"},

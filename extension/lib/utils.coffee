@@ -93,7 +93,7 @@ isTypingElement = (element) ->
 # Active/focused element helpers
 
 getActiveElement = (window) ->
-  { activeElement } = window.document
+  {activeElement} = window.document
   if activeElement instanceof HTMLFrameElement or
      activeElement instanceof HTMLIFrameElement
     return getActiveElement(activeElement.contentWindow)
@@ -112,7 +112,7 @@ blurActiveBrowserElement = (vim) ->
   #   focus events on `document` and `window` in the current page. Many pages
   #   re-focus some text input on those events, making it impossible to blur
   #   those! Therefore we tell the frame script to suppress those events.
-  { window } = vim
+  {window} = vim
   activeElement = getActiveElement(window)
   vim._send('browserRefocus')
   nextTick(window, ->
@@ -217,7 +217,7 @@ createBox = (document, className, parent = null, text = null) ->
   return box
 
 insertText = (input, value) ->
-  { selectionStart, selectionEnd } = input
+  {selectionStart, selectionEnd} = input
   input.value =
     input.value[0...selectionStart] + value + input.value[selectionEnd..]
   input.selectionStart = input.selectionEnd = selectionStart + value.length
@@ -246,7 +246,7 @@ windowContainsDeep = (window, element) ->
 # Language helpers
 
 class Counter
-  constructor: ({ start: @value = 0, @step = 1 }) ->
+  constructor: ({start: @value = 0, @step = 1}) ->
   tick: -> @value += @step
 
 class EventEmitter
@@ -283,7 +283,7 @@ formatError = (error) ->
     .filter((line) -> line.includes('.xpi!'))
     .map((line) -> '  ' + line.replace(/(?:\/<)*@.+\.xpi!/g, '@'))
     .join('\n')
-  return "#{ error }\n#{ stack }"
+  return "#{error}\n#{stack}"
 
 getCurrentLocation = ->
   window = getCurrentWindow()
@@ -297,7 +297,7 @@ getCurrentWindow = ->
 loadCss = (name) ->
   sss = Cc['@mozilla.org/content/style-sheet-service;1']
     .getService(Ci.nsIStyleSheetService)
-  uri = Services.io.newURI("chrome://vimfx/skin/#{ name }.css", null, null)
+  uri = Services.io.newURI("chrome://vimfx/skin/#{name}.css", null, null)
   method = sss.AUTHOR_SHEET
   unless sss.sheetRegistered(uri, method)
     sss.loadAndRegisterSheet(uri, method)
@@ -313,7 +313,7 @@ observe = (topic, observer) ->
   )
 
 openTab = (window, url, options) ->
-  { gBrowser } = window
+  {gBrowser} = window
   window.TreeStyleTabService?.readyToOpenChildTab(gBrowser.selectedTab)
   gBrowser.loadOneTab(url, options)
 

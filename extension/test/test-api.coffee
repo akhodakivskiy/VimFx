@@ -21,12 +21,12 @@ testUtils = require('./utils')
 prefs     = require('../lib/prefs')
 utils     = require('../lib/utils')
 
-{ utils: Cu } = Components
+{utils: Cu} = Components
 
 apiPref = 'extensions.VimFx.api_url'
 apiUrl  = Services.prefs.getComplexValue(apiPref, Ci.nsISupportsString).data
 # Hack: Also import `_callbacks` so callbacks added by tests can be `.pop()`ed.
-{ getAPI, _callbacks: callbacks } = Cu.import(apiUrl, {})
+{getAPI, _callbacks: callbacks} = Cu.import(apiUrl, {})
 
 # In the tests, `vimfx` refers to the API object, while `$vimfx` refers to the
 # passed in `VimFx` instance.
@@ -124,14 +124,14 @@ exports['test customization'] = (assert, $vimfx, teardown) -> getAPI((vimfx) ->
   category_misc = mode_normal.categories.find(
     (category) -> category._name == 'misc'
   )
-  [ ..., { command: test_command } ] = category_misc.commands
+  [..., {command: test_command}] = category_misc.commands
   assert.equal(test_command.description(), 'Test command')
 
   # Test that the new complex command can show up in the help dialog.
   mode_ignore = modes.find((mode) -> mode._name == 'ignore')
-  [ category_new ] = mode_ignore.categories
+  [category_new] = mode_ignore.categories
   assert.equal(category_new.name, 'New category')
-  [ test_command ] = category_new.commands
+  [test_command] = category_new.commands
   assert.equal(test_command.command.description(), 'Test ignore mode command')
   assert.deepEqual(test_command.enabledSequences, ['ö'])
 
@@ -161,12 +161,12 @@ exports['test customization'] = (assert, $vimfx, teardown) -> getAPI((vimfx) ->
   category_misc = mode_normal.categories.find(
     (category) -> category._name == 'misc'
   )
-  [ ..., { command: last_command } ] = category_misc.commands
+  [..., {command: last_command}] = category_misc.commands
   assert.notEqual(last_command.description(), 'Test command')
 
   # Test that the new complex command cannot show up in the help dialog.
   mode_ignore = modes.find((mode) -> mode._name == 'ignore')
-  [ first_category ] = mode_ignore.categories
+  [first_category] = mode_ignore.categories
   assert.notEqual(first_category.name, 'New category')
 )
 
@@ -189,7 +189,7 @@ exports['test addCommand order'] = \
   category_misc = mode_normal.categories.find(
     (category) -> category._name == 'misc'
   )
-  [ { command: first_command } ] = category_misc.commands
+  [{command: first_command}] = category_misc.commands
   assert.equal(first_command.description(), 'Test command')
 )
 
@@ -384,5 +384,5 @@ throws = (assert, regex, badValue, fn) ->
   assert.throws(fn)
   try fn() catch error
     assert.ok(error.message.startsWith('VimFx:'), 'start with VimFx')
-    assert.ok(error.message.endsWith(": #{ badValue }"), 'show bad value')
+    assert.ok(error.message.endsWith(": #{badValue}"), 'show bad value')
     assert.ok(regex.test(error.message), 'regex match')

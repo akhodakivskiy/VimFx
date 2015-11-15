@@ -35,7 +35,7 @@ parsePref = (pref) ->
   value = prefs.get(pref)
 
   if pref of parsers
-    { parsed, normalized } = parsers[pref](value, defaults.all_options[pref])
+    {parsed, normalized} = parsers[pref](value, defaults.all_options[pref])
     if normalized? and normalized != value and prefs.has(pref)
       prefs.set(pref, normalized)
     return parsed
@@ -62,9 +62,9 @@ parsePatterns = (value) ->
       catch
         utils.regexEscape(pattern)
     return ///
-      ^\s*     (?:#{ patternRegex }) (?:\s|$)
+      ^\s*     (?:#{patternRegex}) (?:\s|$)
       |
-      (?:\s|^) (?:#{ patternRegex }) \s*$
+      (?:\s|^) (?:#{patternRegex}) \s*$
     ///i
   )
   return result
@@ -83,7 +83,7 @@ parsers =
   black_list: (value) ->
     result = parseSpaceDelimitedString(value)
     result.parsed = result.parsed.map((pattern) ->
-      return ///^#{ utils.regexEscape(pattern).replace(/\\\*/g, '.*') }$///i
+      return ///^#{utils.regexEscape(pattern).replace(/\\\*/g, '.*')}$///i
     )
     return result
 
