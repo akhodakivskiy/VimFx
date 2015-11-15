@@ -314,6 +314,6 @@ commands.esc = (args) ->
     document.mozCancelFullScreen()
 
 commands.blur_active_element = ({ vim }) ->
-  utils.blurActiveElement(vim.content, vim.state.scrollableElements)
+  utils.blurActiveElement(vim.content)
 
 module.exports = commands

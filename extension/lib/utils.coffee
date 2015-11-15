@@ -100,18 +100,11 @@ getActiveElement = (window) ->
   else
     return activeElement
 
-blurActiveElement = (window, extraAllowedElements = null) ->
-  # Only blur focusable elements, in order to interfere with the browser as
-  # little as possible.
-  activeElement = getActiveElement(window)
-  if activeElement and
-     (activeElement.tabIndex > -1 or extraAllowedElements?.has(activeElement))
-    activeElement.blur()
+blurActiveElement = (window) ->
+  return unless activeElement = getActiveElement(window)
+  activeElement.blur()
 
 blurActiveBrowserElement = (vim) ->
-  # - Some browser UI elements, such as the web console, are not marked as
-  #   focusable, so we can’t check if the element is focusable as in
-  #   `blurActiveElement`.
   # - Blurring in the next tick allows to pass `<escape>` to the location bar to
   #   reset it, for example.
   # - Focusing the current browser afterwards allows to pass `<escape>` as well
