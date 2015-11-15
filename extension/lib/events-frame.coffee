@@ -70,7 +70,7 @@ class FrameEventManager
       @vim.state.scrollableElements.add(target)
     )
 
-    @listen('underflow', (event) ->
+    @listen('underflow', (event) =>
       target = event.originalTarget
       @vim.state.scrollableElements.delete(target)
     )
