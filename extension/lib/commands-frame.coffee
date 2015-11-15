@@ -114,6 +114,8 @@ commands.follow = ({ vim, storage }) ->
            element.hasAttribute('onmouseup') or
            element.hasAttribute('oncommand') or
            element.getAttribute('role') in ['link', 'button'] or
+           # Facebook special-case (comment fields).
+           element.parentElement?.classList.contains('UFIInputContainer') or
            # Twitter special-case.
            element.classList.contains('js-new-tweets-bar') or
            # Feedly special-case.
