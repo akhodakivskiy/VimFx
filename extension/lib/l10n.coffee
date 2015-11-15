@@ -24,7 +24,7 @@ PROPERTIES_FILE = 'vimfx.properties'
 
 stringBundle = Services.strings.createBundle(
   # Randomize URI to work around bug 719376.
-  "chrome://vimfx/locale/#{ PROPERTIES_FILE }?#{ Math.random() }"
+  "chrome://vimfx/locale/#{PROPERTIES_FILE}?#{Math.random()}"
 )
 
 module.exports = (name, values...) ->

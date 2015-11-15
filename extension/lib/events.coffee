@@ -91,7 +91,7 @@ class UIEventManager
           # This also suppresses the 'keypress' event.
           utils.suppressEvent(event) if @suppress
         else
-          vim._listenOnce('consumeKeyEvent', ({ focusType }) =>
+          vim._listenOnce('consumeKeyEvent', ({focusType}) =>
             @consumeKeyEvent(vim, event, focusType)
             return @suppress
           )
@@ -168,7 +168,7 @@ class UIEventManager
         # next tick. In this case, we _don’t_ want that to happen. This is a
         # hack, but it doesn’t matter since it will be removed when
         # multi-process is enabled by default.
-        { _onLocationChange } = vim
+        {_onLocationChange} = vim
         vim._onLocationChange = -> vim._onLocationChange = _onLocationChange
     )
 
@@ -190,7 +190,7 @@ class UIEventManager
     # The passed in `event` is the regular non-late browser UI keydown event.
     # It is only used to set held keys. This is easier than sending an event
     # subset from frame scripts.
-    listener = ({ defaultPrevented }) =>
+    listener = ({defaultPrevented}) =>
       # `@late` is reset on every keydown. If it is no longer `true`, it means
       # that the page called `event.stopPropagation()`, which prevented this
       # listener from running for that event.
@@ -213,14 +213,14 @@ class UIEventManager
     else
       vim._listenOnce('lateKeydown', listener)
 
-  setHeldModifiers: (event, { filterCurrentOnly = false } = {}) ->
+  setHeldModifiers: (event, {filterCurrentOnly = false} = {}) ->
     mainWindow = @window.document.documentElement
     modifiers =
       if filterCurrentOnly
         mainWindow.getAttribute(HELD_MODIFIERS_ATTRIBUTE)
       else
         if @suppress == null then 'alt ctrl meta shift' else ''
-    isHeld = (modifier) -> event["#{ modifier }Key"]
+    isHeld = (modifier) -> event["#{modifier}Key"]
     mainWindow.setAttribute(HELD_MODIFIERS_ATTRIBUTE,
                             modifiers.split(' ').filter(isHeld).join(' '))
 

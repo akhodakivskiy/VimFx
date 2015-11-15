@@ -20,7 +20,7 @@
 list  = require('./tests-list')
 utils = require('../lib/utils')
 
-{ utils: Cu } = Components
+{utils: Cu} = Components
 
 Cu.import('resource://specialpowers/Assert.jsm')
 assert = new Assert()
@@ -31,7 +31,7 @@ module.exports = (vimfx) ->
   total  = 0
 
   for name in list
-    tests = require("./#{ name }")
+    tests = require("./#{name}")
     report.push(name)
     for key, fn of tests when key.startsWith('test')
       total++
@@ -44,8 +44,8 @@ module.exports = (vimfx) ->
       catch error then null
       finally
         (try fn()) for fn in teardowns
-      report.push("  #{ if error then '✘' else '✔' } #{ key }")
+      report.push("  #{if error then '✘' else '✔'} #{key}")
       report.push(utils.formatError(error).replace(/^/gm, '    ')) if error
 
-  report.push("#{ passed }/#{ total } tests passed.")
-  console.log("\n#{ report.join('\n') }")
+  report.push("#{passed}/#{total} tests passed.")
+  console.log("\n#{report.join('\n')}")

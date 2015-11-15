@@ -23,7 +23,7 @@
 
 defaults = require('./defaults')
 
-{ prefs } = Services
+{prefs} = Services
 
 branches =
   addon:
@@ -58,7 +58,7 @@ set = (branch, key, value) ->
         branch.clearUserPref(key)
       else
         throw new Error("VimFx: Prefs may only be set to a boolean, number,
-                         string or null. Got: #{ typeof value }")
+                         string or null. Got: #{typeof value}")
 
 has = (branch, key) ->
   branch.prefHasUserValue(key)
@@ -84,8 +84,9 @@ module.exports =
   default:
     get: get.bind(null, branches.addon.default)
     set: set.bind(null, branches.addon.default)
-    _init: ->
-      @set(key, value) for key, value of defaults.all_prefs
+    init: ->
+      for key, value of defaults.all_prefs
+        module.exports.default.set(key, value)
       return
   root:
     get: get.bind(null, branches.root.user)

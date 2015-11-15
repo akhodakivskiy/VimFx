@@ -1,6 +1,6 @@
 {
   "arrow_spacing":                      {"level": "error"},
-  "braces_spacing":                     {"level": "ignore"},
+  "braces_spacing":                     {"level": "error"},
   "camel_case_classes":                 {"level": "error"},
   "coffeescript_error":                 {"level": "error"},
   "colon_assignment_spacing":           {"level": "ignore"},
@@ -11,8 +11,8 @@
   "eol_last":                           {"level": "error"},
   "indentation":                        {"level": "error", "value": 2},
   "line_endings":                       {"level": "error", "value": "unix"},
-  "max_line_length":                    {"level": "warn", "value": 80},
-  "missing_fat_arrows":                 {"level": "ignore"},
+  "max_line_length":                    {"level": "error", "value": 80},
+  "missing_fat_arrows":                 {"level": "error"},
   "newlines_after_classes":             {"level": "ignore"},
   "no_backticks":                       {"level": "error"},
   "no_debugger":                        {"level": "error"},

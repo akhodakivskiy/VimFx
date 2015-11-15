@@ -21,9 +21,9 @@
 # This file contains functions for getting markable elements, and related data,
 # as well as for creating and inserting markers for markable elements.
 
-huffman    = require('n-ary-huffman')
-{ Marker } = require('./marker')
-utils      = require('./utils')
+huffman  = require('n-ary-huffman')
+{Marker} = require('./marker')
+utils    = require('./utils')
 
 CONTAINER_ID = 'VimFxMarkersContainer'
 
@@ -131,7 +131,7 @@ getMarkableElementsAndViewport = (window, filter) ->
     clientWidth, clientHeight # Viewport size excluding scrollbars, usually.
     scrollWidth, scrollHeight
   } = window.document.documentElement
-  { innerWidth, innerHeight } = window # Viewport size including scrollbars.
+  {innerWidth, innerHeight} = window # Viewport size including scrollbars.
   # We don’t want markers to cover the scrollbars, so we should use
   # `clientWidth` and `clientHeight`. However, when there are no scrollbars
   # those might be too small. Then we use `innerWidth` and `innerHeight`.
@@ -158,11 +158,15 @@ getMarkableElementsAndViewport = (window, filter) ->
 # actually what other methods like using XPath or CSS selectors would need to do
 # anyway behind the scenes.
 getMarkableElements = (window, viewport, wrappers, filter, parents = []) ->
-  { document } = window
+  {document} = window
 
-  localGetElementShape = getElementShape.bind(null, window, viewport, parents)
-  for element in getElements(document, viewport) when element instanceof Element
-    continue unless wrapper = filter(element, localGetElementShape)
+  for element in getAllElements(document) when element instanceof Element
+    # `getRects` is fast and filters out most elements, so run it first of all.
+    rects = getRects(element, viewport)
+    continue unless rects.length > 0
+    continue unless wrapper = filter(
+      element, getElementShape.bind(null, window, viewport, rects, parents)
+    )
     wrappers.push(wrapper)
 
   for frame in window.frames
@@ -170,7 +174,7 @@ getMarkableElements = (window, viewport, wrappers, filter, parents = []) ->
     continue unless isInsideViewport(rect, viewport)
 
     # Calculate the visible part of the frame, according to the parent.
-    { clientWidth, clientHeight } = frame.document.documentElement
+    {clientWidth, clientHeight} = frame.document.documentElement
     frameViewport =
       left:   Math.max(viewport.left - rect.left, 0)
       top:    Math.max(viewport.top  - rect.top,  0)
@@ -189,44 +193,38 @@ getMarkableElements = (window, viewport, wrappers, filter, parents = []) ->
         parseFloat(computedStyle.getPropertyValue('padding-top'))
 
     getMarkableElements(frame, frameViewport, wrappers, filter,
-                        parents.concat({ window, offset }))
+                        parents.concat({window, offset}))
 
   return
 
-# Returns a suitable set of elements in `document` that could possibly get
-# markers.
-getElements = (document, viewport) ->
-  # In XUL documents we have to resort to get every single element in the entire
-  # document, because there are lots of complicated “anonymous” elements, which
-  # `windowUtils.nodesFromRect()` does not catch.
-  if document instanceof XULDocument
-    elements = []
-    getAllRegular = (element) ->
-      for child in element.getElementsByTagName('*')
-        elements.push(child)
-        getAllAnonymous(child)
-      return
-    getAllAnonymous = (element) ->
-      for child in document.getAnonymousNodes(element) or []
-        continue unless child instanceof Element
-        elements.push(child)
-        getAllRegular(child)
-      return
-    getAllRegular(document.documentElement)
-    return elements
-  # In other documents we can use a super-fast Firefox API to get all elements
-  # in the viewport.
-  else
-    windowUtils = document.defaultView
-      .QueryInterface(Ci.nsIInterfaceRequestor)
-      .getInterface(Ci.nsIDOMWindowUtils)
-    return windowUtils.nodesFromRect(
-      viewport.left, viewport.top, # Rect coordinates, relative to the viewport.
-      # Distances to expand in all directions: top, right, bottom, left.
-      0, viewport.right, viewport.bottom, 0,
-      true, # Unsure what this does. Toggling it seems to make no difference.
-      true  # Ensure that the list of matching elements is fully up to date.
-    )
+getAllElements = (document) ->
+  unless document instanceof XULDocument
+    return document.getElementsByTagName('*')
+
+  elements = []
+  getAllRegular = (element) ->
+    for child in element.getElementsByTagName('*')
+      elements.push(child)
+      getAllAnonymous(child)
+    return
+  getAllAnonymous = (element) ->
+    for child in document.getAnonymousNodes(element) or []
+      continue unless child instanceof Element
+      elements.push(child)
+      getAllRegular(child)
+    return
+  getAllRegular(document.documentElement)
+  return elements
+
+getRects = (element, viewport) ->
+  # `element.getClientRects()` returns a list of rectangles, usually just one,
+  # which is identical to the one returned by `element.getBoundingClientRect()`.
+  # However, if `element` is inline and line-wrapped, then it returns one
+  # rectangle for each line, since each line may be of different length, for
+  # example. That allows us to properly add hints to line-wrapped links.
+  return Array.filter(
+    element.getClientRects(), (rect) -> isInsideViewport(viewport, rect)
+  )
 
 # Returns the “shape” of `element`:
 #
@@ -238,19 +236,10 @@ getElements = (document, viewport) ->
 #
 # Returns `null` if `element` is outside `viewport` or entirely covered by other
 # elements.
-getElementShape = (window, viewport, parents, element) ->
-  # `element.getClientRects()` returns a list of rectangles, usually just one,
-  # which is identical to the one returned by `element.getBoundingClientRect()`.
-  # However, if `element` is inline and line-wrapped, then it returns one
-  # rectangle for each line, since each line may be of different length, for
-  # example. That allows us to properly add hints to line-wrapped links.
-  rects = element.getClientRects()
+getElementShape = (window, viewport, rects, parents, element) ->
   totalArea = 0
   visibleRects = []
-  # The `isInsideViewport` check is not needed in HTML documents, but in XUL
-  # documents (see `getElements()`). However, there seems to be no performance
-  # gain in not running the check in HTML documents, so let’s keep it simple.
-  for rect in rects when isInsideViewport(rect, viewport)
+  for rect in rects
     visibleRect = adjustRectToViewport(rect, viewport)
     continue if visibleRect.area == 0
     totalArea += visibleRect.area
@@ -258,7 +247,7 @@ getElementShape = (window, viewport, parents, element) ->
 
   if visibleRects.length == 0
     if rects.length == 1 and totalArea == 0
-      [ rect ] = rects
+      [rect] = rects
       if rect.width > 0 or rect.height > 0
         # If we get here, it means that everything inside `element` is floated
         # and/or absolutely positioned (and that `element` hasn’t been made to
@@ -267,7 +256,8 @@ getElementShape = (window, viewport, parents, element) ->
         # Those are still clickable. Therefore we return the shape of the first
         # visible child instead. At least in that example, that’s the best bet.
         for child in element.children
-          shape = getElementShape(window, viewport, parents, child)
+          shape = getElementShape(window, viewport, getRects(child, viewport),
+                                  parents, child)
           return shape if shape
     return null
 
@@ -384,7 +374,7 @@ getFirstNonCoveredPoint = (window, viewport, element, elementRect, parents) ->
   #
   # It is safer to try points at least one pixel into the element from the
   # edges, hence the `+1`.
-  { left, top, bottom, height } = elementRect
+  {left, top, bottom, height} = elementRect
   nonCoveredPoint = tryPoint(left, +1, Math.floor(top + height / 2), 0, 1)
 
   return nonCoveredPoint

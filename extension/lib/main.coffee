@@ -76,7 +76,7 @@ module.exports = (data, reason) ->
   # Setup the public API. See public.coffee for more information. This is done
   # _after_ the prefs observing setup, so that option prefs get validated and
   # used when calling `vimfx.set()`.
-  apiUrl = "#{ data.resourceURI.spec }lib/public.js"
+  apiUrl = "#{data.resourceURI.spec}lib/public.js"
   prefs.set('api_url', apiUrl)
   publicScope = Cu.import(apiUrl, {})
   api = createAPI(vimfx)
@@ -106,7 +106,7 @@ module.exports = (data, reason) ->
   test?(vimfx)
 
   windows = new WeakSet()
-  messageManager.listen('tabCreated', (data, { target }) ->
+  messageManager.listen('tabCreated', (data, {target}) ->
     # Frame script are run in more places than we need. Tell those not to do
     # anything.
     return false unless target.getAttribute('messagemanagergroup') == 'browsers'

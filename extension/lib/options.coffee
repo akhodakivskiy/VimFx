@@ -103,7 +103,7 @@ class Observer extends BaseObserver
                '<c-z>')
       'first-row': 'true'
     })
-    href = "#{ @vimfx.info.homepageURL }/tree/master/documentation"
+    href = "#{@vimfx.info.homepageURL}/tree/master/documentation"
     docsLink = @document.createElement('label')
     utils.setAttributes(docsLink, {
       value: translate('prefs.documentation')
@@ -116,10 +116,10 @@ class Observer extends BaseObserver
   injectOptions: ->
     for key, value of defaults.options
       setting = @appendSetting({
-        pref:  "#{ defaults.BRANCH }#{ key }"
+        pref:  "#{defaults.BRANCH}#{key}"
         type:  @type(value)
-        title: translate("pref.#{ key }.title")
-        desc:  translate("pref.#{ key }.desc")
+        title: translate("pref.#{key}.title")
+        desc:  translate("pref.#{key}.desc")
       })
     return
 
@@ -139,7 +139,7 @@ class Observer extends BaseObserver
             'first-row': 'true'
           })
 
-        for { command } in category.commands
+        for {command} in category.commands
           @appendSetting({
             pref:  command.pref
             type:  'string'
@@ -152,8 +152,8 @@ class Observer extends BaseObserver
 
   generateErrorMessage: (pref) ->
     commandErrors = @vimfx.errors[pref] ? []
-    return commandErrors.map(({ id, context, subject }) ->
-      return translate("error.#{ id }", context ? subject, subject)
+    return commandErrors.map(({id, context, subject}) ->
+      return translate("error.#{id}", context ? subject, subject)
     ).join('\n')
 
   setupKeybindings: ->
@@ -164,7 +164,7 @@ class Observer extends BaseObserver
       setting = event.target
       isString = (setting.type == 'string')
 
-      { input, pref } = setting
+      {input, pref} = setting
       keyString = @vimfx.stringifyKeyEvent(event)
 
       # Some shortcuts only make sense for string settings. We still match

@@ -54,19 +54,19 @@ class Vim
     # Require the subset of the options needed to be listed explicitly (as
     # opposed to sending _all_ options) for performance. Each option access
     # might trigger an optionOverride.
-    @_listen('options', ({ prefs }) =>
+    @_listen('options', ({prefs}) =>
       options = {}
       for pref in prefs
         options[pref] = @options[pref]
       return options
     )
 
-    @_listen('vimMethod', ({ method, args = [] }, { callback = null }) =>
+    @_listen('vimMethod', ({method, args = []}, {callback = null}) =>
       result = @[method](args...)
       @_send(callback, result) if callback
     )
 
-    @_listen('vimMethodSync', ({ method, args = [] }) =>
+    @_listen('vimMethodSync', ({method, args = []}) =>
       return @[method](args...)
     )
 
@@ -101,8 +101,8 @@ class Vim
 
     unless utils.has(@_parent.modes, mode)
       modes = Object.keys(@_parent.modes).join(', ')
-      throw new Error("VimFx: Unknown mode. Available modes are: #{ modes }.
-                       Got: #{ mode }")
+      throw new Error("VimFx: Unknown mode. Available modes are: #{modes}.
+                       Got: #{mode}")
 
     @_call('onLeave') if @mode?
     @mode = mode
@@ -118,7 +118,7 @@ class Vim
     # In the location bar, `<tab>` is used to cycle between autocomplete
     # results. In the dev tools, `<tab>` autocompletes what you’re typing. The
     # only way to preverve this important behavior seems to be special casing.
-    { focus_previous, focus_next } = @_parent.modes.normal.commands
+    {focus_previous, focus_next} = @_parent.modes.normal.commands
     if uiEvent and
       ((match.command == focus_previous and match.keyStr == '<s-tab>') or
        (match.command == focus_next     and match.keyStr == '<tab>'))

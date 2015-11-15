@@ -158,7 +158,7 @@ addCategory = (category, order) ->
     if uncategorized
       -> ''
     else
-      translate.bind(null, "category.#{ category }")
+      translate.bind(null, "category.#{category}")
   parsed_options.categories[category] = {
     name:  categoryName
     order: if uncategorized then 0 else order
@@ -179,7 +179,7 @@ for modeName, modeCategories of shortcuts
     addCategory(categoryName, categoryCounter.tick())
     commandIndex = createCounter()
     for shortcut, commandName of modeShortcuts
-      pref = "mode.#{ modeName }.#{ commandName }"
+      pref = "mode.#{modeName}.#{commandName}"
       shortcut_prefs[pref] = shortcut
       command_order[pref] = commandIndex.tick()
       categoryMap[pref] = categoryName

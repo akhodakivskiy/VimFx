@@ -46,7 +46,7 @@ injectButton = (vimfx) ->
   module.onShutdown(cui.destroyWidget.bind(cui, BUTTON_ID))
 
   vimfx.on('modeDisplayChange', (vim) ->
-    { window } = vim
+    {window} = vim
     # When the browser starts, the button might not be available yet.
     return unless button = getButton(window)
 
@@ -55,7 +55,7 @@ injectButton = (vimfx) ->
         translate('button.tooltip.normal')
       else
         translate('button.tooltip.other_mode',
-                  translate("mode.#{ vim.mode }"), translate('mode.normal'))
+                  translate("mode.#{vim.mode}"), translate('mode.normal'))
     button.setAttribute('tooltiptext', tooltip)
   )
 

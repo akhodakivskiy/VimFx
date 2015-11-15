@@ -35,8 +35,7 @@ Code! Try to follow these simple rules:
   - `==` and `!=`
   - `and` and `or`
   - `not`
-- Put spaces inside `[]` and `{}` when destructuring and interpolating, but not
-  in array and object literals.
+- Never put spaces inside `[]` and `{}`.
 - Comment when necessary. Comments should be full sentences.
 - Try to keep lines at most 80 characters long.
 - Indent using two spaces.

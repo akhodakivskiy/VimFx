@@ -24,8 +24,9 @@
 # each tab. It mostly tries to mimic the `Vim` class in vim.coffee, but also
 # keeps track of web page state. `VimFrame` is not part of the public API.
 
-messageManager = require('./message-manager')
-utils          = require('./utils')
+messageManager     = require('./message-manager')
+ScrollableElements = require('./scrollable-elements')
+utils              = require('./utils')
 
 class VimFrame
   constructor: (@content) ->
@@ -33,7 +34,7 @@ class VimFrame
 
     @resetState()
 
-    messageManager.listen('modeChange', ({ mode }) =>
+    messageManager.listen('modeChange', ({mode}) =>
       @mode = mode
     )
 
@@ -42,11 +43,10 @@ class VimFrame
 
   resetState: ->
     @state =
-      hasInteraction:           false
-      scrollableElements:       new Set()
-      largestScrollableElement: null
-      lastFocusedTextInput:     null
-      shouldRefocus:            false
+      hasInteraction:       false
+      lastFocusedTextInput: null
+      shouldRefocus:        false
+      scrollableElements:   new ScrollableElements(@content)
 
   options: (prefs) -> messageManager.get('options', {prefs})
 

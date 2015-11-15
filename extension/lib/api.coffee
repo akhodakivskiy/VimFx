@@ -32,15 +32,15 @@ createAPI = (vimfx) ->
     when pref of defaults.all_prefs or pref?.startsWith('custom.')
       prefs.get(pref)
     else
-      throw new Error("VimFx: Unknown pref: #{ pref }")
+      throw new Error("VimFx: Unknown pref: #{pref}")
 
   getDefault: (pref) -> switch
     when pref of defaults.parsed_options or pref?.startsWith('custom.')
-      throw new Error("VimFx: No default for pref: #{ pref }")
+      throw new Error("VimFx: No default for pref: #{pref}")
     when pref of defaults.all_prefs
       defaults.all_prefs[pref]
     else
-      throw new Error("VimFx: Unknown pref: #{ pref }")
+      throw new Error("VimFx: Unknown pref: #{pref}")
 
   set: (pref, value) -> switch
     when pref of defaults.parsed_options
@@ -48,36 +48,36 @@ createAPI = (vimfx) ->
     when pref of defaults.all_prefs or pref?.startsWith('custom.')
       prefs.set(pref, value)
     else
-      throw new Error("VimFx: Unknown pref: #{ pref }")
+      throw new Error("VimFx: Unknown pref: #{pref}")
 
-  addCommand: ({ name, description, mode, category, order } = {}, fn) ->
+  addCommand: ({name, description, mode, category, order} = {}, fn) ->
     mode     ?= 'normal'
     category ?= if mode == 'normal' then 'misc' else ''
     order    ?= counter.tick()
 
     unless typeof name == 'string'
       throw new Error("VimFx: A command name as a string is required.
-                       Got: #{ name }")
+                       Got: #{name}")
     unless /^[a-z_]+$/.test(name)
       throw new Error("VimFx: Command names should only consist of a-z
-                       (lowercase) and underscores. Got: #{ name }")
+                       (lowercase) and underscores. Got: #{name}")
     unless typeof description == 'string' and description != ''
       throw new Error("VimFx: Commands must have a non-empty description.
-                       Got: #{ description }")
+                       Got: #{description}")
     unless utils.has(vimfx.modes, mode)
       modes = Object.keys(vimfx.modes).join(', ')
-      throw new Error("VimFx: Unknown mode. Available modes are: #{ modes }.
-                       Got: #{ mode }")
+      throw new Error("VimFx: Unknown mode. Available modes are: #{modes}.
+                       Got: #{mode}")
     unless utils.has(vimfx.options.categories, category)
       categories = Object.keys(vimfx.options.categories).join(', ')
       throw new Error("VimFx: Unknown category. Available categories are:
-                       #{ categories }. Got: #{ category }")
+                       #{categories}. Got: #{category}")
     unless typeof order == 'number'
-      throw new Error("VimFx: Command order must be a number. Got: #{ order }")
+      throw new Error("VimFx: Command order must be a number. Got: #{order}")
     unless typeof fn == 'function'
-      throw new Error("VimFx: Commands need a function to run. Got: #{ fn }")
+      throw new Error("VimFx: Commands need a function to run. Got: #{fn}")
 
-    pref = "#{ defaults.BRANCH }custom.mode.#{ mode }.#{ name }"
+    pref = "#{defaults.BRANCH}custom.mode.#{mode}.#{name}"
     prefs.root.default.set(pref, '')
     vimfx.modes[mode].commands[name] = {
       pref, category, order, run: fn, description: -> description

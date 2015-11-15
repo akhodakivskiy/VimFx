@@ -93,25 +93,18 @@ isTypingElement = (element) ->
 # Active/focused element helpers
 
 getActiveElement = (window) ->
-  { activeElement } = window.document
+  {activeElement} = window.document
   if activeElement instanceof HTMLFrameElement or
      activeElement instanceof HTMLIFrameElement
     return getActiveElement(activeElement.contentWindow)
   else
     return activeElement
 
-blurActiveElement = (window, extraAllowedElements = null) ->
-  # Only blur focusable elements, in order to interfere with the browser as
-  # little as possible.
-  activeElement = getActiveElement(window)
-  if activeElement and
-     (activeElement.tabIndex > -1 or extraAllowedElements?.has(activeElement))
-    activeElement.blur()
+blurActiveElement = (window) ->
+  return unless activeElement = getActiveElement(window)
+  activeElement.blur()
 
 blurActiveBrowserElement = (vim) ->
-  # - Some browser UI elements, such as the web console, are not marked as
-  #   focusable, so we can’t check if the element is focusable as in
-  #   `blurActiveElement`.
   # - Blurring in the next tick allows to pass `<escape>` to the location bar to
   #   reset it, for example.
   # - Focusing the current browser afterwards allows to pass `<escape>` as well
@@ -119,7 +112,7 @@ blurActiveBrowserElement = (vim) ->
   #   focus events on `document` and `window` in the current page. Many pages
   #   re-focus some text input on those events, making it impossible to blur
   #   those! Therefore we tell the frame script to suppress those events.
-  { window } = vim
+  {window} = vim
   activeElement = getActiveElement(window)
   vim._send('browserRefocus')
   nextTick(window, ->
@@ -178,6 +171,17 @@ listenOnce = (element, eventName, listener, useCapture = true) ->
     element.removeEventListener(eventName, fn, useCapture)
   listen(element, eventName, fn, useCapture)
 
+onRemoved = (window, element, fn) ->
+  mutationObserver = new window.MutationObserver((changes) ->
+    for change in changes then for removedElement in change.removedNodes
+      if removedElement == element
+        mutationObserver.disconnect()
+        fn()
+        return
+  )
+  mutationObserver.observe(element.parentNode, {childList: true})
+  module.onShutdown(mutationObserver.disconnect.bind(mutationObserver))
+
 suppressEvent = (event) ->
   event.preventDefault()
   event.stopPropagation()
@@ -213,22 +217,36 @@ createBox = (document, className, parent = null, text = null) ->
   return box
 
 insertText = (input, value) ->
-  { selectionStart, selectionEnd } = input
+  {selectionStart, selectionEnd} = input
   input.value =
     input.value[0...selectionStart] + value + input.value[selectionEnd..]
   input.selectionStart = input.selectionEnd = selectionStart + value.length
+
+querySelectorAllDeep = (window, selector) ->
+  elements = Array.from(window.document.querySelectorAll(selector))
+  for frame in window.frames
+    elements.push(querySelectorAllDeep(frame, selector)...)
+  return elements
 
 setAttributes = (element, attributes) ->
   for attribute, value of attributes
     element.setAttribute(attribute, value)
   return
 
+windowContainsDeep = (window, element) ->
+  parent = element.ownerDocument.defaultView
+  loop
+    return true if parent == window
+    break if parent.top == parent
+    parent = parent.parent
+  return false
+
 
 
 # Language helpers
 
 class Counter
-  constructor: ({ start: @value = 0, @step = 1 }) ->
+  constructor: ({start: @value = 0, @step = 1}) ->
   tick: -> @value += @step
 
 class EventEmitter
@@ -249,10 +267,7 @@ nextTick = (window, fn) -> window.setTimeout(fn, 0)
 
 regexEscape = (s) -> s.replace(/[|\\{}()[\]^$+*?.]/g, '\\$&')
 
-removeDuplicates = (array) ->
-  # coffeelint: disable=no_backticks
-  return `[...new Set(array)]`
-  # coffeelint: enable=no_backticks
+removeDuplicates = (array) -> Array.from(new Set(array))
 
 # Remove duplicate characters from string (case insensitive).
 removeDuplicateCharacters = (str) ->
@@ -268,7 +283,7 @@ formatError = (error) ->
     .filter((line) -> line.includes('.xpi!'))
     .map((line) -> '  ' + line.replace(/(?:\/<)*@.+\.xpi!/g, '@'))
     .join('\n')
-  return "#{ error }\n#{ stack }"
+  return "#{error}\n#{stack}"
 
 getCurrentLocation = ->
   window = getCurrentWindow()
@@ -282,7 +297,7 @@ getCurrentWindow = ->
 loadCss = (name) ->
   sss = Cc['@mozilla.org/content/style-sheet-service;1']
     .getService(Ci.nsIStyleSheetService)
-  uri = Services.io.newURI("chrome://vimfx/skin/#{ name }.css", null, null)
+  uri = Services.io.newURI("chrome://vimfx/skin/#{name}.css", null, null)
   method = sss.AUTHOR_SHEET
   unless sss.sheetRegistered(uri, method)
     sss.loadAndRegisterSheet(uri, method)
@@ -298,16 +313,9 @@ observe = (topic, observer) ->
   )
 
 openTab = (window, url, options) ->
-  { gBrowser } = window
+  {gBrowser} = window
   window.TreeStyleTabService?.readyToOpenChildTab(gBrowser.selectedTab)
   gBrowser.loadOneTab(url, options)
-
-# Executes `fn` and measures how much time it took.
-timeIt = (fn, name) ->
-  console.time(name)
-  result = fn()
-  console.timeEnd(name)
-  return result
 
 writeToClipboard = (text) ->
   clipboardHelper = Cc['@mozilla.org/widget/clipboardhelper;1']
@@ -333,13 +341,16 @@ module.exports = {
 
   listen
   listenOnce
+  onRemoved
   suppressEvent
   simulateClick
 
   area
   createBox
   insertText
+  querySelectorAllDeep
   setAttributes
+  windowContainsDeep
 
   Counter
   EventEmitter
@@ -355,6 +366,5 @@ module.exports = {
   loadCss
   observe
   openTab
-  timeIt
   writeToClipboard
 }

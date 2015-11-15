@@ -22,7 +22,7 @@
 # messages between the main process and frame scripts. There is one frame script
 # per tab, and only them can access web page content.
 
-namespace = (name) -> "VimFx:#{ name }"
+namespace = (name) -> "VimFx:#{name}"
 
 defaultMM =
   if IS_FRAME_SCRIPT
@@ -33,7 +33,7 @@ defaultMM =
 
 load = (name, messageManager = defaultMM) ->
   # Randomize URI to work around bug 1051238.
-  url = "chrome://vimfx/content/#{ name }.js?#{ Math.random() }"
+  url = "chrome://vimfx/content/#{name}.js?#{Math.random()}"
   messageManager.loadFrameScript(url, true)
   module.onShutdown(->
     messageManager.removeDelayedFrameScript(url)
@@ -62,7 +62,7 @@ send = (name, data = null, messageManager = defaultMM, callback = null) ->
 
   callbackName = null
   if callback
-    callbackName = "#{ name }:callback:#{ callbackCounter }"
+    callbackName = "#{name}:callback:#{callbackCounter}"
     callbackCounter++
     listenOnce(callbackName, callback, messageManager)
 
@@ -74,14 +74,14 @@ send = (name, data = null, messageManager = defaultMM, callback = null) ->
     messageManager.sendAsyncMessage(namespacedName, wrappedData)
 
 # Unwraps the data from `send` and invokes `listener` with it.
-invokeListener = (listener, { name, data: { data, callback } = {}, target }) ->
+invokeListener = (listener, {name, data: {data, callback} = {}, target}) ->
   listener(data, {name, target, callback})
 
 # Note: This is a synchronous call. It should only be used when absolutely
 # needed, such as in an event listener which needs to suppress the event based
 # on the return value.
 get = (name, data) ->
-  [ result ] = defaultMM.sendSyncMessage(namespace(name), {data})
+  [result] = defaultMM.sendSyncMessage(namespace(name), {data})
   return result
 
 module.exports = {
