@@ -146,7 +146,7 @@ moveFocus = (direction) ->
 getFocusType = (event) ->
   target = event.originalTarget
   return switch
-    when isTextInputElement(target) or isContentEditable(target)
+    when isTypingElement(target) or isContentEditable(target)
       'editable'
     when isActivatable(target)
       'activatable'
