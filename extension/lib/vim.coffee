@@ -25,6 +25,7 @@
 # should not be used by API consumers.
 
 messageManager = require('./message-manager')
+statusPanel    = require('./status-panel')
 utils          = require('./utils')
 
 ChromeWindow = Ci.nsIDOMChromeWindow
@@ -79,6 +80,11 @@ class Vim
     @browser = browser
     @window = @browser.ownerGlobal
     @_messageManager = @browser.messageManager
+
+    @_statusPanel?.remove()
+    @_statusPanel = statusPanel.injectStatusPanel(@browser)
+    @_statusPanel.onclick = @hideNotification.bind(this)
+
     @_addListeners() if refresh
 
   _resetState: ->
@@ -141,9 +147,13 @@ class Vim
 
   notify: (message) ->
     @_parent.emit('notification', {vim: this, message})
+    if @_parent.options.notifications_enabled
+      @_statusPanel.setAttribute('label', message)
+      @_statusPanel.removeAttribute('inactive')
 
   hideNotification: ->
     @_parent.emit('hideNotification', {vim: this})
+    @_statusPanel.setAttribute('inactive', 'true')
 
   markPageInteraction: ->
     @_send('markPageInteraction')

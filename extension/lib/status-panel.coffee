@@ -22,7 +22,7 @@
 
 utils = require('./utils')
 
-injectStatusPanel = (browser, vimfx) ->
+injectStatusPanel = (browser) ->
   window = browser.ownerGlobal
 
   statusPanel = window.document.createElement('statuspanel')
@@ -31,32 +31,12 @@ injectStatusPanel = (browser, vimfx) ->
     layer:    'true'
     mirror:   'true'
   })
+  statusPanel.style.pointerEvents = 'auto'
 
-  # The current browser can usually be retrieved from `window`. However, this
-  # runs too early. Instead a browser known to exist is passed in. (_Which_
-  # browser is passed doesn’t matter since only their common container is used.)
   window.gBrowser.getBrowserContainer(browser).appendChild(statusPanel)
   module.onShutdown(-> statusPanel.remove())
 
-  shouldHandleNotification = (vim) ->
-    return vimfx.options.notifications_enabled and
-           vim.window == window and vim == vimfx.getCurrentVim(window)
-
-  vimfx.on('notification', ({vim, message}) ->
-    return unless shouldHandleNotification(vim)
-    statusPanel.setAttribute('label', message)
-    statusPanel.removeAttribute('inactive')
-  )
-
-  vimfx.on('hideNotification', ({vim}) ->
-    return unless shouldHandleNotification(vim)
-    statusPanel.setAttribute('inactive', 'true')
-  )
-
-  statusPanel.style.pointerEvents = 'auto'
-  utils.listen(statusPanel, 'click', ->
-    vimfx.emit('hideNotification')
-  )
+  return statusPanel
 
 module.exports = {
   injectStatusPanel

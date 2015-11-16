@@ -30,7 +30,6 @@ modes          = require('./modes')
 options        = require('./options')
 parsePref      = require('./parse-prefs')
 prefs          = require('./prefs')
-statusPanel    = require('./status-panel')
 utils          = require('./utils')
 VimFx          = require('./vimfx')
 test           = try require('../test/index')
@@ -121,7 +120,6 @@ module.exports = (data, reason) ->
       eventManager = new UIEventManager(vimfx, window)
       eventManager.addListeners(vimfx, window)
       window.document.documentElement.setAttribute('vimfx-mode', 'normal')
-      statusPanel.injectStatusPanel(browser, vimfx)
 
     return [__SCRIPT_URI_SPEC__, MULTI_PROCESS_ENABLED]
   )
