@@ -26,8 +26,6 @@ HTMLButtonElement   = Ci.nsIDOMHTMLButtonElement
 HTMLInputElement    = Ci.nsIDOMHTMLInputElement
 HTMLTextAreaElement = Ci.nsIDOMHTMLTextAreaElement
 HTMLSelectElement   = Ci.nsIDOMHTMLSelectElement
-HTMLFrameElement    = Ci.nsIDOMHTMLFrameElement
-HTMLIFrameElement   = Ci.nsIDOMHTMLIFrameElement
 XULDocument         = Ci.nsIDOMXULDocument
 XULButtonElement    = Ci.nsIDOMXULButtonElement
 XULControlElement   = Ci.nsIDOMXULControlElement
@@ -94,8 +92,7 @@ isTypingElement = (element) ->
 
 getActiveElement = (window) ->
   {activeElement} = window.document
-  if activeElement instanceof HTMLFrameElement or
-     activeElement instanceof HTMLIFrameElement
+  if activeElement.contentWindow
     return getActiveElement(activeElement.contentWindow)
   else
     return activeElement
@@ -128,17 +125,15 @@ focusElement = (element, options = {}) ->
   focusManager.setFocus(element, focusManager.FLAG_BYKEY)
   element.select?() if options.select
 
-getFocusType = (event) ->
-  target = event.originalTarget
-  return switch
-    when isTextInputElement(target) or isContentEditable(target)
-      'editable'
-    when isActivatable(target)
-      'activatable'
-    when isAdjustable(target)
-      'adjustable'
-    else
-      null
+getFocusType = (element) -> switch
+  when isTextInputElement(element) or isContentEditable(element)
+    'editable'
+  when isActivatable(element)
+    'activatable'
+  when isAdjustable(element)
+    'adjustable'
+  else
+    null
 
 
 

@@ -8,6 +8,10 @@ See the file README.md for copying conditions.
 
 VimFx has a toolbar button. It looks like this: ![VimFx button icon].
 
+If you focus a text input, the icon is greyed out. This is to show that your key
+presses will be passed into the text input rather than activating VimFx
+commands.
+
 When in Normal mode, clicking it opens VimFx’s Keyboard Shortcuts dialog, just
 like the `?` shortcut does.
 

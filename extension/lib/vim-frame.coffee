@@ -59,7 +59,7 @@ class VimFrame
     })
 
   onInput: (event) ->
-    focusType = utils.getFocusType(event)
+    focusType = utils.getFocusType(event.originalTarget)
     suppress = messageManager.get('consumeKeyEvent', {focusType})
     return suppress
 
