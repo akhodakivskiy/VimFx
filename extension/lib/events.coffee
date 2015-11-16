@@ -132,7 +132,12 @@ class UIEventManager
         vim.enterMode('normal')
     )
 
-    @listen('TabSelect', @vimfx.emit.bind(@vimfx, 'TabSelect'))
+    @listen('TabSelect', (event) =>
+      @vimfx.emit(@vimfx, 'TabSelect', event)
+
+      return unless vim = @vimfx.getCurrentVim(@window)
+      vim.hideNotification()
+    )
 
     @listen('TabOpen', (event) =>
       browser = @window.gBrowser.getBrowserForTab(event.originalTarget)
@@ -174,14 +179,16 @@ class UIEventManager
 
   consumeKeyEvent: (vim, event, focusType, uiEvent = false) ->
     match = vim._consumeKeyEvent(event, focusType)
-    switch
-      when not match
-        @suppress = null
-      when match.specialKeys['<late>']
+
+    if match
+      vim.hideNotification()
+      if match.specialKeys['<late>']
         @suppress = false
         @consumeLateKeydown(vim, event, match, uiEvent)
       else
         @suppress = vim._onInput(match, uiEvent)
+    else
+      @suppress = null
     @setHeldModifiers(event)
 
   consumeLateKeydown: (vim, event, match, uiEvent) ->
