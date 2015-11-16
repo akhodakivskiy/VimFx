@@ -13,16 +13,6 @@ the beginning, and your new shortcut should work fine.
 
 [`<force>`]: shortcuts.md#force
 
-## What does `<force><late><tab>` mean?
-
-- `<force>`: The shortcut works even in text inputs.
-- `<late>`: The page can override it.
-- `<tab>`: Press the Tab key to trigger it.
-
-Need more explaination? Read about [special keys].
-
-[special keys]: shortcuts.md#special-keys
-
 ## Will VimFx provide advanced Find features?
 
 One VimFx’s key feauters is to embrace standard Firefox features. As long as

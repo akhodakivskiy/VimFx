@@ -99,13 +99,5 @@ the key presses. This makes the VimFx shortcuts work consistently regardless of
 what the current page happens to be up to.
 
 Sometimes, though, it is useful to let the page override a shortcut. For
-example, the [focus next/previous element] commands, use `<late>` in their
-default shorcuts: `<force><late><tab>` and `<force><late><s-tab>`, respectively.
-`<force>` is there so that you can press `<tab>` inside a text input to get to
-the next one; `<late>` lets the page offer tab completion instead, for example.
-
-`<late>` is also useful if you plan to use the arrow keys for VimFx’s scrolling
-commands, while still being able to move the focus in the custom menus some
-sites use.
-
-[focus next/previous element]: commands.md#focus-nextprevious-element
+example, if you plan to use the arrow keys for VimFx’s scrolling commands, while
+still being able to move the focus in the custom menus some sites use.

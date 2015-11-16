@@ -128,21 +128,6 @@ focusElement = (element, options = {}) ->
   focusManager.setFocus(element, focusManager.FLAG_BYKEY)
   element.select?() if options.select
 
-moveFocus = (direction) ->
-  focusManager = Cc['@mozilla.org/focus-manager;1']
-    .getService(Ci.nsIFocusManager)
-  directionFlag =
-    if direction == -1
-      focusManager.MOVEFOCUS_BACKWARD
-    else
-      focusManager.MOVEFOCUS_FORWARD
-  focusManager.moveFocus(
-    null, # Use current window.
-    null, # Move relative to the currently focused element.
-    directionFlag,
-    focusManager.FLAG_BYKEY
-  )
-
 getFocusType = (event) ->
   target = event.originalTarget
   return switch
@@ -336,7 +321,6 @@ module.exports = {
   blurActiveElement
   blurActiveBrowserElement
   focusElement
-  moveFocus
   getFocusType
 
   listen

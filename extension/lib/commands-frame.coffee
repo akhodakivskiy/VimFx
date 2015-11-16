@@ -87,9 +87,9 @@ combine = (hrefs, element, wrapper) ->
       hrefs[href] = wrapper
   return wrapper
 
-commands.follow = ({vim, storage}) ->
+commands.follow = ({vim}) ->
   hrefs = {}
-  storage.markerElements = []
+  vim.state.markerElements = []
   filter = (element, getElementShape) ->
     document = element.ownerDocument
     isXUL = (document instanceof XULDocument)
@@ -154,20 +154,20 @@ commands.follow = ({vim, storage}) ->
         type = 'clickable'
     return unless type
     return unless shape = getElementShape(element)
-    length = storage.markerElements.push(element)
+    length = vim.state.markerElements.push(element)
     return combine(
       hrefs, element, {elementIndex: length - 1, shape, semantic, type}
     )
 
   return hints.getMarkableElementsAndViewport(vim.content, filter)
 
-commands.follow_in_tab = ({vim, storage}) ->
+commands.follow_in_tab = ({vim}) ->
   hrefs = {}
-  storage.markerElements = []
+  vim.state.markerElements = []
   filter = (element, getElementShape) ->
     return unless isProperLink(element)
     return unless shape = getElementShape(element)
-    length = storage.markerElements.push(element)
+    length = vim.state.markerElements.push(element)
     return combine(
       hrefs, element,
       {elementIndex: length - 1, shape, semantic: true, type: 'link'}
@@ -175,9 +175,9 @@ commands.follow_in_tab = ({vim, storage}) ->
 
   return hints.getMarkableElementsAndViewport(vim.content, filter)
 
-commands.follow_copy = ({vim, storage}) ->
+commands.follow_copy = ({vim}) ->
   hrefs = {}
-  storage.markerElements = []
+  vim.state.markerElements = []
   filter = (element, getElementShape) ->
     type = switch
       when isProperLink(element)      then 'link'
@@ -185,15 +185,15 @@ commands.follow_copy = ({vim, storage}) ->
       when isContentEditable(element) then 'contenteditable'
     return unless type
     return unless shape = getElementShape(element)
-    length = storage.markerElements.push(element)
+    length = vim.state.markerElements.push(element)
     return combine(
       hrefs, element, {elementIndex: length - 1, shape, semantic: true, type}
     )
 
   return hints.getMarkableElementsAndViewport(vim.content, filter)
 
-commands.follow_focus = ({vim, storage}) ->
-  storage.markerElements = []
+commands.follow_focus = ({vim}) ->
+  vim.state.markerElements = []
   filter = (element, getElementShape) ->
     type = switch
       when element.tabIndex > -1
@@ -203,18 +203,18 @@ commands.follow_focus = ({vim, storage}) ->
         'scrollable'
     return unless type
     return unless shape = getElementShape(element)
-    length = storage.markerElements.push(element)
+    length = vim.state.markerElements.push(element)
     return {elementIndex: length - 1, shape, semantic: true, type}
 
   return hints.getMarkableElementsAndViewport(vim.content, filter)
 
-commands.focus_marker_element = ({storage, elementIndex, options}) ->
-  element = storage.markerElements[elementIndex]
+commands.focus_marker_element = ({vim, elementIndex, options}) ->
+  element = vim.state.markerElements[elementIndex]
   utils.focusElement(element, options)
 
 commands.click_marker_element = (args) ->
-  {vim, storage, elementIndex, preventTargetBlank, type} = args
-  element = storage.markerElements[elementIndex]
+  {vim, elementIndex, preventTargetBlank, type} = args
+  element = vim.state.markerElements[elementIndex]
   if element.target == '_blank' and preventTargetBlank
     targetReset = element.target
     element.target = ''
@@ -224,8 +224,8 @@ commands.click_marker_element = (args) ->
     utils.simulateClick(element)
   element.target = targetReset if targetReset
 
-commands.copy_marker_element = ({storage, elementIndex, property}) ->
-  element = storage.markerElements[elementIndex]
+commands.copy_marker_element = ({vim, elementIndex, property}) ->
+  element = vim.state.markerElements[elementIndex]
   utils.writeToClipboard(element[property])
 
 commands.follow_pattern = ({vim, type, options}) ->
@@ -270,7 +270,7 @@ commands.follow_pattern = ({vim, type, options}) ->
 
   utils.simulateClick(matchingLink) if matchingLink
 
-commands.focus_text_input = ({vim, storage, count = null}) ->
+commands.focus_text_input = ({vim, count = null}) ->
   {lastFocusedTextInput} = vim.state
   inputs = Array.filter(
     utils.querySelectorAllDeep(vim.content, 'input, textarea'), (element) ->
@@ -288,26 +288,25 @@ commands.focus_text_input = ({vim, storage, count = null}) ->
         1
   index = Math.min(count, inputs.length) - 1
   utils.focusElement(inputs[index], {select: true})
-  storage.inputs = inputs
+  vim.state.inputs = inputs
 
-commands.clear_inputs = ({storage}) ->
-  storage.inputs = null
+commands.clear_inputs = ({vim}) ->
+  vim.state.inputs = null
 
-commands.move_focus = ({vim, storage, direction}) ->
-  if storage.inputs
-    index = storage.inputs.indexOf(utils.getActiveElement(vim.content))
-    # If there’s only one input, `<tab>` would cycle to itself, making it feel
-    # like `<tab>` was not working. Then it’s better to let `<tab>` work as it
-    # usually does.
-    if index == -1 or storage.inputs.length <= 1
-      storage.inputs = null
-    else
-      {inputs} = storage
-      nextInput = inputs[(index + direction) %% inputs.length]
-      utils.focusElement(nextInput, {select: true})
-      return
-
-  utils.moveFocus(direction)
+commands.move_focus = ({vim, direction}) ->
+  return false unless vim.state.inputs
+  index = vim.state.inputs.indexOf(utils.getActiveElement(vim.content))
+  # If there’s only one input, `<tab>` would cycle to itself, making it feel
+  # like `<tab>` was not working. Then it’s better to let `<tab>` work as it
+  # usually does.
+  if index == -1 or vim.state.inputs.length <= 1
+    vim.state.inputs = null
+    return false
+  else
+    {inputs} = vim.state
+    nextInput = inputs[(index + direction) %% inputs.length]
+    utils.focusElement(nextInput, {select: true})
+    return true
 
 commands.esc = (args) ->
   commands.blur_active_element(args)

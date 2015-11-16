@@ -47,6 +47,8 @@ class VimFrame
       lastFocusedTextInput: null
       shouldRefocus:        false
       scrollableElements:   new ScrollableElements(@content)
+      markerElements:       []
+      inputs:               null
 
   options: (prefs) -> messageManager.get('options', {prefs})
 

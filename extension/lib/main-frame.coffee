@@ -27,12 +27,11 @@ VimFrame          = require('./vim-frame')
 module.exports = ->
   {content} = FRAME_SCRIPT_ENVIRONMENT
   vim = new VimFrame(content)
-  storage = {}
 
   eventManager = new FrameEventManager(vim)
   eventManager.addListeners()
 
   messageManager.listen('runCommand', ({name, data}, {callback}) ->
-    result = commands[name](Object.assign({vim, storage}, data))
+    result = commands[name](Object.assign({vim}, data))
     messageManager.send(callback, result) if callback?
   )
