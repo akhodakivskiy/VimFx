@@ -231,6 +231,23 @@ vimfx.on('locationChange', ({vim, location}) => {
 })
 ```
 
+#### The `notification` and `hideNotification` events
+
+The `notification` event occurs when `vim.notify(message)` is called, and means
+that `message` should be displayed to the user.
+
+The `hideNotification` event occurs when the `vim.hideNotification()` is called,
+and means that the current notification is requested to be hidden.
+
+The data passed to listeners is an object with the following properties:
+
+- vim: The current [vim object].
+- message: The message that should be notified. Only for the `notification`
+  event.
+
+Both of these events are emitted even if the [`notifications_enabled`] option is
+disabled, allowing you to display notifications in any way you want.
+
 #### The `modeChange` event
 
 Occurs whenever the current mode in any tab changes. The initial entering of the
@@ -494,9 +511,9 @@ A `vim` object has the following properties:
 - isUIEvent(event): `Function`. Returns `true` if `event` occurred in the
   browser UI, and `false` otherwise (if it occurred in web page content).
 
-- notify(title, options = {}): `Function`. Display a notification with the title
-  `title` (a `String`). If you need more text than a title, use `options.body`.
-  See [`Notification`] for more information.
+- notify(message): `Function`. Display a notification with the text `message`.
+
+- hideNotification(): `Function`. Hide the current notification (if any).
 
 - markPageInteraction(): `Function`. Marks that the user has interacted with the
   page. After that [autofocus prevention] is not done anymore. Commands
@@ -563,6 +580,7 @@ backwards compatibility will be a priority and won’t be broken until VimFx
 [autofocus prevention]: options.md#prevent-autofocus
 [`activatable_element_keys`]: options.md#activatable_element_keys
 [`adjustable_element_keys`]: options.md#adjustable_element_keys
+[`notifications_enabled`]: options.md#notifications_enabled
 
 [button]: button.md
 [special keys]: shortcuts.md#special-keys
@@ -576,7 +594,6 @@ backwards compatibility will be a priority and won’t be broken until VimFx
 
 [`Window`]: https://developer.mozilla.org/en-US/docs/Web/API/Window
 [`Browser`]: https://developer.mozilla.org/en-US/docs/Mozilla/Tech/XUL/browser
-[`Notification`]: https://developer.mozilla.org/en-US/docs/Web/API/Notification
 [`window.location`]: https://developer.mozilla.org/en-US/docs/Web/API/Location
 [`URL`]: https://developer.mozilla.org/en-US/docs/Web/API/URL
 [TabSelect]: https://developer.mozilla.org/en-US/docs/Web/Events/TabSelect

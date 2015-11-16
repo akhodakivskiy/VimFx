@@ -170,27 +170,39 @@ commands.tab_duplicate = ({vim}) ->
     gBrowser.duplicateTab(gBrowser.selectedTab)
   )
 
-absoluteTabIndex = (relativeIndex, gBrowser) ->
+absoluteTabIndex = (relativeIndex, gBrowser, {pinnedSeparate}) ->
   tabs = gBrowser.visibleTabs
   {selectedTab} = gBrowser
 
   currentIndex  = tabs.indexOf(selectedTab)
   absoluteIndex = currentIndex + relativeIndex
-  numTabs       = tabs.length
+  numTabsTotal  = tabs.length
+  numPinnedTabs = gBrowser._numPinnedTabs
 
-  wrap = (Math.abs(relativeIndex) == 1)
-  if wrap
-    absoluteIndex %%= numTabs
-  else
-    absoluteIndex = Math.max(0, absoluteIndex)
-    absoluteIndex = Math.min(absoluteIndex, numTabs - 1)
+  [numTabs, min] = switch
+    when not pinnedSeparate  then [numTabsTotal,  0]
+    when selectedTab.pinned  then [numPinnedTabs, 0]
+    else [numTabsTotal - numPinnedTabs, numPinnedTabs]
+
+  # Wrap _once_ if at one of the ends of the tab bar and cannot move in the
+  # current direction.
+  if (relativeIndex < 0 and currentIndex == min) or
+     (relativeIndex > 0 and currentIndex == min + numTabs - 1)
+    if absoluteIndex < min
+      absoluteIndex += numTabs
+    else if absoluteIndex >= min + numTabs
+      absoluteIndex -= numTabs
+
+  absoluteIndex = Math.max(min, absoluteIndex)
+  absoluteIndex = Math.min(absoluteIndex, min + numTabs - 1)
 
   return absoluteIndex
 
 helper_switch_tab = (direction, {vim, count = 1}) ->
   {gBrowser} = vim.window
+  index = absoluteTabIndex(direction * count, gBrowser, {pinnedSeparate: false})
   utils.nextTick(vim.window, ->
-    gBrowser.selectTabAtIndex(absoluteTabIndex(direction * count, gBrowser))
+    gBrowser.selectTabAtIndex(index)
   )
 
 commands.tab_select_previous = helper_switch_tab.bind(null, -1)
@@ -198,39 +210,30 @@ commands.tab_select_previous = helper_switch_tab.bind(null, -1)
 commands.tab_select_next     = helper_switch_tab.bind(null, +1)
 
 helper_move_tab = (direction, {vim, count = 1}) ->
-  {gBrowser}    = vim.window
-  {selectedTab} = gBrowser
-  {pinned}      = selectedTab
-
-  index = absoluteTabIndex(direction * count, gBrowser)
-
-  if index < gBrowser._numPinnedTabs
-    gBrowser.pinTab(selectedTab) unless pinned
-  else
-    gBrowser.unpinTab(selectedTab) if pinned
-
+  {gBrowser} = vim.window
+  index = absoluteTabIndex(direction * count, gBrowser, {pinnedSeparate: true})
   utils.nextTick(vim.window, ->
-    gBrowser.moveTabTo(selectedTab, index)
+    gBrowser.moveTabTo(gBrowser.selectedTab, index)
   )
 
 commands.tab_move_backward = helper_move_tab.bind(null, -1)
 
 commands.tab_move_forward  = helper_move_tab.bind(null, +1)
 
-commands.tab_select_first = ({vim}) ->
+commands.tab_select_first = ({vim, count = 1}) ->
   utils.nextTick(vim.window, ->
-    vim.window.gBrowser.selectTabAtIndex(0)
+    vim.window.gBrowser.selectTabAtIndex(count - 1)
   )
 
-commands.tab_select_first_non_pinned = ({vim}) ->
+commands.tab_select_first_non_pinned = ({vim, count = 1}) ->
   firstNonPinned = vim.window.gBrowser._numPinnedTabs
   utils.nextTick(vim.window, ->
-    vim.window.gBrowser.selectTabAtIndex(firstNonPinned)
+    vim.window.gBrowser.selectTabAtIndex(firstNonPinned + count - 1)
   )
 
-commands.tab_select_last = ({vim}) ->
+commands.tab_select_last = ({vim, count = 1}) ->
   utils.nextTick(vim.window, ->
-    vim.window.gBrowser.selectTabAtIndex(-1)
+    vim.window.gBrowser.selectTabAtIndex(-count)
   )
 
 commands.tab_toggle_pinned = ({vim}) ->

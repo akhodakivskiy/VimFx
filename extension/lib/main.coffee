@@ -30,6 +30,7 @@ modes          = require('./modes')
 options        = require('./options')
 parsePref      = require('./parse-prefs')
 prefs          = require('./prefs')
+statusPanel    = require('./status-panel')
 utils          = require('./utils')
 VimFx          = require('./vimfx')
 test           = try require('../test/index')
@@ -106,19 +107,21 @@ module.exports = (data, reason) ->
   test?(vimfx)
 
   windows = new WeakSet()
-  messageManager.listen('tabCreated', (data, {target}) ->
+  messageManager.listen('tabCreated', (data, {target: browser}) ->
     # Frame script are run in more places than we need. Tell those not to do
     # anything.
-    return false unless target.getAttribute('messagemanagergroup') == 'browsers'
+    group = browser.getAttribute('messagemanagergroup')
+    return false unless group == 'browsers'
 
-    window = target.ownerGlobal
-    vimfx.addVim(target)
+    window = browser.ownerGlobal
+    vimfx.addVim(browser)
 
     unless windows.has(window)
       windows.add(window)
       eventManager = new UIEventManager(vimfx, window)
       eventManager.addListeners(vimfx, window)
       window.document.documentElement.setAttribute('vimfx-mode', 'normal')
+      statusPanel.injectStatusPanel(browser, vimfx)
 
     return [__SCRIPT_URI_SPEC__, MULTI_PROCESS_ENABLED]
   )

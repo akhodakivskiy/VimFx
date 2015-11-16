@@ -41,14 +41,31 @@ Specifying a count make them scroll _count_ times as far.
 Selects the tab _count_ tabs backward/forward.
 
 If the count is greater than one they don’t wrap around when reaching the ends
-of the tab bar.
+of the tab bar, unless:
+
+- the first tab is selected and `J` is used.
+- the last tab is selected and `K` is used.
+
+They only wrap around _once._
 
 ### `gJ`, `gK`
 
 Moves the current tab _count_ tabs forward/backward.
 
-If the count is greater than one they don’t wrap around when reaching the ends
-of the tab bar.
+As opposed to `J` and `K`, pinned and non-pinned tabs are handled separately.
+The first non-pinned tab wraps to the last tab, and the last tab wraps to the
+first non-pinned tab, and vice versa for non-pinned tabs. Use `gp` to move a tab
+between the pinned and non-pinned parts of the tab bar.
+
+Other than the above, the count and wrap semantics work like `J` and `K`.
+
+### `g0`, `g^`, `g$`
+
+`g0` selects the tab at index _count,_ counting from the start.
+
+`g^` selects the tab at index _count,_ counting from the first non-pinned tab.
+
+`g$` selects the tab at index _count,_ counting from the end.
 
 ### `x`
 
