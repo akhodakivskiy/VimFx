@@ -27,7 +27,6 @@ utils = require('./utils')
 class ScrollableElements
   constructor: (@window) ->
     @elements = new Set()
-    @frames   = new WeakSet()
     @largest  = null
 
   has: (element) -> @elements.has(element)
@@ -35,20 +34,9 @@ class ScrollableElements
   add: (element) ->
     @elements.add(element)
     utils.onRemoved(@window, element, @delete.bind(this, element))
-    @addFrame(element)
 
     if not @largest or utils.area(element) > utils.area(@largest)
       @largest = element
-
-  addFrame: (element) ->
-    window = element.ownerDocument.defaultView
-    frame  = window.frameElement
-    return if not frame or @frames.has(frame)
-
-    utils.onRemoved(@window, frame, =>
-      @frames.delete(frame)
-      @reject(utils.windowContainsDeep.bind(null, window))
-    )
 
   delete: (element) =>
     @elements.delete(element)

@@ -42,20 +42,24 @@ class FrameEventManager
     @listen('readystatechange', (event) =>
       target = event.originalTarget
 
-      # When the page starts loading `.readyState` changes to 'interactive'.
-      return unless target.readyState == 'interactive'
-
       # If the topmost document starts loading, it means that we have navigated
       # to a new page or refreshed the page.
+      if target == @vim.content.document and target.readyState == 'interactive'
+        messageManager.send('locationChange', @vim.content.location.href)
+    )
+
+    @listen('pagehide', (event) =>
+      target = event.originalTarget
+
       if target == @vim.content.document
         @vim.resetState()
-        messageManager.send('locationChange', @vim.content.location.href)
       else
         # If the target isn’t the topmost document, it means that a frame has
-        # started loading. Some sites change the `src` attribute of `<iframe>`s
-        # dynamically. Any scrollable elements for the old frame `src` then
-        # become dead and need to be filtered out.
-        @vim.state.scrollableElements.reject(Cu.isDeadWrapper)
+        # changed: It could have been removed or its `src` attribute could have
+        # been changed. Any scrollable elements in the frame (or its sub-frames)
+        # then need to be filtered out.
+        @vim.state.scrollableElements
+          .reject(utils.windowContainsDeep.bind(null, target.defaultView))
     )
 
     @listen('click', (event) =>
