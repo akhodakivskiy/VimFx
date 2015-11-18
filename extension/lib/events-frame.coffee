@@ -70,8 +70,9 @@ class FrameEventManager
     @listen('overflow', (event) =>
       target = event.originalTarget
       return unless computedStyle = @vim.content.getComputedStyle(target)
-      return if computedStyle.getPropertyValue('overflow') == 'hidden'
-      @vim.state.scrollableElements.add(target)
+      unless computedStyle.getPropertyValue('overflow-y') == 'hidden' and
+             computedStyle.getPropertyValue('overflow-x') == 'hidden'
+        @vim.state.scrollableElements.add(target)
     )
 
     @listen('underflow', (event) =>
