@@ -34,9 +34,7 @@ class ScrollableElements
   add: (element) ->
     @elements.add(element)
     utils.onRemoved(@window, element, @delete.bind(this, element))
-
-    if not @largest or utils.area(element) > utils.area(@largest)
-      @largest = element
+    @largest = element if @isLargest(element)
 
   delete: (element) =>
     @elements.delete(element)
@@ -46,16 +44,18 @@ class ScrollableElements
     @elements.forEach((element) => @elements.delete(element) if fn(element))
     @updateLargest()
 
-  updateLargest: ->
-    @largest = null
+  isLargest: (element) ->
+    # Always consider the toplevel document the largest scrollable element, if
+    # it is scrollable. (Its area may be smaller than other elements).
+    return not @largest or
+           element == @window.document.documentElement or
+           (@largest != @window.document.documentElement and
+            utils.area(element) > utils.area(@largest))
 
-    # Find a new largest scrollable element (if there are any left).
-    largestArea = -1
-    @elements.forEach((element) =>
-      area = utils.area(element)
-      if area > largestArea
-        @largest = element
-        largestArea = area
-    )
+  updateLargest: ->
+    # Reset `@largest` and find a new largest scrollable element (if there are
+    # any left).
+    @largest = null
+    @elements.forEach((element) => @largest = element if @isLargest(element))
 
 module.exports = ScrollableElements
