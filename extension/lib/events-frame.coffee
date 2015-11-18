@@ -26,6 +26,8 @@ class FrameEventManager
   constructor: (@vim) ->
     @numFocusToSuppress = 0
 
+  MINIMUM_SCROLLABLE_ELEMENT_AREA: 25
+
   listen: utils.listen.bind(null, FRAME_SCRIPT_ENVIRONMENT)
   listenOnce: utils.listenOnce.bind(null, FRAME_SCRIPT_ENVIRONMENT)
 
@@ -58,9 +60,11 @@ class FrameEventManager
         # changed: It could have been removed or its `src` attribute could have
         # been changed. Any scrollable elements in the frame then need to be
         # filtered out. If the frame contains other frames, 'pagehide' events
-        # have already been fired for them.
-        @vim.state.scrollableElements
-          .reject((element) -> element.ownerDocument == target)
+        # have already been fired for them. On some sites, such as Gmail, some
+        # elements might be dead at this point.
+        @vim.state.scrollableElements.reject((element) ->
+          return Cu.isDeadWrapper(element) or element.ownerDocument == target
+        )
     )
 
     @listen('click', (event) =>
@@ -70,15 +74,25 @@ class FrameEventManager
 
     @listen('overflow', (event) =>
       target = event.originalTarget
+
       return unless computedStyle = @vim.content.getComputedStyle(target)
-      unless computedStyle.getPropertyValue('overflow-y') == 'hidden' and
-             computedStyle.getPropertyValue('overflow-x') == 'hidden'
+      unless (computedStyle.getPropertyValue('overflow-y') == 'hidden' and
+              computedStyle.getPropertyValue('overflow-x') == 'hidden') or
+             # There’s no need to track elements so small that they don’t even
+             # fit the scrollbars. For example, Gmail has lots of tiny
+             # overflowing iframes. Filter those out.
+             utils.area(target) < @MINIMUM_SCROLLABLE_ELEMENT_AREA
         @vim.state.scrollableElements.add(target)
     )
 
     @listen('underflow', (event) =>
       target = event.originalTarget
-      @vim.state.scrollableElements.delete(target)
+
+      # On some pages, such as Gmail, 'underflow' events may occur for elements
+      # that are actually still scrollable! If so, keep the element.
+      unless target.scrollHeight > target.clientHeight or
+             target.scrollWidth  > target.clientWidth
+        @vim.state.scrollableElements.delete(target)
     )
 
     @listen('keydown', (event) =>
