@@ -270,11 +270,30 @@ the `event` object passed to the standard Firefox [TabSelect] event.
 ### The `modeDisplayChange` event
 
 This is basically a combination of the `modeChange` and the `TabSelect` events.
-The event is useful for knowing when to update UI showing the current mode. (In
-fact, VimFx itself uses it to update the toolbar [button]!) The data passed to
-listeners is the current [vim object].
+The event is useful for knowing when to update UI showing the current mode. The
+data passed to listeners is the current [vim object].
 
-You can also highlight the current mode using [styling].
+(VimFx itself uses this event to update the toolbar [button], by setting
+`#main-window[vimfx-mode]` to the current mode. You may use this with custom
+[styling].)
+
+#### The `focusTypeChange` event
+
+Occurs when focusing or blurring any element. The data passed to listeners is an
+object with the following properties:
+
+- vim: The current [vim object].
+- focusType: A string similar to `match.focus` of a [match object], with the
+  following differences:
+
+  - The current pressed key is _not_ taken into account, because focus and blur
+    events have no current key.
+  - The value is never `null` or `'other'`, but `'none'` instead.
+
+(VimFx itself uses this event to update the toolbar [button], by setting
+`#main-window[vimfx-focus-type]` to the current focus type. You may use this
+with custom [styling].)
+
 
 
 ### `vimfx.modes`
@@ -444,8 +463,8 @@ A `match` object has the following properties:
   following values, depending on what kind of _element_ is focused and which
   _key_ was pressed:
 
-  - `'editable'`: element: a text input or a `contenteditable` element.
-    key: any pressed key.
+  - `'editable'`: element: some kind of text input, a `<select>` element or a
+    `contenteditable` element. key: any pressed key.
   - `'activatable'`: element: an “activatable” element (link or button).
     key: see the [`activatable_element_keys`] option.
   - `'adjustable'`: element: an “adjustable” element (form control or video

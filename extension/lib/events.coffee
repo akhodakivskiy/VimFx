@@ -87,7 +87,8 @@ class UIEventManager
         return unless vim = @vimfx.getCurrentVim(@window)
 
         if vim.isUIEvent(event)
-          @consumeKeyEvent(vim, event, utils.getFocusType(event), event)
+          focusType = utils.getFocusType(event.originalTarget)
+          @consumeKeyEvent(vim, event, focusType, event)
           # This also suppresses the 'keypress' event.
           utils.suppressEvent(event) if @suppress
         else
@@ -105,15 +106,20 @@ class UIEventManager
       @setHeldModifiers(event, {filterCurrentOnly: true})
     )
 
-    checkFindbar = (mode, event) =>
+    handleFocusRelatedEvent = (options, event) =>
       target = event.originalTarget
+      return unless vim = @vimfx.getCurrentVim(@window)
+
       findBar = @window.gBrowser.getFindBar()
       if target == findBar._findField.mInputField
-        return unless vim = @vimfx.getCurrentVim(@window)
-        vim.enterMode(mode)
+        vim.enterMode(options.mode)
 
-    @listen('focus', checkFindbar.bind(null, 'find'))
-    @listen('blur',  checkFindbar.bind(null, 'normal'))
+      if vim.isUIEvent(event)
+        focusType = utils.getFocusType(utils.getActiveElement(@window))
+        @vimfx.emit('focusTypeChange', {vim, focusType})
+
+    @listen('focus', handleFocusRelatedEvent.bind(null, {mode: 'find'}))
+    @listen('blur',  handleFocusRelatedEvent.bind(null, {mode: 'normal'}))
 
     @listen('click', (event) =>
       target = event.originalTarget

@@ -65,6 +65,10 @@ toolbarpaletteitem[place="palette"] > #VimFxButton {
   }
 }
 
+#main-window[vimfx-mode="normal"][vimfx-focus-type="editable"] #VimFxButton image {
+  filter: grayscale(100%) brightness(150%);
+}
+
 
 
 /* All styles below are intentionally very generic to fit with the user’s system

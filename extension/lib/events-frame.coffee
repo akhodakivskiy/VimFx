@@ -141,6 +141,10 @@ class FrameEventManager
       @numFocusToSuppress = 2
     )
 
+    sendFocusType = =>
+      focusType = utils.getFocusType(utils.getActiveElement(@vim.content))
+      messageManager.send('focusType', focusType)
+
     @listen('focus', (event) =>
       target = event.originalTarget
 
@@ -148,6 +152,8 @@ class FrameEventManager
         utils.suppressEvent(event)
         @numFocusToSuppress--
         return
+
+      sendFocusType()
 
       # Reset `hasInteraction` when (re-)selecting a tab, or coming back from
       # another window, in order to prevent the common “automatically re-focus
@@ -195,6 +201,8 @@ class FrameEventManager
 
     @listen('blur', (event) =>
       target = event.originalTarget
+
+      sendFocusType()
 
       # If a text input is blurred immediately before the document loses focus,
       # it most likely means that the user switched tab, for example by pressing

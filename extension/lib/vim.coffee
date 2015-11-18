@@ -75,6 +75,15 @@ class Vim
 
     @_listen('locationChange', @_onLocationChange.bind(this))
 
+    @_listen('focusType', (focusType) =>
+      # If the focus moves from a web page element to a browser UI element, the
+      # focus and blur events happen in the expected order, but the message from
+      # the frame script arrives too late. Therefore, check that the currently
+      # active element isn’t a browser UI element first.
+      unless @_isUIElement(utils.getActiveElement(@window))
+        @_parent.emit('focusTypeChange', {vim: this, focusType})
+    )
+
   _setBrowser: (browser) ->
     refresh = @browser?
     @browser = browser
@@ -94,12 +103,14 @@ class Vim
   _isBlacklisted: (url) -> @options.black_list.some((regex) -> regex.test(url))
 
   isUIEvent: (event) ->
-    target = event.originalTarget
     return not @_state.frameCanReceiveEvents or
-      if MULTI_PROCESS_ENABLED
-        (target != @window.gBrowser.selectedBrowser)
-      else
-        (target.ownerGlobal instanceof ChromeWindow)
+           @_isUIElement(event.originalTarget)
+
+  _isUIElement: (element) ->
+    if MULTI_PROCESS_ENABLED
+      return (element != @window.gBrowser.selectedBrowser)
+    else
+      return (element.ownerGlobal instanceof ChromeWindow)
 
   # `args...` is passed to the mode's `onEnter` method.
   enterMode: (mode, args...) ->
