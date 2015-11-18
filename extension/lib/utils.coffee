@@ -213,14 +213,6 @@ setAttributes = (element, attributes) ->
     element.setAttribute(attribute, value)
   return
 
-windowContainsDeep = (window, element) ->
-  parent = element.ownerDocument.defaultView
-  loop
-    return true if parent == window
-    break if parent.top == parent
-    parent = parent.parent
-  return false
-
 
 
 # Language helpers
@@ -329,7 +321,6 @@ module.exports = {
   insertText
   querySelectorAllDeep
   setAttributes
-  windowContainsDeep
 
   Counter
   EventEmitter
