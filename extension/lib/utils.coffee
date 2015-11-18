@@ -126,7 +126,7 @@ focusElement = (element, options = {}) ->
   element.select?() if options.select
 
 getFocusType = (element) -> switch
-  when isTextInputElement(element) or isContentEditable(element)
+  when isTypingElement(element) or isContentEditable(element)
     'editable'
   when isActivatable(element)
     'activatable'

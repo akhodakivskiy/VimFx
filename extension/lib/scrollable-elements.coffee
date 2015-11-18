@@ -27,7 +27,6 @@ utils = require('./utils')
 class ScrollableElements
   constructor: (@window) ->
     @elements = new Set()
-    @frames   = new WeakSet()
     @largest  = null
 
   has: (element) -> @elements.has(element)
@@ -35,20 +34,7 @@ class ScrollableElements
   add: (element) ->
     @elements.add(element)
     utils.onRemoved(@window, element, @delete.bind(this, element))
-    @addFrame(element)
-
-    if not @largest or utils.area(element) > utils.area(@largest)
-      @largest = element
-
-  addFrame: (element) ->
-    window = element.ownerDocument.defaultView
-    frame  = window.frameElement
-    return if not frame or @frames.has(frame)
-
-    utils.onRemoved(@window, frame, =>
-      @frames.delete(frame)
-      @reject(utils.windowContainsDeep.bind(null, window))
-    )
+    @largest = element if @isLargest(element)
 
   delete: (element) =>
     @elements.delete(element)
@@ -58,16 +44,18 @@ class ScrollableElements
     @elements.forEach((element) => @elements.delete(element) if fn(element))
     @updateLargest()
 
-  updateLargest: ->
-    @largest = null
+  isLargest: (element) ->
+    # Always consider the toplevel document the largest scrollable element, if
+    # it is scrollable. (Its area may be smaller than other elements).
+    return not @largest or
+           element == @window.document.documentElement or
+           (@largest != @window.document.documentElement and
+            utils.area(element) > utils.area(@largest))
 
-    # Find a new largest scrollable element (if there are any left).
-    largestArea = -1
-    @elements.forEach((element) =>
-      area = utils.area(element)
-      if area > largestArea
-        @largest = element
-        largestArea = area
-    )
+  updateLargest: ->
+    # Reset `@largest` and find a new largest scrollable element (if there are
+    # any left).
+    @largest = null
+    @elements.forEach((element) => @largest = element if @isLargest(element))
 
 module.exports = ScrollableElements
