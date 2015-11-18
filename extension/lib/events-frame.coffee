@@ -56,10 +56,11 @@ class FrameEventManager
       else
         # If the target isn’t the topmost document, it means that a frame has
         # changed: It could have been removed or its `src` attribute could have
-        # been changed. Any scrollable elements in the frame (or its sub-frames)
-        # then need to be filtered out.
+        # been changed. Any scrollable elements in the frame then need to be
+        # filtered out. If the frame contains other frames, 'pagehide' events
+        # have already been fired for them.
         @vim.state.scrollableElements
-          .reject(utils.windowContainsDeep.bind(null, target.defaultView))
+          .reject((element) -> element.ownerDocument == target)
     )
 
     @listen('click', (event) =>
