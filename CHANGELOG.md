@@ -1,3 +1,49 @@
+### 0.7.0 (2015-11-19)
+
+- Changed: Instead of using system notifications, which turned out to be a bit
+  too intrusive, [notifications] are now similar to the “URL popup” (shown when
+  hovering or focusing links) but are placed on the opposite side,.
+- Changed: The “Focus next element” and “Focus previous element” commands have
+  been removed. The reason they existed was to let `<tab>` and `<s-tab>` only
+  cycle between text inputs (as opposed to _all_ focusable elements) after
+  you’ve pressed `gi`. Now, `<tab>` and `<s-tab>` are handled specially instead,
+  and _only_ after pressing `gi`. The reason for this change is that the now
+  removed commands were too intrusive, breaking user habits. One of VimFx’s main
+  goal is _not_ to do that. (You can turn the special handling of `<tab>` and
+  `<s-tab>` off using the the new [`focus_previous_key` and `focus_next_key`]
+  prefs.)
+- Fixed: The scrolling commands should now “just work” in a lot more situations,
+  most notably on Gmail and Google Groups. More scrollable elements are also
+  recognized by the `f` and `zf` commands.
+- Improved: The right border of hint markers for scrollable elements is now
+  styled to remind of a scroll bar, making them easier to recognize among hints
+  for links.
+- Improved/Changed: `J` and `gJ` now allow a count on the first tab.
+  Consequently, `K` and `gK` now allow a count on the _last_ tab.
+- Changed: `gJ` and `gK` can no longer be used to pin or unpin tabs. They now
+  only wrap around tabs of the same pinned state. Use `gp` to toggle between
+  pinned and non-pinned.
+- Fixed: Many elements that got a hint before VimFx 0.6.0 now do again.
+- Improved: Comment fields on Facebook can now be focused using `f` and blurred
+  using `<escape>`.
+- Improved: VimFx’s toolbar button is no greyed out when you focus a text input.
+  This is to show that your key presses will be passed into the text input
+  rather than activating VimFx commands.
+- Added: [`g0`, `g^` and `g$` now accept counts][tab-index-counts], allowing you
+  to go to tab number _count._
+- Improved: `gi` now finds text inputs inside frames.
+- Fixed: “gi mode” is now exited properly when blurring a text input.
+- Fixed: `<select>` elements are no longer considered to be text inputs when
+  using `<tab>` and `<s-tab>` in “gi mode.”
+- Fixed: Using `<force>` or `<late>` in a shortcut no longer applies to _every_
+  shortcut for the command, but only that shortcut.
+- Fixed: The order of the Previous/Next page patterns is now respected. This
+  caused the wrong link to be picked by the `[` and `]` commands on some pages.
+
+[`focus_previous_key` and `focus_next_key`]: https://github.com/akhodakivskiy/VimFx/blob/d70b5bb14be89d9ce52138b0e9abdef1b31ad337/documentation/options.md#focus_previous_key-and-focus_next_key
+[notifications]: https://github.com/akhodakivskiy/VimFx/blob/d70b5bb14be89d9ce52138b0e9abdef1b31ad337/documentation/notifications.md
+[tab-index-counts]: https://github.com/akhodakivskiy/VimFx/blob/d70b5bb14be89d9ce52138b0e9abdef1b31ad337/documentation/commands.md#g0-g-g
+
 ### 0.6.2 (2015-11-11)
 
 - Improved: If the entire page isn’t scrollable, the largest scrollable element
