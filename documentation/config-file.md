@@ -179,7 +179,7 @@ unload it when your add-on shuts down.
 In order for Firefox to be able to find [frame.js], you need to add a file
 called `chrome.manifest` with the following contents:
 
-```js
+```
 content vimfx-custom ./
 ```
 
