@@ -43,14 +43,29 @@ class VimFrame
     messageManager.listen('markPageInteraction',
                           @markPageInteraction.bind(this))
 
-  resetState: ->
-    @state =
-      hasInteraction:       false
-      lastFocusedTextInput: null
-      shouldRefocus:        false
-      scrollableElements:   new ScrollableElements(@content, MINIMUM_SCROLL)
-      markerElements:       []
-      inputs:               null
+  # If the target is the topmost document, reset everything. Otherwise filter
+  # out elements belonging to the target frame. On some sites, such as Gmail,
+  # some elements might be dead at this point.
+  resetState: (target = @content.document) ->
+    if target == @content.document
+      @state =
+        hasInteraction:       false
+        shouldRefocus:        false
+        lastFocusedTextInput: null
+        scrollableElements:   new ScrollableElements(@content, MINIMUM_SCROLL)
+        markerElements:       []
+        inputs:               null
+
+    else
+      isDead = (element) ->
+        return Cu.isDeadWrapper(element) or element.ownerDocument == target
+      check = (prop) =>
+        @state[prop] = null if @state[prop] and isDead(@state[prop])
+
+      check('lastFocusedTextInput')
+      @state.scrollableElements.reject(isDead)
+      # `markerElements` and `inputs` could theoretically need to be filtered
+      # too at this point. YAGNI until an issue arises from it.
 
   options: (prefs) -> messageManager.get('options', {prefs})
 

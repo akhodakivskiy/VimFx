@@ -56,18 +56,11 @@ class FrameEventManager
     @listen('pagehide', (event) =>
       target = event.originalTarget
 
-      if target == @vim.content.document
-        @vim.resetState()
-      else
-        # If the target isn’t the topmost document, it means that a frame has
-        # changed: It could have been removed or its `src` attribute could have
-        # been changed. Any scrollable elements in the frame then need to be
-        # filtered out. If the frame contains other frames, 'pagehide' events
-        # have already been fired for them. On some sites, such as Gmail, some
-        # elements might be dead at this point.
-        @vim.state.scrollableElements.reject((element) ->
-          return Cu.isDeadWrapper(element) or element.ownerDocument == target
-        )
+      # If the target isn’t the topmost document, it means that a frame has
+      # changed: It could have been removed or its `src` attribute could have
+      # been changed. If the frame contains other frames, 'pagehide' events have
+      # already been fired for them.
+      @vim.resetState(target)
     )
 
     @listen('click', (event) =>
