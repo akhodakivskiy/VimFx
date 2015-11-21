@@ -6,15 +6,11 @@ See the file README.md for copying conditions.
 
 # Public API
 
-VimFx has a public API. It is intended to be used by:
+VimFx has a public API. It is intended to be used by users who would like to
+write a so-called [config file].
 
-- Users who prefer to configure things using text files.
-- Users who would like to add custom commands.
-- Users who would like to set [special options].
-- Users who would like to make site-specific customizations.
-- Extension authors who would like to extend VimFx.
-
-VimFx users who use the public API should write a so-called [config file].
+Some parts of the API is also intended to be used by authors who would like to
+extend VimFx.
 
 
 ## Getting the API
@@ -570,6 +566,84 @@ Technically, it is a [`URL`] instance. You can experient with the current
 location object by opening the [web console] and entering `location`.
 
 
+## Frame script API
+
+In frame scripts, the API consists of assigning global variables prefixed with
+`VimFx`. VimFx then uses these when needed.
+
+```js
+this.VimFxSomething = ...
+```
+
+### `VimFxHintMatcher(...)`
+
+**Note:** This should only be used by config file users, not by extension
+authors who wish to extend VimFx.
+
+If available, it is used to let you customize which elements do and don’t get
+hints. It might help to read about [the `f` commands] first.
+
+```js
+this.VimFxHintMatcher = (id, element, {type, semantic}) => {
+  // Inspect `element` and change `type` and `semantic` if needed.
+  return {type, semantic}
+}
+```
+
+The arguments passed to this function are:
+
+- id: `String`. A string identifying which command is used:
+
+  - `'normal'`: `f` or `af`.
+  - `'tab'`: `F` or `gf`.
+  - `'copy'`: `yf`.
+  - `'focus'`: `zf`.
+
+- element: `Element`. One out of all elements currently inside the viewport.
+
+- info: `Object`. It has the following properties:
+
+  - type: `String` or `null`. If a string, it means that `element` should get a
+    hint. If `null`, it won’t. See the available strings below. When a marker
+    is matched, `type` decides what happens to `element`.
+  - semantic: `Boolean`. Indicates whether or not the element is “semantic.”
+    Semantic elements get better hints.
+
+  This object contains information on how VimFx has matched `element`. You have
+  the opportunity to change this.
+
+The available type strings depend on `id`:
+
+- normal:
+
+  - link: A “proper” link (not used as a button with the help of JavaScript),
+    with an `href` attribute.
+  - text: An element that can you can type in, such as text inputs.
+  - clickable: Some clickable element not falling into another category.
+  - clickable-special: Like “clickable,” but uses a different technique to
+    simulate a click on the element. If “clickable” doesn’t work, try this one.
+  - scrollable: A scrollable element.
+
+- tab:
+
+  - link: Like “link” when `id` is “normal” (see above).
+
+- copy:
+
+  - link: Like “link” when `id` is “normal” (see above).
+  - text: Like “text” when `id` is “normal” (see above), except
+    contenteditable elements.
+  - contenteditable: Elements with “contenteditable” turned on.
+
+- focus:
+
+  - focusable: Any focusable element not falling into another category.
+  - scrollable: Like “scrollable” when `id` is “normal” (see above).
+
+The function must return an object with just like the `info` parameter (with
+`type` and `semantic`).
+
+
 ## Stability
 
 The public API is currently **experimental** and therefore **unstable.** Things
@@ -602,6 +676,7 @@ backwards compatibility will be a priority and won’t be broken until VimFx
 [`notifications_enabled`]: options.md#notifications_enabled
 
 [button]: button.md
+[the `f` commands]: commands.md#the-f-commands-1
 [special keys]: shortcuts.md#special-keys
 [styling]: styling.md
 

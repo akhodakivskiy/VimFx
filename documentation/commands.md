@@ -144,6 +144,8 @@ It might seem simpler to match the same set of elements for _all_ of the
 commands. The reason that is not the case is because the fewer elements the
 shorter the hints. (Also, what should happen if you tried to `F` a button?)
 
+(You can also customize [which elements do and don’t get hints][hint-matcher].)
+
 Another way to make hints shorter is to assign the same hint to all links with
 the same URL. So don’t get surprised if you see the same hint repeated several
 times.
@@ -210,6 +212,7 @@ like `F`.
 (Also see the advanced prefs [hints\_toggle\_in\_tab] and
 [hints\_toggle\_in\_background].)
 
+[hint-matcher]: api.md#vimfxhintmatcher
 [hint chars]: options.md#hint-chars
 [Styling]: styling.md
 [hints\_toggle\_in\_tab]: options.md#hints_toggle_in_tab

@@ -10,11 +10,15 @@ VimFx can be configured using a configuration file. This should be done by users
 who:
 
 - prefer to configure things using text files.
-- would like to add custom commands.
+- would like to add [custom commands].
 - would like to set [special options].
-- would like to make site-specific customizations.
+- would like to make [site-specific customizations][overrides].
+- would like to customize [which elements do and don’t get hints][hint-matcher].
 
+[custom commands]: api.md#vimfxaddcommandoptions-fn
 [special options]: options.md#special-options
+[overrides]: api.md#vimfxaddoptionoverridesrules-and-vimfxaddkeyoverridesrules
+[hint-matcher]: api.md#vimfxhintmatcher
 
 
 ## Technical notes
@@ -58,7 +62,7 @@ Any time you make changes to any of your add-on files you need to restart
 Firefox to make the changes take effect.
 
 Now you might want to read about the [public API] or look at the [Custom
-Commands] wiki page.
+Commands][custom-commands-wiki] wiki page.
 
 [install.rdf]: #installrdf
 [bootstrap.js]: #bootstrapjs
@@ -66,7 +70,7 @@ Commands] wiki page.
 [profile directory]: https://support.mozilla.org/en-US/kb/profiles-where-firefox-stores-user-data
 [proxy files]: https://developer.mozilla.org/en-US/Add-ons/Setting_up_extension_development_environment#Firefox_extension_proxy_file
 [browser console]: https://developer.mozilla.org/en-US/docs/Tools/Browser_Console
-[Custom Commands]: https://github.com/akhodakivskiy/VimFx/wiki/Custom-Commands
+[custom-commands-wiki]: https://github.com/akhodakivskiy/VimFx/wiki/Custom-Commands
 
 
 ## install.rdf
@@ -145,10 +149,13 @@ console.log('Hello, world! This is vimfx:', vimfx)
 ```
 
 
-## Custom commands that access web page content
+## Frame script API and custom commands that access web page content
 
-If you plan to add custom commands that need to access web page content, you
-have to add two more files and make an adjustment to bootstrap.js.
+If you plan to use the [frame script API], or to add custom commands that need
+to access web page content, you have to add two more files and make an
+adjustment to bootstrap.js.
+
+[frame script API]: api.md#frame-script-api
 
 ### bootstrap.js adjustment
 

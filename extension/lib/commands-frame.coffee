@@ -72,27 +72,45 @@ commands.scroll = ({vim, method, type, direction, amount, property, smooth}) ->
 
   element[method](options)
 
-# Combine links with the same href.
-combine = (hrefs, element, wrapper) ->
-  if wrapper.type == 'link'
-    {href} = element
-    wrapper.href = href
-    if href of hrefs
-      parent = hrefs[href]
-      wrapper.parentIndex = parent.elementIndex
-      parent.shape.area += wrapper.shape.area
-      parent.numChildren++
-    else
-      wrapper.numChildren = 0
-      hrefs[href] = wrapper
-  return wrapper
-
-commands.follow = ({vim}) ->
+helper_follow = ({id, combine = true}, matcher, {vim}) ->
   hrefs = {}
   vim.state.markerElements = []
+
   filter = (element, getElementShape) ->
+    {type, semantic} = matcher({vim, element, getElementShape})
+
+    customMatcher = FRAME_SCRIPT_ENVIRONMENT.VimFxHintMatcher
+    if customMatcher
+      {type, semantic} = customMatcher(id, element, {type, semantic})
+
+    return unless type
+    return unless shape = getElementShape(element)
+
+    length = vim.state.markerElements.push(element)
+    wrapper = {type, semantic, shape, elementIndex: length - 1}
+
+    # Combine links with the same href.
+    if combine and wrapper.type == 'link'
+      {href} = element
+      wrapper.href = href
+      if href of hrefs
+        parent = hrefs[href]
+        wrapper.parentIndex = parent.elementIndex
+        parent.shape.area += wrapper.shape.area
+        parent.numChildren++
+      else
+        wrapper.numChildren = 0
+        hrefs[href] = wrapper
+
+    return wrapper
+
+  return hints.getMarkableElementsAndViewport(vim.content, filter)
+
+commands.follow = helper_follow.bind(null, {id: 'normal'},
+  ({vim, element, getElementShape}) ->
     document = element.ownerDocument
     isXUL = (document instanceof XULDocument)
+    type = null
     semantic = true
     switch
       when isProperLink(element)
@@ -152,61 +170,37 @@ commands.follow = ({vim}) ->
            (element.classList.contains('overflowing') or
             element.classList.contains('shrinkToFit'))
         type = 'clickable'
-    return unless type
-    return unless shape = getElementShape(element)
-    length = vim.state.markerElements.push(element)
-    return combine(
-      hrefs, element, {elementIndex: length - 1, shape, semantic, type}
-    )
+    return {type, semantic}
+)
 
-  return hints.getMarkableElementsAndViewport(vim.content, filter)
+commands.follow_in_tab = helper_follow.bind(null, {id: 'tab'},
+  ({element}) ->
+    type = if isProperLink(element) then 'link' else null
+    return {type, semantic: true}
+)
 
-commands.follow_in_tab = ({vim}) ->
-  hrefs = {}
-  vim.state.markerElements = []
-  filter = (element, getElementShape) ->
-    return unless isProperLink(element)
-    return unless shape = getElementShape(element)
-    length = vim.state.markerElements.push(element)
-    return combine(
-      hrefs, element,
-      {elementIndex: length - 1, shape, semantic: true, type: 'link'}
-    )
-
-  return hints.getMarkableElementsAndViewport(vim.content, filter)
-
-commands.follow_copy = ({vim}) ->
-  hrefs = {}
-  vim.state.markerElements = []
-  filter = (element, getElementShape) ->
+commands.follow_copy = helper_follow.bind(null, {id: 'copy'},
+  ({element}) ->
     type = switch
       when isProperLink(element)      then 'link'
-      when isTypingElement(element)   then 'typing'
+      when isTypingElement(element)   then 'text'
       when isContentEditable(element) then 'contenteditable'
-    return unless type
-    return unless shape = getElementShape(element)
-    length = vim.state.markerElements.push(element)
-    return combine(
-      hrefs, element, {elementIndex: length - 1, shape, semantic: true, type}
-    )
+      else null
+    return {type, semantic: true}
+)
 
-  return hints.getMarkableElementsAndViewport(vim.content, filter)
-
-commands.follow_focus = ({vim}) ->
-  vim.state.markerElements = []
-  filter = (element, getElementShape) ->
+commands.follow_focus = helper_follow.bind(null, {id: 'focus', combine: false},
+  ({vim, element}) ->
     type = switch
       when element.tabIndex > -1
         'focusable'
       when element != element.ownerDocument.documentElement and
            vim.state.scrollableElements.has(element)
         'scrollable'
-    return unless type
-    return unless shape = getElementShape(element)
-    length = vim.state.markerElements.push(element)
-    return {elementIndex: length - 1, shape, semantic: true, type}
-
-  return hints.getMarkableElementsAndViewport(vim.content, filter)
+      else
+        null
+    return {type, semantic: true}
+)
 
 commands.focus_marker_element = ({vim, elementIndex, options}) ->
   element = vim.state.markerElements[elementIndex]
