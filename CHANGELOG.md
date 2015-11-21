@@ -1,3 +1,8 @@
+### 0.7.2 (2015-11-21)
+
+- Fixed: The blinking text caret now always appears correctly when focusing text
+  inputs.
+
 ### 0.7.1 (2015-11-21)
 
 - Fixed: The scrolling commands should now “just work” when using non-default
