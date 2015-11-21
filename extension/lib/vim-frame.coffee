@@ -28,6 +28,8 @@ messageManager     = require('./message-manager')
 ScrollableElements = require('./scrollable-elements')
 utils              = require('./utils')
 
+MINIMUM_SCROLL = 5
+
 class VimFrame
   constructor: (@content) ->
     @mode = 'normal'
@@ -46,7 +48,7 @@ class VimFrame
       hasInteraction:       false
       lastFocusedTextInput: null
       shouldRefocus:        false
-      scrollableElements:   new ScrollableElements(@content)
+      scrollableElements:   new ScrollableElements(@content, MINIMUM_SCROLL)
       markerElements:       []
       inputs:               null
 

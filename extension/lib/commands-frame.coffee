@@ -48,7 +48,7 @@ commands.scroll = ({vim, method, type, direction, amount, property, smooth}) ->
       activeElement
     # If the currently focused element isn’t scrollable, scroll the largest
     # scrollable element instead, which usually means `<html>`.
-    when vim.state.scrollableElements.largest
+    when vim.state.scrollableElements.hasOrUpdateLargestScrollable()
       {scrollableElements} = vim.state
       # In quirks mode (when the page lacks a doctype) `<body>` is considered
       # the root element rather than `<html>`. The 'overflow' event is triggered

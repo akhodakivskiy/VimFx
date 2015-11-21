@@ -84,7 +84,10 @@ class FrameEventManager
              # There’s no need to track elements so small that they don’t even
              # fit the scrollbars. For example, Gmail has lots of tiny
              # overflowing iframes. Filter those out.
-             utils.area(target) < @MINIMUM_SCROLLABLE_ELEMENT_AREA
+             utils.area(target) < @MINIMUM_SCROLLABLE_ELEMENT_AREA or
+             # On some pages, such as Google Groups, 'overflow' events may occur
+             # for elements that aren’t even scrollable.
+             not @vim.state.scrollableElements.isScrollable(target)
         @vim.state.scrollableElements.add(target)
     )
 
@@ -93,8 +96,7 @@ class FrameEventManager
 
       # On some pages, such as Gmail, 'underflow' events may occur for elements
       # that are actually still scrollable! If so, keep the element.
-      unless target.scrollHeight > target.clientHeight or
-             target.scrollWidth  > target.clientWidth
+      unless @vim.state.scrollableElements.isScrollable(target)
         @vim.state.scrollableElements.delete(target)
     )
 

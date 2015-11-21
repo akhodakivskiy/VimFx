@@ -25,7 +25,7 @@
 utils = require('./utils')
 
 class ScrollableElements
-  constructor: (@window) ->
+  constructor: (@window, @MINIMUM_SCROLL) ->
     @elements = new Set()
     @largest  = null
 
@@ -44,6 +44,10 @@ class ScrollableElements
     @elements.forEach((element) => @elements.delete(element) if fn(element))
     @updateLargest()
 
+  isScrollable: (element) ->
+    return element.scrollTopMax  >= @MINIMUM_SCROLL or
+           element.scrollLeftMax >= @MINIMUM_SCROLL
+
   isLargest: (element) ->
     # Always consider the toplevel document the largest scrollable element, if
     # it is scrollable. (Its area may be smaller than other elements).
@@ -57,5 +61,16 @@ class ScrollableElements
     # any left).
     @largest = null
     @elements.forEach((element) => @largest = element if @isLargest(element))
+
+  # Elements may overflow when zooming in or out. However, the `.scrollHeight`
+  # of the element is not correctly updated when the 'overflow' event occurs,
+  # making it possible for unscrollable elements to slip in. This method tells
+  # whether the largest element really is scrollable, updating it if needed.
+  hasOrUpdateLargestScrollable: ->
+    if @largest and @isScrollable(@largest)
+      return true
+    else
+      @reject((element) => not @isScrollable(element))
+      return @largest?
 
 module.exports = ScrollableElements
