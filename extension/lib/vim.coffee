@@ -107,10 +107,10 @@ class Vim
            @_isUIElement(event.originalTarget)
 
   _isUIElement: (element) ->
-    if MULTI_PROCESS_ENABLED
-      return (element != @window.gBrowser.selectedBrowser)
-    else
-      return (element.ownerGlobal instanceof ChromeWindow)
+    # TODO: The `element.ownerGlobal` check will be redundant when
+    # non-multi-process is removed from Firefox.
+    return element.ownerGlobal instanceof ChromeWindow and
+           element != @window.gBrowser.selectedBrowser
 
   # `args...` is passed to the mode's `onEnter` method.
   enterMode: (mode, args...) ->

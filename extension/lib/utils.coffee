@@ -92,7 +92,14 @@ isTypingElement = (element) ->
 
 getActiveElement = (window) ->
   {activeElement} = window.document
-  if activeElement.contentWindow
+  # If the active element is a frame, recurse into it. The easiest way to detect
+  # a frame that works both in browser UI and in web page content is to check
+  # for the presence of `.contentWindow`. However, in non-multi-process
+  # `<browser>` (sometimes `<xul:browser>`) elements have a `.contentWindow`
+  # pointing to the web page content `window`, which we don’t want to recurse
+  # into. `.localName` is `.nodeName` without `xul:` (if it exists). This seems
+  # to be the only way to detect such elements.
+  if activeElement.localName != 'browser' and activeElement.contentWindow
     return getActiveElement(activeElement.contentWindow)
   else
     return activeElement
