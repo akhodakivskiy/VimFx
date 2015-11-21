@@ -1,3 +1,8 @@
+### 0.7.1 (2015-11-21)
+
+- Fixed: The scrolling commands should now “just work” when using non-default
+  zoom or DPI settings, most notably on Google Groups.
+
 ### 0.7.0 (2015-11-19)
 
 - Changed: Instead of using system notifications, which turned out to be a bit
