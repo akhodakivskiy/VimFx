@@ -122,7 +122,7 @@ See the [“Making a release”][release] section below for more information.
 
 - `gulp readme` prints `README.md` as HTML to stdout.
 
-Tip: Add `--silent` add the end of the gulp command to suppress gulp’s standard
+Tip: Add `--silent` at the end of the gulp command to suppress gulp’s standard
 progress output, allowing to pipe stdout to the clipboard.
 
 [release]: #making-a-release
