@@ -83,7 +83,7 @@ class Marker
 
   setHint: (@hint) ->
     @hintIndex = 0
-    @markerElement.firstChild.remove() while @markerElement.hasChildNodes()
+    @markerElement.textContent = ''
     fragment = @document.createDocumentFragment()
     utils.createBox(@document, 'marker-char', fragment, char) for char in @hint
     @markerElement.appendChild(fragment)

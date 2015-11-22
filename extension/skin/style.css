@@ -164,11 +164,11 @@ toolbarpaletteitem[place="palette"] > #VimFxButton {
   padding-right: var(--page-padding);
 }
 
-  #VimFxHelpDialogContainer * {
+  #VimFxHelpDialogContainer .vimfx-box {
     display: block;
   }
 
-  #VimFxHelpDialogContainer :-moz-any([class^="heading"], .key-sequence) {
+  #VimFxHelpDialogContainer :-moz-any(.heading-mode, .heading-category, .key-sequence) {
     font-weight: bold;
     white-space: nowrap;
   }
@@ -178,6 +178,7 @@ toolbarpaletteitem[place="palette"] > #VimFxButton {
   position: relative;
   margin-left: var(--gutter);
   margin-bottom: calc(var(--page-padding) / 4);
+  font-weight: bold;
 }
 
   #VimFxHelpDialogContainer .heading-main {
@@ -284,5 +285,23 @@ toolbarpaletteitem[place="palette"] > #VimFxButton {
       /* The space to the left should be wide enough to fit `<c-w>`. */
       width: calc(100% - 3.5em);
     }
+
+  #VimFxHelpDialogContainer .search-input {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+  }
+
+  #VimFxHelpDialogContainer .search-match {} /* Keep as documentation. */
+
+  #VimFxHelpDialogContainer .search-non-match {
+    opacity: 0.2;
+  }
+
+  #VimFxHelpDialogContainer .search-highlight {
+    display: inline;
+    background-color: Highlight;
+    color: HighlightText;
+  }
 
 }

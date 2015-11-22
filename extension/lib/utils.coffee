@@ -206,9 +206,9 @@ containsDeep = (parent, element) ->
 
   return parent.contains(element)
 
-createBox = (document, className, parent = null, text = null) ->
+createBox = (document, className = '', parent = null, text = null) ->
   box = document.createElement('box')
-  box.className = className
+  box.className = "#{className} vimfx-box"
   box.textContent = text if text?
   parent.appendChild(box) if parent?
   return box

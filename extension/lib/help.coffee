@@ -24,25 +24,37 @@ utils     = require('./utils')
 
 CONTAINER_ID  = 'VimFxHelpDialogContainer'
 MAX_FONT_SIZE = 20
+SEARCH_MATCH_CLASS     = 'search-match'
+SEARCH_NON_MATCH_CLASS = 'search-non-match'
+SEARCH_HIGHLIGHT_CLASS = 'search-highlight'
 
 injectHelp = (window, vimfx) ->
   removeHelp(window)
 
   {document} = window
 
-  container = document.createElement('box')
+  container = utils.createBox(document)
   container.id = CONTAINER_ID
 
-  wrapper = document.createElement('box')
-  container.appendChild(wrapper)
+  wrapper = utils.createBox(document, 'wrapper', container)
 
   header = createHeader(document, vimfx)
+
   wrapper.appendChild(header)
 
   content = createContent(document, vimfx)
   wrapper.appendChild(content)
 
+  searchInput = document.createElement('textbox')
+  utils.setAttributes(searchInput, {
+    class: 'search-input'
+    placeholder: translate('help.search')
+  })
+  searchInput.oninput = -> search(content, searchInput.value.trim())
+  container.appendChild(searchInput)
+
   window.gBrowser.mCurrentBrowser.parentNode.appendChild(container)
+  searchInput.focus()
 
   # The font size of menu items is used by default, which is usually quite
   # small. Try to increase it without causing a scrollbar.
@@ -81,7 +93,7 @@ createContent = (document, vimfx) ->
   content = $('content')
 
   for mode in vimfx.getGroupedCommands({enabledOnly: true})
-    modeHeading = $('heading-mode', null, mode.name)
+    modeHeading = $('heading-mode search-item', null, mode.name)
 
     for category, index in mode.categories
       categoryContainer = $('category', content)
@@ -98,18 +110,19 @@ createContent = (document, vimfx) ->
         categoryContainer.appendChild(modeHeading)
         categoryContainer.classList.add('first')
 
-      $('heading-category', categoryContainer, category.name) if category.name
+      if category.name
+        $('heading-category search-item', categoryContainer, category.name)
 
       for {command, name, enabledSequences} in category.commands
-        commandContainer = $('command', categoryContainer)
+        commandContainer = $('command search-item', categoryContainer)
         utils.setAttributes(commandContainer, {'data-command': command.name})
         commandContainer.setAttribute('data-command', name)
         for sequence in enabledSequences
           keySequence = $('key-sequence', commandContainer)
           [specialKeys, rest] = splitSequence(sequence, vimfx.SPECIAL_KEYS)
           $('key-sequence-special-keys', keySequence, specialKeys)
-          $('key-sequence-rest', keySequence, rest)
-        $('description', commandContainer, command.description())
+          $('key-sequence-rest search-text', keySequence, rest)
+        $('description search-text', commandContainer, command.description())
 
   return content
 
@@ -120,6 +133,40 @@ splitSequence = (sequence, specialKeys) ->
   )
   splitPos = Math.max(specialKeyEnds...)
   return [sequence[0...splitPos], sequence[splitPos..]]
+
+search = (content, term) ->
+  document   = content.ownerDocument
+  ignoreCase = (term == term.toLowerCase())
+  regex = RegExp("(#{utils.regexEscape(term)})", if ignoreCase then 'i' else '')
+  clear = (term == '')
+
+  for item in content.querySelectorAll('.search-item')
+    texts = item.querySelectorAll('.search-text')
+    texts = [item] if texts.length == 0
+    className = SEARCH_NON_MATCH_CLASS
+
+    for element in texts
+      {textContent} = element
+      # Clear the previous highlighting. This is possible to do for non-matches
+      # as well, but too slow.
+      if item.classList.contains(SEARCH_MATCH_CLASS)
+        element.textContent = textContent
+
+      continue if clear or not regex.test(textContent)
+
+      className = SEARCH_MATCH_CLASS
+      element.textContent = '' # Empty the element.
+      for part, index in textContent.split(regex)
+        # Even indices are surrounding text, odd ones are matches.
+        if index % 2 == 0
+          element.appendChild(document.createTextNode(part))
+        else
+          utils.createBox(document, SEARCH_HIGHLIGHT_CLASS, element, part)
+
+    item.classList.remove(SEARCH_MATCH_CLASS, SEARCH_NON_MATCH_CLASS)
+    item.classList.add(className) unless clear
+
+  return
 
 module.exports = {
   injectHelp
