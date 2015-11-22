@@ -1,3 +1,11 @@
+### 0.7.3 (2015-11-22)
+
+- Fixed: Scrolling now works correctly in pages in quirks mode (lacking a
+  doctype), such as Hackernews.
+- Improved: The largest scrollable element is now detected better in frames.
+- Fixed: Hints mode now exits correctly when focusing a text input using `af`,
+  or `f` with a count.
+
 ### 0.7.2 (2015-11-21)
 
 - Fixed: The blinking text caret now always appears correctly when focusing text
