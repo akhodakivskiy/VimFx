@@ -51,6 +51,14 @@ the [Ignore keyboard layout] option.
 
 [Ignore keyboard layout]: options.md#ignore-keyboard-layout
 
+## Going back/forward doesn’t work!
+
+Pressing `H` is like hitting the back button. Use `L` for the forward button.
+
+`[` clicks the link labeled “Previous” on the page, and `]` the link labeled
+“Next.” (See also the [Previous/Next page patterns] option.)
+
+[Previous/Next page patterns]: options.md#previousnext-page-patterns
 
 ## How do i re-map `<escape>` to blur text inputs?
 
