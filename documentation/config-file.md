@@ -14,7 +14,10 @@ who:
 - would like to set [special options].
 - would like to make site-specific customizations.
 
+Look at the [Share your config file] wiki page for inspiration.
+
 [special options]: options.md#special-options
+[Share your config file]: https://github.com/akhodakivskiy/VimFx/wiki/Share-your-config-file
 
 
 ## Technical notes
