@@ -96,13 +96,20 @@ space by default. VimFx provides similar scrolling commands (and actually
 overrides `<space>`), but they work a little bit differently.
 
 They scroll _the currently focused element._ If the currently focused element
-isn’t scrollable, or there is no (apparent) currently focused element, the
-entire page is scrolled. Finally, if the entire page isn’t scrollable, the
-largest scrollable element on the page (if any) is scrolled.
+isn’t scrollable, the largest scrollable element on the page (if any, and
+including the entire page itself) is scrolled.
 
 You can focus scrollable elements using the `zf` command (or the `f` command).
 The right border of hint markers for scrollable elements is styled to remind of
 a scroll bar, making them easier to recognize among hints for links.
+
+Note that `zf` and `f` do _not_ add a hint marker for the _largest_ scrollable
+element (such as the entire page). There’s no need to focus that element, since
+it is scrolled by default if no other scrollable element is focused, as
+explained above. (This prevents the largest scrollable element from likely
+eating your best hint char on most pages; see [The `f` commands]).
+
+[The `f` commands]: #the-f-commands-1
 
 
 ## `gi`

@@ -15,10 +15,13 @@ who:
 - would like to make [site-specific customizations][overrides].
 - would like to customize [which elements do and don’t get hints][hint-matcher].
 
+Look at the [Share your config file] wiki page for inspiration.
+
 [custom commands]: api.md#vimfxaddcommandoptions-fn
 [special options]: options.md#special-options
 [overrides]: api.md#vimfxaddoptionoverridesrules-and-vimfxaddkeyoverridesrules
 [hint-matcher]: api.md#vimfxhintmatcher
+[Share your config file]: https://github.com/akhodakivskiy/VimFx/wiki/Share-your-config-file
 
 
 ## Technical notes

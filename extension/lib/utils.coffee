@@ -177,7 +177,7 @@ suppressEvent = (event) ->
 # elements.)
 eventSequence = ['mouseover', 'mousedown', 'mouseup', 'click', 'command']
 simulateClick = (element) ->
-  window = element.ownerDocument.defaultView
+  window = element.ownerGlobal
   for type in eventSequence
     mouseEvent = new window.MouseEvent(type, {
       # Let the event bubble in order to trigger delegated event listeners.
@@ -195,6 +195,16 @@ simulateClick = (element) ->
 
 area = (element) ->
   return element.clientWidth * element.clientHeight
+
+containsDeep = (parent, element) ->
+  parentWindow  = parent.ownerGlobal
+  elementWindow = element.ownerGlobal
+
+  while elementWindow != parentWindow and elementWindow.top != elementWindow
+    element = elementWindow.frameElement
+    elementWindow = element.ownerGlobal
+
+  return parent.contains(element)
 
 createBox = (document, className, parent = null, text = null) ->
   box = document.createElement('box')
@@ -324,6 +334,7 @@ module.exports = {
   simulateClick
 
   area
+  containsDeep
   createBox
   insertText
   querySelectorAllDeep
