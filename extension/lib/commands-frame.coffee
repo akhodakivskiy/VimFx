@@ -49,19 +49,15 @@ commands.scroll = ({vim, method, type, direction, amount, property, smooth}) ->
     # If the currently focused element isn’t scrollable, scroll the largest
     # scrollable element instead, which usually means `<html>`.
     when vim.state.scrollableElements.hasOrUpdateLargestScrollable()
-      {scrollableElements} = vim.state
-      # In quirks mode (when the page lacks a doctype) `<body>` is considered
-      # the root element rather than `<html>`. The 'overflow' event is triggered
-      # for `<html>` though (_not_ `<body>`!).
-      if scrollableElements.largest == document.documentElement and
-         document.compatMode == 'BackCompat' and document.body?
-        document.body
-      else
-        scrollableElements.largest
+      vim.state.scrollableElements.largest
     else
-      # This point should never be reached, but it’s better to be safe than
-      # sorry. Not being able to scroll is very annoying. Use the best bet.
-      document.documentElement
+      # If this point is reached, it _should_ mean that the page hasn’t got any
+      # scrollable elements, and the whole page itself isn’t scrollable. Instead
+      # of simply `return`ing, scroll the entire page (the best bet at this
+      # point) instead because we cannot be 100% sure that nothing is scrollable
+      # (for example, if VimFx is updated in the middle of a session). Not being
+      # able to scroll is very annoying.
+      vim.state.scrollableElements.root()
 
   options = {}
   options[direction] = switch type
@@ -105,7 +101,7 @@ commands.follow = ({vim}) ->
         type = 'clickable'
         unless isXUL or element.nodeName in ['A', 'INPUT', 'BUTTON']
           semantic = false
-      when element != document.documentElement and
+      when element != vim.state.scrollableElements.root(element) and
            vim.state.scrollableElements.has(element)
         type = 'scrollable'
       when element.hasAttribute('onclick') or
@@ -198,7 +194,7 @@ commands.follow_focus = ({vim}) ->
     type = switch
       when element.tabIndex > -1
         'focusable'
-      when element != element.ownerDocument.documentElement and
+      when element != vim.state.scrollableElements.root(element) and
            vim.state.scrollableElements.has(element)
         'scrollable'
     return unless type

@@ -19,8 +19,7 @@
 
 # This file contains an abstraction for keeping track of scrollable elements,
 # automatically keeping the largest scrollable element up-to-date. It stops
-# tracking elements that are removed from the DOM, or whose containg frame is
-# removed.
+# tracking elements that are removed from the DOM.
 
 utils = require('./utils')
 
@@ -29,14 +28,33 @@ class ScrollableElements
     @elements = new Set()
     @largest  = null
 
-  has: (element) -> @elements.has(element)
+  # In quirks mode (when the page lacks a doctype), such as on Hackernews,
+  # `<body>` is considered the root element rather than `<html>`. The 'overflow'
+  # event is triggered for `<html>` though (_not_ `<body>`!). This method takes
+  # care of returning the appropriate element, so we don’t need to think about
+  # it anywhere else.
+  quirks: (element) ->
+    document = element.ownerDocument
+    if element == document.documentElement and
+       document.compatMode == 'BackCompat' and document.body?
+      return document.body
+    else
+      return element
+
+  root: (element = null) ->
+    document = if element then element.ownerDocument else @window.document
+    return @quirks(document.documentElement)
+
+  has: (element) -> @elements.has(@quirks(element))
 
   add: (element) ->
+    element = @quirks(element)
     @elements.add(element)
     utils.onRemoved(@window, element, @delete.bind(this, element))
     @largest = element if @isLargest(element)
 
   delete: (element) =>
+    element = @quirks(element)
     @elements.delete(element)
     @updateLargest() if @largest == element
 
@@ -45,16 +63,16 @@ class ScrollableElements
     @updateLargest()
 
   isScrollable: (element) ->
+    element = @quirks(element)
     return element.scrollTopMax  >= @MINIMUM_SCROLL or
            element.scrollLeftMax >= @MINIMUM_SCROLL
 
   isLargest: (element) ->
     # Always consider the toplevel document the largest scrollable element, if
     # it is scrollable. (Its area may be smaller than other elements).
-    return not @largest or
-           element == @window.document.documentElement or
-           (@largest != @window.document.documentElement and
-            utils.area(element) > utils.area(@largest))
+    root = @root()
+    return not @largest or element == root or
+           (@largest != root and utils.area(element) > utils.area(@largest))
 
   updateLargest: ->
     # Reset `@largest` and find a new largest scrollable element (if there are
