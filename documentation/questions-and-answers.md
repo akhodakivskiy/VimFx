@@ -44,6 +44,14 @@ Either press [`<s-escape>`] or click VimFx’s toolbar [button].
 [`<s-escape>`]: #what-does-s-escape-mean
 [button]: button.md
 
+## VimFx’s shortcuts work in my English layout but not in my other layout!
+
+If you use more than one keyboard layout, such as Russian plus English, enable
+the [Ignore keyboard layout] option.
+
+[Ignore keyboard layout]: options.md#ignore-keyboard-layout
+
+
 ## How do i re-map `<escape>` to blur text inputs?
 
 The default shortcut is actually `<force><escape>`! Don’t forget [`<force>`] at
