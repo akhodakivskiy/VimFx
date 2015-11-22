@@ -41,10 +41,6 @@ class ScrollableElements
     else
       return element
 
-  root: (element = null) ->
-    document = if element then element.ownerDocument else @window.document
-    return @quirks(document.documentElement)
-
   has: (element) -> @elements.has(@quirks(element))
 
   add: (element) ->
@@ -67,12 +63,15 @@ class ScrollableElements
     return element.scrollTopMax  >= @MINIMUM_SCROLL or
            element.scrollLeftMax >= @MINIMUM_SCROLL
 
+  # It makes the most sense to consider the uppermost scrollable element the
+  # largest. In other words, if a scrollable element contains another scrollable
+  # element (or a frame containing one), the parent should be considered largest
+  # even if the child has greater area.
   isLargest: (element) ->
-    # Always consider the toplevel document the largest scrollable element, if
-    # it is scrollable. (Its area may be smaller than other elements).
-    root = @root()
-    return not @largest or element == root or
-           (@largest != root and utils.area(element) > utils.area(@largest))
+    return true  unless @largest
+    return true  if utils.containsDeep(element, @largest)
+    return false if utils.containsDeep(@largest, element)
+    return utils.area(element) > utils.area(@largest)
 
   updateLargest: ->
     # Reset `@largest` and find a new largest scrollable element (if there are

@@ -57,7 +57,7 @@ commands.scroll = ({vim, method, type, direction, amount, property, smooth}) ->
       # point) instead because we cannot be 100% sure that nothing is scrollable
       # (for example, if VimFx is updated in the middle of a session). Not being
       # able to scroll is very annoying.
-      vim.state.scrollableElements.root()
+      vim.state.scrollableElements.quirks(document.documentElement)
 
   options = {}
   options[direction] = switch type
@@ -101,7 +101,7 @@ commands.follow = ({vim}) ->
         type = 'clickable'
         unless isXUL or element.nodeName in ['A', 'INPUT', 'BUTTON']
           semantic = false
-      when element != vim.state.scrollableElements.root(element) and
+      when element != vim.state.scrollableElements.largest and
            vim.state.scrollableElements.has(element)
         type = 'scrollable'
       when element.hasAttribute('onclick') or
@@ -194,7 +194,7 @@ commands.follow_focus = ({vim}) ->
     type = switch
       when element.tabIndex > -1
         'focusable'
-      when element != vim.state.scrollableElements.root(element) and
+      when element != vim.state.scrollableElements.largest and
            vim.state.scrollableElements.has(element)
         'scrollable'
     return unless type
