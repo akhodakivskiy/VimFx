@@ -68,6 +68,8 @@ Note that the URLs in the list must match the current URL _entirely_ for it to
 apply. Therefore it is easiest to always use the `*` wildcard (which matches
 zero or more characters).
 
+(Set the option to `*` to make VimFx start out in Ignore mode _everywhere._)
+
 You might also want to read about the [Ignore mode `<s-f1>` command][s-f1].
 
 [s-f1]: commands.md#ignore-mode-s-f1
