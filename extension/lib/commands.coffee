@@ -293,8 +293,9 @@ helper_follow = (name, vim, callback, count = null) ->
 
 helper_follow_clickable = ({inTab, inBackground}, {vim, count = 1}) ->
   callback = (marker, timesLeft, keyStr) ->
+    {type, elementIndex} = marker.wrapper
     isLast = (timesLeft == 1)
-    isLink = (marker.wrapper.type == 'link')
+    isLink = (type == 'link')
 
     switch
       when keyStr.startsWith(vim.options.hints_toggle_in_tab)
@@ -309,10 +310,9 @@ helper_follow_clickable = ({inTab, inBackground}, {vim, count = 1}) ->
 
     inTab = false unless isLink
 
-    if marker.type == 'text' or (isLink and not (inTab and inBackground))
+    if type == 'text' or (isLink and not (inTab and inBackground))
       isLast = true
 
-    {elementIndex} = marker.wrapper
     vim._focusMarkerElement(elementIndex)
 
     if inTab
@@ -324,9 +324,8 @@ helper_follow_clickable = ({inTab, inBackground}, {vim, count = 1}) ->
       )
     else
       vim._run('click_marker_element', {
-        elementIndex
+        elementIndex, type
         preventTargetBlank: vim.options.prevent_target_blank
-        type: marker.type
       })
 
     return not isLast

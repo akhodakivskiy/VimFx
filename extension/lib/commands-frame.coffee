@@ -209,7 +209,7 @@ commands.focus_marker_element = ({vim, elementIndex, options}) ->
   utils.focusElement(element, options)
 
 commands.click_marker_element = (args) ->
-  {vim, elementIndex, preventTargetBlank, type} = args
+  {vim, elementIndex, type, preventTargetBlank} = args
   element = vim.state.markerElements[elementIndex]
   if element.target == '_blank' and preventTargetBlank
     targetReset = element.target
