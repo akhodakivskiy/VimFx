@@ -156,6 +156,7 @@ toolbarpaletteitem[place="palette"] > #VimFxButton {
   /* Some light-weight themes set a `text-shadow` that the hint markers inherit,
    * making them almost unreadable. */
   text-shadow: none;
+  cursor: default;
 
   --page-padding: 3em;
   --gutter: 1em;

@@ -39,7 +39,6 @@ injectHelp = (window, vimfx) ->
   wrapper = utils.createBox(document, 'wrapper', container)
 
   header = createHeader(document, vimfx)
-
   wrapper.appendChild(header)
 
   content = createContent(document, vimfx)
