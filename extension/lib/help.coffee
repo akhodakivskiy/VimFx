@@ -49,7 +49,7 @@ injectHelp = (window, vimfx) ->
     class: 'search-input'
     placeholder: translate('help.search')
   })
-  searchInput.oninput = -> search(content, searchInput.value.trim())
+  searchInput.oninput = -> search(content, searchInput.value.trimLeft())
   container.appendChild(searchInput)
 
   window.gBrowser.mCurrentBrowser.parentNode.appendChild(container)
