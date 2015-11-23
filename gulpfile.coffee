@@ -220,19 +220,26 @@ gulp.task('faster', ->
 
 gulp.task('sync-locales', ->
   baseLocale = BASE_LOCALE
+  compareLocale = null
   for arg in process.argv when arg[...2] == '--'
-    baseLocale = arg[2..]
+    name = arg[2..]
+    if name[-1..] == '?' then compareLocale = name[...-1] else baseLocale = name
+
   results = fs.readdirSync(join(LOCALE, baseLocale))
     .filter((file) -> path.extname(file) == '.properties')
     .map(syncLocale.bind(null, baseLocale))
+
   if baseLocale == BASE_LOCALE
     report = []
-    for {fileName, translatedCount, total} in results
+    for {fileName, untranslated, total} in results
       report.push("#{fileName}:")
-      for localeName, count of translatedCount
+      for localeName, strings of untranslated
         paddedName = "#{localeName}:   "[...6]
-        percentage = Math.round((count / total) * 100)
-        report.push("  #{paddedName} #{percentage}%")
+        percentage = Math.round((1 - strings.length / total) * 100)
+        if localeName == compareLocale or compareLocale == null
+          report.push("  #{paddedName} #{percentage}%")
+        if localeName == compareLocale
+          report.push(strings.map((string) -> "    #{string}")...)
     process.stdout.write(report.join('\n') + '\n')
 )
 
@@ -242,12 +249,12 @@ syncLocale = (baseLocaleName, fileName) ->
   oldBasePath = "#{basePath}.old"
   if fs.existsSync(oldBasePath)
     oldBase = parseLocaleFile(read(oldBasePath))
-  translatedCount = {}
+  untranslated = {}
   for localeName in fs.readdirSync(LOCALE) when localeName != baseLocaleName
     localePath = join(LOCALE, localeName, fileName)
     locale = parseLocaleFile(read(localePath))
-    translatedCount[localeName] = 0
-    newLocale = base.template.map((line) ->
+    untranslated[localeName] = []
+    newLocale = base.template.map((line, index) ->
       if Array.isArray(line)
         [key] = line
         oldValue = oldBase?.keys[key]
@@ -257,13 +264,15 @@ syncLocale = (baseLocaleName, fileName) ->
             base.keys[key]
           else
             locale.keys[key]
-        translatedCount[localeName]++ if value != base.keys[key] or value == ''
-        return "#{key}=#{value}"
+        result = "#{key}=#{value}"
+        if value == base.keys[key] and value != ''
+          untranslated[localeName].push("#{index + 1}: #{result}")
+        return result
       else
         return line
     )
     fs.writeFileSync(localePath, newLocale.join(base.newline))
-  return {fileName, translatedCount, total: Object.keys(base.keys).length}
+  return {fileName, untranslated, total: Object.keys(base.keys).length}
 
 parseLocaleFile = (fileContents) ->
   keys  = {}
