@@ -51,6 +51,7 @@ class VimFrame
       @state =
         hasInteraction:       false
         shouldRefocus:        false
+        marks:                {}
         lastFocusedTextInput: null
         scrollableElements:   new ScrollableElements(@content, MINIMUM_SCROLL)
         markerElements:       []

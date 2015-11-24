@@ -52,6 +52,8 @@ shortcuts =
       'G':         'scroll_to_bottom'
       '0  ^':      'scroll_to_left'
       '$':         'scroll_to_right'
+      'm':         'mark_scroll_position'
+      '`':         'scroll_to_mark'
 
     'tabs':
       't':         'tab_new'

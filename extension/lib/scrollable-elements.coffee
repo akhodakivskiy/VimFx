@@ -79,15 +79,22 @@ class ScrollableElements
     @largest = null
     @elements.forEach((element) => @largest = element if @isLargest(element))
 
-  # Elements may overflow when zooming in or out. However, the `.scrollHeight`
-  # of the element is not correctly updated when the 'overflow' event occurs,
-  # making it possible for unscrollable elements to slip in. This method tells
-  # whether the largest element really is scrollable, updating it if needed.
-  hasOrUpdateLargestScrollable: ->
+  # In theory, this method could return `@largest`. In reality, it is not that
+  # simple. Elements may overflow when zooming in or out, but the
+  # `.scrollHeight` of the element is not correctly updated when the 'overflow'
+  # event occurs, making it possible for unscrollable elements to slip in. So
+  # this method has to check whether the largest element really is scrollable,
+  # and update it if needed. In the case where there is no largest element
+  # (left), it _should_ mean that the page hasn’t got any scrollable elements,
+  # and the whole page itself isn’t scrollable. However, we cannot be 100% sure
+  # that nothing is scrollable (for example, if VimFx is updated in the middle
+  # of a session). So in that case, instead of simply returning `null`, return
+  # the entire page (the best bet). Not being able to scroll is very annoying.
+  filterSuitableDefault: ->
     if @largest and @isScrollable(@largest)
-      return true
+      return @largest
     else
       @reject((element) => not @isScrollable(element))
-      return @largest?
+      return @largest ? @quirks(@window.document.documentElement)
 
 module.exports = ScrollableElements

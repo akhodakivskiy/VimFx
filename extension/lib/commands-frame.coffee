@@ -22,8 +22,9 @@
 # same name as the command in commands.coffee that calls it. There are also a
 # few more generalized “commands” used in more than one place.
 
-hints = require('./hints')
-utils = require('./utils')
+hints     = require('./hints')
+translate = require('./l10n')
+utils     = require('./utils')
 
 {isProperLink, isTextInputElement, isTypingElement, isContentEditable} = utils
 
@@ -39,34 +40,42 @@ commands.go_up_path = ({vim, count = 1}) ->
 commands.go_to_root = ({vim}) ->
   vim.content.location.href = vim.content.location.origin
 
-commands.scroll = ({vim, method, type, direction, amount, property, smooth}) ->
-  activeElement = utils.getActiveElement(vim.content)
-  document = activeElement.ownerDocument
-
-  element = switch
-    when vim.state.scrollableElements.has(activeElement)
-      activeElement
-    # If the currently focused element isn’t scrollable, scroll the largest
-    # scrollable element instead, which usually means `<html>`.
-    when vim.state.scrollableElements.hasOrUpdateLargestScrollable()
-      vim.state.scrollableElements.largest
-    else
-      # If this point is reached, it _should_ mean that the page hasn’t got any
-      # scrollable elements, and the whole page itself isn’t scrollable. Instead
-      # of simply `return`ing, scroll the entire page (the best bet at this
-      # point) instead because we cannot be 100% sure that nothing is scrollable
-      # (for example, if VimFx is updated in the middle of a session). Not being
-      # able to scroll is very annoying.
-      vim.state.scrollableElements.quirks(document.documentElement)
-
+helper_scroll = (element, args) ->
+  {method, type, directions, amounts, properties, smooth} = args
   options = {}
-  options[direction] = switch type
-    when 'lines' then amount
-    when 'pages' then amount * element[property]
-    when 'other' then Math.min(amount, element[property])
+  for direction, index in directions
+    amount = amounts[index]
+    options[direction] = switch type
+      when 'lines' then amount
+      when 'pages' then amount * element[properties[index]]
+      when 'other' then Math.min(amount, element[properties[index]])
   options.behavior = 'smooth' if smooth
-
   element[method](options)
+
+commands.scroll = (args) ->
+  {vim} = args
+  activeElement = utils.getActiveElement(vim.content)
+  element =
+    if vim.state.scrollableElements.has(activeElement)
+      activeElement
+    else
+      vim.state.scrollableElements.filterSuitableDefault()
+  helper_scroll(element, args)
+
+commands.mark_scroll_position = ({vim, keyStr}) ->
+  element = vim.state.scrollableElements.filterSuitableDefault()
+  vim.state.marks[keyStr] = [element.scrollTop, element.scrollLeft]
+  vim.notify(translate('mark_scroll_position.success', keyStr))
+
+commands.scroll_to_mark = (args) ->
+  {vim, amounts: keyStr} = args
+  unless keyStr of vim.state.marks
+    vim.notify(translate('scroll_to_mark.error', keyStr))
+    return
+
+  args.amounts = vim.state.marks[keyStr]
+  element = vim.state.scrollableElements.filterSuitableDefault()
+  helper_scroll(element, args)
 
 helper_follow = ({id, combine = true}, matcher, {vim}) ->
   hrefs = {}

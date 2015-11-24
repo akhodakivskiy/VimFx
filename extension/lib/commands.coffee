@@ -115,9 +115,10 @@ commands.stop_all = ({vim}) ->
 
 
 
-helper_scroll = (vim, method, type, direction, amount, property = null) ->
-  args = {
-    method, type, direction, amount, property
+helper_scroll = (vim, args...) ->
+  [method, type, directions, amounts, properties = null, name = 'scroll'] = args
+  options = {
+    method, type, directions, amounts, properties
     smooth: (prefs.root.get('general.smoothScroll') and
              prefs.root.get("general.smoothScroll.#{type}"))
   }
@@ -125,24 +126,27 @@ helper_scroll = (vim, method, type, direction, amount, property = null) ->
     'layout.css.scroll-behavior.spring-constant',
     vim.options["smoothScroll.#{type}.spring-constant"]
   )
-  vim._run('scroll', args, reset)
+  vim._run(name, options, reset)
 
 helper_scrollByLinesX = (amount, {vim, count = 1}) ->
   distance = prefs.root.get('toolkit.scrollbox.horizontalScrollDistance')
-  helper_scroll(vim, 'scrollBy', 'lines', 'left', amount * distance * count * 5)
+  helper_scroll(vim, 'scrollBy', 'lines', ['left'],
+                [amount * distance * count * 5])
 
 helper_scrollByLinesY = (amount, {vim, count = 1}) ->
   distance = prefs.root.get('toolkit.scrollbox.verticalScrollDistance')
-  helper_scroll(vim, 'scrollBy', 'lines', 'top', amount * distance * count * 20)
+  helper_scroll(vim, 'scrollBy', 'lines', ['top'],
+                [amount * distance * count * 20])
 
 helper_scrollByPagesY = (amount, {vim, count = 1}) ->
-  helper_scroll(vim, 'scrollBy', 'pages', 'top', amount * count, 'clientHeight')
+  helper_scroll(vim, 'scrollBy', 'pages', ['top'],
+                [amount * count], ['clientHeight'])
 
 helper_scrollToX = (amount, {vim}) ->
-  helper_scroll(vim, 'scrollTo', 'other', 'left', amount, 'scrollLeftMax')
+  helper_scroll(vim, 'scrollTo', 'other', ['left'], [amount], ['scrollLeftMax'])
 
 helper_scrollToY = (amount, {vim}) ->
-  helper_scroll(vim, 'scrollTo', 'other', 'top', amount, 'scrollTopMax')
+  helper_scroll(vim, 'scrollTo', 'other', ['top'],  [amount], ['scrollTopMax'])
 
 commands.scroll_left           = helper_scrollByLinesX.bind(null, -1)
 commands.scroll_right          = helper_scrollByLinesX.bind(null, +1)
@@ -156,6 +160,15 @@ commands.scroll_to_top         = helper_scrollToY.bind(null, 0)
 commands.scroll_to_bottom      = helper_scrollToY.bind(null, Infinity)
 commands.scroll_to_left        = helper_scrollToX.bind(null, 0)
 commands.scroll_to_right       = helper_scrollToX.bind(null, Infinity)
+
+commands.mark_scroll_position = ({vim}) ->
+  vim.enterMode('marks', (keyStr) -> vim._run('mark_scroll_position', {keyStr}))
+
+commands.scroll_to_mark = ({vim}) ->
+  vim.enterMode('marks', (keyStr) ->
+    helper_scroll(vim, 'scrollTo', 'other', ['top', 'left'], keyStr,
+                  ['scrollTopMax', 'scrollLeftMax'], 'scroll_to_mark')
+  )
 
 
 
