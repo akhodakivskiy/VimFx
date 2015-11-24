@@ -128,6 +128,7 @@ helper_scroll = (vim, args...) ->
   )
   vim._run(name, options, reset)
 
+
 helper_scrollByLinesX = (amount, {vim, count = 1}) ->
   distance = prefs.root.get('toolkit.scrollbox.horizontalScrollDistance')
   helper_scroll(vim, 'scrollBy', 'lines', ['left'],
@@ -144,9 +145,11 @@ helper_scrollByPagesY = (amount, {vim, count = 1}) ->
 
 helper_scrollToX = (amount, {vim}) ->
   helper_scroll(vim, 'scrollTo', 'other', ['left'], [amount], ['scrollLeftMax'])
+  helper_mark_last_scroll_position(vim)
 
 helper_scrollToY = (amount, {vim}) ->
   helper_scroll(vim, 'scrollTo', 'other', ['top'],  [amount], ['scrollTopMax'])
+  helper_mark_last_scroll_position(vim)
 
 commands.scroll_left           = helper_scrollByLinesX.bind(null, -1)
 commands.scroll_right          = helper_scrollByLinesX.bind(null, +1)
@@ -161,11 +164,17 @@ commands.scroll_to_bottom      = helper_scrollToY.bind(null, Infinity)
 commands.scroll_to_left        = helper_scrollToX.bind(null, 0)
 commands.scroll_to_right       = helper_scrollToX.bind(null, Infinity)
 
+helper_mark_last_scroll_position = (vim) ->
+  keyStr = vim.options.last_scroll_position_mark
+  vim._run('mark_scroll_position', {keyStr, notify: false})
+
 commands.mark_scroll_position = ({vim}) ->
   vim.enterMode('marks', (keyStr) -> vim._run('mark_scroll_position', {keyStr}))
 
 commands.scroll_to_mark = ({vim}) ->
   vim.enterMode('marks', (keyStr) ->
+    unless keyStr == vim.options.last_scroll_position_mark
+      helper_mark_last_scroll_position(vim)
     helper_scroll(vim, 'scrollTo', 'other', ['top', 'left'], keyStr,
                   ['scrollTopMax', 'scrollLeftMax'], 'scroll_to_mark')
   )
@@ -401,6 +410,7 @@ commands.focus_text_input = ({vim, count}) ->
 findStorage = {lastSearchString: ''}
 
 helper_find = (highlight, {vim}) ->
+  helper_mark_last_scroll_position(vim)
   findBar = vim.window.gBrowser.getFindBar()
 
   findBar.onFindCommand()
@@ -418,11 +428,12 @@ commands.find_highlight_all = helper_find.bind(null, true)
 
 helper_find_again = (direction, {vim}) ->
   findBar = vim.window.gBrowser.getFindBar()
-  if findStorage.lastSearchString.length > 0
-    findBar._findField.value = findStorage.lastSearchString
-    findBar.onFindAgainCommand(direction)
-    message = findBar._findStatusDesc.textContent
-    vim.notify(message) if message
+  return unless findStorage.lastSearchString.length > 0
+  helper_mark_last_scroll_position(vim)
+  findBar._findField.value = findStorage.lastSearchString
+  findBar.onFindAgainCommand(direction)
+  message = findBar._findStatusDesc.textContent
+  vim.notify(message) if message
 
 commands.find_next     = helper_find_again.bind(null, false)
 

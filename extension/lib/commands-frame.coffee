@@ -62,10 +62,10 @@ commands.scroll = (args) ->
       vim.state.scrollableElements.filterSuitableDefault()
   helper_scroll(element, args)
 
-commands.mark_scroll_position = ({vim, keyStr}) ->
+commands.mark_scroll_position = ({vim, keyStr, notify = true}) ->
   element = vim.state.scrollableElements.filterSuitableDefault()
   vim.state.marks[keyStr] = [element.scrollTop, element.scrollLeft]
-  vim.notify(translate('mark_scroll_position.success', keyStr))
+  vim.notify(translate('mark_scroll_position.success', keyStr)) if notify
 
 commands.scroll_to_mark = (args) ->
   {vim, amounts: keyStr} = args

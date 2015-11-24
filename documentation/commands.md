@@ -118,6 +118,12 @@ letter to associate the current scroll position with that letter. For example,
 press `ma` to save the position into mark _a._ Then you can return to that
 position by pressing `` ` `` followed by the same letter, e.g. `` `a ``.
 
+One mark is special: `` ` ``. Pressing ``` `` ``` takes you to the scroll
+position before the last `gg`, `G`, `0`, `$`, `/`, `n`, `N` or `` ` ``. (You can
+change this mark using the [`last_scroll_position_mark`] pref.)
+
+[`last_scroll_position_mark`]: options.md#last_scroll_position_mark
+
 #### Minor notes
 
 Unlike Vim, you may press _any_ key after `m`, and the scroll position will be

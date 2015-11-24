@@ -131,6 +131,7 @@ advanced_options =
   'smoothScroll.other.spring-constant': '2500'
   'pattern_selector':                   'a, button'
   'pattern_attrs':                      'rel  role  data-tooltip  aria-label'
+  'last_scroll_position_mark':          '`'
   'hints_toggle_in_tab':                '<c-'
   'hints_toggle_in_background':         '<a-'
   'activatable_element_keys':           '<enter>'
