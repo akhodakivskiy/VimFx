@@ -166,6 +166,12 @@ In other words, do not line-wrap translations. Also don’t bother adding commen
 when translating locale files, since they’ll likely be removed by `gulp
 sync-locales`.
 
+If you run `gulp sync-locales` with “en-US” as the base locale, a report is
+printed telling how complete all other locales are. Add `--sv-SE?` (note the
+question mark) to restrict the report to the “sv-SE” locale (you can of course
+substitue with any other locale). In that case, every line (including line
+number) that don’t differ compared to “en-US” is also be printed.
+
 
 ## Making a release
 

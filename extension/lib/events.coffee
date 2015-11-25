@@ -139,7 +139,7 @@ class UIEventManager
     )
 
     @listen('TabSelect', (event) =>
-      @vimfx.emit(@vimfx, 'TabSelect', event)
+      @vimfx.emit('TabSelect', event)
 
       return unless vim = @vimfx.getCurrentVim(@window)
       vim.hideNotification()

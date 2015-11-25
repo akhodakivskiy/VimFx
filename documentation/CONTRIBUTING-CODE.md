@@ -15,6 +15,15 @@ more than welcome. Don’t be afraid to make mistakes–we’ll help you out!
 Contribute your localization! Copy the `extension/locale/en-US` directory and go
 wild! Usually, it’s best to stick to the master branch.
 
+Tip: If you’re translating into Swedish, run `gulp sync-locales --sv-SE?` to see
+how many percent is done. All lines (including line numbers) that don’t differ
+compared to “en-US” are also printed, letting you know what’s left to do.
+Subsitute “sv-SE” with the locale you’re working on.
+
+Also, don’t worry if you can’t get a 100% difference compared to “en-US.”
+Sometimes text strings are very short and will look identical in both languages.
+That’s completely OK.
+
 
 ## Code
 
