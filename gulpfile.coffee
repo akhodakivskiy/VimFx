@@ -161,8 +161,8 @@ gulp.task('lint', ->
 gulp.task('sloc', ->
   gulp.src([
     'extension/bootstrap.coffee'
-    'extension/lib/!(migrations|legacy).coffee']
-  )
+    'extension/lib/!(migrations|legacy).coffee'
+  ])
     .pipe(sloc())
 )
 
