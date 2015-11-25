@@ -30,26 +30,38 @@ add-on, that makes use of VimFx’s [public API].
 
 ## Setup
 
+Basically, you throw a bunch of files into a directory and then tell Firefox
+where that directory is.
+
 1. Create a directory for your config file to live in. Actually, there will be
-   _three_ files that will live in it.
+   _three_ files that will live in it. Two of them are just boilerplate needed
+   to get the third one—the actual config file—up and running.
 
 2. Create an [install.rdf] file in your directory. Inside that file there is an
-   extension ID; take note of it.
+   extension ID; take note of it. This is one of the boilerplate files.
 
-3. Create a [bootstrap.js] and a [vimfx.js] file in your directory.
+3. Create a [bootstrap.js] and a [vimfx.js] file in your directory. bootstrap.js
+   is the second boilerplate file. vimfx.js is your config file!
 
 4. Find the `extensions/` directory in your [profile directory].
 
 5. In the extensions directory, do one of the following:
 
-   - Move your config file directory into it, renamed as the extension ID.
+   - Move your config file directory into it, renamed as the extension ID. For
+     example, rename it to `VimFx-custom@vimfx.org`.
 
    - Create a plain text file named as the extension ID with the absolute path
      to your config file directory inside it. You might want to read the
-     documentation about such [proxy files].
+     documentation about such [proxy files]. For example, name the file
+     `VimFx-custom@vimfx.org` and put `/home/you/.vimfx/` or
+     `C:\users\you\vimfx\` inside it.
 
    - Create a symlink named as the extension ID pointing to your config file
-     directory.
+     directory. For example:
+
+     ```
+     ln -s /home/you/.vimfx/ /home/you/.mozilla/abrowser/dgof8r37.default/extensions/VimFx-custom@vimfx.org
+     ```
 
 6. Restart Firefox.
 
@@ -141,7 +153,8 @@ function uninstall() {}
 
 ## vimfx.js
 
-This is the actual config file, written in JavaScript.
+This is the actual config file, written in JavaScript. It is in this file you
+add custom commands and set options, or whatever you’d like to do.
 
 ```js
 console.log('Hello, world! This is vimfx:', vimfx)
