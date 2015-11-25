@@ -26,10 +26,3 @@ Type a lone `*` to restrict the results to bookmarks only. Use `<c-enter>` to
 open results in new tabs. There are [plenty more such tricks][location-bar].
 
 [location-bar]: http://kb.mozillazine.org/Location_Bar_search
-
-
-## Find—links only
-
-Press `'` to open the “Quick Find Bar.” It’s a specialized version of the
-regular Find Bar that **only searches links.** This is a handy complement to
-VimFx’s `f` commands.

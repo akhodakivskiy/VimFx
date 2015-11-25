@@ -166,6 +166,9 @@ When invoking one of the `f` commands you enter Hints mode. In Hints mode,
 markers with hints are shown for some elements. By typing the letters of a hint
 something is done to that element, depending on the command.
 
+Another way to find links on the page is to use `g/`. It’s like the regular find
+command (`/`), except that it searches links only.
+
 Which elements get hints depends on the command as well:
 
 - `f` and `af`: Anything clickable—links, buttons, form controls.

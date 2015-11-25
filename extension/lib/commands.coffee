@@ -409,22 +409,27 @@ commands.focus_text_input = ({vim, count}) ->
 
 findStorage = {lastSearchString: ''}
 
-helper_find = (highlight, {vim}) ->
+helper_find = ({highlight, linksOnly = false}, {vim}) ->
   helper_mark_last_scroll_position(vim)
   findBar = vim.window.gBrowser.getFindBar()
 
-  findBar.onFindCommand()
+  mode = if linksOnly then findBar.FIND_LINKS else findBar.FIND_NORMAL
+  findBar.startFind(mode)
   utils.focusElement(findBar._findField, {select: true})
 
+  return if linksOnly
   return unless highlightButton = findBar.getElement('highlight')
   if highlightButton.checked != highlight
     highlightButton.click()
 
 # Open the find bar, making sure that hightlighting is off.
-commands.find = helper_find.bind(null, false)
+commands.find = helper_find.bind(null, {highlight: false})
 
 # Open the find bar, making sure that hightlighting is on.
-commands.find_highlight_all = helper_find.bind(null, true)
+commands.find_highlight_all = helper_find.bind(null, {highlight: true})
+
+# Open the find bar in links only mode.
+commands.find_links_only = helper_find.bind(null, {linksOnly: true})
 
 helper_find_again = (direction, {vim}) ->
   findBar = vim.window.gBrowser.getFindBar()

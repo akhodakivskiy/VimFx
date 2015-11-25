@@ -85,6 +85,7 @@ shortcuts =
     'find':
       '/':         'find'
       'a/':        'find_highlight_all'
+      'g/':        'find_links_only'
       'n':         'find_next'
       'N':         'find_previous'
 
