@@ -10,6 +10,7 @@ All of VimFx’s keyboard shortcuts can be customized in VimFx’s settings page
 the Add-ons Manager. Doing so is really easy. You get far just by looking at the
 defaults and trying things out. If not, read on.
 
+
 ## Key notation
 
 VimFx’s key notation is inspired by Vim’s key notation. An example:
@@ -51,6 +52,21 @@ If you’d like to know even more about the key notation, see
 
 [timeout]: options.md#timeout
 [vim-like-key-notation]: https://github.com/lydell/vim-like-key-notation
+
+
+## Tips
+
+If you use more than one keyboard layout, remember to check out the [Ignore
+keyboard layout] option.
+
+If you’d like see what VimFx interprets a key stroke as, you can (ab)use the
+[`m`] command. Press `m` followed by your desired key stroke. A [notification]
+will appear, including the interpreted key notation for that key press.
+
+[Ignore keyboard layout]: options.md#ignore-keyboard-layout
+[`m`]: commands.md#marks-m-and-
+[notification]: notifications.md
+
 
 ## Special keys
 

@@ -115,9 +115,10 @@ commands.stop_all = ({vim}) ->
 
 
 
-helper_scroll = (vim, method, type, direction, amount, property = null) ->
-  args = {
-    method, type, direction, amount, property
+helper_scroll = (vim, args...) ->
+  [method, type, directions, amounts, properties = null, name = 'scroll'] = args
+  options = {
+    method, type, directions, amounts, properties
     smooth: (prefs.root.get('general.smoothScroll') and
              prefs.root.get("general.smoothScroll.#{type}"))
   }
@@ -125,24 +126,30 @@ helper_scroll = (vim, method, type, direction, amount, property = null) ->
     'layout.css.scroll-behavior.spring-constant',
     vim.options["smoothScroll.#{type}.spring-constant"]
   )
-  vim._run('scroll', args, reset)
+  vim._run(name, options, reset)
+
 
 helper_scrollByLinesX = (amount, {vim, count = 1}) ->
   distance = prefs.root.get('toolkit.scrollbox.horizontalScrollDistance')
-  helper_scroll(vim, 'scrollBy', 'lines', 'left', amount * distance * count * 5)
+  helper_scroll(vim, 'scrollBy', 'lines', ['left'],
+                [amount * distance * count * 5])
 
 helper_scrollByLinesY = (amount, {vim, count = 1}) ->
   distance = prefs.root.get('toolkit.scrollbox.verticalScrollDistance')
-  helper_scroll(vim, 'scrollBy', 'lines', 'top', amount * distance * count * 20)
+  helper_scroll(vim, 'scrollBy', 'lines', ['top'],
+                [amount * distance * count * 20])
 
 helper_scrollByPagesY = (amount, {vim, count = 1}) ->
-  helper_scroll(vim, 'scrollBy', 'pages', 'top', amount * count, 'clientHeight')
+  helper_scroll(vim, 'scrollBy', 'pages', ['top'],
+                [amount * count], ['clientHeight'])
 
 helper_scrollToX = (amount, {vim}) ->
-  helper_scroll(vim, 'scrollTo', 'other', 'left', amount, 'scrollLeftMax')
+  helper_scroll(vim, 'scrollTo', 'other', ['left'], [amount], ['scrollLeftMax'])
+  helper_mark_last_scroll_position(vim)
 
 helper_scrollToY = (amount, {vim}) ->
-  helper_scroll(vim, 'scrollTo', 'other', 'top', amount, 'scrollTopMax')
+  helper_scroll(vim, 'scrollTo', 'other', ['top'],  [amount], ['scrollTopMax'])
+  helper_mark_last_scroll_position(vim)
 
 commands.scroll_left           = helper_scrollByLinesX.bind(null, -1)
 commands.scroll_right          = helper_scrollByLinesX.bind(null, +1)
@@ -156,6 +163,21 @@ commands.scroll_to_top         = helper_scrollToY.bind(null, 0)
 commands.scroll_to_bottom      = helper_scrollToY.bind(null, Infinity)
 commands.scroll_to_left        = helper_scrollToX.bind(null, 0)
 commands.scroll_to_right       = helper_scrollToX.bind(null, Infinity)
+
+helper_mark_last_scroll_position = (vim) ->
+  keyStr = vim.options.last_scroll_position_mark
+  vim._run('mark_scroll_position', {keyStr, notify: false})
+
+commands.mark_scroll_position = ({vim}) ->
+  vim.enterMode('marks', (keyStr) -> vim._run('mark_scroll_position', {keyStr}))
+
+commands.scroll_to_mark = ({vim}) ->
+  vim.enterMode('marks', (keyStr) ->
+    unless keyStr == vim.options.last_scroll_position_mark
+      helper_mark_last_scroll_position(vim)
+    helper_scroll(vim, 'scrollTo', 'other', ['top', 'left'], keyStr,
+                  ['scrollTopMax', 'scrollLeftMax'], 'scroll_to_mark')
+  )
 
 
 
@@ -388,6 +410,7 @@ commands.focus_text_input = ({vim, count}) ->
 findStorage = {lastSearchString: ''}
 
 helper_find = (highlight, {vim}) ->
+  helper_mark_last_scroll_position(vim)
   findBar = vim.window.gBrowser.getFindBar()
 
   findBar.onFindCommand()
@@ -405,11 +428,12 @@ commands.find_highlight_all = helper_find.bind(null, true)
 
 helper_find_again = (direction, {vim}) ->
   findBar = vim.window.gBrowser.getFindBar()
-  if findStorage.lastSearchString.length > 0
-    findBar._findField.value = findStorage.lastSearchString
-    findBar.onFindAgainCommand(direction)
-    message = findBar._findStatusDesc.textContent
-    vim.notify(message) if message
+  return unless findStorage.lastSearchString.length > 0
+  helper_mark_last_scroll_position(vim)
+  findBar._findField.value = findStorage.lastSearchString
+  findBar.onFindAgainCommand(direction)
+  message = findBar._findStatusDesc.textContent
+  vim.notify(message) if message
 
 commands.find_next     = helper_find_again.bind(null, false)
 

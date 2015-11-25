@@ -31,7 +31,7 @@ translate                  = require('./l10n')
 utils                      = require('./utils')
 
 # Helper to create modes in a DRY way.
-mode = (modeName, obj, commands) ->
+mode = (modeName, obj, commands = null) ->
   obj.name  = translate.bind(null, "mode.#{modeName}")
   obj.order = defaults.mode_order[modeName]
   obj.commands = {}
@@ -229,4 +229,20 @@ mode('find', {
 
 }, {
   exit: ({findBar}) -> findBar.close()
+})
+
+
+
+mode('marks', {
+  onEnter: ({storage}, callback) ->
+    storage.callback = callback
+
+  onLeave: ({storage}) ->
+    storage.callback = null
+
+  onInput: (args, match) ->
+    {vim, storage} = args
+    storage.callback(match.keyStr)
+    vim.enterMode('normal')
+    return true
 })

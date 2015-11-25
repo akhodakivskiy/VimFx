@@ -51,7 +51,9 @@ class VimFx extends utils.EventEmitter
   getCurrentVim: (window) -> @vims.get(window.gBrowser.selectedBrowser)
 
   reset: (mode = null) ->
-    @currentKeyTree = if mode then @keyTrees[mode] else {}
+    # Modes without commands are returned by neither `.getGroupedCommands()` nor
+    # `createKeyTrees`. Fall back to an empty tree.
+    @currentKeyTree = @keyTrees[mode] ? {}
     @lastInputTime = 0
     @count = ''
 

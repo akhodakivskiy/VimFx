@@ -111,6 +111,34 @@ eating your best hint char on most pages; see [The `f` commands]).
 
 [The `f` commands]: #the-f-commands-1
 
+### Marks: `m` and `` ` ``
+
+Other than traditional scrolling, VimFx has _marks._ Press `m` followed by a
+letter to associate the current scroll position with that letter. For example,
+press `ma` to save the position into mark _a._ Then you can return to that
+position by pressing `` ` `` followed by the same letter, e.g. `` `a ``.
+
+One mark is special: `` ` ``. Pressing ``` `` ``` takes you to the scroll
+position before the last `gg`, `G`, `0`, `$`, `/`, `n`, `N` or `` ` ``. (You can
+change this mark using the [`last_scroll_position_mark`] pref.)
+
+[`last_scroll_position_mark`]: options.md#last_scroll_position_mark
+
+#### Minor notes
+
+Unlike Vim, you may press _any_ key after `m`, and the scroll position will be
+associated with that key (Vim allows only a–z, roughly).
+
+Unlike Vim and Vimium, VimFx has no global marks. The reason is that they would
+be a lot more complicated to implement and do not seem useful enough to warrant
+that effort.
+
+As mentioned above, `m` stores the _current scroll position._ Specifically, that
+means the scroll position of the element that would be scrolled if the active
+element isn't scrollable; see [Scrolling commands] above.
+
+[Scrolling commands]: #scrolling-commands-1
+
 
 ## `gi`
 
