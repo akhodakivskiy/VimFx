@@ -44,7 +44,7 @@ do (global = this) ->
 
     FRAME_SCRIPT_ENVIRONMENT = global
     global = {}
-    [global.__SCRIPT_URI_SPEC__, MULTI_PROCESS_ENABLED] = data
+    [global.__SCRIPT_URI_SPEC__] = data
 
   else
     # Make `Services` and `console` available globally, just like they are in
@@ -53,8 +53,6 @@ do (global = this) ->
     Cu.import('resource://gre/modules/devtools/Console.jsm')
 
     FRAME_SCRIPT_ENVIRONMENT = null
-    MULTI_PROCESS_ENABLED =
-      Services.prefs.getBoolPref('browser.tabs.remote.autostart')
 
   shutdownHandlers = []
 
@@ -84,7 +82,7 @@ do (global = this) ->
         require: (path) -> require(path, moduleRoot, "./#{dirname(fullPath)}")
         module, exports: module.exports
         Cc, Ci, Cu
-        MULTI_PROCESS_ENABLED, IS_FRAME_SCRIPT, FRAME_SCRIPT_ENVIRONMENT
+        IS_FRAME_SCRIPT, FRAME_SCRIPT_ENVIRONMENT
       }
       Services.scriptloader.loadSubScript(fullPath, scope, 'UTF-8')
 

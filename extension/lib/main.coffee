@@ -129,7 +129,7 @@ module.exports = (data, reason) ->
       setWindowAttribute(window, 'mode', 'normal')
       setWindowAttribute(window, 'focus-type', null)
 
-    return [__SCRIPT_URI_SPEC__, MULTI_PROCESS_ENABLED]
+    return [__SCRIPT_URI_SPEC__]
   )
 
   messageManager.load('bootstrap')
