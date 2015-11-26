@@ -28,6 +28,7 @@ class FrameEventManager
   constructor: (@vim) ->
     @numFocusToSuppress = 0
     @keepInputs = false
+    @currentUrl = false
 
   MINIMUM_SCROLLABLE_ELEMENT_AREA: 25
 
@@ -46,15 +47,35 @@ class FrameEventManager
 
     @listen('readystatechange', (event) =>
       target = event.originalTarget
+      @currentUrl = @vim.content.location.href
 
       # If the topmost document starts loading, it means that we have navigated
       # to a new page or refreshed the page.
       if target == @vim.content.document and target.readyState == 'interactive'
-        messageManager.send('locationChange', @vim.content.location.href)
+        messageManager.send('locationChange', @currentUrl)
+    )
+
+    @listen('pageshow', (event) =>
+      [oldUrl, @currentUrl] = [@currentUrl, @vim.content.location.href]
+
+      # When navigating the history, `event.persisted` is `true` (meaning that
+      # the page loaded from cache) and 'readystatechange' won’t be fired, so
+      # send a 'locationChange' message to make sure that the blacklist is
+      # applied etc. The reason we don’t simply _always_ do this on the
+      # 'pageshow' event, is because it usually fires too late. However, it also
+      # fires after having moved a tab to another window. In that case it is
+      # _not_ a location change; the blacklist should not be applied.
+      if event.persisted
+        url = @vim.content.location.href
+        messageManager.send('cachedPageshow', null, (movedToNewTab) =>
+          if not movedToNewTab and oldUrl != @currentUrl
+            messageManager.send('locationChange', @currentUrl)
+        )
     )
 
     @listen('pagehide', (event) =>
       target = event.originalTarget
+      @currentUrl = null
 
       # If the target isn’t the topmost document, it means that a frame has
       # changed: It could have been removed or its `src` attribute could have

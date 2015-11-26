@@ -32,7 +32,7 @@ ChromeWindow = Ci.nsIDOMChromeWindow
 
 class Vim
   constructor: (browser, @_parent) ->
-    @_setBrowser(browser)
+    @_setBrowser(browser, {addListeners: false})
     @_storage = {}
 
     @_resetState()
@@ -84,9 +84,7 @@ class Vim
         @_parent.emit('focusTypeChange', {vim: this, focusType})
     )
 
-  _setBrowser: (browser) ->
-    refresh = @browser?
-    @browser = browser
+  _setBrowser: (@browser, {addListeners = true} = {}) ->
     @window = @browser.ownerGlobal
     @_messageManager = @browser.messageManager
 
@@ -94,7 +92,7 @@ class Vim
     @_statusPanel = statusPanel.injectStatusPanel(@browser)
     @_statusPanel.onclick = @hideNotification.bind(this)
 
-    @_addListeners() if refresh
+    @_addListeners() if addListeners
 
   _resetState: ->
     @_state =
