@@ -16,202 +16,49 @@ who:
 
 Look at the [Share your config file] wiki page for inspiration.
 
+You get far just by copying and pasting.
+
 [special options]: options.md#special-options
 [Share your config file]: https://github.com/akhodakivskiy/VimFx/wiki/Share-your-config-file
 
 
-## Technical notes
-
-The config file is written in JavaScript and is actually a regular Firefox
-add-on, that makes use of VimFx’s [public API].
-
-[public API]: api.md
-
-
 ## Setup
 
-Basically, you throw a bunch of files into a directory and then tell Firefox
-where that directory is.
+The config file is written in JavaScript and is actually a regular Firefox
+add-on, that makes use of VimFx’s [public API]. Don’t worry, creating such an
+add-on is a lot easier than it might sound.
 
-1. Create a directory for your config file to live in. Actually, there will be
-   _three_ files that will live in it. Two of them are just boilerplate needed
-   to get the third one—the actual config file—up and running.
+**[VimFx Config template – Download and instructions][config-template]**
 
-2. Create an [install.rdf] file in your directory. Inside that file there is an
-   extension ID; take note of it. This is one of the boilerplate files.
+Follow the above link to get started. Basically, download a few files and put
+them in a place where Firefox can find them.
 
-3. Create a [bootstrap.js] and a [vimfx.js] file in your directory. bootstrap.js
-   is the second boilerplate file. vimfx.js is your config file!
-
-4. Find the `extensions/` directory in your [profile directory].
-
-5. In the extensions directory, do one of the following:
-
-   - Move your config file directory into it, renamed as the extension ID. For
-     example, rename it to `VimFx-custom@vimfx.org`.
-
-   - Create a plain text file named as the extension ID with the absolute path
-     to your config file directory inside it. You might want to read the
-     documentation about such [proxy files]. For example, name the file
-     `VimFx-custom@vimfx.org` and put `/home/you/.vimfx/` or
-     `C:\users\you\vimfx\` inside it.
-
-   - Create a symlink named as the extension ID pointing to your config file
-     directory. For example:
-
-     ```
-     ln -s /home/you/.vimfx/ /home/you/.mozilla/abrowser/dgof8r37.default/extensions/VimFx-custom@vimfx.org
-     ```
-
-6. Restart Firefox.
-
-7. Open the [browser console]. If you copied the [bootstrap.js] and [vimfx.js]
-   templates below, you should see a greeting and an inspection of VimFx’s
-   public API.
-
-Any time you make changes to any of your add-on files you need to restart
-Firefox to make the changes take effect.
-
-Now you might want to read about the [public API] or look at the [Custom
-Commands] wiki page.
-
-[install.rdf]: #installrdf
-[bootstrap.js]: #bootstrapjs
-[vimfx.js]: #vimfxjs
-[profile directory]: https://support.mozilla.org/en-US/kb/profiles-where-firefox-stores-user-data
-[proxy files]: https://developer.mozilla.org/en-US/Add-ons/Setting_up_extension_development_environment#Firefox_extension_proxy_file
-[browser console]: https://developer.mozilla.org/en-US/docs/Tools/Browser_Console
-[Custom Commands]: https://github.com/akhodakivskiy/VimFx/wiki/Custom-Commands
+[public API]: api.md
+[config-template]: https://github.com/lydell/VimFx-config/
 
 
-## install.rdf
-
-This file tells Firefox that this is an add-on and provides some information
-about it. You’ll probably look at this once and not touch it again.
-
-Here is a boilerplate that you can copy without changing anything (unless you
-feel like it):
-
-```rdf
-<?xml version="1.0" encoding="utf-8"?>
-<RDF xmlns="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-     xmlns:em="http://www.mozilla.org/2004/em-rdf#">
-  <Description about="urn:mozilla:install-manifest">
-
-    <!-- Edit from here ... -->
-    <em:name>VimFx-custom</em:name>
-    <em:id>VimFx-custom@vimfx.org</em:id>
-    <em:version>1</em:version>
-    <!-- ... to here (if you feel like it). -->
-
-    <em:bootstrap>true</em:bootstrap>
-    <em:multiprocessCompatible>true</em:multiprocessCompatible>
-    <em:type>2</em:type>
-    <em:targetApplication>
-      <Description>
-        <em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id>
-        <em:minVersion>38</em:minVersion>
-        <em:maxVersion>*</em:maxVersion>
-      </Description>
-    </em:targetApplication>
-  </Description>
-</RDF>
-```
-
-You might also want to read the [install.rdf documentation].
-
-[install.rdf documentation]: https://developer.mozilla.org/en-US/Add-ons/Install_Manifests
-
-
-## bootstrap.js
-
-This file starts up your add-on. Just like [install.rdf], you’ll probably look
-at this once and not touch it again.
-
-Here is a boilerplate that you can copy as is. All it does is loading VimFx’s
-public API, as well as some very commonly used Firefox APIs, and passing those
-to [vimfx.js].
-
-```js
-let {classes: Cc, interfaces: Ci, utils: Cu} = Components
-function startup() {
-  Cu.import('resource://gre/modules/Services.jsm')
-  Cu.import('resource://gre/modules/devtools/Console.jsm')
-  let apiPref = 'extensions.VimFx.api_url'
-  let apiUrl = Services.prefs.getComplexValue(apiPref, Ci.nsISupportsString).data
-  Cu.import(apiUrl, {}).getAPI(vimfx => {
-    let path = __SCRIPT_URI_SPEC__.replace('bootstrap.js', 'vimfx.js')
-    let scope = {Cc, Ci, Cu, vimfx}
-    Services.scriptloader.loadSubScript(path, scope, 'UTF-8')
-  })
-}
-function shutdown() {}
-function install() {}
-function uninstall() {}
-```
-
-
-## vimfx.js
+## config.js
 
 This is the actual config file, written in JavaScript. It is in this file you
 add custom commands and set options, or whatever you’d like to do.
 
-```js
-console.log('Hello, world! This is vimfx:', vimfx)
-```
-
-
-## Custom commands that access web page content
-
-If you plan to add custom commands that need to access web page content, you
-have to add two more files and make an adjustment to bootstrap.js.
-
-### bootstrap.js adjustment
-
-In bootstrap.js there is one function called `startup` and one called
-`shutdown`. At the end of the `startup` function, add the following:
+Example:
 
 ```js
-Cc['@mozilla.org/globalmessagemanager;1']
-  .getService(Ci.nsIMessageListenerManager)
-  .loadFrameScript('chrome://vimfx-custom/content/frame.js', true)
+vimfx.set('hint_chars', 'abcdefghijklmnopqrstuvwxyz')
 ```
 
-Inside the `shutdown` function, add the following:
 
-```js
-Cc['@mozilla.org/globalmessagemanager;1']
-  .getService(Ci.nsIMessageListenerManager)
-  .removeDelayedFrameScript('chrome://vimfx-custom/content/frame.js')
-```
+## frame.js
 
-That will load a so called “frame script,” named [frame.js] in our case, and
-unload it when your add-on shuts down.
-
-[frame.js]: #framejs
-
-### chrome.manifest
-
-In order for Firefox to be able to find [frame.js], you need to add a file
-called `chrome.manifest` with the following contents:
-
-```
-content vimfx-custom ./
-```
-
-[frame.js]: #framejs
-
-### frame.js
-
-Finally you of course need to add the file frame.js itself. Add any code that
-needs access web page content inside this file.
-
-### Example
+If you add custom commands that accesses web page content, put their "frame
+script code" in this file.
 
 Here’s a typical pattern used in custom commands that communicate with a frame
 script:
 
 ```js
+// config.js
 let {messageManager} = vim.window.gBrowser.selectedBrowser
 let callback = ({data: {selection}}) => {
   messageManager.removeMessageListener('VimFx-custom:selection', callback)
@@ -224,6 +71,7 @@ messageManager.sendAsyncMessage('VimFx-custom:getSelection', {exampleValue: 1337
 And here’s some accompaning frame script code:
 
 ```js
+// frame.js
 addMessageListener('VimFx-custom:getSelection', ({data: {exampleValue}}) => {
   console.log('exampleValue should be 5:', exampleValue)
   let selection = content.getSelection().toString()
