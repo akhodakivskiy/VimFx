@@ -171,8 +171,8 @@ class UIEventManager
 
       # If we get here, it means that we’ve detected a tab dragged from one
       # window to another. If so, the `vim` object from the last closed tab (the
-      # moved tab) should be re-used. See the commit message for commit
-      # <unknown> for more details.
+      # moved tab) should be re-used. See the commit message for commit bb70257d
+      # for more details.
       oldVim._setBrowser(browser)
       @vimfx.vims.set(browser, oldVim)
       @vimfx.emit('modeChange', oldVim)
