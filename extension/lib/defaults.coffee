@@ -62,6 +62,7 @@ shortcuts =
       'K    gt':   'tab_select_next'
       'gJ':        'tab_move_backward'
       'gK':        'tab_move_forward'
+      'gw':        'tab_move_to_window'
       'g0':        'tab_select_first'
       'g^':        'tab_select_first_non_pinned'
       'g$':        'tab_select_last'
@@ -75,6 +76,7 @@ shortcuts =
       'f':         'follow'
       'F':         'follow_in_tab'
       'gf':        'follow_in_focused_tab'
+      'gF':        'follow_in_window'
       'af':        'follow_multiple'
       'yf':        'follow_copy'
       'zf':        'follow_focus'
@@ -90,6 +92,8 @@ shortcuts =
       'N':         'find_previous'
 
     'misc':
+      'w':         'window_new'
+      'W':         'window_new_private'
       'i':         'enter_mode_ignore'
       'I':         'quote'
       '?':         'help'

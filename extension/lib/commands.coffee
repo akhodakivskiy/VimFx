@@ -242,6 +242,10 @@ commands.tab_move_backward = helper_move_tab.bind(null, -1)
 
 commands.tab_move_forward  = helper_move_tab.bind(null, +1)
 
+commands.tab_move_to_window = ({vim}) ->
+  {gBrowser} = vim.window
+  gBrowser.replaceTabWithWindow(gBrowser.selectedTab)
+
 commands.tab_select_first = ({vim, count = 1}) ->
   utils.nextTick(vim.window, ->
     vim.window.gBrowser.selectTabAtIndex(count - 1)
@@ -367,6 +371,13 @@ commands.follow_in_tab =
 commands.follow_in_focused_tab =
   helper_follow_clickable.bind(null, {inTab: true, inBackground: false})
 
+# Follow links in a new window with hint markers.
+commands.follow_in_window = ({vim}) ->
+  callback = (marker) ->
+    vim._focusMarkerElement(marker.wrapper.elementIndex)
+    vim.window.openLinkIn(marker.wrapper.href, 'window', {})
+  helper_follow('follow_in_tab', vim, callback)
+
 # Like command_follow but multiple times.
 commands.follow_multiple = (args) ->
   args.count = Infinity
@@ -445,6 +456,12 @@ commands.find_next     = helper_find_again.bind(null, false)
 commands.find_previous = helper_find_again.bind(null, true)
 
 
+
+commands.window_new = ({vim}) ->
+  vim.window.OpenBrowserWindow()
+
+commands.window_new_private = ({vim}) ->
+  vim.window.OpenBrowserWindow({private: true})
 
 commands.enter_mode_ignore = ({vim}) ->
   vim.enterMode('ignore')

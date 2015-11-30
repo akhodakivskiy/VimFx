@@ -595,7 +595,7 @@ The arguments passed to this function are:
 - id: `String`. A string identifying which command is used:
 
   - `'normal'`: `f` or `af`.
-  - `'tab'`: `F` or `gf`.
+  - `'tab'`: `F`, `gf` or `gF`.
   - `'copy'`: `yf`.
   - `'focus'`: `zf`.
 

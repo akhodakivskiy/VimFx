@@ -172,7 +172,7 @@ command (`/`), except that it searches links only.
 Which elements get hints depends on the command as well:
 
 - `f` and `af`: Anything clickable—links, buttons, form controls.
-- `F` and `gf`: Anything that can be opened in a new tabs—links.
+- `F`, `gf` and `gF`: Anything that can be opened in a new tab or window—links.
 - `yf`: Anything that has something useful to copy—links (their URL) and text
   inputs (their text).
 - `zf`: Anything focusable—links, buttons, form controls, scrollable elements,
@@ -229,7 +229,7 @@ command is implemented by running the same function as for the `f` command,
 passing `Infinity` as the `count` argument!) Therefore the `af` command does not
 accept a count itself.
 
-The `zf` and `yf` commands do not accept counts.
+The `gF`, `zf` and `yf` commands do not accept counts.
 
 Press `<enter>` to increase the count by one. This is useful when you’ve already
 entered Hints mode but realize that you want to interact with yet a marker. This
