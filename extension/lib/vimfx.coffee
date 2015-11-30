@@ -33,6 +33,7 @@ class VimFx extends utils.EventEmitter
   constructor: (@modes, @options) ->
     super()
     @vims = new WeakMap()
+    @lastClosedVim = null
     @createKeyTrees()
     @reset()
     @on('modeChange', ({mode}) => @reset(mode))

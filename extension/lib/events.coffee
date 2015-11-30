@@ -22,8 +22,9 @@
 # launch commands and to provide state to them. Events in web page content are
 # listened for in events-frame.coffee.
 
-button = require('./button')
-utils  = require('./utils')
+button         = require('./button')
+messageManager = require('./message-manager')
+utils          = require('./utils')
 
 HELD_MODIFIERS_ATTRIBUTE = 'vimfx-held-modifiers'
 
@@ -145,43 +146,38 @@ class UIEventManager
       vim.hideNotification()
     )
 
-    @listen('TabOpen', (event) =>
+    @listen('TabClose', (event) =>
       browser = @window.gBrowser.getBrowserForTab(event.originalTarget)
-      focusedWindow = utils.getCurrentWindow()
-
-      # If a tab is opened in another window than the focused window, it might
-      # mean that a tab has been dragged to it from the focused window. Unless
-      # that’s the case, do nothing.
-      return if @window == focusedWindow
-
-      if MULTI_PROCESS_ENABLED
-        # In multi-process, tabs dragged to new windows re-use the frame script.
-        # This means that no new `vim` instance is created (which is good since
-        # state is kept). A new `<browser>` is created, though. So if we’re
-        # already tracking this `<browser>` there’s nothing to do.
-        return if @vimfx.vims.has(browser)
-
-        # Grab the current `vim` (which corresponds to the dragged tab) from the
-        # focused window and update its `.browser`.
-        vim = @vimfx.getCurrentVim(focusedWindow)
-        vim._setBrowser(browser)
-        @vimfx.vims.set(browser, vim)
-
-      else
-        # In non-multi-process, a new frame script _is_ created, which means
-        # that a new `vim` instance is created as well, and also that all state
-        # for the page is lost. The best we can do is to copy over the mode.
-        vim = @vimfx.vims.get(browser)
-        oldVim = @vimfx.getCurrentVim(focusedWindow)
-        vim.enterMode(oldVim.mode)
-
-        # When a new `vim` object is created, `._onLocationChange` is run in the
-        # next tick. In this case, we _don’t_ want that to happen. This is a
-        # hack, but it doesn’t matter since it will be removed when
-        # multi-process is enabled by default.
-        {_onLocationChange} = vim
-        vim._onLocationChange = -> vim._onLocationChange = _onLocationChange
+      return unless vim = @vimfx.vims.get(browser)
+      # Note: `lastClosedVim` must be stored so that any window can access it.
+      @vimfx.lastClosedVim = vim
     )
+
+    messageManager.listen('cachedPageshow', ((data, args) =>
+      {target: browser, callback} = args
+      exit = (movedToNewTab) ->
+        messageManager.send(callback, movedToNewTab) if callback
+
+      [oldVim, @vimfx.lastClosedVim] = [@vimfx.lastClosedVim, null]
+      unless oldVim
+        exit(false)
+        return
+
+      if @vimfx.vims.has(browser)
+        vim = @vimfx.vims.get(browser)
+        if vim._messageManager == vim.browser.messageManager
+          exit(false)
+          return
+
+      # If we get here, it means that we’ve detected a tab dragged from one
+      # window to another. If so, the `vim` object from the last closed tab (the
+      # moved tab) should be re-used. See the commit message for commit bb70257d
+      # for more details.
+      oldVim._setBrowser(browser)
+      @vimfx.vims.set(browser, oldVim)
+      @vimfx.emit('modeChange', oldVim)
+      exit(true)
+    ), @window.messageManager)
 
   consumeKeyEvent: (vim, event, focusType, uiEvent = false) ->
     match = vim._consumeKeyEvent(event, focusType)
