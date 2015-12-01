@@ -1,3 +1,35 @@
+### 0.8.0 (2015-12-01)
+
+- Fixed: VimFx now works properly in tabs moved to other windows.
+- Fixed: An unreliable check for multi-process mode has been eliminated, fixing
+  various problems for some users.
+- Fixed: VimFx’s toolbar button now changes color correctly when switching
+  between blacklisted and non-blacklisted tabs.
+- Fixed: Dead keys now work out of the box on Windows.
+- Improved: Links with the `onclick` attribute (abused as buttons) can no longer
+  get the same hint as another link.
+- Added: The Keyboard Shortcuts dialog (shown by pressing `?`) is now
+  searchable.
+- Added: The `g/` command. It’s like `/` but searches links only.
+
+- Added: [Marks].
+
+  - Use `ma` to mark the current scroll position and `` `a `` to return to it.
+    (You may substitute `a` with any key press.)
+  - Use ``` `` ``` to return to the position before the last `gg`, `G`, `0`,
+    `$`, `/`, `n`, `N` or `` ` ``. (You can change this mark using the
+    [`last_scroll_position_mark`] pref.)
+
+- Added: Window commands.
+
+  - `w`: Open new window.
+  - `W`: Open new private window.
+  - `gw`: Move tab to new window.
+  - `gF`: Follow link in new window.
+
+[Marks]: https://github.com/akhodakivskiy/VimFx/blob/47fc699ce8217ee90af4d12e81f102f2bea09d61/documentation/commands.md#marks-m-and-
+[`last_scroll_position_mark`]: https://github.com/akhodakivskiy/VimFx/blob/47fc699ce8217ee90af4d12e81f102f2bea09d61/documentation/options.md#last_scroll_position_mark
+
 ### 0.7.3 (2015-11-22)
 
 - Fixed: Scrolling now works correctly in pages in quirks mode (lacking a
