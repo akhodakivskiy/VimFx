@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "n-ary-huffman": "^2.1.1",
-    "vim-like-key-notation": "^0.1.4"
+    "vim-like-key-notation": "^0.1.5"
   },
   "devDependencies": {
     "coffee-script": "jashkenas/coffeescript",
