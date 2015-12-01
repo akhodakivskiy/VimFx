@@ -70,7 +70,8 @@ isProperLink = (element) ->
           element.ownerDocument instanceof XULDocument) and
          not element.href.endsWith('#') and
          not element.href.endsWith('#?') and
-         not element.href.startsWith('javascript:')
+         not element.href.startsWith('javascript:') and
+         not element.hasAttribute('onclick')
 
 isTextInputElement = (element) ->
   return (element instanceof HTMLInputElement and element.type in [
