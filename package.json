@@ -16,7 +16,7 @@
   },
   "devDependencies": {
     "coffee-script": "jashkenas/coffeescript",
-    "coffeelint": "^1.13.1",
+    "coffeelint": "^1.14.1",
     "coffeelint-forbidden-keywords": "^0.1.1",
     "gulp": "^3.9.0",
     "gulp-coffee": "^2.3.1",
@@ -29,9 +29,9 @@
     "gulp-zip": "^3.0.2",
     "marked": "^0.3.5",
     "merge2": "^0.3.6",
-    "request": "^2.65.0",
+    "request": "^2.67.0",
     "require-precompute": "^0.2.0",
-    "rimraf": "^2.4.3",
-    "run-sequence": "^1.1.4"
+    "rimraf": "^2.4.4",
+    "run-sequence": "^1.1.5"
   }
 }
