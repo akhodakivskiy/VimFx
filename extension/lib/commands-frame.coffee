@@ -94,23 +94,25 @@ helper_follow = ({id, combine = true}, matcher, {vim}) ->
     length = vim.state.markerElements.push(element)
     wrapper = {type, semantic, shape, elementIndex: length - 1}
 
-    # Combine links with the same href.
-    if combine and wrapper.type == 'link' and
-       # If the element has an 'onclick' attribute we cannot be sure that all
-       # links with this href actually do the same thing. On some pages, such as
-       # startpage.com, actual proper links have the 'onclick' attribute, so we
-       # can’t exclude such links in `utils.isProperLink`.
-       not element.hasAttribute('onclick')
+    if wrapper.type == 'link'
       {href} = element
       wrapper.href = href
-      if href of hrefs
-        parent = hrefs[href]
-        wrapper.parentIndex = parent.elementIndex
-        parent.shape.area += wrapper.shape.area
-        parent.numChildren++
-      else
-        wrapper.numChildren = 0
-        hrefs[href] = wrapper
+
+      # Combine links with the same href.
+      if combine and wrapper.type == 'link' and
+         # If the element has an 'onclick' attribute we cannot be sure that all
+         # links with this href actually do the same thing. On some pages, such
+         # as startpage.com, actual proper links have the 'onclick' attribute,
+         # so we can’t exclude such links in `utils.isProperLink`.
+         not element.hasAttribute('onclick')
+        if href of hrefs
+          parent = hrefs[href]
+          wrapper.parentIndex = parent.elementIndex
+          parent.shape.area += wrapper.shape.area
+          parent.numChildren++
+        else
+          wrapper.numChildren = 0
+          hrefs[href] = wrapper
 
     return wrapper
 
