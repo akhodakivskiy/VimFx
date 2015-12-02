@@ -1,3 +1,13 @@
+### 0.9.0 (2015-12-02)
+
+- Fixed: Links with the `onclick` attribute can now be opened in new tabs again.
+  (Regression since 0.8.0.)
+- Fixed: The text size in VimFx’s Keyboard Shortcuts dialog is now correctly
+  resized.
+- Added: The `gH` command. It opens the back/forward button context menu in the
+  middle of the window, allowing you to choose a history entry with the arrow
+  keys and `<enter>`.
+
 ### 0.8.0 (2015-12-01)
 
 - Fixed: VimFx now works properly in tabs moved to other windows.
