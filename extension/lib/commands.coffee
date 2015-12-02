@@ -481,6 +481,11 @@ commands.enter_mode_ignore = ({vim}) ->
 commands.quote = ({vim, count = 1}) ->
   vim.enterMode('ignore', count)
 
+commands.enter_reader_view = ({vim}) ->
+  return unless button = vim.window.document.getElementById('reader-mode-button')
+  unless button.hidden
+    button.click()
+
 # Display the Help Dialog.
 commands.help = ({vim}) ->
   help.injectHelp(vim.window, vim._parent)

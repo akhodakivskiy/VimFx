@@ -97,6 +97,7 @@ shortcuts =
       'w':         'window_new'
       'W':         'window_new_private'
       'i':         'enter_mode_ignore'
+      'gr':        'enter_reader_view'
       'I':         'quote'
       '?':         'help'
       ':':         'dev'
