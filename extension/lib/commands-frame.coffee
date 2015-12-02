@@ -95,7 +95,12 @@ helper_follow = ({id, combine = true}, matcher, {vim}) ->
     wrapper = {type, semantic, shape, elementIndex: length - 1}
 
     # Combine links with the same href.
-    if combine and wrapper.type == 'link'
+    if combine and wrapper.type == 'link' and
+       # If the element has an 'onclick' attribute we cannot be sure that all
+       # links with this href actually do the same thing. On some pages, such as
+       # startpage.com, actual proper links have the 'onclick' attribute, so we
+       # can’t exclude such links in `utils.isProperLink`.
+       not element.hasAttribute('onclick')
       {href} = element
       wrapper.href = href
       if href of hrefs
