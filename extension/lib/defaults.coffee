@@ -70,6 +70,7 @@ shortcuts =
       'gp':        'tab_toggle_pinned'
       'x':         'tab_close'
       'X':         'tab_restore'
+      'gX':        'tab_restore_list'
       'gx$':       'tab_close_to_end'
       'gxa':       'tab_close_other'
 

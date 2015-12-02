@@ -215,6 +215,13 @@ createBox = (document, className = '', parent = null, text = null) ->
   parent.appendChild(box) if parent?
   return box
 
+injectTemporaryPopup = (document, contents) ->
+  popup = document.createElement('menupopup')
+  popup.appendChild(contents)
+  document.getElementById('mainPopupSet').appendChild(popup)
+  listenOnce(popup, 'popuphidden', popup.remove.bind(popup))
+  return popup
+
 insertText = (input, value) ->
   {selectionStart, selectionEnd} = input
   input.value =
@@ -303,6 +310,16 @@ observe = (topic, observer) ->
     Services.obs.removeObserver(observer, topic, false)
   )
 
+openPopup = (popup) ->
+  window = popup.ownerGlobal
+  # Show the popup so it gets a height and width.
+  popup.openPopupAtScreen(0, 0)
+  # Center the popup inside the window.
+  popup.moveTo(
+    window.screenX + window.outerWidth  / 2 - popup.clientWidth  / 2,
+    window.screenY + window.outerHeight / 2 - popup.clientHeight / 2
+  )
+
 openTab = (window, url, options) ->
   {gBrowser} = window
   window.TreeStyleTabService?.readyToOpenChildTab(gBrowser.selectedTab)
@@ -338,6 +355,7 @@ module.exports = {
   area
   containsDeep
   createBox
+  injectTemporaryPopup
   insertText
   querySelectorAllDeep
   setAttributes
@@ -355,6 +373,7 @@ module.exports = {
   getCurrentWindow
   loadCss
   observe
+  openPopup
   openTab
   writeToClipboard
 }

@@ -89,12 +89,7 @@ commands.history_back    = helper_go_history.bind(null, -1)
 commands.history_forward = helper_go_history.bind(null, +1)
 
 commands.history_list = ({vim}) ->
-  {window} = vim
-  return unless menu = window.document.getElementById('backForwardMenu')
-  menu.openPopupAtScreen(
-    window.screenX + window.outerWidth  / 2 - menu.clientWidth  / 2,
-    window.screenY + window.outerHeight / 2 - menu.clientHeight / 2
-  )
+  utils.openPopup(vim.window.document.getElementById('backForwardMenu'))
 
 commands.reload = ({vim}) ->
   vim.window.BrowserReload()
@@ -292,6 +287,14 @@ commands.tab_restore = ({vim, count = 1}) ->
     vim.window.undoCloseTab() for [1..count] by 1
     return
   )
+
+commands.tab_restore_list = ({vim}) ->
+  {window} = vim
+  fragment = window.RecentlyClosedTabsAndWindowsMenuUtils.getTabsFragment(
+    window, 'menuitem'
+  )
+  if fragment.childElementCount > 0
+    utils.openPopup(utils.injectTemporaryPopup(window.document, fragment))
 
 commands.tab_close_to_end = ({vim}) ->
   {gBrowser} = vim.window
