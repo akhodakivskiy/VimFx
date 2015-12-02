@@ -60,8 +60,7 @@ injectHelp = (window, vimfx) ->
   computedStyle = window.getComputedStyle(container)
   fontSize = originalFontSize =
     parseFloat(computedStyle.getPropertyValue('font-size'))
-  while wrapper.clientHeight < container.clientHeight and
-        fontSize <= MAX_FONT_SIZE
+  while container.scrollTopMax == 0 and fontSize <= MAX_FONT_SIZE
     fontSize++
     container.style.fontSize = "#{fontSize}px"
   container.style.fontSize = "#{Math.max(fontSize - 1, originalFontSize)}px"
