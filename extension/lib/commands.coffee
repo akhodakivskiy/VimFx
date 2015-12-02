@@ -88,6 +88,14 @@ commands.history_back    = helper_go_history.bind(null, -1)
 
 commands.history_forward = helper_go_history.bind(null, +1)
 
+commands.history_list = ({vim}) ->
+  {window} = vim
+  return unless menu = window.document.getElementById('backForwardMenu')
+  menu.openPopupAtScreen(
+    window.screenX + window.outerWidth  / 2 - menu.clientWidth  / 2,
+    window.screenY + window.outerHeight / 2 - menu.clientHeight / 2
+  )
+
 commands.reload = ({vim}) ->
   vim.window.BrowserReload()
 

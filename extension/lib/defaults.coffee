@@ -32,6 +32,7 @@ shortcuts =
       'gh':        'go_home'
       'H':         'history_back'
       'L':         'history_forward'
+      'gH':        'history_list'
       'r':         'reload'
       'R':         'reload_force'
       'ar':        'reload_all'
