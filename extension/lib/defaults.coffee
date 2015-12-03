@@ -130,6 +130,7 @@ options =
 advanced_options =
   'notifications_enabled':              true
   'prevent_target_blank':               true
+  'ignore_ctrl_alt':                    (Services.appinfo.OS == 'WINNT')
   'prevent_autofocus_modes':            'normal'
   'hints_timeout':                      200
   'smoothScroll.lines.spring-constant': '1000'

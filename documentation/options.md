@@ -165,6 +165,24 @@ You might have noticed that some links open in new tabs when you click them.
 That is not the case if you “click” them using VimFx’s `f` command, though. If
 you dislike that, disable this option.
 
+### `ignore_ctrl_alt`
+
+This option is enabled by default on Windows, and disabled otherwise.
+
+If enabled, ignores ctrl+alt for printable keys. `<a-c-$>` becomes `$` and
+`<a-c-A>` becomes `A`, while `<a-c-enter>` stays the same.
+
+This option is suitable on Windows, which treats [AltGr as
+ctrl+alt][wikipedia-altgr]. For example, if a user of the sv-SE layout on
+Windows holds AltGr and presses the key labeled `4`, in order to produce a `$`,
+the result would be `<a-c-$>` without this option, making it impossible to
+trigger a keyboard shortcut containing `$`. _With_ this option the result is
+`$`, as expected (and as on GNU/Linux). On the other hand it won’t be possible
+to trigger keyboard shortcuts such as `<a-c-a>`, but ctrl+alt keyboard shortcuts
+are [discouraged on Windows][wikipedia-altgr] anyway because of this reason.
+
+[wikipedia-altgr]: https://en.wikipedia.org/wiki/AltGr_key#Control_.2B_Alt_as_a_substitute
+
 ### `prevent_autofocus_modes`
 
 Space separated list of modes where `prevent_autofocus` should be used.

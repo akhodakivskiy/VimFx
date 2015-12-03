@@ -63,6 +63,7 @@ class VimFx extends utils.EventEmitter
 
   stringifyKeyEvent: (event) ->
     return notation.stringify(event, {
+      ignoreCtrlAlt: @options.ignore_ctrl_alt
       ignoreKeyboardLayout: @options.ignore_keyboard_layout
       translations: @options.translations
     })
