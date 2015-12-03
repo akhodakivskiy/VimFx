@@ -165,7 +165,9 @@ getMarkableElements = (window, viewport, wrappers, filter, parents = []) ->
     rects = getRects(element, viewport)
     continue unless rects.length > 0
     continue unless wrapper = filter(
-      element, getElementShape.bind(null, window, viewport, rects, parents)
+      element, (elementArg) ->
+        return getElementShape(window, viewport, parents, elementArg,
+                               if elementArg == element then rects else null)
     )
     wrappers.push(wrapper)
 
@@ -236,7 +238,8 @@ getRects = (element, viewport) ->
 #
 # Returns `null` if `element` is outside `viewport` or entirely covered by other
 # elements.
-getElementShape = (window, viewport, rects, parents, element) ->
+getElementShape = (window, viewport, parents, element, rects = null) ->
+  rects ?= getRects(element, viewport)
   totalArea = 0
   visibleRects = []
   for rect in rects
@@ -256,8 +259,7 @@ getElementShape = (window, viewport, rects, parents, element) ->
         # Those are still clickable. Therefore we return the shape of the first
         # visible child instead. At least in that example, that’s the best bet.
         for child in element.children
-          shape = getElementShape(window, viewport, getRects(child, viewport),
-                                  parents, child)
+          shape = getElementShape(window, viewport, parents, child)
           return shape if shape
     return null
 
