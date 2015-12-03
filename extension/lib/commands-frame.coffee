@@ -216,6 +216,8 @@ commands.follow_focus = helper_follow.bind(null, {id: 'focus', combine: false},
 
 commands.focus_marker_element = ({vim, elementIndex, options}) ->
   element = vim.state.markerElements[elementIndex]
+  # To be able to focus scrollable elements, `FLAG_BYKEY` _has_ to be used.
+  options.flag = 'FLAG_BYKEY' if vim.state.scrollableElements.has(element)
   utils.focusElement(element, options)
 
 commands.click_marker_element = (args) ->

@@ -131,7 +131,7 @@ blurActiveBrowserElement = (vim) ->
 focusElement = (element, options = {}) ->
   focusManager = Cc['@mozilla.org/focus-manager;1']
     .getService(Ci.nsIFocusManager)
-  focusManager.setFocus(element, focusManager.FLAG_BYMOUSE)
+  focusManager.setFocus(element, options.flag ? 'FLAG_BYMOUSE')
   element.select?() if options.select
 
 getFocusType = (element) -> switch
