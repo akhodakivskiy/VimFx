@@ -286,14 +286,16 @@ commands.focus_text_input = ({vim, count = null}) ->
     inputs.push(lastFocusedTextInput)
   return unless inputs.length > 0
   inputs.sort((a, b) -> a.tabIndex - b.tabIndex)
-  unless count?
-    count =
-      if lastFocusedTextInput
-        inputs.indexOf(lastFocusedTextInput) + 1
-      else
-        1
-  index = Math.min(count, inputs.length) - 1
-  utils.focusElement(inputs[index], {select: true})
+  num = switch
+    when count?
+      count
+    when lastFocusedTextInput
+      inputs.indexOf(lastFocusedTextInput) + 1
+    else
+      1
+  index = Math.min(num, inputs.length) - 1
+  select = (count? or vim.state.autofocusPrevented)
+  utils.focusElement(inputs[index], {select})
   vim.state.inputs = inputs
 
 commands.clear_inputs = ({vim}) ->

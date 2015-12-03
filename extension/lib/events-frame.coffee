@@ -189,6 +189,7 @@ class FrameEventManager
         @numFocusToSuppress--
         return
 
+      @vim.state.autofocusPrevented = false
       sendFocusType()
 
       # Reset `hasInteraction` when (re-)selecting a tab, or coming back from
@@ -233,6 +234,7 @@ class FrameEventManager
         # are suppressed.
         @listenOnce('blur', utils.suppressEvent)
         target.blur()
+        @vim.state.autofocusPrevented = true
     )
 
     @listen('blur', (event) =>

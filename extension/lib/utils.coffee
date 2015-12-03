@@ -125,11 +125,13 @@ blurActiveBrowserElement = (vim) ->
   )
 
 # Focus an element and tell Firefox that the focus happened because of a user
-# keypress (not just because some random programmatic focus).
+# action (not just because some random programmatic focus). `.FLAG_BYKEY` might
+# look more appropriate, but it unconditionally selects all text, which
+# `.FLAG_BYMOUSE` does not.
 focusElement = (element, options = {}) ->
   focusManager = Cc['@mozilla.org/focus-manager;1']
     .getService(Ci.nsIFocusManager)
-  focusManager.setFocus(element, focusManager.FLAG_BYKEY)
+  focusManager.setFocus(element, focusManager.FLAG_BYMOUSE)
   element.select?() if options.select
 
 getFocusType = (element) -> switch
