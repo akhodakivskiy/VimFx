@@ -189,6 +189,8 @@ class FrameEventManager
         @numFocusToSuppress--
         return
 
+      @vim.state.explicitBodyFocus = (target == @vim.content.document.body)
+
       @vim.state.autofocusPrevented = false
       sendFocusType()
 

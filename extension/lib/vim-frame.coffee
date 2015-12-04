@@ -52,6 +52,7 @@ class VimFrame
         hasInteraction:       false
         shouldRefocus:        false
         marks:                {}
+        explicitBodyFocus:    false
         autofocusPrevented:   false
         lastFocusedTextInput: null
         scrollableElements:   new ScrollableElements(@content, MINIMUM_SCROLL)

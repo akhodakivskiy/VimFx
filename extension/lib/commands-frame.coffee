@@ -56,7 +56,13 @@ commands.scroll = (args) ->
   {vim} = args
   activeElement = utils.getActiveElement(vim.content)
   element =
-    if vim.state.scrollableElements.has(activeElement)
+    # If no element is focused on the page, the the active element is the
+    # topmost `<body>`, and blurring it is a no-op. If it is scrollable, it
+    # means that you can’t blur it in order to scroll `<html>`. Therefore it may
+    # only be scrolled if it has been explicitly focused.
+    if vim.state.scrollableElements.has(activeElement) and
+       (activeElement != vim.content.document.body or
+        vim.state.explicitBodyFocus)
       activeElement
     else
       vim.state.scrollableElements.filterSuitableDefault()
@@ -328,6 +334,7 @@ commands.esc = (args) ->
     document.mozCancelFullScreen()
 
 commands.blur_active_element = ({vim}) ->
+  vim.state.explicitBodyFocus = false
   utils.blurActiveElement(vim.content)
 
 module.exports = commands
