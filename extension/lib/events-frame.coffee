@@ -191,7 +191,6 @@ class FrameEventManager
 
       @vim.state.explicitBodyFocus = (target == @vim.content.document.body)
 
-      @vim.state.autofocusPrevented = false
       sendFocusType()
 
       # Reset `hasInteraction` when (re-)selecting a tab, or coming back from
@@ -211,6 +210,7 @@ class FrameEventManager
       # be blurred because of autofocus prevention.
       if utils.isTextInputElement(target)
         @vim.state.lastFocusedTextInput = target
+        @vim.state.hasFocusedTextInput = true
 
       focusManager = Cc['@mozilla.org/focus-manager;1']
         .getService(Ci.nsIFocusManager)
@@ -236,7 +236,7 @@ class FrameEventManager
         # are suppressed.
         @listenOnce('blur', utils.suppressEvent)
         target.blur()
-        @vim.state.autofocusPrevented = true
+        @vim.state.hasFocusedTextInput = false
     )
 
     @listen('blur', (event) =>

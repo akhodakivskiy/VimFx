@@ -302,7 +302,7 @@ commands.focus_text_input = ({vim, count = null}) ->
     else
       1
   index = Math.min(num, inputs.length) - 1
-  select = (count? or vim.state.autofocusPrevented)
+  select = (count? or not vim.state.hasFocusedTextInput)
   utils.focusElement(inputs[index], {select})
   vim.state.inputs = inputs
 
