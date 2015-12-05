@@ -237,7 +237,7 @@
 
 - You may now, if you want to, configure VimFx through a [config file], using
   the new [public API]. Customizing VimFx through a config file also gives extra
-  abilites, such as [site-specific options][option-overrides] and [disabling
+  abilities, such as [site-specific options][option-overrides] and [disabling
   certain commands on certain sites][key-overrides]. It also allows to add
   [custom commands] \(and other extensions to extend VimFx). #158 #235 #255 #261
   \#300 #408 #445 #490 #515
@@ -377,7 +377,7 @@
 
 ### 0.5.12 (2014-06-01)
 
-- Fixed: Autofocus preventiton got stuck sometimes, making it impossible to
+- Fixed: Autofocus prevention got stuck sometimes, making it impossible to
   focus inputs.
 
 ### 0.5.11 (2014-06-01)
@@ -392,7 +392,7 @@
 
 ### 0.5.10 (2014-05-07)
 
-- Fixed yet another bug related to the default pereferences
+- Fixed yet another bug related to the default preferences
 
 ### 0.5.9 (2014-05-04)
 
@@ -422,7 +422,7 @@
 - Make toolbar button click depend on current mode
 - Higher weight markers should not be overlapped
 - Refactor find mode to use Firefox native search bar
-- Bump minimum requred Firefox version to 25
+- Bump minimum required Firefox version to 25
 - Added commands to go in the URL path
 - Added commands to navigate previous and next links with customizable link
   patterns
@@ -448,11 +448,11 @@
 - Invisible elements will not get hint markers
 - Compatibility with Firefox 25
 - Simple shortcut customization with UI in Help dialog
-- Use huffman coding algorithm for hint markers generation which results in
+- Use Huffman coding algorithm for hint markers generation which results in
   shorter links
 - Implemented Bloom filters to achieve shorter hints for those shortcuts that
   are used often
-- Reimplemented scrolling - now works with pages wihere window is not scrollable
+- Reimplemented scrolling - now works with pages where window is not scrollable
 - Find disabled on non HTML documents
 - Find string is now global for all windows.
 - Fixed logic of locale discovery. Now we rely on general.useragent.locale
@@ -463,16 +463,16 @@
 - `embed` and `object` tags will now have their own hints
 - Bug fixes related to custom hint chars (@LordJZ)
 - Fixed `t` - now it will be nice to other extensions
-- Updated Chineese translations (@mozillazg)
+- Updated Chinese translations (@mozillazg)
 - Reenter Normal mode on page reloads to avoid getting stuck in Hints mode
-  withou any hints
+  without any hints
 - Search will focus element that contains matching text
 - Fixed hint markers for iframes
 - Marker bug fixes (@LordJZ)
 
 ### 0.4.6 (2013-03-27)
 
-- Reimplemented find mode: CJK support, performace boost
+- Reimplemented find mode: CJK support, performance boost
 - `a/` or `a.` to highlight all matches of the search string on the page
 - Hint markers will now reach into iframes
 - Key handling is disabled when a popupmenu or panel are shown
@@ -494,7 +494,7 @@
 - Added `gh` command that will navigate to the home page.
 - Added `o` command to focus address bar.
 - `p` and `P` will parse the contents of the clipboard. If the string in the
-  clipboard appears to be a url then it will navigate to this url. Otherwise it
+  clipboard appears to be a URL then it will navigate to this URL. Otherwise it
   will search for the string in the clipboard using currently selected search
   provider.
 - Now hint markers for links will stay on top of all the markers for different
@@ -518,7 +518,7 @@
 
 - Implemented find with `/` and `n/N`
 - Added `ar` and `aR` commands to reload pages in all open tabs.
-- Added a preference that enables bluring from any element that has input focus
+- Added a preference that enables blurring from any element that has input focus
   in the browser on Esc keydown (on by default)
 - Fixed bug where markers and help dialog would blow up some of the pages.
 - Marker hints are now sorted with respect to the underlying element area.
@@ -539,7 +539,7 @@
 - Scrolling with G will now reach the bottom of the page
 - Implemented localization, currently there is only Russian localization.
   Community is welcome [to contribute your localizations](https://github.com/akhodakivskiy/VimFx/tree/master/extension/locale)!
-- Implemented simple smooth scolling
+- Implemented simple smooth scrolling
 
 ### 0.2 (2012-11-05)
 
@@ -547,7 +547,7 @@
   iframes on the page.
 - Bug fixed where it would completely reset the toolbar while installing the
   toolbar button.
-- Bug fixed where it's not possible to change the text in the blaclisting
+- Bug fixed where it's not possible to change the text in the blacklisting
   textbox
 - Changed u/d to scroll half a page, added c-f/c-b to scroll full page
 - Added tab movement commands: c-J and c-K.
