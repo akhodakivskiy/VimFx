@@ -194,6 +194,10 @@ disappearing (or resetting).
 
 ### Scrolling prefs
 
+Apart from its own prefs, VimFx also respects a few built-in Firefox prefs.
+
+#### Smooth scrolling
+
 If you want to customize Firefox’s smooth scrolling, adjusting
 `general.smoothScroll.{lines,pages,other}.duration{Min,Max}MS` is the way to
 go. VimFx has similar prefs for the scrolling commands, but they work like
@@ -209,15 +213,15 @@ These are VimFx’s variants, and the commands they affect:
 
 Note that the value of these prefs are _strings,_ not numbers!
 
-VimFx’s scrolling commands also respect a few built-in Firefox prefs.
-
-`general.smoothScroll` lets you turn off smooth scrolling entirely, including
-all of VimFx’s scrolling commands.
+The Firefox pref `general.smoothScroll` lets you turn off smooth scrolling
+entirely, including all of VimFx’s scrolling commands.
 
 `general.smoothScroll.lines`, `general.smoothScroll.pages`, and
 `general.smoothScroll.other` lets you selectively disable smooth scrolling.
 VimFx’s scrolling commands follow the same “lines,” “pages” and “other”
 categorization as in the above list.
+
+#### Scroll step
 
 By default you can scroll using the arrow keys in Firefox. You can control how
 much they scroll by adjusting the following prefs:
@@ -228,7 +232,7 @@ much they scroll by adjusting the following prefs:
 (VimFx used to have a `scroll_step` pref, but is has been replaced by the
 above.)
 
-### `scroll.last_position_mark`
+#### `scroll.last_position_mark`
 
 The special mark for the [`` ` ``][scroll-to-mark] command that takes you to the
 last position.
