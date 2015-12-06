@@ -177,6 +177,7 @@ Which elements get hints depends on the command as well:
   inputs (their text).
 - `zf`: Anything focusable—links, buttons, form controls, scrollable elements,
   frames.
+- `zF`: Browser elements, such as toolbar buttons.
 
 It might seem simpler to match the same set of elements for _all_ of the
 commands. The reason that is not the case is because the fewer elements the
@@ -229,7 +230,7 @@ command is implemented by running the same function as for the `f` command,
 passing `Infinity` as the `count` argument!) Therefore the `af` command does not
 accept a count itself.
 
-The `gF`, `zf` and `yf` commands do not accept counts.
+The `gF`, `zf`, `yf` and `zF` commands do not accept counts.
 
 Press `<enter>` to increase the count by one. This is useful when you’ve already
 entered Hints mode but realize that you want to interact with yet a marker. This

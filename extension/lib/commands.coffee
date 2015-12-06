@@ -429,6 +429,37 @@ commands.follow_focus = ({vim}) ->
     vim._focusMarkerElement(marker.wrapper.elementIndex, {select: true})
   return helper_follow('follow_focus', vim, callback)
 
+commands.click_browser_element = ({vim}) ->
+  markerElements = []
+
+  filter = (element, getElementShape) ->
+    document = element.ownerDocument
+    unless element.tabIndex > -1 and
+           not (element.nodeName.endsWith('box') and
+                element.nodeName != 'checkbox') and
+           element.nodeName != 'tabs'
+      return
+    return unless shape = getElementShape(element)
+    length = markerElements.push(element)
+    return {type: 'clickable', semantic: true, shape, elementIndex: length - 1}
+
+  callback = (marker) ->
+    element = markerElements[marker.wrapper.elementIndex]
+    utils.focusElement(element)
+    utils.simulateClick(element)
+
+  {wrappers, viewport} =
+    hints.getMarkableElementsAndViewport(vim.window, filter)
+
+  if wrappers.length > 0
+    markers = hints.injectHints(vim.window, wrappers, viewport, {
+      hint_chars: vim.options.hint_chars
+      ui: true
+    })
+    vim.enterMode('hints', markers, callback)
+  else
+    vim.notify(translate('notification.follow.none'))
+
 helper_follow_pattern = (type, {vim}) ->
   options =
     pattern_selector: vim.options.pattern_selector

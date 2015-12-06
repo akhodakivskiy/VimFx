@@ -107,15 +107,19 @@ injectHints = (window, wrappers, viewport, options) ->
   removeHints(window) # Better safe than sorry.
   container = window.document.createElement('box')
   container.id = CONTAINER_ID
-  window.gBrowser.mCurrentBrowser.parentNode.appendChild(container)
 
-  zoom =
+  zoom = 1
+
+  if options.ui
+    container.classList.add('ui')
+    window.document.getElementById('browser-panel').appendChild(container)
+  else
+    window.gBrowser.mCurrentBrowser.parentNode.appendChild(container)
+    # If “full zoom” is not used, it means that “Zoom text only” is enabled.
+    # If so, that “zoom” does not need to be taken into account.
     if window.ZoomManager.useFullZoom
-      window.ZoomManager.getZoomForBrowser(window.gBrowser.selectedBrowser)
-    else
-      # If “full zoom” is not used, it means that “Zoom text only” is enabled.
-      # If so, that “zoom” does not need to be taken into account.
-      1
+      zoom =
+        window.ZoomManager.getZoomForBrowser(window.gBrowser.selectedBrowser)
 
   for marker in markers
     container.appendChild(marker.markerElement)
@@ -171,7 +175,7 @@ getMarkableElements = (window, viewport, wrappers, filter, parents = []) ->
     )
     wrappers.push(wrapper)
 
-  for frame in window.frames
+  for frame in window.frames when frame.frameElement
     rect = frame.frameElement.getBoundingClientRect() # Frames only have one.
     continue unless isInsideViewport(rect, viewport)
 
@@ -203,20 +207,24 @@ getAllElements = (document) ->
   unless document instanceof XULDocument
     return document.getElementsByTagName('*')
 
-  elements = []
+  # Use a `Set` since this algorithm may find the same element more than once.
+  # Ideally we should find a way to find all elements without duplicates.
+  elements = new Set()
   getAllRegular = (element) ->
-    for child in element.getElementsByTagName('*')
-      elements.push(child)
+    # The first time `zF` is run `.getElementsByTagName('*')` may oddly include
+    # `undefined` in its result! Filter those out.
+    for child in element.getElementsByTagName('*') when child
+      elements.add(child)
       getAllAnonymous(child)
     return
   getAllAnonymous = (element) ->
     for child in document.getAnonymousNodes(element) or []
       continue unless child instanceof Element
-      elements.push(child)
+      elements.add(child)
       getAllRegular(child)
     return
   getAllRegular(document.documentElement)
-  return elements
+  return Array.from(elements)
 
 getRects = (element, viewport) ->
   # `element.getClientRects()` returns a list of rectangles, usually just one,
@@ -327,10 +335,8 @@ getFirstNonCoveredPoint = (window, viewport, element, elementRect, parents) ->
     # bullet proof: Combinations of CSS can cause this check to fail, even
     # though `element` isn’t covered. We don’t try to temporarily reset such CSS
     # because of performance. Instead we rely on that some of the attempts below
-    # will work.
-    if element.contains(elementAtPoint) or # Note that `a.contains(a) == true`!
-       (window.document instanceof XULDocument and
-        getClosestNonAnonymousParent(element) == elementAtPoint)
+    # will work. Note that `a.contains(a) == true`!
+    if normalize(element).contains(elementAtPoint)
       found = true
       # If we’re currently in a frame, there might be something on top of the
       # frame that covers `element`. Therefore we ensure that the frame really
@@ -342,7 +348,7 @@ getFirstNonCoveredPoint = (window, viewport, element, elementRect, parents) ->
         elementAtPoint = parent.window.document.elementFromPoint(
           offset.left + x + dx, offset.top + y + dy
         )
-        unless elementAtPoint == currentWindow.frameElement
+        unless frameAtPoint(currentWindow.frameElement, elementAtPoint)
           found = false
           break
         currentWindow = parent.window
@@ -381,12 +387,24 @@ getFirstNonCoveredPoint = (window, viewport, element, elementRect, parents) ->
 
   return nonCoveredPoint
 
-# In XUL documents there are “anonymous” elements, whose node names start with
-# `xul:` or `html:`. These are never returned by `document.elementFromPoint` but
-# their closest non-anonymous parents are.
-getClosestNonAnonymousParent = (element) ->
-  element = element.parentNode while element.prefix?
-  return element
+# In XUL documents there are “anonymous” elements. These are never returned by
+# `document.elementFromPoint` but their closest non-anonymous parents are.
+normalize = (element) ->
+  return element.ownerDocument.getBindingParent(element) or element
+
+# Returns whether `frameElement` corresponds to `elementAtPoint`. This is only
+# complicated for the dev tools’ frame. `.elementAtPoint()` returns
+# `<tabbrowser#content>` instead of the `<iframe>`. The dev tools might be in
+# another tab and thus invisible, but `<tabbrowser#content>` is the same and
+# visible in _all_ tabs, so we have to check that the frame really belongs to
+# the current tab.
+frameAtPoint = (frameElement, elementAtPoint) ->
+  frame = normalize(frameElement)
+  return false unless elementAtPoint == frame
+  return true  unless frame.nodeName == 'tabbrowser' and frame.id == 'content'
+  {gBrowser} = frameElement.ownerGlobal.top
+  tabpanel = gBrowser.getNotificationBox(gBrowser.selectedBrowser)
+  return tabpanel.contains(frameElement)
 
 module.exports = {
   removeHints
