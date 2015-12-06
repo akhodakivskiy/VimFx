@@ -12,7 +12,6 @@ Anton Khodakivskiy (@akhodakivskiy)
 - Frank Hase (@Kambfhase) – de
 - Benedikt (@benediktg) – de
 - @just-barcodes – de
-- Theodore Keloglou (@sirodoht) – el-GR
 - Mickaël RAYBAUD-ROIG (@m-r-r) – fr
 - Szabó Krisztián (@thenonameguy) – hu
 - Yoppy Halilintar (@comepradz) – id
