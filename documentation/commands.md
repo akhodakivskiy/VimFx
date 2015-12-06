@@ -120,9 +120,9 @@ position by pressing `` ` `` followed by the same letter, e.g. `` `a ``.
 
 One mark is special: `` ` ``. Pressing ``` `` ``` takes you to the scroll
 position before the last `gg`, `G`, `0`, `$`, `/`, `n`, `N` or `` ` ``. (You can
-change this mark using the [`last_scroll_position_mark`] pref.)
+change this mark using the [`scroll.last_position_mark`] pref.)
 
-[`last_scroll_position_mark`]: options.md#last_scroll_position_mark
+[`scroll.last_position_mark`]: options.md#scroll.last_position_mark
 
 #### Minor notes
 

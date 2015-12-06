@@ -141,4 +141,9 @@ migrations[3] = ->
     '$1<force>'
   ))
 
+migrations[4] = ->
+  pref = 'last_scroll_position_mark'
+  return unless prefs.has(pref)
+  prefs.set('scroll.last_position_mark', prefs.get(pref))
+
 module.exports = migrations

@@ -228,7 +228,7 @@ much they scroll by adjusting the following prefs:
 (VimFx used to have a `scroll_step` pref, but is has been replaced by the
 above.)
 
-### `last_scroll_position_mark`
+### `scroll.last_position_mark`
 
 The special mark for the [`` ` ``][scroll-to-mark] command that takes you to the
 last position.
