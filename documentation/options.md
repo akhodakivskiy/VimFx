@@ -159,6 +159,14 @@ You can also choose to show notifications any way you want by listening for the
 [notifications]: notifications.md
 [notification-events]: api.md#the-notification-and-hidenotification-events
 
+### `notify_entered_keys`
+
+If enabled, a [notification] is shown with the the keys you have entered so far
+of a command. This is only noticeable if you type a multi-key shortcut or use a
+count.
+
+[notification]: notifications.md
+
 ### `prevent_target_blank`
 
 You might have noticed that some links open in new tabs when you click them.

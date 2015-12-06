@@ -44,6 +44,8 @@ class UIEventManager
     # keyboard input, allowing accesskeys to be used.
     @popupPassthrough = false
 
+    @enteredKeys = new EnteredKeysManager(@window)
+
   addListeners: ->
     checkPassthrough = (value, event) =>
       target = event.originalTarget
@@ -183,7 +185,14 @@ class UIEventManager
     match = vim._consumeKeyEvent(event, focusType)
 
     if match
-      vim.hideNotification()
+      if @vimfx.options.notify_entered_keys
+        if match.type in ['none', 'full']
+          @enteredKeys.clear(vim)
+        else
+          @enteredKeys.push(vim, match.keyStr, @vimfx.options.timeout)
+      else
+        vim.hideNotification()
+
       if match.specialKeys['<late>']
         @suppress = false
         @consumeLateKeydown(vim, event, match, uiEvent)
@@ -232,5 +241,25 @@ class UIEventManager
     isHeld = (modifier) -> event["#{modifier}Key"]
     mainWindow.setAttribute(HELD_MODIFIERS_ATTRIBUTE,
                             modifiers.split(' ').filter(isHeld).join(' '))
+
+class EnteredKeysManager
+  constructor: (@window) ->
+    @keys = []
+    @timeout = null
+
+  clear: (notifier) ->
+    @keys = []
+    @clearTimeout()
+    notifier.hideNotification()
+
+  push: (notifier, keyStr, duration) ->
+    @keys.push(keyStr)
+    @clearTimeout()
+    notifier.notify(@keys.join(''))
+    @timeout = @window.setTimeout(@clear.bind(this, notifier), duration)
+
+  clearTimeout: ->
+    @window.clearTimeout(@timeout) if @timeout?
+    @timeout = null
 
 module.exports = UIEventManager
