@@ -26,10 +26,11 @@
 # NOTE: Most tab related commands need to do their actual tab manipulations in
 # the next tick (`utils.nextTick`) to work around bug 1200334.
 
-help  = require('./help')
-hints = require('./hints')
-prefs = require('./prefs')
-utils = require('./utils')
+help      = require('./help')
+hints     = require('./hints')
+prefs     = require('./prefs')
+translate = require('./l10n')
+utils     = require('./utils')
 
 commands = {}
 
@@ -56,6 +57,7 @@ commands.paste_and_go_in_tab = helper_paste_and_go.bind(null, {altKey: true})
 
 commands.copy_current_url = ({vim}) ->
   utils.writeToClipboard(vim.window.gBrowser.currentURI.spec)
+  vim.notify(translate('notification.copy_current_url'))
 
 commands.go_up_path = ({vim, count}) ->
   vim._run('go_up_path', {count})
@@ -67,29 +69,34 @@ commands.go_to_root = ({vim}) ->
 commands.go_home = ({vim}) ->
   vim.window.BrowserHome()
 
-helper_go_history = (num, {vim, count = 1}) ->
+helper_go_history = (direction, {vim, count = 1}) ->
   {SessionStore, gBrowser} = vim.window
 
   # TODO: When Firefox 43 is released, only use the `.getSessionHistory`
-  # version and bump the minimut Firefox version.
+  # version and bump the minimum Firefox version.
   if SessionStore.getSessionHistory
     SessionStore.getSessionHistory(gBrowser.selectedTab, (sessionHistory) ->
       {index} = sessionHistory
-      newIndex = index + num * count
+      newIndex = index + count * (if direction == 'back' then -1 else 1)
       newIndex = Math.max(newIndex, 0)
       newIndex = Math.min(newIndex, sessionHistory.entries.length - 1)
-      gBrowser.gotoIndex(newIndex) unless newIndex == index
+      if newIndex == index
+        vim.notify(translate("notification.history_#{direction}.limit"))
+      else
+        gBrowser.gotoIndex(newIndex)
     )
   else
     # Until then, fall back to a no-count version.
-    if num < 0 then gBrowser.goBack() else gBrowser.goForward()
+    if direction == 'back' then gBrowser.goBack() else gBrowser.goForward()
 
-commands.history_back    = helper_go_history.bind(null, -1)
+commands.history_back    = helper_go_history.bind(null, 'back')
 
-commands.history_forward = helper_go_history.bind(null, +1)
+commands.history_forward = helper_go_history.bind(null, 'forward')
 
 commands.history_list = ({vim}) ->
-  utils.openPopup(vim.window.document.getElementById('backForwardMenu'))
+  menu = vim.window.document.getElementById('backForwardMenu')
+  utils.openPopup(menu)
+  vim.notify(translate('notification.history_list.none')) unless menu.open
 
 commands.reload = ({vim}) ->
   vim.window.BrowserReload()
@@ -288,7 +295,11 @@ commands.tab_close = ({vim, count = 1}) ->
 
 commands.tab_restore = ({vim, count = 1}) ->
   utils.nextTick(vim.window, ->
-    vim.window.undoCloseTab() for [1..count] by 1
+    for index in [0...count] by 1
+      restoredTab = vim.window.undoCloseTab()
+      if not restoredTab and index == 0
+        vim.notify(translate('notification.tab_restore.none'))
+        break
     return
   )
 
@@ -297,7 +308,9 @@ commands.tab_restore_list = ({vim}) ->
   fragment = window.RecentlyClosedTabsAndWindowsMenuUtils.getTabsFragment(
     window, 'menuitem'
   )
-  if fragment.childElementCount > 0
+  if fragment.childElementCount == 0
+    vim.notify(translate('notification.tab_restore.none'))
+  else
     utils.openPopup(utils.injectTemporaryPopup(window.document, fragment))
 
 commands.tab_close_to_end = ({vim}) ->
@@ -329,6 +342,7 @@ helper_follow = (name, vim, callback, count = null) ->
       markers = hints.injectHints(vim.window, wrappers, viewport, vim.options)
       storage.markers = markers
     else
+      vim.notify(translate('notification.follow.none'))
       vim.enterMode('normal')
   )
 
@@ -459,7 +473,9 @@ commands.find_links_only = helper_find.bind(null, {linksOnly: true})
 
 helper_find_again = (direction, {vim}) ->
   findBar = vim.window.gBrowser.getFindBar()
-  return unless findStorage.lastSearchString.length > 0
+  if findStorage.lastSearchString.length == 0
+    vim.notify(translate('notification.find_again.none'))
+    return
   helper_mark_last_scroll_position(vim)
   findBar._findField.value = findStorage.lastSearchString
   findBar.onFindAgainCommand(direction)
@@ -486,9 +502,11 @@ commands.quote = ({vim, count = 1}) ->
   vim.enterMode('ignore', count)
 
 commands.enter_reader_view = ({vim}) ->
-  return unless button = vim.window.document.getElementById('reader-mode-button')
-  unless button.hidden
+  button = vim.window.document.getElementById('reader-mode-button')
+  if not button?.hidden
     button.click()
+  else
+    vim.notify(translate('notification.enter_reader_view.none'))
 
 # Display the Help Dialog.
 commands.help = ({vim}) ->

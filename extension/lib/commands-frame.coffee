@@ -33,12 +33,19 @@ XULDocument = Ci.nsIDOMXULDocument
 commands = {}
 
 commands.go_up_path = ({vim, count = 1}) ->
-  vim.content.location.pathname = vim.content.location.pathname.replace(
-    /// (?: /[^/]+ ){1,#{count}} /?$ ///, ''
-  )
+  {pathname}  = vim.content.location
+  newPathname = pathname.replace(/// (?: /[^/]+ ){1,#{count}} /?$ ///, '')
+  if newPathname == pathname
+    vim.notify(translate('notification.go_up_path.limit'))
+  else
+    vim.content.location.pathname = newPathname
 
 commands.go_to_root = ({vim}) ->
-  vim.content.location.href = vim.content.location.origin
+  # `.origin` is `'null'` (as a string) on `about:` pages.
+  if "#{vim.content.location.origin}/" in [vim.content.location.href, 'null/']
+    vim.notify(translate('notification.go_up_path.limit'))
+  else
+    vim.content.location.href = vim.content.location.origin
 
 helper_scroll = (element, args) ->
   {method, type, directions, amounts, properties, adjustment, smooth} = args
@@ -71,12 +78,13 @@ commands.scroll = (args) ->
 commands.mark_scroll_position = ({vim, keyStr, notify = true}) ->
   element = vim.state.scrollableElements.filterSuitableDefault()
   vim.state.marks[keyStr] = [element.scrollTop, element.scrollLeft]
-  vim.notify(translate('mark_scroll_position.success', keyStr)) if notify
+  if notify
+    vim.notify(translate('notification.mark_scroll_position.success', keyStr))
 
 commands.scroll_to_mark = (args) ->
   {vim, amounts: keyStr} = args
   unless keyStr of vim.state.marks
-    vim.notify(translate('scroll_to_mark.error', keyStr))
+    vim.notify(translate('notification.scroll_to_mark.none', keyStr))
     return
 
   args.amounts = vim.state.marks[keyStr]
@@ -282,7 +290,10 @@ commands.follow_pattern = ({vim, type, options}) ->
 
     return null
 
-  utils.simulateClick(matchingLink) if matchingLink
+  if matchingLink
+    utils.simulateClick(matchingLink)
+  else
+    vim.notify(translate("notification.follow_#{type}.none"))
 
 commands.focus_text_input = ({vim, count = null}) ->
   {lastFocusedTextInput} = vim.state
@@ -292,8 +303,12 @@ commands.focus_text_input = ({vim, count = null}) ->
   )
   if lastFocusedTextInput and lastFocusedTextInput not in inputs
     inputs.push(lastFocusedTextInput)
-  return unless inputs.length > 0
   inputs.sort((a, b) -> a.tabIndex - b.tabIndex)
+
+  if inputs.length == 0
+    vim.notify(translate('notification.focus_text_input.none'))
+    return
+
   num = switch
     when count?
       count
