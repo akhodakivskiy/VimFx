@@ -13,7 +13,6 @@ Anton Khodakivskiy (@akhodakivskiy)
 - Benedikt (@benediktg) – de
 - @just-barcodes – de
 - Mickaël RAYBAUD-ROIG (@m-r-r) – fr
-- Szabó Krisztián (@thenonameguy) – hu
 - Yoppy Halilintar (@comepradz) – id
 - Carlo Bertoldi (@cbertoldi) – it
 - Kaoru Esashika (@pluser) – ja
