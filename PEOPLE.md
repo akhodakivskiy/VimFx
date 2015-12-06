@@ -17,8 +17,6 @@ Anton Khodakivskiy (@akhodakivskiy)
 - Carlo Bertoldi (@cbertoldi) – it
 - Kaoru Esashika (@pluser) – ja
 - @HJTP – nl
-- Greg Navis (@grn) – pl
-- @morethanoneanimal – pl
 - Átila Camurça Alves (@atilacamurca) – pt-BR
 - Anton Khodakivskiy (@akhodakivskiy) – ru
 - Nicholas Guriev (@mymedia2) – ru
