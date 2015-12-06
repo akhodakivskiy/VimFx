@@ -41,11 +41,11 @@ commands.go_to_root = ({vim}) ->
   vim.content.location.href = vim.content.location.origin
 
 helper_scroll = (element, args) ->
-  {method, type, directions, amounts, properties, smooth} = args
+  {method, type, directions, amounts, properties, adjustment, smooth} = args
   options = {}
   for direction, index in directions
     amount = amounts[index]
-    options[direction] = switch type
+    options[direction] = -Math.sign(amount) * adjustment + switch type
       when 'lines' then amount
       when 'pages' then amount * element[properties[index]]
       when 'other' then Math.min(amount, element[properties[index]])

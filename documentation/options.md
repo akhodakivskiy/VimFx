@@ -232,6 +232,26 @@ much they scroll by adjusting the following prefs:
 (VimFx used to have a `scroll_step` pref, but is has been replaced by the
 above.)
 
+#### `scroll.full_page_adjustment` and `scroll.half_page_adjustment`
+
+An important use case for scrolling a full page down is to read an entire page
+(a window-full) of text, press `<space>` and then continue reading the next
+page. However, if you can only see, say, _half_ of the height the last line,
+pressing `<space>` would give you the other half, but reading only the top or
+bottom parts of letters is difficult. Even if the lines happen to line up with
+the window edge to not be sliced horizontally, it might feel disorienting
+pressing `<space>`.
+
+For this reason, both VimFx and Firefox by default scroll _about a line less
+than a whole page_ when pressing `<space>`. This solves the sliced-last-line
+problem, and provides some context on where you are in the text you’re reading.
+
+These two prefs control how many pixels “about a line” actually means for the
+different page scrolling commands.
+
+- `scroll.full_page_adjustment`: `<space>, `<s-space>`
+- `scroll.half_page_adjustment`: `d`, `u`
+
 #### `scroll.last_position_mark`
 
 The special mark for the [`` ` ``][scroll-to-mark] command that takes you to the

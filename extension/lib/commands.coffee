@@ -119,9 +119,12 @@ commands.stop_all = ({vim}) ->
 
 
 helper_scroll = (vim, args...) ->
-  [method, type, directions, amounts, properties = null, name = 'scroll'] = args
+  [
+    method, type, directions, amounts
+    properties = null, adjustment = 0, name = 'scroll'
+  ] = args
   options = {
-    method, type, directions, amounts, properties
+    method, type, directions, amounts, properties, adjustment
     smooth: (prefs.root.get('general.smoothScroll') and
              prefs.root.get("general.smoothScroll.#{type}"))
   }
@@ -142,9 +145,10 @@ helper_scrollByLinesY = (amount, {vim, count = 1}) ->
   helper_scroll(vim, 'scrollBy', 'lines', ['top'],
                 [amount * distance * count * 20])
 
-helper_scrollByPagesY = (amount, {vim, count = 1}) ->
+helper_scrollByPagesY = (amount, type, {vim, count = 1}) ->
+  adjustment = prefs.get("scroll.#{type}_page_adjustment")
   helper_scroll(vim, 'scrollBy', 'pages', ['top'],
-                [amount * count], ['clientHeight'])
+                [amount * count], ['clientHeight'], adjustment)
 
 helper_scrollToX = (amount, {vim}) ->
   helper_scroll(vim, 'scrollTo', 'other', ['left'], [amount], ['scrollLeftMax'])
@@ -158,10 +162,10 @@ commands.scroll_left           = helper_scrollByLinesX.bind(null, -1)
 commands.scroll_right          = helper_scrollByLinesX.bind(null, +1)
 commands.scroll_down           = helper_scrollByLinesY.bind(null, +1)
 commands.scroll_up             = helper_scrollByLinesY.bind(null, -1)
-commands.scroll_page_down      = helper_scrollByPagesY.bind(null, +1)
-commands.scroll_page_up        = helper_scrollByPagesY.bind(null, -1)
-commands.scroll_half_page_down = helper_scrollByPagesY.bind(null, +0.5)
-commands.scroll_half_page_up   = helper_scrollByPagesY.bind(null, -0.5)
+commands.scroll_page_down      = helper_scrollByPagesY.bind(null, +1,   'full')
+commands.scroll_page_up        = helper_scrollByPagesY.bind(null, -1,   'full')
+commands.scroll_half_page_down = helper_scrollByPagesY.bind(null, +0.5, 'half')
+commands.scroll_half_page_up   = helper_scrollByPagesY.bind(null, -0.5, 'half')
 commands.scroll_to_top         = helper_scrollToY.bind(null, 0)
 commands.scroll_to_bottom      = helper_scrollToY.bind(null, Infinity)
 commands.scroll_to_left        = helper_scrollToX.bind(null, 0)
@@ -179,7 +183,7 @@ commands.scroll_to_mark = ({vim}) ->
     unless keyStr == vim.options['scroll.last_position_mark']
       helper_mark_last_scroll_position(vim)
     helper_scroll(vim, 'scrollTo', 'other', ['top', 'left'], keyStr,
-                  ['scrollTopMax', 'scrollLeftMax'], 'scroll_to_mark')
+                  ['scrollTopMax', 'scrollLeftMax'], 0, 'scroll_to_mark')
   )
 
 
