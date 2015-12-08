@@ -54,52 +54,48 @@ class UIEventManager
     @listen('popuphidden', checkPassthrough.bind(null, false))
 
     @listen('keydown', (event) =>
-      try
-        # No matter what, always reset the `@suppress` flag, so we don't
-        # suppress more than intended.
-        @suppress = false
+      # No matter what, always reset the `@suppress` flag, so we don't
+      # suppress more than intended.
+      @suppress = false
 
-        # Reset the `@late` flag, telling any late listeners for the previous
-        # event not to run.
-        @late = false
+      # Reset the `@late` flag, telling any late listeners for the previous
+      # event not to run.
+      @late = false
 
-        if @popupPassthrough
-          # The `@popupPassthrough` flag is set a bit unreliably. Sometimes it
-          # can be stuck as `true` even though no popup is shown, effectively
-          # disabling the extension. Therefore we check if there actually _are_
-          # any open popups before stopping processing keyboard input. This is
-          # only done when popups (might) be open (not on every keystroke) of
-          # performance reasons.
-          #
-          # The autocomplete popup in text inputs (for example) is technically a
-          # panel, but it does not respond to key presses. Therefore
-          # `[ignorekeys="true"]` is excluded.
-          #
-          # coffeelint: disable=max_line_length
-          # <https://developer.mozilla.org/en-US/docs/Mozilla/Tech/XUL/PopupGuide/PopupKeys#Ignoring_Keys>
-          # coffeelint: enable=max_line_length
-          popups = @window.document.querySelectorAll(
-            ':-moz-any(menupopup, panel):not([ignorekeys="true"])'
-          )
-          for popup in popups
-            return if popup.state == 'open'
-          @popupPassthrough = false # No popup was actually open.
+      if @popupPassthrough
+        # The `@popupPassthrough` flag is set a bit unreliably. Sometimes it
+        # can be stuck as `true` even though no popup is shown, effectively
+        # disabling the extension. Therefore we check if there actually _are_
+        # any open popups before stopping processing keyboard input. This is
+        # only done when popups (might) be open (not on every keystroke) of
+        # performance reasons.
+        #
+        # The autocomplete popup in text inputs (for example) is technically a
+        # panel, but it does not respond to key presses. Therefore
+        # `[ignorekeys="true"]` is excluded.
+        #
+        # coffeelint: disable=max_line_length
+        # <https://developer.mozilla.org/en-US/docs/Mozilla/Tech/XUL/PopupGuide/PopupKeys#Ignoring_Keys>
+        # coffeelint: enable=max_line_length
+        popups = @window.document.querySelectorAll(
+          ':-moz-any(menupopup, panel):not([ignorekeys="true"])'
+        )
+        for popup in popups
+          return if popup.state == 'open'
+        @popupPassthrough = false # No popup was actually open.
 
-        return unless vim = @vimfx.getCurrentVim(@window)
+      return unless vim = @vimfx.getCurrentVim(@window)
 
-        if vim.isUIEvent(event)
-          focusType = utils.getFocusType(event.originalTarget)
-          @consumeKeyEvent(vim, event, focusType, event)
-          # This also suppresses the 'keypress' event.
-          utils.suppressEvent(event) if @suppress
-        else
-          vim._listenOnce('consumeKeyEvent', ({focusType}) =>
-            @consumeKeyEvent(vim, event, focusType)
-            return @suppress
-          )
-
-      catch error
-        console.error(utils.formatError(error))
+      if vim.isUIEvent(event)
+        focusType = utils.getFocusType(event.originalTarget)
+        @consumeKeyEvent(vim, event, focusType, event)
+        # This also suppresses the 'keypress' event.
+        utils.suppressEvent(event) if @suppress
+      else
+        vim._listenOnce('consumeKeyEvent', ({focusType}) =>
+          @consumeKeyEvent(vim, event, focusType)
+          return @suppress
+        )
     )
 
     @listen('keyup', (event) =>
