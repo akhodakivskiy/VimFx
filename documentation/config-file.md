@@ -69,20 +69,20 @@ script:
 // config.js
 let {messageManager} = vim.window.gBrowser.selectedBrowser
 let callback = ({data: {selection}}) => {
-  messageManager.removeMessageListener('VimFx-custom:selection', callback)
+  messageManager.removeMessageListener('VimFx-config:selection', callback)
   console.log('Currently selected text:', selection)
 }
-messageManager.addMessageListener('VimFx-custom:selection', callback)
-messageManager.sendAsyncMessage('VimFx-custom:getSelection', {exampleValue: 1337})
+messageManager.addMessageListener('VimFx-config:selection', callback)
+messageManager.sendAsyncMessage('VimFx-config:getSelection', {exampleValue: 1337})
 ```
 
 And here’s some accompaning frame script code:
 
 ```js
 // frame.js
-addMessageListener('VimFx-custom:getSelection', ({data: {exampleValue}}) => {
+addMessageListener('VimFx-config:getSelection', ({data: {exampleValue}}) => {
   console.log('exampleValue should be 5:', exampleValue)
   let selection = content.getSelection().toString()
-  sendAsyncMessage('VimFx-custom:selection', {selection})
+  sendAsyncMessage('VimFx-config:selection', {selection})
 })
 ```
