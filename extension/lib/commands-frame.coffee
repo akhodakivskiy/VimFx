@@ -47,18 +47,6 @@ commands.go_to_root = ({vim}) ->
   else
     vim.content.location.href = vim.content.location.origin
 
-helper_scroll = (element, args) ->
-  {method, type, directions, amounts, properties, adjustment, smooth} = args
-  options = {}
-  for direction, index in directions
-    amount = amounts[index]
-    options[direction] = -Math.sign(amount) * adjustment + switch type
-      when 'lines' then amount
-      when 'pages' then amount * element[properties[index]]
-      when 'other' then Math.min(amount, element[properties[index]])
-  options.behavior = 'smooth' if smooth
-  element[method](options)
-
 commands.scroll = (args) ->
   {vim} = args
   activeElement = utils.getActiveElement(vim.content)
@@ -73,7 +61,7 @@ commands.scroll = (args) ->
       activeElement
     else
       vim.state.scrollableElements.filterSuitableDefault()
-  helper_scroll(element, args)
+  utils.scroll(element, args)
 
 commands.mark_scroll_position = ({vim, keyStr, notify = true}) ->
   element = vim.state.scrollableElements.filterSuitableDefault()
@@ -89,7 +77,7 @@ commands.scroll_to_mark = (args) ->
 
   args.amounts = vim.state.marks[keyStr]
   element = vim.state.scrollableElements.filterSuitableDefault()
-  helper_scroll(element, args)
+  utils.scroll(element, args)
 
 helper_follow = ({id, combine = true}, matcher, {vim}) ->
   hrefs = {}

@@ -100,8 +100,10 @@ isn’t scrollable, the largest scrollable element on the page (if any, and
 including the entire page itself) is scrolled.
 
 You can focus scrollable elements using the `zf` command (or the `f` command).
-The right border of hint markers for scrollable elements is styled to remind of
-a scroll bar, making them easier to recognize among hints for links.
+Scrollable browser elements, such as in the dev tools, can be focused using the
+`zF` command. The right border of hint markers for scrollable elements is styled
+to remind of a scroll bar, making them easier to recognize among hints for
+links.
 
 Note that `zf` and `f` do _not_ add a hint marker for the _largest_ scrollable
 element (such as the entire page). There’s no need to focus that element, since

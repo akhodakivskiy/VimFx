@@ -30,8 +30,6 @@ class FrameEventManager
     @keepInputs = false
     @currentUrl = false
 
-  MINIMUM_SCROLLABLE_ELEMENT_AREA: 25
-
   listen: utils.listen.bind(null, FRAME_SCRIPT_ENVIRONMENT)
   listenOnce: utils.listenOnce.bind(null, FRAME_SCRIPT_ENVIRONMENT)
 
@@ -91,27 +89,12 @@ class FrameEventManager
 
     @listen('overflow', (event) =>
       target = event.originalTarget
-
-      return unless computedStyle = @vim.content.getComputedStyle(target)
-      unless (computedStyle.getPropertyValue('overflow-y') == 'hidden' and
-              computedStyle.getPropertyValue('overflow-x') == 'hidden') or
-             # There’s no need to track elements so small that they don’t even
-             # fit the scrollbars. For example, Gmail has lots of tiny
-             # overflowing iframes. Filter those out.
-             utils.area(target) < @MINIMUM_SCROLLABLE_ELEMENT_AREA or
-             # On some pages, such as Google Groups, 'overflow' events may occur
-             # for elements that aren’t even scrollable.
-             not @vim.state.scrollableElements.isScrollable(target)
-        @vim.state.scrollableElements.add(target)
+      @vim.state.scrollableElements.addChecked(target)
     )
 
     @listen('underflow', (event) =>
       target = event.originalTarget
-
-      # On some pages, such as Gmail, 'underflow' events may occur for elements
-      # that are actually still scrollable! If so, keep the element.
-      unless @vim.state.scrollableElements.isScrollable(target)
-        @vim.state.scrollableElements.delete(target)
+      @vim.state.scrollableElements.deleteChecked(target)
     )
 
     @listen('keydown', (event) =>

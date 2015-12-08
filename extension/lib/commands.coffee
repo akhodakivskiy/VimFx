@@ -125,7 +125,7 @@ commands.stop_all = ({vim}) ->
 
 
 
-helper_scroll = (vim, args...) ->
+helper_scroll = (vim, uiEvent, args...) ->
   [
     method, type, directions, amounts
     properties = null, adjustment = 0, name = 'scroll'
@@ -139,30 +139,40 @@ helper_scroll = (vim, args...) ->
     'layout.css.scroll-behavior.spring-constant',
     vim.options["smoothScroll.#{type}.spring-constant"]
   )
+
+  if uiEvent
+    activeElement = utils.getActiveElement(vim.window)
+    if vim._state.scrollableElements.has(activeElement)
+      utils.scroll(activeElement, options)
+      reset()
+      return
+
   vim._run(name, options, reset)
 
 
-helper_scrollByLinesX = (amount, {vim, count = 1}) ->
+helper_scrollByLinesX = (amount, {vim, uiEvent, count = 1}) ->
   distance = prefs.root.get('toolkit.scrollbox.horizontalScrollDistance')
-  helper_scroll(vim, 'scrollBy', 'lines', ['left'],
+  helper_scroll(vim, uiEvent, 'scrollBy', 'lines', ['left'],
                 [amount * distance * count * 5])
 
-helper_scrollByLinesY = (amount, {vim, count = 1}) ->
+helper_scrollByLinesY = (amount, {vim, uiEvent, count = 1}) ->
   distance = prefs.root.get('toolkit.scrollbox.verticalScrollDistance')
-  helper_scroll(vim, 'scrollBy', 'lines', ['top'],
+  helper_scroll(vim, uiEvent, 'scrollBy', 'lines', ['top'],
                 [amount * distance * count * 20])
 
-helper_scrollByPagesY = (amount, type, {vim, count = 1}) ->
+helper_scrollByPagesY = (amount, type, {vim, uiEvent, count = 1}) ->
   adjustment = prefs.get("scroll.#{type}_page_adjustment")
-  helper_scroll(vim, 'scrollBy', 'pages', ['top'],
+  helper_scroll(vim, uiEvent, 'scrollBy', 'pages', ['top'],
                 [amount * count], ['clientHeight'], adjustment)
 
-helper_scrollToX = (amount, {vim}) ->
-  helper_scroll(vim, 'scrollTo', 'other', ['left'], [amount], ['scrollLeftMax'])
+helper_scrollToX = (amount, {vim, uiEvent}) ->
+  helper_scroll(vim, uiEvent, 'scrollTo', 'other', ['left'],
+                [amount], ['scrollLeftMax'])
   helper_mark_last_scroll_position(vim)
 
-helper_scrollToY = (amount, {vim}) ->
-  helper_scroll(vim, 'scrollTo', 'other', ['top'],  [amount], ['scrollTopMax'])
+helper_scrollToY = (amount, {vim, uiEvent}) ->
+  helper_scroll(vim, uiEvent, 'scrollTo', 'other', ['top'],
+                [amount], ['scrollTopMax'])
   helper_mark_last_scroll_position(vim)
 
 commands.scroll_left           = helper_scrollByLinesX.bind(null, -1)
@@ -434,19 +444,27 @@ commands.click_browser_element = ({vim}) ->
 
   filter = (element, getElementShape) ->
     document = element.ownerDocument
-    unless element.tabIndex > -1 and
+    type = switch
+      when vim._state.scrollableElements.has(element)
+        'scrollable'
+      when element.tabIndex > -1 and
            not (element.nodeName.endsWith('box') and
                 element.nodeName != 'checkbox') and
            element.nodeName != 'tabs'
-      return
+        'clickable'
+    return unless type
     return unless shape = getElementShape(element)
     length = markerElements.push(element)
-    return {type: 'clickable', semantic: true, shape, elementIndex: length - 1}
+    return {type, semantic: true, shape, elementIndex: length - 1}
 
   callback = (marker) ->
     element = markerElements[marker.wrapper.elementIndex]
-    utils.focusElement(element)
-    utils.simulateClick(element)
+    switch marker.wrapper.type
+      when 'scrollable'
+        utils.focusElement(element, {flag: 'FLAG_BYKEY'})
+      when 'clickable'
+        utils.focusElement(element)
+        utils.simulateClick(element)
 
   {wrappers, viewport} =
     hints.getMarkableElementsAndViewport(vim.window, filter)

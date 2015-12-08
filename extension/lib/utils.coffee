@@ -234,6 +234,18 @@ querySelectorAllDeep = (window, selector) ->
     elements.push(querySelectorAllDeep(frame, selector)...)
   return elements
 
+scroll = (element, args) ->
+  {method, type, directions, amounts, properties, adjustment, smooth} = args
+  options = {}
+  for direction, index in directions
+    amount = amounts[index]
+    options[direction] = -Math.sign(amount) * adjustment + switch type
+      when 'lines' then amount
+      when 'pages' then amount * element[properties[index]]
+      when 'other' then Math.min(amount, element[properties[index]])
+  options.behavior = 'smooth' if smooth
+  element[method](options)
+
 setAttributes = (element, attributes) ->
   for attribute, value of attributes
     element.setAttribute(attribute, value)
@@ -358,6 +370,7 @@ module.exports = {
   injectTemporaryPopup
   insertText
   querySelectorAllDeep
+  scroll
   setAttributes
 
   Counter
