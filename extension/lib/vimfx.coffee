@@ -180,8 +180,8 @@ createKeyTrees = (groupedCommands, specialKeyStrings) ->
   pushError = (error, command) ->
     (errors[command.pref] ?= []).push(error)
 
-  pushOverrideErrors = (command, tree) ->
-    {command: overridingCommand, originalSequence} = getFirstLeaf(tree)
+  pushOverrideErrors = (command, originalSequence, tree) ->
+    {command: overridingCommand} = getFirstLeaf(tree)
     error =
       id:      'overridden_by'
       subject: overridingCommand.description()
@@ -225,7 +225,7 @@ createKeyTrees = (groupedCommands, specialKeyStrings) ->
           if prefixKey of tree
             next = tree[prefixKey]
             if next instanceof Leaf
-              pushOverrideErrors(command, next)
+              pushOverrideErrors(command, shortcut.original, next)
               errored = true
               break
             else
@@ -239,7 +239,7 @@ createKeyTrees = (groupedCommands, specialKeyStrings) ->
           pushSpecialKeyError(command, shortcut.original, subject)
           continue
         if lastKey of tree
-          pushOverrideErrors(command, tree[lastKey])
+          pushOverrideErrors(command, shortcut.original, tree[lastKey])
           continue
         tree[lastKey] = new Leaf(command, shortcut.original, specialKeys)
 
