@@ -198,7 +198,7 @@ class UIEventManager
 
     if match
       if @vimfx.options.notify_entered_keys
-        if match.type in ['none', 'full']
+        if match.type in ['none', 'full'] or match.focus != null
           @enteredKeys.clear(vim)
         else
           @enteredKeys.push(vim, match.keyStr, @vimfx.options.timeout)
