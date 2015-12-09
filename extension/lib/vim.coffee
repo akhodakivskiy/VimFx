@@ -24,9 +24,10 @@
 # `vim` objects are exposed by the Public API. Underscored names are private and
 # should not be used by API consumers.
 
-messageManager = require('./message-manager')
-statusPanel    = require('./status-panel')
-utils          = require('./utils')
+messageManager     = require('./message-manager')
+ScrollableElements = require('./scrollable-elements')
+statusPanel        = require('./status-panel')
+utils              = require('./utils')
 
 ChromeWindow = Ci.nsIDOMChromeWindow
 
@@ -97,6 +98,7 @@ class Vim
   _resetState: ->
     @_state =
       frameCanReceiveEvents: false
+      scrollableElements:    new ScrollableElements(@window)
 
   _isBlacklisted: (url) -> @options.black_list.some((regex) -> regex.test(url))
 

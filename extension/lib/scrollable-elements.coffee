@@ -24,9 +24,12 @@
 utils = require('./utils')
 
 class ScrollableElements
-  constructor: (@window, @MINIMUM_SCROLL) ->
+  constructor: (@window) ->
     @elements = new Set()
     @largest  = null
+
+  MINIMUM_SCROLL: 5
+  MINIMUM_SCROLLABLE_ELEMENT_AREA: 25
 
   # In quirks mode (when the page lacks a doctype), such as on Hackernews,
   # `<body>` is considered the root element rather than `<html>`. The 'overflow'
@@ -62,6 +65,24 @@ class ScrollableElements
     element = @quirks(element)
     return element.scrollTopMax  >= @MINIMUM_SCROLL or
            element.scrollLeftMax >= @MINIMUM_SCROLL
+
+  addChecked: (element) ->
+    return unless computedStyle = @window.getComputedStyle(element)
+    unless (computedStyle.getPropertyValue('overflow-y') == 'hidden' and
+            computedStyle.getPropertyValue('overflow-x') == 'hidden') or
+           # There’s no need to track elements so small that they don’t even fit
+           # the scrollbars. For example, Gmail has lots of tiny overflowing
+           # iframes. Filter those out.
+           utils.area(element) < @MINIMUM_SCROLLABLE_ELEMENT_AREA or
+           # On some pages, such as Google Groups, 'overflow' events may occur
+           # for elements that aren’t even scrollable.
+           not @isScrollable(element)
+      @add(element)
+
+  deleteChecked: (element) ->
+    # On some pages, such as Gmail, 'underflow' events may occur for elements
+    # that are actually still scrollable! If so, keep the element.
+    @delete(element) unless @isScrollable(element)
 
   # It makes the most sense to consider the uppermost scrollable element the
   # largest. In other words, if a scrollable element contains another scrollable
