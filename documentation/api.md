@@ -501,6 +501,10 @@ A `match` object has the following properties:
   shortcut key tree. This is `true` unless the match is part of the tail of a
   multi-key shortcut.
 
+- discard(): `Function`. Discards keys pressed so far: If `type` is `'partial'`
+  or `'count'`. For example, if you have typed `12g`, run `match.discard()` and
+  then press `$`, the `$` command will be run instead of `12g$`.
+
 ### Vim object
 
 There is one `vim` object per tab.

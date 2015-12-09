@@ -112,6 +112,7 @@ class VimFx extends utils.EventEmitter
     @reset(mode) if type == 'full'
     return {
       type, focus, command, count, specialKeys, keyStr, unmodifiedKey, toplevel
+      discard: @reset.bind(this, mode)
     }
 
   adjustFocusType: (event, vim, focusType, keyStr) ->
