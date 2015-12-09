@@ -1,3 +1,47 @@
+### 0.10.0 (2015-12-09)
+
+- Added: The `zF` command, which lets you click browser elements.
+- Improved: The scrolling commands can now scroll browser elements (in other
+  words, not only web page content), by first selecting the scollable element
+  using `zF`.
+- Added: The `gr` command, which toggles [Reader View].
+- Added: The `gX` command, which opens the Recently Closed Tabs menu at the
+  middle of the screen.
+- Added: The keys you’ve typed so far of a command, as well the count, are now
+  shown in a [notification]. (You may disable this using the
+  [`notify_entered_keys`] pref.)
+- Improved: When commands don’t do anything, they show a [notification] instead,
+  letting you know that you actually pressed the right keys. For example, if you
+  press `f` but there are no markable elements visible, a notification is shown
+  telling you so, instead of silently doing nothing.
+- Improved: `<space>` now scrolls _about a line less_ than a full page, just
+  like Firefox does by default. `d` scroll about _half_ a line less (by
+  default), so that pressing `d` twice works like pressing `<space>` once. (See
+  the [`scroll.full_page_adjustment` and `scroll.half_page_adjustment`] prefs
+  for more information.)
+- Improved: `gi` now only selects all text in its text input if you haven’t
+  focused a text input yet (allowing you to easily replace pre-filled text),
+  instead of _always_ doing so. Otherwise, it now puts the cursor where you left
+  off typing the last time.
+- Fixed: The `f` commands now put the cursor where you left off typing the last
+  time when focusing a text input. Previously, they accidentally selected all
+  text in the text input (use `zf` for that behavior).
+- Fixed: Yet a scrolling fix. VimFx’s scrolling commands should now “just work”
+  on even more sites.
+- Fixed: AltGr should now work out of the box on Windows. (See the
+  [`ignore_ctrl_alt`] pref for more information.)
+- Removed: The el-GR, hu and pl locales were sadly too out of date to be useful,
+  and nobody has shown interest in updating them, so they were removed.
+- Updated locales: id, de and zh-CN. Thanks to Yoppy Halilintar, @just-barcodes
+  and @mozillazg!
+- Fixed: Several tiny bugs.
+
+[Reader View]: https://support.mozilla.org/kb/firefox-reader-view-clutter-free-web-pages
+[notification]: https://github.com/akhodakivskiy/VimFx/blob/ba9d4675e19ce315e6855b64400aae092e727975/documentation/notifications.md
+[`notify_entered_keys`]: https://github.com/akhodakivskiy/VimFx/blob/ba9d4675e19ce315e6855b64400aae092e727975/documentation/options.md#notify_entered_keys
+[`scroll.full_page_adjustment` and `scroll.half_page_adjustment`]: https://github.com/akhodakivskiy/VimFx/blob/ba9d4675e19ce315e6855b64400aae092e727975/documentation/options.md#scrollfull_page_adjustment-and-scrollhalf_page_adjustment
+[`ignore_ctrl_alt`]: https://github.com/akhodakivskiy/VimFx/blob/ba9d4675e19ce315e6855b64400aae092e727975/documentation/options.md#ignore_ctrl_alt
+
 ### 0.9.0 (2015-12-02)
 
 - Fixed: Links with the `onclick` attribute can now be opened in new tabs again.
