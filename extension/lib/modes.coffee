@@ -66,6 +66,7 @@ mode('normal', {
     autoInsertMode = (match.focus != null)
     if match.type == 'none' or
        (autoInsertMode and not match.specialKeys['<force>'])
+      vim._parent.reset('normal')
       if storage.returnTo
         vim.enterMode(storage.returnTo)
         storage.returnTo = null
