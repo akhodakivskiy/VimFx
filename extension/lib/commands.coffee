@@ -140,9 +140,10 @@ helper_scroll = (vim, uiEvent, args...) ->
     vim.options["smoothScroll.#{type}.spring-constant"]
   )
 
-  if uiEvent
-    activeElement = utils.getActiveElement(vim.window)
-    if vim._state.scrollableElements.has(activeElement)
+  helpContainer = help.getHelp(vim.window)
+  if uiEvent or helpContainer
+    activeElement = helpContainer or utils.getActiveElement(vim.window)
+    if vim._state.scrollableElements.has(activeElement) or helpContainer
       utils.scroll(activeElement, options)
       reset()
       return
@@ -499,6 +500,11 @@ commands.focus_text_input = ({vim, count}) ->
 findStorage = {lastSearchString: ''}
 
 helper_find = ({highlight, linksOnly = false}, {vim}) ->
+  helpSearchInput = help.getSearchInput(vim.window)
+  if helpSearchInput
+    helpSearchInput.select()
+    return
+
   helper_mark_last_scroll_position(vim)
   findBar = vim.window.gBrowser.getFindBar()
 
@@ -568,12 +574,14 @@ commands.dev = ({vim}) ->
 commands.esc = ({vim}) ->
   vim._run('esc')
   utils.blurActiveBrowserElement(vim)
-  help.removeHelp(vim.window)
   vim.window.DeveloperToolbar.hide()
   vim.window.gBrowser.getFindBar().close()
   # TODO: Remove when Tab Groups have been removed.
   vim.window.TabView?.hide()
   hints.removeHints(vim.window) # Better safe than sorry.
+
+  unless help.getSearchInput(vim.window)?.getAttribute('focused')
+    help.removeHelp(vim.window)
 
 
 

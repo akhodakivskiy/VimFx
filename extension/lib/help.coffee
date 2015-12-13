@@ -50,10 +50,10 @@ injectHelp = (window, vimfx) ->
     placeholder: translate('help.search')
   })
   searchInput.oninput = -> search(content, searchInput.value.trimLeft())
+  searchInput.onkeydown = (event) -> searchInput.blur() if event.key == 'Enter'
   container.appendChild(searchInput)
 
   window.gBrowser.mCurrentBrowser.parentNode.appendChild(container)
-  searchInput.focus()
 
   # The font size of menu items is used by default, which is usually quite
   # small. Try to increase it without causing a scrollbar.
@@ -68,8 +68,11 @@ injectHelp = (window, vimfx) ->
   # Uncomment this line if you want to use `gulp help.html`!
   # utils.writeToClipboard(container.outerHTML)
 
-removeHelp = (window) ->
-  window.document.getElementById(CONTAINER_ID)?.remove()
+removeHelp = (window) -> getHelp(window)?.remove()
+
+getHelp = (window) -> window.document.getElementById(CONTAINER_ID)
+
+getSearchInput = (window) -> getHelp(window)?.querySelector('.search-input')
 
 createHeader = (document, vimfx) ->
   $ = utils.createBox.bind(null, document)
@@ -169,4 +172,6 @@ search = (content, term) ->
 module.exports = {
   injectHelp
   removeHelp
+  getHelp
+  getSearchInput
 }

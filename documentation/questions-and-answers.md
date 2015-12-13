@@ -67,6 +67,12 @@ the beginning, and your new shortcut should work fine.
 
 [`<force>`]: shortcuts.md#force
 
+## Can I search in the Keyboard Shortcuts help dialog?
+
+Yes! Pressing `/` while the help dialog is open makes a little search box appear
+in the bottom-right corner of the window (instead of opening the find bar),
+which is specialized at searching you keyboard shortcuts.
+
 ## Will VimFx provide advanced Find features?
 
 One VimFx’s key feauters is to embrace standard Firefox features. As long as
