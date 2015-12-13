@@ -25,5 +25,6 @@ Anton Khodakivskiy (@akhodakivskiy)
 - Simon Lydell (@lydell) – sv-SE
 - Wang Zhuochun (@zhuochun) – zh-CN
 - @mozillazg – zh-CN
+- @av2000ii – zh-CN
 - Robert Wang (@cyberrob) – zh-TW
 - Salas (@leVirve) – zh-TW
