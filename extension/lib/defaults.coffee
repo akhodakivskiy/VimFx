@@ -134,6 +134,7 @@ advanced_options =
   'notifications_enabled':              true
   'notify_entered_keys':                true
   'prevent_target_blank':               true
+  'counts_enabled':                     true
   'ignore_ctrl_alt':                    (Services.appinfo.OS == 'WINNT')
   'prevent_autofocus_modes':            'normal'
   'hints_timeout':                      200

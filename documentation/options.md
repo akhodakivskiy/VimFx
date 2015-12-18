@@ -173,6 +173,12 @@ You might have noticed that some links open in new tabs when you click them.
 That is not the case if you “click” them using VimFx’s `f` command, though. If
 you dislike that, disable this option.
 
+### `counts_enabled`
+
+Controls whether [counts] are enabled or not.
+
+[counts]: commands.md#counts
+
 ### `ignore_ctrl_alt`
 
 This option is enabled by default on Windows, and disabled otherwise.
