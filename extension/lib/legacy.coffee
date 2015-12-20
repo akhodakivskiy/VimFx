@@ -46,7 +46,7 @@ commaSeparatedListItem = ///^
 $///
 
 convertKey = (keyStr) ->
-  return keyStr.match(commaSeparatedList).map((part) ->
+  return (keyStr.trim().match(commaSeparatedList) ? []).map((part) ->
     [match, shift, modifiers, key] = part.match(commaSeparatedListItem)
     modifiers ?= ''
     return notation.stringify({
