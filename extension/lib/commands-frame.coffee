@@ -129,7 +129,7 @@ commands.follow = helper_follow.bind(null, {id: 'normal'},
     switch
       when isProperLink(element)
         type = 'link'
-      when isTypingElement(element) or isContentEditable(element)
+      when isTypingElement(element)
         type = 'text'
       when element.tabIndex > -1 and
            not (isXUL and element.nodeName.endsWith('box') and
@@ -197,8 +197,8 @@ commands.follow_copy = helper_follow.bind(null, {id: 'copy'},
   ({element}) ->
     type = switch
       when isProperLink(element)      then 'link'
-      when isTypingElement(element)   then 'text'
       when isContentEditable(element) then 'contenteditable'
+      when isTypingElement(element)   then 'text'
       else null
     return {type, semantic: true}
 )
@@ -285,9 +285,11 @@ commands.follow_pattern = ({vim, type, options}) ->
 
 commands.focus_text_input = ({vim, count = null}) ->
   {lastFocusedTextInput} = vim.state
-  inputs = Array.filter(
-    utils.querySelectorAllDeep(vim.content, 'input, textarea'), (element) ->
-      return isTextInputElement(element) and utils.area(element) > 0
+  candidates = utils.querySelectorAllDeep(
+    vim.content, 'input, textarea, [contenteditable]'
+  )
+  inputs = Array.filter(candidates, (element) ->
+    return isTextInputElement(element) and utils.area(element) > 0
   )
   if lastFocusedTextInput and lastFocusedTextInput not in inputs
     inputs.push(lastFocusedTextInput)

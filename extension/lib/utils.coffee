@@ -77,7 +77,8 @@ isTextInputElement = (element) ->
            'text', 'search', 'tel', 'url', 'email', 'password', 'number'
          ]) or
          element instanceof HTMLTextAreaElement or
-         element instanceof XULTextBoxElement
+         element instanceof XULTextBoxElement or
+         isContentEditable(element)
 
 isTypingElement = (element) ->
   return isTextInputElement(element) or
@@ -135,7 +136,7 @@ focusElement = (element, options = {}) ->
   element.select?() if options.select
 
 getFocusType = (element) -> switch
-  when isTypingElement(element) or isContentEditable(element)
+  when isTypingElement(element)
     'editable'
   when isActivatable(element)
     'activatable'
