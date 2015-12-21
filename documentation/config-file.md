@@ -76,7 +76,7 @@ messageManager.addMessageListener('VimFx-config:selection', callback)
 messageManager.sendAsyncMessage('VimFx-config:getSelection', {exampleValue: 1337})
 ```
 
-And here’s some accompaning frame script code:
+And here’s some accompanying frame script code:
 
 ```js
 // frame.js

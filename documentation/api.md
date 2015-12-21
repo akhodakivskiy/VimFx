@@ -362,7 +362,7 @@ categories.custom = {
 
 ### Mode object
 
-A mode is an object with the follwing properties:
+A mode is an object with the following properties:
 
 - name(): `Function`. Returns a human readable name of the mode used in the help
   dialog and VimFx’s settings page in the Add-ons Manager.
@@ -398,8 +398,8 @@ Whatever is returned from `onEnter` will be returned from
 
 The object passed to this method (see above) also has the following properties:
 
-- uiEvent: `Event` or `false`. The keydown event object if the event occured in
-  the browser UI, `false` otherwise (if the event occured in web page content).
+- uiEvent: `Event` or `false`. The keydown event object if the event occurred in
+  the browser UI, `false` otherwise (if the event occurred in web page content).
 - count: `Number`. The count for the command. `undefined` if no count. (This is
   simply a copy of `match.count`. `match` is defined below.)
 
@@ -414,7 +414,7 @@ to the browser and web pages, and `false` otherwise.
 
 ### Category object
 
-A category is an object with the follwing properties:
+A category is an object with the following properties:
 
 - name(): `Function`. Returns a human readable name of the category used in the
   help dialog and VimFx’s settings page in the Add-ons Manager. Config file
@@ -566,7 +566,7 @@ The [special options] are also available on this object.
 ### Location object
 
 A location object is very similar to [`window.location`] in web pages.
-Technically, it is a [`URL`] instance. You can experient with the current
+Technically, it is a [`URL`] instance. You can experiment with the current
 location object by opening the [web console] and entering `location`.
 
 

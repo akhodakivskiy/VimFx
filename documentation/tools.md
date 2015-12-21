@@ -63,7 +63,7 @@ be in a dependency and already have been fixed.
 
 [gulp] is the task runner used to automate most of the common VimFx tasks.
 
-The tasks are defined in [gulpfile.coffee]. They are summarized in the follwing
+The tasks are defined in [gulpfile.coffee]. They are summarized in the following
 sub-sections.
 
 (There are a few more tasks defined in [gulpfile.coffee], but they are only used
@@ -169,7 +169,7 @@ sync-locales`.
 If you run `gulp sync-locales` with “en-US” as the base locale, a report is
 printed telling how complete all other locales are. Add `--sv-SE?` (note the
 question mark) to restrict the report to the “sv-SE” locale (you can of course
-substitue with any other locale). In that case, every line (including line
+substitute with any other locale). In that case, every line (including line
 number) that don’t differ compared to “en-US” is also be printed.
 
 
@@ -214,7 +214,7 @@ Steps:
 
 8. Make a “release” out of the new tag on github, and attach VimFx.xpi to it.
 
-The idea is to use the contents of `README.md` as the add-on descripton on
-addons.mozilla.org. You can print it as HTML by runnning `gulp readme`.
+The idea is to use the contents of `README.md` as the add-on description on
+addons.mozilla.org. You can print it as HTML by running `gulp readme`.
 
 [valid Firefox versions]: https://addons.mozilla.org/en-US/firefox/pages/appversions/

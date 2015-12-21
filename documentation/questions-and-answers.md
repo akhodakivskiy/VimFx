@@ -60,7 +60,7 @@ Pressing `H` is like hitting the back button. Use `L` for the forward button.
 
 [Previous/Next page patterns]: options.md#previousnext-page-patterns
 
-## How do i re-map `<escape>` to blur text inputs?
+## How do I re-map `<escape>` to blur text inputs?
 
 The default shortcut is actually `<force><escape>`! Don’t forget [`<force>`] at
 the beginning, and your new shortcut should work fine.
@@ -69,7 +69,7 @@ the beginning, and your new shortcut should work fine.
 
 ## Will VimFx provide advanced Find features?
 
-One VimFx’s key feauters is to embrace standard Firefox features. As long as
+One of VimFx’s key features is to embrace standard Firefox features. As long as
 Firefox’s Find Bar doesn’t support for example reverse search (vim’s `?`
 command) or regex search, VimFx won’t either.
 

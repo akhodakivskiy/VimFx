@@ -31,7 +31,7 @@ them to. (See [Styling] if you’d like to highlight Ignore mode, or any mode fo
 that matter, some other way.)
 
 Other modes are easily detectable. You know that you’re in Find mode if the find
-bar is focued. If there are hint markers visible for the page, you’re in Hints
+bar is focused. If there are hint markers visible for the page, you’re in Hints
 mode.
 
 A quick takeaway from this part of the documentation: **If you don’t know what’s
