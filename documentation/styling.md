@@ -64,7 +64,7 @@ To make the hint markers look like they did in version 0.5.x:
 }
 ```
 
-Making the address bar red when in ignore mode (you may substiute “ignore” with
+Making the address bar red when in ignore mode (you may substitute “ignore” with
 any mode name below):
 
 ```css

@@ -18,7 +18,7 @@ wild! Usually, it’s best to stick to the master branch.
 Tip: If you’re translating into Swedish, run `gulp sync-locales --sv-SE?` to see
 how many percent is done. All lines (including line numbers) that don’t differ
 compared to “en-US” are also printed, letting you know what’s left to do.
-Subsitute “sv-SE” with the locale you’re working on.
+Substitute “sv-SE” with the locale you’re working on.
 
 Also, don’t worry if you can’t get a 100% difference compared to “en-US.”
 Sometimes text strings are very short and will look identical in both languages.
@@ -87,7 +87,7 @@ stable version plus trivial bugfixes. develop is the next minor version. master
 is merged into develop when needed, and develop is merged into master before it
 is going to be released.
 
-In short, “backwards-incomptaible” changes and new features go into the develop
+In short, “backwards-incompatible” changes and new features go into the develop
 branch, while most other things go into the master branch.
 
 Trying to choose the right branch is important in order to be able to keep a
