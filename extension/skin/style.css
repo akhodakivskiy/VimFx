@@ -43,7 +43,7 @@ toolbarpaletteitem[place="palette"] > #VimFxButton {
 
 @media (min-resolution: 2dppx) {
   #VimFxButton image {
-    width: 32px;
+    width: 16px;
   }
 
   #VimFxButton {
