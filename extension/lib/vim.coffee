@@ -72,9 +72,11 @@ class Vim
       return @[method](args...)
     )
 
-    @_listen('DOMWindowCreated', => @_state.frameCanReceiveEvents = true)
-
     @_listen('locationChange', @_onLocationChange.bind(this))
+
+    @_listen('frameCanReceiveEvents', (value) =>
+      @_state.frameCanReceiveEvents = value
+    )
 
     @_listen('focusType', (focusType) =>
       # If the focus moves from a web page element to a browser UI element, the
