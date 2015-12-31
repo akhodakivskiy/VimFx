@@ -61,7 +61,7 @@ There are of course many more [shortcuts]! Press <kbd>?</kbd> to see them all.
 Open VimFx’s [settings] page in the Add-ons Manager to customize the [default
 shortcuts].
 
-[shortcuts]: https://github.com/akhodakivskiy/VimFx/blob/master/documentation/shortcuts.md
+[shortcuts]: https://github.com/akhodakivskiy/VimFx/blob/master/documentation/commands.md
 [settings]: https://github.com/akhodakivskiy/VimFx/blob/master/documentation/options.md
 [default shortcuts]: https://github.com/akhodakivskiy/VimFx/blob/master/extension/lib/defaults.coffee
 
