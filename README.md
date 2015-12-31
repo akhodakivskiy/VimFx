@@ -57,12 +57,13 @@ Top/Bottom: <kbd>gg</kbd>, <kbd>G</kbd>.
 Page up/down: <kbd>space</kbd>, <kbd>shift-space</kbd>.  
 Half a page: <kbd>d</kbd>, <kbd>u</kbd>.
 
-There are of course many more shortcuts! Press <kbd>?</kbd> to see them all.
-That opens the keyboard shortcuts dialog, which helps you remember the
-shortcuts, and lets you customize every single one of them. You can also look at
-all default shortcuts [here][defaults].
+There are of course many more [shortcuts]! Press <kbd>?</kbd> to see them all.
+Open VimFx’s [settings] page in the Add-ons Manager to customize the [default
+shortcuts].
 
-[defaults]: https://github.com/akhodakivskiy/VimFx/blob/master/extension/lib/defaults.coffee
+[shortcuts]: https://github.com/akhodakivskiy/VimFx/blob/master/documentation/shortcuts.md
+[settings]: https://github.com/akhodakivskiy/VimFx/blob/master/documentation/options.md
+[default shortcuts]: https://github.com/akhodakivskiy/VimFx/blob/master/extension/lib/defaults.coffee
 
 ## Feedback
 
