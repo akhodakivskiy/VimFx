@@ -43,6 +43,11 @@ This section describes how to install and use the tools needed to:
    - Pressing ctrl+o and choosing it.
    - Using “Install from file…” in the top-right menu in the Add-ons Manager.
 
+**Note:** Since Mozilla added [extension signing] things have gotten a bit more
+complicated.
+
+[extension signing]: https://wiki.mozilla.org/Addons/Extension_Signing
+
 ### Development
 
 1. Create a new [Firefox profile] for development.
@@ -87,6 +92,9 @@ internally by other tasks.)
 - Use the `--test` or `-t` option to include the unit test files. The output of
   the tests are `console.log`ed. See the browser console, or start Firefox from
   the command line to see it.
+
+- Use the `--unlisted` or `-u` option to append `-unlisted` to the extension ID.
+  This is used when adding .xpi files to github releases.
 
 - `gulp clean` removes the `build/` directory.
 
@@ -212,7 +220,11 @@ Steps:
    the publish on addons.mozilla.org, because sometimes its validator complains.
    This saves some commits.)
 
-8. Make a “release” out of the new tag on github, and attach VimFx.xpi to it.
+8. Make a “release” out of the new tag on github, and attach an .xpi to it:
+
+   1. Create the .xpi by running `gulp xpi --unlisted`.
+   2. Sign it on AMO.
+   3. Attach to the release.
 
 The idea is to use the contents of `README.md` as the add-on description on
 addons.mozilla.org. You can print it as HTML by running `gulp readme`.
