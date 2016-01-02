@@ -390,7 +390,9 @@ getFirstNonCoveredPoint = (window, viewport, element, elementRect, parents) ->
 # In XUL documents there are “anonymous” elements. These are never returned by
 # `document.elementFromPoint` but their closest non-anonymous parents are.
 normalize = (element) ->
-  return element.ownerDocument.getBindingParent(element) or element
+  normalized = element.ownerDocument.getBindingParent(element) or element
+  normalized = normalized.parentNode while normalized.prefix?
+  return normalized
 
 # Returns whether `frameElement` corresponds to `elementAtPoint`. This is only
 # complicated for the dev tools’ frame. `.elementAtPoint()` returns
