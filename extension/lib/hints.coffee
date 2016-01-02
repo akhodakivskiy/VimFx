@@ -399,7 +399,7 @@ normalize = (element) ->
 # `.elementAtPoint()` always returns `<tabbrowser#content>` then. The element
 # might be in another tab and thus invisible, but `<tabbrowser#content>` is the
 # same and visible in _all_ tabs, so we have to check that the element really
-# belongs to the current tab. Note that `a.contains(a) == true`!
+# belongs to the current tab.
 contains = (element, elementAtPoint) ->
   container = normalize(element)
   if elementAtPoint.nodeName == 'tabbrowser' and elementAtPoint.id == 'content'
@@ -407,7 +407,9 @@ contains = (element, elementAtPoint) ->
     tabpanel = gBrowser.getNotificationBox(gBrowser.selectedBrowser)
     return tabpanel.contains(element)
   else
-    return container.contains(elementAtPoint)
+    # Note that `a.contains(a)` is supposed to be true, but strangely aren’t for
+    # `<menulist>`s in the Add-ons Manager, so do a direct comparison as well.
+    return container == elementAtPoint or container.contains(elementAtPoint)
 
 module.exports = {
   removeHints
