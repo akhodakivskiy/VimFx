@@ -144,7 +144,13 @@ commands.follow = helper_follow.bind(null, {id: 'normal'},
            element.hasAttribute('onmousedown') or
            element.hasAttribute('onmouseup') or
            element.hasAttribute('oncommand') or
-           element.getAttribute('role') in ['link', 'button'] or
+           # Clickable ARIA roles:
+           # <http://www.w3.org/html/wg/drafts/html/master/dom.html#wai-aria>
+           element.getAttribute('role') in [
+             'link', 'button', 'tab'
+             'checkbox', 'radio', 'combobox', 'option', 'slider', 'textbox'
+             'menuitem', 'menuitemcheckbox', 'menuitemradio'
+           ] or
            # Twitter special-case.
            element.classList.contains('js-new-tweets-bar') or
            # Feedly special-case.
