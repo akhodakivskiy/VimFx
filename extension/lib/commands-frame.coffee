@@ -181,7 +181,7 @@ commands.follow = helper_follow.bind(null, {id: 'normal'},
       # “button-wrapper”s. (`<SVG element>.className` is not a string!)
       when not isXUL and typeof element.className == 'string' and
            element.className.toLowerCase().includes('button')
-        unless element.querySelector('a, button, [class*=button]')
+        unless element.querySelector('a, button, input, [class*=button]')
           type = 'clickable'
           semantic = false
       # When viewing an image it should get a marker to toggle zoom.
