@@ -155,8 +155,6 @@ toolbarpaletteitem[place="palette"] > #VimFxButton {
 
 #VimFxHelpDialogContainer {
   position: absolute;
-  overflow-y: auto;
-  overflow-x: hidden;
 
   opacity: 0.92;
   background-color: Window;
@@ -169,10 +167,20 @@ toolbarpaletteitem[place="palette"] > #VimFxButton {
 
   --page-padding: 3em;
   --gutter: 1em;
-  padding-top: calc(var(--page-padding) / 2);
-  padding-left: calc(var(--page-padding) - var(--gutter));
-  padding-right: var(--page-padding);
 }
+
+  #VimFxHelpDialogContainer .wrapper {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-top: calc(var(--page-padding) / 2);
+    padding-left: calc(var(--page-padding) - var(--gutter));
+    padding-right: var(--page-padding);
+  }
 
   #VimFxHelpDialogContainer .vimfx-box {
     display: block;
@@ -297,7 +305,7 @@ toolbarpaletteitem[place="palette"] > #VimFxButton {
     }
 
   #VimFxHelpDialogContainer .search-input {
-    position: fixed;
+    position: absolute;
     right: 0;
     bottom: 0;
   }
