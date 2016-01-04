@@ -138,10 +138,10 @@ helper_scroll = (vim, uiEvent, args...) ->
     vim.options["smoothScroll.#{type}.spring-constant"]
   )
 
-  helpContainer = help.getHelp(vim.window)
-  if uiEvent or helpContainer
-    activeElement = helpContainer or utils.getActiveElement(vim.window)
-    if vim._state.scrollableElements.has(activeElement) or helpContainer
+  helpScroll = help.getHelp(vim.window)?.querySelector('.wrapper')
+  if uiEvent or helpScroll
+    activeElement = helpScroll or utils.getActiveElement(vim.window)
+    if vim._state.scrollableElements.has(activeElement) or helpScroll
       utils.scroll(activeElement, options)
       reset()
       return
