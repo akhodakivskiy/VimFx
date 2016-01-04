@@ -29,12 +29,10 @@ of the many `f` commands. See also [The `f` commands].
 
 [The `f` commands]: commands.md#the-f-commands-1
 
-### Previous/Next page patterns
+### “Previous”/“Next” link patterns
 
 Space separated lists of patterns that match links to the previous/next page.
-Used by the `[` and `]` commands. Example:
-
-    *example.com*  http://example.org/editor/*
+Used by the `[` and `]` commands.
 
 There is a standardized way for websites to tell browsers the URLs to the
 previous and next page. VimFx looks for that information in the first place.
@@ -63,6 +61,9 @@ Note: If you need to include a space in your pattern, use `\s`. For example:
 ### Blacklist
 
 Space separated list of URLs where VimFx should automatically enter Ignore mode.
+Example:
+
+    *example.com*  http://example.org/editor/*
 
 Note that the URLs in the list must match the current URL _entirely_ for it to
 apply. Therefore it is easiest to always use the `*` wildcard (which matches
@@ -279,8 +280,10 @@ A CSS selector that targets candidates for a previous/next page link.
 
 ### `pattern_attrs`
 
-A space-separated list of attributes that the previous/next page patterns should
-be matched against.
+A space-separated list of attributes that the [“Previous”/“Next” link patterns]
+should be matched against.
+
+[“Previous”/“Next” link patterns]: #previousnext-link-patterns
 
 ### `hints_toggle_in_tab`
 
