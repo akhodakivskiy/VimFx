@@ -163,7 +163,7 @@
 
 - Fixed: If you customized the “esc” command before VimFx 0.6.0 it should now
   work as expected.
-- Fixed: `<tab>` now works as expected in the address bar and in the dev tools.
+- Fixed: `<tab>` now works as expected in the location bar and in the dev tools.
 - Fixed: Light-weight themes can no longer make VimFx’s Keyboard Shortcuts help
   dialog and hint markers unreadable.
 - Added: The [notifications\_enabled] option.
@@ -318,7 +318,7 @@
 
 - The `p` and `P` commands are now smarter regarding whether to treat the
   clipboard contents as a URL or a search, by working exactly like pasting in
-  the address bar. They also now read the selection clipboard, if available.
+  the location bar. They also now read the selection clipboard, if available.
   \#353 #382
 
 - VimFx’s toolbar button is now properly implemented. #303 #349 #383
@@ -536,7 +536,7 @@
 
 - Thanks to @mozillazg and @mcomella for translation contributions.
 - Added `gh` command that will navigate to the home page.
-- Added `o` command to focus address bar.
+- Added `o` command to focus location bar.
 - `p` and `P` will parse the contents of the clipboard. If the string in the
   clipboard appears to be a URL then it will navigate to this URL. Otherwise it
   will search for the string in the clipboard using currently selected search
@@ -600,7 +600,7 @@
   Alt-Shift V
 - ^u and ^d are removed from the command list. ^u is commonly used to show the
   page source code
-- Opening new tab with now focuses the Address Bar
+- Opening new tab with now focuses the location bar
 - Other small bugs nailed down.
 
 ### 0.1.1 (2012-10-27)

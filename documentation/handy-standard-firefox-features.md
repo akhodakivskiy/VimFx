@@ -12,9 +12,9 @@ preferred over re-implementing similar functionality.
 This section lists a few handy such standard features.
 
 
-## The Address Bar
+## The location bar
 
-Firefox’s Address Bar is sometimes called the “Awesomebar” because it is so
+Firefox’s location bar is sometimes called the “Awesomebar” because it is so
 powerful. Other than simply entering URLs, you can also use it to:
 
 - Search through bookmarks.
