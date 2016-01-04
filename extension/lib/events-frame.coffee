@@ -35,22 +35,20 @@ class FrameEventManager
 
   addListeners: ->
     # If the page already was loaded when VimFx was initialized, send the
-    # 'DOMWindowCreated' message straight away.
-    if @vim.content.document.readyState in ['interactive', 'complete']
-      messageManager.send('DOMWindowCreated')
-    else
-      @listen('DOMWindowCreated', (event) ->
-        messageManager.send('DOMWindowCreated')
-      )
+    # 'frameCanReceiveEvents' message straight away.
+    if @vim.content.document.readyState == 'complete'
+      messageManager.send('frameCanReceiveEvents', true)
 
     @listen('readystatechange', (event) =>
       target = event.originalTarget
       @currentUrl = @vim.content.location.href
 
-      # If the topmost document starts loading, it means that we have navigated
-      # to a new page or refreshed the page.
-      if target == @vim.content.document and target.readyState == 'interactive'
-        messageManager.send('locationChange', @currentUrl)
+      if target == @vim.content.document
+        switch target.readyState
+          when 'interactive'
+            messageManager.send('locationChange', @currentUrl)
+          when 'complete'
+            messageManager.send('frameCanReceiveEvents', true)
     )
 
     @listen('pageshow', (event) =>
@@ -74,6 +72,9 @@ class FrameEventManager
     @listen('pagehide', (event) =>
       target = event.originalTarget
       @currentUrl = null
+
+      if target == @vim.content.document
+        messageManager.send('frameCanReceiveEvents', false)
 
       # If the target isn’t the topmost document, it means that a frame has
       # changed: It could have been removed or its `src` attribute could have
@@ -212,7 +213,7 @@ class FrameEventManager
           # …and the event is programmatic (not caused by clicks or keypresses)…
           focusManager.getLastFocusMethod(null) == 0 and
           # …and the target may steal most keystrokes.
-          (utils.isTypingElement(target) or utils.isContentEditable(target))
+          utils.isTypingElement(target)
         # Some sites (such as icloud.com) re-focuses inputs if they are blurred,
         # causing an infinite loop of autofocus prevention and re-focusing.
         # Therefore, blur events that happen just after an autofocus prevention
@@ -234,7 +235,7 @@ class FrameEventManager
       # will, and should, be re-focused (because it was focused when you left
       # the tab). This case is kept track of so that the autofocus prevention
       # does not catch it.
-      if utils.isTypingElement(target) or utils.isContentEditable(target)
+      if utils.isTypingElement(target)
         utils.nextTick(@vim.content, =>
           @vim.state.shouldRefocus = not @vim.content.document.hasFocus()
 

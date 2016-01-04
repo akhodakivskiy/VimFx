@@ -129,7 +129,7 @@ commands.follow = helper_follow.bind(null, {id: 'normal'},
     switch
       when isProperLink(element)
         type = 'link'
-      when isTypingElement(element) or isContentEditable(element)
+      when isTypingElement(element)
         type = 'text'
       when element.tabIndex > -1 and
            not (isXUL and element.nodeName.endsWith('box') and
@@ -144,7 +144,13 @@ commands.follow = helper_follow.bind(null, {id: 'normal'},
            element.hasAttribute('onmousedown') or
            element.hasAttribute('onmouseup') or
            element.hasAttribute('oncommand') or
-           element.getAttribute('role') in ['link', 'button'] or
+           # Clickable ARIA roles:
+           # <http://www.w3.org/html/wg/drafts/html/master/dom.html#wai-aria>
+           element.getAttribute('role') in [
+             'link', 'button', 'tab'
+             'checkbox', 'radio', 'combobox', 'option', 'slider', 'textbox'
+             'menuitem', 'menuitemcheckbox', 'menuitemradio'
+           ] or
            # Twitter special-case.
            element.classList.contains('js-new-tweets-bar') or
            # Feedly special-case.
@@ -175,7 +181,7 @@ commands.follow = helper_follow.bind(null, {id: 'normal'},
       # “button-wrapper”s. (`<SVG element>.className` is not a string!)
       when not isXUL and typeof element.className == 'string' and
            element.className.toLowerCase().includes('button')
-        unless element.querySelector('a, button, [class*=button]')
+        unless element.querySelector('a, button, input, [class*=button]')
           type = 'clickable'
           semantic = false
       # When viewing an image it should get a marker to toggle zoom.
@@ -197,8 +203,8 @@ commands.follow_copy = helper_follow.bind(null, {id: 'copy'},
   ({element}) ->
     type = switch
       when isProperLink(element)      then 'link'
-      when isTypingElement(element)   then 'text'
       when isContentEditable(element) then 'contenteditable'
+      when isTypingElement(element)   then 'text'
       else null
     return {type, semantic: true}
 )
@@ -285,9 +291,11 @@ commands.follow_pattern = ({vim, type, options}) ->
 
 commands.focus_text_input = ({vim, count = null}) ->
   {lastFocusedTextInput} = vim.state
-  inputs = Array.filter(
-    utils.querySelectorAllDeep(vim.content, 'input, textarea'), (element) ->
-      return isTextInputElement(element) and utils.area(element) > 0
+  candidates = utils.querySelectorAllDeep(
+    vim.content, 'input, textarea, [contenteditable]'
+  )
+  inputs = Array.filter(candidates, (element) ->
+    return isTextInputElement(element) and utils.area(element) > 0
   )
   if lastFocusedTextInput and lastFocusedTextInput not in inputs
     inputs.push(lastFocusedTextInput)

@@ -70,7 +70,9 @@ mode('normal', {
       if storage.returnTo
         vim.enterMode(storage.returnTo)
         storage.returnTo = null
-      return false
+      # If you press `aa` (and `a` is a prefix key, but there’s no `aa`
+      # shortcut), don’t pass the second `a` to the page.
+      return not match.toplevel
 
     if match.type == 'full'
       match.command.run(args)

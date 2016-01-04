@@ -43,7 +43,9 @@ TEST   = 'extension/test'
 
 BASE_LOCALE = 'en-US'
 
-test = '--test' in process.argv or '-t' in process.argv
+argv = process.argv.slice(2)
+
+test = '--test' in argv or '-t' in argv
 ifTest = (value) -> if test then [value] else []
 
 {join} = path
@@ -99,6 +101,7 @@ gulp.task('install.rdf', ->
 
   gulp.src('extension/install.rdf.tmpl')
     .pipe(template({
+      idSuffix: if '--unlisted' in argv or '-u' in argv then '-unlisted' else ''
       version: pkg.version
       minVersion: pkg.firefoxVersions.min
       maxVersion: pkg.firefoxVersions.max
@@ -185,7 +188,7 @@ gulp.task('release', (callback) ->
 
 gulp.task('changelog', ->
   num = 1
-  for arg in process.argv when /^-[1-9]$/.test(arg)
+  for arg in argv when /^-[1-9]$/.test(arg)
     num = Number(arg[1])
   entries = read('CHANGELOG.md').split(/^### .+/m)[1..num].join('')
   process.stdout.write(html(entries))
@@ -221,7 +224,7 @@ gulp.task('faster', ->
 gulp.task('sync-locales', ->
   baseLocale = BASE_LOCALE
   compareLocale = null
-  for arg in process.argv when arg[...2] == '--'
+  for arg in argv when arg[...2] == '--'
     name = arg[2..]
     if name[-1..] == '?' then compareLocale = name[...-1] else baseLocale = name
 

@@ -29,12 +29,10 @@ of the many `f` commands. See also [The `f` commands].
 
 [The `f` commands]: commands.md#the-f-commands-1
 
-### Previous/Next page patterns
+### “Previous”/“Next” link patterns
 
 Space separated lists of patterns that match links to the previous/next page.
-Used by the `[` and `]` commands. Example:
-
-    *example.com*  http://example.org/editor/*
+Used by the `[` and `]` commands.
 
 There is a standardized way for websites to tell browsers the URLs to the
 previous and next page. VimFx looks for that information in the first place.
@@ -63,6 +61,9 @@ Note: If you need to include a space in your pattern, use `\s`. For example:
 ### Blacklist
 
 Space separated list of URLs where VimFx should automatically enter Ignore mode.
+Example:
+
+    *example.com*  http://example.org/editor/*
 
 Note that the URLs in the list must match the current URL _entirely_ for it to
 apply. Therefore it is easiest to always use the `*` wildcard (which matches
@@ -96,7 +97,7 @@ well. Trying to catch those cases as well, VimFx used to prevent all focusing
 that didn’t occur within a fixed number of milliseconds after your last
 interaction (click or keypress). However, this proved to be too aggressive,
 preventing too much focusing. In other words, the time-based check was not
-sufficent to distinguish between inteded focusing and automatic unwanted
+sufficient to distinguish between intended focusing and automatic unwanted
 focusing. It made things worse more than it helped. Since these cases are so
 difficult (if not impossible) to detect, it is better to leave them. Thankfully
 they are not very common.
@@ -115,7 +116,7 @@ standard en-US QWERTY layout as well.
 
 This option makes VimFx ignore your current layout and pretend that the standard
 en-US QWERTY layout is _always_ used. This way the default shortcuts work even
-if your layout doesn’t contain the letters A–Z and all shorcuts can be typed by
+if your layout doesn’t contain the letters A–Z and all shortcuts can be typed by
 the same physical keys on your keyboard regardless of your current keyboard
 layout.
 
@@ -161,8 +162,8 @@ You can also choose to show notifications any way you want by listening for the
 
 ### `notify_entered_keys`
 
-If enabled, a [notification] is shown with the the keys you have entered so far
-of a command. This is only noticeable if you type a multi-key shortcut or use a
+If enabled, a [notification] is shown with the keys you have entered so far of
+a command. This is only noticeable if you type a multi-key shortcut or use a
 count.
 
 [notification]: notifications.md
@@ -172,6 +173,12 @@ count.
 You might have noticed that some links open in new tabs when you click them.
 That is not the case if you “click” them using VimFx’s `f` command, though. If
 you dislike that, disable this option.
+
+### `counts_enabled`
+
+Controls whether [counts] are enabled or not.
+
+[counts]: commands.md#counts
 
 ### `ignore_ctrl_alt`
 
@@ -273,8 +280,10 @@ A CSS selector that targets candidates for a previous/next page link.
 
 ### `pattern_attrs`
 
-A space-separated list of attributes that the previous/next page patterns should
-be matched against.
+A space-separated list of attributes that the [“Previous”/“Next” link patterns]
+should be matched against.
+
+[“Previous”/“Next” link patterns]: #previousnext-link-patterns
 
 ### `hints_toggle_in_tab`
 

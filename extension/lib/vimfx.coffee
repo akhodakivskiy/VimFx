@@ -98,7 +98,7 @@ class VimFx extends utils.EventEmitter
           @currentKeyTree = next
           type = 'partial'
 
-      when toplevel and DIGIT.test(keyStr) and
+      when @options.counts_enabled and toplevel and DIGIT.test(keyStr) and
            not (keyStr == '0' and @count == '')
         @count += keyStr
         type = 'count'

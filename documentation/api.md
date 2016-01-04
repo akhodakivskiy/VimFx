@@ -362,7 +362,7 @@ categories.custom = {
 
 ### Mode object
 
-A mode is an object with the follwing properties:
+A mode is an object with the following properties:
 
 - name(): `Function`. Returns a human readable name of the mode used in the help
   dialog and VimFx’s settings page in the Add-ons Manager.
@@ -398,8 +398,8 @@ Whatever is returned from `onEnter` will be returned from
 
 The object passed to this method (see above) also has the following properties:
 
-- uiEvent: `Event` or `false`. The keydown event object if the event occured in
-  the browser UI, `false` otherwise (if the event occured in web page content).
+- uiEvent: `Event` or `false`. The keydown event object if the event occurred in
+  the browser UI, `false` otherwise (if the event occurred in web page content).
 - count: `Number`. The count for the command. `undefined` if no count. (This is
   simply a copy of `match.count`. `match` is defined below.)
 
@@ -414,7 +414,7 @@ to the browser and web pages, and `false` otherwise.
 
 ### Category object
 
-A category is an object with the follwing properties:
+A category is an object with the following properties:
 
 - name(): `Function`. Returns a human readable name of the category used in the
   help dialog and VimFx’s settings page in the Add-ons Manager. Config file
@@ -460,7 +460,7 @@ A `match` object has the following properties:
   _key_ was pressed:
 
   - `'editable'`: element: some kind of text input, a `<select>` element or a
-    `contenteditable` element. key: any pressed key.
+    “contenteditable” element. key: any pressed key.
   - `'activatable'`: element: an “activatable” element (link or button).
     key: see the [`activatable_element_keys`] option.
   - `'adjustable'`: element: an “adjustable” element (form control or video
@@ -566,7 +566,7 @@ The [special options] are also available on this object.
 ### Location object
 
 A location object is very similar to [`window.location`] in web pages.
-Technically, it is a [`URL`] instance. You can experient with the current
+Technically, it is a [`URL`] instance. You can experiment with the current
 location object by opening the [web console] and entering `location`.
 
 
@@ -635,8 +635,8 @@ The available type strings depend on `id`:
 - copy:
 
   - link: Like “link” when `id` is “normal” (see above).
-  - text: Like “text” when `id` is “normal” (see above), except
-    contenteditable elements.
+  - text: Like “text” when `id` is “normal” (see above), except that in this
+    case “contenteditable” elements are not included.
   - contenteditable: Elements with “contenteditable” turned on.
 
 - focus:
@@ -644,8 +644,8 @@ The available type strings depend on `id`:
   - focusable: Any focusable element not falling into another category.
   - scrollable: Like “scrollable” when `id` is “normal” (see above).
 
-The function must return an object with just like the `info` parameter (with
-`type` and `semantic`).
+The function must return an object like the `info` parameter (with the `type`
+and `semantic` properties).
 
 
 ## Stability

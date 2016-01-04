@@ -103,9 +103,8 @@ migrations[0] = ->
 
 
   convert = (value) ->
-    keys =
-      try JSON.parse(value)
-      catch then []
+    keys = try JSON.parse(value)
+    keys = [] unless Array.isArray(keys)
     for key, index in keys when typeof key == 'string'
       keys[index] = legacy.convertKey(key)
     return keys.map((key) -> key.join('')).join('    ')

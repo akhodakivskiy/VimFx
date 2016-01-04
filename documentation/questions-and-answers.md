@@ -56,11 +56,11 @@ the [Ignore keyboard layout] option.
 Pressing `H` is like hitting the back button. Use `L` for the forward button.
 
 `[` clicks the link labeled “Previous” on the page, and `]` the link labeled
-“Next.” (See also the [Previous/Next page patterns] option.)
+“Next.” (See also the [“Previous”/“Next” link patterns] option.)
 
-[Previous/Next page patterns]: options.md#previousnext-page-patterns
+[“Previous”/“Next” link patterns]: options.md#previousnext-link-patterns
 
-## How do i re-map `<escape>` to blur text inputs?
+## How do I re-map `<escape>` to blur text inputs?
 
 The default shortcut is actually `<force><escape>`! Don’t forget [`<force>`] at
 the beginning, and your new shortcut should work fine.
@@ -75,7 +75,7 @@ which is specialized at searching you keyboard shortcuts.
 
 ## Will VimFx provide advanced Find features?
 
-One VimFx’s key feauters is to embrace standard Firefox features. As long as
+One of VimFx’s key features is to embrace standard Firefox features. As long as
 Firefox’s Find Bar doesn’t support for example reverse search (vim’s `?`
 command) or regex search, VimFx won’t either.
 

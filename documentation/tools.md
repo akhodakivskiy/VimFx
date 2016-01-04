@@ -43,6 +43,11 @@ This section describes how to install and use the tools needed to:
    - Pressing ctrl+o and choosing it.
    - Using “Install from file…” in the top-right menu in the Add-ons Manager.
 
+**Note:** Since Mozilla added [extension signing] things have gotten a bit more
+complicated.
+
+[extension signing]: https://wiki.mozilla.org/Addons/Extension_Signing
+
 ### Development
 
 1. Create a new [Firefox profile] for development.
@@ -63,7 +68,7 @@ be in a dependency and already have been fixed.
 
 [gulp] is the task runner used to automate most of the common VimFx tasks.
 
-The tasks are defined in [gulpfile.coffee]. They are summarized in the follwing
+The tasks are defined in [gulpfile.coffee]. They are summarized in the following
 sub-sections.
 
 (There are a few more tasks defined in [gulpfile.coffee], but they are only used
@@ -87,6 +92,9 @@ internally by other tasks.)
 - Use the `--test` or `-t` option to include the unit test files. The output of
   the tests are `console.log`ed. See the browser console, or start Firefox from
   the command line to see it.
+
+- Use the `--unlisted` or `-u` option to append `-unlisted` to the extension ID.
+  This is used when adding .xpi files to github releases.
 
 - `gulp clean` removes the `build/` directory.
 
@@ -169,7 +177,7 @@ sync-locales`.
 If you run `gulp sync-locales` with “en-US” as the base locale, a report is
 printed telling how complete all other locales are. Add `--sv-SE?` (note the
 question mark) to restrict the report to the “sv-SE” locale (you can of course
-substitue with any other locale). In that case, every line (including line
+substitute with any other locale). In that case, every line (including line
 number) that don’t differ compared to “en-US” is also be printed.
 
 
@@ -212,9 +220,13 @@ Steps:
    the publish on addons.mozilla.org, because sometimes its validator complains.
    This saves some commits.)
 
-8. Make a “release” out of the new tag on github, and attach VimFx.xpi to it.
+8. Make a “release” out of the new tag on github, and attach an .xpi to it:
 
-The idea is to use the contents of `README.md` as the add-on descripton on
-addons.mozilla.org. You can print it as HTML by runnning `gulp readme`.
+   1. Create the .xpi by running `gulp xpi --unlisted`.
+   2. Sign it on AMO.
+   3. Attach to the release.
+
+The idea is to use the contents of `README.md` as the add-on description on
+addons.mozilla.org. You can print it as HTML by running `gulp readme`.
 
 [valid Firefox versions]: https://addons.mozilla.org/en-US/firefox/pages/appversions/

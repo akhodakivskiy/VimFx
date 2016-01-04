@@ -37,11 +37,10 @@ commands = {}
 
 
 commands.focus_location_bar = ({vim}) ->
-  # This function works even if the Address Bar has been removed.
   vim.window.focusAndSelectUrlBar()
 
 commands.focus_search_bar = ({vim, count}) ->
-  # The `.webSearch()` method opens a search engine in a tab if the Search Bar
+  # The `.webSearch()` method opens a search engine in a tab if the search bar
   # has been removed. Therefore we first check if it exists.
   if vim.window.BrowserSearch.searchBar
     vim.window.BrowserSearch.webSearch()
@@ -62,7 +61,6 @@ commands.copy_current_url = ({vim}) ->
 commands.go_up_path = ({vim, count}) ->
   vim._run('go_up_path', {count})
 
-# Go up to root of the URL hierarchy.
 commands.go_to_root = ({vim}) ->
   vim._run('go_to_root')
 
@@ -399,31 +397,25 @@ helper_follow_clickable = ({inTab, inBackground}, {vim, count = 1}) ->
   name = if inTab then 'follow_in_tab' else 'follow'
   helper_follow(name, vim, callback, count)
 
-# Follow links, focus text inputs and click buttons with hint markers.
 commands.follow =
   helper_follow_clickable.bind(null, {inTab: false, inBackground: true})
 
-# Follow links in a new background tab with hint markers.
 commands.follow_in_tab =
   helper_follow_clickable.bind(null, {inTab: true, inBackground: true})
 
-# Follow links in a new foreground tab with hint markers.
 commands.follow_in_focused_tab =
   helper_follow_clickable.bind(null, {inTab: true, inBackground: false})
 
-# Follow links in a new window with hint markers.
 commands.follow_in_window = ({vim}) ->
   callback = (marker) ->
     vim._focusMarkerElement(marker.wrapper.elementIndex)
     vim.window.openLinkIn(marker.wrapper.href, 'window', {})
   helper_follow('follow_in_tab', vim, callback)
 
-# Like command_follow but multiple times.
 commands.follow_multiple = (args) ->
   args.count = Infinity
   commands.follow(args)
 
-# Copy the URL or text of a markable element to the system clipboard.
 commands.follow_copy = ({vim}) ->
   callback = (marker) ->
     {elementIndex} = marker.wrapper
@@ -434,7 +426,6 @@ commands.follow_copy = ({vim}) ->
     vim._run('copy_marker_element', {elementIndex, property})
   helper_follow('follow_copy', vim, callback)
 
-# Focus element with hint markers.
 commands.follow_focus = ({vim}) ->
   callback = (marker) ->
     vim._focusMarkerElement(marker.wrapper.elementIndex, {select: true})
@@ -490,7 +481,6 @@ commands.follow_previous = helper_follow_pattern.bind(null, 'prev')
 
 commands.follow_next     = helper_follow_pattern.bind(null, 'next')
 
-# Focus last focused or first text input.
 commands.focus_text_input = ({vim, count}) ->
   vim.markPageInteraction()
   vim._run('focus_text_input', {count})
@@ -517,13 +507,10 @@ helper_find = ({highlight, linksOnly = false}, {vim}) ->
   if highlightButton.checked != highlight
     highlightButton.click()
 
-# Open the find bar, making sure that hightlighting is off.
 commands.find = helper_find.bind(null, {highlight: false})
 
-# Open the find bar, making sure that hightlighting is on.
 commands.find_highlight_all = helper_find.bind(null, {highlight: true})
 
-# Open the find bar in links only mode.
 commands.find_links_only = helper_find.bind(null, {linksOnly: true})
 
 helper_find_again = (direction, {vim}) ->
@@ -563,11 +550,9 @@ commands.enter_reader_view = ({vim}) ->
   else
     vim.notify(translate('notification.enter_reader_view.none'))
 
-# Display the Help Dialog.
 commands.help = ({vim}) ->
   help.injectHelp(vim.window, vim._parent)
 
-# Open and focus the Developer Toolbar.
 commands.dev = ({vim}) ->
   vim.window.DeveloperToolbar.show(true) # `true` to focus.
 

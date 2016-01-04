@@ -10,8 +10,6 @@ VimFx was inspired by [Vimperator] and designed after [Vimium] for [Google
 Chrome], preserving the shortcuts and behavior. If you are used to Vimium then
 it will be easy to get started with VimFx.
 
-**Mailing list:** [vimfx@librelist.com] \(just send an email to subscribe)
-
 Check out the [documentation] and the [wiki]!
 
 VimFx is made by [these awesome people][people].
@@ -21,7 +19,6 @@ VimFx is made by [these awesome people][people].
 [Vimperator]: http://www.vimperator.org/vimperator
 [Vimium]: http://vimium.github.io/
 [Google Chrome]: https://www.google.com/chrome
-[vimfx@librelist.com]: mailto:vimfx@librelist.com?subject=Subscribe
 [documentation]: https://github.com/akhodakivskiy/VimFx/tree/master/documentation
 [wiki]: https://github.com/akhodakivskiy/VimFx/wiki
 [people]: https://github.com/akhodakivskiy/VimFx/blob/master/PEOPLE.md
@@ -60,12 +57,13 @@ Top/Bottom: <kbd>gg</kbd>, <kbd>G</kbd>.
 Page up/down: <kbd>space</kbd>, <kbd>shift-space</kbd>.  
 Half a page: <kbd>d</kbd>, <kbd>u</kbd>.
 
-There are of course many more shortcuts! Press <kbd>?</kbd> to see them all.
-That opens the keyboard shortcuts dialog, which helps you remember the
-shortcuts, and lets you customize every single one of them. You can also look at
-all default shortcuts [here][defaults].
+There are of course many more [shortcuts]! Press <kbd>?</kbd> to see them all.
+Open VimFx’s [settings] page in the Add-ons Manager to customize the [default
+shortcuts].
 
-[defaults]: https://github.com/akhodakivskiy/VimFx/blob/master/extension/lib/defaults.coffee
+[shortcuts]: https://github.com/akhodakivskiy/VimFx/blob/master/documentation/commands.md
+[settings]: https://github.com/akhodakivskiy/VimFx/blob/master/documentation/options.md
+[default shortcuts]: https://github.com/akhodakivskiy/VimFx/blob/master/extension/lib/defaults.coffee
 
 ## Feedback
 

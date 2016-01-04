@@ -29,6 +29,9 @@ exports['test convertKey'] = (assert) ->
   assert.deepEqual(legacy.convertKey('a,,,b'), ['a', ',', 'b'])
   assert.deepEqual(legacy.convertKey(',,,,a'), [',', ',', 'a'])
   assert.deepEqual(legacy.convertKey('a,,,,'), ['a', ',', ','])
+  assert.deepEqual(legacy.convertKey(' a '), ['a'])
+  assert.deepEqual(legacy.convertKey(''), [])
+  assert.deepEqual(legacy.convertKey('    '), [])
 
 exports['test convertPattern'] = (assert) ->
   assert.equal(legacy.convertPattern('aB.   t*o!	*!'), 'aB\\.\\s+t.*o.\\s+.*.')
