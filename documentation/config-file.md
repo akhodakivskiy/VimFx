@@ -55,8 +55,8 @@ vimfx.set('hint_chars', 'abcdefghijklmnopqrstuvwxyz')
 
 ## frame.js
 
-If you add custom commands that accesses web page content, put their "frame
-script code" in this file.
+If you add custom commands which access web page content, put their “frame
+script code” in this file.
 
 This file is also where usage of the [frame script API] goes.
 
