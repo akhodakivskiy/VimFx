@@ -144,7 +144,9 @@ advanced_options =
   'scroll.full_page_adjustment':        40
   'scroll.half_page_adjustment':        20
   'scroll.last_position_mark':          '`'
-  'pattern_selector':                   'a, button'
+  'pattern_selector':                   ':-moz-any(
+                                           a, button, input[type="button"]
+                                         ):not([role="menu"]):not([role="tab"])'
   'pattern_attrs':                      'rel  role  data-tooltip  aria-label'
   'hints_toggle_in_tab':                '<c-'
   'hints_toggle_in_background':         '<a-'
