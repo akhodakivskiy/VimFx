@@ -395,6 +395,7 @@ helper_follow_clickable = ({inTab, inBackground}, {vim, count = 1}) ->
         })
       )
     else
+      vim._state.allowNextHintsClick = true
       vim._run('click_marker_element', {
         elementIndex, type
         preventTargetBlank: vim.options.prevent_target_blank
@@ -450,7 +451,7 @@ commands.click_browser_element = ({vim}) ->
       when element.tabIndex > -1 and
            not (element.nodeName.endsWith('box') and
                 element.nodeName != 'checkbox') and
-           element.nodeName != 'tabs'
+           element.nodeName not in ['tabs', 'menuitem', 'menuseparator']
         'clickable'
     return unless type
     return unless shape = getElementShape(element)

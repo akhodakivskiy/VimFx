@@ -80,6 +80,7 @@ toolbarpaletteitem[place="palette"] > #VimFxButton {
 
 #VimFxMarkersContainer {
   position: absolute;
+  pointer-events: none;
 }
 
   #VimFxMarkersContainer.ui {

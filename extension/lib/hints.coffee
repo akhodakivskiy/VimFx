@@ -335,8 +335,8 @@ getFirstNonCoveredPoint = (window, viewport, element, elementRect, parents) ->
     # bullet proof: Combinations of CSS can cause this check to fail, even
     # though `element` isn’t covered. We don’t try to temporarily reset such CSS
     # because of performance. Instead we rely on that some of the attempts below
-    # will work. Note that `a.contains(a) == true`!
-    if normalize(element).contains(elementAtPoint)
+    # will work.
+    if contains(element, elementAtPoint)
       found = true
       # If we’re currently in a frame, there might be something on top of the
       # frame that covers `element`. Therefore we ensure that the frame really
@@ -348,7 +348,7 @@ getFirstNonCoveredPoint = (window, viewport, element, elementRect, parents) ->
         elementAtPoint = parent.window.document.elementFromPoint(
           offset.left + x + dx, offset.top + y + dy
         )
-        unless frameAtPoint(currentWindow.frameElement, elementAtPoint)
+        unless contains(currentWindow.frameElement, elementAtPoint)
           found = false
           break
         currentWindow = parent.window
@@ -394,19 +394,20 @@ normalize = (element) ->
   normalized = normalized.parentNode while normalized.prefix?
   return normalized
 
-# Returns whether `frameElement` corresponds to `elementAtPoint`. This is only
-# complicated for the dev tools’ frame. `.elementAtPoint()` returns
-# `<tabbrowser#content>` instead of the `<iframe>`. The dev tools might be in
-# another tab and thus invisible, but `<tabbrowser#content>` is the same and
-# visible in _all_ tabs, so we have to check that the frame really belongs to
-# the current tab.
-frameAtPoint = (frameElement, elementAtPoint) ->
-  frame = normalize(frameElement)
-  return false unless elementAtPoint == frame
-  return true  unless frame.nodeName == 'tabbrowser' and frame.id == 'content'
-  {gBrowser} = frameElement.ownerGlobal.top
-  tabpanel = gBrowser.getNotificationBox(gBrowser.selectedBrowser)
-  return tabpanel.contains(frameElement)
+# Returns whether `element` corresponds to `elementAtPoint`. This is only
+# complicated for browser elements in the web page content area.
+# `.elementAtPoint()` always returns `<tabbrowser#content>` then. The element
+# might be in another tab and thus invisible, but `<tabbrowser#content>` is the
+# same and visible in _all_ tabs, so we have to check that the element really
+# belongs to the current tab. Note that `a.contains(a) == true`!
+contains = (element, elementAtPoint) ->
+  container = normalize(element)
+  if elementAtPoint.nodeName == 'tabbrowser' and elementAtPoint.id == 'content'
+    {gBrowser} = element.ownerGlobal.top
+    tabpanel = gBrowser.getNotificationBox(gBrowser.selectedBrowser)
+    return tabpanel.contains(element)
+  else
+    return container.contains(elementAtPoint)
 
 module.exports = {
   removeHints

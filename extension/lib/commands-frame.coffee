@@ -30,6 +30,13 @@ utils     = require('./utils')
 
 XULDocument = Ci.nsIDOMXULDocument
 
+# <http://www.w3.org/html/wg/drafts/html/master/dom.html#wai-aria>
+CLICKABLE_ARIA_ROLES = [
+  'link', 'button', 'tab'
+  'checkbox', 'radio', 'combobox', 'option', 'slider', 'textbox'
+  'menuitem', 'menuitemcheckbox', 'menuitemradio'
+]
+
 commands = {}
 
 commands.go_up_path = ({vim, count = 1}) ->
@@ -132,6 +139,9 @@ commands.follow = helper_follow.bind(null, {id: 'normal'},
       when isTypingElement(element)
         type = 'text'
       when element.tabIndex > -1 and
+           # Google Drive Documents. The hint for this element would cover the
+           # real hint that allows you to focus the document to start typing.
+           element.id != 'docs-editor' and
            not (isXUL and element.nodeName.endsWith('box') and
                 element.nodeName != 'checkbox')
         type = 'clickable'
@@ -144,22 +154,20 @@ commands.follow = helper_follow.bind(null, {id: 'normal'},
            element.hasAttribute('onmousedown') or
            element.hasAttribute('onmouseup') or
            element.hasAttribute('oncommand') or
-           # Clickable ARIA roles:
-           # <http://www.w3.org/html/wg/drafts/html/master/dom.html#wai-aria>
-           element.getAttribute('role') in [
-             'link', 'button', 'tab'
-             'checkbox', 'radio', 'combobox', 'option', 'slider', 'textbox'
-             'menuitem', 'menuitemcheckbox', 'menuitemradio'
-           ] or
-           # Twitter special-case.
+           element.getAttribute('role') in CLICKABLE_ARIA_ROLES or
+           # Twitter.
            element.classList.contains('js-new-tweets-bar') or
-           # Feedly special-case.
+           # Feedly.
            element.hasAttribute('data-app-action') or
            element.hasAttribute('data-uri') or
-           element.hasAttribute('data-page-action')
+           element.hasAttribute('data-page-action') or
+           # CodeMirror.
+           element.classList?.contains('CodeMirror-scroll') or
+           # Google Drive Document.
+           element.classList?.contains('kix-appview-editor')
         type = 'clickable'
         semantic = false
-      # Facebook special-case (comment fields).
+      # Facebook comment fields.
       when element.parentElement?.classList.contains('UFIInputContainer')
         type = 'clickable-special'
       # Putting markers on `<label>` elements is generally redundant, because
@@ -227,6 +235,10 @@ commands.focus_marker_element = ({vim, elementIndex, options}) ->
   # To be able to focus scrollable elements, `FLAG_BYKEY` _has_ to be used.
   options.flag = 'FLAG_BYKEY' if vim.state.scrollableElements.has(element)
   utils.focusElement(element, options)
+  if vim.state.lastHoveredElement
+    utils.setHover(vim.state.lastHoveredElement, false)
+  utils.setHover(element, true)
+  vim.state.lastHoveredElement = element
 
 commands.click_marker_element = (args) ->
   {vim, elementIndex, type, preventTargetBlank} = args
@@ -336,9 +348,13 @@ commands.move_focus = ({vim, direction}) ->
     return true
 
 commands.esc = (args) ->
+  {vim} = args
   commands.blur_active_element(args)
+  if vim.state.lastHoveredElement
+    utils.setHover(vim.state.lastHoveredElement, false)
+  vim.state.lastHoveredElement = null
 
-  {document} = args.vim.content
+  {document} = vim.content
   if document.exitFullscreen
     document.exitFullscreen()
   else
