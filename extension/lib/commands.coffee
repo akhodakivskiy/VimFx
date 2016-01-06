@@ -254,6 +254,14 @@ commands.tab_select_previous = helper_switch_tab.bind(null, -1)
 
 commands.tab_select_next     = helper_switch_tab.bind(null, +1)
 
+commands.tab_select_most_recent = ({vim}) ->
+  {gBrowser} = vim.window
+  mostRecentTab = null
+  for tab in gBrowser.tabs when not tab.closing and tab != gBrowser.selectedTab
+    if not mostRecentTab or tab.lastAccessed > mostRecentTab.lastAccessed
+      mostRecentTab = tab
+  gBrowser.selectedTab = mostRecentTab if mostRecentTab
+
 helper_move_tab = (direction, {vim, count = 1}) ->
   {gBrowser} = vim.window
   index = absoluteTabIndex(direction * count, gBrowser, {pinnedSeparate: true})

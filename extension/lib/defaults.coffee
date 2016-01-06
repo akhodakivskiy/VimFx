@@ -61,6 +61,7 @@ shortcuts =
       'yt':        'tab_duplicate'
       'J    gT':   'tab_select_previous'
       'K    gt':   'tab_select_next'
+      'gl':        'tab_select_most_recent'
       'gJ':        'tab_move_backward'
       'gK':        'tab_move_forward'
       'gw':        'tab_move_to_window'
