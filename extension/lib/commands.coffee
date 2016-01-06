@@ -441,7 +441,7 @@ commands.click_browser_element = ({vim}) ->
       when element.tabIndex > -1 and
            not (element.nodeName.endsWith('box') and
                 element.nodeName != 'checkbox') and
-           element.nodeName != 'tabs'
+           element.nodeName not in ['tabs', 'menuitem', 'menuseparator']
         'clickable'
     return unless type
     return unless shape = getElementShape(element)
