@@ -129,12 +129,14 @@ class UIEventManager
       # a text input, then that input will be focused, but you can’t type in it
       # (instead markers will be matched). So if the user clicks anything in
       # hints mode it’s better to leave it.
-      if vim.mode == 'hints' and vim.isUIEvent(event) and
+      if vim.mode == 'hints' and not vim._state.allowNextHintsClick and
          # Exclude the VimFx button, though, since clicking it returns to normal
          # mode. Otherwise we’d first return to normal mode and then the button
          # would open the help dialog.
          target != button.getButton(@window)
         vim.enterMode('normal')
+
+      vim._state.allowNextHintsClick = false
     )
 
     @listen('overflow', (event) =>

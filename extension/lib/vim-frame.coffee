@@ -53,6 +53,7 @@ class VimFrame
         explicitBodyFocus:    false
         hasFocusedTextInput:  false
         lastFocusedTextInput: null
+        lastHoveredElement:   null
         scrollableElements:   new ScrollableElements(@content)
         markerElements:       []
         inputs:               null
@@ -64,6 +65,7 @@ class VimFrame
         @state[prop] = null if @state[prop] and isDead(@state[prop])
 
       check('lastFocusedTextInput')
+      check('lastHoveredElement')
       @state.scrollableElements.reject(isDead)
       # `markerElements` and `inputs` could theoretically need to be filtered
       # too at this point. YAGNI until an issue arises from it.

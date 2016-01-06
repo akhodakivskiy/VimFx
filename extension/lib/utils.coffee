@@ -269,6 +269,14 @@ setAttributes = (element, attributes) ->
     element.setAttribute(attribute, value)
   return
 
+setHover = (element, hover) ->
+  method = if hover then 'addPseudoClassLock' else 'removePseudoClassLock'
+  domUtils = Cc['@mozilla.org/inspector/dom-utils;1'].getService(Ci.inIDOMUtils)
+  while element.parentElement
+    domUtils[method](element, ':hover')
+    element = element.parentElement
+  return
+
 
 
 # Language helpers
@@ -390,6 +398,7 @@ module.exports = {
   querySelectorAllDeep
   scroll
   setAttributes
+  setHover
 
   Counter
   EventEmitter

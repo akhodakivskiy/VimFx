@@ -386,6 +386,7 @@ helper_follow_clickable = ({inTab, inBackground}, {vim, count = 1}) ->
         })
       )
     else
+      vim._state.allowNextHintsClick = true
       vim._run('click_marker_element', {
         elementIndex, type
         preventTargetBlank: vim.options.prevent_target_blank

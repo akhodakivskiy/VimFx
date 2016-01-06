@@ -83,11 +83,6 @@ class FrameEventManager
       @vim.resetState(target)
     )
 
-    @listen('click', (event) =>
-      if @vim.mode == 'hints' and event.isTrusted
-        messageManager.send('enterMode', {mode: 'normal'})
-    )
-
     @listen('overflow', (event) =>
       target = event.originalTarget
       @vim.state.scrollableElements.addChecked(target)
