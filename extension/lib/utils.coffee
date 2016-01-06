@@ -26,6 +26,7 @@ HTMLButtonElement   = Ci.nsIDOMHTMLButtonElement
 HTMLInputElement    = Ci.nsIDOMHTMLInputElement
 HTMLTextAreaElement = Ci.nsIDOMHTMLTextAreaElement
 HTMLSelectElement   = Ci.nsIDOMHTMLSelectElement
+HTMLBodyElement     = Ci.nsIDOMHTMLBodyElement
 XULDocument         = Ci.nsIDOMXULDocument
 XULButtonElement    = Ci.nsIDOMXULButtonElement
 XULControlElement   = Ci.nsIDOMXULControlElement
@@ -58,9 +59,21 @@ isAdjustable = (element) ->
 
 isContentEditable = (element) ->
   return element.isContentEditable or
-         # `g_editable` is a non-standard attribute commonly used by Google.
+         isIframeEditor(element) or
+         # Google.
          element.getAttribute?('g_editable') == 'true' or
          element.ownerDocument?.body?.getAttribute('g_editable') == 'true'
+
+isIframeEditor = (element) ->
+  return false unless element instanceof HTMLBodyElement
+  return \
+         # Etherpad.
+         element.id == 'innerdocbody' or
+         # XpressEditor.
+         (element.classList.contains('xe_content') and
+          element.classList.contains('editable')) or
+         # vBulletin.
+         element.classList.contains('wysiwyg')
 
 isProperLink = (element) ->
   # `.getAttribute` is used below instead of `.hasAttribute` to exclude `<a
@@ -106,8 +119,12 @@ getActiveElement = (window) ->
     return activeElement
 
 blurActiveElement = (window) ->
-  return unless activeElement = getActiveElement(window)
-  activeElement.blur()
+  # Blurring a frame element also blurs any active elements inside it. Recursing
+  # into the frames and blurring the “real” active element directly would give
+  # focus to the `<body>` of its containing frame, while blurring the top-most
+  # frame gives focus to the top-most `<body>`. This allows to blur fancy text
+  # editors which use an `<iframe>` as their text area.
+  window.document.activeElement.blur()
 
 blurActiveBrowserElement = (vim) ->
   # - Blurring in the next tick allows to pass `<escape>` to the location bar to

@@ -139,6 +139,9 @@ commands.follow = helper_follow.bind(null, {id: 'normal'},
       when isTypingElement(element)
         type = 'text'
       when element.tabIndex > -1 and
+           # Google Drive Documents. The hint for this element would cover the
+           # real hint that allows you to focus the document to start typing.
+           element.id != 'docs-editor' and
            not (isXUL and element.nodeName.endsWith('box') and
                 element.nodeName != 'checkbox')
         type = 'clickable'
@@ -152,15 +155,19 @@ commands.follow = helper_follow.bind(null, {id: 'normal'},
            element.hasAttribute('onmouseup') or
            element.hasAttribute('oncommand') or
            element.getAttribute('role') in CLICKABLE_ARIA_ROLES or
-           # Twitter special-case.
+           # Twitter.
            element.classList.contains('js-new-tweets-bar') or
-           # Feedly special-case.
+           # Feedly.
            element.hasAttribute('data-app-action') or
            element.hasAttribute('data-uri') or
-           element.hasAttribute('data-page-action')
+           element.hasAttribute('data-page-action') or
+           # CodeMirror.
+           element.classList?.contains('CodeMirror-scroll') or
+           # Google Drive Document.
+           element.classList?.contains('kix-appview-editor')
         type = 'clickable'
         semantic = false
-      # Facebook special-case (comment fields).
+      # Facebook comment fields.
       when element.parentElement?.classList.contains('UFIInputContainer')
         type = 'clickable-special'
       # Putting markers on `<label>` elements is generally redundant, because
