@@ -235,10 +235,8 @@ commands.focus_marker_element = ({vim, elementIndex, options}) ->
   # To be able to focus scrollable elements, `FLAG_BYKEY` _has_ to be used.
   options.flag = 'FLAG_BYKEY' if vim.state.scrollableElements.has(element)
   utils.focusElement(element, options)
-  if vim.state.lastHoveredElement
-    utils.setHover(vim.state.lastHoveredElement, false)
-  utils.setHover(element, true)
-  vim.state.lastHoveredElement = element
+  vim.clearHover()
+  vim.setHover(element)
 
 commands.click_marker_element = (args) ->
   {vim, elementIndex, type, preventTargetBlank} = args
@@ -350,9 +348,7 @@ commands.move_focus = ({vim, direction}) ->
 commands.esc = (args) ->
   {vim} = args
   commands.blur_active_element(args)
-  if vim.state.lastHoveredElement
-    utils.setHover(vim.state.lastHoveredElement, false)
-  vim.state.lastHoveredElement = null
+  vim.clearHover()
 
   {document} = vim.content
   if document.exitFullscreen

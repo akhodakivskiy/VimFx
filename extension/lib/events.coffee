@@ -136,6 +136,9 @@ class UIEventManager
          target != button.getButton(@window)
         vim.enterMode('normal')
 
+      unless vim._state.allowNextHintsClick
+        vim._send('clearHover')
+
       vim._state.allowNextHintsClick = false
     )
 
