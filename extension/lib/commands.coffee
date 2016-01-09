@@ -198,7 +198,7 @@ commands.scroll_to_mark = ({vim}) ->
   vim.enterMode('marks', (keyStr) ->
     unless keyStr == vim.options['scroll.last_position_mark']
       helper_mark_last_scroll_position(vim)
-    helper_scroll(vim, 'scrollTo', 'other', ['top', 'left'], keyStr,
+    helper_scroll(vim, null, 'scrollTo', 'other', ['top', 'left'], keyStr,
                   ['scrollTopMax', 'scrollLeftMax'], 0, 'scroll_to_mark')
   )
 
@@ -397,7 +397,6 @@ helper_follow_clickable = ({inTab, inBackground}, {vim, count = 1}) ->
         })
       )
     else
-      vim._state.allowNextHintsClick = true
       vim._run('click_marker_element', {
         elementIndex, type
         preventTargetBlank: vim.options.prevent_target_blank
@@ -467,7 +466,7 @@ commands.click_browser_element = ({vim}) ->
         utils.focusElement(element, {flag: 'FLAG_BYKEY'})
       when 'clickable'
         utils.focusElement(element)
-        utils.simulateClick(element)
+        utils.simulateMouseEvents(element, 'click')
 
   {wrappers, viewport} =
     hints.getMarkableElementsAndViewport(vim.window, filter)

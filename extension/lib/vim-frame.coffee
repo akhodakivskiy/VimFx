@@ -41,6 +41,8 @@ class VimFrame
     messageManager.listen('markPageInteraction',
                           @markPageInteraction.bind(this))
 
+    messageManager.listen('clearHover', @clearHover.bind(this))
+
   # If the target is the topmost document, reset everything. Otherwise filter
   # out elements belonging to the target frame. On some sites, such as Gmail,
   # some elements might be dead at this point.
@@ -87,5 +89,16 @@ class VimFrame
     messageManager.send('vimMethod', {method: 'notify', args})
 
   markPageInteraction: -> @state.hasInteraction = true
+
+  setHover: (element) ->
+    utils.setHover(element, true)
+    utils.simulateMouseEvents(element, 'mouseover')
+    @state.lastHoveredElement = element
+
+  clearHover: ->
+    if @state.lastHoveredElement
+      utils.setHover(@state.lastHoveredElement, false)
+      utils.simulateMouseEvents(@state.lastHoveredElement, 'mouseout')
+    @state.lastHoveredElement = null
 
 module.exports = VimFrame

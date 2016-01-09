@@ -99,7 +99,6 @@ class Vim
 
   _resetState: ->
     @_state =
-      allowNextHintsClick:   false
       frameCanReceiveEvents: false
       scrollableElements:    new ScrollableElements(@window)
 
