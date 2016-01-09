@@ -198,6 +198,7 @@ suppressEvent = (event) ->
 eventSequence = ['mouseover', 'mousedown', 'mouseup', 'click', 'command']
 simulateClick = (element) ->
   window = element.ownerGlobal
+  rect   = element.getBoundingClientRect()
   for type in eventSequence
     mouseEvent = new window.MouseEvent(type, {
       # Let the event bubble in order to trigger delegated event listeners.
@@ -205,6 +206,21 @@ simulateClick = (element) ->
       # Make the event cancelable so that `<a href="#">` can be used as a
       # JavaScript-powered button without scrolling to the top of the page.
       cancelable: true
+      # These properties are just here for mimicing a real click as much as
+      # possible.
+      buttons: 1
+      detail: 1
+      view: window
+      # `page{X,Y}` are set automatically to the correct values when setting
+      # `client{X,Y}`. `{offset,layer,movement}{X,Y}` are not worth the trouble
+      # to set.
+      clientX: rect.left
+      clientY: rect.top
+      # To exactly calculate `screen{X,Y}` one has to to check where the web
+      # page content area is inside the browser chrome and go through all parent
+      # frames as well. This is good enough. YAGNI for now.
+      screenX: window.screenX + rect.left
+      screenY: window.screenY + rect.top
     })
     element.dispatchEvent(mouseEvent)
   return
