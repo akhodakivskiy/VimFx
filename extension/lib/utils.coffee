@@ -33,7 +33,11 @@ XULControlElement   = Ci.nsIDOMXULControlElement
 XULMenuListElement  = Ci.nsIDOMXULMenuListElement
 XULTextBoxElement   = Ci.nsIDOMXULTextBoxElement
 
-USE_CAPTURE = true
+# Full chains of events for different mouse actions. ('command' is for XUL
+# elements.)
+EVENTS_CLICK     = ['mousedown', 'mouseup', 'click', 'command']
+EVENTS_MOUSEOVER = ['mouseover', 'mouseenter', 'mousemove']
+EVENTS_MOUSEOUT  = ['mouseout',  'mouseleave']
 
 
 
@@ -193,23 +197,26 @@ suppressEvent = (event) ->
   event.preventDefault()
   event.stopPropagation()
 
-# Simulate mouse click with a full chain of events. ('command' is for XUL
-# elements.)
-eventSequence = ['mouseover', 'mousedown', 'mouseup', 'click', 'command']
-simulateClick = (element) ->
+simulateMouseEvents = (element, sequenceType) ->
   window = element.ownerGlobal
   rect   = element.getBoundingClientRect()
+
+  eventSequence = switch sequenceType
+    when 'click'     then EVENTS_CLICK
+    when 'mouseover' then EVENTS_MOUSEOVER
+    when 'mouseout'  then EVENTS_MOUSEOUT
+
   for type in eventSequence
     mouseEvent = new window.MouseEvent(type, {
       # Let the event bubble in order to trigger delegated event listeners.
-      bubbles: true
+      bubbles: type not in ['mouseenter', 'mouseleave']
       # Make the event cancelable so that `<a href="#">` can be used as a
       # JavaScript-powered button without scrolling to the top of the page.
-      cancelable: true
+      cancelable: type not in ['mouseenter', 'mouseleave']
       # These properties are just here for mimicing a real click as much as
       # possible.
-      buttons: 1
-      detail: 1
+      buttons: if type in EVENTS_CLICK then 1 else 0
+      detail:  if type in EVENTS_CLICK then 1 else 0
       view: window
       # `page{X,Y}` are set automatically to the correct values when setting
       # `client{X,Y}`. `{offset,layer,movement}{X,Y}` are not worth the trouble
@@ -223,6 +230,7 @@ simulateClick = (element) ->
       screenY: window.screenY + rect.top
     })
     element.dispatchEvent(mouseEvent)
+
   return
 
 
@@ -404,7 +412,7 @@ module.exports = {
   listenOnce
   onRemoved
   suppressEvent
-  simulateClick
+  simulateMouseEvents
 
   area
   containsDeep

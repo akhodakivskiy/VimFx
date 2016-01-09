@@ -247,7 +247,7 @@ commands.click_marker_element = (args) ->
   if type == 'clickable-special'
     element.click()
   else
-    utils.simulateClick(element)
+    utils.simulateMouseEvents(element, 'click')
   element.target = targetReset if targetReset
 
 commands.copy_marker_element = ({vim, elementIndex, property}) ->
@@ -295,7 +295,7 @@ commands.follow_pattern = ({vim, type, options}) ->
     return null
 
   if matchingLink
-    utils.simulateClick(matchingLink)
+    utils.simulateMouseEvents(matchingLink, 'click')
   else
     vim.notify(translate("notification.follow_#{type}.none"))
 

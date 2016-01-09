@@ -92,11 +92,13 @@ class VimFrame
 
   setHover: (element) ->
     utils.setHover(element, true)
+    utils.simulateMouseEvents(element, 'mouseover')
     @state.lastHoveredElement = element
 
   clearHover: ->
     if @state.lastHoveredElement
       utils.setHover(@state.lastHoveredElement, false)
+      utils.simulateMouseEvents(@state.lastHoveredElement, 'mouseout')
     @state.lastHoveredElement = null
 
 module.exports = VimFrame

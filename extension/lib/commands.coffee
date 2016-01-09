@@ -455,7 +455,7 @@ commands.click_browser_element = ({vim}) ->
         utils.focusElement(element, {flag: 'FLAG_BYKEY'})
       when 'clickable'
         utils.focusElement(element)
-        utils.simulateClick(element)
+        utils.simulateMouseEvents(element, 'click')
 
   {wrappers, viewport} =
     hints.getMarkableElementsAndViewport(vim.window, filter)
