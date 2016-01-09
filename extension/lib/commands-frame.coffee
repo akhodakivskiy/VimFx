@@ -100,7 +100,8 @@ helper_follow = ({id, combine = true}, matcher, {vim}) ->
     return unless type
     return unless shape = getElementShape(element)
 
-    length = vim.state.markerElements.push(element)
+    originalRect = element.getBoundingClientRect()
+    length = vim.state.markerElements.push({element, originalRect})
     wrapper = {type, semantic, shape, elementIndex: length - 1}
 
     if wrapper.type == 'link'
@@ -231,7 +232,7 @@ commands.follow_focus = helper_follow.bind(null, {id: 'focus', combine: false},
 )
 
 commands.focus_marker_element = ({vim, elementIndex, options}) ->
-  element = vim.state.markerElements[elementIndex]
+  {element} = vim.state.markerElements[elementIndex]
   # To be able to focus scrollable elements, `FLAG_BYKEY` _has_ to be used.
   options.flag = 'FLAG_BYKEY' if vim.state.scrollableElements.has(element)
   utils.focusElement(element, options)
@@ -242,7 +243,7 @@ commands.focus_marker_element = ({vim, elementIndex, options}) ->
 
 commands.click_marker_element = (args) ->
   {vim, elementIndex, type, preventTargetBlank} = args
-  element = vim.state.markerElements[elementIndex]
+  {element} = vim.state.markerElements[elementIndex]
   if element.target == '_blank' and preventTargetBlank
     targetReset = element.target
     element.target = ''
@@ -253,7 +254,7 @@ commands.click_marker_element = (args) ->
   element.target = targetReset if targetReset
 
 commands.copy_marker_element = ({vim, elementIndex, property}) ->
-  element = vim.state.markerElements[elementIndex]
+  {element} = vim.state.markerElements[elementIndex]
   utils.writeToClipboard(element[property])
 
 commands.follow_pattern = ({vim, type, options}) ->

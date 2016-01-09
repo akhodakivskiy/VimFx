@@ -309,6 +309,19 @@ removeDuplicates = (array) -> Array.from(new Set(array))
 removeDuplicateCharacters = (str) ->
   return removeDuplicates( str.toLowerCase().split('') ).join('')
 
+# Calls `fn` repeatedly, with at least `interval` ms between each call.
+setInterval = (window, interval, fn) ->
+  stopped = false
+  currentIntervalId = null
+  callback = ->
+    return if stopped
+    currentIntervalId = window.setTimeout((-> fn(callback)), interval)
+  clearInterval = ->
+    stopped = true
+    window.clearTimeout(currentIntervalId)
+  callback()
+  return clearInterval
+
 
 
 # Misc helpers
@@ -407,6 +420,7 @@ module.exports = {
   regexEscape
   removeDuplicates
   removeDuplicateCharacters
+  setInterval
 
   formatError
   getCurrentLocation

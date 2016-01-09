@@ -58,8 +58,6 @@ injectHints = (window, wrappers, viewport, options) ->
 
   markers = semantic.concat(unsemantic)
 
-  return null if markers.length == 0
-
   # Each marker gets a unique `z-index`, so that it can be determined if a
   # marker overlaps another. Put more important markers (higher weight) at the
   # end, so that they get higher `z-index`, in order not to be overlapped.
@@ -127,7 +125,7 @@ injectHints = (window, wrappers, viewport, options) ->
     # marker.coffee).
     marker.setPosition(viewport, zoom)
 
-  return markers
+  return {markers, markerMap}
 
 
 getMarkableElementsAndViewport = (window, filter) ->

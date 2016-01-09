@@ -356,8 +356,10 @@ helper_follow = (name, vim, callback, count = null) ->
     return unless storage.markers == initialMarkers
 
     if wrappers.length > 0
-      markers = hints.injectHints(vim.window, wrappers, viewport, vim.options)
+      {markers, markerMap} = hints.injectHints(vim.window, wrappers, viewport,
+                                               vim.options)
       storage.markers = markers
+      storage.markerMap = markerMap
     else
       vim.notify(translate('notification.follow.none'))
       vim.enterMode('normal')
@@ -471,7 +473,7 @@ commands.click_browser_element = ({vim}) ->
     hints.getMarkableElementsAndViewport(vim.window, filter)
 
   if wrappers.length > 0
-    markers = hints.injectHints(vim.window, wrappers, viewport, {
+    {markers} = hints.injectHints(vim.window, wrappers, viewport, {
       hint_chars: vim.options.hint_chars
       ui: true
     })

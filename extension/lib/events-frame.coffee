@@ -83,6 +83,17 @@ class FrameEventManager
       @vim.resetState(target)
     )
 
+    messageManager.listen('getMarkableElementsMovements', (data, {callback}) =>
+      diffs = @vim.state.markerElements.map(({element, originalRect}) ->
+        newRect = element.getBoundingClientRect()
+        return {
+          dx: newRect.left - originalRect.left
+          dy: newRect.top  - originalRect.top
+        }
+      )
+      messageManager.send(callback, diffs)
+    )
+
     @listen('overflow', (event) =>
       target = event.originalTarget
       @vim.state.scrollableElements.addChecked(target)

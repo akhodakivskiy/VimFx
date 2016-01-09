@@ -27,10 +27,18 @@ class Marker
   # `@wrapper` is a stand-in for the element that the marker represents. See
   # `injectHints` in hints.coffee for more information.
   constructor: (@wrapper, @document) ->
-    @elementShape = @wrapper.shape
+    @elementShape  = @wrapper.shape
     @markerElement = utils.createBox(@document, 'marker')
     @markerElement.setAttribute('data-type', @wrapper.type)
-    @weight = @elementShape.area
+    @weight    = @elementShape.area
+    @width     = 0
+    @height    = 0
+    @hint      = ''
+    @hintIndex = 0
+    @zoom      = 1
+    @viewport  = null
+    @position  = null
+    @originalPosition = null
 
   reset: ->
     @setHint(@hint)
@@ -42,33 +50,37 @@ class Marker
     @markerElement.classList.toggle('marker--hidden', not visible)
 
   # To be called when the marker has been both assigned a hint and inserted
-  # into the DOM, and thus gotten a height and width.
-  setPosition: (viewport, zoom) ->
+  # into the DOM, and thus gotten a width and height.
+  setPosition: (@viewport, @zoom) ->
     {
-      markerElement: {clientHeight: height, clientWidth: width}
+      markerElement: {clientWidth: @width, clientHeight: @height}
       elementShape:  {nonCoveredPoint: {x: left, y: top, offset, rect}}
     } = this
 
     # Center the marker vertically on the non-covered point.
-    top -= Math.ceil(height / 2)
+    top -= Math.ceil(@height / 2)
 
     # Make sure that the marker stays within its element (vertically).
-    top = Math.min(top, rect.bottom - height)
+    top = Math.min(top, rect.bottom - @height)
     top = Math.max(top, rect.top)
 
     # Make the position relative to the top frame.
     left += offset.left
     top  += offset.top
 
+    @moveTo(left, top)
+    @originalPosition = Object.assign({}, @position)
+
+  moveTo: (left, top) ->
     # Make sure that the marker stays within the viewport.
-    left = Math.min(left, viewport.right  - width)
-    top  = Math.min(top,  viewport.bottom - height)
-    left = Math.max(left, viewport.left)
-    top  = Math.max(top,  viewport.top)
+    left = Math.min(left, @viewport.right  - @width)
+    top  = Math.min(top,  @viewport.bottom - @height)
+    left = Math.max(left, @viewport.left)
+    top  = Math.max(top,  @viewport.top)
 
     # Take the current zoom into account.
-    left = Math.round(left * zoom)
-    top  = Math.round(top  * zoom)
+    left = Math.round(left * @zoom)
+    top  = Math.round(top  * @zoom)
 
     # The positioning is absolute.
     @markerElement.style.left = "#{left}px"
@@ -76,10 +88,12 @@ class Marker
 
     # For quick access.
     @position = {
-      left, right: left + width,
-      top, bottom: top + height,
-      height, width
+      left, right: left + @width,
+      top, bottom: top + @height,
     }
+
+  updatePosition: (dx, dy) ->
+    @moveTo(@originalPosition.left + dx, @originalPosition.top + dy)
 
   setHint: (@hint) ->
     @hintIndex = 0
