@@ -197,7 +197,7 @@ commands.scroll_to_mark = ({vim}) ->
   vim.enterMode('marks', (keyStr) ->
     unless keyStr == vim.options['scroll.last_position_mark']
       helper_mark_last_scroll_position(vim)
-    helper_scroll(vim, 'scrollTo', 'other', ['top', 'left'], keyStr,
+    helper_scroll(vim, null, 'scrollTo', 'other', ['top', 'left'], keyStr,
                   ['scrollTopMax', 'scrollLeftMax'], 0, 'scroll_to_mark')
   )
 
