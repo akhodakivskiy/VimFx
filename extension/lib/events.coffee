@@ -124,22 +124,28 @@ class UIEventManager
       target = event.originalTarget
       return unless vim = @vimfx.getCurrentVim(@window)
 
+      # In multi-process, clicks simulated by VimFx cannot be caught here. In
+      # non-multi-process, they unfortunately can. This hack should be
+      # sufficient for that case until non-multi-process is removed from
+      # Firefox.
+      isVimFxGeneratedEvent = (
+        event.layerX == 0 and event.layerY == 0 and
+        event.movementX == 0 and event.movementY == 0
+      )
+
       # If the user clicks the reload button or a link when in hints mode, we’re
       # going to end up in hints mode without any markers. Or if the user clicks
       # a text input, then that input will be focused, but you can’t type in it
       # (instead markers will be matched). So if the user clicks anything in
       # hints mode it’s better to leave it.
-      if vim.mode == 'hints' and not vim._state.allowNextHintsClick and
+      if vim.mode == 'hints' and not isVimFxGeneratedEvent and
          # Exclude the VimFx button, though, since clicking it returns to normal
          # mode. Otherwise we’d first return to normal mode and then the button
          # would open the help dialog.
          target != button.getButton(@window)
         vim.enterMode('normal')
 
-      unless vim._state.allowNextHintsClick
-        vim._send('clearHover')
-
-      vim._state.allowNextHintsClick = false
+      vim._send('clearHover') unless isVimFxGeneratedEvent
     )
 
     @listen('overflow', (event) =>
