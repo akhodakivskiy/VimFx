@@ -401,6 +401,7 @@ normalize = (element) ->
 # same and visible in _all_ tabs, so we have to check that the element really
 # belongs to the current tab.
 contains = (element, elementAtPoint) ->
+  return false unless elementAtPoint
   container = normalize(element)
   if elementAtPoint.nodeName == 'tabbrowser' and elementAtPoint.id == 'content'
     {gBrowser} = element.ownerGlobal.top
