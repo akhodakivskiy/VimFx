@@ -151,13 +151,15 @@ class UIEventManager
     @listen('overflow', (event) =>
       target = event.originalTarget
       return unless vim = @vimfx.getCurrentVim(@window)
-      vim._state.scrollableElements.addChecked(target)
+      if vim._isUIElement(target)
+        vim._state.scrollableElements.addChecked(target)
     )
 
     @listen('underflow', (event) =>
       target = event.originalTarget
       return unless vim = @vimfx.getCurrentVim(@window)
-      vim._state.scrollableElements.deleteChecked(target)
+      if vim._isUIElement(target)
+        vim._state.scrollableElements.deleteChecked(target)
     )
 
     @listen('TabSelect', (event) =>
