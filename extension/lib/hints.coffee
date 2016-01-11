@@ -114,12 +114,13 @@ injectHints = (window, wrappers, viewport, options) ->
     container.classList.add('ui')
     window.document.getElementById('browser-panel').appendChild(container)
   else
-    window.gBrowser.mCurrentBrowser.parentNode.appendChild(container)
+    {ZoomManager, gBrowser: {selectedBrowser: browser}} = window
+    browser.parentNode.appendChild(container)
     # If “full zoom” is not used, it means that “Zoom text only” is enabled.
     # If so, that “zoom” does not need to be taken into account.
-    if window.ZoomManager.useFullZoom
-      zoom =
-        window.ZoomManager.getZoomForBrowser(window.gBrowser.selectedBrowser)
+    # `.getCurrentMode()` is added by the “Default FullZoom Level” extension.
+    if ZoomManager.getCurrentMode?(browser) ? ZoomManager.useFullZoom
+      zoom = ZoomManager.getZoomForBrowser(browser)
 
   for marker in markers
     container.appendChild(marker.markerElement)
