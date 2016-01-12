@@ -68,8 +68,8 @@ class Marker
     left += offset.left
     top  += offset.top
 
+    @originalPosition = {left, top}
     @moveTo(left, top)
-    @originalPosition = Object.assign({}, @position)
 
   moveTo: (left, top) ->
     # Make sure that the marker stays within the viewport.
