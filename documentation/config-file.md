@@ -46,11 +46,17 @@ them in a place where Firefox can find them.
 This is the actual config file, written in JavaScript. It is in this file you
 add custom commands and set options, or whatever you’d like to do.
 
+If you add custom commands, remember to [add shortcuts to
+them][custom-command-shortcuts]!
+
 Example:
 
 ```js
 vimfx.set('hint_chars', 'abcdefghijklmnopqrstuvwxyz')
+vimfx.set('custom.mode.normal.zoom_in', 'zi')
 ```
+
+[custom-command-shortcuts]: api.md#user-content-custom-command-shortcuts
 
 
 ## frame.js

@@ -132,9 +132,9 @@ authors who wish to extend VimFx. They should add commands manually to
 `fn` is called when the command is activated. See the [onInput] documentation
 below for more information.
 
-Note that you have to give the new command a shortcut in VimFx’s settings page
-in the Add-ons Manager or set one using `vimfx.set()` to able to use the new
-command.
+<strong id="custom-command-shortcuts">Note</strong> that you have to give the
+new command a shortcut in VimFx’s settings page in the Add-ons Manager or set
+one using `vimfx.set()` to able to use the new command.
 
 ```js
 vimfx.addCommand({
