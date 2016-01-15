@@ -1,3 +1,30 @@
+### 0.11.0 (2016-01-15)
+
+- Fixed: The `` ` `` command is no longer broken.
+- Fixed: Memory leak.
+- Added: The `gl` command, which takes you to the most recent tab.
+- Improved: The Keyboard Shortcuts help dialog is now scrollable using VimFx’s
+  scrolling commands. To allow for this, the search field is no longer
+  autofocused. Instead, press `/` to open it.
+- Improved: Using the `f` commands, such as `f` and `zf`, now works like
+  actually moving your mouse onto the link, making hover menus and such-like
+  appear.
+- Improved: VimFx should now work better with Google Drive Documents, Etherpad
+  and a few other fancy text editors.
+- Improved: The `]` command now works on google.com.
+- Improved: Checkboxes and menu items on gmail.com are now given hints by the
+  `f` command.
+- Improved: The `gi` command now also recognizes 'contenteditable' elements.
+- Improved: Hint markers now move along together with their elements.
+- Fixed: Hint markers should now be correctly positioned when zooming.
+- Fixed: The toolbar button icon should now look correctly on Retina screens.
+- Added: You may now disable counts by using toggling the [`counts_enabled`]
+  pref.
+- Updated locale: de. Thanks to @just-barcodes!
+- Improved: Several minor things.
+
+[`counts_enabled`]: https://github.com/akhodakivskiy/VimFx/blob/8dae7aec9008595da31b939d5ae2d239849cf6dc/documentation/options.md#counts_enabled
+
 ### 0.10.0 (2015-12-09)
 
 - Added: The `zF` command, which lets you click browser elements.
