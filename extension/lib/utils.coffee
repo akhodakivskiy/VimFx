@@ -35,9 +35,9 @@ XULTextBoxElement   = Ci.nsIDOMXULTextBoxElement
 
 # Full chains of events for different mouse actions. ('command' is for XUL
 # elements.)
-EVENTS_CLICK     = ['mousedown', 'mouseup', 'click', 'command']
-EVENTS_MOUSEOVER = ['mouseover', 'mouseenter', 'mousemove']
-EVENTS_MOUSEOUT  = ['mouseout',  'mouseleave']
+EVENTS_CLICK       = ['mousedown', 'mouseup', 'click', 'command']
+EVENTS_HOVER_START = ['mouseover', 'mouseenter', 'mousemove']
+EVENTS_HOVER_END   = ['mouseout',  'mouseleave']
 
 
 
@@ -202,9 +202,9 @@ simulateMouseEvents = (element, sequenceType) ->
   rect   = element.getBoundingClientRect()
 
   eventSequence = switch sequenceType
-    when 'click'     then EVENTS_CLICK
-    when 'mouseover' then EVENTS_MOUSEOVER
-    when 'mouseout'  then EVENTS_MOUSEOUT
+    when 'click'       then EVENTS_CLICK
+    when 'hover-start' then EVENTS_HOVER_START
+    when 'hover-end'   then EVENTS_HOVER_END
 
   for type in eventSequence
     mouseEvent = new window.MouseEvent(type, {
