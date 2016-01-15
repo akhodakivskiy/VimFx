@@ -22,7 +22,7 @@ utils = require('../lib/utils')
 
 {utils: Cu} = Components
 
-Cu.import('resource://specialpowers/Assert.jsm')
+Cu.import('chrome://specialpowers/content/Assert.jsm')
 assert = new Assert()
 
 module.exports = (vimfx) ->
