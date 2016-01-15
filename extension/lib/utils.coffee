@@ -108,8 +108,13 @@ isTypingElement = (element) ->
 
 # Active/focused element helpers
 
+# NOTE: In frame scripts, `document.activeElement` may be `null` when the page
+# is loading. Therefore always check if anything was returned, such as:
+#
+#     return unless activeElement = utils.getActiveElement(window)
 getActiveElement = (window) ->
   {activeElement} = window.document
+  return null unless activeElement
   # If the active element is a frame, recurse into it. The easiest way to detect
   # a frame that works both in browser UI and in web page content is to check
   # for the presence of `.contentWindow`. However, in non-multi-process
@@ -128,7 +133,7 @@ blurActiveElement = (window) ->
   # focus to the `<body>` of its containing frame, while blurring the top-most
   # frame gives focus to the top-most `<body>`. This allows to blur fancy text
   # editors which use an `<iframe>` as their text area.
-  window.document.activeElement.blur()
+  window.document.activeElement?.blur()
 
 blurActiveBrowserElement = (vim) ->
   # - Blurring in the next tick allows to pass `<escape>` to the location bar to

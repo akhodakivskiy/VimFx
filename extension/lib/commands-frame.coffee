@@ -56,7 +56,7 @@ commands.go_to_root = ({vim}) ->
 
 commands.scroll = (args) ->
   {vim} = args
-  activeElement = utils.getActiveElement(vim.content)
+  return unless activeElement = utils.getActiveElement(vim.content)
   element =
     # If no element is focused on the page, the the active element is the
     # topmost `<body>`, and blurring it is a no-op. If it is scrollable, it

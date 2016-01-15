@@ -168,7 +168,8 @@ class FrameEventManager
     )
 
     sendFocusType = =>
-      focusType = utils.getFocusType(utils.getActiveElement(@vim.content))
+      return unless activeElement = utils.getActiveElement(@vim.content)
+      focusType = utils.getFocusType(activeElement)
       messageManager.send('focusType', focusType)
 
     @listen('focus', (event) =>
