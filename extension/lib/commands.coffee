@@ -439,9 +439,10 @@ commands.click_browser_element = ({vim}) ->
       when vim._state.scrollableElements.has(element)
         'scrollable'
       when element.tabIndex > -1 and
-           not (element.nodeName.endsWith('box') and
-                element.nodeName != 'checkbox') and
-           element.nodeName not in ['tabs', 'menuitem', 'menuseparator']
+           # `.localName` is `.nodeName` without `xul:` (if it exists).
+           not (element.localName.endsWith('box') and
+                element.localName != 'checkbox') and
+           element.localName not in ['tabs', 'menuitem', 'menuseparator']
         'clickable'
     return unless type
     return unless shape = getElementShape(element)
