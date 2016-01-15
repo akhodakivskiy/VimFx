@@ -93,8 +93,8 @@ mode('normal', {
     if uiEvent
       # In browser UI the biggest reasons are allowing to reset the location bar
       # when blurring it, and closing dialogs such as the “bookmark this page”
-      # dialog (<c-d>). However, an exception is made for the dev tools (<c-K>).
-      # There, trying to unfocus the dev tools using Escape would annoyingly
+      # dialog (<c-d>). However, an exception is made for the devtools (<c-K>).
+      # There, trying to unfocus the devtools using Escape would annoyingly
       # open the split console.
       return uiEvent.originalTarget.ownerGlobal.DevTools?
     else

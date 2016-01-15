@@ -25,6 +25,8 @@ huffman  = require('n-ary-huffman')
 {Marker} = require('./marker')
 utils    = require('./utils')
 
+{devtools} = Cu.import('resource://devtools/shared/Loader.jsm', {})
+
 CONTAINER_ID = 'VimFxMarkersContainer'
 
 Element     = Ci.nsIDOMElement
@@ -112,12 +114,13 @@ injectHints = (window, wrappers, viewport, options) ->
     container.classList.add('ui')
     window.document.getElementById('browser-panel').appendChild(container)
   else
-    window.gBrowser.mCurrentBrowser.parentNode.appendChild(container)
+    {ZoomManager, gBrowser: {selectedBrowser: browser}} = window
+    browser.parentNode.appendChild(container)
     # If “full zoom” is not used, it means that “Zoom text only” is enabled.
     # If so, that “zoom” does not need to be taken into account.
-    if window.ZoomManager.useFullZoom
-      zoom =
-        window.ZoomManager.getZoomForBrowser(window.gBrowser.selectedBrowser)
+    # `.getCurrentMode()` is added by the “Default FullZoom Level” extension.
+    if ZoomManager.getCurrentMode?(browser) ? ZoomManager.useFullZoom
+      zoom = ZoomManager.getZoomForBrowser(browser)
 
   for marker in markers
     container.appendChild(marker.markerElement)
@@ -126,7 +129,6 @@ injectHints = (window, wrappers, viewport, options) ->
     marker.setPosition(viewport, zoom)
 
   return {markers, markerMap}
-
 
 getMarkableElementsAndViewport = (window, filter) ->
   {
@@ -273,16 +275,13 @@ getElementShape = (window, viewport, parents, element, rects = null) ->
   for visibleRect in visibleRects
     nonCoveredPoint = getFirstNonCoveredPoint(window, viewport, element,
                                               visibleRect, parents)
-    if nonCoveredPoint
-      nonCoveredPoint.rect = visibleRect
-      break
+    break if nonCoveredPoint
 
   return null unless nonCoveredPoint
 
   return {
     nonCoveredPoint, area: totalArea
   }
-
 
 MINIMUM_EDGE_DISTANCE = 4
 isInsideViewport = (rect, viewport) ->
@@ -291,7 +290,6 @@ isInsideViewport = (rect, viewport) ->
     rect.top    <= viewport.bottom + MINIMUM_EDGE_DISTANCE and
     rect.right  >= viewport.left   + MINIMUM_EDGE_DISTANCE and
     rect.bottom >= viewport.top    - MINIMUM_EDGE_DISTANCE
-
 
 adjustRectToViewport = (rect, viewport) ->
   # The right and bottom values are subtracted by 1 because
@@ -315,7 +313,6 @@ adjustRectToViewport = (rect, viewport) ->
     left, right, top, bottom
     height, width, area
   }
-
 
 getFirstNonCoveredPoint = (window, viewport, element, elementRect, parents) ->
   # Tries a point `(x + dx, y + dy)`. Returns `(x, y)` (and the frame offset)
@@ -341,6 +338,20 @@ getFirstNonCoveredPoint = (window, viewport, element, elementRect, parents) ->
       # is present at the point for each parent in `parents`.
       currentWindow = window
       for parent in parents by -1
+        # If leaving the devtools container take the devtools zoom into account.
+        if currentWindow.DevTools and not parent.window.DevTools
+          toolbox = window.gDevTools.getToolbox(
+            devtools.TargetFactory.forTab(window.top.gBrowser.selectedTab)
+          )
+          if toolbox
+            devtoolsZoom = toolbox.zoomValue
+            offset.left *= devtoolsZoom
+            offset.top  *= devtoolsZoom
+            x  *= devtoolsZoom
+            y  *= devtoolsZoom
+            dx *= devtoolsZoom
+            dy *= devtoolsZoom
+
         offset.left += parent.offset.left
         offset.top  += parent.offset.top
         elementAtPoint = parent.window.document.elementFromPoint(
@@ -399,6 +410,7 @@ normalize = (element) ->
 # same and visible in _all_ tabs, so we have to check that the element really
 # belongs to the current tab.
 contains = (element, elementAtPoint) ->
+  return false unless elementAtPoint
   container = normalize(element)
   if elementAtPoint.nodeName == 'tabbrowser' and elementAtPoint.id == 'content'
     {gBrowser} = element.ownerGlobal.top

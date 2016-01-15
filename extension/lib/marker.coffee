@@ -53,16 +53,15 @@ class Marker
   # into the DOM, and thus gotten a width and height.
   setPosition: (@viewport, @zoom) ->
     {
-      markerElement: {clientWidth: @width, clientHeight: @height}
-      elementShape:  {nonCoveredPoint: {x: left, y: top, offset, rect}}
+      markerElement: {clientWidth, clientHeight}
+      elementShape:  {nonCoveredPoint: {x: left, y: top, offset}}
     } = this
+
+    @width  = clientWidth  / @zoom
+    @height = clientHeight / @zoom
 
     # Center the marker vertically on the non-covered point.
     top -= Math.ceil(@height / 2)
-
-    # Make sure that the marker stays within its element (vertically).
-    top = Math.min(top, rect.bottom - @height)
-    top = Math.max(top, rect.top)
 
     # Make the position relative to the top frame.
     left += offset.left

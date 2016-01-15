@@ -114,7 +114,10 @@ helper_follow = ({id, combine = true}, matcher, {vim}) ->
          # links with this href actually do the same thing. On some pages, such
          # as startpage.com, actual proper links have the 'onclick' attribute,
          # so we can’t exclude such links in `utils.isProperLink`.
-         not element.hasAttribute('onclick')
+         not element.hasAttribute('onclick') and
+         # GitHub’s diff expansion buttons are links with both `href` and
+         # `data-url`. They are JavaScript-powered using the latter attribute.
+         not element.hasAttribute('data-url')
         if href of hrefs
           parent = hrefs[href]
           wrapper.parentIndex = parent.elementIndex
