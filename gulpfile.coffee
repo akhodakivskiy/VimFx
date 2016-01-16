@@ -312,7 +312,7 @@ helpHTMLPrelude = '''
   <title>VimFx help</title>
   <style>
     * {margin: 0;}
-    body > :first-child {min-height: 100vh;}
+    body > :first-child {min-height: 100vh; width: 100vw;}
   </style>
   <link rel=stylesheet href=extension/skin/style.css>
 '''
