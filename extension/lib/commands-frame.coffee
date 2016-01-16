@@ -166,9 +166,9 @@ commands.follow = helper_follow.bind(null, {id: 'normal'},
            element.hasAttribute('data-uri') or
            element.hasAttribute('data-page-action') or
            # CodeMirror.
-           element.classList?.contains('CodeMirror-scroll') or
+           element.classList.contains('CodeMirror-scroll') or
            # Google Drive Document.
-           element.classList?.contains('kix-appview-editor')
+           element.classList.contains('kix-appview-editor')
         type = 'clickable'
         semantic = false
       # Facebook comment fields.
@@ -202,6 +202,7 @@ commands.follow = helper_follow.bind(null, {id: 'normal'},
            (element.classList.contains('overflowing') or
             element.classList.contains('shrinkToFit'))
         type = 'clickable'
+    type = null if isXUL and element.classList.contains('textbox-input')
     return {type, semantic}
 )
 
