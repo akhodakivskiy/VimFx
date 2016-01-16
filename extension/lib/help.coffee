@@ -53,7 +53,7 @@ injectHelp = (window, vimfx) ->
   searchInput.onkeydown = (event) -> searchInput.blur() if event.key == 'Enter'
   container.appendChild(searchInput)
 
-  window.gBrowser.mCurrentBrowser.parentNode.appendChild(container)
+  window.gBrowser.selectedBrowser.parentNode.appendChild(container)
 
   # The font size of menu items is used by default, which is usually quite
   # small. Try to increase it without causing a scrollbar.

@@ -1,6 +1,6 @@
 ###
 # Copyright Anton Khodakivskiy 2012, 2013, 2014.
-# Copyright Simon Lydell 2013, 2014, 2015.
+# Copyright Simon Lydell 2013, 2014, 2015, 2016.
 #
 # This file is part of VimFx.
 #
@@ -114,7 +114,7 @@ module.exports = (data, reason) ->
 
   windows = new WeakSet()
   messageManager.listen('tabCreated', (data, {target: browser}) ->
-    # Frame script are run in more places than we need. Tell those not to do
+    # Frame scripts are run in more places than we need. Tell those not to do
     # anything.
     group = browser.getAttribute('messagemanagergroup')
     return false unless group == 'browsers'

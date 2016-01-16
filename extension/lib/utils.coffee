@@ -342,13 +342,13 @@ removeDuplicateCharacters = (str) ->
 setInterval = (window, interval, fn) ->
   stopped = false
   currentIntervalId = null
-  callback = ->
+  next = ->
     return if stopped
-    currentIntervalId = window.setTimeout((-> fn(callback)), interval)
+    currentIntervalId = window.setTimeout((-> fn(next)), interval)
   clearInterval = ->
     stopped = true
     window.clearTimeout(currentIntervalId)
-  callback()
+  next()
   return clearInterval
 
 

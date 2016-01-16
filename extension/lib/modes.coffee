@@ -121,14 +121,14 @@ mode('hints', {
     storage.count     = count
     storage.numEnteredChars = 0
 
-    storage.clearInterval = utils.setInterval(vim.window, 0, (callback) ->
+    storage.clearInterval = utils.setInterval(vim.window, 0, (next) ->
       unless storage.markerMap
-        callback()
+        next()
         return
       vim._send('getMarkableElementsMovements', null, (diffs) ->
         for {dx, dy}, index in diffs when not (dx == 0 and dy == 0)
           storage.markerMap[index].updatePosition(dx, dy)
-        callback()
+        next()
       )
     )
 
