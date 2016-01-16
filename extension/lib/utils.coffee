@@ -249,7 +249,9 @@ containsDeep = (parent, element) ->
   parentWindow  = parent.ownerGlobal
   elementWindow = element.ownerGlobal
 
-  while elementWindow != parentWindow and elementWindow.top != elementWindow
+  # Owner windows might be missing when opening the devtools.
+  while elementWindow and parentWindow and
+        elementWindow != parentWindow and elementWindow.top != elementWindow
     element = elementWindow.frameElement
     elementWindow = element.ownerGlobal
 
