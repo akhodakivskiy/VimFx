@@ -278,7 +278,12 @@ toolbarpaletteitem[place="palette"] > #VimFxButton {
     clear: left;
     width: 100%;
     margin-top: 0.2em;
+    cursor: pointer;
   }
+
+    #VimFxHelpDialogContainer .command:hover * {
+      text-decoration: underline;
+    }
 
     #VimFxHelpDialogContainer .key-sequence {
       float: left;

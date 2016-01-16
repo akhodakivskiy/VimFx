@@ -73,6 +73,12 @@ Yes! Pressing `/` while the help dialog is open makes a little search box appear
 in the bottom-right corner of the window (instead of opening the find bar),
 which is specialized at searching you keyboard shortcuts.
 
+## Can I edit shortcuts in the Keyboard Shortcuts help dialog?
+
+No, but clicking on any command in it opens VimFx’s settings page in the Add-ons
+Manager and automatically selects the text input for that command. Tip: Use the
+`zF` command to click without using the mouse.
+
 ## Will VimFx provide advanced Find features?
 
 One of VimFx’s key features is to embrace standard Firefox features. As long as

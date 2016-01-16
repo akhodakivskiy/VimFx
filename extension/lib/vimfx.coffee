@@ -1,5 +1,5 @@
 ###
-# Copyright Simon Lydell 2015.
+# Copyright Simon Lydell 2015, 2016.
 #
 # This file is part of VimFx.
 #
@@ -34,6 +34,7 @@ class VimFx extends utils.EventEmitter
     super()
     @vims = new WeakMap()
     @lastClosedVim = null
+    @goToCommand = null
     @createKeyTrees()
     @reset()
     @on('modeChange', ({mode}) => @reset(mode))

@@ -1,6 +1,6 @@
 <!--
 This is part of the VimFx documentation.
-Copyright Simon Lydell 2015.
+Copyright Simon Lydell 2015, 2016.
 See the file README.md for copying conditions.
 -->
 
@@ -9,6 +9,11 @@ See the file README.md for copying conditions.
 All of VimFx’s keyboard shortcuts can be customized in VimFx’s settings page in
 the Add-ons Manager. Doing so is really easy. You get far just by looking at the
 defaults and trying things out. If not, read on.
+
+In VimFx’s Keyboard Shortcuts help dialog (which can be opened by pressing `?`)
+you can click any command to open VimFx’s settings page in the Add-ons Manager
+and automatically select the text input for that command. Tip: Use the `zF`
+command to click without using the mouse.
 
 
 ## Key notation

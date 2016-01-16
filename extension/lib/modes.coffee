@@ -57,7 +57,6 @@ mode('normal', {
 
   onLeave: ({vim}) ->
     vim._run('clear_inputs')
-    help.removeHelp(vim.window)
 
   onInput: (args, match) ->
     {vim, storage, uiEvent} = args

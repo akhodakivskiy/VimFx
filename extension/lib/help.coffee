@@ -38,10 +38,10 @@ injectHelp = (window, vimfx) ->
 
   wrapper = utils.createBox(document, 'wrapper', container)
 
-  header = createHeader(document, vimfx)
+  header = createHeader(window, vimfx)
   wrapper.appendChild(header)
 
-  content = createContent(document, vimfx)
+  content = createContent(window, vimfx)
   wrapper.appendChild(content)
 
   searchInput = document.createElement('textbox')
@@ -74,8 +74,8 @@ getHelp = (window) -> window.document.getElementById(CONTAINER_ID)
 
 getSearchInput = (window) -> getHelp(window)?.querySelector('.search-input')
 
-createHeader = (document, vimfx) ->
-  $ = utils.createBox.bind(null, document)
+createHeader = (window, vimfx) ->
+  $ = utils.createBox.bind(null, window.document)
 
   header = $('header')
 
@@ -84,12 +84,12 @@ createHeader = (document, vimfx) ->
   $('title', mainHeading, translate('help.title'))
 
   closeButton = $('close-button', header, '×')
-  closeButton.onclick = removeHelp.bind(null, document.ownerGlobal)
+  closeButton.onclick = removeHelp.bind(null, window)
 
   return header
 
-createContent = (document, vimfx) ->
-  $ = utils.createBox.bind(null, document)
+createContent = (window, vimfx) ->
+  $ = utils.createBox.bind(null, window.document)
 
   content = $('content')
 
@@ -116,8 +116,9 @@ createContent = (document, vimfx) ->
 
       for {command, name, enabledSequences} in category.commands
         commandContainer = $('command search-item', categoryContainer)
-        utils.setAttributes(commandContainer, {'data-command': command.name})
-        commandContainer.setAttribute('data-command', name)
+        commandContainer.setAttribute('data-command', command.name)
+        commandContainer.onclick = goToCommandSetting.bind(null, window, vimfx,
+                                                           command)
         for sequence in enabledSequences
           keySequence = $('key-sequence', commandContainer)
           [specialKeys, rest] = splitSequence(sequence, vimfx.SPECIAL_KEYS)
@@ -134,6 +135,13 @@ splitSequence = (sequence, specialKeys) ->
   )
   splitPos = Math.max(specialKeyEnds...)
   return [sequence[0...splitPos], sequence[splitPos..]]
+
+goToCommandSetting = (window, vimfx, command) ->
+  vimfx.goToCommand = command
+  removeHelp(window)
+  # Randomize URI to force a reload of the Add-ons Manager if it’s already open.
+  uri = "addons://detail/#{vimfx.id}/preferences?#{Math.random()}"
+  window.BrowserOpenAddonsMgr(uri)
 
 search = (content, term) ->
   document   = content.ownerDocument

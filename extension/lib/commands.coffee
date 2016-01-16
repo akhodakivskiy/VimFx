@@ -342,6 +342,7 @@ commands.tab_close_other = ({vim}) ->
 
 helper_follow = (name, vim, callback, count = null) ->
   vim.markPageInteraction()
+  help.removeHelp(vim.window)
 
   # Enter hints mode immediately, with an empty set of markers. The user might
   # press keys before the `vim._run` callback is invoked. Those key presses
@@ -449,11 +450,12 @@ commands.click_browser_element = ({vim}) ->
     type = switch
       when vim._state.scrollableElements.has(element)
         'scrollable'
-      when element.tabIndex > -1 and
-           # `.localName` is `.nodeName` without `xul:` (if it exists).
-           not (element.localName.endsWith('box') and
-                element.localName != 'checkbox') and
-           element.localName not in ['tabs', 'menuitem', 'menuseparator']
+      when (element.tabIndex > -1 and
+            # `.localName` is `.nodeName` without `xul:` (if it exists).
+            not (element.localName.endsWith('box') and
+                 element.localName != 'checkbox') and
+            element.localName not in ['tabs', 'menuitem', 'menuseparator']) or
+           element.onclick
         'clickable'
     return unless type
     return unless shape = getElementShape(element)

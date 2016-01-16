@@ -1,5 +1,5 @@
 ###
-# Copyright Simon Lydell 2015.
+# Copyright Simon Lydell 2015, 2016.
 #
 # This file is part of VimFx.
 #
@@ -91,6 +91,17 @@ class Observer extends BaseObserver
     @injectShortcuts()
     @setupKeybindings()
     @setupValidation()
+
+    if @vimfx.goToCommand
+      return unless vim = @vimfx.getCurrentVim(utils.getCurrentWindow())
+      vim.markPageInteraction()
+      utils.nextTick(vim.window, =>
+        {pref} = @vimfx.goToCommand
+        setting = @container.querySelector("setting[pref='#{pref}']")
+        setting.scrollIntoView()
+        setting.input.select()
+        @vimfx.goToCommand = null
+      )
 
   injectInstructions: ->
     setting = @appendSetting({
