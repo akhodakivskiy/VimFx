@@ -95,7 +95,7 @@ module.exports = (data, reason) ->
     callback(api)
     skipCreateKeyTrees = false
     vimfx.createKeyTrees()
-  module.onShutdown(-> publicScope._invokeCallbacks = null)
+  module.onShutdown(-> publicScope._invokeCallback = null)
 
   # Pass the API to add-ons that loaded before VimFx, either because they just
   # happened to do so when Firefox started, or because VimFx was updated (or
