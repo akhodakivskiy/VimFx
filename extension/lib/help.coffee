@@ -141,7 +141,9 @@ goToCommandSetting = (window, vimfx, command) ->
   removeHelp(window)
   # Randomize URI to force a reload of the Add-ons Manager if it’s already open.
   uri = "addons://detail/#{vimfx.id}/preferences?#{Math.random()}"
-  window.BrowserOpenAddonsMgr(uri)
+  utils.nextTick(window, ->
+    window.BrowserOpenAddonsMgr(uri)
+  )
 
 search = (content, term) ->
   document   = content.ownerDocument

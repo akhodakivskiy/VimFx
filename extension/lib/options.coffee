@@ -94,6 +94,7 @@ class Observer extends BaseObserver
 
     if @vimfx.goToCommand
       return unless vim = @vimfx.getCurrentVim(utils.getCurrentWindow())
+      # Make sure our autofocus isn’t prevented.
       vim.markPageInteraction()
       utils.nextTick(vim.window, =>
         {pref} = @vimfx.goToCommand
