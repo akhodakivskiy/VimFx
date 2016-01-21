@@ -138,10 +138,27 @@ commands.follow = helper_follow.bind(null, {id: 'normal'},
     type = null
     semantic = true
     switch
+      # Bootstrap. Match these before regular links, because especially slider
+      # “buttons” often get the same hint otherwise.
+      when element.hasAttribute('data-toggle') or
+           element.hasAttribute('data-dismiss') or
+           element.hasAttribute('data-slide') or
+           element.hasAttribute('data-slide-to')
+        # Some elements may not be semantic, but _should be_ and still deserve a
+        # good hint.
+        type = 'clickable'
       when isProperLink(element)
         type = 'link'
       when isTypingElement(element)
         type = 'text'
+      when element.getAttribute('role') in CLICKABLE_ARIA_ROLES or
+           # <http://www.w3.org/TR/wai-aria/states_and_properties>
+           element.hasAttribute('aria-controls') or
+           element.hasAttribute('aria-pressed') or
+           element.hasAttribute('aria-checked') or
+           (element.hasAttribute('aria-haspopup') and
+            element.getAttribute('role') != 'menu')
+        type = 'clickable'
       when element.tabIndex > -1 and
            # Google Drive Documents. The hint for this element would cover the
            # real hint that allows you to focus the document to start typing.
@@ -158,7 +175,6 @@ commands.follow = helper_follow.bind(null, {id: 'normal'},
            element.hasAttribute('onmousedown') or
            element.hasAttribute('onmouseup') or
            element.hasAttribute('oncommand') or
-           element.getAttribute('role') in CLICKABLE_ARIA_ROLES or
            # Twitter.
            element.classList.contains('js-new-tweets-bar') or
            # Feedly.
@@ -187,16 +203,25 @@ commands.follow = helper_follow.bind(null, {id: 'normal'},
             element.querySelector('input, textarea, select')
         if input and not getElementShape(input)
           type = 'clickable'
-      # Elements that have “button” somewhere in the class might be clickable,
-      # unless they contain a real link or button or yet an element with
-      # “button” somewhere in the class, in which case they likely are
-      # “button-wrapper”s. (`<SVG element>.className` is not a string!)
-      when not isXUL and typeof element.className == 'string' and
-           element.className.toLowerCase().includes('button')
+      # Last resort checks for elements that might be clickable because of
+      # JavaScript.
+      when (not isXUL and
+            # It is common to listen for clicks on `<html>` or `<body>`. Don’t
+            # waste time on them.
+            element not in [document.documentElement, document.body]) and
+           (utils.includes(element.className, 'button') or
+            utils.includes(element.className, 'close') or
+            utils.includes(element.getAttribute('aria-label'), 'close') or
+            # Do this last as it’s a potentially expensive check.
+            utils.hasEventListeners(element, 'click'))
+        # Make a quick check for likely clickable descendants, to reduce the
+        # number of false positives. the element might be a “button-wrapper” or
+        # a large element with a click-tracking event listener.
         unless element.querySelector('a, button, input, [class*=button]')
           type = 'clickable'
           semantic = false
-      # When viewing an image it should get a marker to toggle zoom.
+      # When viewing an image it should get a marker to toggle zoom. This is the
+      # most unlikely rule to match, so keep it last.
       when document.body?.childElementCount == 1 and
            element.nodeName == 'IMG' and
            (element.classList.contains('overflowing') or
