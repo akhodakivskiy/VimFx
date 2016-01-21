@@ -21,6 +21,17 @@
 
 # This file contains lots of different helper functions.
 
+nsIClipboardHelper = Cc['@mozilla.org/widget/clipboardhelper;1']
+  .getService(Ci.nsIClipboardHelper)
+nsIDomUtils = Cc['@mozilla.org/inspector/dom-utils;1']
+  .getService(Ci.inIDOMUtils)
+nsIFocusManager = Cc['@mozilla.org/focus-manager;1']
+  .getService(Ci.nsIFocusManager)
+nsIStyleSheetService = Cc['@mozilla.org/content/style-sheet-service;1']
+  .getService(Ci.nsIStyleSheetService)
+nsIWindowMediator = Cc['@mozilla.org/appshell/window-mediator;1']
+  .getService(Ci.nsIWindowMediator)
+
 HTMLAnchorElement   = Ci.nsIDOMHTMLAnchorElement
 HTMLButtonElement   = Ci.nsIDOMHTMLButtonElement
 HTMLInputElement    = Ci.nsIDOMHTMLInputElement
@@ -156,9 +167,7 @@ blurActiveBrowserElement = (vim) ->
 # look more appropriate, but it unconditionally selects all text, which
 # `.FLAG_BYMOUSE` does not.
 focusElement = (element, options = {}) ->
-  focusManager = Cc['@mozilla.org/focus-manager;1']
-    .getService(Ci.nsIFocusManager)
-  focusManager.setFocus(element, options.flag ? 'FLAG_BYMOUSE')
+  nsIFocusManager.setFocus(element, options.flag ? 'FLAG_BYMOUSE')
   element.select?() if options.select
 
 getFocusType = (element) -> switch
@@ -302,9 +311,8 @@ setAttributes = (element, attributes) ->
 
 setHover = (element, hover) ->
   method = if hover then 'addPseudoClassLock' else 'removePseudoClassLock'
-  domUtils = Cc['@mozilla.org/inspector/dom-utils;1'].getService(Ci.inIDOMUtils)
   while element.parentElement
-    domUtils[method](element, ':hover')
+    nsIDomUtils[method](element, ':hover')
     element = element.parentElement
   return
 
@@ -369,20 +377,15 @@ getCurrentLocation = ->
   window = getCurrentWindow()
   return new window.URL(window.gBrowser.selectedBrowser.currentURI.spec)
 
-getCurrentWindow = ->
-  windowMediator = Cc['@mozilla.org/appshell/window-mediator;1']
-    .getService(Components.interfaces.nsIWindowMediator)
-  return windowMediator.getMostRecentWindow('navigator:browser')
+getCurrentWindow = -> nsIWindowMediator.getMostRecentWindow('navigator:browser')
 
 loadCss = (name) ->
-  sss = Cc['@mozilla.org/content/style-sheet-service;1']
-    .getService(Ci.nsIStyleSheetService)
   uri = Services.io.newURI("chrome://vimfx/skin/#{name}.css", null, null)
-  method = sss.AUTHOR_SHEET
-  unless sss.sheetRegistered(uri, method)
-    sss.loadAndRegisterSheet(uri, method)
+  method = nsIStyleSheetService.AUTHOR_SHEET
+  unless nsIStyleSheetService.sheetRegistered(uri, method)
+    nsIStyleSheetService.loadAndRegisterSheet(uri, method)
   module.onShutdown(->
-    sss.unregisterSheet(uri, method)
+    nsIStyleSheetService.unregisterSheet(uri, method)
   )
 
 observe = (topic, observer) ->
@@ -407,10 +410,7 @@ openTab = (window, url, options) ->
   window.TreeStyleTabService?.readyToOpenChildTab(gBrowser.selectedTab)
   gBrowser.loadOneTab(url, options)
 
-writeToClipboard = (text) ->
-  clipboardHelper = Cc['@mozilla.org/widget/clipboardhelper;1']
-    .getService(Ci.nsIClipboardHelper)
-  clipboardHelper.copyString(text)
+writeToClipboard = (text) -> nsIClipboardHelper.copyString(text)
 
 
 

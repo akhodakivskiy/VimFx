@@ -24,6 +24,9 @@ commands       = require('./commands-frame')
 messageManager = require('./message-manager')
 utils          = require('./utils')
 
+nsIFocusManager = Cc['@mozilla.org/focus-manager;1']
+  .getService(Ci.nsIFocusManager)
+
 class FrameEventManager
   constructor: (@vim) ->
     @numFocusToSuppress = 0
@@ -203,9 +206,6 @@ class FrameEventManager
         @vim.state.lastFocusedTextInput = target
         @vim.state.hasFocusedTextInput = true
 
-      focusManager = Cc['@mozilla.org/focus-manager;1']
-        .getService(Ci.nsIFocusManager)
-
       # When moving a tab to another window, there is a short period of time
       # when there’s no listener for this call.
       return unless options = @vim.options(
@@ -218,7 +218,7 @@ class FrameEventManager
           # …and the user has interacted with the page…
           not @vim.state.hasInteraction and
           # …and the event is programmatic (not caused by clicks or keypresses)…
-          focusManager.getLastFocusMethod(null) == 0 and
+          nsIFocusManager.getLastFocusMethod(null) == 0 and
           # …and the target may steal most keystrokes.
           utils.isTypingElement(target)
         # Some sites (such as icloud.com) re-focuses inputs if they are blurred,
