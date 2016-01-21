@@ -301,6 +301,14 @@ commands.follow_pattern = ({vim, type, options}) ->
 
   if matchingLink
     utils.simulateMouseEvents(matchingLink, 'click')
+    # When you go to the next page of GitHub’s code search results, the page is
+    # loaded with AJAX. GitHub then annoyingly focuses its search input. This
+    # autofocus cannot be prevented in a reliable way, because the case is
+    # indistinguishable from a button whose job is to focus some text input.
+    # However, in this command we know for sure that we can prevent the next
+    # focus. This must be done _after_ the click has been triggered, since
+    # clicks count as page interactions.
+    vim.markPageInteraction(false)
   else
     vim.notify(translate("notification.follow_#{type}.none"))
 
