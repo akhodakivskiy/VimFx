@@ -25,6 +25,8 @@ nsIClipboardHelper = Cc['@mozilla.org/widget/clipboardhelper;1']
   .getService(Ci.nsIClipboardHelper)
 nsIDomUtils = Cc['@mozilla.org/inspector/dom-utils;1']
   .getService(Ci.inIDOMUtils)
+nsIEventListenerService = Cc['@mozilla.org/eventlistenerservice;1']
+  .getService(Ci.nsIEventListenerService)
 nsIFocusManager = Cc['@mozilla.org/focus-manager;1']
   .getService(Ci.nsIFocusManager)
 nsIStyleSheetService = Cc['@mozilla.org/content/style-sheet-service;1']
@@ -338,6 +340,13 @@ class EventEmitter
 
 has = (obj, prop) -> Object::hasOwnProperty.call(obj, prop)
 
+# Check if `search` exists in `string` (case insensitively). Returns `false` if
+# `string` doesn’t exist or isn’t a string, such as `<SVG element>.className`.
+includes = (string, search) ->
+  return false unless typeof string == 'string'
+  return string.toLowerCase().includes(search)
+
+
 nextTick = (window, fn) -> window.setTimeout(fn, 0)
 
 regexEscape = (s) -> s.replace(/[|\\{}()[\]^$+*?.]/g, '\\$&')
@@ -378,6 +387,12 @@ getCurrentLocation = ->
   return new window.URL(window.gBrowser.selectedBrowser.currentURI.spec)
 
 getCurrentWindow = -> nsIWindowMediator.getMostRecentWindow('navigator:browser')
+
+hasEventListeners = (element, type) ->
+  for listener in nsIEventListenerService.getListenerInfoFor(element)
+    if listener.listenerObject and listener.type == type
+      return true
+  return false
 
 loadCss = (name) ->
   uri = Services.io.newURI("chrome://vimfx/skin/#{name}.css", null, null)
@@ -447,6 +462,7 @@ module.exports = {
   Counter
   EventEmitter
   has
+  includes
   nextTick
   regexEscape
   removeDuplicates
@@ -456,6 +472,7 @@ module.exports = {
   formatError
   getCurrentLocation
   getCurrentWindow
+  hasEventListeners
   loadCss
   observe
   openPopup
