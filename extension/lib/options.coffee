@@ -93,10 +93,7 @@ class Observer extends BaseObserver
     @setupValidation()
 
     if @vimfx.goToCommand
-      return unless vim = @vimfx.getCurrentVim(utils.getCurrentWindow())
-      # Make sure our autofocus isn’t prevented.
-      vim.markPageInteraction()
-      utils.nextTick(vim.window, =>
+      utils.nextTick(@document.ownerGlobal, =>
         {pref} = @vimfx.goToCommand
         setting = @container.querySelector("setting[pref='#{pref}']")
         setting.scrollIntoView()
