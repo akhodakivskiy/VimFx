@@ -48,6 +48,10 @@ of the tab bar, unless:
 
 They only wrap around _once._
 
+### `gl`
+
+Selects the _count_ most recent tab.
+
 ### `gJ`, `gK`
 
 Moves the current tab _count_ tabs forward/backward.
