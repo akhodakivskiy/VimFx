@@ -10,7 +10,7 @@ VimFx was inspired by [Vimperator] and designed after [Vimium] for [Chrome],
 preserving the shortcuts and behavior. If you are used to Vimium then it will be
 easy to get started with VimFx.
 
-Check out the [documentation] and the [wiki]!
+Check out the [documentation], the [wiki] and [Questions & Answers]!
 
 VimFx is made by [these awesome people][people].
 
@@ -21,6 +21,7 @@ VimFx is made by [these awesome people][people].
 [Chrome]: https://www.google.com/chrome
 [documentation]: https://github.com/akhodakivskiy/VimFx/tree/master/documentation
 [wiki]: https://github.com/akhodakivskiy/VimFx/wiki
+[Questions & Answers]: https://github.com/akhodakivskiy/VimFx/tree/master/documentation/questions-and-answers.md
 [people]: https://github.com/akhodakivskiy/VimFx/blob/master/PEOPLE.md
 
 ## Why VimFx was created
