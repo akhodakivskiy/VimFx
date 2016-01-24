@@ -28,6 +28,8 @@ SEARCH_MATCH_CLASS     = 'search-match'
 SEARCH_NON_MATCH_CLASS = 'search-non-match'
 SEARCH_HIGHLIGHT_CLASS = 'search-highlight'
 
+shutdownHandlerAdded = false
+
 injectHelp = (window, vimfx) ->
   removeHelp(window)
 
@@ -66,7 +68,11 @@ injectHelp = (window, vimfx) ->
   container.style.fontSize = "#{Math.max(fontSize - 1, originalFontSize)}px"
 
   # Uncomment this line if you want to use `gulp help.html`!
-  utils.writeToClipboard(container.outerHTML)
+  # utils.writeToClipboard(container.outerHTML)
+
+  unless shutdownHandlerAdded
+    module.onShutdown(removeHelp.bind(null, window))
+    shutdownHandlerAdded = true
 
 removeHelp = (window) -> getHelp(window)?.remove()
 

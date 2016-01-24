@@ -25,7 +25,6 @@ huffman  = require('n-ary-huffman')
 {Marker} = require('./marker')
 utils    = require('./utils')
 
-
 try
   # TODO: Only use this path when Firefox 44 is released.
   {devtools} = Cu.import('resource://devtools/shared/Loader.jsm', {})
@@ -36,6 +35,8 @@ CONTAINER_ID = 'VimFxMarkersContainer'
 
 Element     = Ci.nsIDOMElement
 XULDocument = Ci.nsIDOMXULDocument
+
+shutdownHandlerAdded = false
 
 # For some time we used to return the hints container from `injectHints`, and
 # use that reference to remove the hints when needed. That’s fine in theory, but
@@ -132,6 +133,10 @@ injectHints = (window, wrappers, viewport, options) ->
     # Must be done after the hints have been inserted into the DOM (see
     # marker.coffee).
     marker.setPosition(viewport, zoom)
+
+  unless shutdownHandlerAdded
+    module.onShutdown(removeHints.bind(null, window))
+    shutdownHandlerAdded = true
 
   return {markers, markerMap}
 

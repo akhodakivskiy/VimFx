@@ -168,8 +168,7 @@ class Vim
     @_parent.emit('hideNotification', {vim: this})
     @_statusPanel.setAttribute('inactive', 'true')
 
-  markPageInteraction: ->
-    @_send('markPageInteraction')
+  markPageInteraction: (value = null) -> @_send('markPageInteraction', value)
 
   _focusMarkerElement: (elementIndex, options = {}) ->
     # If you, for example, focus the location bar, unfocus it by pressing

@@ -534,9 +534,11 @@ A `vim` object has the following properties:
 
 - hideNotification(): `Function`. Hide the current notification (if any).
 
-- markPageInteraction(): `Function`. Marks that the user has interacted with the
-  page. After that [autofocus prevention] is not done anymore. Commands
-  interacting with web page content might want to do this.
+- markPageInteraction(value=true): `Function`. When `value` is `true` (as it is
+  by default when the argument is omitted), marks that the user has interacted
+  with the page. After that [autofocus prevention] is not done anymore. Commands
+  interacting with web page content might want to do this. If `value` is
+  `false`, the state is reset and autofocus prevention _will_ be done again.
 
 **Warning:** There are also properties starting with an underscore on `vim`
 objects. They are private, and not supposed to be used outside of VimFx’s own

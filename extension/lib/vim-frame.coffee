@@ -88,7 +88,7 @@ class VimFrame
   notify: (args...) ->
     messageManager.send('vimMethod', {method: 'notify', args})
 
-  markPageInteraction: -> @state.hasInteraction = true
+  markPageInteraction: (value = true) -> @state.hasInteraction = value
 
   setHover: (element) ->
     utils.setHover(element, true)

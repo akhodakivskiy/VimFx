@@ -6,16 +6,6 @@ See the file README.md for copying conditions.
 
 # Questions & Answers
 
-## What does `<s-escape>` mean?
-
-It means that you should press Escape while holding shift. In some other
-programs it might be written as `Shift+Escape`, but not in VimFx’s [key
-notation].
-
-(`<s-escape>` is the default shortcut to exit Ignore mode.)
-
-[key notation]: shortcuts.md#key-notation
-
 ## How do I disable VimFx?
 
 If you press `i` you will enter Ignore mode. VimFx’s toolbar [button] turns red
@@ -39,10 +29,19 @@ any add-on).
 
 ## How do I get out of Ignore mode?
 
-Either press [`<s-escape>`] or click VimFx’s toolbar [button].
+Either press `<s-escape>` or click VimFx’s toolbar [button].
 
-[`<s-escape>`]: #what-does-s-escape-mean
 [button]: button.md
+
+## What does `<s-escape>` mean?
+
+It means that you should press Escape while holding shift. In some other
+programs it might be written as `Shift+Escape`, but not in VimFx’s [key
+notation].
+
+(`<s-escape>` is the default shortcut to exit Ignore mode.)
+
+[key notation]: shortcuts.md#key-notation
 
 ## VimFx’s shortcuts work in my English layout but not in my other layout!
 
@@ -71,7 +70,7 @@ the beginning, and your new shortcut should work fine.
 
 Yes! Pressing `/` while the help dialog is open makes a little search box appear
 in the bottom-right corner of the window (instead of opening the find bar),
-which is specialized at searching you keyboard shortcuts.
+which is specialized at searching your keyboard shortcuts.
 
 ## Can I edit shortcuts in the Keyboard Shortcuts help dialog?
 
@@ -85,7 +84,11 @@ One of VimFx’s key features is to embrace standard Firefox features. As long a
 Firefox’s Find Bar doesn’t support for example reverse search (vim’s `?`
 command) or regex search, VimFx won’t either.
 
-The [public API] could be used, though, to integrate with another Add-on that
-provides advanced Find features.
+(The [public API] could be used, though, to integrate with another Add-on that
+provides advanced Find features.)
 
 [public API]: api.md
+
+## My question isn’t listed here!
+
+Tell us, and we’ll add it. Let’s make this a great resource for new users.
