@@ -94,7 +94,8 @@ commands.history_forward = helper_go_history.bind(null, 'forward')
 commands.history_list = ({vim}) ->
   menu = vim.window.document.getElementById('backForwardMenu')
   utils.openPopup(menu)
-  vim.notify(translate('notification.history_list.none')) unless menu.open
+  if menu.childElementCount == 0
+    vim.notify(translate('notification.history_list.none'))
 
 commands.reload = ({vim}) ->
   vim.window.BrowserReload()
