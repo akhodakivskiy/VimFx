@@ -210,7 +210,6 @@ commands.follow = helper_follow.bind(null, {id: 'normal'},
             # waste time on them.
             element not in [document.documentElement, document.body]) and
            (utils.includes(element.className, 'button') or
-            utils.includes(element.className, 'close') or
             utils.includes(element.getAttribute('aria-label'), 'close') or
             # Do this last as it’s a potentially expensive check.
             utils.hasEventListeners(element, 'click'))
