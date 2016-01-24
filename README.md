@@ -32,7 +32,7 @@ VimFx is made by [these awesome people][people].
 > functionality, but for Chrome. That’s why I decided to develop similar
 > extension for Firefox.
 >
-> **VimFx will be nice to your browser and to your habits. Promise.**
+> &nbsp;**VimFx will be nice to your browser and to your habits. Promise.**
 >
 > – _Anton Khodakivskiy,_ VimFx’s original author.
 
