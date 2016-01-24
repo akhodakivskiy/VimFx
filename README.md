@@ -2,23 +2,23 @@
 
 <img src="extension/skin/icon128.png" alt="" align="right">
 
-[VimFx] is a [Mozilla Firefox] extension which adds Vim-style keyboard shortcuts
-for browsing and navigation, significantly reducing the use of the mouse, and
-allowing your hands to rest on the home row.
+[VimFx] is a Firefox extension which adds Vim-style keyboard shortcuts for
+browsing and navigation, significantly reducing the use of the mouse.
 
-VimFx was inspired by [Vimperator] and designed after [Vimium] for [Chrome],
-preserving the shortcuts and behavior. If you are used to Vimium then it will be
-easy to get started with VimFx.
+- Doesn’t change your browser in any way. Everything can be disabled.
+- Easy for beginners, powerful for advanced users. Not just for Vim fanatics.
+- Modeled after [Vimium] for Chrome.
 
-Check out the [documentation], the [wiki] and [Questions & Answers]!
+**New to VimFx?** Check out [Questions & Answers]!  
+Power user? Make a [config file]!  
+In either case, have look at the the [documentation] and the [wiki].
 
 VimFx is made by [these awesome people][people].
 
 [VimFx]: https://addons.mozilla.org/firefox/addon/vimfx
-[Mozilla Firefox]: https://www.mozilla.org/firefox
-[Vimperator]: http://www.vimperator.org/vimperator
 [Vimium]: http://vimium.github.io/
-[Chrome]: https://www.google.com/chrome
+[Vimperator]: http://www.vimperator.org/vimperator
+[config file]: https://github.com/akhodakivskiy/VimFx/blob/master/documentation/config-file.md
 [documentation]: https://github.com/akhodakivskiy/VimFx/tree/master/documentation
 [wiki]: https://github.com/akhodakivskiy/VimFx/wiki
 [Questions & Answers]: https://github.com/akhodakivskiy/VimFx/tree/master/documentation/questions-and-answers.md
@@ -26,13 +26,13 @@ VimFx is made by [these awesome people][people].
 
 ## Why VimFx was created
 
-> Even before Vimium there was Vimperator for Firefox. In my opinion the problem
-> with Vimperator is that it has too many features and aggressively changes the
-> default Firefox appearance and behavior. Vimium was developed for Chrome and
-> it was exactly what I needed in terms of added functionality. That's why I
-> decided to develop similar extension for Firefox.
+> Even before [Vimium] there was [Vimperator] for Firefox. In my opinion,
+> Vimperator has too many features and aggressively changes the default Firefox
+> appearance and behavior. Vimium is exactly what I need in terms of added
+> functionality, but for Chrome. That’s why I decided to develop similar
+> extension for Firefox.
 >
-> VimFx will be nice to your browser and to your habits. Promise.
+> **VimFx will be nice to your browser and to your habits. Promise.**
 >
 > – _Anton Khodakivskiy,_ VimFx’s original author.
 
@@ -42,16 +42,16 @@ VimFx has concise shortcuts for most commonly performed actions. Many simply
 invoke native Firefox features. That is preferred over re-implementing similar
 functionality.
 
-Follow links, focus text inputs and click buttons using hint markers by pressing
-<kbd>f</kbd>. This command has many variations to for example copy links and
-open links in new tabs.
+Follow links, focus text inputs and click buttons using _hint markers_ by
+pressing <kbd>f</kbd>. This command has many variations, for example to copy
+links or open them in new tabs.
 
 Search with <kbd>/</kbd> and cycle between matches with <kbd>n</kbd> and
 <kbd>N</kbd>.
 
 Open a new tab with <kbd>t</kbd>, close it with <kbd>x</kbd>. Reopen it again
-with <kbd>X</kbd>. There are many more tab related commands, for example to
-change the currently selected tab.
+with <kbd>X</kbd>. Switch between tabs with <kbd>J</kbd> and <kbd>K</kbd>, or
+some of the several other tab commands.
 
 Scrolling left/down/up/right: <kbd>h</kbd>, <kbd>j</kbd>, <kbd>k</kbd>, <kbd>l</kbd>.  
 Top/Bottom: <kbd>gg</kbd>, <kbd>G</kbd>.  
