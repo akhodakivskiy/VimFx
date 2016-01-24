@@ -6,9 +6,9 @@
 for browsing and navigation, significantly reducing the use of the mouse, and
 allowing your hands to rest on the home row.
 
-VimFx was inspired by [Vimperator] and designed after [Vimium] for [Google
-Chrome], preserving the shortcuts and behavior. If you are used to Vimium then
-it will be easy to get started with VimFx.
+VimFx was inspired by [Vimperator] and designed after [Vimium] for [Chrome],
+preserving the shortcuts and behavior. If you are used to Vimium then it will be
+easy to get started with VimFx.
 
 Check out the [documentation] and the [wiki]!
 
@@ -18,7 +18,7 @@ VimFx is made by [these awesome people][people].
 [Mozilla Firefox]: https://www.mozilla.org/firefox
 [Vimperator]: http://www.vimperator.org/vimperator
 [Vimium]: http://vimium.github.io/
-[Google Chrome]: https://www.google.com/chrome
+[Chrome]: https://www.google.com/chrome
 [documentation]: https://github.com/akhodakivskiy/VimFx/tree/master/documentation
 [wiki]: https://github.com/akhodakivskiy/VimFx/wiki
 [people]: https://github.com/akhodakivskiy/VimFx/blob/master/PEOPLE.md
@@ -27,8 +27,8 @@ VimFx is made by [these awesome people][people].
 
 > Even before Vimium there was Vimperator for Firefox. In my opinion the problem
 > with Vimperator is that it has too many features and aggressively changes the
-> default Firefox appearance and behavior. Vimium was developed for Google Chrome
-> and it was exactly what I needed in terms of added functionality. That's why I
+> default Firefox appearance and behavior. Vimium was developed for Chrome and
+> it was exactly what I needed in terms of added functionality. That's why I
 > decided to develop similar extension for Firefox.
 >
 > VimFx will be nice to your browser and to your habits. Promise.
