@@ -59,8 +59,8 @@ Page up/down: <kbd>space</kbd>, <kbd>shift-space</kbd>.
 Half a page: <kbd>d</kbd>, <kbd>u</kbd>.
 
 There are of course many more shortcuts! Press <kbd>?</kbd> to see them all, and
-then <kbd>/</kbd> to search among them. Open VimFx’s [settings] page in the
-Add-ons Manager to customize the [default shortcuts].
+then <kbd>/</kbd> to search among them. Click on a command or open VimFx’s
+[settings] page in the Add-ons Manager to customize the [default shortcuts].
 
 You can temporarily disable VimFx by using Ignore mode. Press <kbd>i</kbd> to
 enter it, and <kbd>shift-escape</kbd> to exit. Use the [blacklist] to
