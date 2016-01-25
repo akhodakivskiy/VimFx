@@ -334,14 +334,15 @@ getFirstNonCoveredPoint = (window, viewport, element, elementRect, parents) ->
     elementAtPoint = window.document.elementFromPoint(x + dx, y + dy)
     offset = {left: 0, top: 0}
     found = false
+    firstLevel = true
 
     # Ensure that `element`, or a child of `element` (anything inside an `<a>`
     # is clickable too), really is present at (x,y). Note that this is not 100%
     # bullet proof: Combinations of CSS can cause this check to fail, even
     # though `element` isn’t covered. We don’t try to temporarily reset such CSS
     # because of performance. Instead we rely on that some of the attempts below
-    # will work.
-    if contains(element, elementAtPoint)
+    # will work. (See further down for the special value `-1` of `tryRight`.)
+    if contains(element, elementAtPoint) or tryRight == -1
       found = true
       # If we’re currently in a frame, there might be something on top of the
       # frame that covers `element`. Therefore we ensure that the frame really
@@ -367,19 +368,30 @@ getFirstNonCoveredPoint = (window, viewport, element, elementRect, parents) ->
         elementAtPoint = parent.window.document.elementFromPoint(
           offset.left + x + dx, offset.top + y + dy
         )
+        firstLevel = false
         unless contains(currentWindow.frameElement, elementAtPoint)
           found = false
           break
         currentWindow = parent.window
 
-    if found
-      return {x, y, offset}
-    else
-      return false if elementAtPoint == null or tryRight == 0
-      rect = elementAtPoint.getBoundingClientRect()
-      x = rect.right - offset.left + 1
-      return false if x > viewport.right
-      return tryPoint(x, 0, y, 0, tryRight - 1)
+    return {x, y, offset} if found
+
+    return false if elementAtPoint == null or tryRight <= 0
+    rect = elementAtPoint.getBoundingClientRect()
+
+    # `.getBoundingClientRect()` does not include pseudo-elements that are
+    # absolutely positioned so that they go outside of the element (which is
+    # common for `/###\`-looking tabs), but calling `.elementAtPoint()` on the
+    # pseudo-element _does_ return the element. This means that the covering
+    # element’s _rect_ won’t cover the element we’re looking for. If so, it’s
+    # better to try again, forcing the element to be considered located at this
+    # point. That’s what `-1` for the `tryRight` argument means.
+    if firstLevel and rect.right <= x + offset.left
+      return tryPoint(x, dx, y, dy, -1)
+
+    x = rect.right - offset.left + 1
+    return false if x > viewport.right
+    return tryPoint(x, 0, y, 0, tryRight - 1)
 
 
   # Try the left-middle point, or immediately to the right of a covering element
