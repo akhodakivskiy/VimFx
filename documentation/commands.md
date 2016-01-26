@@ -141,7 +141,7 @@ that effort.
 
 As mentioned above, `m` stores the _current scroll position._ Specifically, that
 means the scroll position of the element that would be scrolled if the active
-element isn't scrollable; see [Scrolling commands] above.
+element isn’t scrollable; see [Scrolling commands] above.
 
 [Scrolling commands]: #scrolling-commands-1
 

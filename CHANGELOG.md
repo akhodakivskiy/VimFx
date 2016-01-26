@@ -73,8 +73,8 @@
 
 - Fixed: Links with the `onclick` attribute can now be opened in new tabs again.
   (Regression since 0.8.0.)
-- Fixed: The text size in VimFx’s Keyboard Shortcuts dialog is now correctly
-  resized.
+- Fixed: The text size in VimFx’s Keyboard Shortcuts help dialog is now
+  correctly resized.
 - Added: The `gH` command. It opens the back/forward button context menu in the
   middle of the window, allowing you to choose a history entry with the arrow
   keys and `<enter>`.
@@ -89,7 +89,7 @@
 - Fixed: Dead keys now work out of the box on Windows.
 - Improved: Links with the `onclick` attribute (abused as buttons) can no longer
   get the same hint as another link.
-- Added: The Keyboard Shortcuts dialog (shown by pressing `?`) is now
+- Added: The Keyboard Shortcuts help dialog (shown by pressing `?`) is now
   searchable.
 - Added: The `g/` command. It’s like `/` but searches links only.
 

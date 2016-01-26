@@ -11,7 +11,7 @@ See the file README.md for copying conditions.
 If you press `i` you will enter Ignore mode. VimFx’s toolbar [button] turns red
 to reflect this.
 
-As you can see in VimFx’s Keyboard Shortcuts dialog (which you can open by
+As you can see in VimFx’s Keyboard Shortcuts help dialog (which you can open by
 pressing `?`), Ignore mode only has two shortcuts. That means that almost all
 key presses will be ignored by VimFx, and will be handled as if VimFx wasn’t
 installed.

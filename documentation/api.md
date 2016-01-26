@@ -86,9 +86,9 @@ your needs.
 
 Note: If you produce conflicting keyboard shortcuts, the order of your code does
 not matter. The command that comes first in VimFx’s settings page in the Add-ons
-Manager (and in the help dialog) gets the shortcut; the other one(s) do(es) not.
-See the notes about order in [mode object], [category object] and [command
-object] for more information about order.
+Manager (and in the Keyboard Shortcuts help dialog) gets the shortcut; the other
+one(s) do(es) not. See the notes about order in [mode object], [category object]
+and [command object] for more information about order.
 
 ```js
 // Even though we set the shortcut for focusing the search bar last, the command
@@ -117,8 +117,8 @@ authors who wish to extend VimFx. They should add commands manually to
   `vimfx.modes[options.mode].commands[options.name]`. It is also used for the
   pref used to store the shortcuts for the command:
   `` `custom.mode.${options.mode}.${options.name}` ``.
-- description: `String`. Shown in the help dialog and VimFx’s settings page in
-  the Add-ons Manager.
+- description: `String`. Shown in the Keyboard Shortcuts help dialog and VimFx’s
+  settings page in the Add-ons Manager.
 - mode: `String`. Defaults to `'normal'`. The mode to add the command to. The
   value has to be one of the keys of [`vimfx.modes`].
 - category: `String`. Defaults to `'misc'` for Normal mode and `''`
@@ -364,10 +364,10 @@ categories.custom = {
 
 A mode is an object with the following properties:
 
-- name: `String`. A human readable name of the mode used in the help dialog and
-  VimFx’s settings page in the Add-ons Manager. Config file users adding custom
-  modes could simply use a hard-coded string; extension authors are encouraged
-  to look up the name from a locale file.
+- name: `String`. A human readable name of the mode used in the Keyboard
+  Shortcuts help dialog and VimFx’s settings page in the Add-ons Manager. Config
+  file users adding custom modes could simply use a hard-coded string; extension
+  authors are encouraged to look up the name from a locale file.
 - order: `Number`. The first of the default modes has the order `100` and then
   they increase by `100` per mode. This allows to put new modes between two
   already existing ones.
@@ -418,10 +418,10 @@ to the browser and web pages, and `false` otherwise.
 
 A category is an object with the following properties:
 
-- name: `String`. A human readable name of the category used in the help dialog
-  and VimFx’s settings page in the Add-ons Manager. Config file users adding
-  custom categories could simply a use hard-coded string; extension authors are
-  encouraged to look up the name from a locale file.
+- name: `String`. A human readable name of the category used in the Keyboard
+  Shortcuts help dialog and VimFx’s settings page in the Add-ons Manager. Config
+  file users adding custom categories could simply a use hard-coded string;
+  extension authors are encouraged to look up the name from a locale file.
 - order: `Number`. The first of the default categories is the “uncategorized”
   category. It has the order `100` and then they increase by `100` per category.
   This allows to put new categories between two already existing ones.
@@ -432,10 +432,10 @@ A command is an object with the following properties:
 
 - pref: `String`. The pref used to store the shortcuts for the command.
 - run(args): `Function`. Called when the command is activated.
-- description: `String`. A description of the command, shown in the help dialog
-  and VimFx’s settings page in the Add-ons Manager. Config file users adding
-  custom commands could simply use a hard-coded string; extension authors are
-  encouraged to look up the name from a locale file.
+- description: `String`. A description of the command, shown in the Keyboard
+  Shortcuts help dialog and VimFx’s settings page in the Add-ons Manager. Config
+  file users adding custom commands could simply use a hard-coded string;
+  extension authors are encouraged to look up the name from a locale file.
 - category: `String`. The category to add the command to. The value has to be
   one of the keys of [`vimfx.get('categories')`][categories].
 - order: `Number`. The first of the default commands has the order `100` and

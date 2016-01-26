@@ -115,9 +115,10 @@ internally by other tasks.)
   lot and wish it ran faster, just tell it and it will! You’ll have to remember
   to re-run it whenever gulpfile.coffee is updated, though.
 
-- `gulp help.html` dumps VimFx’s Keyboard Shortcuts dialog into `help.html`. You
-  can then open up `help.html` in Firefox and style it live using the Style
-  Editor! You can even press the “Save” button when done to save your changes!
+- `gulp help.html` dumps VimFx’s Keyboard Shortcuts help dialog into
+  `help.html`. You can then open up `help.html` in Firefox and style it live
+  using the Style Editor! You can even press the “Save” button when done to save
+  your changes!
 
 ### Release
 

@@ -12,8 +12,8 @@ If you focus a text input, the icon is greyed out. This is to show that your key
 presses will be passed into the text input rather than activating VimFx
 commands.
 
-When in Normal mode, clicking it opens VimFx’s Keyboard Shortcuts dialog, just
-like the `?` shortcut does.
+When in Normal mode, clicking it opens VimFx’s Keyboard Shortcuts help dialog,
+just like the `?` shortcut does.
 
 In other modes, clicking it returns you to normal mode. If you feel like VimFx
 does not respond to any of your key presses, it might be because you’re not in
