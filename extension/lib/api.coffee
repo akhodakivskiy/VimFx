@@ -80,7 +80,7 @@ createAPI = (vimfx) ->
     pref = "#{defaults.BRANCH}custom.mode.#{mode}.#{name}"
     prefs.root.default.set(pref, '')
     vimfx.modes[mode].commands[name] = {
-      pref, category, order, run: fn, description: -> description
+      pref, category, order, run: fn, description
     }
 
   addOptionOverrides: (rules...) ->

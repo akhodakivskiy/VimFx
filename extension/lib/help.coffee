@@ -130,7 +130,7 @@ createContent = (window, vimfx) ->
           [specialKeys, rest] = splitSequence(sequence, vimfx.SPECIAL_KEYS)
           $('key-sequence-special-keys', keySequence, specialKeys)
           $('key-sequence-rest search-text', keySequence, rest)
-        $('description search-text', commandContainer, command.description())
+        $('description search-text', commandContainer, command.description)
 
   return content
 

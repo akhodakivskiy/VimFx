@@ -252,7 +252,7 @@ listeners is the current [vim object].
 
 ```js
 vimfx.on('modeChange', vim => {
-  let mode = vimfx.modes[vim.mode].name()
+  let mode = vimfx.modes[vim.mode].name
   vim.notify(`Entering mode: ${mode}`)
 })
 ```
@@ -316,7 +316,7 @@ This is a very low-level part of the API. It allows to:
     pref: 'extensions.my_extension.mode.normal.new_command',
     category: 'misc',
     order: 10000,
-    description: () => translate('mode.normal.new_command'),
+    description: translate('mode.normal.new_command'),
     run: args => console.log('New command! args:', args)
   }
   ```
@@ -364,8 +364,10 @@ categories.custom = {
 
 A mode is an object with the following properties:
 
-- name(): `Function`. Returns a human readable name of the mode used in the help
-  dialog and VimFx’s settings page in the Add-ons Manager.
+- name: `String`. A human readable name of the mode used in the help dialog and
+  VimFx’s settings page in the Add-ons Manager. Config file users adding custom
+  modes could simply use a hard-coded string; extension authors are encouraged
+  to look up the name from a locale file.
 - order: `Number`. The first of the default modes has the order `100` and then
   they increase by `100` per mode. This allows to put new modes between two
   already existing ones.
@@ -416,10 +418,10 @@ to the browser and web pages, and `false` otherwise.
 
 A category is an object with the following properties:
 
-- name(): `Function`. Returns a human readable name of the category used in the
-  help dialog and VimFx’s settings page in the Add-ons Manager. Config file
-  users adding custom categories could simply return a string; extension authors
-  are encouraged to look up the name from a locale file.
+- name: `String`. A human readable name of the category used in the help dialog
+  and VimFx’s settings page in the Add-ons Manager. Config file users adding
+  custom categories could simply a use hard-coded string; extension authors are
+  encouraged to look up the name from a locale file.
 - order: `Number`. The first of the default categories is the “uncategorized”
   category. It has the order `100` and then they increase by `100` per category.
   This allows to put new categories between two already existing ones.
@@ -430,8 +432,10 @@ A command is an object with the following properties:
 
 - pref: `String`. The pref used to store the shortcuts for the command.
 - run(args): `Function`. Called when the command is activated.
-- description(): `Function`. Returns a description of the command (as a string),
-  shown in the help dialog and VimFx’s settings page in the Add-ons Manager.
+- description: `String`. A description of the command, shown in the help dialog
+  and VimFx’s settings page in the Add-ons Manager. Config file users adding
+  custom commands could simply use a hard-coded string; extension authors are
+  encouraged to look up the name from a locale file.
 - category: `String`. The category to add the command to. The value has to be
   one of the keys of [`vimfx.get('categories')`][categories].
 - order: `Number`. The first of the default commands has the order `100` and

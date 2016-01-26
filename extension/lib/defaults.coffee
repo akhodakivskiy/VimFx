@@ -174,11 +174,7 @@ utils     = require('./utils')
 
 addCategory = (category, order) ->
   uncategorized = (category == '')
-  categoryName =
-    if uncategorized
-      -> ''
-    else
-      translate.bind(null, "category.#{category}")
+  categoryName = if uncategorized then '' else translate("category.#{category}")
   parsed_options.categories[category] = {
     name:  categoryName
     order: if uncategorized then 0 else order

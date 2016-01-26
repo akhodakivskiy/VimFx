@@ -32,7 +32,7 @@ utils                      = require('./utils')
 
 # Helper to create modes in a DRY way.
 mode = (modeName, obj, commands = null) ->
-  obj.name  = translate.bind(null, "mode.#{modeName}")
+  obj.name  = translate("mode.#{modeName}")
   obj.order = defaults.mode_order[modeName]
   obj.commands = {}
   for commandName, fn of commands
@@ -41,7 +41,7 @@ mode = (modeName, obj, commands = null) ->
       pref:        defaults.BRANCH + pref
       run:         fn
       category:    defaults.categoryMap[pref]
-      description: translate.bind(null, pref)
+      description: translate(pref)
       order:       defaults.command_order[pref]
   exports[modeName] = obj
 

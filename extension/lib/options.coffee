@@ -152,7 +152,7 @@ class Observer extends BaseObserver
           @appendSetting({
             pref:  command.pref
             type:  'string'
-            title: command.description()
+            title: command.description
             desc:  @generateErrorMessage(command.pref)
             class: 'is-shortcut'
           })

@@ -92,7 +92,7 @@ exports['test customization'] = (assert, $vimfx, teardown) -> getAPI((vimfx) ->
 
   # Add a slightly more complex command.
   vimfx.get('categories')['new_category'] = {
-    name:  -> 'New category'
+    name:  'New category'
     order: -100
   }
   vimfx.addCommand({
@@ -125,14 +125,14 @@ exports['test customization'] = (assert, $vimfx, teardown) -> getAPI((vimfx) ->
     (category) -> category._name == 'misc'
   )
   [..., {command: test_command}] = category_misc.commands
-  assert.equal(test_command.description(), 'Test command')
+  assert.equal(test_command.description, 'Test command')
 
   # Test that the new complex command can show up in the help dialog.
   mode_ignore = modes.find((mode) -> mode._name == 'ignore')
   [category_new] = mode_ignore.categories
   assert.equal(category_new.name, 'New category')
   [test_command] = category_new.commands
-  assert.equal(test_command.command.description(), 'Test ignore mode command')
+  assert.equal(test_command.command.description, 'Test ignore mode command')
   assert.deepEqual(test_command.enabledSequences, ['ö'])
 
   # Remove the added commands.
@@ -162,7 +162,7 @@ exports['test customization'] = (assert, $vimfx, teardown) -> getAPI((vimfx) ->
     (category) -> category._name == 'misc'
   )
   [..., {command: last_command}] = category_misc.commands
-  assert.notEqual(last_command.description(), 'Test command')
+  assert.notEqual(last_command.description, 'Test command')
 
   # Test that the new complex command cannot show up in the help dialog.
   mode_ignore = modes.find((mode) -> mode._name == 'ignore')
@@ -190,7 +190,7 @@ exports['test addCommand order'] = \
     (category) -> category._name == 'misc'
   )
   [{command: first_command}] = category_misc.commands
-  assert.equal(first_command.description(), 'Test command')
+  assert.equal(first_command.description, 'Test command')
 )
 
 exports['test addOptionOverrides'] = \
