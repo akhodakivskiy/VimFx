@@ -51,7 +51,7 @@ listenOnce = (name, listener, messageManager = defaultMM) ->
   namespacedName = namespace(name)
   fn = (data) ->
     messageManager.removeMessageListener(namespacedName, fn)
-    invokeListener(listener, data)
+    return invokeListener(listener, data)
   messageManager.addMessageListener(namespacedName, fn)
 
 callbackCounter = 0
@@ -75,7 +75,7 @@ send = (name, data = null, messageManager = defaultMM, callback = null) ->
 
 # Unwraps the data from `send` and invokes `listener` with it.
 invokeListener = (listener, {name, data: {data, callback} = {}, target}) ->
-  listener(data, {name, target, callback})
+  return listener(data, {name, target, callback})
 
 # Note: This is a synchronous call. It should only be used when absolutely
 # needed, such as in an event listener which needs to suppress the event based
