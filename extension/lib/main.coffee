@@ -119,11 +119,12 @@ module.exports = (data, reason) ->
   test?(vimfx)
 
   windows = new WeakSet()
-  messageManager.listen('tabCreated', (data, {target: browser}) ->
+  messageManager.listen('tabCreated', (data, {target: browser, callback}) ->
     # Frame scripts are run in more places than we need. Tell those not to do
     # anything.
-    group = browser.getAttribute('messagemanagergroup')
-    return false unless group == 'browsers'
+    unless browser.getAttribute('messagemanagergroup') == 'browsers'
+      messageManager.send(callback, false, browser.messageManager)
+      return
 
     window = browser.ownerGlobal
     vimfx.addVim(browser)
@@ -135,7 +136,7 @@ module.exports = (data, reason) ->
       setWindowAttribute(window, 'mode', 'normal')
       setWindowAttribute(window, 'focus-type', null)
 
-    return true
+    messageManager.send(callback, true, browser.messageManager)
   )
 
   messageManager.load('bootstrap')

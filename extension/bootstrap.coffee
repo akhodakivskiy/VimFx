@@ -34,16 +34,7 @@ do (global = this) ->
   ADDON_PATH = 'chrome://vimfx'
   IS_FRAME_SCRIPT = (typeof content != 'undefined')
 
-  if IS_FRAME_SCRIPT
-    # Tell the main process that this frame script was created, and get data
-    # back that only the main process has access to.
-    [ok] = sendSyncMessage("#{ADDON_PATH}/tabCreated")
-
-    # The main process told this frame script not to do anything (or there was
-    # an error and no message was received at all).
-    return unless ok
-
-  else
+  unless IS_FRAME_SCRIPT
     # Make `Services` and `console` available globally, just like they are in
     # frame scripts by default.
     Cu.import('resource://gre/modules/Services.jsm')
@@ -88,9 +79,12 @@ do (global = this) ->
 
     return require.scopes[normalizedUri].module.exports
 
+  require.scopes = {}
+
   global.startup = (args...) ->
-    require.scopes = {}
-    require.data   = require('./require-data')
+    # `require` cannot be used outside of `startup` (except for in frame
+    # scripts), so wait setting `require.data` until here.
+    require.data = require('./require-data')
 
     main = if IS_FRAME_SCRIPT then './lib/main-frame' else './lib/main'
     require(main)(args...)
@@ -117,11 +111,19 @@ do (global = this) ->
   global.uninstall = ->
 
   if IS_FRAME_SCRIPT
-    global.startup()
+    messageManager = require('./lib/message-manager')
 
-    # When updating the add-on, the previous version is going to shut down at
-    # the same time as the new version starts up. Add the shutdown listener in
-    # the next tick to prevent the previous version from triggering it.
-    content.setTimeout((->
-      require('./lib/message-manager').listenOnce('shutdown', global.shutdown)
-    ), 0)
+    # Tell the main process that this frame script was created, and ask if
+    # anything should be done in this frame.
+    messageManager.send('tabCreated', null, (ok) ->
+      return unless ok
+
+      global.startup()
+
+      # When updating the add-on, the previous version is going to shut down at
+      # the same time as the new version starts up. Add the shutdown listener in
+      # the next tick to prevent the previous version from triggering it.
+      content.setTimeout((->
+        messageManager.listenOnce('shutdown', global.shutdown)
+      ), 0)
+    )
