@@ -31,20 +31,17 @@
 do (global = this) ->
 
   {classes: Cc, interfaces: Ci, utils: Cu} = Components
+  ADDON_PATH = 'chrome://vimfx'
   IS_FRAME_SCRIPT = (typeof content != 'undefined')
 
   if IS_FRAME_SCRIPT
     # Tell the main process that this frame script was created, and get data
     # back that only the main process has access to.
-    [data] = sendSyncMessage('VimFx:tabCreated')
+    [ok] = sendSyncMessage("#{ADDON_PATH}/tabCreated")
 
     # The main process told this frame script not to do anything (or there was
     # an error and no message was received at all).
-    return unless data
-
-    FRAME_SCRIPT_ENVIRONMENT = global
-    global = {}
-    [global.__SCRIPT_URI_SPEC__] = data
+    return unless ok
 
   else
     # Make `Services` and `console` available globally, just like they are in
@@ -56,16 +53,9 @@ do (global = this) ->
     catch
       Cu.import('resource://gre/modules/devtools/Console.jsm')
 
-
-    FRAME_SCRIPT_ENVIRONMENT = null
-
   shutdownHandlers = []
 
-  createURI = (path, base = null) -> Services.io.newURI(path, null, base)
-  baseURI   = createURI(global.__SCRIPT_URI_SPEC__)
-
-  # Everything up to the first `!` is the absolute path to the .xpi.
-  dirname = (uri) -> uri.match(///^ [^!]+!/ (.+) /[^/]+ $///)[1]
+  dirname = (uri) -> uri.split('/')[...-1].join('/') or '.'
 
   require = (path, moduleRoot = '.', dir = '.') ->
     unless path[0] == '.'
@@ -77,36 +67,33 @@ do (global = this) ->
       path = subPath ? main ? 'index'
       moduleRoot = dir
 
-    fullPath = createURI("#{dir}/#{path}.js", baseURI).spec
+    prefix = "#{ADDON_PATH}/content"
+    uri = "#{prefix}/#{dir}/#{path}.js"
+    normalizedUri = Services.io.newURI(uri, null, null).spec
+    currentDir = dirname(".#{normalizedUri[prefix.length..]}")
 
-    unless require.scopes[fullPath]?
+    unless require.scopes[normalizedUri]?
       module =
         exports:    {}
         onShutdown: (fn) -> shutdownHandlers.push(fn)
-      require.scopes[fullPath] = scope = {
-        require: (path) -> require(path, moduleRoot, "./#{dirname(fullPath)}")
+      require.scopes[normalizedUri] = scope = {
+        require: (path) -> require(path, moduleRoot, currentDir)
         module, exports: module.exports
         Cc, Ci, Cu
-        IS_FRAME_SCRIPT, FRAME_SCRIPT_ENVIRONMENT
+        ADDON_PATH
+        IS_FRAME_SCRIPT
+        FRAME_SCRIPT_ENVIRONMENT: if IS_FRAME_SCRIPT then global else null
       }
-      Services.scriptloader.loadSubScript(fullPath, scope, 'UTF-8')
+      Services.scriptloader.loadSubScript(normalizedUri, scope, 'UTF-8')
 
-    return require.scopes[fullPath].module.exports
+    return require.scopes[normalizedUri].module.exports
 
-  require.scopes = {}
-  require.data   = require('./require-data')
+  global.startup = (args...) ->
+    require.scopes = {}
+    require.data   = require('./require-data')
 
-  unless IS_FRAME_SCRIPT
-    # Set default prefs and apply migrations as early as possible.
-    {applyMigrations} = require('./lib/legacy')
-    migrations        = require('./lib/migrations')
-    prefs             = require('./lib/prefs')
-
-    prefs.default.init()
-    applyMigrations(migrations)
-
-  main = if IS_FRAME_SCRIPT then './lib/main-frame' else './lib/main'
-  global.startup = require(main)
+    main = if IS_FRAME_SCRIPT then './lib/main-frame' else './lib/main'
+    require(main)(args...)
 
   global.shutdown = ->
     require('./lib/message-manager').send('shutdown') unless IS_FRAME_SCRIPT

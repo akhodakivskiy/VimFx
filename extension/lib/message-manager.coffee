@@ -22,7 +22,7 @@
 # messages between the main process and frame scripts. There is one frame script
 # per tab, and only them can access web page content.
 
-namespace = (name) -> "VimFx:#{name}"
+namespace = (name) -> "#{ADDON_PATH}/#{name}"
 
 defaultMM =
   if IS_FRAME_SCRIPT
@@ -33,10 +33,10 @@ defaultMM =
 
 load = (name, messageManager = defaultMM) ->
   # Randomize URI to work around bug 1051238.
-  url = "chrome://vimfx/content/#{name}.js?#{Math.random()}"
-  messageManager.loadFrameScript(url, true)
+  uri = "#{ADDON_PATH}/content/#{name}.js?#{Math.random()}"
+  messageManager.loadFrameScript(uri, true)
   module.onShutdown(->
-    messageManager.removeDelayedFrameScript(url)
+    messageManager.removeDelayedFrameScript(uri)
   )
 
 listen = (name, listener, messageManager = defaultMM) ->

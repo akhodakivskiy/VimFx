@@ -395,7 +395,7 @@ hasEventListeners = (element, type) ->
   return false
 
 loadCss = (name) ->
-  uri = Services.io.newURI("chrome://vimfx/skin/#{name}.css", null, null)
+  uri = Services.io.newURI("#{ADDON_PATH}/skin/#{name}.css", null, null)
   method = nsIStyleSheetService.AUTHOR_SHEET
   unless nsIStyleSheetService.sheetRegistered(uri, method)
     nsIStyleSheetService.loadAndRegisterSheet(uri, method)
