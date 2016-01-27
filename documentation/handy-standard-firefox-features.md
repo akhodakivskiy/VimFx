@@ -25,7 +25,12 @@ powerful. Other than simply entering URLs, you can also use it to:
 Type a lone `*` to restrict the results to bookmarks only. Use `<c-enter>` to
 open results in new tabs. There are [plenty more such tricks][location-bar].
 
+If you use this a lot, you might be interested in the [Enter Selects] extension
+and adding a [custom command as a shortcut][location-bar-custom-command].
+
 [location-bar]: http://kb.mozillazine.org/Location_Bar_search
+[Enter Selects]: https://addons.mozilla.org/en-US/firefox/addon/enter-selects/
+[location-bar-custom-command]: https://github.com/akhodakivskiy/VimFx/wiki/Custom-Commands#search-bookmarks
 
 
 ## Menus
