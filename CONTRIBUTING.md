@@ -28,7 +28,7 @@ Description
 VimFx version: 
 Firefox version: 
 OS: 
-Keyboard layout: 
+Keyboard language: 
 Worked before: 
 Example URL(s):
 - 
@@ -50,7 +50,7 @@ Ignore mode.
 VimFx version: 0.11.0
 Firefox version: 43
 OS: Ubuntu 15.04
-Keyboard layout: en-US QWERTY
+Keyboard language: en-US
 Worked before: No
 Example URL(s):
 - https://www.codecademy.com/en/courses/learn-the-command-line/lessons/navigation/exercises/your-first-command
