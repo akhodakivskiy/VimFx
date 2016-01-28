@@ -98,7 +98,7 @@ class FrameEventManager
       @vim.resetState(target)
     )
 
-    messageManager.listen('getMarkableElementsMovements', (data, {callback}) =>
+    messageManager.listen('getMarkableElementsMovements', (data, callback) =>
       diffs = @vim.state.markerElements.map(({element, originalRect}) ->
         newRect = element.getBoundingClientRect()
         return {
@@ -106,7 +106,7 @@ class FrameEventManager
           dy: newRect.top  - originalRect.top
         }
       )
-      messageManager.send(callback, diffs)
+      callback(diffs)
     )
 
     @listen('overflow', (event) =>

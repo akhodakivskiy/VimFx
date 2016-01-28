@@ -19,8 +19,6 @@
 
 utils = require('../lib/utils')
 
-{classes: Cc, interfaces: Ci} = Components
-
 exports['test removeDuplicates'] = (assert) ->
   assert.deepEqual(utils.removeDuplicates([1, 1, 2, 1, 3, 2]),
                                           [1, 2, 3])

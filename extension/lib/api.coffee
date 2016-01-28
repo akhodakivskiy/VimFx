@@ -1,5 +1,5 @@
 ###
-# Copyright Simon Lydell 2015.
+# Copyright Simon Lydell 2015, 2016.
 #
 # This file is part of VimFx.
 #
@@ -22,13 +22,14 @@
 defaults = require('./defaults')
 prefs    = require('./prefs')
 utils    = require('./utils')
+Vim      = require('./vim')
 
 counter = new utils.Counter({start: 10000, step: 100})
 
-createAPI = (vimfx) ->
+createConfigAPI = (vimfx) ->
   get: (pref) -> switch
     when pref of defaults.parsed_options
-      defaults.parsed_options[pref]
+      vimfx.options[pref]
     when pref of defaults.all_prefs or pref?.startsWith('custom.')
       prefs.get(pref)
     else
@@ -44,9 +45,13 @@ createAPI = (vimfx) ->
 
   set: (pref, value) -> switch
     when pref of defaults.parsed_options
+      previousValue = vimfx.options[pref]
       vimfx.options[pref] = value
+      onShutdown(vimfx, -> vimfx.options[pref] = previousValue)
     when pref of defaults.all_prefs or pref?.startsWith('custom.')
+      previousValue = if prefs.has(pref) then prefs.get(pref) else null
       prefs.set(pref, value)
+      onShutdown(vimfx, -> prefs.set(pref, previousValue))
     else
       throw new Error("VimFx: Unknown pref: #{pref}")
 
@@ -82,6 +87,7 @@ createAPI = (vimfx) ->
     vimfx.modes[mode].commands[name] = {
       pref, category, order, run: fn, description
     }
+    onShutdown(vimfx, -> delete vimfx.modes[mode].commands[name])
 
   addOptionOverrides: (rules...) ->
     unless vimfx.optionOverrides
@@ -92,6 +98,7 @@ createAPI = (vimfx) ->
           overrides = getOverrides(vimfx.optionOverrides, location)
           return overrides?[pref] ? options[pref]
       })
+      onShutdown(vimfx, -> vimfx.optionOverrides = [])
     vimfx.optionOverrides.push(rules...)
 
   addKeyOverrides: (rules...) ->
@@ -101,14 +108,41 @@ createAPI = (vimfx) ->
         location = utils.getCurrentLocation()
         overrides = getOverrides(vimfx.keyOverrides, location, mode)
         return keyStr not in (overrides ? [])
+      onShutdown(vimfx, -> vimfx.keyOverrides = [])
     vimfx.keyOverrides.push(rules...)
 
-  on:      vimfx.on.bind(vimfx)
-  modes:   vimfx.modes
+  send: (vim, message, data = null, callback = null) ->
+    unless vim instanceof Vim
+      throw new Error("VimFx: The first argument must be a vim object.
+                       Got: #{vim}")
+    unless typeof message == 'string'
+      throw new Error("VimFx: The second argument must be a message string.
+                       Got: #{message}")
+    if typeof data == 'function'
+      throw new Error("VimFx: The third argument must not be a function.
+                       Got: #{data}")
+
+    unless typeof callback == 'function' or callback == null
+      throw Error("VimFx: If provided, `callback` must be a function.
+                   Got: #{callback}")
+    vim._send(message, data, callback, {prefix: 'config:'})
+
+  on: (event, listener) ->
+    vimfx.on(event, listener)
+    onShutdown(vimfx, -> vimfx.off(event, listener))
+
+  off:   vimfx.off.bind(vimfx)
+  modes: vimfx.modes
 
 getOverrides = (rules, args...) ->
   for [match, overrides] in rules
     return overrides if match(args...)
   return null
 
-module.exports = createAPI
+onShutdown = (vimfx, handler) ->
+  fn = ->
+    handler()
+    vimfx.off('shutdown', fn)
+  vimfx.on('shutdown', fn)
+
+module.exports = createConfigAPI

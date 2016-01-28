@@ -21,8 +21,8 @@
 # This file pulls in all the different parts of VimFx, initializes them, and
 # stiches them together.
 
-createAPI         = require('./api')
 button            = require('./button')
+config            = require('./config')
 defaults          = require('./defaults')
 UIEventManager    = require('./events')
 {applyMigrations} = require('./legacy')
@@ -51,14 +51,13 @@ module.exports = (data, reason) ->
   vimfx.version = data.version
   AddonManager.getAddonByID(vimfx.id, (info) -> vimfx.info = info)
 
-  utils.loadCss('style')
+  utils.loadCss("#{ADDON_PATH}/skin/style.css")
 
   options.observe(vimfx)
 
-  skipCreateKeyTrees = false
   prefs.observe('', (pref) ->
     if pref.startsWith('mode.') or pref.startsWith('custom.')
-      vimfx.createKeyTrees() unless skipCreateKeyTrees
+      vimfx.createKeyTrees()
     else if pref of defaults.all_options
       value = parsePref(pref)
       vimfx.options[pref] = value
@@ -90,44 +89,12 @@ module.exports = (data, reason) ->
     setWindowAttribute(vim.window, 'focus-type', focusType)
   )
 
-  # Setup the config file API. See public.coffee for more information. This is
-  # done _after_ the prefs observing setup, so that option prefs get validated
-  # and used when calling `vimfx.set()`.
-  apiUrl = "#{data.resourceURI.spec}lib/public.js"
-  prefs.set('api_url', apiUrl)
-  publicScope = Cu.import(apiUrl, {})
-  api = createAPI(vimfx)
-  publicScope._invokeCallback = (callback) ->
-    # Calling `vimfx.createKeyTrees()` after each `vimfx.set()` that modifies a
-    # shortcut is absolutely redundant and may make Firefox start slower. Do it
-    # once instead.
-    skipCreateKeyTrees = true
-    callback(api)
-    skipCreateKeyTrees = false
-    vimfx.createKeyTrees()
-  module.onShutdown(-> publicScope._invokeCallback = null)
-
-  # Pass the API to add-ons that loaded before VimFx, either because they just
-  # happened to do so when Firefox started, or because VimFx was updated (or
-  # disabled and then enabled) in the middle of the session. Because of the
-  # latter case, `Cu.unload(apiUrl)` is not called on shutdown. Otherwise you’d
-  # have to either restart Firefox, or disable and enable every add-on using the
-  # API in order for them to take effect again. (`_callbacks` should always
-  # exist, but it’s better to be safe than sorry.)
-  if publicScope._callbacks?.length > 0
-    publicScope._invokeCallback((api) ->
-      callback(api) for callback in publicScope._callbacks
-      return
-    )
-
-  test?(vimfx)
-
   windows = new WeakSet()
-  messageManager.listen('tabCreated', (data, {target: browser, callback}) ->
+  messageManager.listen('tabCreated', (data, callback, browser) ->
     # Frame scripts are run in more places than we need. Tell those not to do
     # anything.
     unless browser.getAttribute('messagemanagergroup') == 'browsers'
-      messageManager.send(callback, false, browser.messageManager)
+      callback(false)
       return
 
     window = browser.ownerGlobal
@@ -140,7 +107,25 @@ module.exports = (data, reason) ->
       setWindowAttribute(window, 'mode', 'normal')
       setWindowAttribute(window, 'focus-type', null)
 
-    messageManager.send(callback, true, browser.messageManager)
+    callback(true)
   )
 
-  messageManager.load('bootstrap')
+  messageManager.load("#{ADDON_PATH}/content/bootstrap.js")
+
+  config.load(vimfx)
+  vimfx.on('shutdown', -> messageManager.send('unloadConfig'))
+  module.onShutdown(->
+    # Make sure to run the below lines in this order. The second line results in
+    # removing all message listeners in frame scripts, including the one for
+    # 'unloadConfig' (see above).
+    vimfx.emit('shutdown')
+    messageManager.send('shutdown')
+  )
+
+  if test
+    test(vimfx)
+    runFrameTests = true
+    messageManager.listen('runTests', (data, callback) ->
+      callback(runFrameTests)
+      runFrameTests = false
+    )

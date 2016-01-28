@@ -26,6 +26,7 @@
 # NOTE: Most tab related commands need to do their actual tab manipulations in
 # the next tick (`utils.nextTick`) to work around bug 1200334.
 
+config    = require('./config')
 help      = require('./help')
 hints     = require('./hints')
 prefs     = require('./prefs')
@@ -574,6 +575,17 @@ commands.enter_reader_view = ({vim}) ->
     button.click()
   else
     vim.notify(translate('notification.enter_reader_view.none'))
+
+commands.reload_config_file = ({vim}) ->
+  vim._parent.emit('shutdown')
+  config.load(vim._parent, (status) -> switch status
+    when null
+      vim.notify(translate('notification.reload_config_file.none'))
+    when true
+      vim.notify(translate('notification.reload_config_file.success'))
+    else
+      vim.notify(translate('notification.reload_config_file.failure'))
+  )
 
 commands.help = ({vim}) ->
   help.injectHelp(vim.window, vim._parent)

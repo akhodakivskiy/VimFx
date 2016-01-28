@@ -101,6 +101,7 @@ shortcuts =
       'i':         'enter_mode_ignore'
       'I':         'quote'
       'gr':        'enter_reader_view'
+      'zr':        'reload_config_file'
       '?':         'help'
       ':':         'dev'
       '<force><escape>': 'esc'
@@ -138,6 +139,7 @@ advanced_options =
   'counts_enabled':                     true
   'ignore_ctrl_alt':                    (Services.appinfo.OS == 'WINNT')
   'prevent_autofocus_modes':            'normal'
+  'config_file_directory':              ''
   'hints_timeout':                      200
   'hints_sleep':                        15
   'smoothScroll.lines.spring-constant': '1000'

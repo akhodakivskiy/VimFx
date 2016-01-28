@@ -203,6 +203,19 @@ are [discouraged on Windows][wikipedia-altgr] anyway because of this reason.
 
 Space separated list of modes where `prevent_autofocus` should be used.
 
+### `config_file_directory`
+
+VimFx can optionally be customized using a [config file]. If you want to that,
+you need to tell VimFx where that file is. That’s what this pref is for.
+
+By default this pref is blank (the empty string), which means that no config
+file should be loaded.
+
+If non-blank, it should be the path to the directory where the config file
+exists. See the [config file] documentation for more information.
+
+[config file]: config-file.md
+
 ### `hints_timeout`
 
 The number of milliseconds a matched hint marker should stay on screen before

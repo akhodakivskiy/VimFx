@@ -63,9 +63,9 @@ class Vim
       return options
     )
 
-    @_listen('vimMethod', ({method, args = []}, {callback = null}) =>
+    @_listen('vimMethod', ({method, args = []}, callback = null) =>
       result = @[method](args...)
-      @_send(callback, result) if callback
+      callback?(result)
     )
 
     @_listen('vimMethodSync', ({method, args = []}) =>
@@ -149,14 +149,19 @@ class Vim
   _run: (name, data = {}, callback = null) ->
     @_send('runCommand', {name, data}, callback)
 
-  _listen: (name, listener) ->
-    messageManager.listen(name, listener, @_messageManager)
+  _messageManagerOptions: (options) ->
+    return Object.assign({
+      messageManager: @_messageManager
+    }, options)
 
-  _listenOnce: (name, listener) ->
-    messageManager.listenOnce(name, listener, @_messageManager)
+  _listen: (name, listener, options = {}) ->
+    messageManager.listen(name, listener, @_messageManagerOptions(options))
 
-  _send: (name, data, callback = null) ->
-    messageManager.send(name, data, @_messageManager, callback)
+  _listenOnce: (name, listener, options = {}) ->
+    messageManager.listenOnce(name, listener, @_messageManagerOptions(options))
+
+  _send: (name, data, callback = null, options = {}) ->
+    messageManager.send(name, data, callback, @_messageManagerOptions(options))
 
   notify: (message) ->
     @_parent.emit('notification', {vim: this, message})

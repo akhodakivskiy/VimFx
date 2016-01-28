@@ -333,12 +333,15 @@ class EventEmitter
     @listeners = {}
 
   on: (event, listener) ->
-    (@listeners[event] ?= []).push(listener)
+    (@listeners[event] ?= new Set()).add(listener)
+
+  off: (event, listener) ->
+    @listeners[event]?.delete(listener)
 
   emit: (event, data) ->
-    for listener in @listeners[event] ? []
+    @listeners[event]?.forEach((listener) ->
       listener(data)
-    return
+    )
 
 has = (obj, prop) -> Object::hasOwnProperty.call(obj, prop)
 
@@ -396,8 +399,8 @@ hasEventListeners = (element, type) ->
       return true
   return false
 
-loadCss = (name) ->
-  uri = Services.io.newURI("#{ADDON_PATH}/skin/#{name}.css", null, null)
+loadCss = (uriString) ->
+  uri = Services.io.newURI(uriString, null, null)
   method = nsIStyleSheetService.AUTHOR_SHEET
   unless nsIStyleSheetService.sheetRegistered(uri, method)
     nsIStyleSheetService.loadAndRegisterSheet(uri, method)

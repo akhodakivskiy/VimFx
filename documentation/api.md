@@ -6,44 +6,25 @@ See the file README.md for copying conditions.
 
 # API
 
-VimFx has an API. It is intended to be used by users who would like to write a
-so-called [config file].
+This file documents VimFx’s [config file] API.
 
-## Getting the API
-
-```js
-let {classes: Cc, interfaces: Ci, utils: Cu} = Components
-Cu.import('resource://gre/modules/Services.jsm')
-let apiPref = 'extensions.VimFx.api_url'
-let apiUrl = Services.prefs.getComplexValue(apiPref, Ci.nsISupportsString).data
-Cu.import(apiUrl, {}).getAPI(vimfx => {
-
-  // Do things with the `vimfx` object here.
-
-})
-```
-
-You might also want to take a look at the [config file bootstrap.js
-example][bootstrap.js].
-
-Note that the callback passed to `getAPI` is called once every time VimFx starts
-up, not once per Firefox session! This means that if you update VimFx (or
-disable and then enable it), the callback is re-run with the new version.
+Both `config.js` and `frame.js` have access to a variable called `vimfx`. Note
+that while the variables have the same name, they are different and provide
+different API methods.
 
 
-## API
+## `config.js` API
 
-The following sub-sections assume that you store VimFx’s API in a variable
-called `vimfx`.
+In `config.js`, the following API is available as the variable `vimfx`.
 
-### `vimfx.get(pref)`, `vimfx.getDefault(pref)` and `vimfx.set(pref, value)`
+### `vimfx.get(...)`, `vimfx.getDefault(...)` and `vimfx.set(...)`
 
-Gets or sets the (default) value of the VimFx pref `pref`.
+Gets or sets the (default) value of a VimFx pref.
 
 You can see all prefs in [defaults.coffee], or by opening [about:config] and
 filtering by `extensions.vimfx`. Note that you can also access the [special
-options], which may not be accessed in [about:config], using `vimfx.get()` and
-`vimfx.set()`—in fact, this is the _only_ way of accessing those options.
+options], which may not be accessed in [about:config], using `vimfx.get(...)`
+and `vimfx.set(...)`—in fact, this is the _only_ way of accessing those options.
 
 #### `vimfx.get(pref)`
 
@@ -126,7 +107,7 @@ below for more information.
 
 <strong id="custom-command-shortcuts">Note</strong> that you have to give the
 new command a shortcut in VimFx’s settings page in the Add-ons Manager or set
-one using `vimfx.set()` to able to use the new command.
+one using `vimfx.set(...)` to able to use the new command.
 
 ```js
 vimfx.addCommand({
@@ -139,7 +120,7 @@ vimfx.addCommand({
 vimfx.set('custom.mode.normal.hello', 'gö')
 ```
 
-### `vimfx.addOptionOverrides(...rules)` and `vimfx.addKeyOverrides(...rules)`
+### `vimfx.addOptionOverrides(...)` and `vimfx.addKeyOverrides(...)`
 
 These methods take any number of arguments. Each argument is a rule. The rules
 are added in order. The methods may be run multiple times.
@@ -195,9 +176,58 @@ vimfx.addKeyOverrides(
 )
 ```
 
-### `vimfx.on(eventName, listener)`
+### `vimfx.send(vim, message, data = null, callback = null)`
 
-Runs `listener(data)` when `eventName` is fired.
+Send `message` (a string) to the instance of `frame.js` in the tab managed by
+[`vim`][vim object], and pass it `data`. If provided, `callback` must be a
+function that takes a single argument, which is the data that `frame.js`
+responds with. `frame.js` uses its [`vimfx.listen(...)`] method to listen for
+(and optionally respond to) `message`.
+
+Here is an example:
+
+```js
+// config.js
+// You get a `vim` instance by using `vimfx.addCommand(...)` or `vimfx.on(...)`.
+vimfx.send(vim, 'getSelection', {example: 5}, selection => {
+  console.log('Currently selected text:', selection)
+})
+```
+
+```js
+// frame.js
+vimfx.listen('getSelection', ({example}, callback) => {
+  console.log('`example` should be 5:', example)
+  let selection = content.getSelection().toString()
+  callback(selection)
+})
+```
+
+What if you want to do it the other way around: Send a message _from_ `frame.js`
+and listen for it in `config.js`? That’s not the common use case, so VimFx does
+not provide convenience functions for it. Yes, `vimfx.send(...)`, and
+`vimfx.listen(...)` in `frame.js`, are just light wrappers around the standard
+Firefox [Message Manager] to make it easier to create custom commands that ask
+`frame.js` for information about the current web page (as in the above example).
+If you want to send messages any other way, you’ll need to use the Message
+Manager directly. See [the `shutdown` event] for an example.
+
+(While it would have made sense to provide `vim.send(message, data, callback)`
+instead of `vimfx.send(vim, message, data, callback)`, the latter was chosen for
+symmetry between `config.js` and `frame.js`. Use `vimfx.send()` to send
+messages, and `vimfx.listen()` to listen for them.)
+
+### `vimfx.on(eventName, listener)` and `vimfx.off(eventName, listener)`
+
+After calling `vimfx.on(eventName, listener)`, `listener(data)` will be called
+when `eventName` is fired.
+
+You may use `vimfx.off(eventName, listener)` if you’d like to remove your
+added listener for some reason.
+
+While [`vimfx.send(...)`] and [`vimfx.listen(...)`] are all about passing
+messages between `config.js` and `frame.js`, `vimfx.on(...)` is all about doing
+something whenever VimFx emits internal events.
 
 #### The `locationChange` event
 
@@ -255,7 +285,7 @@ Occurs whenever any tab in any window is selected. This is also fired when
 Firefox starts for the currently selected tab. The data passed to listeners is
 the `event` object passed to the standard Firefox [TabSelect] event.
 
-### The `modeDisplayChange` event
+#### The `modeDisplayChange` event
 
 This is basically a combination of the `modeChange` and the `TabSelect` events.
 The event is useful for knowing when to update UI showing the current mode. The
@@ -282,7 +312,73 @@ object with the following properties:
 `#main-window[vimfx-focus-type]` to the current focus type. You may use this
 with custom [styling].)
 
+#### The `shutdown` event
 
+Occurs when:
+
+- VimFx shuts down: When Firefox shuts down, when VimFx is disabled or when
+  VimFx is updated.
+- When the config file is reloaded using the `zr` command.
+
+If you care about that things you do in `config.js` and `frame.js` are undone
+when any of the above happens, read on.
+
+If all you do is using the methods of the `vimfx` object, you shouldn’t need to
+care about this event.
+
+The following methods don’t need any undoing:
+
+- `vimfx.get(...)`
+- `vimfx.getDefault(...)`
+- `vimfx.send(...)`
+- `vimfx.off(...)`
+
+The following methods are automatically undone when the `shutdown` event fires.
+This means that if you, for example, add a custom command in `config.js` but
+then remove it from `config.js` and hit `zr`, the custom command will be gone in
+VimFx.
+
+- `vimfx.set(...)`
+- `vimfx.addCommand(...)`
+- `vimfx.addOptionOverrides(...)`
+- `vimfx.addKeyOverrides(...)`
+- `vimfx.on(...)`
+
+The following require manual undoing:
+
+- `vimfx.mode`. Any changes you do here must be manually undone.
+
+If you add event listeners in `frame.js`, here’s an example of how to remove
+them on `shutdown`:
+
+```js
+// config.js
+vimfx.on('shutdown', () => {
+  Components.classes['@mozilla.org/globalmessagemanager;1']
+    .getService(Components.interfaces.nsIMessageListenerManager)
+    // Send this message to _all_ frame scripts.
+    .broadcastAsyncMessage('VimFx-config:shutdown')
+})
+```
+
+```js
+// frame.js
+let listeners = []
+function listen(eventName, listener) {
+  addEventListener(eventName, listener, true)
+  listeners.push([eventName, listener])
+}
+
+listen('focus', event => {
+  console.log('focused element', event.target)
+})
+
+addMessageListener('VimFx-config:shutdown', () => {
+  listeners.forEach(([eventName, listener]) => {
+    removeMessageListener(eventName, listener, true)
+  })
+})
+```
 
 ### `vimfx.modes`
 
@@ -299,8 +395,8 @@ This is a very low-level part of the API. It allows to:
     commands.tab_new.run(args)
   ```
 
-- Adding new commands. It is recommended to use the `vimfx.addCommand()` helper
-  instead. It’s easier.
+- Adding new commands. It is recommended to use the `vimfx.addCommand(...)`
+  helper instead. It’s easier.
 
   ```js
   vimfx.modes.normal.commands.new_command = {
@@ -317,7 +413,7 @@ This is a very low-level part of the API. It allows to:
 
   ```js
   vimfx.modes.new_mode = {
-    name: () => translate('mode.new_mode'),
+    name: translate('mode.new_mode'),
     order: 10000,
     commands: {},
     onEnter(args) {},
@@ -342,7 +438,7 @@ let categories = vimfx.get('categories')
 
 // Add a new category.
 categories.custom = {
-  name: () => 'Custom commands',
+  name: 'Custom commands',
   order: 10000,
 }
 
@@ -567,28 +663,38 @@ Technically, it is a [`URL`] instance. You can experiment with the current
 location object by opening the [web console] and entering `location`.
 
 
-## Frame script API
+## `frame.js` API
 
-In frame scripts, the API consists of assigning global variables prefixed with
-`VimFx`. VimFx then uses these when needed.
+In `frame.js`, the following API is available as the variable `vimfx`.
+
+### `vimfx.listen(message, listener)`
+
+Listen for `message` (a string) from `config.js`. `listener` will be called with
+the data sent from `config.js` (if any), and optionally a callback function if
+`config.js` wants you to respond. If so, call the callback function, optionally
+with some data to send back to `config.js.` `config.js` uses its
+[`vimfx.send(...)`] method to send  `message` (and optionally some data along
+with it).
+
+See the [`vimfx.send(...)`] method in `config.js` for more information and
+examples.
+
+### `vimfx.setHintMatcher(hintMatcher)`
+
+`hintMatcher` is a function that lets you customize which elements do and don’t
+get hints. It might help to read about [the `f` commands] first.
+
+If you call `vimfx.setHintMatcher(hintMatcher)` more than once, only the
+`hintMatcher` provided the last time will be used.
 
 ```js
-this.VimFxSomething = ...
-```
-
-### `VimFxHintMatcher(...)`
-
-If available, it is used to let you customize which elements do and don’t get
-hints. It might help to read about [the `f` commands] first.
-
-```js
-this.VimFxHintMatcher = (id, element, {type, semantic}) => {
+vimfx.setHintMatcher((id, element, {type, semantic}) => {
   // Inspect `element` and change `type` and `semantic` if needed.
   return {type, semantic}
-}
+})
 ```
 
-The arguments passed to this function are:
+The arguments passed to the `hintMatcher` function are:
 
 - id: `String`. A string identifying which command is used:
 
@@ -653,6 +759,8 @@ backwards compatibility will be a priority and won’t be broken until VimFx
 2.0.0.
 
 [option overrides]: #vimfxaddoptionoverridesrules
+[`vimfx.send(...)`]: #vimfxsendvim-message-data--null-callback--null
+[`vimfx.listen(...)`]: #vimfxlistenmessage-listener
 [categories]: #vimfxgetcategories
 [`vimfx.modes`]: #vimfxmodes
 [onInput]: #oninput
@@ -663,6 +771,7 @@ backwards compatibility will be a priority and won’t be broken until VimFx
 [vim object]: #vim-object
 [options object]: #options-object
 [location object]: #location-object
+[the `shutdown` event]: #the-shutdown-event
 
 [blacklisted]: options.md#blacklist
 [special options]: options.md#special-options
@@ -688,6 +797,7 @@ backwards compatibility will be a priority and won’t be broken until VimFx
 [`Browser`]: https://developer.mozilla.org/en-US/docs/Mozilla/Tech/XUL/browser
 [`window.location`]: https://developer.mozilla.org/en-US/docs/Web/API/Location
 [`URL`]: https://developer.mozilla.org/en-US/docs/Web/API/URL
+[Message Manager]: https://developer.mozilla.org/en-US/Firefox/Multiprocess_Firefox/Message_Manager
 [TabSelect]: https://developer.mozilla.org/en-US/docs/Web/Events/TabSelect
 [web console]: https://developer.mozilla.org/en-US/docs/Tools/Web_Console
 [about:config]: http://kb.mozillazine.org/About:config

@@ -90,8 +90,6 @@ do (global = this) ->
     require(main)(args...)
 
   global.shutdown = ->
-    require('./lib/message-manager').send('shutdown') unless IS_FRAME_SCRIPT
-
     for shutdownHandler in shutdownHandlers
       try
         shutdownHandler()

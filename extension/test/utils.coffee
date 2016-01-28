@@ -1,5 +1,5 @@
 ###
-# Copyright Simon Lydell 2015.
+# Copyright Simon Lydell 2015, 2016.
 #
 # This file is part of VimFx.
 #
@@ -17,11 +17,38 @@
 # along with VimFx.  If not, see <http://www.gnu.org/licenses/>.
 ###
 
+# This file provides some handy helpers for testing.
+
+Vim = require('../lib/vim')
+
 stub = (obj, method, fn) ->
   originalFn = obj[method]
   obj[method] = fn
   return -> obj[method] = originalFn
 
+throws = (assert, regex, badValue, fn) ->
+  assert.throws(fn)
+  try fn() catch error
+    assert.ok(error.message.startsWith('VimFx:'), 'start with VimFx')
+    assert.ok(error.message.endsWith(": #{badValue}"), 'show bad value')
+    assert.ok(regex.test(error.message), 'regex match')
+
+class MockMessageManager
+  constructor: ->
+    @sendAsyncMessageCalls      = 0
+    @addMessageListenerCalls    = 0
+    @removeMessageListenerCalls = 0
+
+  sendAsyncMessage:      -> @sendAsyncMessageCalls++
+  addMessageListener:    -> @addMessageListenerCalls++
+  removeMessageListener: -> @removeMessageListenerCalls++
+
+class MockVim extends Vim
+  constructor: (@_messageManager = null) ->
+
 module.exports = {
   stub
+  throws
+  MockMessageManager
+  MockVim
 }

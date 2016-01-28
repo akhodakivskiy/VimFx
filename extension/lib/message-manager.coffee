@@ -22,66 +22,81 @@
 # messages between the main process and frame scripts. There is one frame script
 # per tab, and only them can access web page content.
 
-namespace = (name) -> "#{ADDON_PATH}/#{name}"
+namespace = (name, prefix) -> "#{ADDON_PATH}/#{prefix}#{name}"
 
-defaultMM =
+defaultMessageManager =
   if IS_FRAME_SCRIPT
     FRAME_SCRIPT_ENVIRONMENT
   else
     Cc['@mozilla.org/globalmessagemanager;1']
       .getService(Ci.nsIMessageListenerManager)
 
-load = (name, messageManager = defaultMM) ->
+defaultOptions = {
+  messageManager: defaultMessageManager
+  onShutdown: module.onShutdown
+  prefix: ''
+}
+
+load = (uri, options = {}) ->
+  args = Object.assign({}, defaultOptions, options)
   # Randomize URI to work around bug 1051238.
-  uri = "#{ADDON_PATH}/content/#{name}.js?#{Math.random()}"
-  messageManager.loadFrameScript(uri, true)
-  module.onShutdown(->
-    messageManager.removeDelayedFrameScript(uri)
+  args.messageManager.loadFrameScript("#{uri}?#{Math.random()}", true)
+  args.onShutdown(->
+    args.messageManager.removeDelayedFrameScript(uri)
   )
 
-listen = (name, listener, messageManager = defaultMM) ->
-  namespacedName = namespace(name)
-  fn = invokeListener.bind(null, listener)
-  messageManager.addMessageListener(namespacedName, fn)
-  module.onShutdown(->
-    messageManager.removeMessageListener(namespacedName, fn)
+listen = (name, listener, options = {}) ->
+  args = Object.assign({}, defaultOptions, options)
+  namespacedName = namespace(name, args.prefix)
+  fn = invokeListener.bind(null, listener, args)
+  args.messageManager.addMessageListener(namespacedName, fn)
+  args.onShutdown(->
+    args.messageManager.removeMessageListener(namespacedName, fn)
   )
 
-listenOnce = (name, listener, messageManager = defaultMM) ->
-  namespacedName = namespace(name)
+listenOnce = (name, listener, options = {}) ->
+  args = Object.assign({}, defaultOptions, options)
+  namespacedName = namespace(name, args.prefix)
   fn = (data) ->
-    messageManager.removeMessageListener(namespacedName, fn)
-    return invokeListener(listener, data)
-  messageManager.addMessageListener(namespacedName, fn)
+    args.messageManager.removeMessageListener(namespacedName, fn)
+    return invokeListener(listener, args, data)
+  args.messageManager.addMessageListener(namespacedName, fn)
 
 callbackCounter = 0
-send = (name, data = null, messageManager = defaultMM, callback = null) ->
-  if typeof messageManager == 'function'
-    callback = messageManager
-    messageManager = defaultMM
+send = (name, data = null, callback = null, options = {}) ->
+  args = Object.assign({}, defaultOptions, options)
 
   callbackName = null
   if callback
     callbackName = "#{name}:callback:#{callbackCounter}"
     callbackCounter++
-    listenOnce(callbackName, callback, messageManager)
+    listenOnce(callbackName, callback, args)
 
-  namespacedName = namespace(name)
-  wrappedData = {data, callback: callbackName}
-  if messageManager.broadcastAsyncMessage
-    messageManager.broadcastAsyncMessage(namespacedName, wrappedData)
+  namespacedName = namespace(name, args.prefix)
+  wrappedData = {data, callbackName}
+  if args.messageManager.broadcastAsyncMessage
+    args.messageManager.broadcastAsyncMessage(namespacedName, wrappedData)
   else
-    messageManager.sendAsyncMessage(namespacedName, wrappedData)
+    args.messageManager.sendAsyncMessage(namespacedName, wrappedData)
 
 # Unwraps the data from `send` and invokes `listener` with it.
-invokeListener = (listener, {name, data: {data, callback} = {}, target}) ->
-  return listener(data, {name, target, callback})
+invokeListener = (listener, args, {data: {data, callbackName} = {}, target}) ->
+  callback =
+    if callbackName
+      (data = null) ->
+        send(callbackName, data, null, Object.assign({}, args, {
+          messageManager: target.messageManager ? target
+        }))
+    else
+      null
+  return listener(data, callback, target)
 
 # Note: This is a synchronous call. It should only be used when absolutely
 # needed, such as in an event listener which needs to suppress the event based
 # on the return value.
 get = (name, data) ->
-  [result] = defaultMM.sendSyncMessage(namespace(name), {data})
+  namespacedName = namespace(name, defaultOptions.prefix)
+  [result] = defaultMessageManager.sendSyncMessage(namespacedName, {data})
   return result
 
 module.exports = {

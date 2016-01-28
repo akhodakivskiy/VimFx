@@ -20,9 +20,12 @@
 # This file is the equivalent of main.coffee, but for frame scripts.
 
 commands          = require('./commands-frame')
+config            = require('./config')
+createConfigAPI   = require('./api-frame')
 FrameEventManager = require('./events-frame')
 messageManager    = require('./message-manager')
 VimFrame          = require('./vim-frame')
+test              = try require('../test/index')
 
 module.exports = ->
   {content} = FRAME_SCRIPT_ENVIRONMENT
@@ -31,7 +34,28 @@ module.exports = ->
   eventManager = new FrameEventManager(vim)
   eventManager.addListeners()
 
-  messageManager.listen('runCommand', ({name, data}, {callback}) ->
+  messageManager.listen('runCommand', ({name, data}, callback) ->
     result = commands[name](Object.assign({vim}, data))
-    messageManager.send(callback, result) if callback?
+    callback?(result)
   )
+
+  shutdownHandlers = []
+  onShutdown = (fn) -> shutdownHandlers.push(fn)
+
+  messageManager.listen('loadConfig', (configDir, callback) ->
+    scope = {vimfx: createConfigAPI(vim, onShutdown)}
+    error = config.loadFile(configDir, 'frame.js', scope)
+    callback(not error)
+  )
+
+  messageManager.listen('unloadConfig', ->
+    for shutdownHandler in shutdownHandlers
+      try
+        shutdownHandler()
+      catch error
+        console.error("VimFx: `vimfx.on('shutdown')` error in frame.js", error)
+    shutdownHandlers = []
+  )
+
+  if test
+    messageManager.send('runTests', null, (ok) -> test(vim) if ok)

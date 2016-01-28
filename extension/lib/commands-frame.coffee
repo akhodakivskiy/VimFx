@@ -93,9 +93,8 @@ helper_follow = ({id, combine = true}, matcher, {vim}) ->
   filter = (element, getElementShape) ->
     {type, semantic} = matcher({vim, element, getElementShape})
 
-    customMatcher = FRAME_SCRIPT_ENVIRONMENT.VimFxHintMatcher
-    if customMatcher
-      {type, semantic} = customMatcher(id, element, {type, semantic})
+    if vim.hintMatcher
+      {type, semantic} = vim.hintMatcher(id, element, {type, semantic})
 
     return unless type
     return unless shape = getElementShape(element)

@@ -121,10 +121,20 @@ gulp.task('require-data', ['node_modules'], ->
 
 gulp.task('tests-list', ->
   list = JSON.stringify(fs.readdirSync(TEST)
-    .map((name) -> name.match(/^(test-.+)\.coffee$/)?[1])
+    .map((name) -> name.match(/^(?!.+-frame\.)(test-.+)\.coffee$/)?[1])
     .filter(Boolean)
   )
   gulp.src("#{TEST}/tests-list.js.tmpl", {base: 'extension'})
+    .pipe(template({list}))
+    .pipe(gulp.dest(DEST))
+)
+
+gulp.task('tests-list-frame', ->
+  list = JSON.stringify(fs.readdirSync(TEST)
+    .map((name) -> name.match(/^(test-.+-frame)\.coffee$/)?[1])
+    .filter(Boolean)
+  )
+  gulp.src("#{TEST}/tests-list-frame.js.tmpl", {base: 'extension'})
     .pipe(template({list}))
     .pipe(gulp.dest(DEST))
 )
@@ -134,6 +144,7 @@ gulp.task('templates', [
   'install.rdf'
   'require-data'
   ifTest('tests-list')...
+  ifTest('tests-list-frame')...
 ])
 
 gulp.task('build', (callback) ->

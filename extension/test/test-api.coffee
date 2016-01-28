@@ -17,22 +17,16 @@
 # along with VimFx.  If not, see <http://www.gnu.org/licenses/>.
 ###
 
-testUtils = require('./utils')
-prefs     = require('../lib/prefs')
-utils     = require('../lib/utils')
+testUtils       = require('./utils')
+createConfigAPI = require('../lib/api')
+defaults        = require('../lib/defaults')
+prefs           = require('../lib/prefs')
+utils           = require('../lib/utils')
 
-{utils: Cu} = Components
+{throws} = testUtils
 
-apiPref = 'extensions.VimFx.api_url'
-apiUrl  = Services.prefs.getComplexValue(apiPref, Ci.nsISupportsString).data
-# Hack: Also import `_callbacks` so callbacks added by tests can be `.pop()`ed.
-{getAPI, _callbacks: callbacks} = Cu.import(apiUrl, {})
-
-# In the tests, `vimfx` refers to the API object, while `$vimfx` refers to the
-# passed in `VimFx` instance.
-
-exports['test exports'] = (assert, $vimfx, teardown) -> getAPI((vimfx) ->
-  teardown(-> callbacks.pop())
+exports['test exports'] = (assert, $vimfx) ->
+  vimfx = createConfigAPI($vimfx)
 
   assert.equal(typeof vimfx.get, 'function', 'get')
   assert.equal(typeof vimfx.getDefault, 'function', 'getDefault')
@@ -41,32 +35,53 @@ exports['test exports'] = (assert, $vimfx, teardown) -> getAPI((vimfx) ->
   assert.equal(typeof vimfx.addOptionOverrides, 'function',
                'addOptionOverrides')
   assert.equal(typeof vimfx.addKeyOverrides, 'function', 'addKeyOverrides')
+  assert.equal(typeof vimfx.send, 'function', 'send')
   assert.equal(typeof vimfx.on, 'function', 'on')
+  assert.equal(typeof vimfx.off, 'function', 'off')
   assert.equal(vimfx.modes, $vimfx.modes, 'modes')
-)
 
-exports['test get'] = (assert, $vimfx, teardown) -> getAPI((vimfx) ->
-  reset = prefs.tmp('hint_chars', 'abcd')
+exports['test vimfx.get and vimfx.set'] = (assert, $vimfx, teardown) ->
+  vimfx = createConfigAPI($vimfx)
+
+  resetHintChars = prefs.tmp('hint_chars', 'abcd')
+  resetBlacklist = prefs.tmp('black_list', null)
+  originalOptions = Object.assign({}, $vimfx.options)
   teardown(->
-    reset?()
-    callbacks.pop()
+    resetHintChars?()
+    resetBlacklist?()
+    $vimfx.options = originalOptions
   )
 
   assert.equal(vimfx.get('hint_chars'), 'abcd')
-)
+  assert.ok(not prefs.has('black_list'))
 
-exports['test getDefault'] = (assert, $vimfx, teardown) -> getAPI((vimfx) ->
-  default_hint_chars = $vimfx.options.hint_chars
+  vimfx.set('hint_chars', 'xyz')
+  assert.equal(vimfx.get('hint_chars'), 'xyz')
+
+  vimfx.set('black_list', 'test')
+  assert.equal(vimfx.get('black_list'), 'test')
+
+  vimfx.set('translations', {KeyQ: ['ö', 'Ö']})
+  assert.deepEqual(vimfx.get('translations'), {KeyQ: ['ö', 'Ö']})
+
+  $vimfx.emit('shutdown')
+  assert.equal(vimfx.get('hint_chars'), 'abcd')
+  assert.ok(not prefs.has('black_list'))
+  assert.deepEqual(vimfx.get('translations'), {})
+
+exports['test vimfx.getDefault'] = (assert, $vimfx, teardown) ->
+  vimfx = createConfigAPI($vimfx)
+
   reset = prefs.tmp('hint_chars', 'abcd')
   teardown(->
     reset?()
-    callbacks.pop()
   )
 
-  assert.equal(vimfx.getDefault('hint_chars'), default_hint_chars)
-)
+  assert.equal(vimfx.getDefault('hint_chars'), defaults.options.hint_chars)
 
-exports['test customization'] = (assert, $vimfx, teardown) -> getAPI((vimfx) ->
+exports['test customization'] = (assert, $vimfx, teardown) ->
+  vimfx = createConfigAPI($vimfx)
+
   originalOptions = Object.assign({}, $vimfx.options)
   originalCategories = Object.assign({}, $vimfx.options.categories)
   $vimfx.options.keyValidator = null
@@ -77,7 +92,6 @@ exports['test customization'] = (assert, $vimfx, teardown) -> getAPI((vimfx) ->
     $vimfx.options.categories = originalCategories
     delete $vimfx.modes.normal.commands.test_command
     delete $vimfx.modes.ignore.commands.test_command
-    callbacks.pop()
   )
 
   nonce = {}
@@ -168,13 +182,12 @@ exports['test customization'] = (assert, $vimfx, teardown) -> getAPI((vimfx) ->
   mode_ignore = modes.find((mode) -> mode._name == 'ignore')
   [first_category] = mode_ignore.categories
   assert.notEqual(first_category.name, 'New category')
-)
 
-exports['test addCommand order'] = \
-(assert, $vimfx, teardown) -> getAPI((vimfx) ->
+exports['test vimfx.addCommand order'] = (assert, $vimfx, teardown) ->
+  vimfx = createConfigAPI($vimfx)
+
   teardown(->
     delete vimfx.modes.normal.commands.test_command
-    callbacks.pop()
   )
 
   vimfx.addCommand({
@@ -191,10 +204,14 @@ exports['test addCommand order'] = \
   )
   [{command: first_command}] = category_misc.commands
   assert.equal(first_command.description, 'Test command')
-)
 
-exports['test addOptionOverrides'] = \
-(assert, $vimfx, teardown) -> getAPI((vimfx) ->
+  assert.ok('test_command' of vimfx.modes.normal.commands)
+  $vimfx.emit('shutdown')
+  assert.ok('test_command' not of vimfx.modes.normal.commands)
+
+exports['test vimfx.addOptionOverrides'] = (assert, $vimfx, teardown) ->
+  vimfx = createConfigAPI($vimfx)
+
   originalOptions = Object.assign({}, $vimfx.options)
   originalOptionOverrides = Object.assign({}, $vimfx.optionOverrides)
   $vimfx.optionOverrides = null
@@ -203,7 +220,6 @@ exports['test addOptionOverrides'] = \
     reset?() # Defined below.
     $vimfx.options = originalOptions
     $vimfx.optionOverrides = originalOptionOverrides
-    callbacks.pop()
   )
 
   vimfx.addOptionOverrides(
@@ -220,10 +236,13 @@ exports['test addOptionOverrides'] = \
   })
 
   assert.equal($vimfx.options.prevent_autofocus, false)
-)
 
-exports['test addKeyOverrides'] = \
-(assert, $vimfx, teardown) -> getAPI((vimfx) ->
+  $vimfx.emit('shutdown')
+  assert.equal($vimfx.options.prevent_autofocus, true)
+
+exports['test vimfx.addKeyOverrides'] = (assert, $vimfx, teardown) ->
+  vimfx = createConfigAPI($vimfx)
+
   originalOptions = Object.assign({}, $vimfx.options)
   originalKeyOverrides = Object.assign({}, $vimfx.keyOverrides)
   $vimfx.options.keyValidator = null
@@ -234,7 +253,6 @@ exports['test addKeyOverrides'] = \
     resetGetCurrentLocation?() # Defined below.
     $vimfx.options = originalOptions
     $vimfx.keyOverrides = originalKeyOverrides
-    callbacks.pop()
   )
 
   vimfx.addKeyOverrides(
@@ -284,11 +302,63 @@ exports['test addKeyOverrides'] = \
 
   match = $vimfx.consumeKeyEvent({key: 'escape'}, {mode: 'ignore'}, null)
   assert.ok(not match)
-)
 
-exports['test vimfx.[gs]et(Default)? errors'] = \
-(assert, $vimfx, teardown) -> getAPI((vimfx) ->
-  teardown(-> callbacks.pop())
+  $vimfx.emit('shutdown')
+
+  $vimfx.reset('normal')
+  match = $vimfx.consumeKeyEvent({key: 'j'}, {mode: 'normal'}, null)
+  assert.ok(match)
+
+  $vimfx.reset('ignore')
+  match = $vimfx.consumeKeyEvent({key: 'escape'}, {mode: 'ignore'}, null)
+  assert.ok(match)
+
+exports['test vimfx.send'] = (assert, $vimfx) ->
+  vimfx = createConfigAPI($vimfx)
+
+  messageManager = new testUtils.MockMessageManager()
+  vim = new testUtils.MockVim(messageManager)
+
+  vimfx.send(vim, 'message', {example: 5})
+  assert.equal(messageManager.sendAsyncMessageCalls, 1)
+  assert.equal(messageManager.addMessageListenerCalls, 0)
+  assert.equal(messageManager.removeMessageListenerCalls, 0)
+
+  vimfx.send(vim, 'message2', null, ->)
+  assert.equal(messageManager.sendAsyncMessageCalls, 2)
+  assert.equal(messageManager.addMessageListenerCalls, 1)
+  assert.equal(messageManager.removeMessageListenerCalls, 0)
+
+  $vimfx.emit('shutdown')
+  assert.equal(messageManager.sendAsyncMessageCalls, 2)
+  assert.equal(messageManager.addMessageListenerCalls, 1)
+  assert.equal(messageManager.removeMessageListenerCalls, 0)
+
+exports['test vimfx.on and vimfx.off'] = (assert, $vimfx) ->
+  vimfx = createConfigAPI($vimfx)
+
+  callCount = 0
+  count = -> callCount++
+  vimfx.on('foo', count)
+  vimfx.on('bar', count)
+
+  $vimfx.emit('foo')
+  assert.equal(callCount, 1)
+
+  $vimfx.emit('bar')
+  assert.equal(callCount, 2)
+
+  vimfx.off('bar', count)
+  $vimfx.emit('bar')
+  assert.equal(callCount, 2)
+
+  $vimfx.emit('shutdown')
+
+  $vimfx.emit('foo')
+  assert.equal(callCount, 2)
+
+exports['test vimfx.[gs]et(Default)? errors'] = (assert, $vimfx) ->
+  vimfx = createConfigAPI($vimfx)
 
   throws(assert, /unknown pref/i, 'undefined', ->
     vimfx.get()
@@ -329,11 +399,9 @@ exports['test vimfx.[gs]et(Default)? errors'] = \
   throws(assert, /boolean, number, string or null/i, 'object', ->
     vimfx.set('hint_chars', ['a', 'b', 'c'])
   )
-)
 
-exports['test vimfx.addCommand errors'] = \
-(assert, $vimfx, teardown) -> getAPI((vimfx) ->
-  teardown(-> callbacks.pop())
+exports['test vimfx.addCommand errors'] = (assert, $vimfx) ->
+  vimfx = createConfigAPI($vimfx)
 
   throws(assert, /name.+string.+required/i, 'undefined', ->
     vimfx.addCommand()
@@ -378,11 +446,32 @@ exports['test vimfx.addCommand errors'] = \
   throws(assert, /function/i, 'false', ->
     vimfx.addCommand({name: 'test_command', description: 'Test command'}, false)
   )
-)
 
-throws = (assert, regex, badValue, fn) ->
-  assert.throws(fn)
-  try fn() catch error
-    assert.ok(error.message.startsWith('VimFx:'), 'start with VimFx')
-    assert.ok(error.message.endsWith(": #{badValue}"), 'show bad value')
-    assert.ok(regex.test(error.message), 'regex match')
+exports['test vimfx.send errors'] = (assert, $vimfx) ->
+  vimfx = createConfigAPI($vimfx)
+
+  vim = new testUtils.MockVim()
+
+  throws(assert, /vim object/i, 'undefined', ->
+    vimfx.send()
+  )
+
+  throws(assert, /vim object/i, '[object Object]', ->
+    vimfx.send({mode: 'normal'})
+  )
+
+  throws(assert, /message string/i, 'undefined', ->
+    vimfx.send(vim)
+  )
+
+  throws(assert, /message string/i, 'false', ->
+    vimfx.send(vim, false)
+  )
+
+  throws(assert, /not.+function/i, 'function () {}', ->
+    vimfx.send(vim, 'message', ->)
+  )
+
+  throws(assert, /if provided.+function/i, '5', ->
+    vimfx.send(vim, 'message', null, 5)
+  )

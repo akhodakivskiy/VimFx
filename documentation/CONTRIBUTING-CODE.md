@@ -48,6 +48,7 @@ Code! Try to follow these simple rules:
 - Comment when necessary. Comments should be full sentences.
 - Keep lines at most 80 characters long.
 - Indent using two spaces.
+- Commit no `console.log(...)`s (but do use them when debugging).
 
 See [tools.md] for how to **build,** **lint,** and **run the tests.**
 

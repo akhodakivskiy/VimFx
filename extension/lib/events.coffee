@@ -176,20 +176,16 @@ class UIEventManager
       @vimfx.lastClosedVim = vim
     )
 
-    messageManager.listen('cachedPageshow', ((data, args) =>
-      {target: browser, callback} = args
-      exit = (movedToNewTab) ->
-        messageManager.send(callback, movedToNewTab) if callback
-
+    messageManager.listen('cachedPageshow', ((data, callback, browser) =>
       [oldVim, @vimfx.lastClosedVim] = [@vimfx.lastClosedVim, null]
       unless oldVim
-        exit(false)
+        callback(false)
         return
 
       if @vimfx.vims.has(browser)
         vim = @vimfx.vims.get(browser)
         if vim._messageManager == vim.browser.messageManager
-          exit(false)
+          callback(false)
           return
 
       # If we get here, it means that we’ve detected a tab dragged from one
@@ -199,8 +195,8 @@ class UIEventManager
       oldVim._setBrowser(browser)
       @vimfx.vims.set(browser, oldVim)
       @vimfx.emit('modeChange', oldVim)
-      exit(true)
-    ), @window.messageManager)
+      callback(true)
+    ), {messageManager: @window.messageManager})
 
   consumeKeyEvent: (vim, event, focusType, uiEvent = false) ->
     match = vim._consumeKeyEvent(event, focusType)

@@ -88,13 +88,15 @@ internally by other tasks.)
   automatically install it. (No need to restart Firefox.)
 
 - Use the `--test` or `-t` option to include the unit test files. The output of
-  the tests are `console.log`ed. See the browser console, or start Firefox from
-  the command line to see it.
+  the tests are `console.log`ed. See the [browser console], or start Firefox
+  from the command line to see it.
 
 - Use the `--unlisted` or `-u` option to append `-unlisted` to the extension ID.
   This is used when adding .xpi files to github releases.
 
 - `gulp clean` removes the `build/` directory.
+
+[browser console]: https://developer.mozilla.org/en-US/docs/Tools/Browser_Console
 
 ### Management
 

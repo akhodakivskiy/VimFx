@@ -31,6 +31,7 @@ utils              = require('./utils')
 class VimFrame
   constructor: (@content) ->
     @mode = 'normal'
+    @hintMatcher = null
 
     @resetState()
 

@@ -35,6 +35,7 @@ class VimFx extends utils.EventEmitter
     @vims = new WeakMap()
     @lastClosedVim = null
     @goToCommand = null
+    @skipCreateKeyTrees = false
     @createKeyTrees()
     @reset()
     @on('modeChange', ({mode}) => @reset(mode))
@@ -60,6 +61,7 @@ class VimFx extends utils.EventEmitter
     @count = ''
 
   createKeyTrees: ->
+    return if @skipCreateKeyTrees
     {@keyTrees, @errors} = createKeyTrees(@getGroupedCommands(), @SPECIAL_KEYS)
 
   stringifyKeyEvent: (event) ->
