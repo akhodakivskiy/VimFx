@@ -121,7 +121,7 @@ mode('hints', {
     storage.numEnteredChars = 0
 
     if sleep >= 0
-      storage.clearInterval = utils.setInterval(vim.window, sleep, (next) ->
+      storage.clearInterval = utils.interval(vim.window, sleep, (next) ->
         unless storage.markerMap
           next()
           return
@@ -137,7 +137,7 @@ mode('hints', {
     return storage
 
   onLeave: ({vim, storage}) ->
-    vim.window.setTimeout(hints.removeHints.bind(null, vim.window),
+    vim.window.setTimeout((-> hints.removeHints(vim.window)),
                           vim.options.hints_timeout)
     storage.clearInterval?()
     for key of storage

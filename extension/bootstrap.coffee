@@ -68,7 +68,7 @@ do (global = this) ->
         exports:    {}
         onShutdown: (fn) -> shutdownHandlers.push(fn)
       require.scopes[normalizedUri] = scope = {
-        require: (path) -> require(path, moduleRoot, currentDir)
+        require: (path) -> require.call(null, path, moduleRoot, currentDir)
         module, exports: module.exports
         Cc, Ci, Cu
         ADDON_PATH

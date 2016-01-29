@@ -349,7 +349,7 @@ includes = (string, search) ->
   return string.toLowerCase().includes(search)
 
 
-nextTick = (window, fn) -> window.setTimeout(fn, 0)
+nextTick = (window, fn) -> window.setTimeout((-> fn()) , 0)
 
 regexEscape = (s) -> s.replace(/[|\\{}()[\]^$+*?.]/g, '\\$&')
 
@@ -360,7 +360,7 @@ removeDuplicateCharacters = (str) ->
   return removeDuplicates( str.toLowerCase().split('') ).join('')
 
 # Calls `fn` repeatedly, with at least `interval` ms between each call.
-setInterval = (window, interval, fn) ->
+interval = (window, interval, fn) ->
   stopped = false
   currentIntervalId = null
   next = ->
@@ -469,7 +469,7 @@ module.exports = {
   regexEscape
   removeDuplicates
   removeDuplicateCharacters
-  setInterval
+  interval
 
   formatError
   getCurrentLocation

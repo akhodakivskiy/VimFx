@@ -277,7 +277,8 @@ class EnteredKeysManager
     @keys.push(keyStr)
     @clearTimeout()
     notifier.notify(@keys.join(''))
-    @timeout = @window.setTimeout(@clear.bind(this, notifier), duration)
+    clear = @clear.bind(this)
+    @timeout = @window.setTimeout((-> clear(notifier)), duration)
 
   clearTimeout: ->
     @window.clearTimeout(@timeout) if @timeout?
