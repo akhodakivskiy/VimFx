@@ -94,7 +94,8 @@ commands.history_forward = helper_go_history.bind(null, 'forward')
 commands.history_list = ({vim}) ->
   menu = vim.window.document.getElementById('backForwardMenu')
   utils.openPopup(menu)
-  vim.notify(translate('notification.history_list.none')) unless menu.open
+  if menu.childElementCount == 0
+    vim.notify(translate('notification.history_list.none'))
 
 commands.reload = ({vim}) ->
   vim.window.BrowserReload()
@@ -347,7 +348,8 @@ helper_follow = (name, vim, callback, count = null) ->
   # press keys before the `vim._run` callback is invoked. Those key presses
   # should be handled in hints mode, not normal mode.
   initialMarkers = []
-  storage = vim.enterMode('hints', initialMarkers, callback, count)
+  storage = vim.enterMode('hints', initialMarkers, callback, count,
+                          vim.options.hints_sleep)
 
   vim._run(name, null, ({wrappers, viewport}) ->
     # The user might have exited hints mode (and perhaps even entered it again)

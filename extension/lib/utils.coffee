@@ -79,7 +79,9 @@ isContentEditable = (element) ->
          isIframeEditor(element) or
          # Google.
          element.getAttribute?('g_editable') == 'true' or
-         element.ownerDocument?.body?.getAttribute('g_editable') == 'true'
+         element.ownerDocument?.body?.getAttribute('g_editable') == 'true' or
+         # Codeacademy terminals.
+         element.classList?.contains('real-terminal')
 
 isIframeEditor = (element) ->
   return false unless element instanceof HTMLBodyElement

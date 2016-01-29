@@ -100,13 +100,15 @@ internally by other tasks.)
 
 ### Management
 
-- `gulp lint` lints all `.coffee` files.
+- `gulp lint` lints all `.coffee` files. There’s also `npm run addons-linter` to
+  run [`addons-linter`] on a freshly built VimFx .xpi.
 
 - `gulp sloc` prints comment and source code line counts.
 
 - `gulp sync-locales` syncs locales. See the [“Syncing locales”][sync-locales]
   section below for more information.
 
+[`addons-linter`]: https://github.com/mozilla/addons-linter/
 [sync-locales]: #syncing-locales
 
 ### Helpers

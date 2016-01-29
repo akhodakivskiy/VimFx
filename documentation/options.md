@@ -207,6 +207,19 @@ Space separated list of modes where `prevent_autofocus` should be used.
 The number of milliseconds a matched hint marker should stay on screen before
 disappearing (or resetting).
 
+### `hints_sleep`
+
+In Hints mode, VimFx continually checks if the element for a hint marker has
+moved. If so, the marker is moved as well. This pref controls how many
+milliseconds VimFx should “sleep” between each check. The shorter, the more CPU
+usage, the longer, the more stuttery marker movement.
+
+The default value should work fine, but if you have a low-performing computer
+and you notice bothering CPU usage during Hints mode you might want to raise the
+sleep time.
+
+Set it to -1 to disable the marker movement feature entirely.
+
 ### Scrolling prefs
 
 Apart from its own prefs, VimFx also respects a few built-in Firefox prefs.

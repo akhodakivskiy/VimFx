@@ -113,23 +113,24 @@ mode('normal', {
 
 
 mode('hints', {
-  onEnter: ({vim, storage}, markers, callback, count = 1) ->
+  onEnter: ({vim, storage}, markers, callback, count = 1, sleep = -1) ->
     storage.markers   = markers
     storage.markerMap = null
     storage.callback  = callback
     storage.count     = count
     storage.numEnteredChars = 0
 
-    storage.clearInterval = utils.setInterval(vim.window, 0, (next) ->
-      unless storage.markerMap
-        next()
-        return
-      vim._send('getMarkableElementsMovements', null, (diffs) ->
-        for {dx, dy}, index in diffs when not (dx == 0 and dy == 0)
-          storage.markerMap[index].updatePosition(dx, dy)
-        next()
+    if sleep >= 0
+      storage.clearInterval = utils.setInterval(vim.window, sleep, (next) ->
+        unless storage.markerMap
+          next()
+          return
+        vim._send('getMarkableElementsMovements', null, (diffs) ->
+          for {dx, dy}, index in diffs when not (dx == 0 and dy == 0)
+            storage.markerMap[index].updatePosition(dx, dy)
+          next()
+        )
       )
-    )
 
     # Expose the storage so asynchronously computed markers can be set
     # retroactively.
