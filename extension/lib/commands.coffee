@@ -68,24 +68,35 @@ commands.go_home = ({vim}) ->
   vim.window.BrowserHome()
 
 helper_go_history = (direction, {vim, count = 1}) ->
-  {SessionStore, gBrowser} = vim.window
+  {window} = vim
+  {SessionStore, gBrowser} = window
 
-  # TODO: When Firefox 43 is released, only use the `.getSessionHistory`
-  # version and bump the minimum Firefox version.
-  if SessionStore.getSessionHistory
-    SessionStore.getSessionHistory(gBrowser.selectedTab, (sessionHistory) ->
-      {index} = sessionHistory
-      newIndex = index + count * (if direction == 'back' then -1 else 1)
-      newIndex = Math.max(newIndex, 0)
-      newIndex = Math.min(newIndex, sessionHistory.entries.length - 1)
-      if newIndex == index
-        vim.notify(translate("notification.history_#{direction}.limit"))
-      else
-        gBrowser.gotoIndex(newIndex)
-    )
-  else
-    # Until then, fall back to a no-count version.
-    if direction == 'back' then gBrowser.goBack() else gBrowser.goForward()
+  if (direction == 'back'    and not gBrowser.canGoBack) or
+     (direction == 'forward' and not gBrowser.canGoForward)
+    vim.notify(translate("notification.history_#{direction}.limit"))
+    return
+
+  # `SessionStore.getSessionHistory()` (used below to support counts) starts
+  # lots of asynchronous tasks internally, which is a bit unreliable, it has
+  # turned out. The primary use of the `history_back` and `history_forward`
+  # commands is to go _one_ step back or forward, though, so those cases are
+  # optimized to use more reliable ways of going back and forward. Also, some
+  # extensions override the following functions, so calling them also gives
+  # better interoperability.
+  if count == 1
+    if direction == 'back'
+      window.BrowserBack()
+    else
+      window.BrowserForward()
+    return
+
+  SessionStore.getSessionHistory(gBrowser.selectedTab, (sessionHistory) ->
+    {index} = sessionHistory
+    newIndex = index + count * (if direction == 'back' then -1 else 1)
+    newIndex = Math.max(newIndex, 0)
+    newIndex = Math.min(newIndex, sessionHistory.entries.length - 1)
+    gBrowser.gotoIndex(newIndex)
+  )
 
 commands.history_back    = helper_go_history.bind(null, 'back')
 

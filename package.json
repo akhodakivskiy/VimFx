@@ -2,7 +2,7 @@
   "name": "VimFx",
   "version": "0.11.0",
   "firefoxVersions": {
-    "min": "40.0",
+    "min": "43.0",
     "max": "45.*"
   },
   "license": "GPL-3.0+",
