@@ -1,3 +1,34 @@
+### 0.12.0 (2016-02-03)
+
+- Improved: More clickable elements are now recognized. Most notably, elements
+  with click event listeners added by JavaScript now get hints.
+- Improved: Autofocus prevention after using the `[` and `]` commands.
+- Added: In VimFx’s Keyboard Shortcuts help dialog (which can be opened by
+  pressing `?`) you can now click on any command to open VimFx’s settings page
+  in the Add-ons Manager and automatically select the text input for that
+  command, letting you edit its shortcuts. Tip: Use the `zF` command to click
+  without using the mouse.
+- Changed: Autofocus is no longer prevented in Firefox internal pages, such as
+  `about:preferences`, `about:addons` and `about:config` (as well as other XUL
+  pages).
+- Fixed: VimFx and the Beyond Australis extension do not conflict with each
+  other anymore.
+- Fixed: The `gH` command no longer nags you about “No back/forward history”
+  even though there is.
+- Added: The `gl` command now takes a [count][gl-count].
+- Improved: Optimized CPU usage in Hints mode. (See also the [`hints_sleep`]
+  pref.)
+- Improved: The `H` and `L` commands should now be more reliable in Firefox 43
+  and later.
+- Changed: There was a tiny breaking change to the Public API, though I doubt it
+  will affect anyone. (See [commit 0ca807605e] if you’re especially interested.)
+- Improved: _Several_ minor things, and some really nice internal refactoring.
+- Updated locale: de. Thanks to @just-barcodes!
+
+[`hints_sleep`]: https://github.com/akhodakivskiy/VimFx/blob/92b483c4a4f6da0b2c998267e0f01d3d999f93b6/documentation/options.md#hints_sleep
+[gl-count]: https://github.com/akhodakivskiy/VimFx/blob/92b483c4a4f6da0b2c998267e0f01d3d999f93b6/documentation/commands.md#gl
+[commit 0ca807605e]: https://github.com/akhodakivskiy/VimFx/commit/0ca807605e8d69fdc01ef9ce5d539cf66ce7d96f
+
 ### 0.11.0 (2016-01-15)
 
 - Fixed: The `` ` `` command is no longer broken.
