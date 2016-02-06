@@ -1,14 +1,14 @@
-- Use **English.**
-- Search for **duplicates**—also closed issues.
 - **Bugs:** Copy and paste the template below.
-- Feature requests: Include a specific detailed **use case** example.
+- Search for **duplicates**—also closed issues.
+- Feature requests: Add detailed **use case** example.
+- Just updated VimFx? Check out the [changelog]!
 
-Just updated VimFx? Check out the [changelog]!
+[Go to the issue tracker.][issue-tracker]
 
-[Contributing code?][code-contrib]
+<p align="right"><i><a href="documentation/CONTRIBUTING-CODE.md">Contributing code?</a></i></p>
 
 [changelog]: CHANGELOG.md
-[code-contrib]: documentation/CONTRIBUTING-CODE.md
+[issue-tracker]: https://github.com/akhodakivskiy/VimFx/issues
 
 &nbsp;
 

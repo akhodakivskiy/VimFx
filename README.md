@@ -76,8 +76,5 @@ Enjoying VimFx? [Write a review][review]!
 
 Found a bug? Report it in the [issue tracker]!
 
-Read the [contribution tips] before opening issues and pull requests.
-
 [review]: https://addons.mozilla.org/firefox/addon/vimfx/reviews/add
-[issue tracker]: https://github.com/akhodakivskiy/VimFx/issues
-[contribution tips]: https://github.com/akhodakivskiy/VimFx/blob/master/CONTRIBUTING.md
+[issue tracker]: https://github.com/akhodakivskiy/VimFx/blob/master/CONTRIBUTING.md
