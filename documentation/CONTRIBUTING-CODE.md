@@ -1,6 +1,6 @@
 <!--
 This is part of the VimFx documentation.
-Copyright Simon Lydell 2015.
+Copyright Simon Lydell 2015, 2016.
 See the file README.md for copying conditions.
 -->
 
@@ -15,10 +15,10 @@ more than welcome. Don’t be afraid to make mistakes–we’ll help you out!
 Contribute your localization! Copy the `extension/locale/en-US` directory and go
 wild! Usually, it’s best to stick to the master branch.
 
-Tip: If you’re translating into Swedish, run `gulp sync-locales --sv-SE?` to see
-how many percent is done. All lines (including line numbers) that don’t differ
-compared to “en-US” are also printed, letting you know what’s left to do.
-Substitute “sv-SE” with the locale you’re working on.
+Tip: If you’re translating into, for example, Swedish, run `gulp sync-locales
+--sv-SE?` to see how many percent is done. All lines (including line numbers)
+that don’t differ compared to “en-US” are also printed, letting you know what’s
+left to do. Substitute “sv-SE” with the locale you’re working on.
 
 Also, don’t worry if you can’t get a 100% difference compared to “en-US.”
 Sometimes text strings are very short and will look identical in both languages.
@@ -35,25 +35,25 @@ Create a new topic branch, based on either master or develop.
 
 Code! Try to follow these simple rules:
 
-- Always use parenthesis when calling functions.
+- Always use parentheses when calling functions.
 - Always use explicit `return`s, unless the function is a one-liner.
 - Always use single quotes, unless you use interpolation.
-- Prefer interpolation over concatenation, both in strings and in regexes.
+- Prefer interpolation over concatenation, both for strings and regexes.
 - Always use the following forms (not any aliases):
   - `true` and `false`
   - `==` and `!=`
   - `and` and `or`
   - `not`
-- Never put spaces inside `[]` and `{}`.
+- Never put spaces directly inside `[]` and `{}`.
 - Comment when necessary. Comments should be full sentences.
-- Try to keep lines at most 80 characters long.
+- Keep lines at most 80 characters long.
 - Indent using two spaces.
 
 See [tools.md] for how to **build,** **lint,** and **run the tests.**
 
 Break up your pull request in several commits if necessary. The first line of
-commit messages should be a short summary. Add a blank line and then a nicely
-formatted markdown description after it if needed.
+commit messages should be a short summary. If needed, add a blank line and then
+a nicely formatted markdown description.
 
 Finally send a pull request to same branch as you based your topic branch on
 (master or develop).
@@ -67,8 +67,8 @@ VimFx uses three numbers to describe its version: x.y.z, or major.minor.patch.
 
 Version 1.0.0 will soon be released. When that’s the case, the first number
 (major) will only be incremented when there are backwards-incompatible changes,
-such as changes to defaults or to the public API. This should be avoided. The
-idea is that when a user installs a new major release, they should expect
+such as changes to defaults or to the [config file API]. This should be avoided.
+The idea is that when a user installs a new major release, they should expect
 changes that they need to get familiar with.
 
 The middle number (minor) is incremented when a release contains new features,
@@ -92,3 +92,5 @@ branch, while most other things go into the master branch.
 
 Trying to choose the right branch is important in order to be able to keep a
 rapid release cycle.
+
+[config file API]: api.md

@@ -21,8 +21,8 @@
 # This file defines the `vim` API, available to all modes and commands. There is
 # one `Vim` instance for each tab. Most importantly, it provides access to the
 # owning Firefox window and the current mode, and allows you to change mode.
-# `vim` objects are exposed by the Public API. Underscored names are private and
-# should not be used by API consumers.
+# `vim` objects are exposed by the config file API. Underscored names are
+# private and should not be used by API consumers.
 
 messageManager     = require('./message-manager')
 ScrollableElements = require('./scrollable-elements')

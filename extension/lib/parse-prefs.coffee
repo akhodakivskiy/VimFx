@@ -28,7 +28,7 @@ MIN_NUM_HINT_CHARS = 2
 parsePref = (pref) ->
   # Parsed options are not stored in Firefox’s prefs system, and are therefore
   # always read from the defaults. The only way to override them is via the
-  # public API.
+  # config file API.
   if pref of defaults.parsed_options
     return defaults.parsed_options[pref]
 

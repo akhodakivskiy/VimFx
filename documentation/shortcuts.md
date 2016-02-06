@@ -15,19 +15,27 @@ you can click any command to open VimFx’s settings page in the Add-ons Manager
 and automatically select the text input for that command. Tip: Use the `zF`
 command to click without using the mouse.
 
+Shortcuts tell which keys to press to activate a command. A command may have
+several different shortcuts. Read about [modes] for more information.
+
+[modes]: modes.md
+
 
 ## Key notation
 
-VimFx’s key notation is inspired by Vim’s key notation. An example:
+VimFx’s key notation is inspired by Vim’s key notation.
 
-    J  gT  <c-s-tab>  g<left>  <c-j>
+Here is an example of what you can type into a text input for a command in
+VimFx’s settings page in the Add-ons Manager:
 
-The above defines five alternative shortcuts. The odd ones consist of one key
-each, while the even ones consist of two. Letters can be written as they are,
-while non-letter keys like Tab and the arrow keys need to be put inside `<` and
-`>`. Letters also need to be put inside `<` and `>` if you want to specify a
-modifier (as in the `<c-j>` example, which might be notated as “CTRL+J” in some
-other programs.)
+    J  <c-s-tab>  <c-j>  gT  g<left>
+
+The above defines five alternative shortcuts for the same command. The first
+three consist of one key each, while the rest consist of two. Letters can be
+written as they are, while non-letter keys like Tab and the arrow keys need to
+be put inside `<` and `>`. If you want to specify a modifier, then letters need
+to be put inside `<` and `>` as well (as in the `<c-j>` example, which might be
+notated as “CTRL+J” in some other programs.)
 
 If you’re usure on how to express a key press you’d like to use as part of a
 shortcut, press `<c-q>` while inside one of the text inputs for a command and
@@ -38,6 +46,8 @@ entirely. You can of course use the standard `<c-z>` to undo.
 
 You can specify any number of shortcuts for every command. Separate them from
 each other by one or more spaces.
+
+Here is a more formal description of all of the above:
 
 A _shortcut_ consists of one or more _keys_ that you need to press in order to
 activate the command. (See also the [timeout] option.)
@@ -109,6 +119,11 @@ is `<force><escape>`.
 Using `<force>` allows you to run other commands in text inputs as well. For
 example, you could use `<force><a-j>` and `<force><a-k>` to be able to select
 tab backward and forward regardless if you happen to be in a text input or not.
+
+Notice that VimFx’s [button] turns grey when you’re in this “automatic insert
+mode.”
+
+[button]: button.md
 
 ### `<late>`
 

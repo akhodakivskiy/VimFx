@@ -22,7 +22,7 @@
 # `vim.content` to be consistent with Firefox’s frame script terminology and to
 # avoid confusion about what it represents. There is one `VimFrame` instance for
 # each tab. It mostly tries to mimic the `Vim` class in vim.coffee, but also
-# keeps track of web page state. `VimFrame` is not part of the public API.
+# keeps track of web page state. `VimFrame` is not part of the config file API.
 
 messageManager     = require('./message-manager')
 ScrollableElements = require('./scrollable-elements')

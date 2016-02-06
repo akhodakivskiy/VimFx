@@ -6,8 +6,8 @@ See the file README.md for copying conditions.
 
 # Config file
 
-VimFx can be configured using a configuration file. This should be done by users
-who:
+VimFx can be configured using a text file—called a _config file._ This should be
+done by users who:
 
 - prefer to configure things using text files.
 - would like to add [custom commands].
@@ -29,15 +29,15 @@ You get far just by copying and pasting.
 ## Setup
 
 The config file is written in JavaScript and is actually a regular Firefox
-add-on, that makes use of VimFx’s [public API]. Don’t worry, creating such an
-add-on is a lot easier than it might sound.
+add-on, that makes use of VimFx’s [API]. Don’t worry, creating such an add-on is
+a lot easier than it might sound.
 
 **[VimFx Config template – Download and instructions][config-template]**
 
 Follow the above link to get started. Basically, download a few files and put
 them in a place where Firefox can find them.
 
-[public API]: api.md
+[API]: api.md
 [config-template]: https://github.com/lydell/VimFx-config/
 
 

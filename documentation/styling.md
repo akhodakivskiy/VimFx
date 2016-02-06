@@ -7,7 +7,8 @@ See the file README.md for copying conditions.
 # Styling
 
 It is possible to change the style of VimFx’s hint markers, help dialog and
-button with CSS.
+button with CSS. In fact, using the techniques shown here you can re-style
+almost _any_ part of Firefox.
 
 1. Copy rules from [style.css] into [userChrome.css] or a new [Stylish] style.
 
@@ -29,6 +30,7 @@ effect, while Stylish applies them instantly.
 [style.css]: ../extension/skin/style.css
 [userChrome.css]: http://kb.mozillazine.org/UserChrome.css
 [Stylish]: https://addons.mozilla.org/firefox/addon/stylish/
+
 
 ## Examples
 
@@ -73,7 +75,8 @@ with any mode name below):
 }
 ```
 
-(While speaking of highlighting the current mode, you might be interested in
-reading about the [the `modeDisplayChange` event].)
+(While speaking of highlighting the current mode, if you’re a [config file] user
+you might be interested in reading about the [the `modeDisplayChange` event].)
 
+[config file]: config-file.md
 [the `modeDisplayChange` event]: api.md#the-modedisplaychange-event

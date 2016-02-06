@@ -17,10 +17,10 @@
 # along with VimFx.  If not, see <http://www.gnu.org/licenses/>.
 ###
 
-# This file provides VimFx’s public API (defined in api.coffee) for public
-# consumption. It is kept as short as possible on purpose to reduce the need to
-# update it. When VimFx updates, consumers of this module do not get updates to
-# this module until the next Firefox restart.
+# This file provides VimFx’s config file API (defined in api.coffee). It is kept
+# as short as possible on purpose to reduce the need to update it. When VimFx
+# updates, consumers of this module do not get updates to this module until the
+# next Firefox restart.
 
 EXPORTED_SYMBOLS = ['getAPI']
 

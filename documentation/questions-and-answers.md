@@ -84,11 +84,6 @@ One of VimFx’s key features is to embrace standard Firefox features. As long a
 Firefox’s Find Bar doesn’t support for example reverse search (vim’s `?`
 command) or regex search, VimFx won’t either.
 
-(The [public API] could be used, though, to integrate with another Add-on that
-provides advanced Find features.)
-
-[public API]: api.md
-
 ## My question isn’t listed here!
 
 Tell us, and we’ll add it. Let’s make this a great resource for new users.

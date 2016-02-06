@@ -4,14 +4,10 @@ Copyright Simon Lydell 2015, 2016.
 See the file README.md for copying conditions.
 -->
 
-# Public API
+# API
 
-VimFx has a public API. It is intended to be used by users who would like to
-write a so-called [config file].
-
-Some parts of the API is also intended to be used by authors who would like to
-extend VimFx.
-
+VimFx has an API. It is intended to be used by users who would like to write a
+so-called [config file].
 
 ## Getting the API
 
@@ -37,8 +33,8 @@ disable and then enable it), the callback is re-run with the new version.
 
 ## API
 
-The following sub-sections assume that you store VimFx’s public API in a
-variable called `vimfx`.
+The following sub-sections assume that you store VimFx’s API in a variable
+called `vimfx`.
 
 ### `vimfx.get(pref)`, `vimfx.getDefault(pref)` and `vimfx.set(pref, value)`
 
@@ -106,10 +102,6 @@ let {commands} = vimfx.modes.normal
 ### `vimfx.addCommand(options, fn)`
 
 Creates a new command.
-
-**Note:** This should only be used by config file users, not by extension
-authors who wish to extend VimFx. They should add commands manually to
-[`vimfx.modes`] instead.
 
 `options`:
 
@@ -298,8 +290,8 @@ An object whose keys are mode names and whose values are [mode object]s.
 
 This is a very low-level part of the API. It allows to:
 
-- Access all commands and run them. This is the only thing that a config file
-  user needs it for.
+- Access all commands and run them. This is the most common thing that a config
+  file user needs it for.
 
   ```js
     let {commands} = vimfx.modes.normal
@@ -307,9 +299,8 @@ This is a very low-level part of the API. It allows to:
     commands.tab_new.run(args)
   ```
 
-- Adding new commands. This is intended to be used by extension authors who wish
-  to extend VimFx, not config file users. They should use the
-  `vimfx.addCommand()` helper instead.
+- Adding new commands. It is recommended to use the `vimfx.addCommand()` helper
+  instead. It’s easier.
 
   ```js
   vimfx.modes.normal.commands.new_command = {
@@ -321,8 +312,8 @@ This is a very low-level part of the API. It allows to:
   }
   ```
 
-- Adding new modes. This is intended to be used by extension authors who wish to
-  extend VimFx, not config file users.
+- Adding new modes. This is the most advanced customization you can do to VimFx.
+  Expect having to read VimFx’s source code to figure it all out.
 
   ```js
   vimfx.modes.new_mode = {
@@ -587,9 +578,6 @@ this.VimFxSomething = ...
 
 ### `VimFxHintMatcher(...)`
 
-**Note:** This should only be used by config file users, not by extension
-authors who wish to extend VimFx.
-
 If available, it is used to let you customize which elements do and don’t get
 hints. It might help to read about [the `f` commands] first.
 
@@ -656,9 +644,9 @@ and `semantic` properties).
 
 ## Stability
 
-The public API is currently **experimental** and therefore **unstable.** Things
-might break with new VimFx versions. However, no breaking changes are planned,
-and will be avoided if feasible.
+The API is currently **experimental** and therefore **unstable.** Things might
+break with new VimFx versions. However, no breaking changes are planned, and
+will be avoided if feasible.
 
 As soon as VimFx 1.0.0 (which does not seem to be too far away) is released
 backwards compatibility will be a priority and won’t be broken until VimFx
@@ -686,7 +674,7 @@ backwards compatibility will be a priority and won’t be broken until VimFx
 [`notifications_enabled`]: options.md#notifications_enabled
 
 [button]: button.md
-[the `f` commands]: commands.md#the-f-commands-1
+[the `f` commands]: commands.md#the-f-commands--hints-mode
 [special keys]: shortcuts.md#special-keys
 [styling]: styling.md
 

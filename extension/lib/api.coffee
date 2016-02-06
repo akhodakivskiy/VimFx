@@ -17,7 +17,7 @@
 # along with VimFx.  If not, see <http://www.gnu.org/licenses/>.
 ###
 
-# This file defines VimFx’s public API.
+# This file defines VimFx’s config file API.
 
 defaults = require('./defaults')
 prefs    = require('./prefs')

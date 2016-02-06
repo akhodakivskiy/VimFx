@@ -1,6 +1,6 @@
 <!--
 This is part of the VimFx documentation.
-Copyright Simon Lydell 2015.
+Copyright Simon Lydell 2015, 2016.
 See the file README.md for copying conditions.
 -->
 
@@ -23,11 +23,13 @@ This section describes how to install and use the tools needed to:
 3. Optional: Run `npm install -g gulp` to be able to run [`gulp`][gulp] tasks.
 
    If you prefer not to install gulp globally, you can use `npm run gulp`
-   instead. For example, to create an `.xpi`: `npm run gulp -- xpi`. (Note that
-   you might need to update `npm` for this to run; try `npm update -g npm`.)
+   instead. For example, to create an .xpi file: `npm run gulp -- xpi`. (Note
+   that you might need to update `npm` for this to run; try `npm update -g
+   npm`.)
 
 [Node.js]: http://nodejs.org/
 [gulp]: https://github.com/gulpjs/gulp
+
 
 ## Getting started
 
@@ -37,16 +39,12 @@ This section describes how to install and use the tools needed to:
 
 2. Run `npm run gulp -- xpi`.
 
-3. Install `build/VimFx.xpi` in Firefox by doing one of the following:
+3. [Open `build/VimFx.xpi` in Firefox][open-xpi].
 
-   - Dragging and dropping it.
-   - Pressing ctrl+o and choosing it.
-   - Using “Install from file…” in the top-right menu in the Add-ons Manager.
+Note that the built .xpi file is [unsigned].
 
-**Note:** Since Mozilla added [extension signing] things have gotten a bit more
-complicated.
-
-[extension signing]: https://wiki.mozilla.org/Addons/Extension_Signing
+[open-xpi]: installation.md#how-to-install-an-xpi-file-in-firefox
+[unsigned]: installation.md#what-is-a-signed-add-on
 
 ### Development
 

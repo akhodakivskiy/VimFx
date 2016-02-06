@@ -9,7 +9,8 @@ See the file README.md for copying conditions.
 VimFx has many options that can be configured, but they all have nice defaults
 so you shouldn’t need to.
 
-You might also be interested in [styling] VimFx and writing a [config file].
+Advanced users might also be interested in [styling] VimFx and writing a [config
+file].
 
 [styling]: styling.md
 [config file]: config-file.md
@@ -18,7 +19,7 @@ You might also be interested in [styling] VimFx and writing a [config file].
 ## Regular options
 
 These options are available in VimFx’s settings page in the Add-ons Manager
-(where you can also customize all [keyboard shortcuts]).
+(where you can also customize [keyboard shortcuts]).
 
 [keyboard shortcuts]: shortcuts.md
 
@@ -27,7 +28,7 @@ These options are available in VimFx’s settings page in the Add-ons Manager
 The characters used for the hints in Hints mode, which can be entered using one
 of the many `f` commands. See also [The `f` commands].
 
-[The `f` commands]: commands.md#the-f-commands-1
+[The `f` commands]: commands.md#the-f-commands--hints-mode
 
 ### “Previous”/“Next” link patterns
 
@@ -140,14 +141,14 @@ the `a` would be cancelled when the timeout has passed.
 ## Advanced options
 
 These options are _not_ available in VimFx’s settings page in the Add-ons
-Manager. They can only be changed in [about:config] or using the [public API].
+Manager. They can only be changed in [about:config] or using a [config file].
 They all start with `extensions.VimFx.`.
 
 (There are actually a few more advanced options than those listed here. You can
 see them all in [defaults.coffee].)
 
 [about:config]: http://kb.mozillazine.org/About:config
-[public API]: api.md
+[config file]: config-file.md
 [defaults.coffee]: ../extension/lib/defaults.coffee
 
 ### `notifications_enabled`
@@ -333,7 +334,7 @@ special handling, set the prefs to the empty string.
 
 These options are available in neither VimFx’s settings page in the Add-ons
 Manager nor in [about:config]. The only way to change them is by using the
-[public API].
+a [config file].
 
 ### `translations`
 

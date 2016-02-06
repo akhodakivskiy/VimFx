@@ -1,6 +1,6 @@
 <!--
 This is part of the VimFx documentation.
-Copyright Simon Lydell 2015.
+Copyright Simon Lydell 2015, 2016.
 See the file README.md for copying conditions.
 -->
 
@@ -10,9 +10,11 @@ Most of VimFx’s commands are straight-forward enough to not need any
 documentation. For some commands, though, there is a bit more to know.
 
 In this document, many commands are referred to by their default shortcut. You
-can of course [change those] if you like.
+can of course [change those] if you like. (Read about [modes] to tell the
+difference between _commands_ and _shortcuts._)
 
 [change those]: shortcuts.md
+[modes]: modes.md
 
 ## Counts
 
@@ -20,9 +22,9 @@ Some commands support _counts._ That means that you can type a number before a
 command and it will change its behavior based on that number—the count. For
 example, typing `12x` would close 12 tabs.
 
-(As opposed to vim, you may only supply a count _before_ a command, not in the
-middle of one. This is because VimFx’s commands are simple sequences, while
-vim’s are operators and motions.)
+(As opposed to Vim, you may only supply a count _before_ a command, not in the
+middle of one. That’s because VimFx’s commands are simple sequences, while Vim’s
+are operators and motions.)
 
 ### `gu`
 
@@ -115,7 +117,7 @@ it is scrolled by default if no other scrollable element is focused, as
 explained above. (This prevents the largest scrollable element from likely
 eating your best hint char on most pages; see [The `f` commands]).
 
-[The `f` commands]: #the-f-commands-1
+[The `f` commands]: #the-f-commands--hints-mode
 
 ### Marks: `m` and `` ` ``
 
@@ -166,7 +168,7 @@ elements as they usually do. (See also the [`focus_previous_key` and
 [`focus_previous_key` and `focus_next_key`]: options.md#focus_previous_key-and-focus_next_key
 
 
-## The `f` commands
+## The `f` commands / Hints mode
 
 When invoking one of the `f` commands you enter Hints mode. In Hints mode,
 markers with hints are shown for some elements. By typing the letters of a hint
@@ -294,7 +296,7 @@ the page. (Another way is for example `<s-f1>I<s-escape>`.)
 
 ## Ex commands
 
-vim has something called “ex” commands. Want something similar in VimFx? True to
+Vim has something called “ex” commands. Want something similar in VimFx? True to
 its spirit, VimFx embraces a standard Firefox feature for this purpose: The
 [Developer Toolbar]. That link also includes instructions on how to extend it
 with your own commands.

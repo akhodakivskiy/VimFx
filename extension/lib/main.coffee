@@ -86,9 +86,9 @@ module.exports = (data, reason) ->
     setWindowAttribute(vim.window, 'focus-type', focusType)
   )
 
-  # Setup the public API. See public.coffee for more information. This is done
-  # _after_ the prefs observing setup, so that option prefs get validated and
-  # used when calling `vimfx.set()`.
+  # Setup the config file API. See public.coffee for more information. This is
+  # done _after_ the prefs observing setup, so that option prefs get validated
+  # and used when calling `vimfx.set()`.
   apiUrl = "#{data.resourceURI.spec}lib/public.js"
   prefs.set('api_url', apiUrl)
   publicScope = Cu.import(apiUrl, {})
