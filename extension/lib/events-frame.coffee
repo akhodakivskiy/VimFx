@@ -46,13 +46,23 @@ class FrameEventManager
 
     @listen('readystatechange', (event) =>
       target = event.originalTarget
-      @currentUrl = @vim.content.location.href
+      topDocument = @vim.content.document
+      [oldUrl, @currentUrl] = [@currentUrl, @vim.content.location.href]
 
-      if target == @vim.content.document
-        switch target.readyState
-          when 'interactive'
+      switch target.readyState
+        when 'interactive'
+          if target == topDocument or
+             # When loading the editor on codepen.io, a frame gets
+             # 'readystatechange' → 'interactive' quite a bit before the
+             # toplevel document does. Checking for this case lets us send
+             # 'locationChange' earlier, allowing to enter Ignore mode earlier,
+             # for example. Be careful not to trigger a 'locationChange' for
+             # frames loading _after_ the toplevel document, though.
+             (topDocument.readyState == 'loading' and oldUrl == null)
             messageManager.send('locationChange', @currentUrl)
-          when 'complete'
+
+        when 'complete'
+          if target == topDocument
             messageManager.send('frameCanReceiveEvents', true)
     )
 
