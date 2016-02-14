@@ -116,7 +116,9 @@ do (global = this) ->
     # Tell the main process that this frame script was created, and ask if
     # anything should be done in this frame.
     messageManager.send('tabCreated', null, (ok) ->
-      return unless ok
+      # After dragging a tab from one window to another, `content` might have
+      # been set to `null` by Firefox when this runs. If so, simply return.
+      return unless ok and content?
 
       global.startup()
 
