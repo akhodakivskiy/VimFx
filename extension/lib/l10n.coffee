@@ -28,4 +28,10 @@ stringBundle = Services.strings.createBundle(
 )
 
 module.exports = (name, values...) ->
-  return stringBundle.formatStringFromName(name, values, values.length)
+  try
+    return stringBundle.formatStringFromName(name, values, values.length)
+  catch error
+    # If you accidentally pass a `name` that does not exist in a '.properties'
+    # file the thrown error is terrible. It only tells you that an error
+    # occurred, but not why. Wrap in a try-catch to fix that.
+    console.error('VimFx: Translation error', name, values, error)
