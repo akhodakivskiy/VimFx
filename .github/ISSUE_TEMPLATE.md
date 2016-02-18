@@ -1,6 +1,7 @@
-| - First: Search for DUPLICATES – also closed issues.
-| - Just updated VimFx? Check https://github.com/akhodakivskiy/VimFx/blob/master/CHANGELOG.md
-| - Remove lines starting with `|` when done.
+| ✦ First: Search for DUPLICATES – also closed issues.
+| ✦ Just updated VimFx? Check out the change log:
+|     https://github.com/akhodakivskiy/VimFx/blob/master/CHANGELOG.md
+| ✦ Remove lines starting with `|` when done.
 
 
 Steps to reproduce:
@@ -9,7 +10,7 @@ Steps to reproduce:
 2. 
 3. 
 
-Description
+[Description]
 
 
 | OR, for feature requests:
@@ -17,7 +18,7 @@ Description
 
 Detailed use case example:
 
-Description
+[Description]
 
 
 | ALWAYS include:
