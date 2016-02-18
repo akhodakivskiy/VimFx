@@ -196,9 +196,9 @@ Steps:
 
 1. Add a list of changes since the last version at the top of `CHANGELOG.md`.
 
-2. Update the version in `package.json` (see `CONTRIBUTING-CODE.md` about
-   versioning), the minimum Firefox version (if needed) and the maximum Firefox
-   version (ideally to the latest nightly). See [valid Firefox versions].
+2. Update the version in `package.json` ([versioning guidelines]), the minimum
+   Firefox version (if needed) and the maximum Firefox version (ideally to the
+   latest nightly). See [valid Firefox versions].
 
 3. Run `gulp release`, which does the following for you:
 
@@ -230,4 +230,5 @@ Steps:
 The idea is to use the contents of `README.md` as the add-on description on
 addons.mozilla.org. You can print it as HTML by running `gulp readme`.
 
+[versioning guidelines]: CONTRIBUTING_CODE.md#versioning-and-branches
 [valid Firefox versions]: https://addons.mozilla.org/en-US/firefox/pages/appversions/
