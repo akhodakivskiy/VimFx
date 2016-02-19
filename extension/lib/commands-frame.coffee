@@ -22,9 +22,9 @@
 # same name as the command in commands.coffee that calls it. There are also a
 # few more generalized “commands” used in more than one place.
 
-hints     = require('./hints')
+hints = require('./hints')
 translate = require('./l10n')
-utils     = require('./utils')
+utils = require('./utils')
 
 {isProperLink, isTextInputElement, isTypingElement, isContentEditable} = utils
 
@@ -239,9 +239,9 @@ commands.follow_in_tab = helper_follow.bind(null, {id: 'tab'},
 commands.follow_copy = helper_follow.bind(null, {id: 'copy'},
   ({element}) ->
     type = switch
-      when isProperLink(element)      then 'link'
+      when isProperLink(element) then 'link'
       when isContentEditable(element) then 'contenteditable'
-      when isTypingElement(element)   then 'text'
+      when isTypingElement(element) then 'text'
       else null
     return {type, semantic: true}
 )

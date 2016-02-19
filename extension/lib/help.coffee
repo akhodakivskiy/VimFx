@@ -20,11 +20,11 @@
 # This file creates VimFx’s Keyboard Shortcuts help screen.
 
 translate = require('./l10n')
-utils     = require('./utils')
+utils = require('./utils')
 
-CONTAINER_ID  = 'VimFxHelpDialogContainer'
+CONTAINER_ID = 'VimFxHelpDialogContainer'
 MAX_FONT_SIZE = 20
-SEARCH_MATCH_CLASS     = 'search-match'
+SEARCH_MATCH_CLASS = 'search-match'
 SEARCH_NON_MATCH_CLASS = 'search-non-match'
 SEARCH_HIGHLIGHT_CLASS = 'search-highlight'
 
@@ -152,7 +152,7 @@ goToCommandSetting = (window, vimfx, command) ->
   )
 
 search = (content, term) ->
-  document   = content.ownerDocument
+  document = content.ownerDocument
   ignoreCase = (term == term.toLowerCase())
   regex = RegExp("(#{utils.regexEscape(term)})", if ignoreCase then 'i' else '')
   clear = (term == '')

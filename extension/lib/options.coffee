@@ -19,10 +19,10 @@
 
 # This file constructs VimFx’s options UI in the Add-ons Manager.
 
-defaults  = require('./defaults')
+defaults = require('./defaults')
 translate = require('./l10n')
-prefs     = require('./prefs')
-utils     = require('./utils')
+prefs = require('./prefs')
+utils = require('./utils')
 
 TYPE_MAP = {
   string: 'string'
@@ -41,7 +41,7 @@ observe = (options) ->
 # Generalized observer.
 class BaseObserver
   constructor: (@options) ->
-    @document  = null
+    @document = null
     @container = null
     @listeners = []
 

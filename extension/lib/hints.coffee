@@ -21,9 +21,9 @@
 # This file contains functions for getting markable elements, and related data,
 # as well as for creating and inserting markers for markable elements.
 
-huffman  = require('n-ary-huffman')
+huffman = require('n-ary-huffman')
 {Marker} = require('./marker')
-utils    = require('./utils')
+utils = require('./utils')
 
 try
   # TODO: Only use this path when Firefox 44 is released.
@@ -33,7 +33,7 @@ catch
 
 CONTAINER_ID = 'VimFxMarkersContainer'
 
-Element     = Ci.nsIDOMElement
+Element = Ci.nsIDOMElement
 XULDocument = Ci.nsIDOMXULDocument
 
 shutdownHandlerAdded = false
@@ -50,16 +50,16 @@ removeHints = (window) ->
 # about the element—a “wrapper,” a stand-in for the real element, which is only
 # accessible in frame scripts) in `wrappers`, and insert them into `window`.
 injectHints = (window, wrappers, viewport, options) ->
-  semantic   = []
+  semantic = []
   unsemantic = []
-  combined   = []
-  markerMap  = {}
+  combined = []
+  markerMap = {}
 
   for wrapper in wrappers
     marker = new Marker(wrapper, window.document)
     group = switch
       when wrapper.parentIndex? then combined
-      when wrapper.semantic     then semantic
+      when wrapper.semantic then semantic
       else unsemantic
     group.push(marker)
     markerMap[wrapper.elementIndex] = marker

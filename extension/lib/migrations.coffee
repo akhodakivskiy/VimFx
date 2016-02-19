@@ -21,7 +21,7 @@
 # from an old format to a new one, without breaking backwards compatibility.
 
 legacy = require('./legacy')
-prefs  = require('./prefs')
+prefs = require('./prefs')
 
 migrations = []
 

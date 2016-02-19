@@ -34,17 +34,17 @@ nsIStyleSheetService = Cc['@mozilla.org/content/style-sheet-service;1']
 nsIWindowMediator = Cc['@mozilla.org/appshell/window-mediator;1']
   .getService(Ci.nsIWindowMediator)
 
-HTMLAnchorElement   = Ci.nsIDOMHTMLAnchorElement
-HTMLButtonElement   = Ci.nsIDOMHTMLButtonElement
-HTMLInputElement    = Ci.nsIDOMHTMLInputElement
+HTMLAnchorElement = Ci.nsIDOMHTMLAnchorElement
+HTMLButtonElement = Ci.nsIDOMHTMLButtonElement
+HTMLInputElement = Ci.nsIDOMHTMLInputElement
 HTMLTextAreaElement = Ci.nsIDOMHTMLTextAreaElement
-HTMLSelectElement   = Ci.nsIDOMHTMLSelectElement
-HTMLBodyElement     = Ci.nsIDOMHTMLBodyElement
-XULDocument         = Ci.nsIDOMXULDocument
-XULButtonElement    = Ci.nsIDOMXULButtonElement
-XULControlElement   = Ci.nsIDOMXULControlElement
-XULMenuListElement  = Ci.nsIDOMXULMenuListElement
-XULTextBoxElement   = Ci.nsIDOMXULTextBoxElement
+HTMLSelectElement = Ci.nsIDOMHTMLSelectElement
+HTMLBodyElement = Ci.nsIDOMHTMLBodyElement
+XULDocument = Ci.nsIDOMXULDocument
+XULButtonElement = Ci.nsIDOMXULButtonElement
+XULControlElement = Ci.nsIDOMXULControlElement
+XULMenuListElement = Ci.nsIDOMXULMenuListElement
+XULTextBoxElement = Ci.nsIDOMXULTextBoxElement
 
 # Full chains of events for different mouse actions. ('command' is for XUL
 # elements.)
@@ -217,7 +217,7 @@ suppressEvent = (event) ->
 
 simulateMouseEvents = (element, sequenceType) ->
   window = element.ownerGlobal
-  rect   = element.getBoundingClientRect()
+  rect = element.getBoundingClientRect()
 
   eventSequence = switch sequenceType
     when 'click'       then EVENTS_CLICK
@@ -260,7 +260,7 @@ area = (element) ->
   return element.clientWidth * element.clientHeight
 
 containsDeep = (parent, element) ->
-  parentWindow  = parent.ownerGlobal
+  parentWindow = parent.ownerGlobal
   elementWindow = element.ownerGlobal
 
   # Owner windows might be missing when opening the devtools.

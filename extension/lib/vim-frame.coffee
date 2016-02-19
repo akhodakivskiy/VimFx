@@ -24,9 +24,9 @@
 # each tab. It mostly tries to mimic the `Vim` class in vim.coffee, but also
 # keeps track of web page state. `VimFrame` is not part of the config file API.
 
-messageManager     = require('./message-manager')
+messageManager = require('./message-manager')
 ScrollableElements = require('./scrollable-elements')
-utils              = require('./utils')
+utils = require('./utils')
 
 class VimFrame
   constructor: (@content) ->

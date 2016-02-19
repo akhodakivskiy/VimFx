@@ -19,10 +19,10 @@
 
 # This file is the equivalent to events.coffee, but for frame scripts.
 
-notation       = require('vim-like-key-notation')
-commands       = require('./commands-frame')
+notation = require('vim-like-key-notation')
+commands = require('./commands-frame')
 messageManager = require('./message-manager')
-utils          = require('./utils')
+utils = require('./utils')
 
 nsIFocusManager = Cc['@mozilla.org/focus-manager;1']
   .getService(Ci.nsIFocusManager)

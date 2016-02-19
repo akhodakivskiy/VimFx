@@ -26,11 +26,11 @@
 # NOTE: Most tab related commands need to do their actual tab manipulations in
 # the next tick (`utils.nextTick`) to work around bug 1200334.
 
-help      = require('./help')
-hints     = require('./hints')
-prefs     = require('./prefs')
+help = require('./help')
+hints = require('./hints')
+prefs = require('./prefs')
 translate = require('./l10n')
-utils     = require('./utils')
+utils = require('./utils')
 
 commands = {}
 
@@ -231,14 +231,14 @@ absoluteTabIndex = (relativeIndex, gBrowser, {pinnedSeparate}) ->
   tabs = gBrowser.visibleTabs
   {selectedTab} = gBrowser
 
-  currentIndex  = tabs.indexOf(selectedTab)
+  currentIndex = tabs.indexOf(selectedTab)
   absoluteIndex = currentIndex + relativeIndex
-  numTabsTotal  = tabs.length
+  numTabsTotal = tabs.length
   numPinnedTabs = gBrowser._numPinnedTabs
 
   [numTabs, min] = switch
-    when not pinnedSeparate  then [numTabsTotal,  0]
-    when selectedTab.pinned  then [numPinnedTabs, 0]
+    when not pinnedSeparate then [numTabsTotal,  0]
+    when selectedTab.pinned then [numPinnedTabs, 0]
     else [numTabsTotal - numPinnedTabs, numPinnedTabs]
 
   # Wrap _once_ if at one of the ends of the tab bar and cannot move in the
@@ -443,8 +443,8 @@ commands.follow_copy = ({vim}) ->
   callback = (marker) ->
     {elementIndex} = marker.wrapper
     property = switch marker.wrapper.type
-      when 'link'            then 'href'
-      when 'text'            then 'value'
+      when 'link' then 'href'
+      when 'text' then 'value'
       when 'contenteditable' then 'textContent'
     vim._run('copy_marker_element', {elementIndex, property})
   helper_follow('follow_copy', vim, callback)

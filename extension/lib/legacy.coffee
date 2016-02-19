@@ -21,8 +21,8 @@
 # without breaking backwards-compatibility. These are used in migrations.coffee.
 
 notation = require('vim-like-key-notation')
-prefs    = require('./prefs')
-utils    = require('./utils')
+prefs = require('./prefs')
+utils = require('./utils')
 
 applyMigrations = (migrations) ->
   for migration, index in migrations

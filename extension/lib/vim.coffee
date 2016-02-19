@@ -24,10 +24,10 @@
 # `vim` objects are exposed by the config file API. Underscored names are
 # private and should not be used by API consumers.
 
-messageManager     = require('./message-manager')
+messageManager = require('./message-manager')
 ScrollableElements = require('./scrollable-elements')
-statusPanel        = require('./status-panel')
-utils              = require('./utils')
+statusPanel = require('./status-panel')
+utils = require('./utils')
 
 ChromeWindow = Ci.nsIDOMChromeWindow
 

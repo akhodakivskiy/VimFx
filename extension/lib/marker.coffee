@@ -30,14 +30,14 @@ class Marker
     @elementShape  = @wrapper.shape
     @markerElement = utils.createBox(@document, 'marker')
     @markerElement.setAttribute('data-type', @wrapper.type)
-    @weight    = @elementShape.area
-    @width     = 0
-    @height    = 0
-    @hint      = ''
+    @weight = @elementShape.area
+    @width = 0
+    @height = 0
+    @hint = ''
     @hintIndex = 0
-    @zoom      = 1
-    @viewport  = null
-    @position  = null
+    @zoom = 1
+    @viewport = null
+    @position = null
     @originalPosition = null
 
   reset: ->
@@ -46,6 +46,7 @@ class Marker
 
   show: -> @setVisibility(true)
   hide: -> @setVisibility(false)
+
   setVisibility: (visible) ->
     @markerElement.classList.toggle('marker--hidden', not visible)
 

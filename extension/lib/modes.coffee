@@ -22,17 +22,17 @@
 # This file defines VimFx’s modes, and their respective commands. The Normal
 # mode commands are defined in commands.coffee, though.
 
-{commands, findStorage}    = require('./commands')
-defaults                   = require('./defaults')
-help                       = require('./help')
-hints                      = require('./hints')
-translate                  = require('./l10n')
+{commands, findStorage} = require('./commands')
+defaults = require('./defaults')
+help = require('./help')
+hints = require('./hints')
+translate = require('./l10n')
 {rotateOverlappingMarkers} = require('./marker')
-utils                      = require('./utils')
+utils = require('./utils')
 
 # Helper to create modes in a DRY way.
 mode = (modeName, obj, commands = null) ->
-  obj.name  = translate("mode.#{modeName}")
+  obj.name = translate("mode.#{modeName}")
   obj.order = defaults.mode_order[modeName]
   obj.commands = {}
   for commandName, fn of commands
@@ -115,10 +115,10 @@ mode('normal', {
 
 mode('hints', {
   onEnter: ({vim, storage}, markers, callback, count = 1, sleep = -1) ->
-    storage.markers   = markers
+    storage.markers = markers
     storage.markerMap = null
-    storage.callback  = callback
-    storage.count     = count
+    storage.callback = callback
+    storage.count = count
     storage.numEnteredChars = 0
 
     if sleep >= 0

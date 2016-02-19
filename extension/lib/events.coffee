@@ -22,9 +22,9 @@
 # launch commands and to provide state to them. Events in web page content are
 # listened for in events-frame.coffee.
 
-button         = require('./button')
+button = require('./button')
 messageManager = require('./message-manager')
-utils          = require('./utils')
+utils = require('./utils')
 
 HELD_MODIFIERS_ATTRIBUTE = 'vimfx-held-modifiers'
 

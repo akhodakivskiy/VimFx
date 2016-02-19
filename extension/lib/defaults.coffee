@@ -177,7 +177,7 @@ parsed_options =
 # coffeelint: enable=no_implicit_braces
 
 translate = require('./l10n')
-utils     = require('./utils')
+utils = require('./utils')
 
 addCategory = (category, order) ->
   uncategorized = (category == '')
@@ -188,12 +188,12 @@ addCategory = (category, order) ->
   }
 
 shortcut_prefs = {}
-categoryMap    = {}
-mode_order     = {}
-command_order  = {}
+categoryMap = {}
+mode_order = {}
+command_order = {}
 
-createCounter   = -> new utils.Counter({step: 100})
-modeCounter     = createCounter()
+createCounter = -> new utils.Counter({step: 100})
+modeCounter = createCounter()
 categoryCounter = createCounter()
 
 for modeName, modeCategories of shortcuts

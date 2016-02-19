@@ -18,8 +18,8 @@
 ###
 
 testUtils = require('./utils')
-prefs     = require('../lib/prefs')
-utils     = require('../lib/utils')
+prefs = require('../lib/prefs')
+utils = require('../lib/utils')
 
 {utils: Cu} = Components
 

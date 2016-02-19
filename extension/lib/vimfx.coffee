@@ -23,9 +23,9 @@
 # the commands for UI presentation. There is only one `VimFx` instance.
 
 notation = require('vim-like-key-notation')
-prefs    = require('./prefs')
-utils    = require('./utils')
-Vim      = require('./vim')
+prefs = require('./prefs')
+utils = require('./utils')
+Vim = require('./vim')
 
 {EventEmitter} = utils
 
@@ -253,7 +253,7 @@ createKeyTrees = (groupedCommands, specialKeyStrings) ->
 
 parseShortcutPref = (pref) ->
   shortcuts = []
-  errors    = []
+  errors = []
 
   # The shorcut prefs are read from root in order to support other extensions to
   # extend VimFx with custom commands.
