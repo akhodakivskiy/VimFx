@@ -27,11 +27,11 @@ defaults = require('./defaults')
 
 branches = {
   addon: {
-    user:    prefs.getBranch(defaults.BRANCH)
+    user: prefs.getBranch(defaults.BRANCH)
     default: prefs.getDefaultBranch(defaults.BRANCH)
   }
   root: {
-    user:    prefs
+    user: prefs
     default: prefs.getDefaultBranch('')
   }
 }

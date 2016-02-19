@@ -17,6 +17,7 @@
 # along with VimFx.  If not, see <http://www.gnu.org/licenses/>.
 ###
 
+# coffeelint: disable=colon_assignment_spacing
 # coffeelint: disable=no_implicit_braces
 
 # This file defines all VimFx’s options in an easy-to-read way.
@@ -172,6 +173,7 @@ parsed_options =
 # The above easy-to-read data is transformed in to easy-to-consume (for
 # computers) formats below.
 
+# coffeelint: enable=colon_assignment_spacing
 # coffeelint: enable=no_implicit_braces
 
 translate = require('./l10n')
@@ -181,7 +183,7 @@ addCategory = (category, order) ->
   uncategorized = (category == '')
   categoryName = if uncategorized then '' else translate("category.#{category}")
   parsed_options.categories[category] = {
-    name:  categoryName
+    name: categoryName
     order: if uncategorized then 0 else order
   }
 

@@ -26,6 +26,7 @@ prefs  = require('./prefs')
 migrations = []
 
 migrations[0] = ->
+  # coffeelint: disable=colon_assignment_spacing
   # coffeelint: disable=no_implicit_braces
 
   conversions =
@@ -103,6 +104,7 @@ migrations[0] = ->
 
     'mode_find_exit': 'find.exit'
 
+  # coffeelint: enable=colon_assignment_spacing
   # coffeelint: enable=no_implicit_braces
 
   convert = (value) ->

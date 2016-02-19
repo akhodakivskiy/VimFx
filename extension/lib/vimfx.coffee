@@ -158,16 +158,16 @@ class VimFx extends EventEmitter
       for categoryName, commands of categories
         category = @options.categories[categoryName]
         categoriesSorted.push({
-          name:     category.name
-          _name:    categoryName
-          order:    category.order
+          name: category.name
+          _name: categoryName
+          order: category.order
           commands: commands.sort(byOrder)
         })
       mode = @modes[modeName]
       modesSorted.push({
-        name:       mode.name
-        _name:      modeName
-        order:      mode.order
+        name: mode.name
+        _name: modeName
+        order: mode.order
         categories: categoriesSorted.sort(byOrder)
       })
     return modesSorted.sort(byOrder)
@@ -187,7 +187,7 @@ createKeyTrees = (groupedCommands, specialKeyStrings) ->
   pushOverrideErrors = (command, originalSequence, tree) ->
     {command: overridingCommand} = getFirstLeaf(tree)
     error = {
-      id:      'overridden_by'
+      id: 'overridden_by'
       subject: overridingCommand.description
       context: originalSequence
     }

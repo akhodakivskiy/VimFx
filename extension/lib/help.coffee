@@ -107,7 +107,7 @@ createContent = (window, vimfx) ->
       # `data-` attributes are currently unused by VimFx, but provide a great
       # way to customize the help dialog with custom CSS.
       utils.setAttributes(categoryContainer, {
-        'data-mode':     mode._name
+        'data-mode': mode._name
         'data-category': category._name
       })
 

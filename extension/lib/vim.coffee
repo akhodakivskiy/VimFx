@@ -100,7 +100,7 @@ class Vim
   _resetState: ->
     @_state = {
       frameCanReceiveEvents: false
-      scrollableElements:    new ScrollableElements(@window)
+      scrollableElements: new ScrollableElements(@window)
     }
 
   _isBlacklisted: (url) -> @options.black_list.some((regex) -> regex.test(url))

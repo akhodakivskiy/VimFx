@@ -498,8 +498,8 @@ commands.click_browser_element = ({vim}) ->
 helper_follow_pattern = (type, {vim}) ->
   options = {
     pattern_selector: vim.options.pattern_selector
-    pattern_attrs:    vim.options.pattern_attrs
-    patterns:         vim.options["#{type}_patterns"]
+    pattern_attrs: vim.options.pattern_attrs
+    patterns: vim.options["#{type}_patterns"]
   }
   vim._run('follow_pattern', {type, options})
 

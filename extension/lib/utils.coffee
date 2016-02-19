@@ -225,6 +225,7 @@ simulateMouseEvents = (element, sequenceType) ->
     when 'hover-end'   then EVENTS_HOVER_END
 
   for type in eventSequence
+    buttonNum = if type in EVENTS_CLICK then 1 else 0
     mouseEvent = new window.MouseEvent(type, {
       # Let the event bubble in order to trigger delegated event listeners.
       bubbles: type not in ['mouseenter', 'mouseleave']
@@ -233,8 +234,8 @@ simulateMouseEvents = (element, sequenceType) ->
       cancelable: type not in ['mouseenter', 'mouseleave']
       # These properties are just here for mimicing a real click as much as
       # possible.
-      buttons: if type in EVENTS_CLICK then 1 else 0
-      detail:  if type in EVENTS_CLICK then 1 else 0
+      buttons: buttonNum
+      detail: buttonNum
       view: window
       # `page{X,Y}` are set automatically to the correct values when setting
       # `client{X,Y}`. `{offset,layer,movement}{X,Y}` are not worth the trouble

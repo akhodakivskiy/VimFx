@@ -103,8 +103,8 @@ createAPI = (vimfx) -> {
         return keyStr not in (overrides ? [])
     vimfx.keyOverrides.push(rules...)
 
-  on:      vimfx.on.bind(vimfx)
-  modes:   vimfx.modes
+  on: vimfx.on.bind(vimfx)
+  modes: vimfx.modes
 }
 
 getOverrides = (rules, args...) ->

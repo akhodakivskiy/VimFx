@@ -65,7 +65,7 @@ do (global = this) ->
 
     unless require.scopes[normalizedUri]?
       module = {
-        exports:    {}
+        exports: {}
         onShutdown: (fn) -> shutdownHandlers.push(fn)
       }
       require.scopes[normalizedUri] = scope = {

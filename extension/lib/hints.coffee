@@ -154,9 +154,9 @@ getMarkableElementsAndViewport = (window, filter) ->
   width  = if scrollWidth  > innerWidth  then clientWidth  else innerWidth
   height = if scrollHeight > innerHeight then clientHeight else innerHeight
   viewport = {
-    left:   0
-    top:    0
-    right:  width
+    left: 0
+    top: 0
+    right: width
     bottom: height
     width
     height
@@ -192,6 +192,7 @@ getMarkableElements = (window, viewport, wrappers, filter, parents = []) ->
     continue unless isInsideViewport(rect, viewport)
 
     # Calculate the visible part of the frame, according to the parent.
+    # coffeelint: disable=colon_assignment_spacing
     {clientWidth, clientHeight} = frame.document.documentElement
     frameViewport = {
       left:   Math.max(viewport.left - rect.left, 0)
@@ -199,6 +200,7 @@ getMarkableElements = (window, viewport, wrappers, filter, parents = []) ->
       right:  clientWidth  + Math.min(viewport.right  - rect.right,  0)
       bottom: clientHeight + Math.min(viewport.bottom - rect.bottom, 0)
     }
+    # coffeelint: enable=colon_assignment_spacing
 
     # `.getComputedStyle()` may return `null` if the computed style isn’t
     # availble yet. If so, consider the element not visible.

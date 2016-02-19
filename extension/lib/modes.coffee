@@ -38,11 +38,11 @@ mode = (modeName, obj, commands = null) ->
   for commandName, fn of commands
     pref = "mode.#{modeName}.#{commandName}"
     obj.commands[commandName] = {
-      pref:        defaults.BRANCH + pref
-      run:         fn
-      category:    defaults.categoryMap[pref]
+      pref: defaults.BRANCH + pref
+      run: fn
+      category: defaults.categoryMap[pref]
       description: translate(pref)
-      order:       defaults.command_order[pref]
+      order: defaults.command_order[pref]
     }
   exports[modeName] = obj
 
@@ -224,7 +224,7 @@ mode('ignore', {
     return false
 
 }, {
-  exit:    ({vim}) -> vim.enterMode('normal')
+  exit: ({vim}) -> vim.enterMode('normal')
   unquote: ({vim}) -> vim.enterMode('normal', {returnTo: 'ignore'})
 })
 

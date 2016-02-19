@@ -54,7 +54,7 @@ class Marker
   setPosition: (@viewport, @zoom) ->
     {
       markerElement: {clientWidth, clientHeight}
-      elementShape:  {nonCoveredPoint: {x: left, y: top, offset}}
+      elementShape: {nonCoveredPoint: {x: left, y: top, offset}}
     } = this
 
     @width  = clientWidth  / @zoom

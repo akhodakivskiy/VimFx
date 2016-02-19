@@ -52,9 +52,9 @@ convertKey = (keyStr) ->
     return notation.stringify({
       key
       shiftKey: Boolean(shift)
-      altKey:   'a' in modifiers
-      ctrlKey:  'c' in modifiers
-      metaKey:  'm' in modifiers
+      altKey: 'a' in modifiers
+      ctrlKey: 'c' in modifiers
+      metaKey: 'm' in modifiers
     })
   )
 

@@ -49,16 +49,16 @@ class VimFrame
   resetState: (target = @content.document) ->
     if target == @content.document
       @state = {
-        hasInteraction:       false
-        shouldRefocus:        false
-        marks:                {}
-        explicitBodyFocus:    false
-        hasFocusedTextInput:  false
+        hasInteraction: false
+        shouldRefocus: false
+        marks: {}
+        explicitBodyFocus: false
+        hasFocusedTextInput: false
         lastFocusedTextInput: null
-        lastHoveredElement:   null
-        scrollableElements:   new ScrollableElements(@content)
-        markerElements:       []
-        inputs:               null
+        lastHoveredElement: null
+        scrollableElements: new ScrollableElements(@content)
+        markerElements: []
+        inputs: null
       }
 
     else
