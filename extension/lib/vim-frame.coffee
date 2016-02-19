@@ -48,7 +48,7 @@ class VimFrame
   # some elements might be dead at this point.
   resetState: (target = @content.document) ->
     if target == @content.document
-      @state =
+      @state = {
         hasInteraction:       false
         shouldRefocus:        false
         marks:                {}
@@ -59,6 +59,7 @@ class VimFrame
         scrollableElements:   new ScrollableElements(@content)
         markerElements:       []
         inputs:               null
+      }
 
     else
       isDead = (element) ->

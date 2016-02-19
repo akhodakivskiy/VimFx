@@ -98,9 +98,10 @@ class Vim
     @_addListeners() if addListeners
 
   _resetState: ->
-    @_state =
+    @_state = {
       frameCanReceiveEvents: false
       scrollableElements:    new ScrollableElements(@window)
+    }
 
   _isBlacklisted: (url) -> @options.black_list.some((regex) -> regex.test(url))
 

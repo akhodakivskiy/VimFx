@@ -25,13 +25,16 @@ defaults = require('./defaults')
 
 {prefs} = Services
 
-branches =
-  addon:
+branches = {
+  addon: {
     user:    prefs.getBranch(defaults.BRANCH)
     default: prefs.getDefaultBranch(defaults.BRANCH)
-  root:
+  }
+  root: {
     user:    prefs
     default: prefs.getDefaultBranch('')
+  }
+}
 
 get = (branch, key) ->
   return switch branch.getPrefType(key)
@@ -75,25 +78,29 @@ observe = (branch, domain, callback) ->
     branch.removeObserver(domain, observer)
   )
 
-module.exports =
+module.exports = {
   get: get.bind(null, branches.addon.user)
   set: set.bind(null, branches.addon.user)
   has: has.bind(null, branches.addon.user)
   tmp: tmp.bind(null, branches.addon.user)
   observe: observe.bind(null, branches.addon.user)
-  default:
+  default: {
     get: get.bind(null, branches.addon.default)
     set: set.bind(null, branches.addon.default)
     init: ->
       for key, value of defaults.all_prefs
         module.exports.default.set(key, value)
       return
-  root:
+  }
+  root: {
     get: get.bind(null, branches.root.user)
     set: set.bind(null, branches.root.user)
     has: has.bind(null, branches.root.user)
     tmp: tmp.bind(null, branches.root.user)
-    default:
+    default: {
       get: get.bind(null, branches.root.default)
       set: set.bind(null, branches.root.default)
+    }
+  }
   unbound: {get, set, has, tmp, observe}
+}

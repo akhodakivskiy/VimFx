@@ -25,7 +25,7 @@ utils    = require('./utils')
 
 counter = new utils.Counter({start: 10000, step: 100})
 
-createAPI = (vimfx) ->
+createAPI = (vimfx) -> {
   get: (pref) -> switch
     when pref of defaults.parsed_options
       defaults.parsed_options[pref]
@@ -105,6 +105,7 @@ createAPI = (vimfx) ->
 
   on:      vimfx.on.bind(vimfx)
   modes:   vimfx.modes
+}
 
 getOverrides = (rules, args...) ->
   for [match, overrides] in rules

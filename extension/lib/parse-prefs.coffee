@@ -69,7 +69,7 @@ parsePatterns = (value) ->
   )
   return result
 
-parsers =
+parsers = {
   hint_chars: (value, defaultValue) ->
     parsed = utils.removeDuplicateCharacters(value).replace(/\s/g, '')
     # Make sure that hint chars contain at least the required amount of chars.
@@ -93,5 +93,6 @@ parsers =
   activatable_element_keys: parseSpaceDelimitedString
 
   pattern_attrs: parseSpaceDelimitedString
+}
 
 module.exports = parsePref

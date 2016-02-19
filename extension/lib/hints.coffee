@@ -193,22 +193,24 @@ getMarkableElements = (window, viewport, wrappers, filter, parents = []) ->
 
     # Calculate the visible part of the frame, according to the parent.
     {clientWidth, clientHeight} = frame.document.documentElement
-    frameViewport =
+    frameViewport = {
       left:   Math.max(viewport.left - rect.left, 0)
       top:    Math.max(viewport.top  - rect.top,  0)
       right:  clientWidth  + Math.min(viewport.right  - rect.right,  0)
       bottom: clientHeight + Math.min(viewport.bottom - rect.bottom, 0)
+    }
 
     # `.getComputedStyle()` may return `null` if the computed style isn’t
     # availble yet. If so, consider the element not visible.
     continue unless computedStyle = window.getComputedStyle(frame.frameElement)
-    offset =
+    offset = {
       left: rect.left +
         parseFloat(computedStyle.getPropertyValue('border-left-width')) +
         parseFloat(computedStyle.getPropertyValue('padding-left'))
       top: rect.top +
         parseFloat(computedStyle.getPropertyValue('border-top-width')) +
         parseFloat(computedStyle.getPropertyValue('padding-top'))
+    }
 
     getMarkableElements(frame, frameViewport, wrappers, filter,
                         parents.concat({window, offset}))

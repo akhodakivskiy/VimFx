@@ -64,9 +64,10 @@ do (global = this) ->
     currentDir = dirname(".#{normalizedUri[prefix.length..]}")
 
     unless require.scopes[normalizedUri]?
-      module =
+      module = {
         exports:    {}
         onShutdown: (fn) -> shutdownHandlers.push(fn)
+      }
       require.scopes[normalizedUri] = scope = {
         require: (path) -> require.call(null, path, moduleRoot, currentDir)
         module, exports: module.exports

@@ -184,17 +184,19 @@ createKeyTrees = (groupedCommands, specialKeyStrings) ->
 
   pushOverrideErrors = (command, originalSequence, tree) ->
     {command: overridingCommand} = getFirstLeaf(tree)
-    error =
+    error = {
       id:      'overridden_by'
       subject: overridingCommand.description
       context: originalSequence
+    }
     pushError(error, command)
 
   pushSpecialKeyError = (command, originalSequence, key) ->
-    error =
+    error = {
       id: 'illegal_special_key'
       subject: key
       context: originalSequence
+    }
     pushError(error, command)
 
   for mode in groupedCommands

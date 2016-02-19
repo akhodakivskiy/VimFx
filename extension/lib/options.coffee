@@ -24,10 +24,11 @@ translate = require('./l10n')
 prefs     = require('./prefs')
 utils     = require('./utils')
 
-TYPE_MAP =
+TYPE_MAP = {
   string:  'string'
   number:  'integer'
   boolean: 'bool'
+}
 
 observe = (options) ->
   observer = new Observer(options)
