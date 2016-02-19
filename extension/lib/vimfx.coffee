@@ -23,13 +23,15 @@
 # the commands for UI presentation. There is only one `VimFx` instance.
 
 notation = require('vim-like-key-notation')
-prefs    = require('./prefs')
-utils    = require('./utils')
-Vim      = require('./vim')
+prefs = require('./prefs')
+utils = require('./utils')
+Vim = require('./vim')
+
+{EventEmitter} = utils
 
 DIGIT = /^\d$/
 
-class VimFx extends utils.EventEmitter
+class VimFx extends EventEmitter
   constructor: (@modes, @options) ->
     super()
     @vims = new WeakMap()
@@ -156,16 +158,16 @@ class VimFx extends utils.EventEmitter
       for categoryName, commands of categories
         category = @options.categories[categoryName]
         categoriesSorted.push({
-          name:     category.name
-          _name:    categoryName
-          order:    category.order
+          name: category.name
+          _name: categoryName
+          order: category.order
           commands: commands.sort(byOrder)
         })
       mode = @modes[modeName]
       modesSorted.push({
-        name:       mode.name
-        _name:      modeName
-        order:      mode.order
+        name: mode.name
+        _name: modeName
+        order: mode.order
         categories: categoriesSorted.sort(byOrder)
       })
     return modesSorted.sort(byOrder)
@@ -184,17 +186,19 @@ createKeyTrees = (groupedCommands, specialKeyStrings) ->
 
   pushOverrideErrors = (command, originalSequence, tree) ->
     {command: overridingCommand} = getFirstLeaf(tree)
-    error =
-      id:      'overridden_by'
+    error = {
+      id: 'overridden_by'
       subject: overridingCommand.description
       context: originalSequence
+    }
     pushError(error, command)
 
   pushSpecialKeyError = (command, originalSequence, key) ->
-    error =
+    error = {
       id: 'illegal_special_key'
       subject: key
       context: originalSequence
+    }
     pushError(error, command)
 
   for mode in groupedCommands
@@ -249,7 +253,7 @@ createKeyTrees = (groupedCommands, specialKeyStrings) ->
 
 parseShortcutPref = (pref) ->
   shortcuts = []
-  errors    = []
+  errors = []
 
   # The shorcut prefs are read from root in order to support other extensions to
   # extend VimFx with custom commands.

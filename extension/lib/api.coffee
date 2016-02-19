@@ -20,12 +20,12 @@
 # This file defines VimFx’s config file API.
 
 defaults = require('./defaults')
-prefs    = require('./prefs')
-utils    = require('./utils')
+prefs = require('./prefs')
+utils = require('./utils')
 
 counter = new utils.Counter({start: 10000, step: 100})
 
-createAPI = (vimfx) ->
+createAPI = (vimfx) -> {
   get: (pref) -> switch
     when pref of defaults.parsed_options
       defaults.parsed_options[pref]
@@ -51,9 +51,9 @@ createAPI = (vimfx) ->
       throw new Error("VimFx: Unknown pref: #{pref}")
 
   addCommand: ({name, description, mode, category, order} = {}, fn) ->
-    mode     ?= 'normal'
+    mode ?= 'normal'
     category ?= if mode == 'normal' then 'misc' else ''
-    order    ?= counter.tick()
+    order ?= counter.tick()
 
     unless typeof name == 'string'
       throw new Error("VimFx: A command name as a string is required.
@@ -103,8 +103,9 @@ createAPI = (vimfx) ->
         return keyStr not in (overrides ? [])
     vimfx.keyOverrides.push(rules...)
 
-  on:      vimfx.on.bind(vimfx)
-  modes:   vimfx.modes
+  on: vimfx.on.bind(vimfx)
+  modes: vimfx.modes
+}
 
 getOverrides = (rules, args...) ->
   for [match, overrides] in rules

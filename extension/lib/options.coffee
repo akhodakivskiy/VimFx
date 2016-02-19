@@ -19,15 +19,16 @@
 
 # This file constructs VimFx’s options UI in the Add-ons Manager.
 
-defaults  = require('./defaults')
+defaults = require('./defaults')
 translate = require('./l10n')
-prefs     = require('./prefs')
-utils     = require('./utils')
+prefs = require('./prefs')
+utils = require('./utils')
 
-TYPE_MAP =
-  string:  'string'
-  number:  'integer'
+TYPE_MAP = {
+  string: 'string'
+  number: 'integer'
   boolean: 'bool'
+}
 
 observe = (options) ->
   observer = new Observer(options)
@@ -40,7 +41,7 @@ observe = (options) ->
 # Generalized observer.
 class BaseObserver
   constructor: (@options) ->
-    @document  = null
+    @document = null
     @container = null
     @listeners = []
 
@@ -103,13 +104,15 @@ class Observer extends BaseObserver
 
   injectInstructions: ->
     setting = @appendSetting({
-      type:  'control'
+      type: 'control'
       title: translate('prefs.instructions.title')
-      desc:  translate('prefs.instructions.desc',
-               @vimfx.options['options.key.quote'],
-               @vimfx.options['options.key.insert_default'],
-               @vimfx.options['options.key.reset_default'],
-               '<c-z>')
+      desc: translate(
+        'prefs.instructions.desc',
+        @vimfx.options['options.key.quote'],
+        @vimfx.options['options.key.insert_default'],
+        @vimfx.options['options.key.reset_default'],
+        '<c-z>'
+      )
       'first-row': 'true'
     })
     href = "#{@vimfx.info.homepageURL}/tree/master/documentation"
@@ -117,7 +120,7 @@ class Observer extends BaseObserver
     utils.setAttributes(docsLink, {
       value: translate('prefs.documentation')
       href
-      crop:  'end'
+      crop: 'end'
       class: 'text-link'
     })
     setting.appendChild(docsLink)
@@ -125,35 +128,35 @@ class Observer extends BaseObserver
   injectOptions: ->
     for key, value of defaults.options
       setting = @appendSetting({
-        pref:  "#{defaults.BRANCH}#{key}"
-        type:  @type(value)
+        pref: "#{defaults.BRANCH}#{key}"
+        type: @type(value)
         title: translate("pref.#{key}.title")
-        desc:  translate("pref.#{key}.desc")
+        desc: translate("pref.#{key}.desc")
       })
     return
 
   injectShortcuts: ->
     for mode in @vimfx.getGroupedCommands()
       @appendSetting({
-        type:        'control'
-        title:       mode.name
+        type: 'control'
+        title: mode.name
         'first-row': 'true'
       })
 
       for category in mode.categories
         if category.name
           @appendSetting({
-            type:        'control'
-            title:       category.name
+            type: 'control'
+            title: category.name
             'first-row': 'true'
           })
 
         for {command} in category.commands
           @appendSetting({
-            pref:  command.pref
-            type:  'string'
+            pref: command.pref
+            type: 'string'
             title: command.description
-            desc:  @generateErrorMessage(command.pref)
+            desc: @generateErrorMessage(command.pref)
             class: 'is-shortcut'
           })
 

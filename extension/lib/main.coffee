@@ -21,20 +21,20 @@
 # This file pulls in all the different parts of VimFx, initializes them, and
 # stiches them together.
 
-createAPI         = require('./api')
-button            = require('./button')
-defaults          = require('./defaults')
-UIEventManager    = require('./events')
+createAPI = require('./api')
+button = require('./button')
+defaults = require('./defaults')
+UIEventManager = require('./events')
 {applyMigrations} = require('./legacy')
-messageManager    = require('./message-manager')
-migrations        = require('./migrations')
-modes             = require('./modes')
-options           = require('./options')
-parsePref         = require('./parse-prefs')
-prefs             = require('./prefs')
-utils             = require('./utils')
-VimFx             = require('./vimfx')
-test              = try require('../test/index')
+messageManager = require('./message-manager')
+migrations = require('./migrations')
+modes = require('./modes')
+options = require('./options')
+parsePref = require('./parse-prefs')
+prefs = require('./prefs')
+utils = require('./utils')
+VimFx = require('./vimfx')
+test = try require('../test/index')
 
 Cu.import('resource://gre/modules/AddonManager.jsm')
 
@@ -47,7 +47,7 @@ module.exports = (data, reason) ->
   for pref of defaults.all_options
     parsedOptions[pref] = parsePref(pref)
   vimfx = new VimFx(modes, parsedOptions)
-  vimfx.id      = data.id
+  vimfx.id = data.id
   vimfx.version = data.version
   AddonManager.getAddonByID(vimfx.id, (info) -> vimfx.info = info)
 

@@ -63,7 +63,7 @@ send = (name, data = null, messageManager = defaultMM, callback = null) ->
   callbackName = null
   if callback
     callbackName = "#{name}:callback:#{callbackCounter}"
-    callbackCounter++
+    callbackCounter += 1
     listenOnce(callbackName, callback, messageManager)
 
   namespacedName = namespace(name)

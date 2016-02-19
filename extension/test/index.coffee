@@ -17,7 +17,7 @@
 # along with VimFx.  If not, see <http://www.gnu.org/licenses/>.
 ###
 
-list  = require('./tests-list')
+list = require('./tests-list')
 utils = require('../lib/utils')
 
 {utils: Cu} = Components
@@ -28,19 +28,19 @@ assert = new Assert()
 module.exports = (vimfx) ->
   report = []
   passed = 0
-  total  = 0
+  total = 0
 
   for name in list
     tests = require("./#{name}")
     report.push(name)
     for key, fn of tests when key.startsWith('test')
-      total++
+      total += 1
       error = null
       teardowns = []
       teardown = (fn) -> teardowns.push(fn)
       try
         fn(assert, vimfx, teardown)
-        passed++
+        passed += 1
       catch error then null
       finally
         (try fn()) for fn in teardowns

@@ -22,27 +22,28 @@
 # This file defines VimFx’s modes, and their respective commands. The Normal
 # mode commands are defined in commands.coffee, though.
 
-{commands, findStorage}    = require('./commands')
-defaults                   = require('./defaults')
-help                       = require('./help')
-hints                      = require('./hints')
-translate                  = require('./l10n')
+{commands, findStorage} = require('./commands')
+defaults = require('./defaults')
+help = require('./help')
+hints = require('./hints')
+translate = require('./l10n')
 {rotateOverlappingMarkers} = require('./marker')
-utils                      = require('./utils')
+utils = require('./utils')
 
 # Helper to create modes in a DRY way.
 mode = (modeName, obj, commands = null) ->
-  obj.name  = translate("mode.#{modeName}")
+  obj.name = translate("mode.#{modeName}")
   obj.order = defaults.mode_order[modeName]
   obj.commands = {}
   for commandName, fn of commands
     pref = "mode.#{modeName}.#{commandName}"
-    obj.commands[commandName] =
-      pref:        defaults.BRANCH + pref
-      run:         fn
-      category:    defaults.categoryMap[pref]
+    obj.commands[commandName] = {
+      pref: defaults.BRANCH + pref
+      run: fn
+      category: defaults.categoryMap[pref]
       description: translate(pref)
-      order:       defaults.command_order[pref]
+      order: defaults.command_order[pref]
+    }
   exports[modeName] = obj
 
 
@@ -114,10 +115,10 @@ mode('normal', {
 
 mode('hints', {
   onEnter: ({vim, storage}, markers, callback, count = 1, sleep = -1) ->
-    storage.markers   = markers
+    storage.markers = markers
     storage.markerMap = null
-    storage.callback  = callback
-    storage.count     = count
+    storage.callback = callback
+    storage.count = count
     storage.numEnteredChars = 0
 
     if sleep >= 0
@@ -162,7 +163,7 @@ mode('hints', {
 
       if matchedMarkers.length > 0
         again = callback(matchedMarkers[0], storage.count, match.keyStr)
-        storage.count--
+        storage.count -= 1
         if again
           vim.window.setTimeout((->
             marker.markMatched(false) for marker in matchedMarkers
@@ -173,7 +174,7 @@ mode('hints', {
         else
           vim.enterMode('normal')
       else
-        storage.numEnteredChars++
+        storage.numEnteredChars += 1
 
     return true
 
@@ -193,11 +194,13 @@ mode('hints', {
   delete_hint_char: ({storage}) ->
     for marker in storage.markers
       switch marker.hintIndex - storage.numEnteredChars
-        when  0 then marker.deleteHintChar()
-        when -1 then marker.show()
-    storage.numEnteredChars-- unless storage.numEnteredChars == 0
+        when 0
+          marker.deleteHintChar()
+        when -1
+          marker.show()
+    storage.numEnteredChars -= 1 unless storage.numEnteredChars == 0
 
-  increase_count: ({storage}) -> storage.count++
+  increase_count: ({storage}) -> storage.count += 1
 })
 
 
@@ -219,11 +222,11 @@ mode('ignore', {
       when 1
         vim.enterMode('normal')
       else
-        storage.count--
+        storage.count += 1
     return false
 
 }, {
-  exit:    ({vim}) -> vim.enterMode('normal')
+  exit: ({vim}) -> vim.enterMode('normal')
   unquote: ({vim}) -> vim.enterMode('normal', {returnTo: 'ignore'})
 })
 

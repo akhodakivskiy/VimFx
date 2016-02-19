@@ -21,9 +21,9 @@
 # This file contains functions for getting markable elements, and related data,
 # as well as for creating and inserting markers for markable elements.
 
-huffman  = require('n-ary-huffman')
+huffman = require('n-ary-huffman')
 {Marker} = require('./marker')
-utils    = require('./utils')
+utils = require('./utils')
 
 try
   # TODO: Only use this path when Firefox 44 is released.
@@ -33,7 +33,7 @@ catch
 
 CONTAINER_ID = 'VimFxMarkersContainer'
 
-Element     = Ci.nsIDOMElement
+Element = Ci.nsIDOMElement
 XULDocument = Ci.nsIDOMXULDocument
 
 shutdownHandlerAdded = false
@@ -50,17 +50,20 @@ removeHints = (window) ->
 # about the element—a “wrapper,” a stand-in for the real element, which is only
 # accessible in frame scripts) in `wrappers`, and insert them into `window`.
 injectHints = (window, wrappers, viewport, options) ->
-  semantic   = []
+  semantic = []
   unsemantic = []
-  combined   = []
-  markerMap  = {}
+  combined = []
+  markerMap = {}
 
   for wrapper in wrappers
     marker = new Marker(wrapper, window.document)
     group = switch
-      when wrapper.parentIndex? then combined
-      when wrapper.semantic     then semantic
-      else unsemantic
+      when wrapper.parentIndex?
+        combined
+      when wrapper.semantic
+        semantic
+      else
+        unsemantic
     group.push(marker)
     markerMap[wrapper.elementIndex] = marker
 
@@ -73,7 +76,8 @@ injectHints = (window, wrappers, viewport, options) ->
   setZIndexes = (markers) ->
     markers.sort((a, b) -> a.weight - b.weight)
     for marker in markers when marker not instanceof huffman.BranchPoint
-      marker.markerElement.style.zIndex = zIndex++
+      marker.markerElement.style.zIndex = zIndex
+      zIndex += 1
       # Add `z-index` space for all the children of the marker.
       zIndex += marker.wrapper.numChildren if marker.wrapper.numChildren?
     return
@@ -106,7 +110,8 @@ injectHints = (window, wrappers, viewport, options) ->
   # unique `z-index` (space for this was added in `setZIndexes`).
   for marker in combined
     parent = markerMap[marker.wrapper.parentIndex]
-    marker.markerElement.style.zIndex = parent.markerElement.style.zIndex++
+    marker.markerElement.style.zIndex = parent.markerElement.style.zIndex
+    parent.markerElement.style.zIndex += 1
     marker.setHint(parent.hint)
   markers.push(combined...)
 
@@ -152,9 +157,9 @@ getMarkableElementsAndViewport = (window, filter) ->
   width  = if scrollWidth  > innerWidth  then clientWidth  else innerWidth
   height = if scrollHeight > innerHeight then clientHeight else innerHeight
   viewport = {
-    left:   0
-    top:    0
-    right:  width
+    left: 0
+    top: 0
+    right: width
     bottom: height
     width
     height
@@ -190,23 +195,27 @@ getMarkableElements = (window, viewport, wrappers, filter, parents = []) ->
     continue unless isInsideViewport(rect, viewport)
 
     # Calculate the visible part of the frame, according to the parent.
+    # coffeelint: disable=colon_assignment_spacing
     {clientWidth, clientHeight} = frame.document.documentElement
-    frameViewport =
+    frameViewport = {
       left:   Math.max(viewport.left - rect.left, 0)
       top:    Math.max(viewport.top  - rect.top,  0)
       right:  clientWidth  + Math.min(viewport.right  - rect.right,  0)
       bottom: clientHeight + Math.min(viewport.bottom - rect.bottom, 0)
+    }
+    # coffeelint: enable=colon_assignment_spacing
 
     # `.getComputedStyle()` may return `null` if the computed style isn’t
     # availble yet. If so, consider the element not visible.
     continue unless computedStyle = window.getComputedStyle(frame.frameElement)
-    offset =
+    offset = {
       left: rect.left +
         parseFloat(computedStyle.getPropertyValue('border-left-width')) +
         parseFloat(computedStyle.getPropertyValue('padding-left'))
       top: rect.top +
         parseFloat(computedStyle.getPropertyValue('border-top-width')) +
         parseFloat(computedStyle.getPropertyValue('padding-top'))
+    }
 
     getMarkableElements(frame, frameViewport, wrappers, filter,
                         parents.concat({window, offset}))

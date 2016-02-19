@@ -34,17 +34,17 @@ nsIStyleSheetService = Cc['@mozilla.org/content/style-sheet-service;1']
 nsIWindowMediator = Cc['@mozilla.org/appshell/window-mediator;1']
   .getService(Ci.nsIWindowMediator)
 
-HTMLAnchorElement   = Ci.nsIDOMHTMLAnchorElement
-HTMLButtonElement   = Ci.nsIDOMHTMLButtonElement
-HTMLInputElement    = Ci.nsIDOMHTMLInputElement
+HTMLAnchorElement = Ci.nsIDOMHTMLAnchorElement
+HTMLButtonElement = Ci.nsIDOMHTMLButtonElement
+HTMLInputElement = Ci.nsIDOMHTMLInputElement
 HTMLTextAreaElement = Ci.nsIDOMHTMLTextAreaElement
-HTMLSelectElement   = Ci.nsIDOMHTMLSelectElement
-HTMLBodyElement     = Ci.nsIDOMHTMLBodyElement
-XULDocument         = Ci.nsIDOMXULDocument
-XULButtonElement    = Ci.nsIDOMXULButtonElement
-XULControlElement   = Ci.nsIDOMXULControlElement
-XULMenuListElement  = Ci.nsIDOMXULMenuListElement
-XULTextBoxElement   = Ci.nsIDOMXULTextBoxElement
+HTMLSelectElement = Ci.nsIDOMHTMLSelectElement
+HTMLBodyElement = Ci.nsIDOMHTMLBodyElement
+XULDocument = Ci.nsIDOMXULDocument
+XULButtonElement = Ci.nsIDOMXULButtonElement
+XULControlElement = Ci.nsIDOMXULControlElement
+XULMenuListElement = Ci.nsIDOMXULMenuListElement
+XULTextBoxElement = Ci.nsIDOMXULTextBoxElement
 
 # Full chains of events for different mouse actions. ('command' is for XUL
 # elements.)
@@ -217,14 +217,18 @@ suppressEvent = (event) ->
 
 simulateMouseEvents = (element, sequenceType) ->
   window = element.ownerGlobal
-  rect   = element.getBoundingClientRect()
+  rect = element.getBoundingClientRect()
 
   eventSequence = switch sequenceType
-    when 'click'       then EVENTS_CLICK
-    when 'hover-start' then EVENTS_HOVER_START
-    when 'hover-end'   then EVENTS_HOVER_END
+    when 'click'
+      EVENTS_CLICK
+    when 'hover-start'
+      EVENTS_HOVER_START
+    when 'hover-end'
+      EVENTS_HOVER_END
 
   for type in eventSequence
+    buttonNum = if type in EVENTS_CLICK then 1 else 0
     mouseEvent = new window.MouseEvent(type, {
       # Let the event bubble in order to trigger delegated event listeners.
       bubbles: type not in ['mouseenter', 'mouseleave']
@@ -233,8 +237,8 @@ simulateMouseEvents = (element, sequenceType) ->
       cancelable: type not in ['mouseenter', 'mouseleave']
       # These properties are just here for mimicing a real click as much as
       # possible.
-      buttons: if type in EVENTS_CLICK then 1 else 0
-      detail:  if type in EVENTS_CLICK then 1 else 0
+      buttons: buttonNum
+      detail: buttonNum
       view: window
       # `page{X,Y}` are set automatically to the correct values when setting
       # `client{X,Y}`. `{offset,layer,movement}{X,Y}` are not worth the trouble
@@ -259,7 +263,7 @@ area = (element) ->
   return element.clientWidth * element.clientHeight
 
 containsDeep = (parent, element) ->
-  parentWindow  = parent.ownerGlobal
+  parentWindow = parent.ownerGlobal
   elementWindow = element.ownerGlobal
 
   # Owner windows might be missing when opening the devtools.
@@ -302,9 +306,12 @@ scroll = (element, args) ->
   for direction, index in directions
     amount = amounts[index]
     options[direction] = -Math.sign(amount) * adjustment + switch type
-      when 'lines' then amount
-      when 'pages' then amount * element[properties[index]]
-      when 'other' then Math.min(amount, element[properties[index]])
+      when 'lines'
+        amount
+      when 'pages'
+        amount * element[properties[index]]
+      when 'other'
+        Math.min(amount, element[properties[index]])
   options.behavior = 'smooth' if smooth
   element[method](options)
 

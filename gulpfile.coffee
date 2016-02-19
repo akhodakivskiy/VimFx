@@ -17,29 +17,29 @@
 # along with VimFx.  If not, see <http://www.gnu.org/licenses/>.
 ###
 
-fs          = require('fs')
-path        = require('path')
-gulp        = require('gulp')
-coffee      = require('gulp-coffee')
-coffeelint  = require('gulp-coffeelint')
-git         = require('gulp-git')
-header      = require('gulp-header')
-mustache    = require('gulp-mustache')
-sloc        = require('gulp-sloc')
-tap         = require('gulp-tap')
-zip         = require('gulp-zip')
-marked      = require('marked')
-merge       = require('merge2')
-precompute  = require('require-precompute')
-request     = require('request')
-rimraf      = require('rimraf')
+fs = require('fs')
+path = require('path')
+gulp = require('gulp')
+coffee = require('gulp-coffee')
+coffeelint = require('gulp-coffeelint')
+git = require('gulp-git')
+header = require('gulp-header')
+mustache = require('gulp-mustache')
+sloc = require('gulp-sloc')
+tap = require('gulp-tap')
+zip = require('gulp-zip')
+marked = require('marked')
+merge = require('merge2')
+precompute = require('require-precompute')
+request = require('request')
+rimraf = require('rimraf')
 runSequence = require('run-sequence')
-pkg         = require('./package.json')
+pkg = require('./package.json')
 
-DEST   = 'build'
-XPI    = 'VimFx.xpi'
+DEST = 'build'
+XPI = 'VimFx.xpi'
 LOCALE = 'extension/locale'
-TEST   = 'extension/test'
+TEST = 'extension/test'
 
 BASE_LOCALE = 'en-US'
 
@@ -278,7 +278,7 @@ syncLocale = (baseLocaleName, fileName) ->
   return {fileName, untranslated, total: Object.keys(base.keys).length}
 
 parseLocaleFile = (fileContents) ->
-  keys  = {}
+  keys = {}
   lines = []
   [newline] = fileContents.match(/\r?\n/)
   for line in fileContents.split(newline)

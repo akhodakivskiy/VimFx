@@ -30,14 +30,14 @@ class Marker
     @elementShape  = @wrapper.shape
     @markerElement = utils.createBox(@document, 'marker')
     @markerElement.setAttribute('data-type', @wrapper.type)
-    @weight    = @elementShape.area
-    @width     = 0
-    @height    = 0
-    @hint      = ''
+    @weight = @elementShape.area
+    @width = 0
+    @height = 0
+    @hint = ''
     @hintIndex = 0
-    @zoom      = 1
-    @viewport  = null
-    @position  = null
+    @zoom = 1
+    @viewport = null
+    @position = null
     @originalPosition = null
 
   reset: ->
@@ -46,6 +46,7 @@ class Marker
 
   show: -> @setVisibility(true)
   hide: -> @setVisibility(false)
+
   setVisibility: (visible) ->
     @markerElement.classList.toggle('marker--hidden', not visible)
 
@@ -54,7 +55,7 @@ class Marker
   setPosition: (@viewport, @zoom) ->
     {
       markerElement: {clientWidth, clientHeight}
-      elementShape:  {nonCoveredPoint: {x: left, y: top, offset}}
+      elementShape: {nonCoveredPoint: {x: left, y: top, offset}}
     } = this
 
     @width  = clientWidth  / @zoom
@@ -104,13 +105,13 @@ class Marker
   matchHintChar: (char) ->
     if char == @hint[@hintIndex]
       @toggleLastHintChar(true)
-      @hintIndex++
+      @hintIndex += 1
       return true
     return false
 
   deleteHintChar: ->
     if @hintIndex > 0
-      @hintIndex--
+      @hintIndex -= 1
       @toggleLastHintChar(false)
 
   toggleLastHintChar: (visible) ->
@@ -176,7 +177,7 @@ getStackFor = (marker, markers) ->
       stack = stack.concat(getStackFor(nextMarker, markers))
     else
       # Continue the search.
-      index++
+      index += 1
 
   return stack
 

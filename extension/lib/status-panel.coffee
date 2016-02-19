@@ -28,8 +28,8 @@ injectStatusPanel = (browser) ->
   statusPanel = window.document.createElement('statuspanel')
   utils.setAttributes(statusPanel, {
     inactive: 'true'
-    layer:    'true'
-    mirror:   'true'
+    layer: 'true'
+    mirror: 'true'
   })
   statusPanel.style.pointerEvents = 'auto'
 
