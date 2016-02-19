@@ -73,7 +73,8 @@ injectHints = (window, wrappers, viewport, options) ->
   setZIndexes = (markers) ->
     markers.sort((a, b) -> a.weight - b.weight)
     for marker in markers when marker not instanceof huffman.BranchPoint
-      marker.markerElement.style.zIndex = zIndex++
+      marker.markerElement.style.zIndex = zIndex
+      zIndex += 1
       # Add `z-index` space for all the children of the marker.
       zIndex += marker.wrapper.numChildren if marker.wrapper.numChildren?
     return
@@ -106,7 +107,8 @@ injectHints = (window, wrappers, viewport, options) ->
   # unique `z-index` (space for this was added in `setZIndexes`).
   for marker in combined
     parent = markerMap[marker.wrapper.parentIndex]
-    marker.markerElement.style.zIndex = parent.markerElement.style.zIndex++
+    marker.markerElement.style.zIndex = parent.markerElement.style.zIndex
+    parent.markerElement.style.zIndex += 1
     marker.setHint(parent.hint)
   markers.push(combined...)
 

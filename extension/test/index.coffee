@@ -34,13 +34,13 @@ module.exports = (vimfx) ->
     tests = require("./#{name}")
     report.push(name)
     for key, fn of tests when key.startsWith('test')
-      total++
+      total += 1
       error = null
       teardowns = []
       teardown = (fn) -> teardowns.push(fn)
       try
         fn(assert, vimfx, teardown)
-        passed++
+        passed += 1
       catch error then null
       finally
         (try fn()) for fn in teardowns

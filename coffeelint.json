@@ -22,7 +22,7 @@
   "no_implicit_parens":                 {"level": "error"},
   "no_interpolation_in_single_quotes":  {"level": "error"},
   "no_nested_string_interpolation":     {"level": "error"},
-  "no_plusplus":                        {"level": "ignore"},
+  "no_plusplus":                        {"level": "error"},
   "no_private_function_fat_arrows":     {"level": "error"},
   "no_stand_alone_at":                  {"level": "error"},
   "no_tabs":                            {"level": "error"},

@@ -122,7 +122,7 @@ helper_follow = ({id, combine = true}, matcher, {vim}) ->
           parent = hrefs[href]
           wrapper.parentIndex = parent.elementIndex
           parent.shape.area += wrapper.shape.area
-          parent.numChildren++
+          parent.numChildren += 1
         else
           wrapper.numChildren = 0
           hrefs[href] = wrapper

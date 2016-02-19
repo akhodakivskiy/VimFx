@@ -104,13 +104,13 @@ class Marker
   matchHintChar: (char) ->
     if char == @hint[@hintIndex]
       @toggleLastHintChar(true)
-      @hintIndex++
+      @hintIndex += 1
       return true
     return false
 
   deleteHintChar: ->
     if @hintIndex > 0
-      @hintIndex--
+      @hintIndex -= 1
       @toggleLastHintChar(false)
 
   toggleLastHintChar: (visible) ->
@@ -176,7 +176,7 @@ getStackFor = (marker, markers) ->
       stack = stack.concat(getStackFor(nextMarker, markers))
     else
       # Continue the search.
-      index++
+      index += 1
 
   return stack
 

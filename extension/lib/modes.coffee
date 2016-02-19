@@ -162,7 +162,7 @@ mode('hints', {
 
       if matchedMarkers.length > 0
         again = callback(matchedMarkers[0], storage.count, match.keyStr)
-        storage.count--
+        storage.count -= 1
         if again
           vim.window.setTimeout((->
             marker.markMatched(false) for marker in matchedMarkers
@@ -173,7 +173,7 @@ mode('hints', {
         else
           vim.enterMode('normal')
       else
-        storage.numEnteredChars++
+        storage.numEnteredChars += 1
 
     return true
 
@@ -195,9 +195,9 @@ mode('hints', {
       switch marker.hintIndex - storage.numEnteredChars
         when  0 then marker.deleteHintChar()
         when -1 then marker.show()
-    storage.numEnteredChars-- unless storage.numEnteredChars == 0
+    storage.numEnteredChars -= 1 unless storage.numEnteredChars == 0
 
-  increase_count: ({storage}) -> storage.count++
+  increase_count: ({storage}) -> storage.count += 1
 })
 
 
@@ -219,7 +219,7 @@ mode('ignore', {
       when 1
         vim.enterMode('normal')
       else
-        storage.count--
+        storage.count += 1
     return false
 
 }, {

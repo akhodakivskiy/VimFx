@@ -192,7 +192,7 @@ class FrameEventManager
 
       if @numFocusToSuppress > 0
         utils.suppressEvent(event)
-        @numFocusToSuppress--
+        @numFocusToSuppress -= 1
         return
 
       @vim.state.explicitBodyFocus = (target == @vim.content.document.body)
