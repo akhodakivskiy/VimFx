@@ -220,9 +220,12 @@ simulateMouseEvents = (element, sequenceType) ->
   rect = element.getBoundingClientRect()
 
   eventSequence = switch sequenceType
-    when 'click'       then EVENTS_CLICK
-    when 'hover-start' then EVENTS_HOVER_START
-    when 'hover-end'   then EVENTS_HOVER_END
+    when 'click'
+      EVENTS_CLICK
+    when 'hover-start'
+      EVENTS_HOVER_START
+    when 'hover-end'
+      EVENTS_HOVER_END
 
   for type in eventSequence
     buttonNum = if type in EVENTS_CLICK then 1 else 0
@@ -303,9 +306,12 @@ scroll = (element, args) ->
   for direction, index in directions
     amount = amounts[index]
     options[direction] = -Math.sign(amount) * adjustment + switch type
-      when 'lines' then amount
-      when 'pages' then amount * element[properties[index]]
-      when 'other' then Math.min(amount, element[properties[index]])
+      when 'lines'
+        amount
+      when 'pages'
+        amount * element[properties[index]]
+      when 'other'
+        Math.min(amount, element[properties[index]])
   options.behavior = 'smooth' if smooth
   element[method](options)
 

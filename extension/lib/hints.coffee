@@ -58,9 +58,12 @@ injectHints = (window, wrappers, viewport, options) ->
   for wrapper in wrappers
     marker = new Marker(wrapper, window.document)
     group = switch
-      when wrapper.parentIndex? then combined
-      when wrapper.semantic then semantic
-      else unsemantic
+      when wrapper.parentIndex?
+        combined
+      when wrapper.semantic
+        semantic
+      else
+        unsemantic
     group.push(marker)
     markerMap[wrapper.elementIndex] = marker
 

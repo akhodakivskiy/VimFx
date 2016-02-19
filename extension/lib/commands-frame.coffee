@@ -239,10 +239,14 @@ commands.follow_in_tab = helper_follow.bind(null, {id: 'tab'},
 commands.follow_copy = helper_follow.bind(null, {id: 'copy'},
   ({element}) ->
     type = switch
-      when isProperLink(element) then 'link'
-      when isContentEditable(element) then 'contenteditable'
-      when isTypingElement(element) then 'text'
-      else null
+      when isProperLink(element)
+        'link'
+      when isContentEditable(element)
+        'contenteditable'
+      when isTypingElement(element)
+        'text'
+      else
+        null
     return {type, semantic: true}
 )
 

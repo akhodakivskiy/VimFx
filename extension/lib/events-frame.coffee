@@ -154,10 +154,14 @@ class FrameEventManager
         keyStr = notation.stringify(event)
         options = @vim.options(['focus_previous_key', 'focus_next_key'])
         direction = switch keyStr
-          when '' then null
-          when options.focus_previous_key then -1
-          when options.focus_next_key     then +1
-          else null
+          when ''
+            null
+          when options.focus_previous_key
+            -1
+          when options.focus_next_key
+            +1
+          else
+            null
         if direction?
           suppress = commands.move_focus({@vim, direction})
           @keepInputs = true

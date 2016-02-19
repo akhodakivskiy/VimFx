@@ -194,8 +194,10 @@ mode('hints', {
   delete_hint_char: ({storage}) ->
     for marker in storage.markers
       switch marker.hintIndex - storage.numEnteredChars
-        when  0 then marker.deleteHintChar()
-        when -1 then marker.show()
+        when 0
+          marker.deleteHintChar()
+        when -1
+          marker.show()
     storage.numEnteredChars -= 1 unless storage.numEnteredChars == 0
 
   increase_count: ({storage}) -> storage.count += 1

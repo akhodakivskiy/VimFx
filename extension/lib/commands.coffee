@@ -237,9 +237,12 @@ absoluteTabIndex = (relativeIndex, gBrowser, {pinnedSeparate}) ->
   numPinnedTabs = gBrowser._numPinnedTabs
 
   [numTabs, min] = switch
-    when not pinnedSeparate then [numTabsTotal,  0]
-    when selectedTab.pinned then [numPinnedTabs, 0]
-    else [numTabsTotal - numPinnedTabs, numPinnedTabs]
+    when not pinnedSeparate
+      [numTabsTotal,  0]
+    when selectedTab.pinned
+      [numPinnedTabs, 0]
+    else
+      [numTabsTotal - numPinnedTabs, numPinnedTabs]
 
   # Wrap _once_ if at one of the ends of the tab bar and cannot move in the
   # current direction.
@@ -443,9 +446,12 @@ commands.follow_copy = ({vim}) ->
   callback = (marker) ->
     {elementIndex} = marker.wrapper
     property = switch marker.wrapper.type
-      when 'link' then 'href'
-      when 'text' then 'value'
-      when 'contenteditable' then 'textContent'
+      when 'link'
+        'href'
+      when 'text'
+        'value'
+      when 'contenteditable'
+        'textContent'
     vim._run('copy_marker_element', {elementIndex, property})
   helper_follow('follow_copy', vim, callback)
 
