@@ -69,7 +69,7 @@ send = (name, data = null, callback = null, options = {}) ->
   callbackName = null
   if callback
     callbackName = "#{name}:callback:#{callbackCounter}"
-    callbackCounter++
+    callbackCounter += 1
     listenOnce(callbackName, callback, args)
 
   namespacedName = namespace(name, args.prefix)

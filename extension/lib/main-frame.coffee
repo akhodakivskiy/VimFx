@@ -19,13 +19,13 @@
 
 # This file is the equivalent of main.coffee, but for frame scripts.
 
-commands          = require('./commands-frame')
-config            = require('./config')
-createConfigAPI   = require('./api-frame')
+commands = require('./commands-frame')
+config = require('./config')
+createConfigAPI = require('./api-frame')
 FrameEventManager = require('./events-frame')
-messageManager    = require('./message-manager')
-VimFrame          = require('./vim-frame')
-test              = try require('../test/index')
+messageManager = require('./message-manager')
+VimFrame = require('./vim-frame')
+test = try require('../test/index')
 
 module.exports = ->
   {content} = FRAME_SCRIPT_ENVIRONMENT

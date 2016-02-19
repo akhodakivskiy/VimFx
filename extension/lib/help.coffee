@@ -20,11 +20,11 @@
 # This file creates VimFx’s Keyboard Shortcuts help screen.
 
 translate = require('./l10n')
-utils     = require('./utils')
+utils = require('./utils')
 
-CONTAINER_ID  = 'VimFxHelpDialogContainer'
+CONTAINER_ID = 'VimFxHelpDialogContainer'
 MAX_FONT_SIZE = 20
-SEARCH_MATCH_CLASS     = 'search-match'
+SEARCH_MATCH_CLASS = 'search-match'
 SEARCH_NON_MATCH_CLASS = 'search-non-match'
 SEARCH_HIGHLIGHT_CLASS = 'search-highlight'
 
@@ -63,7 +63,7 @@ injectHelp = (window, vimfx) ->
   fontSize = originalFontSize =
     parseFloat(computedStyle.getPropertyValue('font-size'))
   while wrapper.scrollTopMax == 0 and fontSize <= MAX_FONT_SIZE
-    fontSize++
+    fontSize += 1
     container.style.fontSize = "#{fontSize}px"
   container.style.fontSize = "#{Math.max(fontSize - 1, originalFontSize)}px"
 
@@ -107,7 +107,7 @@ createContent = (window, vimfx) ->
       # `data-` attributes are currently unused by VimFx, but provide a great
       # way to customize the help dialog with custom CSS.
       utils.setAttributes(categoryContainer, {
-        'data-mode':     mode._name
+        'data-mode': mode._name
         'data-category': category._name
       })
 
@@ -152,7 +152,7 @@ goToCommandSetting = (window, vimfx, command) ->
   )
 
 search = (content, term) ->
-  document   = content.ownerDocument
+  document = content.ownerDocument
   ignoreCase = (term == term.toLowerCase())
   regex = RegExp("(#{utils.regexEscape(term)})", if ignoreCase then 'i' else '')
   clear = (term == '')

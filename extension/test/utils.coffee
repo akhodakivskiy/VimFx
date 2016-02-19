@@ -39,9 +39,9 @@ class MockMessageManager
     @addMessageListenerCalls    = 0
     @removeMessageListenerCalls = 0
 
-  sendAsyncMessage:      -> @sendAsyncMessageCalls++
-  addMessageListener:    -> @addMessageListenerCalls++
-  removeMessageListener: -> @removeMessageListenerCalls++
+  sendAsyncMessage: -> @sendAsyncMessageCalls += 1
+  addMessageListener: -> @addMessageListenerCalls += 1
+  removeMessageListener: -> @removeMessageListenerCalls += 1
 
 class MockVim extends Vim
   constructor: (@_messageManager = null) ->

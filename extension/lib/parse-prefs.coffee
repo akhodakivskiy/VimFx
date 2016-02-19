@@ -20,8 +20,8 @@
 # This file parses string prefs into more easily used data structures.
 
 defaults = require('./defaults')
-prefs    = require('./prefs')
-utils    = require('./utils')
+prefs = require('./prefs')
+utils = require('./utils')
 
 MIN_NUM_HINT_CHARS = 2
 
@@ -69,7 +69,7 @@ parsePatterns = (value) ->
   )
   return result
 
-parsers =
+parsers = {
   hint_chars: (value, defaultValue) ->
     parsed = utils.removeDuplicateCharacters(value).replace(/\s/g, '')
     # Make sure that hint chars contain at least the required amount of chars.
@@ -87,11 +87,12 @@ parsers =
     )
     return result
 
-  prevent_autofocus_modes:  parseSpaceDelimitedString
+  prevent_autofocus_modes: parseSpaceDelimitedString
 
-  adjustable_element_keys:  parseSpaceDelimitedString
+  adjustable_element_keys: parseSpaceDelimitedString
   activatable_element_keys: parseSpaceDelimitedString
 
   pattern_attrs: parseSpaceDelimitedString
+}
 
 module.exports = parsePref

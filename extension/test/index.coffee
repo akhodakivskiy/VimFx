@@ -21,7 +21,7 @@
 
 testsList = if IS_FRAME_SCRIPT then './tests-list-frame' else './tests-list'
 
-list  = require(testsList)
+list = require(testsList)
 utils = require('../lib/utils')
 
 Cu.import('chrome://specialpowers/content/Assert.jsm')
@@ -30,19 +30,19 @@ assert = new Assert()
 module.exports = (topLevelObject) ->
   report = []
   passed = 0
-  total  = 0
+  total = 0
 
   for name in list
     tests = require("./#{name}")
     report.push(name)
     for key, fn of tests when key.startsWith('test')
-      total++
+      total += 1
       error = null
       teardowns = []
       teardown = (fn) -> teardowns.push(fn)
       try
         fn(assert, topLevelObject, teardown)
-        passed++
+        passed += 1
       catch error then null
       finally
         (try fn()) for fn in teardowns

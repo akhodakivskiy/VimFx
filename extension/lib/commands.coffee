@@ -26,12 +26,12 @@
 # NOTE: Most tab related commands need to do their actual tab manipulations in
 # the next tick (`utils.nextTick`) to work around bug 1200334.
 
-config    = require('./config')
-help      = require('./help')
-hints     = require('./hints')
-prefs     = require('./prefs')
+config = require('./config')
+help = require('./help')
+hints = require('./hints')
+prefs = require('./prefs')
 translate = require('./l10n')
-utils     = require('./utils')
+utils = require('./utils')
 
 commands = {}
 
@@ -232,15 +232,18 @@ absoluteTabIndex = (relativeIndex, gBrowser, {pinnedSeparate}) ->
   tabs = gBrowser.visibleTabs
   {selectedTab} = gBrowser
 
-  currentIndex  = tabs.indexOf(selectedTab)
+  currentIndex = tabs.indexOf(selectedTab)
   absoluteIndex = currentIndex + relativeIndex
-  numTabsTotal  = tabs.length
+  numTabsTotal = tabs.length
   numPinnedTabs = gBrowser._numPinnedTabs
 
   [numTabs, min] = switch
-    when not pinnedSeparate  then [numTabsTotal,  0]
-    when selectedTab.pinned  then [numPinnedTabs, 0]
-    else [numTabsTotal - numPinnedTabs, numPinnedTabs]
+    when not pinnedSeparate
+      [numTabsTotal,  0]
+    when selectedTab.pinned
+      [numPinnedTabs, 0]
+    else
+      [numTabsTotal - numPinnedTabs, numPinnedTabs]
 
   # Wrap _once_ if at one of the ends of the tab bar and cannot move in the
   # current direction.
@@ -444,9 +447,12 @@ commands.follow_copy = ({vim}) ->
   callback = (marker) ->
     {elementIndex} = marker.wrapper
     property = switch marker.wrapper.type
-      when 'link'            then 'href'
-      when 'text'            then 'value'
-      when 'contenteditable' then 'textContent'
+      when 'link'
+        'href'
+      when 'text'
+        'value'
+      when 'contenteditable'
+        'textContent'
     vim._run('copy_marker_element', {elementIndex, property})
   helper_follow('follow_copy', vim, callback)
 
@@ -497,10 +503,11 @@ commands.click_browser_element = ({vim}) ->
     vim.notify(translate('notification.follow.none'))
 
 helper_follow_pattern = (type, {vim}) ->
-  options =
+  options = {
     pattern_selector: vim.options.pattern_selector
-    pattern_attrs:    vim.options.pattern_attrs
-    patterns:         vim.options["#{type}_patterns"]
+    pattern_attrs: vim.options.pattern_attrs
+    patterns: vim.options["#{type}_patterns"]
+  }
   vim._run('follow_pattern', {type, options})
 
 commands.follow_previous = helper_follow_pattern.bind(null, 'prev')

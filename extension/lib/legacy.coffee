@@ -21,8 +21,8 @@
 # without breaking backwards-compatibility. These are used in migrations.coffee.
 
 notation = require('vim-like-key-notation')
-prefs    = require('./prefs')
-utils    = require('./utils')
+prefs = require('./prefs')
+utils = require('./utils')
 
 applyMigrations = (migrations) ->
   for migration, index in migrations
@@ -52,9 +52,9 @@ convertKey = (keyStr) ->
     return notation.stringify({
       key
       shiftKey: Boolean(shift)
-      altKey:   'a' in modifiers
-      ctrlKey:  'c' in modifiers
-      metaKey:  'm' in modifiers
+      altKey: 'a' in modifiers
+      ctrlKey: 'c' in modifiers
+      metaKey: 'm' in modifiers
     })
   )
 

@@ -21,7 +21,7 @@
 
 messageManager = require('./message-manager')
 
-createConfigAPI = (vim, onShutdown = module.onShutdown) ->
+createConfigAPI = (vim, onShutdown = module.onShutdown) -> {
   listen: (message, listener) ->
     unless typeof message == 'string'
       throw new Error("VimFx: The first argument must be a message string.
@@ -40,5 +40,6 @@ createConfigAPI = (vim, onShutdown = module.onShutdown) ->
                        Got: #{hintMatcher}")
     vim.hintMatcher = hintMatcher
     onShutdown(-> vim.hintMatcher = null)
+}
 
 module.exports = createConfigAPI

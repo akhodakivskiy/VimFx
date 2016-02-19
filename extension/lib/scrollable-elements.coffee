@@ -26,7 +26,7 @@ utils = require('./utils')
 class ScrollableElements
   constructor: (@window) ->
     @elements = new Set()
-    @largest  = null
+    @largest = null
 
   MINIMUM_SCROLL: 5
   MINIMUM_SCROLLABLE_ELEMENT_AREA: 25

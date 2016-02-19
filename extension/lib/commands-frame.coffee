@@ -22,9 +22,9 @@
 # same name as the command in commands.coffee that calls it. There are also a
 # few more generalized “commands” used in more than one place.
 
-hints     = require('./hints')
+hints = require('./hints')
 translate = require('./l10n')
-utils     = require('./utils')
+utils = require('./utils')
 
 {isProperLink, isTextInputElement, isTypingElement, isContentEditable} = utils
 
@@ -121,7 +121,7 @@ helper_follow = ({id, combine = true}, matcher, {vim}) ->
           parent = hrefs[href]
           wrapper.parentIndex = parent.elementIndex
           parent.shape.area += wrapper.shape.area
-          parent.numChildren++
+          parent.numChildren += 1
         else
           wrapper.numChildren = 0
           hrefs[href] = wrapper
@@ -238,10 +238,14 @@ commands.follow_in_tab = helper_follow.bind(null, {id: 'tab'},
 commands.follow_copy = helper_follow.bind(null, {id: 'copy'},
   ({element}) ->
     type = switch
-      when isProperLink(element)      then 'link'
-      when isContentEditable(element) then 'contenteditable'
-      when isTypingElement(element)   then 'text'
-      else null
+      when isProperLink(element)
+        'link'
+      when isContentEditable(element)
+        'contenteditable'
+      when isTypingElement(element)
+        'text'
+      else
+        null
     return {type, semantic: true}
 )
 

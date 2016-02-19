@@ -21,11 +21,14 @@
 # from an old format to a new one, without breaking backwards compatibility.
 
 legacy = require('./legacy')
-prefs  = require('./prefs')
+prefs = require('./prefs')
 
 migrations = []
 
 migrations[0] = ->
+  # coffeelint: disable=colon_assignment_spacing
+  # coffeelint: disable=no_implicit_braces
+
   conversions =
     'focus':                 'normal.focus_location_bar'
     'focus_search':          'normal.focus_search_bar'
@@ -101,6 +104,8 @@ migrations[0] = ->
 
     'mode_find_exit': 'find.exit'
 
+  # coffeelint: enable=colon_assignment_spacing
+  # coffeelint: enable=no_implicit_braces
 
   convert = (value) ->
     keys = try JSON.parse(value)

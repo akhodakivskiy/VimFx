@@ -20,7 +20,7 @@
 # This file loads the user config file: config.js and frame.js.
 
 createConfigAPI = require('./api')
-messageManager  = require('./message-manager')
+messageManager = require('./message-manager')
 
 load = (vimfx, callback = ->) ->
   configDir = vimfx.options.config_file_directory

@@ -17,11 +17,11 @@
 # along with VimFx.  If not, see <http://www.gnu.org/licenses/>.
 ###
 
-testUtils       = require('./utils')
+testUtils = require('./utils')
 createConfigAPI = require('../lib/api')
-defaults        = require('../lib/defaults')
-prefs           = require('../lib/prefs')
-utils           = require('../lib/utils')
+defaults = require('../lib/defaults')
+prefs = require('../lib/prefs')
+utils = require('../lib/utils')
 
 {throws} = testUtils
 
@@ -99,21 +99,21 @@ exports['test customization'] = (assert, $vimfx, teardown) ->
 
   # Add a simple test command.
   vimfx.addCommand({
-    name:        'test_command'
+    name: 'test_command'
     description: 'Test command'
   }, -> nonce)
   vimfx.set('custom.mode.normal.test_command', 'ö')
 
   # Add a slightly more complex command.
   vimfx.get('categories')['new_category'] = {
-    name:  'New category'
+    name: 'New category'
     order: -100
   }
   vimfx.addCommand({
-    name:        'test_command'
+    name: 'test_command'
     description: 'Test ignore mode command'
-    mode:        'ignore'
-    category:    'new_category'
+    mode: 'ignore'
+    category: 'new_category'
   }, -> nonce)
   vimfx.set('custom.mode.ignore.test_command', 'ö  <ö>  <c-c-invalid>')
 
@@ -191,9 +191,9 @@ exports['test vimfx.addCommand order'] = (assert, $vimfx, teardown) ->
   )
 
   vimfx.addCommand({
-    name:        'test_command'
+    name: 'test_command'
     description: 'Test command'
-    order:       0
+    order: 0
   }, Function.prototype)
   vimfx.set('custom.mode.normal.test_command', 'ö')
 
@@ -338,7 +338,7 @@ exports['test vimfx.on and vimfx.off'] = (assert, $vimfx) ->
   vimfx = createConfigAPI($vimfx)
 
   callCount = 0
-  count = -> callCount++
+  count = -> callCount += 1
   vimfx.on('foo', count)
   vimfx.on('bar', count)
 

@@ -56,7 +56,7 @@ Also check out the [wiki](https://github.com/akhodakivskiy/VimFx/wiki)!
 ### For contributors
 
 - [Contributing code](CONTRIBUTING-CODE.md)
-  – Get your pull request merged faster.
+  – How to, and tips for getting your pull request merged faster.
 
 - [Tools](tools.md)
   – Automation for building and maintaining VimFx.

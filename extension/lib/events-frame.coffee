@@ -19,10 +19,10 @@
 
 # This file is the equivalent to events.coffee, but for frame scripts.
 
-notation       = require('vim-like-key-notation')
-commands       = require('./commands-frame')
+notation = require('vim-like-key-notation')
+commands = require('./commands-frame')
 messageManager = require('./message-manager')
-utils          = require('./utils')
+utils = require('./utils')
 
 nsIFocusManager = Cc['@mozilla.org/focus-manager;1']
   .getService(Ci.nsIFocusManager)
@@ -154,10 +154,14 @@ class FrameEventManager
         keyStr = notation.stringify(event)
         options = @vim.options(['focus_previous_key', 'focus_next_key'])
         direction = switch keyStr
-          when '' then null
-          when options.focus_previous_key then -1
-          when options.focus_next_key     then +1
-          else null
+          when ''
+            null
+          when options.focus_previous_key
+            -1
+          when options.focus_next_key
+            +1
+          else
+            null
         if direction?
           suppress = commands.move_focus({@vim, direction})
           @keepInputs = true
@@ -192,7 +196,7 @@ class FrameEventManager
 
       if @numFocusToSuppress > 0
         utils.suppressEvent(event)
-        @numFocusToSuppress--
+        @numFocusToSuppress -= 1
         return
 
       @vim.state.explicitBodyFocus = (target == @vim.content.document.body)
