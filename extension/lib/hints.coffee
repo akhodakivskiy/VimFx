@@ -110,8 +110,9 @@ injectHints = (window, wrappers, viewport, options) ->
   # unique `z-index` (space for this was added in `setZIndexes`).
   for marker in combined
     parent = markerMap[marker.wrapper.parentIndex]
-    marker.markerElement.style.zIndex = parent.markerElement.style.zIndex
-    parent.markerElement.style.zIndex += 1
+    parentZIndex = Number(parent.markerElement.style.zIndex)
+    marker.markerElement.style.zIndex = parentZIndex
+    parent.markerElement.style.zIndex = parentZIndex + 1
     marker.setHint(parent.hint)
   markers.push(combined...)
 
