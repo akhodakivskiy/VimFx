@@ -34,12 +34,8 @@ nsIStyleSheetService = Cc['@mozilla.org/content/style-sheet-service;1']
 nsIWindowMediator = Cc['@mozilla.org/appshell/window-mediator;1']
   .getService(Ci.nsIWindowMediator)
 
-HTMLAnchorElement = Ci.nsIDOMHTMLAnchorElement
-HTMLButtonElement = Ci.nsIDOMHTMLButtonElement
-HTMLInputElement = Ci.nsIDOMHTMLInputElement
-HTMLTextAreaElement = Ci.nsIDOMHTMLTextAreaElement
-HTMLSelectElement = Ci.nsIDOMHTMLSelectElement
-HTMLBodyElement = Ci.nsIDOMHTMLBodyElement
+# For XUL, `instanceof` checks are often better than `.localName` checks,
+# because some of the below interfaces are extended by many elements.
 XULDocument = Ci.nsIDOMXULDocument
 XULButtonElement = Ci.nsIDOMXULButtonElement
 XULControlElement = Ci.nsIDOMXULControlElement
@@ -57,15 +53,14 @@ EVENTS_HOVER_END   = ['mouseout',  'mouseleave']
 # Element classification helpers
 
 isActivatable = (element) ->
-  return element instanceof HTMLAnchorElement or
-         element instanceof HTMLButtonElement or
-         (element instanceof HTMLInputElement and element.type in [
+  return element.localName in ['a', 'button'] or
+         (element.localName == 'input' and element.type in [
            'button', 'submit', 'reset', 'image'
          ]) or
          element instanceof XULButtonElement
 
 isAdjustable = (element) ->
-  return element instanceof HTMLInputElement and element.type in [
+  return element.localName == 'input' and element.type in [
            'checkbox', 'radio', 'file', 'color'
            'date', 'time', 'datetime', 'datetime-local', 'month', 'week'
          ] or
@@ -84,7 +79,7 @@ isContentEditable = (element) ->
          element.classList?.contains('real-terminal')
 
 isIframeEditor = (element) ->
-  return false unless element instanceof HTMLBodyElement
+  return false unless element.localName == 'body'
   return \
          # Etherpad.
          element.id == 'innerdocbody' or
@@ -100,17 +95,17 @@ isProperLink = (element) ->
   # `.getAttribute` is used below instead of `.hasAttribute` to exclude `<a
   # href="">`s used as buttons on some sites.
   return element.getAttribute('href') and
-         (element instanceof HTMLAnchorElement or
+         (element.localName == 'a' or
           element.ownerDocument instanceof XULDocument) and
          not element.href.endsWith('#') and
          not element.href.endsWith('#?') and
          not element.href.startsWith('javascript:')
 
 isTextInputElement = (element) ->
-  return (element instanceof HTMLInputElement and element.type in [
+  return (element.localName == 'input' and element.type in [
            'text', 'search', 'tel', 'url', 'email', 'password', 'number'
          ]) or
-         element instanceof HTMLTextAreaElement or
+         element.localName == 'textarea' or
          element instanceof XULTextBoxElement or
          isContentEditable(element)
 
@@ -118,7 +113,7 @@ isTypingElement = (element) ->
   return isTextInputElement(element) or
          # `<select>` elements can also receive text input: You may type the
          # text of an item to select it.
-         element instanceof HTMLSelectElement or
+         element.localName == 'select' or
          element instanceof XULMenuListElement
 
 
@@ -137,8 +132,7 @@ getActiveElement = (window) ->
   # for the presence of `.contentWindow`. However, in non-multi-process
   # `<browser>` (sometimes `<xul:browser>`) elements have a `.contentWindow`
   # pointing to the web page content `window`, which we don’t want to recurse
-  # into. `.localName` is `.nodeName` without `xul:` (if it exists). This seems
-  # to be the only way to detect such elements.
+  # into. This seems to be the only way to detect such elements.
   if activeElement.localName != 'browser' and activeElement.contentWindow
     return getActiveElement(activeElement.contentWindow)
   else

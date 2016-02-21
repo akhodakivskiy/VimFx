@@ -162,10 +162,10 @@ commands.follow = helper_follow.bind(null, {id: 'normal'},
            # Google Drive Documents. The hint for this element would cover the
            # real hint that allows you to focus the document to start typing.
            element.id != 'docs-editor' and
-           not (isXUL and element.nodeName.endsWith('box') and
-                element.nodeName != 'checkbox')
+           not (isXUL and element.localName.endsWith('box') and
+                element.localName != 'checkbox')
         type = 'clickable'
-        unless isXUL or element.nodeName in ['A', 'INPUT', 'BUTTON']
+        unless isXUL or element.localName in ['a', 'input', 'button']
           semantic = false
       when element != vim.state.scrollableElements.largest and
            vim.state.scrollableElements.has(element)
@@ -194,7 +194,7 @@ commands.follow = helper_follow.bind(null, {id: 'normal'},
       # but keeps the `<label>` to click, either for styling purposes or to keep
       # the `<input>` hidden until it is used. In those cases we should add a
       # marker for the `<label>`.
-      when element.nodeName == 'LABEL'
+      when element.localName == 'label'
         input =
           if element.htmlFor
             document.getElementById(element.htmlFor)
@@ -221,7 +221,7 @@ commands.follow = helper_follow.bind(null, {id: 'normal'},
       # When viewing an image it should get a marker to toggle zoom. This is the
       # most unlikely rule to match, so keep it last.
       when document.body?.childElementCount == 1 and
-           element.nodeName == 'IMG' and
+           element.localName == 'img' and
            (element.classList.contains('overflowing') or
             element.classList.contains('shrinkToFit'))
         type = 'clickable'

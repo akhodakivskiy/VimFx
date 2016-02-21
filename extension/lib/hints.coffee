@@ -425,7 +425,7 @@ normalize = (element) ->
 contains = (element, elementAtPoint) ->
   return false unless elementAtPoint
   container = normalize(element)
-  if elementAtPoint.nodeName == 'tabbrowser' and elementAtPoint.id == 'content'
+  if elementAtPoint.localName == 'tabbrowser' and elementAtPoint.id == 'content'
     {gBrowser} = element.ownerGlobal.top
     tabpanel = gBrowser.getNotificationBox(gBrowser.selectedBrowser)
     return tabpanel.contains(element)
