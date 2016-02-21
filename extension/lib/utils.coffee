@@ -281,6 +281,63 @@ createBox = (document, className = '', parent = null, text = null) ->
   parent.appendChild(box) if parent?
   return box
 
+# Returns the minimum of `element.clientHeight` and the height of the viewport,
+# taking fixed headers and footers into account. Adapted from Firefox’s source
+# code for `<space>` scrolling (which is where the arbitrary constants below
+# come from).
+#
+# coffeelint: disable=max_line_length
+# <https://hg.mozilla.org/mozilla-central/file/4d75bd6fd234/layout/generic/nsGfxScrollFrame.cpp#l3829>
+# coffeelint: enable=max_line_length
+getViewportCappedClientHeight = (element) ->
+  window = element.ownerGlobal
+  viewport = getWindowViewport(window)
+  headerBottom = viewport.top
+  footerTop = viewport.bottom
+  maxHeight = viewport.height / 3
+  minWidth = Math.min(viewport.width / 2, 800)
+
+  # Restricting the candidates for headers and footers to the most likely set of
+  # elements results in a noticeable performance boost.
+  candidates = window.document.querySelectorAll(
+    'div, ul, nav, header, footer, section'
+  )
+
+  for candidate in candidates
+    rect = candidate.getBoundingClientRect()
+    continue unless rect.height <= maxHeight and rect.width >= minWidth
+    # Checking for `position: fixed;` is the absolutely most expensive
+    # operation, so that is done last.
+    switch
+      when rect.top <= headerBottom and rect.bottom > headerBottom and
+           isPositionFixed(candidate)
+        headerBottom = rect.bottom
+      when rect.bottom >= footerTop and rect.top < footerTop and
+           isPositionFixed(candidate)
+        footerTop = rect.top
+
+  return Math.min(element.clientHeight, footerTop - headerBottom)
+
+getWindowViewport = (window) ->
+  {
+    clientWidth, clientHeight # Viewport size excluding scrollbars, usually.
+    scrollWidth, scrollHeight
+  } = window.document.documentElement
+  {innerWidth, innerHeight} = window # Viewport size including scrollbars.
+  # We don’t want markers to cover the scrollbars, so we should use
+  # `clientWidth` and `clientHeight`. However, when there are no scrollbars
+  # those might be too small. Then we use `innerWidth` and `innerHeight`.
+  width  = if scrollWidth  > innerWidth  then clientWidth  else innerWidth
+  height = if scrollHeight > innerHeight then clientHeight else innerHeight
+  return {
+    left: 0
+    top: 0
+    right: width
+    bottom: height
+    width
+    height
+  }
+
 injectTemporaryPopup = (document, contents) ->
   popup = document.createElement('menupopup')
   popup.appendChild(contents)
@@ -293,6 +350,10 @@ insertText = (input, value) ->
   input.value =
     input.value[0...selectionStart] + value + input.value[selectionEnd..]
   input.selectionStart = input.selectionEnd = selectionStart + value.length
+
+isPositionFixed = (element) ->
+  computedStyle = element.ownerGlobal.getComputedStyle(element)
+  return computedStyle?.getPropertyValue('position') == 'fixed'
 
 querySelectorAllDeep = (window, selector) ->
   elements = Array.from(window.document.querySelectorAll(selector))
@@ -309,7 +370,11 @@ scroll = (element, args) ->
       when 'lines'
         amount
       when 'pages'
-        amount * element[properties[index]]
+        amount *
+          if properties[index] == 'clientHeight'
+            getViewportCappedClientHeight(element)
+          else
+            element[properties[index]]
       when 'other'
         Math.min(amount, element[properties[index]])
   options.behavior = 'smooth' if smooth
@@ -464,8 +529,11 @@ module.exports = {
   area
   containsDeep
   createBox
+  getViewportCappedClientHeight
+  getWindowViewport
   injectTemporaryPopup
   insertText
+  isPositionFixed
   querySelectorAllDeep
   scroll
   setAttributes
