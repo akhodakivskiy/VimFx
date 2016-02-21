@@ -43,13 +43,8 @@ class Vim
       enumerable: true
     })
 
-    # Since this is done in the constructor, defer location change handling to
-    # the next tick so that this `vim` instance is saved in `vimfx.vims` first.
-    # This allows 'locationChange' listeners to use `@vimfx.getCurrentVim()`.
-    utils.nextTick(@window, =>
-      @_onLocationChange(@browser.currentURI.spec)
-    )
-
+  _start: ->
+    @_onLocationChange(@browser.currentURI.spec)
     @_addListeners()
 
   _addListeners: ->

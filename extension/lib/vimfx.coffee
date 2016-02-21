@@ -45,7 +45,13 @@ class VimFx extends EventEmitter
   SPECIAL_KEYS: ['<force>', '<late>']
 
   addVim: (browser) ->
-    @vims.set(browser, new Vim(browser, this))
+    vim = new Vim(browser, this)
+    @vims.set(browser, vim)
+    # Calling `vim._start` will emit VimFx events. It might seem as if the logic
+    # of `vim._start` could be moved into the constructor, but splitting it like
+    # this allows to save the `vim` instance in `vimfx.vims` first, which in
+    # turn allows `vimfx.on(...)` listeners to use `vimfx.getCurrentVim()`.
+    vim._start()
 
   # NOTE: This method is often called in event handlers. Many events may fire
   # before a `vim` object has been created for the current tab yet (such as when

@@ -71,16 +71,12 @@ module.exports = (data, reason) ->
   onModeDisplayChange = (vimOrEvent) ->
     window = vimOrEvent.window ? vimOrEvent.originalTarget.ownerGlobal
 
-    # If the passed `vim` is brand new, `vim.mode` is not available until in the
-    # next tick (see `Vim::constructor`), so wait for it.
-    utils.nextTick(window, ->
-      # The 'modeChange' event provides the `vim` object that changed mode, but
-      # it might not be the current `vim` anymore so always get the current one.
-      return unless vim = vimfx.getCurrentVim(window)
+    # The 'modeChange' event provides the `vim` object that changed mode, but
+    # it might not be the current `vim` anymore so always get the current one.
+    return unless vim = vimfx.getCurrentVim(window)
 
-      setWindowAttribute(window, 'mode', vim.mode)
-      vimfx.emit('modeDisplayChange', vim)
-    )
+    setWindowAttribute(window, 'mode', vim.mode)
+    vimfx.emit('modeDisplayChange', vim)
 
   vimfx.on('modeChange', onModeDisplayChange)
   vimfx.on('TabSelect',  onModeDisplayChange)
