@@ -92,7 +92,9 @@ isIframeEditor = (element) ->
          (element.classList.contains('xe_content') and
           element.classList.contains('editable')) or
          # vBulletin.
-         element.classList.contains('wysiwyg')
+         element.classList.contains('wysiwyg') or
+         # The wasavi extension.
+         element.hasAttribute('data-wasavi-state')
 
 isProperLink = (element) ->
   # `.getAttribute` is used below instead of `.hasAttribute` to exclude `<a
