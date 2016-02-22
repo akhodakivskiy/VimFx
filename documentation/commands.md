@@ -52,7 +52,28 @@ They only wrap around _once._
 
 ### `gl`
 
-Selects the _count_ most recent tab.
+Selects the _count_ most recently visited tab.
+
+Note that unread tabs are never considered _visited._ See the `gL` command
+below.
+
+### `gL`
+
+Selects the _count_ oldest unread tab.
+
+Unread tabs are tabs opened in the background, for example by using the `F`
+command, that you have not yet visited.
+
+Tip: It might help to make unread tabs visually different through custom
+[styling]. The following makes the tab titles of unread tabs italic:
+
+```css
+.tabbrowser-tab[unread]:not(#override) {
+    font-style: italic !important;
+}
+```
+
+[styling]: styling.md
 
 ### `gJ`, `gK`
 
