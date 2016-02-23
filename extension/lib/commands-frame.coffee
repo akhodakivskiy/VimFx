@@ -97,7 +97,27 @@ helper_follow = ({id, combine = true}, matcher, {vim}) ->
       {type, semantic} = vim.hintMatcher(id, element, {type, semantic})
 
     return unless type
-    return unless shape = getElementShape(element)
+    shape = getElementShape(element)
+
+    # CodeMirror editor uses a tiny hidden textarea positioned at the caret.
+    # Targeting those are the only reliable way of focusing CodeMirror editors,
+    # and doing so without moving the caret.
+    if not shape and id == 'normal' and element.nodeName == 'TEXTAREA' and
+       element.ownerGlobal == vim.content
+      rect = element.getBoundingClientRect()
+      # Use `.clientWidth` instead of `rect.width` because the latter includes
+      # the width of the borders of the textarea, which are unreliable.
+      if element.clientWidth == 1 and rect.height > 0
+        shape = {
+          nonCoveredPoint: {
+            x: rect.left
+            y: rect.top + rect.height / 2
+            offset: {left: 0, top: 0}
+          }
+          area: rect.width * rect.height
+        }
+
+    return unless shape
 
     originalRect = element.getBoundingClientRect()
     length = vim.state.markerElements.push({element, originalRect})
@@ -180,8 +200,6 @@ commands.follow = helper_follow.bind(null, {id: 'normal'},
            element.hasAttribute('data-app-action') or
            element.hasAttribute('data-uri') or
            element.hasAttribute('data-page-action') or
-           # CodeMirror.
-           element.classList.contains('CodeMirror-scroll') or
            # Google Drive Document.
            element.classList.contains('kix-appview-editor')
         type = 'clickable'
