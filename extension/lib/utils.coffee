@@ -68,7 +68,10 @@ isAdjustable = (element) ->
          element instanceof XULControlElement or
          # Youtube special case.
          element.classList?.contains('html5-video-player') or
-         element.classList?.contains('ytp-button')
+         element.classList?.contains('ytp-button') or
+         # Allow navigating object inspection trees in th devtools with the
+         # arrow keys, even if the arrow keys are used as VimFx shortcuts.
+         element.ownerGlobal.DevTools
 
 isContentEditable = (element) ->
   return element.isContentEditable or
