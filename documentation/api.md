@@ -556,8 +556,8 @@ A `match` object has the following properties:
     key: see the [`activatable_element_keys`] option.
   - `'adjustable'`: element: an “adjustable” element (form control or video
     player). key: see the [`adjustable_element_keys`] option.
-  - `'other'`: element: some other kind of element that can receive keystrokes,
-    for example an element in fullscreen mode. key: any pressed key.
+  - `'other'`: element: some other kind of element that can receive keystrokes.
+    key: any pressed key.
 
   If none of the above criteria is met, the value is `null`, which means that
   the currently focused element does not appear to respond to keystrokes in any

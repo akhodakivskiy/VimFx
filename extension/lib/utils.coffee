@@ -64,6 +64,7 @@ isAdjustable = (element) ->
            'checkbox', 'radio', 'file', 'color'
            'date', 'time', 'datetime', 'datetime-local', 'month', 'week'
          ] or
+         element.localName in ['video', 'audio', 'embed', 'object'] or
          element instanceof XULControlElement or
          # Youtube special case.
          element.classList?.contains('html5-video-player') or

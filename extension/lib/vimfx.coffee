@@ -131,8 +131,7 @@ class VimFx extends EventEmitter
     document = event.originalTarget?.ownerDocument
     if focusType == null and document and
        # TODO: Remove when Tab Groups have been removed.
-       (vim.window.TabView?.isVisible() or
-        document.fullscreenElement or document.mozFullScreenElement)
+       vim.window.TabView?.isVisible()
       return 'other'
 
     keys = @options["#{focusType}_element_keys"]
