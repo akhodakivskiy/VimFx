@@ -49,8 +49,27 @@ class UIEventManager
   addListeners: ->
     checkPassthrough = (value, event) =>
       target = event.originalTarget
-      if target.localName in ['menupopup', 'panel']
+      if target.localName in ['menupopup', 'panel'] and
+         # Don’t set `@popupPassthrough` to `false` if there actually are popups
+         # open. This is the case when a sub-menu closes.
+         (value or not anyPopupsOpen())
         @popupPassthrough = value
+
+    anyPopupsOpen = =>
+      # The autocomplete popup in text inputs (for example) is technically a
+      # panel, but it does not respond to key presses. Therefore
+      # `[ignorekeys="true"]` is excluded.
+      #
+      # coffeelint: disable=max_line_length
+      # <https://developer.mozilla.org/en-US/docs/Mozilla/Tech/XUL/PopupGuide/PopupKeys#Ignoring_Keys>
+      # coffeelint: enable=max_line_length
+      popups = utils.querySelectorAllDeep(
+        @window,
+        ':-moz-any(menupopup, panel):not([ignorekeys="true"])'
+      )
+      for popup in popups
+        return true if popup.state == 'open'
+      return false
 
     @listen('popupshown',  checkPassthrough.bind(null, true))
     @listen('popuphidden', checkPassthrough.bind(null, false))
@@ -69,21 +88,9 @@ class UIEventManager
         # can be stuck as `true` even though no popup is shown, effectively
         # disabling the extension. Therefore we check if there actually _are_
         # any open popups before stopping processing keyboard input. This is
-        # only done when popups (might) be open (not on every keystroke) of
+        # only done when popups (might) be open (not on every keystroke) for
         # performance reasons.
-        #
-        # The autocomplete popup in text inputs (for example) is technically a
-        # panel, but it does not respond to key presses. Therefore
-        # `[ignorekeys="true"]` is excluded.
-        #
-        # coffeelint: disable=max_line_length
-        # <https://developer.mozilla.org/en-US/docs/Mozilla/Tech/XUL/PopupGuide/PopupKeys#Ignoring_Keys>
-        # coffeelint: enable=max_line_length
-        popups = @window.document.querySelectorAll(
-          ':-moz-any(menupopup, panel):not([ignorekeys="true"])'
-        )
-        for popup in popups
-          return if popup.state == 'open'
+        return if anyPopupsOpen()
         @popupPassthrough = false # No popup was actually open.
 
       return unless vim = @vimfx.getCurrentVim(@window)
