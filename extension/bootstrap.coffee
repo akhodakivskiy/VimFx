@@ -96,14 +96,14 @@ do (global = this) ->
         shutdownHandler()
       catch error
         Cu.reportError(error)
-    shutdownHandlers = null
+    shutdownHandlers = []
 
     # Release everything in `require`d modules. This must be done _after_ all
     # shutdownHandlers, since they use variables in these scopes.
     for path, scope of require.scopes
       for name of scope
         scope[name] = null
-    require.scopes = null
+    require.scopes = {}
 
   global.install = ->
 
