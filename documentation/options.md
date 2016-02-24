@@ -70,10 +70,15 @@ Note that the URLs in the list must match the current URL _entirely_ for it to
 apply. Therefore it is easiest to always use the `*` wildcard (which matches
 zero or more characters).
 
-(Set the option to `*` to make VimFx start out in Ignore mode _everywhere._)
+Set the option to `*` to make VimFx start out in Ignore mode _everywhere._
+
+When you’re done editing the blacklist, go to one of the pages you intend to
+match. If you already have a tab open for that page, reload it. Then look at
+VimFx’s [button] to see if your edits work out.
 
 You might also want to read about the [Ignore mode `<s-f1>` command][s-f1].
 
+[button]: button.md
 [s-f1]: commands.md#ignore-mode-s-f1
 
 ### Prevent autofocus
