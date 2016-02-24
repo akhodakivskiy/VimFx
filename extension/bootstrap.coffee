@@ -121,10 +121,5 @@ do (global = this) ->
 
       global.startup()
 
-      # When updating the add-on, the previous version is going to shut down at
-      # the same time as the new version starts up. Add the shutdown listener in
-      # the next tick to prevent the previous version from triggering it.
-      content.setTimeout((->
-        messageManager.listenOnce('shutdown', global.shutdown)
-      ), 0)
+      messageManager.listenOnce('shutdown', global.shutdown)
     )
