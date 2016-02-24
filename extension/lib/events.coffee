@@ -122,7 +122,7 @@ class UIEventManager
 
       if vim.isUIEvent(event)
         focusType = utils.getFocusType(utils.getActiveElement(@window))
-        @vimfx.emit('focusTypeChange', {vim, focusType})
+        vim._setFocusType(focusType)
 
     @listen('focus', handleFocusRelatedEvent.bind(null, {mode: 'find'}))
     @listen('blur',  handleFocusRelatedEvent.bind(null, {mode: 'normal'}))

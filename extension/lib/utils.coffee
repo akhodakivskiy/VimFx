@@ -95,6 +95,24 @@ isIframeEditor = (element) ->
          # The wasavi extension.
          element.hasAttribute('data-wasavi-state')
 
+isIgnoreModeFocusType = (element) ->
+  return \
+    # The wasavi extension.
+    element.hasAttribute('data-wasavi-state') or
+    element.closest('#wasavi_container') or
+    # CodeMirror in Vim mode.
+    (element.localName == 'textarea' and
+     element.closest('.CodeMirror') and _hasVimEventListener(element))
+
+# CodeMirror’s Vim mode is really sucky to detect. The only way seems to be to
+# check if the there are any event listener functions with Vim-y words in them.
+_hasVimEventListener = (element) ->
+  for listener in nsIEventListenerService.getListenerInfoFor(element)
+    if listener.listenerObject and
+       /\bvim\b|insertmode/i.test(String(listener.listenerObject))
+      return true
+  return false
+
 isProperLink = (element) ->
   # `.getAttribute` is used below instead of `.hasAttribute` to exclude `<a
   # href="">`s used as buttons on some sites.
@@ -175,6 +193,8 @@ focusElement = (element, options = {}) ->
   element.select?() if options.select
 
 getFocusType = (element) -> switch
+  when isIgnoreModeFocusType(element)
+    'ignore'
   when isTypingElement(element)
     'editable'
   when isActivatable(element)
@@ -510,6 +530,8 @@ module.exports = {
   isActivatable
   isAdjustable
   isContentEditable
+  isIframeEditor
+  isIgnoreModeFocusType
   isProperLink
   isTextInputElement
   isTypingElement

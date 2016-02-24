@@ -217,7 +217,8 @@ mode('ignore', {
       storage.type ?= 'explicit'
 
   onLeave: ({vim, storage}) ->
-    vim._run('blur_active_element') unless storage.count?
+    unless storage.count? or storage.type == 'focusType'
+      vim._run('blur_active_element')
 
   onInput: (args, match) ->
     {vim, storage} = args
@@ -233,8 +234,11 @@ mode('ignore', {
     return false
 
 }, {
-  exit: ({vim}) -> vim.enterMode('normal')
-  unquote: ({vim}) -> vim.enterMode('normal', {returnTo: 'ignore'})
+  exit: ({vim, storage}) ->
+    storage.type = null
+    vim.enterMode('normal')
+  unquote: ({vim}) ->
+    vim.enterMode('normal', {returnTo: 'ignore'})
 })
 
 

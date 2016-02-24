@@ -87,6 +87,29 @@ You might also want to read about the [Ignore mode `<s-f1>` command][s-f1].
 [button]: button.md
 [s-f1]: commands.md#ignore-mode-s-f1
 
+#### Blacklisting specific elements
+
+VimFx automatically enters Ignore mode while Vim-style editors are focused, such
+as the [wasavi] extension and [CodeMirror editors in Vim mode][codemirror-vim].
+
+By default, VimFx lets you press `<escape>` to blur text inputs. Also by
+default, Vim-style editors use `<escape>` to exit from their Insert mode to
+their Normal mode. In other words, there is a keyboard shortcut conflict here.
+
+It makes the most sense to let the Vim-style editor “win.” That’s why VimFx
+(temporarily) enters Ignore mode when focusing such an editor. In Insert mode,
+there is no `<escape>` shortcut (by default), and thus no conflict. Instead,
+there’s `<s-escape>` to blur the current element and exit Ignore mode.
+`<s-escape>` was chosen because it is very unlikely to cause conflicts. If it
+ever does, there’s the [`<s-f1>`] command to the rescue.
+
+There is currently no way of specifying your own elements to be blacklisted, but
+such a feature could be added if there’s demand for it.
+
+[wasavi]: http://appsweets.net/wasavi/
+[codemirror-vim]: https://codemirror.net/demo/vim.html
+[`<s-f1>`]: commands.md#ignore-mode-s-f1
+
 ### Prevent autofocus
 
 Many sites autofocus their search box, for example. This might be annoying when

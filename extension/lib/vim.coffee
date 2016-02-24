@@ -79,7 +79,7 @@ class Vim
       # the frame script arrives too late. Therefore, check that the currently
       # active element isn’t a browser UI element first.
       unless @_isUIElement(utils.getActiveElement(@window))
-        @_parent.emit('focusTypeChange', {vim: this, focusType})
+        @_setFocusType(focusType)
     )
 
   _setBrowser: (@browser, {addListeners = true} = {}) ->
@@ -181,5 +181,13 @@ class Vim
     # won’t work unless `@browser` is focused first.
     @browser.focus()
     @_run('focus_marker_element', {elementIndex, options})
+
+  _setFocusType: (focusType) ->
+    switch
+      when focusType == 'ignore'
+        @enterMode('ignore', {type: 'focusType'})
+      when @mode == 'ignore' and @_storage.ignore.type == 'focusType'
+        @enterMode('normal')
+    @_parent.emit('focusTypeChange', {vim: this, focusType})
 
 module.exports = Vim

@@ -550,6 +550,9 @@ A `match` object has the following properties:
   following values, depending on what kind of _element_ is focused and which
   _key_ was pressed:
 
+  - `'ignore'`: element: some kind of Vim-style editor. VimFx automatically
+    enters Ignore mode when this focus type is encountered. key: any pressed
+    key.
   - `'editable'`: element: some kind of text input, a `<select>` element or a
     “contenteditable” element. key: any pressed key.
   - `'activatable'`: element: an “activatable” element (link or button).
