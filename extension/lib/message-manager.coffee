@@ -74,10 +74,12 @@ send = (name, data = null, callback = null, options = {}) ->
 
   namespacedName = namespace(name, args.prefix)
   wrappedData = {data, callbackName}
+
+  # Message Manager methods may be missing on shutdown.
   if args.messageManager.broadcastAsyncMessage
-    args.messageManager.broadcastAsyncMessage(namespacedName, wrappedData)
+    args.messageManager.broadcastAsyncMessage?(namespacedName, wrappedData)
   else
-    args.messageManager.sendAsyncMessage(namespacedName, wrappedData)
+    args.messageManager.sendAsyncMessage?(namespacedName, wrappedData)
 
 # Unwraps the data from `send` and invokes `listener` with it.
 invokeListener = (listener, args, {data: {data, callbackName} = {}, target}) ->
