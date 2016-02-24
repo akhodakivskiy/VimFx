@@ -48,7 +48,7 @@ load = (uri, options = {}) ->
 listen = (name, listener, options = {}) ->
   args = Object.assign({}, defaultOptions, options)
   namespacedName = namespace(name, args.prefix)
-  fn = invokeListener.bind(null, listener, args)
+  fn = (data) -> invokeListener?(listener, args, data)
   args.messageManager.addMessageListener(namespacedName, fn)
   args.onShutdown(->
     args.messageManager.removeMessageListener(namespacedName, fn)
@@ -57,12 +57,9 @@ listen = (name, listener, options = {}) ->
 listenOnce = (name, listener, options = {}) ->
   args = Object.assign({}, defaultOptions, options)
   namespacedName = namespace(name, args.prefix)
-  # Make a copy of `invokeListener` in case it has been `null`ed out at the time
-  # this runs.
-  _invokeListener = invokeListener.bind(null, listener, args)
   fn = (data) ->
     args.messageManager.removeMessageListener(namespacedName, fn)
-    return _invokeListener(data)
+    return invokeListener?(listener, args, data)
   args.messageManager.addMessageListener(namespacedName, fn)
 
 callbackCounter = 0
