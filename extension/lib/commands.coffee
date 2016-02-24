@@ -588,11 +588,11 @@ commands.window_new_private = ({vim}) ->
   vim.window.OpenBrowserWindow({private: true})
 
 commands.enter_mode_ignore = ({vim}) ->
-  vim.enterMode('ignore')
+  vim.enterMode('ignore', {type: 'explicit'})
 
 # Quote next keypress (pass it through to the page).
 commands.quote = ({vim, count = 1}) ->
-  vim.enterMode('ignore', count)
+  vim.enterMode('ignore', {type: 'explicit', count})
 
 commands.enter_reader_view = ({vim}) ->
   button = vim.window.document.getElementById('reader-mode-button')

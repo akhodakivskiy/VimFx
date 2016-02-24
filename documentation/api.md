@@ -244,7 +244,7 @@ be used to replace the blacklist option).
 ```js
 vimfx.on('locationChange', ({vim, location}) => {
   if (location.hostname === 'example.com') {
-    vim.enterMode('ignore')
+    vim.enterMode('ignore', {type: 'blacklist'})
   }
 })
 ```

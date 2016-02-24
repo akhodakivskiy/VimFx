@@ -134,7 +134,11 @@ class Vim
     return suppress
 
   _onLocationChange: (url) ->
-    @enterMode(if @_isBlacklisted(url) then 'ignore' else 'normal')
+    unless @mode == 'ignore' and @_storage.ignore.type == 'explicit'
+      if @_isBlacklisted(url)
+        @enterMode('ignore', {type: 'blacklist'})
+      else
+        @enterMode('normal')
     @_parent.emit('locationChange', {vim: this, location: new @window.URL(url)})
 
   _call: (method, data = {}, extraArgs...) ->

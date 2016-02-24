@@ -206,8 +206,15 @@ mode('hints', {
 
 
 mode('ignore', {
-  onEnter: ({vim, storage}, count = null) ->
+  onEnter: ({vim, storage}, {count = null, type = null} = {}) ->
     storage.count = count
+
+    # Keep last `.type` if no type was given. This is useful when returning to
+    # Ignore mode after runnning the `unquote` command.
+    if type
+      storage.type = type
+    else
+      storage.type ?= 'explicit'
 
   onLeave: ({vim, storage}) ->
     vim._run('blur_active_element') unless storage.count?

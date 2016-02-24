@@ -76,6 +76,12 @@ When you’re done editing the blacklist, go to one of the pages you intend to
 match. If you already have a tab open for that page, reload it. Then look at
 VimFx’s [button] to see if your edits work out.
 
+Note that when Ignore mode is automatically entered because of the blacklist, it
+is also automatically exited (returning to Normal mode) if you go to a
+non-blacklisted page in the same tab. On the other hand, if you entered Ignore
+mode by pressing `i`, you’ll stay in Ignore mode in that tab until you exit it,
+even if you navigate to another page.
+
 You might also want to read about the [Ignore mode `<s-f1>` command][s-f1].
 
 [button]: button.md
