@@ -167,7 +167,7 @@ class Vim
 
   notify: (message) ->
     @_parent.emit('notification', {vim: this, message})
-    if @_parent.options.notifications_enabled
+    if @options.notifications_enabled
       @_statusPanel.setAttribute('label', message)
       @_statusPanel.removeAttribute('inactive')
 
