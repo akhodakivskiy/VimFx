@@ -173,7 +173,7 @@ helper_scrollByLinesY = (amount, {vim, uiEvent, count = 1}) ->
                 [amount * distance * count * 20])
 
 helper_scrollByPagesY = (amount, type, {vim, uiEvent, count = 1}) ->
-  adjustment = prefs.get("scroll.#{type}_page_adjustment")
+  adjustment = vim.options["scroll.#{type}_page_adjustment"]
   helper_scroll(vim, uiEvent, 'scrollBy', 'pages', ['top'],
                 [amount * count], ['clientHeight'], adjustment)
 
