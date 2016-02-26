@@ -123,8 +123,8 @@ class VimFx extends EventEmitter
     focusTypeKeys = @options["#{vim.focusType}_element_keys"]
     likelyConflict =
       if toplevel
-        if focusTypeKeys and keyStr in focusTypeKeys
-          true
+        if focusTypeKeys
+          keyStr in focusTypeKeys
         else
           vim.focusType != 'none'
       else
