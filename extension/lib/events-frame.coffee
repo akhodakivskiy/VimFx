@@ -125,9 +125,15 @@ class FrameEventManager
     )
 
     @listen('keydown', ((event) =>
-      suppress = messageManager.get('lateKeydown', {
-        defaultPrevented: event.defaultPrevented
-      })
+      suppress = false
+
+      # This message _has_ to be synchronous so we can suppress the event if
+      # needed. To avoid sending a synchronous message on _every_ keydown, this
+      # hack of toggling a pref when a `<late>` shortcut is encountered is used.
+      if prefs.get('late')
+        suppress = messageManager.get('lateKeydown', {
+          defaultPrevented: event.defaultPrevented
+        })
 
       if @vim.state.inputs and @vim.mode == 'normal' and not suppress and
          not event.defaultPrevented
@@ -149,7 +155,9 @@ class FrameEventManager
           suppress = commands.move_focus({@vim, direction})
           @keepInputs = true
 
-      utils.suppressEvent(event) if suppress
+      if suppress
+        utils.suppressEvent(event)
+        @listenOnce('keyup', utils.suppressEvent, false)
     ), false)
 
     @listen('mousedown', (event) =>

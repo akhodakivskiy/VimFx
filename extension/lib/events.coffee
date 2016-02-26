@@ -24,6 +24,7 @@
 
 button = require('./button')
 messageManager = require('./message-manager')
+prefs = require('./prefs')
 utils = require('./utils')
 
 HELD_MODIFIERS_ATTRIBUTE = 'vimfx-held-modifiers'
@@ -80,8 +81,10 @@ class UIEventManager
       @suppress = false
 
       # Reset the `@late` flag, telling any late listeners for the previous
-      # event not to run.
+      # event not to run. Also reset the `late` pref, telling frame scripts not
+      # to do synchronous message passong on every keydown.
       @late = false
+      prefs.set('late', false)
 
       if @popupPassthrough
         # The `@popupPassthrough` flag is set a bit unreliably. Sometimes it
@@ -252,6 +255,9 @@ class UIEventManager
           @listenOnce('keyup', utils.suppressEvent, false)
       ), false)
     else
+      # Hack to avoid synchronous messages on every keydown (see
+      # events-frame.coffee).
+      prefs.set('late', true)
       vim._listenOnce('lateKeydown', listener)
 
   setHeldModifiers: (event, {filterCurrentOnly = false} = {}) ->
