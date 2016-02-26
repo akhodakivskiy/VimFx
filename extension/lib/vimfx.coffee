@@ -42,7 +42,10 @@ class VimFx extends EventEmitter
     @reset()
     @on('modeChange', ({mode}) => @reset(mode))
 
-  SPECIAL_KEYS: ['<force>', '<late>']
+  SPECIAL_KEYS: {
+    '<force>': {}
+    '<late>': {single: true}
+  }
 
   addVim: (browser) ->
     vim = new Vim(browser, this)
@@ -182,7 +185,7 @@ byOrder = (a, b) -> a.order - b.order
 class Leaf
   constructor: (@command, @originalSequence, @specialKeys) ->
 
-createKeyTrees = (groupedCommands, specialKeyStrings) ->
+createKeyTrees = (groupedCommands, specialKeysSpec) ->
   keyTrees = {}
   errors = {}
 
@@ -198,9 +201,9 @@ createKeyTrees = (groupedCommands, specialKeyStrings) ->
     }
     pushError(error, command)
 
-  pushSpecialKeyError = (command, originalSequence, key) ->
+  pushSpecialKeyError = (command, id, originalSequence, key) ->
     error = {
-      id: 'illegal_special_key'
+      id: "special_key.#{id}"
       subject: key
       context: originalSequence
     }
@@ -222,15 +225,24 @@ createKeyTrees = (groupedCommands, specialKeyStrings) ->
 
         errored = false
         for prefixKey, index in prefixKeys
-          if prefixKey in specialKeyStrings
+          if prefixKey of specialKeysSpec
             if seenNonSpecialKey
-              pushSpecialKeyError(command, shortcut.original, prefixKey)
+              pushSpecialKeyError(command, 'prefix_only', shortcut.original,
+                                  prefixKey)
               errored = true
               break
             else
               specialKeys[prefixKey] = true
               continue
-          else
+          else if not seenNonSpecialKey
+            for specialKey of specialKeys
+              options = specialKeysSpec[specialKey]
+              if options.single
+                pushSpecialKeyError(command, 'single_only', shortcut.original,
+                                    specialKey)
+                errored = true
+                break
+            break if errored
             seenNonSpecialKey = true
 
           if prefixKey of tree
@@ -245,9 +257,10 @@ createKeyTrees = (groupedCommands, specialKeyStrings) ->
             tree = tree[prefixKey] = {}
         continue if errored
 
-        if lastKey in specialKeyStrings
+        if lastKey of specialKeysSpec
           subject = if seenNonSpecialKey then lastKey else shortcut.original
-          pushSpecialKeyError(command, shortcut.original, subject)
+          pushSpecialKeyError(command, 'prefix_only', shortcut.original,
+                              subject)
           continue
         if lastKey of tree
           pushOverrideErrors(command, shortcut.original, tree[lastKey])
