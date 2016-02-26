@@ -49,16 +49,6 @@ class Vim
     @_addListeners()
 
   _addListeners: ->
-    # Require the subset of the options needed to be listed explicitly (as
-    # opposed to sending _all_ options) for performance. Each option access
-    # might trigger an optionOverride.
-    @_listen('options', ({prefs}) =>
-      options = {}
-      for pref in prefs
-        options[pref] = @options[pref]
-      return options
-    )
-
     @_listen('vimMethod', ({method, args = []}, callback = null) =>
       result = @[method](args...)
       callback?(result)

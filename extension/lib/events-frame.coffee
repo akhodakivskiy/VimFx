@@ -22,6 +22,7 @@
 notation = require('vim-like-key-notation')
 commands = require('./commands-frame')
 messageManager = require('./message-manager')
+prefs = require('./prefs')
 utils = require('./utils')
 
 nsIFocusManager = Cc['@mozilla.org/focus-manager;1']
@@ -135,13 +136,12 @@ class FrameEventManager
         # behavior. Then, `event.key` is the way to go. (Unless the prefs are
         # customized. YAGNI until requested.)
         keyStr = notation.stringify(event)
-        options = @vim.options(['focus_previous_key', 'focus_next_key'])
         direction = switch keyStr
           when ''
             null
-          when options.focus_previous_key
+          when prefs.get('focus_previous_key')
             -1
-          when options.focus_next_key
+          when prefs.get('focus_next_key')
             +1
           else
             null
@@ -205,15 +205,9 @@ class FrameEventManager
         @vim.state.lastFocusedTextInput = target
         @vim.state.hasFocusedTextInput = true
 
-      # When moving a tab to another window, there is a short period of time
-      # when there’s no listener for this call.
-      return unless options = @vim.options(
-        ['prevent_autofocus', 'prevent_autofocus_modes']
-      )
-
       # Blur the focus target, if autofocus prevention is enabled…
-      if options.prevent_autofocus and
-         @vim.mode in options.prevent_autofocus_modes and
+      if prefs.get('prevent_autofocus') and
+         @vim.mode in prefs.get('prevent_autofocus_modes').split(/\s+/) and
          # …and the user has interacted with the page…
          not @vim.state.hasInteraction and
          # …and the event is programmatic (not caused by clicks or keypresses)…
