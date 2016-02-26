@@ -121,23 +121,6 @@ class FrameEventManager
 
     @listen('keydown', (event) =>
       @keepInputs = false
-
-      suppress = messageManager.get('consumeKeyEvent')
-
-      # This also suppresses the 'keypress' and 'keyup' events. (Yes, in frame
-      # scripts, suppressing the 'keydown' events does seem to even suppress
-      # the 'keyup' event!)
-      utils.suppressEvent(event) if suppress
-
-      # From this line on, the rest of the code in `addListeners` is more or
-      # less devoted to autofocus prevention. When enabled, focus events that
-      # occur before the user has interacted with page are prevented.
-      #
-      # If this keydown event wasn’t suppressed (`not suppress`), it’s an
-      # obvious interaction with the page. If it _was_ suppressed, though, it’s
-      # an interaction depending on the command triggered; if it calls
-      # `vim.markPageInteraction()` or not.
-      @vim.markPageInteraction() unless suppress
     )
 
     @listen('keydown', ((event) =>

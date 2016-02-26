@@ -95,15 +95,15 @@ class UIEventManager
 
       return unless vim = @vimfx.getCurrentVim(@window)
 
-      if vim.isUIEvent(event)
-        @consumeKeyEvent(vim, event)
-        # This also suppresses the 'keypress' event.
-        utils.suppressEvent(event) if @suppress
+      @consumeKeyEvent(vim, event)
+      if @suppress
+        utils.suppressEvent(event) # This also suppresses the 'keypress' event.
       else
-        vim._listenOnce('consumeKeyEvent', =>
-          @consumeKeyEvent(vim, event)
-          return @suppress
-        )
+        # If this keydown event wasn’t suppressed, it’s an obvious interaction
+        # with the page. If it _was_ suppressed, though, it’s an interaction
+        # depending on the command triggered; if _it_ calls
+        # `vim.markPageInteraction()` or not.
+        vim.markPageInteraction() if vim.isUIEvent(event)
     )
 
     @listen('keyup', (event) =>
