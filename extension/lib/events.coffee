@@ -82,7 +82,7 @@ class UIEventManager
 
       # Reset the `@late` flag, telling any late listeners for the previous
       # event not to run. Also reset the `late` pref, telling frame scripts not
-      # to do synchronous message passong on every keydown.
+      # to do synchronous message passing on every keydown.
       @late = false
       prefs.set('late', false)
 
