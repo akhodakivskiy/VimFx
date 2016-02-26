@@ -130,7 +130,8 @@ class Vim
   _consumeKeyEvent: (event) ->
     return @_parent.consumeKeyEvent(event, this)
 
-  _onInput: (match, uiEvent = false) ->
+  _onInput: (match, event) ->
+    uiEvent = if @isUIEvent(event) then event else false
     suppress = @_call('onInput', {uiEvent, count: match.count}, match)
     return suppress
 

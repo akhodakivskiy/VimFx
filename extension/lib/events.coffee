@@ -96,12 +96,12 @@ class UIEventManager
       return unless vim = @vimfx.getCurrentVim(@window)
 
       if vim.isUIEvent(event)
-        @consumeKeyEvent(vim, event, event)
+        @consumeKeyEvent(vim, event)
         # This also suppresses the 'keypress' event.
         utils.suppressEvent(event) if @suppress
       else
         vim._listenOnce('consumeKeyEvent', =>
-          @consumeKeyEvent(vim, event, false)
+          @consumeKeyEvent(vim, event)
           return @suppress
         )
     )
@@ -204,7 +204,7 @@ class UIEventManager
       callback(true)
     ), {messageManager: @window.messageManager})
 
-  consumeKeyEvent: (vim, event, uiEvent = false) ->
+  consumeKeyEvent: (vim, event) ->
     match = vim._consumeKeyEvent(event)
 
     if match
@@ -218,14 +218,14 @@ class UIEventManager
 
       if match.specialKeys['<late>']
         @suppress = false
-        @consumeLateKeydown(vim, event, match, uiEvent)
+        @consumeLateKeydown(vim, event, match)
       else
-        @suppress = vim._onInput(match, uiEvent)
+        @suppress = vim._onInput(match, event)
     else
       @suppress = null
     @setHeldModifiers(event)
 
-  consumeLateKeydown: (vim, event, match, uiEvent) ->
+  consumeLateKeydown: (vim, event, match) ->
     @late = true
 
     # The passed in `event` is the regular non-late browser UI keydown event.
@@ -240,11 +240,11 @@ class UIEventManager
         if defaultPrevented
           false
         else
-          vim._onInput(match, uiEvent)
+          vim._onInput(match, event)
       @setHeldModifiers(event)
       return @suppress
 
-    if uiEvent
+    if vim.isUIEvent(event)
       @listenOnce('keydown', ((lateEvent) =>
         listener(lateEvent)
         if @suppress
