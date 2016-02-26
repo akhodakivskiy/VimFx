@@ -65,7 +65,7 @@ module.exports = (data, reason) ->
 
   button.injectButton(vimfx)
 
-  setWindowAttribute = (window, name, value = 'none') ->
+  setWindowAttribute = (window, name, value) ->
     window.document.documentElement.setAttribute("vimfx-#{name}", value)
 
   onModeDisplayChange = (vimOrEvent) ->
@@ -81,8 +81,8 @@ module.exports = (data, reason) ->
   vimfx.on('modeChange', onModeDisplayChange)
   vimfx.on('TabSelect',  onModeDisplayChange)
 
-  vimfx.on('focusTypeChange', ({vim, focusType}) ->
-    setWindowAttribute(vim.window, 'focus-type', focusType)
+  vimfx.on('focusTypeChange', (vim) ->
+    setWindowAttribute(vim.window, 'focus-type', vim.focusType)
   )
 
   windows = new WeakSet()
@@ -101,7 +101,7 @@ module.exports = (data, reason) ->
       eventManager = new UIEventManager(vimfx, window)
       eventManager.addListeners(vimfx, window)
       setWindowAttribute(window, 'mode', 'normal')
-      setWindowAttribute(window, 'focus-type', null)
+      setWindowAttribute(window, 'focus-type', 'none')
 
     callback(true)
   )

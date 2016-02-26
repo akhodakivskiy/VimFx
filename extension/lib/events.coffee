@@ -96,13 +96,12 @@ class UIEventManager
       return unless vim = @vimfx.getCurrentVim(@window)
 
       if vim.isUIEvent(event)
-        focusType = utils.getFocusType(event.originalTarget)
-        @consumeKeyEvent(vim, event, focusType, event)
+        @consumeKeyEvent(vim, event, event)
         # This also suppresses the 'keypress' event.
         utils.suppressEvent(event) if @suppress
       else
-        vim._listenOnce('consumeKeyEvent', ({focusType}) =>
-          @consumeKeyEvent(vim, event, focusType)
+        vim._listenOnce('consumeKeyEvent', =>
+          @consumeKeyEvent(vim, event, false)
           return @suppress
         )
     )
@@ -205,12 +204,12 @@ class UIEventManager
       callback(true)
     ), {messageManager: @window.messageManager})
 
-  consumeKeyEvent: (vim, event, focusType, uiEvent = false) ->
-    match = vim._consumeKeyEvent(event, focusType)
+  consumeKeyEvent: (vim, event, uiEvent = false) ->
+    match = vim._consumeKeyEvent(event)
 
     if match
       if @vimfx.options.notify_entered_keys
-        if match.type in ['none', 'full'] or match.focus != null
+        if match.type in ['none', 'full'] or match.likelyConflict
           @enteredKeys.clear(vim)
         else
           @enteredKeys.push(vim, match.keyStr, @vimfx.options.timeout)

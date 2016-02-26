@@ -122,7 +122,7 @@ class FrameEventManager
     @listen('keydown', (event) =>
       @keepInputs = false
 
-      suppress = @vim.onInput(event)
+      suppress = messageManager.get('consumeKeyEvent')
 
       # This also suppresses the 'keypress' and 'keyup' events. (Yes, in frame
       # scripts, suppressing the 'keydown' events does seem to even suppress

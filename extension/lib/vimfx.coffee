@@ -79,7 +79,7 @@ class VimFx extends EventEmitter
       translations: @options.translations
     })
 
-  consumeKeyEvent: (event, vim, focusType) ->
+  consumeKeyEvent: (event, vim) ->
     {mode} = vim
     return unless keyStr = @stringifyKeyEvent(event)
 
@@ -118,26 +118,24 @@ class VimFx extends EventEmitter
         @reset(mode)
 
     count = if @count == '' then undefined else Number(@count)
-    focus = @adjustFocusType(event, vim, focusType, keyStr)
     unmodifiedKey = notation.parse(keyStr).key
+
+    focusTypeKeys = @options["#{vim.focusType}_element_keys"]
+    likelyConflict =
+      if toplevel
+        if focusTypeKeys and keyStr in focusTypeKeys
+          true
+        else
+          vim.focusType != 'none'
+      else
+        false
+
     @reset(mode) if type == 'full'
     return {
-      type, focus, command, count, specialKeys, keyStr, unmodifiedKey, toplevel
+      type, command, count, specialKeys, keyStr, unmodifiedKey, toplevel
+      likelyConflict
       discard: @reset.bind(this, mode)
     }
-
-  adjustFocusType: (event, vim, focusType, keyStr) ->
-    # Frame scripts and the tests don’t pass in `originalTarget`.
-    document = event.originalTarget?.ownerDocument
-    if focusType == null and document and
-       # TODO: Remove when Tab Groups have been removed.
-       vim.window.TabView?.isVisible()
-      return 'other'
-
-    keys = @options["#{focusType}_element_keys"]
-    return null if keys and keyStr not in keys
-
-    return focusType
 
   getGroupedCommands: (options = {}) ->
     modes = {}

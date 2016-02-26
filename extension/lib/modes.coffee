@@ -63,9 +63,8 @@ mode('normal', {
     {vim, storage, uiEvent} = args
     {keyStr} = match
 
-    autoInsertMode = (match.focus != null)
     if match.type == 'none' or
-       (autoInsertMode and not match.specialKeys['<force>'])
+       (match.likelyConflict and not match.specialKeys['<force>'])
       match.discard()
       if storage.returnTo
         vim.enterMode(storage.returnTo)
@@ -98,10 +97,10 @@ mode('normal', {
       # open the split console.
       return uiEvent.originalTarget.ownerGlobal.DevTools?
     else
-      # In web pages content, an exception is made if we’re in autoInsertMode.
-      # That allows for blurring an input in a custom dialog without closing the
-      # dialog too.
-      return autoInsertMode
+      # In web pages content, an exception is made if an element that VimFx
+      # cares about is focused. That allows for blurring an input in a custom
+      # dialog without closing the dialog too.
+      return vim.focusType != 'none'
 
     # Note that this special handling of Escape is only used in Normal mode.
     # There are two reasons we might suppress it in other modes. If some custom

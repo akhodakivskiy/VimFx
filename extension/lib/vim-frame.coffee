@@ -82,11 +82,6 @@ class VimFrame
       args: [@mode, args...]
     })
 
-  onInput: (event) ->
-    focusType = utils.getFocusType(event.originalTarget)
-    suppress = messageManager.get('consumeKeyEvent', {focusType})
-    return suppress
-
   notify: (args...) ->
     messageManager.send('vimMethod', {method: 'notify', args})
 

@@ -33,6 +33,7 @@ ChromeWindow = Ci.nsIDOMChromeWindow
 
 class Vim
   constructor: (browser, @_parent) ->
+    @focusType = 'none'
     @_setBrowser(browser, {addListeners: false})
     @_storage = {}
 
@@ -126,8 +127,8 @@ class Vim
     @_send('modeChange', {mode})
     return result
 
-  _consumeKeyEvent: (event, focusType) ->
-    return @_parent.consumeKeyEvent(event, this, focusType)
+  _consumeKeyEvent: (event) ->
+    return @_parent.consumeKeyEvent(event, this)
 
   _onInput: (match, uiEvent = false) ->
     suppress = @_call('onInput', {uiEvent, count: match.count}, match)
@@ -182,12 +183,12 @@ class Vim
     @browser.focus()
     @_run('focus_marker_element', {elementIndex, options})
 
-  _setFocusType: (focusType) ->
+  _setFocusType: (@focusType) ->
     switch
-      when focusType == 'ignore'
+      when @focusType == 'ignore'
         @enterMode('ignore', {type: 'focusType'})
       when @mode == 'ignore' and @_storage.ignore.type == 'focusType'
         @enterMode('normal')
-    @_parent.emit('focusTypeChange', {vim: this, focusType})
+    @_parent.emit('focusTypeChange', this)
 
 module.exports = Vim

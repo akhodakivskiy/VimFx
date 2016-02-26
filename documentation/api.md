@@ -297,16 +297,10 @@ data passed to listeners is the current [vim object].
 
 #### The `focusTypeChange` event
 
-Occurs when focusing or blurring any element. The data passed to listeners is an
-object with the following properties:
+Occurs when focusing or blurring any element. The data passed to listeners is
+the current [vim object].
 
-- vim: The current [vim object].
-- focusType: A string similar to `match.focus` of a [match object], with the
-  following differences:
-
-  - The current pressed key is _not_ taken into account, because focus and blur
-    events have no current key.
-  - The value is never `null` or `'other'`, but `'none'` instead.
+`vim.focusType` has been updated just before this event fires.
 
 (VimFx itself uses this event to update the toolbar [button], by setting
 `#main-window[vimfx-focus-type]` to the current focus type. You may use this
@@ -544,27 +538,27 @@ A `match` object has the following properties:
   - `'none'`: The current keypress is not part of a command shortcut and does
     not contribute to a count.
 
-- focus: `String` or `null`. The type of currently focused _element_ plus
-  current pressed _key_ combo. You might not want to run commands and suppress
-  the event if this value is anything other than null. It has one of the
-  following values, depending on what kind of _element_ is focused and which
-  _key_ was pressed:
+- likelyConflict: `Boolean`. This is `true` if the current keypress is likely to
+  cause conflicts with default Firefox behavior of that key, and `false`
+  otherwise. A mode might not want to run commands and suppress the event if
+  this value is `true`. VimFx uses the current keypress and `vim.focusType` of
+  the current [vim object] to decide if the current keypress is a likely
+  conflict:
 
-  - `'ignore'`: element: some kind of Vim-style editor. VimFx automatically
-    enters Ignore mode when this focus type is encountered. key: any pressed
-    key.
-  - `'editable'`: element: some kind of text input, a `<select>` element or a
-    “contenteditable” element. key: any pressed key.
-  - `'activatable'`: element: an “activatable” element (link or button).
-    key: see the [`activatable_element_keys`] option.
-  - `'adjustable'`: element: an “adjustable” element (form control or video
-    player). key: see the [`adjustable_element_keys`] option.
-  - `'other'`: element: some other kind of element that can receive keystrokes.
-    key: any pressed key.
+  1. If the key is part of the tail of a shortcut, it is never a conflict.
+  2. If `vim.focusType` is `'activatable'` or `'adjustable'` and the key is
+     present in [`activatable_element_keys`] or [`adjustable_element_keys`]
+     (respectively), then it is a likely conflict.
+  3. Finally, unless `vim.focusType` is `'none'`, then it is a likely conflict.
+     This most commonly means that a text input is focused.
 
-  If none of the above criteria is met, the value is `null`, which means that
-  the currently focused element does not appear to respond to keystrokes in any
-  special way.
+  Note that any VimFx shortcut starting with a keypress involving a modifier is
+  _very_ likely to conflict with either a Firefox default shortcut or a shortcut
+  from some other add-on. This is _not_ attempted to be detected in any way.
+  Instead, VimFx uses no modifiers in any default Normal mode shortcuts, leaving
+  it up to you to choose modifier-shortcuts that work out for you if you want
+  such shortcuts. In other words, for modifier-shortcuts the point of VimFx _is_
+  to conflict (overriding default shortcuts).
 
 - command: `null` unless `type` is `'full'`. Then it is the matched command (a
   [command object]).
@@ -614,6 +608,27 @@ A `vim` object has the following properties:
   [options object].
 
 - mode: `String`. The current mode name.
+
+- focusType: `String`. The type of currently focused element. VimFx decides the
+  type based on how it responds to keystorkes. It has one of the following
+  values:
+
+  - `'ignore'`: Some kind of Vim-style editor. VimFx automatically
+    enters Ignore mode when this focus type is encountered.
+  - `'editable'`: Some kind of text input, a `<select>` element or a
+    “contenteditable” element.
+  - `'activatable'`: An “activatable” element (link or button).
+    (See also the [`activatable_element_keys`] option.)
+  - `'adjustable'`: An “adjustable” element (form control or video
+    player). (See also the [`adjustable_element_keys`] option.)
+  - `'other'`: Some other kind of element that can receive keystrokes.
+    (Deprecated.)
+  - `'none'`: The currently focused element does not appear to respond to
+    keystrokes in any special way.
+
+  [The `focusTypeChange` event] is fired whenever `focusType` is updated.
+
+  `match.likelyConflict` of [match object]s depend on `focusType`.
 
 - enterMode(modeName, ...args): `Function`. Enter mode `modeName`, passing
   `...args` to the mode. It is up to every mode to do whatever it wants to with
@@ -774,6 +789,7 @@ backwards compatibility will be a priority and won’t be broken until VimFx
 [vim object]: #vim-object
 [options object]: #options-object
 [location object]: #location-object
+[The `focusTypeChange` event]: #the-focustypechange-event
 [the `shutdown` event]: #the-shutdown-event
 
 [blacklisted]: options.md#blacklist
