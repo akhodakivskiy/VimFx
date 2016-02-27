@@ -27,11 +27,9 @@ prefs = require('./prefs')
 utils = require('./utils')
 Vim = require('./vim')
 
-{EventEmitter} = utils
-
 DIGIT = /^\d$/
 
-class VimFx extends EventEmitter
+class VimFx extends utils.EventEmitter
   constructor: (@modes, @options) ->
     super()
     @vims = new WeakMap()
