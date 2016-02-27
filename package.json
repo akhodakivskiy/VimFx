@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "n-ary-huffman": "^2.1.1",
-    "vim-like-key-notation": "^0.2.0"
+    "vim-like-key-notation": "^1.0.0"
   },
   "devDependencies": {
     "addons-linter": "0.0.11",
