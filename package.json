@@ -9,7 +9,7 @@
   "private": true,
   "scripts": {
     "gulp": "gulp",
-    "addons-linter": "npm run gulp -- xpi && addons-linter build/VimFx.xpi"
+    "addons-linter": "npm run gulp -- xpi && addons-linter -o text build/VimFx.xpi"
   },
   "dependencies": {
     "n-ary-huffman": "^2.1.1",
