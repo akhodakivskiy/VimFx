@@ -381,8 +381,9 @@ helper_follow = (name, vim, callback, count = null) ->
       vim.enterMode('normal')
   )
 
-helper_follow_clickable = ({inTab, inBackground}, {vim, count = 1}) ->
+helper_follow_clickable = (options, {vim, count = 1}) ->
   callback = (marker, timesLeft, keyStr) ->
+    {inTab, inBackground} = options
     {type, elementIndex} = marker.wrapper
     isLast = (timesLeft == 1)
     isLink = (type == 'link')
@@ -420,7 +421,7 @@ helper_follow_clickable = ({inTab, inBackground}, {vim, count = 1}) ->
 
     return not isLast
 
-  name = if inTab then 'follow_in_tab' else 'follow'
+  name = if options.inTab then 'follow_in_tab' else 'follow'
   helper_follow(name, vim, callback, count)
 
 commands.follow =
