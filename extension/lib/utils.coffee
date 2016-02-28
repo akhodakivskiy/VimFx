@@ -21,6 +21,8 @@
 
 # This file contains lots of different helper functions.
 
+{OS} = Components.utils.import('resource://gre/modules/osfile.jsm')
+
 nsIClipboardHelper = Cc['@mozilla.org/widget/clipboardhelper;1']
   .getService(Ci.nsIClipboardHelper)
 nsIDomUtils = Cc['@mozilla.org/inspector/dom-utils;1']
@@ -474,6 +476,12 @@ interval = (window, interval, fn) ->
 
 # Misc helpers
 
+expandPath = (path) ->
+  if path.startsWith('~/') or path.startsWith('~\\')
+    return OS.Constants.Path.homeDir + path[1..]
+  else
+    return path
+
 formatError = (error) ->
   stack = String(error.stack?.formattedStack ? error.stack ? '')
     .split('\n')
@@ -574,6 +582,7 @@ module.exports = {
   removeDuplicateCharacters
   interval
 
+  expandPath
   formatError
   getCurrentLocation
   getCurrentWindow

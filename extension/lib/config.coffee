@@ -21,6 +21,9 @@
 
 createConfigAPI = require('./api')
 messageManager = require('./message-manager')
+utils = require('./utils')
+
+{OS} = Components.utils.import('resource://gre/modules/osfile.jsm')
 
 load = (vimfx, callback = ->) ->
   configDir = vimfx.options.config_file_directory
@@ -46,7 +49,7 @@ load = (vimfx, callback = ->) ->
   messageManager.send('loadConfig', configDir, callback)
 
 loadFile = (dir, file, scope) ->
-  uri = "#{dir}/#{file}"
+  uri = OS.Path.toFileURI(OS.Path.join(utils.expandPath(dir), file))
   try
     Services.scriptloader.loadSubScriptWithOptions(uri, {
       target: scope

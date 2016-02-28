@@ -44,17 +44,10 @@ Follow these steps to get started with your config file:
 2. Create two empty plain text files in your directory, called `config.js` and
    `frame.js`.
 
-3. Set the [`config_file_directory`] pref to the path of your directory. (That’s
-   an [advanced option].)
-   Examples:
-
-   - GNU/Linux: `file:///home/you/.config/vimfx` or `file:///home/you/.vimfx`.
-   - Windows: `file:///c:/Users/you/vimfx` – note that `\` should be replaced
-     with `/`!
-
-   If you’re unsure, drag and drop `config.js` from your file manager into
-   Firefox, and copy the path from the location bar. (Remember to remove
-   `/config.js` from the end of it, though!)
+3. Set the [`config_file_directory`] pref (that’s an [advanced option]) to the
+   path of the directory you created above. It can be either absolute, such as
+   `/home/you/.config/vimfx` or `C:\Users\you\vimfx`, or start with a `~`, which
+   is a shortcut to your home directory, such as `~/.config/vimfx` or `~\vimfx`.
 
 4. Run the `zr` command in VimFx. That needs to be done any time
    `config_file_directory` is changed, or the contents of `config.js` or
