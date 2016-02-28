@@ -21,6 +21,7 @@
 
 createConfigAPI = require('./api')
 messageManager = require('./message-manager')
+utils = require('./utils')
 
 load = (vimfx, callback = ->) ->
   configDir = vimfx.options.config_file_directory
@@ -35,6 +36,7 @@ load = (vimfx, callback = ->) ->
   # shortcut is absolutely redundant and may make Firefox start slower. Do it
   # once instead.
   vimfx.skipCreateKeyTrees = true
+  configDir = utils.expandPath(configDir)
   error = loadFile(configDir, 'config.js', scope)
   vimfx.skipCreateKeyTrees = false
   vimfx.createKeyTrees()

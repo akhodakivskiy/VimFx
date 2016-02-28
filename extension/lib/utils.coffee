@@ -23,6 +23,8 @@
 
 nsIClipboardHelper = Cc['@mozilla.org/widget/clipboardhelper;1']
   .getService(Ci.nsIClipboardHelper)
+nsIDirService = Cc["@mozilla.org/file/directory_service;1"]
+  .getService(Ci.nsIProperties)
 nsIDomUtils = Cc['@mozilla.org/inspector/dom-utils;1']
   .getService(Ci.inIDOMUtils)
 nsIEventListenerService = Cc['@mozilla.org/eventlistenerservice;1']
@@ -527,6 +529,13 @@ openTab = (window, url, options) ->
 
 writeToClipboard = (text) -> nsIClipboardHelper.copyString(text)
 
+expandPath = (path) ->
+  if path.indexOf('~') == 0
+    homeDir = nsIDirService.get('Home', Ci.nsIFile).path
+    path = path.substr(1)
+    path = "file://#{homeDir}#{path}"
+  return path
+
 
 
 module.exports = {
@@ -583,4 +592,5 @@ module.exports = {
   openPopup
   openTab
   writeToClipboard
+  expandPath
 }
