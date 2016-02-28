@@ -113,7 +113,7 @@ class Vim
     @_call('onLeave') if @mode?
     @mode = mode
     result = @_call('onEnter', null, args...)
-    @_parent.emit('modeChange', this)
+    @_parent.emit('modeChange', {vim: this})
     @_send('modeChange', {mode})
     return result
 
@@ -180,6 +180,6 @@ class Vim
         @enterMode('ignore', {type: 'focusType'})
       when @mode == 'ignore' and @_storage.ignore.type == 'focusType'
         @enterMode('normal')
-    @_parent.emit('focusTypeChange', this)
+    @_parent.emit('focusTypeChange', {vim: this})
 
 module.exports = Vim

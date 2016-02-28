@@ -220,7 +220,8 @@ messages, and `vimfx.listen()` to listen for them.)
 ### `vimfx.on(eventName, listener)` and `vimfx.off(eventName, listener)`
 
 After calling `vimfx.on(eventName, listener)`, `listener(data)` will be called
-when `eventName` is fired.
+when `eventName` is fired, where `data` is an object. Which properties `data`
+has is specific to each event.
 
 You may use `vimfx.off(eventName, listener)` if you’d like to remove your
 added listener for some reason.
@@ -232,14 +233,15 @@ something whenever VimFx emits internal events.
 #### The `locationChange` event
 
 Occurs when opening a new tab, navigating to a new URL or refreshing the page,
-causing a full page load. The data passed to listeners is an object with the
-following properties:
+causing a full page load.
+
+`data`:
 
 - vim: The current [vim object].
 - location: A [location object].
 
-This can be used to enter a different mode by default on some pages (which can
-be used to replace the blacklist option).
+This event can be used to enter a different mode by default on some pages (which
+can be used to replace the blacklist option).
 
 ```js
 vimfx.on('locationChange', ({vim, location}) => {
@@ -257,7 +259,7 @@ that `message` should be displayed to the user.
 The `hideNotification` event occurs when the `vim.hideNotification()` is called,
 and means that the current notification is requested to be hidden.
 
-The data passed to listeners is an object with the following properties:
+`data`:
 
 - vim: The current [vim object].
 - message: The message that should be notified. Only for the `notification`
@@ -269,11 +271,14 @@ disabled, allowing you to display notifications in any way you want.
 #### The `modeChange` event
 
 Occurs whenever the current mode in any tab changes. The initial entering of the
-default mode in new tabs also counts as a mode change. The data passed to
-listeners is the current [vim object].
+default mode in new tabs also counts as a mode change.
+
+`data`:
+
+- vim: The current [vim object].
 
 ```js
-vimfx.on('modeChange', vim => {
+vimfx.on('modeChange', ({vim}) => {
   let mode = vimfx.modes[vim.mode].name
   vim.notify(`Entering mode: ${mode}`)
 })
@@ -282,14 +287,20 @@ vimfx.on('modeChange', vim => {
 #### The `TabSelect` event
 
 Occurs whenever any tab in any window is selected. This is also fired when
-Firefox starts for the currently selected tab. The data passed to listeners is
-the `event` object passed to the standard Firefox [TabSelect] event.
+Firefox starts for the currently selected tab.
+
+`data`:
+
+- event: The `event` object passed to the standard Firefox [TabSelect] event.
 
 #### The `modeDisplayChange` event
 
 This is basically a combination of the `modeChange` and the `TabSelect` events.
-The event is useful for knowing when to update UI showing the current mode. The
-data passed to listeners is the current [vim object].
+The event is useful for knowing when to update UI showing the current mode.
+
+`data`:
+
+- vim: The current [vim object].
 
 (VimFx itself uses this event to update the toolbar [button], by setting
 `#main-window[vimfx-mode]` to the current mode. You may use this with custom
@@ -297,10 +308,13 @@ data passed to listeners is the current [vim object].
 
 #### The `focusTypeChange` event
 
-Occurs when focusing or blurring any element. The data passed to listeners is
-the current [vim object].
+Occurs when focusing or blurring any element.
 
-`vim.focusType` has been updated just before this event fires.
+`data`:
+
+- vim: The current [vim object].
+
+`data.vim.focusType` has been updated just before this event fires.
 
 (VimFx itself uses this event to update the toolbar [button], by setting
 `#main-window[vimfx-focus-type]` to the current focus type. You may use this
@@ -313,6 +327,8 @@ Occurs when:
 - VimFx shuts down: When Firefox shuts down, when VimFx is disabled or when
   VimFx is updated.
 - When the config file is reloaded using the `zr` command.
+
+`data`: No data at all is passed.
 
 If you care about that things you do in `config.js` and `frame.js` are undone
 when any of the above happens, read on.

@@ -45,7 +45,7 @@ injectButton = (vimfx) ->
   })
   module.onShutdown(cui.destroyWidget.bind(cui, BUTTON_ID))
 
-  vimfx.on('modeDisplayChange', (vim) ->
+  vimfx.on('modeDisplayChange', ({vim}) ->
     {window} = vim
     # When the browser starts, the button might not be available yet.
     return unless button = getButton(window)

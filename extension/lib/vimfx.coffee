@@ -38,7 +38,7 @@ class VimFx extends utils.EventEmitter
     @skipCreateKeyTrees = false
     @createKeyTrees()
     @reset()
-    @on('modeChange', ({mode}) => @reset(mode))
+    @on('modeChange', ({vim}) => @reset(vim.mode))
 
   SPECIAL_KEYS: {
     '<force>': {}

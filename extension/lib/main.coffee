@@ -68,20 +68,20 @@ module.exports = (data, reason) ->
   setWindowAttribute = (window, name, value) ->
     window.document.documentElement.setAttribute("vimfx-#{name}", value)
 
-  onModeDisplayChange = (vimOrEvent) ->
-    window = vimOrEvent.window ? vimOrEvent.originalTarget.ownerGlobal
+  onModeDisplayChange = (data) ->
+    window = data.vim?.window ? data.event.originalTarget.ownerGlobal
 
     # The 'modeChange' event provides the `vim` object that changed mode, but
     # it might not be the current `vim` anymore so always get the current one.
     return unless vim = vimfx.getCurrentVim(window)
 
     setWindowAttribute(window, 'mode', vim.mode)
-    vimfx.emit('modeDisplayChange', vim)
+    vimfx.emit('modeDisplayChange', {vim})
 
   vimfx.on('modeChange', onModeDisplayChange)
   vimfx.on('TabSelect',  onModeDisplayChange)
 
-  vimfx.on('focusTypeChange', (vim) ->
+  vimfx.on('focusTypeChange', ({vim}) ->
     setWindowAttribute(vim.window, 'focus-type', vim.focusType)
   )
 

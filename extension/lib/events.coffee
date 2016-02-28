@@ -172,7 +172,7 @@ class UIEventManager
     )
 
     @listen('TabSelect', (event) =>
-      @vimfx.emit('TabSelect', event)
+      @vimfx.emit('TabSelect', {event})
 
       return unless vim = @vimfx.getCurrentVim(@window)
       vim.hideNotification()
@@ -203,7 +203,7 @@ class UIEventManager
       # for more details.
       oldVim._setBrowser(browser)
       @vimfx.vims.set(browser, oldVim)
-      @vimfx.emit('modeChange', oldVim)
+      @vimfx.emit('modeChange', {vim: oldVim})
       callback(true)
     ), {messageManager: @window.messageManager})
 
