@@ -133,10 +133,10 @@ helper_follow = ({id, combine = true}, matcher, {vim}) ->
          # links with this href actually do the same thing. On some pages, such
          # as startpage.com, actual proper links have the 'onclick' attribute,
          # so we can’t exclude such links in `utils.isProperLink`.
-         not element.hasAttribute('onclick') and
+         not element.hasAttribute?('onclick') and
          # GitHub’s diff expansion buttons are links with both `href` and
          # `data-url`. They are JavaScript-powered using the latter attribute.
-         not element.hasAttribute('data-url')
+         not element.hasAttribute?('data-url')
         if href of hrefs
           parent = hrefs[href]
           wrapper.parentIndex = parent.elementIndex
@@ -159,10 +159,10 @@ commands.follow = helper_follow.bind(null, {id: 'normal'},
     switch
       # Bootstrap. Match these before regular links, because especially slider
       # “buttons” often get the same hint otherwise.
-      when element.hasAttribute('data-toggle') or
-           element.hasAttribute('data-dismiss') or
-           element.hasAttribute('data-slide') or
-           element.hasAttribute('data-slide-to')
+      when element.hasAttribute?('data-toggle') or
+           element.hasAttribute?('data-dismiss') or
+           element.hasAttribute?('data-slide') or
+           element.hasAttribute?('data-slide-to')
         # Some elements may not be semantic, but _should be_ and still deserve a
         # good hint.
         type = 'clickable'
@@ -170,19 +170,19 @@ commands.follow = helper_follow.bind(null, {id: 'normal'},
         type = 'link'
       when isTypingElement(element)
         type = 'text'
-      when element.getAttribute('role') in CLICKABLE_ARIA_ROLES or
+      when element.getAttribute?('role') in CLICKABLE_ARIA_ROLES or
            # <http://www.w3.org/TR/wai-aria/states_and_properties>
-           element.hasAttribute('aria-controls') or
-           element.hasAttribute('aria-pressed') or
-           element.hasAttribute('aria-checked') or
-           (element.hasAttribute('aria-haspopup') and
-            element.getAttribute('role') != 'menu')
+           element.hasAttribute?('aria-controls') or
+           element.hasAttribute?('aria-pressed') or
+           element.hasAttribute?('aria-checked') or
+           (element.hasAttribute?('aria-haspopup') and
+            element.getAttribute?('role') != 'menu')
         type = 'clickable'
       when element.tabIndex > -1 and
            # Google Drive Documents. The hint for this element would cover the
            # real hint that allows you to focus the document to start typing.
            element.id != 'docs-editor' and
-           not (isXUL and element.localName.endsWith('box') and
+           not (isXUL and element.localName?.endsWith?('box') and
                 element.localName != 'checkbox')
         type = 'clickable'
         unless isXUL or element.localName in ['a', 'input', 'button']
@@ -190,22 +190,22 @@ commands.follow = helper_follow.bind(null, {id: 'normal'},
       when element != vim.state.scrollableElements.largest and
            vim.state.scrollableElements.has(element)
         type = 'scrollable'
-      when element.hasAttribute('onclick') or
-           element.hasAttribute('onmousedown') or
-           element.hasAttribute('onmouseup') or
-           element.hasAttribute('oncommand') or
+      when element.hasAttribute?('onclick') or
+           element.hasAttribute?('onmousedown') or
+           element.hasAttribute?('onmouseup') or
+           element.hasAttribute?('oncommand') or
            # Twitter.
-           element.classList.contains('js-new-tweets-bar') or
+           element.classList?.contains('js-new-tweets-bar') or
            # Feedly.
-           element.hasAttribute('data-app-action') or
-           element.hasAttribute('data-uri') or
-           element.hasAttribute('data-page-action') or
+           element.hasAttribute?('data-app-action') or
+           element.hasAttribute?('data-uri') or
+           element.hasAttribute?('data-page-action') or
            # Google Drive Document.
-           element.classList.contains('kix-appview-editor')
+           element.classList?.contains('kix-appview-editor')
         type = 'clickable'
         semantic = false
       # Facebook comment fields.
-      when element.parentElement?.classList.contains('UFIInputContainer')
+      when element.parentElement?.classList?.contains('UFIInputContainer')
         type = 'clickable-special'
       # Putting markers on `<label>` elements is generally redundant, because
       # its `<input>` gets one. However, some sites hide the actual `<input>`
@@ -215,9 +215,9 @@ commands.follow = helper_follow.bind(null, {id: 'normal'},
       when element.localName == 'label'
         input =
           if element.htmlFor
-            document.getElementById(element.htmlFor)
+            document.getElementById?(element.htmlFor)
           else
-            element.querySelector('input, textarea, select')
+            element.querySelector?('input, textarea, select')
         if input and not getElementShape(input)
           type = 'clickable'
       # Last resort checks for elements that might be clickable because of
@@ -227,23 +227,23 @@ commands.follow = helper_follow.bind(null, {id: 'normal'},
             # waste time on them.
             element not in [document.documentElement, document.body]) and
            (utils.includes(element.className, 'button') or
-            utils.includes(element.getAttribute('aria-label'), 'close') or
+            utils.includes(element.getAttribute?('aria-label'), 'close') or
             # Do this last as it’s a potentially expensive check.
             utils.hasEventListeners(element, 'click'))
         # Make a quick check for likely clickable descendants, to reduce the
         # number of false positives. the element might be a “button-wrapper” or
         # a large element with a click-tracking event listener.
-        unless element.querySelector('a, button, input, [class*=button]')
+        unless element.querySelector?('a, button, input, [class*=button]')
           type = 'clickable'
           semantic = false
       # When viewing an image it should get a marker to toggle zoom. This is the
       # most unlikely rule to match, so keep it last.
       when document.body?.childElementCount == 1 and
            element.localName == 'img' and
-           (element.classList.contains('overflowing') or
-            element.classList.contains('shrinkToFit'))
+           (element.classList?.contains('overflowing') or
+            element.classList?.contains('shrinkToFit'))
         type = 'clickable'
-    type = null if isXUL and element.classList.contains('textbox-input')
+    type = null if isXUL and element.classList?.contains('textbox-input')
     return {type, semantic}
 )
 
@@ -335,7 +335,7 @@ commands.follow_pattern = ({vim, type, options}) ->
     for attr in attrs
       for regex in patterns
         for element in candidates
-          return element if regex.test(element.getAttribute(attr))
+          return element if regex.test(element.getAttribute?(attr))
 
     # Then search in element contents.
     for regex in patterns

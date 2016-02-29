@@ -489,7 +489,7 @@ commands.click_browser_element = ({vim}) ->
       when vim._state.scrollableElements.has(element)
         'scrollable'
       when (element.tabIndex > -1 and
-            not (element.localName.endsWith('box') and
+            not (element.localName?.endsWith('box') and
                  element.localName != 'checkbox') and
             element.localName not in ['tabs', 'menuitem', 'menuseparator']) or
            element.onclick

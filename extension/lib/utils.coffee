@@ -73,14 +73,14 @@ isAdjustable = (element) ->
          element.classList?.contains('ytp-button') or
          # Allow navigating object inspection trees in th devtools with the
          # arrow keys, even if the arrow keys are used as VimFx shortcuts.
-         element.ownerGlobal.DevTools
+         element.ownerGlobal?.DevTools
 
 isContentEditable = (element) ->
   return element.isContentEditable or
          isIframeEditor(element) or
          # Google.
          element.getAttribute?('g_editable') == 'true' or
-         element.ownerDocument?.body?.getAttribute('g_editable') == 'true' or
+         element.ownerDocument?.body?.getAttribute?('g_editable') == 'true' or
          # Codeacademy terminals.
          element.classList?.contains('real-terminal')
 
@@ -90,21 +90,21 @@ isIframeEditor = (element) ->
          # Etherpad.
          element.id == 'innerdocbody' or
          # XpressEditor.
-         (element.classList.contains('xe_content') and
-          element.classList.contains('editable')) or
+         (element.classList?.contains('xe_content') and
+          element.classList?.contains('editable')) or
          # vBulletin.
-         element.classList.contains('wysiwyg') or
+         element.classList?.contains('wysiwyg') or
          # The wasavi extension.
-         element.hasAttribute('data-wasavi-state')
+         element.hasAttribute?('data-wasavi-state')
 
 isIgnoreModeFocusType = (element) ->
   return \
     # The wasavi extension.
-    element.hasAttribute('data-wasavi-state') or
-    element.closest('#wasavi_container') or
+    element.hasAttribute?('data-wasavi-state') or
+    element.closest?('#wasavi_container') or
     # CodeMirror in Vim mode.
     (element.localName == 'textarea' and
-     element.closest('.CodeMirror') and _hasVimEventListener(element))
+     element.closest?('.CodeMirror') and _hasVimEventListener(element))
 
 # CodeMirror’s Vim mode is really sucky to detect. The only way seems to be to
 # check if the there are any event listener functions with Vim-y words in them.
@@ -118,12 +118,12 @@ _hasVimEventListener = (element) ->
 isProperLink = (element) ->
   # `.getAttribute` is used below instead of `.hasAttribute` to exclude `<a
   # href="">`s used as buttons on some sites.
-  return element.getAttribute('href') and
+  return element.getAttribute?('href') and
          (element.localName == 'a' or
           element.ownerDocument instanceof XULDocument) and
-         not element.href.endsWith('#') and
-         not element.href.endsWith('#?') and
-         not element.href.startsWith('javascript:')
+         not element.href?.endsWith?('#') and
+         not element.href?.endsWith?('#?') and
+         not element.href?.startsWith?('javascript:')
 
 isTextInputElement = (element) ->
   return (element.localName == 'input' and element.type in [
@@ -204,7 +204,7 @@ getFocusType = (element) -> switch
   when isAdjustable(element)
     'adjustable'
   # TODO: Remove when Tab Groups have been removed.
-  when element.ownerGlobal.TabView?.isVisible?()
+  when element.ownerGlobal?.TabView?.isVisible?()
     'other'
   else
     'none'
