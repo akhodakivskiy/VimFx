@@ -231,16 +231,29 @@ listenOnce = (element, eventName, listener, useCapture = true) ->
     element.removeEventListener(eventName, fn, useCapture)
   listen(element, eventName, fn, useCapture)
 
-onRemoved = (window, element, fn) ->
+onRemoved = (element, fn) ->
+  window = element.ownerGlobal
+
+  disconnected = false
+  disconnect = ->
+    return if disconnected
+    disconnected = true
+    mutationObserver.disconnect()
+
   mutationObserver = new window.MutationObserver((changes) ->
     for change in changes then for removedElement in change.removedNodes
-      if removedElement == element
-        mutationObserver.disconnect()
+      if removedElement.contains?(element)
+        disconnect()
         fn()
         return
   )
-  mutationObserver.observe(element.parentNode, {childList: true})
-  module.onShutdown(mutationObserver.disconnect.bind(mutationObserver))
+  mutationObserver.observe(window.document.documentElement, {
+    childList: true
+    subtree: true
+  })
+  module.onShutdown(disconnect)
+
+  return disconnect
 
 suppressEvent = (event) ->
   event.preventDefault()

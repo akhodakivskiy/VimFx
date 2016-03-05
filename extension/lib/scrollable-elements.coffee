@@ -49,7 +49,6 @@ class ScrollableElements
   add: (element) ->
     element = @quirks(element)
     @elements.add(element)
-    utils.onRemoved(@window, element, @delete.bind(this, element))
     @largest = element if @isLargest(element)
 
   delete: (element) =>

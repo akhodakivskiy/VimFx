@@ -35,6 +35,7 @@ class FrameEventManager
     @numFocusToSuppress = 0
     @keepInputs = false
     @currentUrl = false
+    @disconnectActiveElementObserver = null
 
   listen: utils.listen.bind(null, FRAME_SCRIPT_ENVIRONMENT)
   listenOnce: utils.listenOnce.bind(null, FRAME_SCRIPT_ENVIRONMENT)
@@ -177,11 +178,6 @@ class FrameEventManager
       @numFocusToSuppress = 2
     )
 
-    sendFocusType = =>
-      return unless activeElement = utils.getActiveElement(@vim.content)
-      focusType = utils.getFocusType(activeElement)
-      messageManager.send('focusType', focusType)
-
     @listen('focus', (event) =>
       target = event.originalTarget
 
@@ -192,7 +188,7 @@ class FrameEventManager
 
       @vim.state.explicitBodyFocus = (target == @vim.content.document.body)
 
-      sendFocusType()
+      @sendFocusType()
 
       # Reset `hasInteraction` when (re-)selecting a tab, or coming back from
       # another window, in order to prevent the common “automatically re-focus
@@ -236,7 +232,7 @@ class FrameEventManager
     @listen('blur', (event) =>
       target = event.originalTarget
 
-      sendFocusType()
+      @sendFocusType()
 
       # If a text input is blurred immediately before the document loses focus,
       # it most likely means that the user switched tab, for example by pressing
@@ -255,5 +251,21 @@ class FrameEventManager
             commands.clear_inputs({@vim})
         )
     )
+
+  sendFocusType: ->
+    return unless activeElement = utils.getActiveElement(@vim.content)
+    focusType = utils.getFocusType(activeElement)
+    messageManager.send('focusType', focusType)
+
+    # If a text input is removed from the DOM while it is focused, no 'focus'
+    # or 'blur' events will be fired, making VimFx think that the text input is
+    # still focused. Therefore we add a temporary observer for the currently
+    # focused element and re-send the focusType if it gets removed.
+    @disconnectActiveElementObserver?()
+    @disconnectActiveElementObserver =
+      if focusType == 'none'
+        null
+      else
+        utils.onRemoved(activeElement, @sendFocusType.bind(this))
 
 module.exports = FrameEventManager
