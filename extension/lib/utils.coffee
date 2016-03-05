@@ -395,6 +395,9 @@ insertText = (input, value) ->
     input.value[0...selectionStart] + value + input.value[selectionEnd..]
   input.selectionStart = input.selectionEnd = selectionStart + value.length
 
+isDetached = (element) ->
+  return not element.ownerDocument?.documentElement?.contains?(element)
+
 isPositionFixed = (element) ->
   computedStyle = element.ownerGlobal.getComputedStyle(element)
   return computedStyle?.getPropertyValue('position') == 'fixed'
@@ -585,6 +588,7 @@ module.exports = {
   getWindowViewport
   injectTemporaryPopup
   insertText
+  isDetached
   isPositionFixed
   querySelectorAllDeep
   scroll

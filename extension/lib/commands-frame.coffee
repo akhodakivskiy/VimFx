@@ -359,6 +359,10 @@ commands.follow_pattern = ({vim, type, options}) ->
 
 commands.focus_text_input = ({vim, count = null}) ->
   {lastFocusedTextInput} = vim.state
+
+  if lastFocusedTextInput and utils.isDetached(lastFocusedTextInput)
+    lastFocusedTextInput = null
+
   candidates = utils.querySelectorAllDeep(
     vim.content, 'input, textarea, [contenteditable]'
   )
