@@ -172,6 +172,8 @@ class UIEventManager
     )
 
     @listen('TabSelect', (event) =>
+      target = event.originalTarget
+      target.setAttribute('VimFx-visited', 'true')
       @vimfx.emit('TabSelect', {event})
 
       return unless vim = @vimfx.getCurrentVim(@window)

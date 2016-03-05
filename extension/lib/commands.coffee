@@ -270,12 +270,15 @@ commands.tab_select_previous = helper_switch_tab.bind(null, -1)
 
 commands.tab_select_next     = helper_switch_tab.bind(null, +1)
 
+helper_is_visited = (tab) ->
+  return tab.getAttribute('VimFx-visited') or not tab.getAttribute('unread')
+
 commands.tab_select_most_recent = ({vim, count = 1}) ->
   {gBrowser} = vim.window
   tabsSorted =
     Array.filter(
       gBrowser.tabs,
-      (tab) -> not tab.closing and not tab.getAttribute('unread')
+      (tab) -> not tab.closing and helper_is_visited(tab)
     ).sort((a, b) -> b.lastAccessed - a.lastAccessed)[1..] # Remove current tab.
   tab = tabsSorted[Math.min(count - 1, tabsSorted.length - 1)]
   if tab
@@ -283,18 +286,18 @@ commands.tab_select_most_recent = ({vim, count = 1}) ->
   else
     vim.notify(translate('notification.tab_select_most_recent.none'))
 
-commands.tab_select_oldest_unread = ({vim, count = 1}) ->
+commands.tab_select_oldest_unvisited = ({vim, count = 1}) ->
   {gBrowser} = vim.window
   tabsSorted =
     Array.filter(
       gBrowser.tabs,
-      (tab) -> not tab.closing and tab.getAttribute('unread')
+      (tab) -> not tab.closing and not helper_is_visited(tab)
     ).sort((a, b) -> a.lastAccessed - b.lastAccessed)
   tab = tabsSorted[Math.min(count - 1, tabsSorted.length - 1)]
   if tab
     gBrowser.selectedTab = tab
   else
-    vim.notify(translate('notification.tab_select_oldest_unread.none'))
+    vim.notify(translate('notification.tab_select_oldest_unvisited.none'))
 
 helper_move_tab = (direction, {vim, count = 1}) ->
   {gBrowser} = vim.window

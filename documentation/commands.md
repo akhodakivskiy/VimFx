@@ -54,22 +54,23 @@ They only wrap around _once._
 
 Selects the _count_ most recently visited tab.
 
-Note that unread tabs are never considered _visited._ See the `gL` command
-below.
-
 ### `gL`
 
-Selects the _count_ oldest unread tab.
+Selects the _count_ oldest unvisited tab.
 
-Unread tabs are tabs opened in the background, for example by using the `F`
-command, that you have not yet visited.
-
-Tip: It might help to make unread tabs visually different through custom
-[styling]. The following makes the tab titles of unread tabs italic:
+Tip: It might help to make “unread” tabs visually different through custom
+[styling]:
 
 ```css
-.tabbrowser-tab[unread]:not(#override) {
+// Unread, unvisited tabs (opened in the background). These are the ones that
+// can be selected using `gL`.
+.tabbrowser-tab[unread]:not([VimFx-visited]):not(#override) {
     font-style: italic !important;
+}
+
+// Unread but previously selected tabs (that have changed since last select).
+.tabbrowser-tab[unread][VimFx-visited]:not(#override) {
+    font-weight: bold !important;
 }
 ```
 
