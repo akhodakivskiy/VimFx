@@ -153,11 +153,17 @@ getActiveElement = (window) ->
   return null unless activeElement
   # If the active element is a frame, recurse into it. The easiest way to detect
   # a frame that works both in browser UI and in web page content is to check
-  # for the presence of `.contentWindow`. However, in non-multi-process
+  # for the presence of `.contentWindow`. However, in non-multi-process,
   # `<browser>` (sometimes `<xul:browser>`) elements have a `.contentWindow`
   # pointing to the web page content `window`, which we don’t want to recurse
-  # into. This seems to be the only way to detect such elements.
-  if activeElement.localName != 'browser' and activeElement.contentWindow
+  # into. This seems to be the only way to detect such elements. There is one
+  # exception: The sidebar (such as the history sidebar). It is also a
+  # `<browser>` with `.contentWindow`, but we _do_ want to recurse into it. Note
+  # that bookmarks can be opened in the sidebar, but their content is inside
+  # another `<browser>` inside `<browser#sidebar>` so there’s no need to worry
+  # about that case.
+  if (activeElement.localName != 'browser' or activeElement.id == 'sidebar') and
+     activeElement.contentWindow
     return getActiveElement(activeElement.contentWindow)
   else
     return activeElement
