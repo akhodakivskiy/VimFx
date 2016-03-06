@@ -24,7 +24,7 @@ testsList = if IS_FRAME_SCRIPT then './tests-list-frame' else './tests-list'
 list = require(testsList)
 utils = require('../lib/utils')
 
-Cu.import('chrome://specialpowers/content/Assert.jsm')
+{Assert} = Cu.import('chrome://specialpowers/content/Assert.jsm', {})
 assert = new Assert()
 
 module.exports = (topLevelObject) ->

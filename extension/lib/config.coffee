@@ -23,7 +23,7 @@ createConfigAPI = require('./api')
 messageManager = require('./message-manager')
 utils = require('./utils')
 
-{OS} = Components.utils.import('resource://gre/modules/osfile.jsm')
+{OS} = Components.utils.import('resource://gre/modules/osfile.jsm', {})
 
 load = (vimfx, callback = ->) ->
   configDir = vimfx.options.config_file_directory

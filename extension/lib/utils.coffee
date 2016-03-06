@@ -21,7 +21,7 @@
 
 # This file contains lots of different helper functions.
 
-{OS} = Components.utils.import('resource://gre/modules/osfile.jsm')
+{OS} = Components.utils.import('resource://gre/modules/osfile.jsm', {})
 
 nsIClipboardHelper = Cc['@mozilla.org/widget/clipboardhelper;1']
   .getService(Ci.nsIClipboardHelper)

@@ -36,7 +36,7 @@ utils = require('./utils')
 VimFx = require('./vimfx')
 test = try require('../test/index')
 
-Cu.import('resource://gre/modules/AddonManager.jsm')
+{AddonManager} = Cu.import('resource://gre/modules/AddonManager.jsm', {})
 
 module.exports = (data, reason) ->
   # Set default prefs and apply migrations as early as possible.
