@@ -86,6 +86,9 @@ Both `config.js` and `frame.js` have access to the following variables:
   work with this object and not much else.
 - [`console`]: Let’s you print things to the [browser console]. Great for
   simple debugging.
+- `__dirname`: The full path to the config file directory, in a format that
+  Firefox likes to work with. Useful if you want to import other files relative
+  to the config file.
 - [`Components`]: This object is available to all add-ons, and is the main
   gateway to all of Firefox’s internals. This lets advanced users do basically
   anything, as if they had created a full regular Firefox add-on.
