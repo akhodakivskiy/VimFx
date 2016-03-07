@@ -46,7 +46,7 @@ load = (vimfx, callback = ->) ->
     callback(false)
     return
 
-  messageManager.send('loadConfig', configDir, callback)
+  messageManager.send('loadConfig', null, callback)
 
 loadFile = (dir, file, scope) ->
   uri = OS.Path.toFileURI(OS.Path.join(utils.expandPath(dir), file))

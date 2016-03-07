@@ -85,6 +85,21 @@ module.exports = (data, reason) ->
     setWindowAttribute(vim.window, 'focus-type', vim.focusType)
   )
 
+  # `config.load` sends a 'loadConfig' message to all frame scripts, but it is
+  # intenionally run _before_ the frame scripts are loaded. Even if it is run
+  # after the frame scripts have been `messageManager.load`ed, we cannot know
+  # when it is ready to receive messages. Instead, the frame scripts trigger
+  # their 'loadConfig' code manually.
+  config.load(vimfx)
+  vimfx.on('shutdown', -> messageManager.send('unloadConfig'))
+  module.onShutdown(->
+    # Make sure to run the below lines in this order. The second line results in
+    # removing all message listeners in frame scripts, including the one for
+    # 'unloadConfig' (see above).
+    vimfx.emit('shutdown')
+    messageManager.send('shutdown')
+  )
+
   windows = new WeakSet()
   messageManager.listen('tabCreated', (data, callback, browser) ->
     # Frame scripts are run in more places than we need. Tell those not to do
@@ -107,16 +122,6 @@ module.exports = (data, reason) ->
   )
 
   messageManager.load("#{ADDON_PATH}/content/bootstrap.js")
-
-  config.load(vimfx)
-  vimfx.on('shutdown', -> messageManager.send('unloadConfig'))
-  module.onShutdown(->
-    # Make sure to run the below lines in this order. The second line results in
-    # removing all message listeners in frame scripts, including the one for
-    # 'unloadConfig' (see above).
-    vimfx.emit('shutdown')
-    messageManager.send('shutdown')
-  )
 
   if test
     test(vimfx)

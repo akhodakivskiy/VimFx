@@ -24,6 +24,7 @@ config = require('./config')
 createConfigAPI = require('./api-frame')
 FrameEventManager = require('./events-frame')
 messageManager = require('./message-manager')
+prefs = require('./prefs')
 VimFrame = require('./vim-frame')
 test = try require('../test/index')
 
@@ -42,9 +43,18 @@ module.exports = ->
   shutdownHandlers = []
   onShutdown = (fn) -> shutdownHandlers.push(fn)
 
-  messageManager.listen('loadConfig', (configDir, callback) ->
+  loadConfig = ->
+    configDir = prefs.get('config_file_directory')
     scope = {vimfx: createConfigAPI(vim, onShutdown)}
     error = config.loadFile(configDir, 'frame.js', scope)
+    return error
+
+  # main.coffee cannot know when the 'loadConfig' listener below is ready, so
+  # run `loadConfig` manually on startup.
+  loadConfig()
+
+  messageManager.listen('loadConfig', (data, callback) ->
+    error = loadConfig()
     callback(not error)
   )
 
