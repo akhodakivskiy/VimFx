@@ -44,9 +44,10 @@ XULControlElement = Ci.nsIDOMXULControlElement
 XULMenuListElement = Ci.nsIDOMXULMenuListElement
 XULTextBoxElement = Ci.nsIDOMXULTextBoxElement
 
-# Full chains of events for different mouse actions. ('command' is for XUL
-# elements.)
-EVENTS_CLICK       = ['mousedown', 'mouseup', 'click', 'command']
+# Full chains of events for different mouse actions. Note: 'mouseup' is actually
+# fired before 'click'!
+EVENTS_CLICK       = ['mousedown', 'mouseup', 'click']
+EVENTS_CLICK_XUL   = ['click', 'command']
 EVENTS_HOVER_START = ['mouseover', 'mouseenter', 'mousemove']
 EVENTS_HOVER_END   = ['mouseout',  'mouseleave']
 
@@ -259,17 +260,21 @@ suppressEvent = (event) ->
   event.preventDefault()
   event.stopPropagation()
 
-simulateMouseEvents = (element, sequenceType) ->
+simulateMouseEvents = (element, sequence) ->
   window = element.ownerGlobal
   rect = element.getBoundingClientRect()
 
-  eventSequence = switch sequenceType
+  eventSequence = switch sequence
     when 'click'
       EVENTS_CLICK
+    when 'click-xul'
+      EVENTS_CLICK_XUL
     when 'hover-start'
       EVENTS_HOVER_START
     when 'hover-end'
       EVENTS_HOVER_END
+    else
+      sequence
 
   for type in eventSequence
     buttonNum = if type in EVENTS_CLICK then 1 else 0

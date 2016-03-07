@@ -297,7 +297,8 @@ commands.click_marker_element = (args) ->
   if type == 'clickable-special'
     element.click()
   else
-    utils.simulateMouseEvents(element, 'click')
+    isXUL = (element.ownerDocument instanceof XULDocument)
+    utils.simulateMouseEvents(element, if isXUL then 'click-xul' else 'click')
   element.target = targetReset if targetReset
 
 commands.copy_marker_element = ({vim, elementIndex, property}) ->

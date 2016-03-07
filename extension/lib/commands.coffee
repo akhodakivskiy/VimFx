@@ -519,8 +519,13 @@ commands.click_browser_element = ({vim}) ->
       when 'scrollable'
         utils.focusElement(element, {flag: 'FLAG_BYKEY'})
       when 'clickable'
+        sequence =
+          if element.classList?.contains('tabbrowser-tab')
+            ['mousedown']
+          else
+            'click-xul'
         utils.focusElement(element)
-        utils.simulateMouseEvents(element, 'click')
+        utils.simulateMouseEvents(element, sequence)
 
   {wrappers, viewport} =
     hints.getMarkableElementsAndViewport(vim.window, filter)
