@@ -222,6 +222,17 @@ commands.tab_new = ({vim}) ->
     vim.window.BrowserOpenTab()
   )
 
+commands.tab_new_after_current = ({vim}) ->
+  {window} = vim
+  newTabPosition = window.gBrowser.selectedTab._tPos + 1
+  utils.nextTick(window, ->
+    utils.listenOnce(window, 'TabOpen', (event) ->
+      newTab = event.originalTarget
+      window.gBrowser.moveTabTo(newTab, newTabPosition)
+    )
+    window.BrowserOpenTab()
+  )
+
 commands.tab_duplicate = ({vim}) ->
   {gBrowser} = vim.window
   utils.nextTick(vim.window, ->

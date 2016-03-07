@@ -61,6 +61,7 @@ shortcuts =
 
     'tabs':
       't':         'tab_new'
+      'T':         'tab_new_after_current'
       'yt':        'tab_duplicate'
       'J    gT':   'tab_select_previous'
       'K    gt':   'tab_select_next'
