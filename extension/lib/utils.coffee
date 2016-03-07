@@ -239,7 +239,7 @@ onRemoved = (element, fn) ->
   disconnect = ->
     return if disconnected
     disconnected = true
-    mutationObserver.disconnect()
+    mutationObserver.disconnect() unless Cu.isDeadWrapper(mutationObserver)
 
   mutationObserver = new window.MutationObserver((changes) ->
     for change in changes then for removedElement in change.removedNodes
