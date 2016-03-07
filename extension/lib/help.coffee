@@ -127,7 +127,8 @@ createContent = (window, vimfx) ->
                                                            command)
         for sequence in enabledSequences
           keySequence = $('key-sequence', commandContainer)
-          [specialKeys, rest] = splitSequence(sequence, vimfx.SPECIAL_KEYS)
+          [specialKeys, rest] =
+            splitSequence(sequence, Object.keys(vimfx.SPECIAL_KEYS))
           $('key-sequence-special-keys', keySequence, specialKeys)
           $('key-sequence-rest search-text', keySequence, rest)
         $('description search-text', commandContainer, command.description)
