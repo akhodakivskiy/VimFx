@@ -229,7 +229,7 @@ mode('ignore', {
       when 1
         vim.enterMode('normal')
       else
-        storage.count += 1
+        storage.count -= 1
     return false
 
 }, {
