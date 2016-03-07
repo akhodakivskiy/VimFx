@@ -137,7 +137,9 @@ mode('hints', {
     return storage
 
   onLeave: ({vim, storage}) ->
-    vim.window.setTimeout((-> hints.removeHints(vim.window)),
+    # When clicking VimFx’s disable button in the Add-ons Manager, `hints` will
+    # have been `null`ed out when the timeout has passed.
+    vim.window.setTimeout((-> hints?.removeHints(vim.window)),
                           vim.options.hints_timeout)
     storage.clearInterval?()
     for key of storage
