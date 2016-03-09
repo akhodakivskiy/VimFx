@@ -42,6 +42,7 @@ LOCALE = 'extension/locale'
 TEST = 'extension/test'
 
 BASE_LOCALE = 'en-US'
+UPDATE_ALL = /\s*UPDATE_ALL$/
 
 argv = process.argv.slice(2)
 
@@ -260,22 +261,18 @@ gulp.task('sync-locales', ->
 syncLocale = (baseLocaleName, fileName) ->
   basePath = join(LOCALE, baseLocaleName, fileName)
   base = parseLocaleFile(read(basePath))
-  oldBasePath = "#{basePath}.old"
-  if fs.existsSync(oldBasePath)
-    oldBase = parseLocaleFile(read(oldBasePath))
   untranslated = {}
-  for localeName in fs.readdirSync(LOCALE) when localeName != baseLocaleName
+  for localeName in fs.readdirSync(LOCALE)
     localePath = join(LOCALE, localeName, fileName)
     locale = parseLocaleFile(read(localePath))
     untranslated[localeName] = []
     newLocale = base.template.map((line, index) ->
       if Array.isArray(line)
         [key] = line
-        oldValue = oldBase?.keys[key]
+        baseValue = base.keys[key]
         value =
-          if (oldValue? and oldValue != base.keys[key]) or
-             key not of locale.keys
-            base.keys[key]
+          if UPDATE_ALL.test(baseValue) or key not of locale.keys
+            baseValue.replace(UPDATE_ALL, '')
           else
             locale.keys[key]
         result = "#{key}=#{value}"
@@ -286,6 +283,7 @@ syncLocale = (baseLocaleName, fileName) ->
         return line
     )
     fs.writeFileSync(localePath, newLocale.join(base.newline))
+  delete untranslated[baseLocaleName]
   return {fileName, untranslated, total: Object.keys(base.keys).length}
 
 parseLocaleFile = (fileContents) ->

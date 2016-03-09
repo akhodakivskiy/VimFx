@@ -155,22 +155,10 @@ That rewrites all other locales so that:
 - All translations appear in the same order.
 
 If you modify an existing translation in a file and want to update all other
-locales to use the new wording:
-
-- If possible, edit all other locales by hand to save as much translated text as
-  possible.
-
-- Otherwise:
-
-  1. Before modifying existing translations, copy the file in question and add
-     the extension `.old` to the filename. For example, copy a
-     `vimfx.properties` file to `vimfx.properties.old`.
-  2. Make your modifications (in for example `vimfx.properties`, leaving
-     `vimfx.properties.old` intact).
-  3. Run `gulp sync-locales`. It does the same thing as before, except that if a
-     translation has changed compared to an `.old`-file, the newly changed
-     translation is used in all locales, replacing what was there before.
-  4. Remove the `.old`-file.
+locales to use the new wording, add `UPDATE_ALL` at the end of it. `gulp
+sync-locales` will then use that translation in _all_ locales, replacing what
+was there before. It also removes `UPDATE_ALL` for you. However, if possible,
+edit all other locales by hand to save as much translated text as possible.
 
 Note that `gulp sync-locales` requires every translation to be in a single line.
 In other words, do not line-wrap translations. Also don’t bother adding comments
