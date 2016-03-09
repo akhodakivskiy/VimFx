@@ -89,7 +89,7 @@ class Vim
       scrollableElements: new ScrollableElements(@window)
     }
 
-  _isBlacklisted: (url) -> @options.black_list.some((regex) -> regex.test(url))
+  _isBlacklisted: (url) -> @options.blacklist.some((regex) -> regex.test(url))
 
   isUIEvent: (event) ->
     return not @_state.frameCanReceiveEvents or

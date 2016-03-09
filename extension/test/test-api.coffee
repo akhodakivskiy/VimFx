@@ -44,7 +44,7 @@ exports['test vimfx.get and vimfx.set'] = (assert, $vimfx, teardown) ->
   vimfx = createConfigAPI($vimfx)
 
   resetHintChars = prefs.tmp('hint_chars', 'abcd')
-  resetBlacklist = prefs.tmp('black_list', null)
+  resetBlacklist = prefs.tmp('blacklist', null)
   originalOptions = Object.assign({}, $vimfx.options)
   teardown(->
     resetHintChars?()
@@ -53,20 +53,20 @@ exports['test vimfx.get and vimfx.set'] = (assert, $vimfx, teardown) ->
   )
 
   assert.equal(vimfx.get('hint_chars'), 'abcd')
-  assert.ok(not prefs.has('black_list'))
+  assert.ok(not prefs.has('blacklist'))
 
   vimfx.set('hint_chars', 'xyz')
   assert.equal(vimfx.get('hint_chars'), 'xyz')
 
-  vimfx.set('black_list', 'test')
-  assert.equal(vimfx.get('black_list'), 'test')
+  vimfx.set('blacklist', 'test')
+  assert.equal(vimfx.get('blacklist'), 'test')
 
   vimfx.set('translations', {KeyQ: ['ö', 'Ö']})
   assert.deepEqual(vimfx.get('translations'), {KeyQ: ['ö', 'Ö']})
 
   $vimfx.emit('shutdown')
   assert.equal(vimfx.get('hint_chars'), 'abcd')
-  assert.ok(not prefs.has('black_list'))
+  assert.ok(not prefs.has('blacklist'))
   assert.deepEqual(vimfx.get('translations'), {})
 
 exports['test vimfx.getDefault'] = (assert, $vimfx, teardown) ->

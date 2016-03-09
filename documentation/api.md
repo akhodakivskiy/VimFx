@@ -679,7 +679,7 @@ question; they are _parsed_ (`parse(vimfx.get(pref))`):
 
 - Space-separated prefs are parsed into arrays of strings.
 
-- `black_list` and `{prev,next}_patterns` are parsed into arrays of regular
+- `blacklist` and `{prev,next}_patterns` are parsed into arrays of regular
   expressions.
 
 (See [parse-prefs.coffee] for all details.)

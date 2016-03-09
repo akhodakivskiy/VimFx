@@ -150,4 +150,17 @@ migrations[4] = ->
   return unless prefs.has(pref)
   prefs.set('scroll.last_position_mark', prefs.get(pref))
 
+# The reasons for this migration are:
+#
+# - Make sure that people who have edited the pref and then blanked it out get
+#   the new default.
+# - Try to help users who thought that the list was comma separated.
+# - Rename to `blacklist`.
+migrations[5] = ->
+  pref = 'black_list'
+  return unless prefs.has(pref)
+  oldValue = prefs.get(pref).trim()
+  unless oldValue == ''
+    prefs.set('blacklist', oldValue.replace(/,(?:\s+|(?=\*))/g, '  '))
+
 module.exports = migrations

@@ -132,7 +132,7 @@ options =
   'hint_chars':             'fjdkslaghrueiwovncm'
   'prev_patterns':          'prev  previous  ‹  «  ◀  ←  <<  <  back  newer'
   'next_patterns':          'next  ›  »  ▶  →  >>  >  more  older'
-  'black_list':             ''
+  'blacklist':              '*example.com*  http://example.org/editor/*'
   'prevent_autofocus':      false
   'ignore_keyboard_layout': false
   'timeout':                2000
