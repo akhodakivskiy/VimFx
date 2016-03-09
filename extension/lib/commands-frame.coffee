@@ -298,7 +298,12 @@ commands.click_marker_element = (args) ->
     element.click()
   else
     isXUL = (element.ownerDocument instanceof XULDocument)
-    utils.simulateMouseEvents(element, if isXUL then 'click-xul' else 'click')
+    sequence =
+      if isXUL
+        if element.localName == 'tab' then ['mousedown'] else 'click-xul'
+      else
+        'click'
+    utils.simulateMouseEvents(element, sequence)
   element.target = targetReset if targetReset
 
 commands.copy_marker_element = ({vim, elementIndex, property}) ->

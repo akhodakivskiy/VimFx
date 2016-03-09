@@ -520,7 +520,7 @@ commands.click_browser_element = ({vim}) ->
         utils.focusElement(element, {flag: 'FLAG_BYKEY'})
       when 'clickable'
         sequence =
-          if element.classList?.contains('tabbrowser-tab')
+          if element.localName == 'tab'
             ['mousedown']
           else
             'click-xul'
