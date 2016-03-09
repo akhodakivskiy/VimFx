@@ -85,6 +85,12 @@ isContentEditable = (element) ->
          # Codeacademy terminals.
          element.classList?.contains('real-terminal')
 
+isFocusable = (element) ->
+  return element.tabIndex > -1 and
+         not (element.localName?.endsWith?('box') and
+              element.localName != 'checkbox') and
+         element.localName not in ['tabs', 'menuitem', 'menuseparator']
+
 isIframeEditor = (element) ->
   return false unless element.localName == 'body'
   return \
@@ -568,6 +574,7 @@ module.exports = {
   isActivatable
   isAdjustable
   isContentEditable
+  isFocusable
   isIframeEditor
   isIgnoreModeFocusType
   isProperLink

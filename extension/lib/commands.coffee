@@ -502,11 +502,8 @@ commands.click_browser_element = ({vim}) ->
     type = switch
       when vim._state.scrollableElements.has(element)
         'scrollable'
-      when (element.tabIndex > -1 and
-            not (element.localName?.endsWith('box') and
-                 element.localName != 'checkbox') and
-            element.localName not in ['tabs', 'menuitem', 'menuseparator']) or
-           element.onclick
+      when utils.isFocusable(element) or
+           (element.onclick and element.localName != 'statuspanel')
         'clickable'
     return unless type
     return unless shape = getElementShape(element)

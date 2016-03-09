@@ -178,12 +178,10 @@ commands.follow = helper_follow.bind(null, {id: 'normal'},
            (element.hasAttribute?('aria-haspopup') and
             element.getAttribute?('role') != 'menu')
         type = 'clickable'
-      when element.tabIndex > -1 and
+      when utils.isFocusable(element) and
            # Google Drive Documents. The hint for this element would cover the
            # real hint that allows you to focus the document to start typing.
-           element.id != 'docs-editor' and
-           not (isXUL and element.localName?.endsWith?('box') and
-                element.localName != 'checkbox')
+           element.id != 'docs-editor'
         type = 'clickable'
         unless isXUL or element.localName in ['a', 'input', 'button']
           semantic = false
