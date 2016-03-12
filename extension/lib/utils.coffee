@@ -163,13 +163,13 @@ getActiveElement = (window) ->
   # for the presence of `.contentWindow`. However, in non-multi-process,
   # `<browser>` (sometimes `<xul:browser>`) elements have a `.contentWindow`
   # pointing to the web page content `window`, which we don’t want to recurse
-  # into. This seems to be the only way to detect such elements. There is one
-  # exception: The sidebar (such as the history sidebar). It is also a
-  # `<browser>` with `.contentWindow`, but we _do_ want to recurse into it. Note
-  # that bookmarks can be opened in the sidebar, but their content is inside
-  # another `<browser>` inside `<browser#sidebar>` so there’s no need to worry
-  # about that case.
-  if (activeElement.localName != 'browser' or activeElement.id == 'sidebar') and
+  # into. The problem is that there are _some_ `<browser>`s which we _want_ to
+  # recurse into, such as the sidebar (for instance the history sidebar), and
+  # dialogs in `about:preferences`. Checking the `context` attribute seems to be
+  # a reliable test, catching both the main tab `<browser>`s and bookmarks
+  # opened in the sidebar.
+  if (activeElement.localName != 'browser' or
+      activeElement.getAttribute?('context') != 'contentAreaContextMenu') and
      activeElement.contentWindow
     return getActiveElement(activeElement.contentWindow)
   else
