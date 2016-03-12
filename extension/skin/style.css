@@ -27,6 +27,10 @@
   list-style-image: url(icon16.png);
 }
 
+  #VimFxButton image {
+    width: inherit;
+  }
+
 #main-window[vimfx-mode="ignore"] #VimFxButton {
   list-style-image: url(icon16-red.png);
 }
@@ -42,10 +46,6 @@ toolbarpaletteitem[place="palette"] > #VimFxButton {
 }
 
 @media (min-resolution: 2dppx) {
-  #VimFxButton image {
-    width: 16px;
-  }
-
   #VimFxButton {
     list-style-image: url(icon32.png);
   }
