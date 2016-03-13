@@ -47,6 +47,8 @@ class Vim
   _start: ->
     @_onLocationChange(@browser.currentURI.spec)
     @_addListeners()
+    focusType = utils.getFocusType(utils.getActiveElement(@window))
+    @_setFocusType(focusType)
 
   _addListeners: ->
     @_listen('vimMethod', ({method, args = []}, callback = null) =>

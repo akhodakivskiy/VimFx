@@ -34,6 +34,7 @@ module.exports = ->
 
   eventManager = new FrameEventManager(vim)
   eventManager.addListeners()
+  eventManager.sendFocusType({ignore: ['none']})
 
   messageManager.listen('runCommand', ({name, data}, callback) ->
     result = commands[name](Object.assign({vim}, data))

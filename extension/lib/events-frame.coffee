@@ -252,10 +252,10 @@ class FrameEventManager
         )
     )
 
-  sendFocusType: ->
+  sendFocusType: ({ignore = []} = {}) ->
     return unless activeElement = utils.getActiveElement(@vim.content)
     focusType = utils.getFocusType(activeElement)
-    messageManager.send('focusType', focusType)
+    messageManager.send('focusType', focusType) unless focusType in ignore
 
     # If a text input is removed from the DOM while it is focused, no 'focus'
     # or 'blur' events will be fired, making VimFx think that the text input is
