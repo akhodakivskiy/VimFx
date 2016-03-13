@@ -82,7 +82,7 @@ do (global = this) ->
 
   require.scopes = {}
 
-  global.startup = (args...) ->
+  startup = (args...) ->
     # `require` cannot be used outside of `startup` (except for in frame
     # scripts), so wait setting `require.data` until here.
     require.data = require('./require-data')
@@ -90,7 +90,7 @@ do (global = this) ->
     main = if IS_FRAME_SCRIPT then './lib/main-frame' else './lib/main'
     require(main)(args...)
 
-  global.shutdown = ->
+  shutdown = ->
     for shutdownHandler in shutdownHandlers
       try
         shutdownHandler()
@@ -105,10 +105,6 @@ do (global = this) ->
         scope[name] = null
     require.scopes = {}
 
-  global.install = ->
-
-  global.uninstall = ->
-
   if IS_FRAME_SCRIPT
     messageManager = require('./lib/message-manager')
 
@@ -119,7 +115,12 @@ do (global = this) ->
       # been set to `null` by Firefox when this runs. If so, simply return.
       return unless ok and content?
 
-      global.startup()
+      startup()
 
-      messageManager.listenOnce('shutdown', global.shutdown)
+      messageManager.listenOnce('shutdown', shutdown)
     )
+  else
+    global.startup = startup
+    global.shutdown = shutdown
+    global.install = ->
+    global.uninstall = ->
