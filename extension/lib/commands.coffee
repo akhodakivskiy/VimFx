@@ -208,6 +208,7 @@ helper_mark_last_scroll_position = (vim) ->
 
 commands.mark_scroll_position = ({vim}) ->
   vim.enterMode('marks', (keyStr) -> vim._run('mark_scroll_position', {keyStr}))
+  vim.notify(translate('notification.mark_scroll_position.enter'))
 
 commands.scroll_to_mark = ({vim}) ->
   vim.enterMode('marks', (keyStr) ->
@@ -216,6 +217,7 @@ commands.scroll_to_mark = ({vim}) ->
     helper_scroll(vim, null, 'scrollTo', 'other', ['top', 'left'], keyStr,
                   ['scrollTopMax', 'scrollLeftMax'], 0, 'scroll_to_mark')
   )
+  vim.notify(translate('notification.scroll_to_mark.enter'))
 
 
 
