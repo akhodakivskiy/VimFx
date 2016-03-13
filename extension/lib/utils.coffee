@@ -211,7 +211,7 @@ getFocusType = (element) -> switch
   when isIgnoreModeFocusType(element)
     'ignore'
   when isTypingElement(element)
-    'editable'
+    if element.closest?('findbar') then 'findbar' else 'editable'
   when isActivatable(element)
     'activatable'
   when isAdjustable(element)

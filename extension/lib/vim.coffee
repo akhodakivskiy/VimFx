@@ -182,6 +182,10 @@ class Vim
         @enterMode('ignore', {type: 'focusType'})
       when @mode == 'ignore' and @_storage.ignore.type == 'focusType'
         @enterMode('normal')
+      when @mode == 'normal' and @focusType == 'findbar'
+        @enterMode('find')
+      when @mode == 'find' and @focusType != 'findbar'
+        @enterMode('normal')
     @_parent.emit('focusTypeChange', {vim: this})
 
 module.exports = Vim

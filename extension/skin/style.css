@@ -66,9 +66,9 @@ toolbarpaletteitem[place="palette"] > #VimFxButton {
 }
 
 #main-window:-moz-any(
-      [vimfx-mode="normal"],
-      [vimfx-mode="find"]
-    )[vimfx-focus-type="editable"] #VimFxButton image {
+      [vimfx-mode="normal"][vimfx-focus-type="editable"],
+      [vimfx-mode="find"][vimfx-focus-type="findbar"]
+    ) #VimFxButton image {
   filter: grayscale(100%) brightness(150%);
 }
 

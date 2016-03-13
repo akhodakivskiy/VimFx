@@ -98,20 +98,16 @@ class UIEventManager
       @setHeldModifiers(event, {filterCurrentOnly: true})
     )
 
-    handleFocusRelatedEvent = (options, event) =>
+    handleFocusRelatedEvent = (event) =>
       target = event.originalTarget
       return unless vim = @vimfx.getCurrentVim(@window)
-
-      findBar = @window.gBrowser.getFindBar()
-      if target == findBar._findField.mInputField
-        vim.enterMode(options.mode)
 
       if vim.isUIEvent(event)
         focusType = utils.getFocusType(utils.getActiveElement(@window))
         vim._setFocusType(focusType)
 
-    @listen('focus', handleFocusRelatedEvent.bind(null, {mode: 'find'}))
-    @listen('blur',  handleFocusRelatedEvent.bind(null, {mode: 'normal'}))
+    @listen('focus', handleFocusRelatedEvent)
+    @listen('blur',  handleFocusRelatedEvent)
 
     @listen('click', (event) =>
       target = event.originalTarget

@@ -637,6 +637,7 @@ A `vim` object has the following properties:
     (See also the [`activatable_element_keys`] option.)
   - `'adjustable'`: An “adjustable” element (form control or video
     player). (See also the [`adjustable_element_keys`] option.)
+  - `'findbar'`: The findbar text input is focused.
   - `'other'`: Some other kind of element that can receive keystrokes.
     (Deprecated.)
   - `'none'`: The currently focused element does not appear to respond to
