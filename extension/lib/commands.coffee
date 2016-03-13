@@ -59,7 +59,7 @@ commands.paste_and_go_in_tab = helper_paste_and_go.bind(null, {altKey: true})
 
 commands.copy_current_url = ({vim}) ->
   utils.writeToClipboard(vim.window.gBrowser.currentURI.spec)
-  vim.notify(translate('notification.copy_current_url'))
+  vim.notify(translate('notification.copy_current_url.success'))
 
 commands.go_up_path = ({vim, count}) ->
   vim._run('go_up_path', {count})
