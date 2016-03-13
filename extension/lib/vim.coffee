@@ -132,7 +132,7 @@ class Vim
       if @_isBlacklisted(url)
         @enterMode('ignore', {type: 'blacklist'})
       else
-        @enterMode('normal')
+        @enterMode('normal') unless @mode == 'find'
     @_parent.emit('locationChange', {vim: this, location: new @window.URL(url)})
 
   _call: (method, data = {}, extraArgs...) ->
