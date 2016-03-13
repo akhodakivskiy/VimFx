@@ -26,7 +26,9 @@ FrameEventManager = require('./events-frame')
 messageManager = require('./message-manager')
 prefs = require('./prefs')
 VimFrame = require('./vim-frame')
-test = try require('../test/index')
+# @if TESTS
+test = require('../test/index')
+# @endif
 
 module.exports = ->
   {content} = FRAME_SCRIPT_ENVIRONMENT
@@ -68,5 +70,6 @@ module.exports = ->
     shutdownHandlers = []
   )
 
-  if test
-    messageManager.send('runTests', null, (ok) -> test(vim) if ok)
+  # @if TESTS
+  messageManager.send('runTests', null, (ok) -> test(vim) if ok)
+  # @endif

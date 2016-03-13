@@ -25,6 +25,7 @@ coffeelint = require('gulp-coffeelint')
 git = require('gulp-git')
 header = require('gulp-header')
 mustache = require('gulp-mustache')
+preprocess = require('gulp-preprocess')
 sloc = require('gulp-sloc')
 tap = require('gulp-tap')
 zip = require('gulp-zip')
@@ -45,9 +46,6 @@ BASE_LOCALE = 'en-US'
 UPDATE_ALL = /\s*UPDATE_ALL$/
 
 argv = process.argv.slice(2)
-
-test = '--test' in argv or '-t' in argv
-ifTest = (value) -> if test then [value] else []
 
 {join} = path
 read = (filepath) -> fs.readFileSync(filepath).toString()
@@ -74,11 +72,24 @@ gulp.task('node_modules', ->
 )
 
 gulp.task('coffee', ->
+  test = '--test' in argv or '-t' in argv
   gulp.src([
     'extension/bootstrap.coffee'
     'extension/lib/**/*.coffee'
-    ifTest('extension/test/**/*.coffee')...
-  ], {base: 'extension'})
+  ].concat(if test then 'extension/test/**/*.coffee' else []),
+  {base: 'extension'})
+    .pipe(preprocess({context: {
+      BUILD_TIME: Date.now()
+      REQUIRE_DATA: JSON.stringify(precompute('.'), null, 2)
+      TESTS:
+        if test
+          JSON.stringify(fs.readdirSync(TEST)
+            .map((name) -> name.match(/^(test-.+)\.coffee$/)?[1])
+            .filter(Boolean)
+          )
+        else
+          null
+    }}))
     .pipe(coffee({bare: true}))
     .pipe(gulp.dest(DEST))
 )
@@ -113,39 +124,9 @@ gulp.task('install.rdf', ->
     .pipe(gulp.dest(DEST))
 )
 
-gulp.task('require-data', ['node_modules'], ->
-  data = JSON.stringify(precompute('.'), null, 2)
-  gulp.src('extension/require-data.js.tmpl')
-    .pipe(template({data}))
-    .pipe(gulp.dest(DEST))
-)
-
-gulp.task('tests-list', ->
-  list = JSON.stringify(fs.readdirSync(TEST)
-    .map((name) -> name.match(/^(?!.+-frame\.)(test-.+)\.coffee$/)?[1])
-    .filter(Boolean)
-  )
-  gulp.src("#{TEST}/tests-list.js.tmpl", {base: 'extension'})
-    .pipe(template({list}))
-    .pipe(gulp.dest(DEST))
-)
-
-gulp.task('tests-list-frame', ->
-  list = JSON.stringify(fs.readdirSync(TEST)
-    .map((name) -> name.match(/^(test-.+-frame)\.coffee$/)?[1])
-    .filter(Boolean)
-  )
-  gulp.src("#{TEST}/tests-list-frame.js.tmpl", {base: 'extension'})
-    .pipe(template({list}))
-    .pipe(gulp.dest(DEST))
-)
-
 gulp.task('templates', [
   'chrome.manifest'
   'install.rdf'
-  'require-data'
-  ifTest('tests-list')...
-  ifTest('tests-list-frame')...
 ])
 
 gulp.task('build', (callback) ->

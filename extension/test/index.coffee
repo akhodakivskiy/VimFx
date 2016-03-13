@@ -19,20 +19,19 @@
 
 # This file implements a simple test runner.
 
-testsList = if IS_FRAME_SCRIPT then './tests-list-frame' else './tests-list'
-
-list = require(testsList)
 utils = require('../lib/utils')
 
 {Assert} = Cu.import('chrome://specialpowers/content/Assert.jsm', {})
 assert = new Assert()
+
+list = do -> # @echo TESTS
 
 module.exports = (topLevelObject) ->
   report = []
   passed = 0
   total = 0
 
-  for name in list
+  for name in list when name.endsWith('-frame') == IS_FRAME_SCRIPT
     tests = require("./#{name}")
     report.push(name)
     for key, fn of tests when key.startsWith('test')

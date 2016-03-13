@@ -34,7 +34,9 @@ parsePref = require('./parse-prefs')
 prefs = require('./prefs')
 utils = require('./utils')
 VimFx = require('./vimfx')
-test = try require('../test/index')
+# @if TESTS
+test = require('../test/index')
+# @endif
 
 {AddonManager} = Cu.import('resource://gre/modules/AddonManager.jsm', {})
 
@@ -123,10 +125,11 @@ module.exports = (data, reason) ->
 
   messageManager.load("#{ADDON_PATH}/content/bootstrap.js")
 
-  if test
-    test(vimfx)
-    runFrameTests = true
-    messageManager.listen('runTests', (data, callback) ->
-      callback(runFrameTests)
-      runFrameTests = false
-    )
+  # @if TESTS
+  test(vimfx)
+  runFrameTests = true
+  messageManager.listen('runTests', (data, callback) ->
+    callback(runFrameTests)
+    runFrameTests = false
+  )
+  # @endif

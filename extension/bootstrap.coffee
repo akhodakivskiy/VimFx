@@ -33,6 +33,7 @@ do (global = this) ->
   {classes: Cc, interfaces: Ci, utils: Cu} = Components
   ADDON_PATH = 'chrome://vimfx'
   IS_FRAME_SCRIPT = (typeof content != 'undefined')
+  REQUIRE_DATA = do -> # @echo REQUIRE_DATA
 
   unless IS_FRAME_SCRIPT
     # Make `Services` and `console` available globally, just like they are in
@@ -52,9 +53,9 @@ do (global = this) ->
     unless path[0] == '.'
       # Allow `require('module/lib/foo')` in additon to `require('module')`.
       [match, name, subPath] = path.match(///^ ([^/]+) (?: /(.+) )? ///)
-      base = require.data[moduleRoot]?[name] ? moduleRoot
+      base = REQUIRE_DATA[moduleRoot]?[name] ? moduleRoot
       dir  = "#{base}/node_modules/#{name}"
-      main = require.data[dir]?['']
+      main = REQUIRE_DATA[dir]?['']
       path = subPath ? main ? 'index'
       moduleRoot = dir
 
@@ -83,10 +84,6 @@ do (global = this) ->
   require.scopes = {}
 
   startup = (args...) ->
-    # `require` cannot be used outside of `startup` (except for in frame
-    # scripts), so wait setting `require.data` until here.
-    require.data = require('./require-data')
-
     main = if IS_FRAME_SCRIPT then './lib/main-frame' else './lib/main'
     require(main)(args...)
 
