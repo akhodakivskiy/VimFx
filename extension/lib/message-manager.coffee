@@ -22,7 +22,7 @@
 # messages between the main process and frame scripts. There is one frame script
 # per tab, and only them can access web page content.
 
-namespace = (name, prefix) -> "#{ADDON_PATH}/#{prefix}#{name}"
+namespace = (name, prefix) -> "#{ADDON_PATH}/#{BUILD_TIME}/#{prefix}#{name}"
 
 defaultMessageManager =
   if IS_FRAME_SCRIPT
