@@ -45,6 +45,8 @@ commands.focus_search_bar = ({vim, count}) ->
   # has been removed. Therefore we first check if it exists.
   if vim.window.BrowserSearch.searchBar
     vim.window.BrowserSearch.webSearch()
+  else
+    vim.notify(translate('notification.focus_search_bar.none'))
 
 helper_paste_and_go = (props, {vim}) ->
   {gURLBar} = vim.window
