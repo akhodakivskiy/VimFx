@@ -165,15 +165,15 @@ getActiveElement = (window) ->
   # pointing to the web page content `window`, which we don’t want to recurse
   # into. The problem is that there are _some_ `<browser>`s which we _want_ to
   # recurse into, such as the sidebar (for instance the history sidebar), and
-  # dialogs in `about:preferences`. Checking the `context` attribute seems to be
-  # a reliable test, catching both the main tab `<browser>`s and bookmarks
+  # dialogs in `about:preferences`. Checking the `contextmenu` attribute seems
+  # to be a reliable test, catching both the main tab `<browser>`s and bookmarks
   # opened in the sidebar.
-  if (activeElement.localName != 'browser' or
-      activeElement.getAttribute?('context') != 'contentAreaContextMenu') and
-     activeElement.contentWindow
-    return getActiveElement(activeElement.contentWindow)
-  else
+  if (activeElement.localName == 'browser' and
+      activeElement.getAttribute?('contextmenu') == 'contentAreaContextMenu') or
+     not activeElement.contentWindow
     return activeElement
+  else
+    return getActiveElement(activeElement.contentWindow)
 
 blurActiveElement = (window) ->
   # Blurring a frame element also blurs any active elements inside it. Recursing
