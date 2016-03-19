@@ -16,7 +16,7 @@
     "vim-like-key-notation": "^1.0.0"
   },
   "devDependencies": {
-    "addons-linter": "0.0.13",
+    "addons-linter": "0.0.15",
     "coffee-script": "jashkenas/coffeescript",
     "coffeelint": "clutchski/coffeelint",
     "coffeelint-forbidden-keywords": "^0.1.1",
