@@ -27,10 +27,6 @@
   list-style-image: url(icon16.png);
 }
 
-  #VimFxButton image {
-    width: inherit;
-  }
-
 #main-window[vimfx-mode="ignore"] #VimFxButton {
   list-style-image: url(icon16-red.png);
 }
