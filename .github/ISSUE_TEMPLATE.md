@@ -10,15 +10,15 @@ Steps to reproduce:
 2. 
 3. 
 
-[Description]
+Expected result: 
+
+Actual result: 
 
 
 | OR, for feature requests:
 
 
-Detailed use case example:
-
-[Description]
+Detailed use case example: 
 
 
 | ALWAYS include:
@@ -29,8 +29,7 @@ Firefox version:
 OS: 
 Keyboard language: 
 Worked before: 
-Example URL(s):
-- 
+Example URL(s): 
 
 
 | EXAMPLE:
@@ -41,9 +40,13 @@ Example URL(s):
 | 2. Focus the online terminal.
 | 3. Type something into it.
 |
-| VimFx doesn’t recognize the online terminal as a text input, so instead of
-| typing into it I end up activating VimFx commands. A work-around is to use
-| Ignore mode.
+| Expected reult: VimFx recognizes the terminal as a text input, automatically
+| allowing to type into it.
+|
+| Actual result: Instead of typing into the terminal I end up activating VimFx
+| commands.
+|
+| A work-around is to use Ignore mode.
 |
 | VimFx version: 0.11.0
 | Firefox version: 43

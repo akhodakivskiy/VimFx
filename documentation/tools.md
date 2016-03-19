@@ -220,5 +220,5 @@ Steps:
 The idea is to use the contents of `README.md` as the add-on description on
 addons.mozilla.org. You can print it as HTML by running `gulp readme`.
 
-[versioning guidelines]: CONTRIBUTING_CODE.md#versioning-and-branches
+[versioning guidelines]: CONTRIBUTING-CODE.md#versioning-and-branches
 [valid Firefox versions]: https://addons.mozilla.org/en-US/firefox/pages/appversions/
