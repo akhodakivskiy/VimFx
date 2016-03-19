@@ -1,3 +1,78 @@
+### 0.13.0 (2016-03-19)
+
+- Added: The `T` command, which opens a new tab after the current.
+- Changed: The `gl` command now deals with _visited_ tabs only.
+- Added: The [`gL`] command, which deals with <em>un</em>visited tabs only, in
+  oldest-first order. Use this to step through your unvisited background tabs in
+  the order you opened them (for example using the `F` command).
+- Improved: The `gi` command no longer tries to focus the last focused text
+  input if it has been removed from the page. If so, it finds a new one instead.
+- Fixed: You can now type in sidebar text inputs (such as in the history
+  sidebar) without having to switch to Ignore mode.
+- Changed: If you enter Ignore mode you will now stay in Ignore mode in that tab
+  until you explicitly exit it (by pressing `<s-escape>`), even if you reload
+  the page or follow a link. If Ignore mode was entered automatically because of
+  the [blacklist][blacklist-2], though, you will be automatically returned to
+  Normal mode if
+  the URL changes to a non-blacklisted page.
+- Added: VimFx can now automatically enter and exit Ignore mode based on the
+  currently focused element. Currently, the [wasavi] extension as well as
+  [CodeMirror] in Vim mode are detected. Both of those provide Vim-style
+  editors. This allows sending `<escape>` to those editors in order to exit
+  their Insert mode, without blurring the editor.
+- Improved: CodeMirror editors now get better hints, keeping the cursor where
+  you left it.
+- Improved: The [blacklist][blacklist-2] is now applied faster on some pages.
+- Improved: Many audio and video elements are now recognized as “adjustable”,
+  allowing you to press for example `<space>` on them to toggle play/pause,
+  without scrolling the page.
+- Improved: Scrolling by pages, such as using the `<space>` command, now takes
+  fixed heaears and footers into account, just like Firefox does.
+- Fixed: Access keys now work correctly in context menus in the devtools and
+  `about:config`.
+- Improved: The arrow keys now Just Work in the devtools, even if you have bound
+  them to VimFx commands.
+- Changed: The public API has been removed, and turned into the Config file API.
+  If you were already using a config file, it will no longer work. You need to
+  set up a new one, but you should be able to simply copy and paste the contents
+  of the old one into the new one. Read the [config file] documentation for more
+  information.
+- Changed: There are a few minor breaking changes to the API, though I doubt it
+  will affect anyone.
+  - If you use [`vimfx.on`], you probably need to adjust the arguments of the
+    your callbacks. They are now _always_ passed an object of data, instead of
+    sometimes passing the data directly.
+  - `match.focus` of [match object]s has been removed, and replaced by
+    `vim.focusType` of [vim object]s.
+- Fixed: The toolbar button’s icon is now correctly sized when setting
+  `layout.css.devPixelsPerPx` to `2`. Thanks to Robert Ma (@Hexcles) and Dale
+  Whinham (@dwhinham)!
+- Fixed: Find commands now work when the find bar was opened before the page had
+  finished loading.
+- Improved: Lots of internal improvements. This should make VimFx faster, more
+  reliable and more responsive.
+  - All keyboard event handling (except `<late>` shortcuts) are now handled in
+    the UI process, instead of mostly in each tab’s web page content process.
+    This should make VimFx’s shortcuts more reliable and responsive.
+  - Removed all synchronous message passing (execpt for `<late>` keypresses).
+    Mozilla recommends using them only where absolutely necessary. Turns out
+    VimFx doesn’t need them anymore!
+  - The `f` commands are now more reliable. Before, they could crash on rare
+    occasions (on certain web pages), but that is less likely now.
+  - Less `MutationObserver`s are now used. This should improve performance.
+  - Less uncaught errors (especially on shutdown).
+  - Lots of minor improvements.
+- Updated locale: ja. Thanks to Kaoru Esashika (@pluser)!
+
+[`gL`]: https://github.com/akhodakivskiy/VimFx/blob/44b3e1bc350ceb1560176ee5b4ae97d9671a04db/documentation/commands.md#gl-1
+[blacklist-2]: https://github.com/akhodakivskiy/VimFx/blob/44b3e1bc350ceb1560176ee5b4ae97d9671a04db/documentation/options.md#blacklist
+[wasavi]: http://appsweets.net/wasavi/
+[CodeMirror]: https://codemirror.net/demo/vim.html
+[config file]: https://github.com/akhodakivskiy/VimFx/blob/44b3e1bc350ceb1560176ee5b4ae97d9671a04db/documentation/config-file.md
+[`vimfx.on`]: https://github.com/akhodakivskiy/VimFx/blob/44b3e1bc350ceb1560176ee5b4ae97d9671a04db/documentation/api.md#vimfxoneventname-listener-and-vimfxoffeventname-listener
+[match object]: https://github.com/akhodakivskiy/VimFx/blob/44b3e1bc350ceb1560176ee5b4ae97d9671a04db/documentation/api.md#match-object
+[vim object]: https://github.com/akhodakivskiy/VimFx/blob/44b3e1bc350ceb1560176ee5b4ae97d9671a04db/documentation/api.md#vim-object
+
 ### 0.12.0 (2016-02-03)
 
 - Improved: More clickable elements are now recognized. Most notably, elements
