@@ -40,11 +40,7 @@ do (global = this) ->
     # Make `Services` and `console` available globally, just like they are in
     # frame scripts by default.
     Cu.import('resource://gre/modules/Services.jsm')
-    try
-      # TODO: Only use this path when Firefox 44 is released.
-      Cu.import('resource://gre/modules/Console.jsm')
-    catch
-      Cu.import('resource://gre/modules/devtools/Console.jsm')
+    Cu.import('resource://gre/modules/Console.jsm')
 
   shutdownHandlers = []
 

@@ -216,9 +216,6 @@ getFocusType = (element) -> switch
     'activatable'
   when isAdjustable(element)
     'adjustable'
-  # TODO: Remove when Tab Groups have been removed.
-  when element.ownerGlobal?.TabView?.isVisible?()
-    'other'
   else
     'none'
 

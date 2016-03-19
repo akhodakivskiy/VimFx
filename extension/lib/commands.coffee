@@ -643,8 +643,6 @@ commands.esc = ({vim}) ->
   utils.blurActiveBrowserElement(vim)
   vim.window.DeveloperToolbar.hide()
   vim.window.gBrowser.getFindBar().close()
-  # TODO: Remove when Tab Groups have been removed.
-  vim.window.TabView?.hide()
   hints.removeHints(vim.window) # Better safe than sorry.
 
   unless help.getSearchInput(vim.window)?.getAttribute('focused')

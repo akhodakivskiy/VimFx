@@ -25,11 +25,7 @@ huffman = require('n-ary-huffman')
 {Marker} = require('./marker')
 utils = require('./utils')
 
-try
-  # TODO: Only use this path when Firefox 44 is released.
-  {devtools} = Cu.import('resource://devtools/shared/Loader.jsm', {})
-catch
-  {devtools} = Cu.import('resource://gre/modules/devtools/Loader.jsm', {})
+{devtools} = Cu.import('resource://devtools/shared/Loader.jsm', {})
 
 CONTAINER_ID = 'VimFxMarkersContainer'
 
