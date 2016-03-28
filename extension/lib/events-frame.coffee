@@ -59,8 +59,11 @@ class FrameEventManager
              # toplevel document does. Checking for this case lets us send
              # 'locationChange' earlier, allowing to enter Ignore mode earlier,
              # for example. Be careful not to trigger a 'locationChange' for
-             # frames loading _after_ the toplevel document, though.
-             (topDocument.readyState == 'loading' and oldUrl == null)
+             # frames loading _after_ the toplevel document, though. Finally,
+             # checking for 'uninitialized' is needed to be able to blacklist
+             # some XUL pages.
+             (topDocument.readyState in ['loading', 'uninitialized'] and
+              oldUrl == null)
             messageManager.send('locationChange', @currentUrl)
 
         when 'complete'
