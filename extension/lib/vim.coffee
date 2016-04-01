@@ -33,6 +33,7 @@ ChromeWindow = Ci.nsIDOMChromeWindow
 
 class Vim
   constructor: (browser, @_parent) ->
+    @mode = undefined
     @focusType = 'none'
     @_setBrowser(browser, {addListeners: false})
     @_storage = {}
@@ -128,11 +129,12 @@ class Vim
     return suppress
 
   _onLocationChange: (url) ->
-    unless @mode == 'ignore' and @_storage.ignore.type == 'explicit'
-      if @_isBlacklisted(url)
+    switch
+      when @_isBlacklisted(url)
         @enterMode('ignore', {type: 'blacklist'})
-      else
-        @enterMode('normal') unless @mode == 'find'
+      when (@mode == 'ignore' and @_storage.ignore.type == 'blacklist') or
+           not @mode
+        @enterMode('normal')
     @_parent.emit('locationChange', {vim: this, location: new @window.URL(url)})
 
   _call: (method, data = {}, extraArgs...) ->
