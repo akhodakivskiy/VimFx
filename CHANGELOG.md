@@ -1,3 +1,12 @@
+### 0.13.1 (2016-04-01)
+
+- Fixed: Blacklisting of some XUL pages.
+- Fixed: The current mode is no longer lost when a page loads. For example, if
+  you press `zF` while a page is loading, the markers no longer disappear.
+- Fixed: Elements that you have focused using an `f` command no longer get stuck
+  appearing as if you’d put the mouse pointer.
+- Updated locale: zh-CN. Thanks to @mozillazg!
+
 ### 0.13.0 (2016-03-19)
 
 - Added: The `T` command, which opens a new tab after the current.
