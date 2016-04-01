@@ -235,6 +235,8 @@ class FrameEventManager
     @listen('blur', (event) =>
       target = event.originalTarget
 
+      @vim.clearHover() if target == @vim.state.lastHoveredElement
+
       @sendFocusType()
 
       # If a text input is blurred immediately before the document loses focus,
