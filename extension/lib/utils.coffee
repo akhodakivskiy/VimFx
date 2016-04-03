@@ -333,6 +333,15 @@ createBox = (document, className = '', parent = null, text = null) ->
   parent.appendChild(box) if parent?
   return box
 
+# In quirks mode (when the page lacks a doctype), such as on Hackernews,
+# `<body>` is considered the root element rather than `<html>`.
+getRootElement = (document) ->
+  if document.compatMode == 'BackCompat' and document.body?
+    return document.body
+  else
+    return document.documentElement
+
+
 # Returns the minimum of `element.clientHeight` and the height of the viewport,
 # taking fixed headers and footers into account. Adapted from Firefox’s source
 # code for `<space>` scrolling (which is where the arbitrary constants below
@@ -374,7 +383,7 @@ getWindowViewport = (window) ->
   {
     clientWidth, clientHeight # Viewport size excluding scrollbars, usually.
     scrollWidth, scrollHeight
-  } = window.document.documentElement
+  } = getRootElement(window.document)
   {innerWidth, innerHeight} = window # Viewport size including scrollbars.
   # We don’t want markers to cover the scrollbars, so we should use
   # `clientWidth` and `clientHeight`. However, when there are no scrollbars
@@ -593,6 +602,7 @@ module.exports = {
   area
   containsDeep
   createBox
+  getRootElement
   getViewportCappedClientHeight
   getWindowViewport
   injectTemporaryPopup

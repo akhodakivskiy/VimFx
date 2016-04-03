@@ -31,16 +31,13 @@ class ScrollableElements
   MINIMUM_SCROLL: 5
   MINIMUM_SCROLLABLE_ELEMENT_AREA: 25
 
-  # In quirks mode (when the page lacks a doctype), such as on Hackernews,
-  # `<body>` is considered the root element rather than `<html>`. The 'overflow'
-  # event is triggered for `<html>` though (_not_ `<body>`!). This method takes
-  # care of returning the appropriate element, so we don’t need to think about
-  # it anywhere else.
+  # Even in quirks mode the 'overflow' event is triggered for `<html>`, _not_
+  # `<body>`. This method takes care of returning the appropriate element, so
+  # we don’t need to think about it anywhere else.
   quirks: (element) ->
     document = element.ownerDocument
-    if element == document.documentElement and
-       document.compatMode == 'BackCompat' and document.body?
-      return document.body
+    if element == document.documentElement
+      return utils.getRootElement(document)
     else
       return element
 
