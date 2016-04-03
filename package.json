@@ -18,10 +18,10 @@
   "devDependencies": {
     "addons-linter": "0.0.15",
     "coffee-script": "jashkenas/coffeescript",
-    "coffeelint": "clutchski/coffeelint",
+    "coffeelint": "^1.15.0",
     "coffeelint-forbidden-keywords": "^0.1.1",
     "gulp": "^3.9.1",
-    "gulp-coffee": "^2.3.1",
+    "gulp-coffee": "^2.3.2",
     "gulp-coffeelint": "^0.6.0",
     "gulp-git": "^1.7.0",
     "gulp-header": "^1.7.1",
