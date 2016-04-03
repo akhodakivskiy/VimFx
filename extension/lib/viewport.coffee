@@ -46,6 +46,53 @@ adjustRectToViewport = (rect, viewport) ->
     height, width, area
   }
 
+getAllRangesInsideViewport = (window, viewport, offset = {left: 0, top: 0}) ->
+  selection = window.getSelection()
+  {rangeCount} = selection
+  ranges = []
+
+  if rangeCount > 0
+    {header, headerBottom, footer, footerTop} =
+      getFixedHeaderAndFooter(window, viewport)
+
+    # Many sites use `text-indent: -9999px;` or similar to hide text intended
+    # for screen readers only. That text can still be selected and found by
+    # searching, though. Therefore, we have to allow selection ranges that are
+    # within the viewport vertically but not horizontally, even though they
+    # actually are outside the viewport. Otherwise you won’t be able to press
+    # `n` to get past those elements (instead, `n` would start over from the top
+    # of the viewport).
+    for index in [0...rangeCount]
+      range = selection.getRangeAt(index)
+      continue if range.collapsed
+      rect = range.getBoundingClientRect()
+      if (rect.top >= headerBottom - MINIMUM_EDGE_DISTANCE and
+          rect.bottom <= footerTop + MINIMUM_EDGE_DISTANCE) or
+         header.contains(range.commonAncestorContainer) or
+         footer.contains(range.commonAncestorContainer)
+        adjustedRect = {
+          left: offset.left + rect.left
+          top: offset.top + rect.top
+          right: offset.left + rect.right
+          bottom: offset.top + rect.bottom
+          width: rect.width
+          height: rect.height
+        }
+        ranges.push({range, rect: adjustedRect})
+
+  for frame in window.frames
+    {viewport: frameViewport, offset: frameOffset} =
+      getFrameViewport(frame.frameElement, viewport) ? {}
+    continue unless frameViewport
+    newOffset = {
+      left: offset.left + frameOffset.left
+      top: offset.top + frameOffset.top
+    }
+    frameRanges = getAllRangesInsideViewport(frame, frameViewport, newOffset)
+    ranges.push(frameRanges...)
+
+  return ranges
+
 getFirstNonWhitespace = (element) ->
   window = element.ownerGlobal
   viewport = getWindowViewport(window)
@@ -63,9 +110,7 @@ getFirstNonWhitespace = (element) ->
 getFirstVisibleOffset = (textNode, viewport) ->
   {length} = textNode.data
   return null if length == 0
-  [header] = getFixedHeaderAndFooter(textNode.ownerGlobal, viewport)
-  headerBottom =
-    if header then header.getBoundingClientRect().bottom else viewport.top
+  {headerBottom} = getFixedHeaderAndFooter(textNode.ownerGlobal, viewport)
   [nonMatch, match] = utils.bisect(0, length - 1, (offset) ->
     range = textNode.ownerDocument.createRange()
     # Using a zero-width range sometimes gives a bad rect, so make it span one
@@ -79,6 +124,36 @@ getFirstVisibleOffset = (textNode, viewport) ->
     return rect.top >= headerBottom - MINIMUM_EDGE_DISTANCE
   )
   return match
+
+getFirstVisibleRange = (window, viewport) ->
+  ranges = getAllRangesInsideViewport(window, viewport)
+  first = null
+  for item in ranges
+    if not first or item.rect.top < first.rect.top
+      first = item
+  return if first then first.range else null
+
+getFirstVisibleText = (window, viewport) ->
+  for element in window.document.getElementsByTagName('*')
+    rect = element.getBoundingClientRect()
+    continue unless isInsideViewport(rect, viewport)
+
+    if element.contentWindow and
+       not utils.checkElementOrAncestor(element, utils.isPositionFixed)
+      {viewport: frameViewport} = getFrameViewport(element, viewport) ? {}
+      continue unless frameViewport
+      result = getFirstVisibleText(element.contentWindow, frameViewport)
+      return result if result
+      continue
+
+    continue unless Array.some(element.childNodes, utils.isNonEmptyTextNode)
+
+    continue if utils.checkElementOrAncestor(element, utils.isPositionFixed)
+
+    result = getFirstNonWhitespace(element)
+    return result if result
+
+  return null
 
 # Adapted from Firefox’s source code for `<space>` scrolling (which is where the
 # arbitrary constants below come from).
@@ -116,7 +191,7 @@ getFixedHeaderAndFooter = (window) ->
         footer = candidate
         footerTop = rect.top
 
-  return [header, footer]
+  return {header, headerBottom, footer, footerTop}
 
 getFrameViewport = (frame, parentViewport) ->
   rect = frame.getBoundingClientRect()
@@ -161,11 +236,7 @@ getFrameViewport = (frame, parentViewport) ->
 getViewportCappedClientHeight = (element) ->
   window = element.ownerGlobal
   viewport = getWindowViewport(window)
-  [header, footer] = getFixedHeaderAndFooter(window)
-  headerBottom =
-    if header then header.getBoundingClientRect().bottom else viewport.top
-  footerTop =
-    if footer then footer.getBoundingClientRect().bottom else viewport.bottom
+  {headerBottom, footerTop} = getFixedHeaderAndFooter(window)
   return Math.min(element.clientHeight, footerTop - headerBottom)
 
 getWindowViewport = (window) ->
@@ -217,8 +288,11 @@ scroll = (element, args) ->
 module.exports = {
   MINIMUM_EDGE_DISTANCE
   adjustRectToViewport
+  getAllRangesInsideViewport
   getFirstNonWhitespace
   getFirstVisibleOffset
+  getFirstVisibleRange
+  getFirstVisibleText
   getFixedHeaderAndFooter
   getFrameViewport
   getViewportCappedClientHeight

@@ -32,9 +32,11 @@ hints = require('./hints')
 prefs = require('./prefs')
 translate = require('./l10n')
 utils = require('./utils')
+SelectionManager = require('./selection')
 viewportUtils = require('./viewport')
 
 {ContentClick} = Cu.import('resource:///modules/ContentClick.jsm', {})
+{FORWARD, BACKWARD} = SelectionManager
 
 commands = {}
 
@@ -632,6 +634,12 @@ commands.element_text_copy = ({vim}) ->
 
 findStorage = {lastSearchString: ''}
 
+helper_find_from_top_of_viewport = (vim, direction, callback) ->
+  if vim.options.find_from_top_of_viewport
+    vim._run('find_from_top_of_viewport', {direction}, callback)
+  else
+    callback()
+
 helper_find = ({highlight, linksOnly = false}, {vim}) ->
   helpSearchInput = help.getSearchInput(vim.window)
   if helpSearchInput
@@ -639,16 +647,18 @@ helper_find = ({highlight, linksOnly = false}, {vim}) ->
     return
 
   helper_mark_last_scroll_position(vim)
-  findBar = vim.window.gBrowser.getFindBar()
+  helper_find_from_top_of_viewport(vim, FORWARD, ->
+    findBar = vim.window.gBrowser.getFindBar()
 
-  mode = if linksOnly then findBar.FIND_LINKS else findBar.FIND_NORMAL
-  findBar.startFind(mode)
-  utils.focusElement(findBar._findField, {select: true})
+    mode = if linksOnly then findBar.FIND_LINKS else findBar.FIND_NORMAL
+    findBar.startFind(mode)
+    utils.focusElement(findBar._findField, {select: true})
 
-  return if linksOnly
-  return unless highlightButton = findBar.getElement('highlight')
-  if highlightButton.checked != highlight
-    highlightButton.click()
+    return if linksOnly
+    return unless highlightButton = findBar.getElement('highlight')
+    if highlightButton.checked != highlight
+      highlightButton.click()
+  )
 
 commands.find = helper_find.bind(null, {highlight: false})
 
@@ -661,15 +671,18 @@ helper_find_again = (direction, {vim}) ->
   if findStorage.lastSearchString.length == 0
     vim.notify(translate('notification.find_again.none'))
     return
+
   helper_mark_last_scroll_position(vim)
-  findBar._findField.value = findStorage.lastSearchString
-  findBar.onFindAgainCommand(direction)
-  message = findBar._findStatusDesc.textContent
-  vim.notify(message) if message
+  helper_find_from_top_of_viewport(vim, direction, ->
+    findBar._findField.value = findStorage.lastSearchString
+    findBar.onFindAgainCommand(not direction)
+    message = findBar._findStatusDesc.textContent
+    vim.notify(message) if message
+  )
 
-commands.find_next     = helper_find_again.bind(null, false)
+commands.find_next     = helper_find_again.bind(null, FORWARD)
 
-commands.find_previous = helper_find_again.bind(null, true)
+commands.find_previous = helper_find_again.bind(null, BACKWARD)
 
 
 

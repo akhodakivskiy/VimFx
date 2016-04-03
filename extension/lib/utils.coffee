@@ -316,6 +316,13 @@ simulateMouseEvents = (element, sequence) ->
 area = (element) ->
   return element.clientWidth * element.clientHeight
 
+checkElementOrAncestor = (element, fn) ->
+  window = element.ownerGlobal
+  while element.parentElement
+    return true if fn(element)
+    element = element.parentElement
+  return false
+
 clearSelectionDeep = (window) ->
   # The selection might be `null` in hidden frames.
   selection = window.getSelection()
@@ -368,6 +375,9 @@ insertText = (input, value) ->
 
 isDetached = (element) ->
   return not element.ownerDocument?.documentElement?.contains?(element)
+
+isNonEmptyTextNode = (node) ->
+  return node.nodeType == 3 and node.data.trim() != ''
 
 isPositionFixed = (element) ->
   computedStyle = element.ownerGlobal.getComputedStyle(element)
@@ -566,6 +576,7 @@ module.exports = {
   simulateMouseEvents
 
   area
+  checkElementOrAncestor
   clearSelectionDeep
   containsDeep
   createBox
@@ -573,6 +584,7 @@ module.exports = {
   injectTemporaryPopup
   insertText
   isDetached
+  isNonEmptyTextNode
   isPositionFixed
   querySelectorAllDeep
   setAttributes

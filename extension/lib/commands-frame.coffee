@@ -29,6 +29,7 @@ translate = require('./l10n')
 utils = require('./utils')
 viewportUtils = require('./viewport')
 
+{FORWARD, BACKWARD} = SelectionManager
 {isProperLink, isTextInputElement, isTypingElement, isContentEditable} = utils
 
 XULDocument = Ci.nsIDOMXULDocument
@@ -478,6 +479,51 @@ commands.move_focus = ({vim, direction}) ->
     nextInput = inputs[(index + direction) %% inputs.length]
     utils.focusElement(nextInput, {select: true})
     return true
+
+# This is an attempt to enhance Firefox’s native “Find in page” functionality.
+# Firefox starts searching after the end of the first selection range, or from
+# the top of the page if there are no selection ranges. If there are frames, the
+# top-most document in DOM order with selections seems to be used.
+#
+# Replace the current selection with one single range. (Searching clears the
+# previous selection anyway.) That single range is either the first visible
+# range, or a newly created (and collapsed) one at the top of the viewport. This
+# way we can control where Firefox searches from.
+commands.find_from_top_of_viewport = ({vim, direction}) ->
+  viewport = viewportUtils.getWindowViewport(vim.content)
+
+  range = viewportUtils.getFirstVisibleRange(vim.content, viewport)
+  if range
+    window = range.startContainer.ownerGlobal
+    selection = window.getSelection()
+    utils.clearSelectionDeep(vim.content)
+    window.focus()
+    # When the next match is in another frame than the current selection (A),
+    # Firefox won’t clear that selection before making a match selection (B) in
+    # the other frame. When searching again, selection B is cleared because
+    # selection A appears further up the viewport. This causes us to search
+    # _again_ from selection A, rather than selection B. In effect, we get stuck
+    # re-selecting selection B over and over. Therefore, collapse the range
+    # first, in case Firefox doesn’t.
+    range.collapse()
+    selection.addRange(range)
+    # Collapsing the range causes backwards search to keep re-selecting the same
+    # match. Therefore, move it one character back.
+    selection.modify('move', 'backward', 'character') if direction == BACKWARD
+    return
+
+  result = viewportUtils.getFirstVisibleText(vim.content, viewport)
+  return unless result
+  [textNode, offset] = result
+
+  utils.clearSelectionDeep(vim.content)
+  window = textNode.ownerGlobal
+  window.focus()
+  range = window.document.createRange()
+  range.setStart(textNode, offset)
+  range.setEnd(textNode, offset)
+  selection = window.getSelection()
+  selection.addRange(range)
 
 commands.esc = (args) ->
   {vim} = args

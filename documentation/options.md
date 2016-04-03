@@ -215,6 +215,31 @@ Controls whether [counts] are enabled or not.
 
 [counts]: commands.md#counts
 
+### `find_from_top_of_viewport`
+
+Toggles whether the various find commands are Vim-style or Firefox
+default-style.
+
+Disable this pref if you want `/` to work more like `<c-f>` and `n`/`N` to work
+more like `<f3>`/`<s-f3>`.
+
+If there is selected text on the page, Firefox starts searching after that.
+VimFx does so too, but only if the selection is currently _visible_ (inside the
+current viewport).
+
+If there _isn’t_ selected text on the page, Firefox starts searching from the
+top of the page. VimFx instead starts searching from the top of the current
+viewport.
+
+The VimFx behavior is designed to be less disorienting. It is also similar to
+how searching in Vim works. Again, you can return to the Firefox default
+behavior (if you prefer that) by disabling this pref.
+
+One of the main benefits of the VimFx behavior is that you can scroll past a
+block of the text with lots of search matches and then continue going through
+matches with `n` after that block, without having to spam `n` lots and lots of
+times.
+
 ### `ignore_ctrl_alt`
 
 This option is enabled by default on Windows, and disabled otherwise.
