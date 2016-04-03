@@ -95,7 +95,7 @@ class FrameEventManager
 
       if target == @vim.content.document
         messageManager.send('frameCanReceiveEvents', false)
-        @vim.enterMode('normal') if @vim.mode =='hints'
+        @vim.enterMode('normal') if @vim.mode == 'hints'
 
       # If the target isn’t the topmost document, it means that a frame has
       # changed: It could have been removed or its `src` attribute could have
