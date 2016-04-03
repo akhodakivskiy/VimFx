@@ -497,7 +497,7 @@ commands.follow_copy = ({vim}) ->
 commands.follow_focus = ({vim}) ->
   callback = (marker) ->
     vim._focusMarkerElement(marker.wrapper.elementIndex, {select: true})
-  return helper_follow('follow_focus', vim, callback)
+  helper_follow('follow_focus', vim, callback)
 
 commands.click_browser_element = ({vim}) ->
   markerElements = []
