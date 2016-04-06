@@ -180,14 +180,14 @@ helper_scrollByPagesY = (amount, type, {vim, uiEvent, count = 1}) ->
                 [amount * count], ['clientHeight'], adjustment)
 
 helper_scrollToX = (amount, {vim, uiEvent}) ->
+  helper_mark_last_scroll_position(vim)
   helper_scroll(vim, uiEvent, 'scrollTo', 'other', ['left'],
                 [amount], ['scrollLeftMax'])
-  helper_mark_last_scroll_position(vim)
 
 helper_scrollToY = (amount, {vim, uiEvent}) ->
+  helper_mark_last_scroll_position(vim)
   helper_scroll(vim, uiEvent, 'scrollTo', 'other', ['top'],
                 [amount], ['scrollTopMax'])
-  helper_mark_last_scroll_position(vim)
 
 commands.scroll_left           = helper_scrollByLinesX.bind(null, -1)
 commands.scroll_right          = helper_scrollByLinesX.bind(null, +1)
