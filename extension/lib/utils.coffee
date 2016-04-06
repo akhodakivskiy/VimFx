@@ -69,8 +69,10 @@ isAdjustable = (element) ->
          ] or
          element.localName in ['video', 'audio', 'embed', 'object'] or
          element instanceof XULControlElement or
+         # Custom video players.
+         includes(element.className, 'video') or
+         includes(element.className, 'player') or
          # Youtube special case.
-         element.classList?.contains('html5-video-player') or
          element.classList?.contains('ytp-button') or
          # Allow navigating object inspection trees in th devtools with the
          # arrow keys, even if the arrow keys are used as VimFx shortcuts.
