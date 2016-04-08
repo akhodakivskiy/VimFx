@@ -1,3 +1,14 @@
+### 0.13.2 (2016-04-08)
+
+- Improved: The “last position mark” `` ` `` now works more reliably.
+- Improved: More video players are now recognized. Many video players lets you
+  press `<space>` while focused to toggle play/pause. VimFx tries to detect if
+  the currently focused element is a video player. If so, `<space>` is passed to
+  the video player instead of scrolling the page. (For those interested, see
+  also the [`adjustable_element_keys`] pref.)
+
+[`adjustable_element_keys`]: https://github.com/akhodakivskiy/VimFx/blob/645e35d7d82019b0551534c43926bc126e7105bd/documentation/options.md#adjustable_element_keys
+
 ### 0.13.1 (2016-04-01)
 
 - Fixed: Blacklisting of some XUL pages.
