@@ -41,7 +41,9 @@ class ScrollableElements
     else
       return element
 
-  has: (element) -> @elements.has(@quirks(element))
+  # Note: Don’t use `@quirks` here. That causes a hint marker for `<html>` on
+  # quirks mode sites, such as Hackernews.
+  has: (element) -> @elements.has(element)
 
   add: (element) ->
     element = @quirks(element)
