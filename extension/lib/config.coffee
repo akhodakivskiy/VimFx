@@ -49,11 +49,12 @@ load = (vimfx, callback = ->) ->
   messageManager.send('loadConfig', null, callback)
 
 loadFile = (dir, file, scope) ->
-  uri = OS.Path.toFileURI(OS.Path.join(utils.expandPath(dir), file))
+  expandedDir = utils.expandPath(dir)
+  uri = OS.Path.toFileURI(OS.Path.join(expandedDir, file))
   try
     Services.scriptloader.loadSubScriptWithOptions(uri, {
       target: Object.assign({
-        __dirname: OS.Path.dirname(uri)
+        __dirname: OS.Path.toFileURI(expandedDir)
       }, scope)
       charset: 'UTF-8'
       ignoreCache: true
