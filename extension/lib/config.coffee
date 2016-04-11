@@ -53,7 +53,7 @@ loadFile = (dir, file, scope) ->
   try
     Services.scriptloader.loadSubScriptWithOptions(uri, {
       target: Object.assign({
-        __dirname: OS.Path.dirname(uri)
+        __dirname: OS.Path.toFileURI(utils.expandPath(dir))
       }, scope)
       charset: 'UTF-8'
       ignoreCache: true
