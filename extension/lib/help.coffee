@@ -123,8 +123,9 @@ createContent = (window, vimfx) ->
       for {command, name, enabledSequences} in category.commands
         commandContainer = $('command search-item', categoryContainer)
         commandContainer.setAttribute('data-command', command.name)
-        commandContainer.onclick = goToCommandSetting.bind(null, window, vimfx,
-                                                           command)
+        commandContainer.onclick = goToCommandSetting.bind(
+          null, window, vimfx, command
+        )
         for sequence in enabledSequences
           keySequence = $('key-sequence', commandContainer)
           [specialKeys, rest] =

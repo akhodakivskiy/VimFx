@@ -250,8 +250,9 @@ class UIEventManager
       else
         if @suppress == null then 'alt ctrl meta shift' else ''
     isHeld = (modifier) -> event["#{modifier}Key"]
-    mainWindow.setAttribute(HELD_MODIFIERS_ATTRIBUTE,
-                            modifiers.split(' ').filter(isHeld).join(' '))
+    mainWindow.setAttribute(
+      HELD_MODIFIERS_ATTRIBUTE, modifiers.split(' ').filter(isHeld).join(' ')
+    )
 
   anyPopupsOpen: ->
     # The autocomplete popup in text inputs (for example) is technically a

@@ -164,8 +164,10 @@ getMarkableElements = (window, viewport, wrappers, filter, parents = []) ->
     continue unless rects.length > 0
     continue unless wrapper = filter(
       element, (elementArg) ->
-        return getElementShape(window, viewport, parents, elementArg,
-                               if elementArg == element then rects else null)
+        return getElementShape(
+          window, viewport, parents, elementArg,
+          if elementArg == element then rects else null
+        )
     )
     wrappers.push(wrapper)
 
@@ -196,8 +198,9 @@ getMarkableElements = (window, viewport, wrappers, filter, parents = []) ->
         parseFloat(computedStyle.getPropertyValue('padding-top'))
     }
 
-    getMarkableElements(frame, frameViewport, wrappers, filter,
-                        parents.concat({window, offset}))
+    getMarkableElements(
+      frame, frameViewport, wrappers, filter, parents.concat({window, offset})
+    )
 
   return
 
@@ -271,8 +274,9 @@ getElementShape = (window, viewport, parents, element, rects = null) ->
 
   # Even if `element` has a visible rect, it might be covered by other elements.
   for visibleRect in visibleRects
-    nonCoveredPoint = getFirstNonCoveredPoint(window, viewport, element,
-                                              visibleRect, parents)
+    nonCoveredPoint = getFirstNonCoveredPoint(
+      window, viewport, element, visibleRect, parents
+    )
     break if nonCoveredPoint
 
   return null unless nonCoveredPoint

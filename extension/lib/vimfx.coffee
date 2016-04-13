@@ -225,8 +225,9 @@ createKeyTrees = (groupedCommands, specialKeysSpec) ->
         for prefixKey, index in prefixKeys
           if prefixKey of specialKeysSpec
             if seenNonSpecialKey
-              pushSpecialKeyError(command, 'prefix_only', shortcut.original,
-                                  prefixKey)
+              pushSpecialKeyError(
+                command, 'prefix_only', shortcut.original, prefixKey
+              )
               errored = true
               break
             else
@@ -236,8 +237,9 @@ createKeyTrees = (groupedCommands, specialKeysSpec) ->
             for specialKey of specialKeys
               options = specialKeysSpec[specialKey]
               if options.single
-                pushSpecialKeyError(command, 'single_only', shortcut.original,
-                                    specialKey)
+                pushSpecialKeyError(
+                  command, 'single_only', shortcut.original, specialKey
+                )
                 errored = true
                 break
             break if errored
@@ -257,8 +259,9 @@ createKeyTrees = (groupedCommands, specialKeysSpec) ->
 
         if lastKey of specialKeysSpec
           subject = if seenNonSpecialKey then lastKey else shortcut.original
-          pushSpecialKeyError(command, 'prefix_only', shortcut.original,
-                              subject)
+          pushSpecialKeyError(
+            command, 'prefix_only', shortcut.original, subject
+          )
           continue
         if lastKey of tree
           pushOverrideErrors(command, shortcut.original, tree[lastKey])

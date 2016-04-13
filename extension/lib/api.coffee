@@ -61,22 +61,29 @@ createConfigAPI = (vimfx) -> {
     order ?= counter.tick()
 
     unless typeof name == 'string'
-      throw new Error("VimFx: A command name as a string is required.
-                       Got: #{name}")
+      throw new Error(
+        "VimFx: A command name as a string is required. Got: #{name}"
+      )
     unless /^[a-z_]+$/.test(name)
-      throw new Error("VimFx: Command names should only consist of a-z
-                       (lowercase) and underscores. Got: #{name}")
+      throw new Error(
+        "VimFx: Command names should only consist of a-z (lowercase) and
+         underscores. Got: #{name}"
+      )
     unless typeof description == 'string' and description != ''
-      throw new Error("VimFx: Commands must have a non-empty description.
-                       Got: #{description}")
+      throw new Error(
+        "VimFx: Commands must have a non-empty description. Got: #{description}"
+      )
     unless utils.has(vimfx.modes, mode)
       modes = Object.keys(vimfx.modes).join(', ')
-      throw new Error("VimFx: Unknown mode. Available modes are: #{modes}.
-                       Got: #{mode}")
+      throw new Error(
+        "VimFx: Unknown mode. Available modes are: #{modes}. Got: #{mode}"
+      )
     unless utils.has(vimfx.options.categories, category)
       categories = Object.keys(vimfx.options.categories).join(', ')
-      throw new Error("VimFx: Unknown category. Available categories are:
-                       #{categories}. Got: #{category}")
+      throw new Error(
+        "VimFx: Unknown category. Available categories are: #{categories}.
+         Got: #{category}"
+      )
     unless typeof order == 'number'
       throw new Error("VimFx: Command order must be a number. Got: #{order}")
     unless typeof fn == 'function'
@@ -113,18 +120,22 @@ createConfigAPI = (vimfx) -> {
 
   send: (vim, message, data = null, callback = null) ->
     unless vim instanceof Vim
-      throw new Error("VimFx: The first argument must be a vim object.
-                       Got: #{vim}")
+      throw new Error(
+        "VimFx: The first argument must be a vim object. Got: #{vim}"
+      )
     unless typeof message == 'string'
-      throw new Error("VimFx: The second argument must be a message string.
-                       Got: #{message}")
+      throw new Error(
+        "VimFx: The second argument must be a message string. Got: #{message}"
+      )
     if typeof data == 'function'
-      throw new Error("VimFx: The third argument must not be a function.
-                       Got: #{data}")
+      throw new Error(
+        "VimFx: The third argument must not be a function. Got: #{data}"
+      )
 
     unless typeof callback == 'function' or callback == null
-      throw Error("VimFx: If provided, `callback` must be a function.
-                   Got: #{callback}")
+      throw Error(
+        "VimFx: If provided, `callback` must be a function. Got: #{callback}"
+      )
     vim._send(message, data, callback, {prefix: 'config:'})
 
   on: (event, listener) ->

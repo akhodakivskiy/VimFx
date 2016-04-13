@@ -60,8 +60,10 @@ set = (branch, key, value) ->
       if value == null
         branch.clearUserPref(key)
       else
-        throw new Error("VimFx: Prefs may only be set to a boolean, number,
-                         string or null. Got: #{typeof value}")
+        throw new Error(
+          "VimFx: Prefs may only be set to a boolean, number, string or null.
+           Got: #{typeof value}"
+        )
 
 has = (branch, key) ->
   branch.prefHasUserValue(key)

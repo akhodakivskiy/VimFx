@@ -20,7 +20,11 @@
 utils = require('../lib/utils')
 
 exports['test removeDuplicates'] = (assert) ->
-  assert.deepEqual(utils.removeDuplicates([1, 1, 2, 1, 3, 2]),
-                                          [1, 2, 3])
-  assert.deepEqual(utils.removeDuplicates(['a', 'b', 'c', 'b', 'd', 'a']),
-                                          ['a', 'b', 'c', 'd'])
+  assert.deepEqual(utils.removeDuplicates(
+    [1, 1, 2, 1, 3, 2]),
+    [1, 2, 3]
+  )
+  assert.deepEqual(utils.removeDuplicates(
+    ['a', 'b', 'c', 'b', 'd', 'a']),
+    ['a', 'b', 'c', 'd']
+  )

@@ -110,8 +110,9 @@ class Vim
 
     unless utils.has(@_parent.modes, mode)
       modes = Object.keys(@_parent.modes).join(', ')
-      throw new Error("VimFx: Unknown mode. Available modes are: #{modes}.
-                       Got: #{mode}")
+      throw new Error(
+        "VimFx: Unknown mode. Available modes are: #{modes}. Got: #{mode}"
+      )
 
     @_call('onLeave') if @mode?
     @mode = mode

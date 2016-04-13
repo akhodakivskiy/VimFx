@@ -139,8 +139,9 @@ rotateOverlappingMarkers = (originalMarkers, forward) ->
   # be skipped.
   for stack in stacks when stack.length > 1
     # This sort is not required, but makes the rotation more predictable.
-    stack.sort((a, b) -> a.markerElement.style.zIndex -
-                         b.markerElement.style.zIndex)
+    stack.sort((a, b) ->
+      return a.markerElement.style.zIndex - b.markerElement.style.zIndex
+    )
 
     # Array of z-indices.
     indexStack = (marker.markerElement.style.zIndex for marker in stack)

@@ -145,8 +145,10 @@ helper_scroll = (vim, uiEvent, args...) ->
   ] = args
   options = {
     method, type, directions, amounts, properties, adjustment
-    smooth: (prefs.root.get('general.smoothScroll') and
-             prefs.root.get("general.smoothScroll.#{type}"))
+    smooth: (
+      prefs.root.get('general.smoothScroll') and
+      prefs.root.get("general.smoothScroll.#{type}")
+    )
   }
   reset = prefs.root.tmp(
     'layout.css.scroll-behavior.spring-constant',
@@ -166,28 +168,34 @@ helper_scroll = (vim, uiEvent, args...) ->
 
 helper_scrollByLinesX = (amount, {vim, uiEvent, count = 1}) ->
   distance = prefs.root.get('toolkit.scrollbox.horizontalScrollDistance')
-  helper_scroll(vim, uiEvent, 'scrollBy', 'lines', ['left'],
-                [amount * distance * count * 5])
+  helper_scroll(
+    vim, uiEvent, 'scrollBy', 'lines', ['left'], [amount * distance * count * 5]
+  )
 
 helper_scrollByLinesY = (amount, {vim, uiEvent, count = 1}) ->
   distance = prefs.root.get('toolkit.scrollbox.verticalScrollDistance')
-  helper_scroll(vim, uiEvent, 'scrollBy', 'lines', ['top'],
-                [amount * distance * count * 20])
+  helper_scroll(
+    vim, uiEvent, 'scrollBy', 'lines', ['top'], [amount * distance * count * 20]
+  )
 
 helper_scrollByPagesY = (amount, type, {vim, uiEvent, count = 1}) ->
   adjustment = vim.options["scroll.#{type}_page_adjustment"]
-  helper_scroll(vim, uiEvent, 'scrollBy', 'pages', ['top'],
-                [amount * count], ['clientHeight'], adjustment)
+  helper_scroll(
+    vim, uiEvent, 'scrollBy', 'pages', ['top'], [amount * count],
+    ['clientHeight'], adjustment
+  )
 
 helper_scrollToX = (amount, {vim, uiEvent}) ->
   helper_mark_last_scroll_position(vim)
-  helper_scroll(vim, uiEvent, 'scrollTo', 'other', ['left'],
-                [amount], ['scrollLeftMax'])
+  helper_scroll(
+    vim, uiEvent, 'scrollTo', 'other', ['left'], [amount], ['scrollLeftMax']
+  )
 
 helper_scrollToY = (amount, {vim, uiEvent}) ->
   helper_mark_last_scroll_position(vim)
-  helper_scroll(vim, uiEvent, 'scrollTo', 'other', ['top'],
-                [amount], ['scrollTopMax'])
+  helper_scroll(
+    vim, uiEvent, 'scrollTo', 'other', ['top'], [amount], ['scrollTopMax']
+  )
 
 commands.scroll_left           = helper_scrollByLinesX.bind(null, -1)
 commands.scroll_right          = helper_scrollByLinesX.bind(null, +1)
@@ -214,8 +222,10 @@ commands.scroll_to_mark = ({vim}) ->
   vim.enterMode('marks', (keyStr) ->
     unless keyStr == vim.options['scroll.last_position_mark']
       helper_mark_last_scroll_position(vim)
-    helper_scroll(vim, null, 'scrollTo', 'other', ['top', 'left'], keyStr,
-                  ['scrollTopMax', 'scrollLeftMax'], 0, 'scroll_to_mark')
+    helper_scroll(
+      vim, null, 'scrollTo', 'other', ['top', 'left'], keyStr,
+      ['scrollTopMax', 'scrollLeftMax'], 0, 'scroll_to_mark'
+    )
   )
   vim.notify(translate('notification.scroll_to_mark.enter'))
 
@@ -400,8 +410,9 @@ helper_follow = (name, vim, callback, count = null) ->
   # press keys before the `vim._run` callback is invoked. Those key presses
   # should be handled in hints mode, not normal mode.
   initialMarkers = []
-  storage = vim.enterMode('hints', initialMarkers, callback, count,
-                          vim.options.hints_sleep)
+  storage = vim.enterMode(
+    'hints', initialMarkers, callback, count, vim.options.hints_sleep
+  )
 
   vim._run(name, null, ({wrappers, viewport}) ->
     # The user might have exited hints mode (and perhaps even entered it again)
@@ -410,8 +421,9 @@ helper_follow = (name, vim, callback, count = null) ->
     return unless storage.markers == initialMarkers
 
     if wrappers.length > 0
-      {markers, markerMap} = hints.injectHints(vim.window, wrappers, viewport,
-                                               vim.options)
+      {markers, markerMap} = hints.injectHints(
+        vim.window, wrappers, viewport, vim.options
+      )
       storage.markers = markers
       storage.markerMap = markerMap
     else

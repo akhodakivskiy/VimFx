@@ -1,5 +1,5 @@
 ###
-# Copyright Simon Lydell 2015.
+# Copyright Simon Lydell 2015, 2016.
 #
 # This file is part of VimFx.
 #
@@ -54,8 +54,11 @@ injectButton = (vimfx) ->
       if vim.mode == 'normal'
         translate('button.tooltip.normal')
       else
-        translate('button.tooltip.other_mode',
-                  translate("mode.#{vim.mode}"), translate('mode.normal'))
+        translate(
+          'button.tooltip.other_mode',
+          translate("mode.#{vim.mode}"),
+          translate('mode.normal')
+        )
     button.setAttribute('tooltiptext', tooltip)
   )
 

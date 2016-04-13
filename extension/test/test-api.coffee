@@ -270,8 +270,9 @@ exports['test vimfx.addKeyOverrides'] = (assert, $vimfx, teardown) ->
   $vimfx.createKeyTrees()
   $vimfx.reset('normal')
 
-  match = $vimfx.consumeKeyEvent({key: 'j'},
-                                 {mode: 'ignore', focusType: 'none'})
+  match = $vimfx.consumeKeyEvent(
+    {key: 'j'}, {mode: 'ignore', focusType: 'none'}
+  )
   assert.ok(match)
 
   resetGetCurrentLocation = testUtils.stub(utils, 'getCurrentLocation', -> {
@@ -279,47 +280,63 @@ exports['test vimfx.addKeyOverrides'] = (assert, $vimfx, teardown) ->
     href: 'about:blank'
   })
 
-  match = $vimfx.consumeKeyEvent({key: '1'},
-                                 {mode: 'normal', focusType: 'none'})
+  match = $vimfx.consumeKeyEvent(
+    {key: '1'}, {mode: 'normal', focusType: 'none'}
+  )
   assert.equal(match.type, 'count')
   assert.equal(match.count, 1)
 
-  match = $vimfx.consumeKeyEvent({key: 'j'},
-                                 {mode: 'normal', focusType: 'none'})
+  match = $vimfx.consumeKeyEvent(
+    {key: 'j'}, {mode: 'normal', focusType: 'none'}
+  )
   assert.ok(not match)
 
-  match = $vimfx.consumeKeyEvent({key: 'foobar', ctrlKey: true},
-                                 {mode: 'normal', focusType: 'none'})
+  match = $vimfx.consumeKeyEvent(
+    {key: 'foobar', ctrlKey: true},
+    {mode: 'normal', focusType: 'none'}
+  )
   assert.ok(not match)
 
-  match = $vimfx.consumeKeyEvent({key: 'foobar'},
-                                 {mode: 'normal', focusType: 'none'})
+  match = $vimfx.consumeKeyEvent(
+    {key: 'foobar'},
+    {mode: 'normal', focusType: 'none'}
+  )
   assert.equal(match.type, 'partial')
-  match = $vimfx.consumeKeyEvent({key: 'j'},
-                                 {mode: 'normal', focusType: 'none'})
+  match = $vimfx.consumeKeyEvent(
+    {key: 'j'},
+    {mode: 'normal', focusType: 'none'}
+  )
   assert.equal(match.type, 'full')
   assert.strictEqual(match.count, undefined)
 
   $vimfx.reset('ignore')
 
-  match = $vimfx.consumeKeyEvent({key: 'j'},
-                                 {mode: 'ignore', focusType: 'none'})
+  match = $vimfx.consumeKeyEvent(
+    {key: 'j'},
+    {mode: 'ignore', focusType: 'none'}
+  )
   assert.ok(match)
 
-  match = $vimfx.consumeKeyEvent({key: 'escape'},
-                                 {mode: 'ignore', focusType: 'none'})
+  match = $vimfx.consumeKeyEvent(
+    {key: 'escape'},
+    {mode: 'ignore', focusType: 'none'}
+  )
   assert.ok(not match)
 
   $vimfx.emit('shutdown')
 
   $vimfx.reset('normal')
-  match = $vimfx.consumeKeyEvent({key: 'j'},
-                                 {mode: 'normal', focusType: 'none'})
+  match = $vimfx.consumeKeyEvent(
+    {key: 'j'},
+    {mode: 'normal', focusType: 'none'}
+  )
   assert.ok(match)
 
   $vimfx.reset('ignore')
-  match = $vimfx.consumeKeyEvent({key: 'escape'},
-                                 {mode: 'ignore', focusType: 'none'})
+  match = $vimfx.consumeKeyEvent(
+    {key: 'escape'},
+    {mode: 'ignore', focusType: 'none'}
+  )
   assert.ok(match)
 
 exports['test vimfx.send'] = (assert, $vimfx) ->
