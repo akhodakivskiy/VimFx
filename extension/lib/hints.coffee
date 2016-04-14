@@ -234,7 +234,7 @@ getRects = (element, viewport) ->
   # rectangle for each line, since each line may be of different length, for
   # example. That allows us to properly add hints to line-wrapped links.
   return Array.filter(
-    element.getClientRects(), (rect) -> isInsideViewport(viewport, rect)
+    element.getClientRects(), (rect) -> isInsideViewport(rect, viewport)
   )
 
 # Returns the “shape” of `element`:
