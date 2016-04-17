@@ -119,6 +119,7 @@ mode('hints', {
     storage.callback = callback
     storage.count = count
     storage.numEnteredChars = 0
+    storage.markEverything = null
 
     if sleep >= 0
       storage.clearInterval = utils.interval(vim.window, sleep, (next) ->
@@ -204,6 +205,9 @@ mode('hints', {
     storage.numEnteredChars -= 1 unless storage.numEnteredChars == 0
 
   increase_count: ({storage}) -> storage.count += 1
+
+  mark_everything: ({storage}) ->
+    storage.markEverything?()
 })
 
 

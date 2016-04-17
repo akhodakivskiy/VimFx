@@ -118,6 +118,7 @@ shortcuts =
       '<s-space>':       'rotate_markers_backward'
       '<backspace>':     'delete_hint_char'
       '<enter>':         'increase_count'
+      '<c-a>':           'mark_everything'
 
   'ignore':
     '':

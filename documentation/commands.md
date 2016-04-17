@@ -281,6 +281,12 @@ like `F`.
 (Also see the advanced prefs [hints\_toggle\_in\_tab] and
 [hints\_toggle\_in\_background].)
 
+Finally, if the element you wanted to interact with didn’t get a hint marker you
+can try pressing `<c-a>` while the hints are still shown. That will give hint
+markers to _every_ element on screen. Warning: This can be very slow, and result
+in an overwhelming amount of hint markers. See this as an escape hatch if you
+_really_ want to avoid using the mouse at all costs.
+
 [hint-matcher]: api.md#vimfxhintmatcher
 [hint chars]: options.md#hint-chars
 [Styling]: styling.md

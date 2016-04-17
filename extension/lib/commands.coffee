@@ -414,12 +414,7 @@ helper_follow = (name, vim, callback, count = null) ->
     'hints', initialMarkers, callback, count, vim.options.hints_sleep
   )
 
-  vim._run(name, null, ({wrappers, viewport}) ->
-    # The user might have exited hints mode (and perhaps even entered it again)
-    # before this callback is invoked. If so, `storage.markers` has been
-    # cleared, or set to a new value. Only proceed if it is unchanged.
-    return unless storage.markers == initialMarkers
-
+  setMarkers = ({wrappers, viewport}) ->
     if wrappers.length > 0
       {markers, markerMap} = hints.injectHints(
         vim.window, wrappers, viewport, vim.options
@@ -429,6 +424,19 @@ helper_follow = (name, vim, callback, count = null) ->
     else
       vim.notify(translate('notification.follow.none'))
       vim.enterMode('normal')
+
+  vim._run(name, {}, (result) ->
+    # The user might have exited hints mode (and perhaps even entered it again)
+    # before this callback is invoked. If so, `storage.markers` has been
+    # cleared, or set to a new value. Only proceed if it is unchanged.
+    return unless storage.markers == initialMarkers
+    setMarkers(result)
+    storage.markEverything = ->
+      lastMarkers = storage.markers
+      vim._run(name, {markEverything: true}, (newResult) ->
+        return unless storage.markers == lastMarkers
+        setMarkers(newResult)
+      )
   )
 
 helper_follow_clickable = (options, {vim, count = 1}) ->
@@ -486,7 +494,8 @@ commands.follow_in_focused_tab =
 commands.follow_in_window = ({vim}) ->
   callback = (marker) ->
     vim._focusMarkerElement(marker.wrapper.elementIndex)
-    vim.window.openLinkIn(marker.wrapper.href, 'window', {})
+    {href} = marker.wrapper
+    vim.window.openLinkIn(href, 'window', {}) if href
   helper_follow('follow_in_tab', vim, callback)
 
 commands.follow_multiple = (args) ->
@@ -501,7 +510,7 @@ commands.follow_copy = ({vim}) ->
         'href'
       when 'text'
         'value'
-      when 'contenteditable'
+      when 'contenteditable', 'other'
         'textContent'
     vim._run('copy_marker_element', {elementIndex, property})
   helper_follow('follow_copy', vim, callback)
@@ -514,25 +523,31 @@ commands.follow_focus = ({vim}) ->
 commands.click_browser_element = ({vim}) ->
   markerElements = []
 
-  filter = (element, getElementShape) ->
+  filter = ({markEverything}, element, getElementShape) ->
     document = element.ownerDocument
+    semantic = true
     type = switch
       when vim._state.scrollableElements.has(element)
         'scrollable'
       when utils.isFocusable(element) or
            (element.onclick and element.localName != 'statuspanel')
         'clickable'
+
+    if markEverything and not type
+      type = 'other'
+      semantic = false
+
     return unless type
     return unless shape = getElementShape(element)
     length = markerElements.push(element)
-    return {type, semantic: true, shape, elementIndex: length - 1}
+    return {type, semantic, shape, elementIndex: length - 1}
 
   callback = (marker) ->
     element = markerElements[marker.wrapper.elementIndex]
     switch marker.wrapper.type
       when 'scrollable'
         utils.focusElement(element, {flag: 'FLAG_BYKEY'})
-      when 'clickable'
+      when 'clickable', 'other'
         sequence =
           if element.localName == 'tab'
             ['mousedown']
@@ -541,15 +556,24 @@ commands.click_browser_element = ({vim}) ->
         utils.focusElement(element)
         utils.simulateMouseEvents(element, sequence)
 
-  {wrappers, viewport} =
-    hints.getMarkableElementsAndViewport(vim.window, filter)
-
-  if wrappers.length > 0
+  createMarkers = ({wrappers, viewport}) ->
     {markers} = hints.injectHints(vim.window, wrappers, viewport, {
       hint_chars: vim.options.hint_chars
       ui: true
     })
-    vim.enterMode('hints', markers, callback)
+    return markers
+
+  result = hints.getMarkableElementsAndViewport(
+    vim.window, filter.bind(null, {markEverything: false})
+  )
+
+  if result.wrappers.length > 0
+    storage = vim.enterMode('hints', createMarkers(result), callback)
+    storage.markEverything = ->
+      newResult = hints.getMarkableElementsAndViewport(
+        vim.window, filter.bind(null, {markEverything: true})
+      )
+      storage.markers = createMarkers(newResult)
   else
     vim.notify(translate('notification.follow.none'))
 

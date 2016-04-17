@@ -86,12 +86,17 @@ commands.scroll_to_mark = (args) ->
   element = vim.state.scrollableElements.filterSuitableDefault()
   utils.scroll(element, args)
 
-helper_follow = ({id, combine = true}, matcher, {vim}) ->
+helper_follow = ({id, combine = true}, matcher, args) ->
+  {vim, markEverything = false} = args
   hrefs = {}
   vim.state.markerElements = []
 
   filter = (element, getElementShape) ->
     {type, semantic} = matcher({vim, element, getElementShape})
+
+    if markEverything and not type
+      type = 'other'
+      semantic = false
 
     if vim.hintMatcher
       {type, semantic} = vim.hintMatcher(id, element, {type, semantic})
