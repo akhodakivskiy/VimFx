@@ -778,7 +778,7 @@ The available type strings depend on `id`:
   - scrollable: Like “scrollable” when `id` is “normal” (see above).
 
 The type string can also be `'other'`, regardless of what `id` is. That is the
-case for elements for markers added by the `<c-a>` Hints mode command.
+case for elements for markers added by the `<c-enter>` Hints mode command.
 
 The function must return an object like the `info` parameter (with the `type`
 and `semantic` properties).
