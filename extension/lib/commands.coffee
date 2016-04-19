@@ -604,6 +604,29 @@ commands.focus_text_input = ({vim, count}) ->
   vim.markPageInteraction()
   vim._run('focus_text_input', {count})
 
+helper_follow_selectable = ({select}, {vim}) ->
+  callback = (marker) ->
+    vim._run('element_text_select', {
+      elementIndex: marker.wrapper.elementIndex
+      full: select
+    })
+    vim.enterMode('caret', select)
+  helper_follow('follow_selectable', vim, callback)
+
+commands.element_text_caret =
+  helper_follow_selectable.bind(null, {select: false})
+
+commands.element_text_select =
+  helper_follow_selectable.bind(null, {select: true})
+
+commands.element_text_copy = ({vim}) ->
+  callback = (marker) ->
+    vim._run('copy_marker_element', {
+      elementIndex: marker.wrapper.elementIndex
+      property: 'textContent'
+    })
+  helper_follow('follow_selectable', vim, callback)
+
 
 
 findStorage = {lastSearchString: ''}

@@ -33,8 +33,11 @@ These are the modes of VimFx:
   make sense to [enter Ignore mode by default][blacklist] and stay in Ignore
   mode most of the time, occasionally popping into Normal mode.
 
-- Hints mode. Entered when using the [`f` commands][f-commands] and let’s click
-  things by typing the letters of hint markers.
+- Hints mode. Entered when using the [`f` commands][f-commands] and lets you
+  click things by typing the letters of hint markers.
+
+- Caret mode. Entered when using some of the [`v` commands][v-commands] and lets
+  you copy text using the keyboard.
 
 If you’re unsure which mode you’re in, have a look at VimFx’s toolbar [button].
 
@@ -69,4 +72,5 @@ Note that the mode is per tab, not global.
 [autofocus prevention]: options.md#prevent-autofocus
 [shortcut]: shortcuts.md
 [f-commands]: commands.md#the-f-commands--hints-mode
+[v-commands]: commands.md#the-v-commands--caret-mode
 [button]: button.md

@@ -207,11 +207,14 @@ class FrameEventManager
           @vim.state.hasInteraction = false
         return
 
-      # Save the last focused text input regardless of whether that input might
-      # be blurred because of autofocus prevention.
       if utils.isTextInputElement(target)
+        # Save the last focused text input regardless of whether that input
+        # might be blurred because of autofocus prevention.
         @vim.state.lastFocusedTextInput = target
         @vim.state.hasFocusedTextInput = true
+
+        if @vim.mode == 'caret' and not utils.isContentEditable(target)
+          @vim.enterMode('normal')
 
       # Blur the focus target, if autofocus prevention is enabled…
       if prefs.get('prevent_autofocus') and

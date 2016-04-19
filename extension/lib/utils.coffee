@@ -318,6 +318,16 @@ simulateMouseEvents = (element, sequence) ->
 area = (element) ->
   return element.clientWidth * element.clientHeight
 
+clearSelectionDeep = (window) ->
+  # The selection might be `null` in hidden frames.
+  selection = window.getSelection()
+  selection?.removeAllRanges()
+  for frame in window.frames
+    clearSelectionDeep(frame)
+    # Allow parents to re-gain control of text selection.
+    frame.frameElement.blur()
+  return
+
 containsDeep = (parent, element) ->
   parentWindow = parent.ownerGlobal
   elementWindow = element.ownerGlobal
@@ -336,6 +346,16 @@ createBox = (document, className = '', parent = null, text = null) ->
   box.textContent = text if text?
   parent.appendChild(box) if parent?
   return box
+
+getFirstNonWhitespace = (element) ->
+  for node in element.childNodes then switch node.nodeType
+    when 3 # TextNode.
+      offset = node.data.search(/\S/)
+      return [node, offset] if offset >= 0
+    when 1 # Element
+      result = getFirstNonWhitespace(node)
+      return result if result
+  return null
 
 getFrameViewport = (frame, parentViewport) ->
   rect = frame.getBoundingClientRect()
@@ -644,10 +664,12 @@ module.exports = {
   simulateMouseEvents
 
   area
+  clearSelectionDeep
   containsDeep
   createBox
-  getRootElement
+  getFirstNonWhitespace
   getFrameViewport
+  getRootElement
   getViewportCappedClientHeight
   getWindowViewport
   injectTemporaryPopup

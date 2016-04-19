@@ -23,6 +23,8 @@
 # few more generalized “commands” used in more than one place.
 
 hints = require('./hints')
+prefs = require('./prefs')
+SelectionManager = require('./selection')
 translate = require('./l10n')
 utils = require('./utils')
 
@@ -286,6 +288,20 @@ commands.follow_focus = helper_follow.bind(null, {id: 'focus', combine: false},
     return {type, semantic: true}
 )
 
+commands.follow_selectable = helper_follow.bind(null, {id: 'selectable'},
+  ({element}) ->
+    isRelevantTextNode = (node) ->
+      # Ignore whitespace-only text nodes, and single-letter ones (which are
+      # common in many syntax highlighters).
+      return node.nodeType == 3 and node.data.trim().length > 1
+    type =
+      if Array.some(element.childNodes, isRelevantTextNode)
+        'selectable'
+      else
+        null
+    return {type, semantic: true}
+)
+
 commands.focus_marker_element = ({vim, elementIndex, options}) ->
   {element} = vim.state.markerElements[elementIndex]
   # To be able to focus scrollable elements, `FLAG_BYKEY` _has_ to be used.
@@ -315,6 +331,46 @@ commands.click_marker_element = (args) ->
 commands.copy_marker_element = ({vim, elementIndex, property}) ->
   {element} = vim.state.markerElements[elementIndex]
   utils.writeToClipboard(element[property])
+
+commands.element_text_select = ({vim, elementIndex, full}) ->
+  {element} = vim.state.markerElements[elementIndex]
+  window = element.ownerGlobal
+  selection = window.getSelection()
+  range = window.document.createRange()
+
+  if full
+    range.selectNodeContents(element)
+
+    # Try to scroll the element into view, but keep the caret visible.
+    viewport = viewportUtils.getWindowViewport(window)
+    rect = element.getBoundingClientRect()
+    block = switch
+      when rect.bottom > viewport.bottom
+        'end'
+      when rect.top < viewport.top and rect.height < viewport.height
+        'start'
+      else
+        null
+    if block
+      smooth = (
+        prefs.root.get('general.smoothScroll') and
+        prefs.root.get('general.smoothScroll.other')
+      )
+      element.scrollIntoView({
+        block
+        behavior: if smooth then 'smooth' else 'instant'
+      })
+
+  else
+    result = utils.getFirstNonWhitespace(element)
+    return unless result
+    [node, offset] = result
+    range.setStart(node, offset)
+    range.setEnd(node, offset)
+
+  utils.clearSelectionDeep(vim.content)
+  window.focus()
+  selection.addRange(range)
 
 commands.follow_pattern = ({vim, type, options}) ->
   {document} = vim.content
@@ -423,6 +479,7 @@ commands.esc = (args) ->
   {vim} = args
   commands.blur_active_element(args)
   vim.clearHover()
+  utils.clearSelectionDeep(vim.content)
 
   {document} = vim.content
   if document.exitFullscreen
@@ -433,5 +490,45 @@ commands.esc = (args) ->
 commands.blur_active_element = ({vim}) ->
   vim.state.explicitBodyFocus = false
   utils.blurActiveElement(vim.content)
+
+helper_create_selection_manager = (vim) ->
+  window = utils.getActiveElement(vim.content)?.ownerGlobal ? vim.content
+  return new SelectionManager(window)
+
+commands.enable_caret = ({vim}) ->
+  return unless selectionManager = helper_create_selection_manager(vim)
+  selectionManager.enableCaret()
+
+commands.move_caret = ({vim, method, direction, select, count}) ->
+  return unless selectionManager = helper_create_selection_manager(vim)
+  for [0...count] by 1
+    if selectionManager[method]
+      error = selectionManager[method](direction, select)
+    else
+      error = selectionManager.moveCaret(method, direction, select)
+    break if error
+  return
+
+commands.toggle_selection = ({vim, select}) ->
+  return unless selectionManager = helper_create_selection_manager(vim)
+  if select
+    vim.notify(translate('notification.toggle_selection.enter'))
+  else
+    selectionManager.collapse()
+
+commands.toggle_selection_direction = ({vim}) ->
+  return unless selectionManager = helper_create_selection_manager(vim)
+  selectionManager.reverseDirection()
+
+commands.get_selection = ({vim}) ->
+  return unless selectionManager = helper_create_selection_manager(vim)
+  return selectionManager.selection.toString()
+
+commands.collapse_selection = ({vim}) ->
+  return unless selectionManager = helper_create_selection_manager(vim)
+  selectionManager.collapse()
+
+commands.clear_selection = ({vim}) ->
+  utils.clearSelectionDeep(vim.content)
 
 module.exports = commands

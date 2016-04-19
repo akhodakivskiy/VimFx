@@ -28,7 +28,12 @@ help = require('./help')
 hints = require('./hints')
 translate = require('./l10n')
 {rotateOverlappingMarkers} = require('./marker')
+prefs = require('./prefs')
+SelectionManager = require('./selection')
 utils = require('./utils')
+
+{FORWARD, BACKWARD} = SelectionManager
+CARET_BROWSING_PREF = 'accessibility.browsewithcaret'
 
 # Helper to create modes in a DRY way.
 mode = (modeName, obj, commands = null) ->
@@ -112,6 +117,83 @@ mode('normal', {
 
 
 
+helper_move_caret = (method, direction, {vim, storage, count = 1}) ->
+  vim._run('move_caret', {
+    method, direction, select: storage.select
+    count: if method == 'intraLineMove' then 1 else count
+  })
+
+mode('caret', {
+  onEnter: ({vim, storage}, select = false) ->
+    storage.select = select
+    storage.caretBrowsingPref = prefs.root.get(CARET_BROWSING_PREF)
+    prefs.root.set(CARET_BROWSING_PREF, true)
+    vim._run('enable_caret')
+
+    listener = ->
+      return unless newVim = vim._parent.getCurrentVim(vim.window)
+      prefs.root.set(
+        CARET_BROWSING_PREF,
+        if newVim.mode == 'caret' then true else storage.caretBrowsingPref
+      )
+    vim._parent.on('TabSelect', listener)
+    storage.removeListener = -> vim._parent.off('TabSelect', listener)
+
+  onLeave: ({vim, storage}) ->
+    prefs.root.set(CARET_BROWSING_PREF, storage.caretBrowsingPref)
+    vim._run('clear_selection')
+    storage.removeListener?()
+    storage.removeListener = null
+
+  onInput: (args, match) ->
+    {vim, storage} = args
+    if match.type == 'full'
+      match.command.run(args)
+      return true
+    return false
+
+}, {
+  # coffeelint: disable=colon_assignment_spacing
+  move_left:          helper_move_caret.bind(null, 'characterMove',    BACKWARD)
+  move_right:         helper_move_caret.bind(null, 'characterMove',    FORWARD)
+  move_down:          helper_move_caret.bind(null, 'lineMove',         FORWARD)
+  move_up:            helper_move_caret.bind(null, 'lineMove',         BACKWARD)
+  move_word_left:     helper_move_caret.bind(null, 'wordMoveAdjusted', BACKWARD)
+  move_word_right:    helper_move_caret.bind(null, 'wordMoveAdjusted', FORWARD)
+  move_to_line_start: helper_move_caret.bind(null, 'intraLineMove',    BACKWARD)
+  move_to_line_end:   helper_move_caret.bind(null, 'intraLineMove',    FORWARD)
+  # coffeelint: enable=colon_assignment_spacing
+
+  toggle_selection: ({vim, storage}) ->
+    storage.select = not storage.select
+    if storage.select
+      vim.notify(translate('notification.toggle_selection.enter'))
+    else
+      vim._run('collapse_selection')
+
+  toggle_selection_direction: ({vim}) ->
+    vim._run('toggle_selection_direction')
+
+  copy_selection_and_exit: ({vim}) ->
+    vim._run('get_selection', null, (selection) ->
+      # If the selection consists of newlines only, it _looks_ as if the
+      # selection is collapsed, so don’t try to copy it in that case.
+      if /^\n*$/.test(selection)
+        vim.notify(translate('notification.copy_selection_and_exit.none'))
+      else
+        # Trigger this copying command instead of putting `selection` into the
+        # clipboard, since `window.getSelection().toString()` sadly collapses
+        # whitespace in `<pre>` elements.
+        vim.window.goDoCommand('cmd_copy')
+        vim.enterMode('normal')
+    )
+
+  exit: ({vim}) ->
+    vim.enterMode('normal')
+})
+
+
+
 mode('hints', {
   onEnter: ({vim, storage}, markers, callback, count = 1, sleep = -1) ->
     storage.markers = markers
@@ -176,7 +258,9 @@ mode('hints', {
           marker.reset() for marker in markers
           storage.numEnteredChars = 0
         else
-          vim.enterMode('normal')
+          # The callback might have entered another mode. Only go back to Normal
+          # mode if we’re still in Hints mode.
+          vim.enterMode('normal') if vim.mode == 'hints'
       else
         storage.numEnteredChars += 1
 

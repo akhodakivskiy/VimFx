@@ -32,7 +32,8 @@ that matter, some other way.)
 
 Other [modes] are easily detectable. You know that you’re in Find mode if the
 find bar is focused. If there are hint markers visible for the page, you’re in
-Hints mode.
+Hints mode. Finally, if there’s a blinking caret outside a text input, you’re in
+Caret mode.
 
 A quick takeaway from this part of the documentation: **If you don’t know what’s
 going on, look for VimFx’s toolbar button.** It can often help you.

@@ -92,6 +92,9 @@ shortcuts =
       '[':         'follow_previous'
       ']':         'follow_next'
       'gi':        'focus_text_input'
+      'v':         'element_text_caret'
+      'zv':        'element_text_select'
+      'yv':        'element_text_copy'
 
     'find':
       '/':         'find'
@@ -110,6 +113,21 @@ shortcuts =
       '?':         'help'
       ':':         'dev'
       '<force><escape>': 'esc'
+
+  'caret':
+    '':
+      'h':         'move_left'
+      'l':         'move_right'
+      'j':         'move_down'
+      'k':         'move_up'
+      'b':         'move_word_left'
+      'w':         'move_word_right'
+      '0    ^':    'move_to_line_start'
+      '$':         'move_to_line_end'
+      'v':         'toggle_selection'
+      'o':         'toggle_selection_direction'
+      'y':         'copy_selection_and_exit'
+      '<escape>':  'exit'
 
   'hints':
     '':

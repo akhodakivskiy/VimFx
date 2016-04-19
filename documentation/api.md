@@ -777,6 +777,10 @@ The available type strings depend on `id`:
   - focusable: Any focusable element not falling into another category.
   - scrollable: Like “scrollable” when `id` is “normal” (see above).
 
+- select:
+
+  - selectable: An element with selectable text (but not text inputs).
+
 The type string can also be `'other'`, regardless of what `id` is. That is the
 case for elements for markers added by the `<c-enter>` Hints mode command.
 

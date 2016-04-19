@@ -294,6 +294,100 @@ you _really_ want to avoid using the mouse at all costs.
 [hints\_toggle\_in\_background]: options.md#hints_toggle_in_background
 
 
+## The `v` commands / Caret mode
+
+The point of Caret mode is to copy text from web pages using the keyboard.
+
+### Entering Caret mode
+
+Pressing `v` will enter Hints mode with hint markers for all elements with text
+inside. When activating a marker, its element will get a blinking caret at the
+beginning of it, and Caret mode will be entered.
+
+The `zv` command does the same thing as `v`, but instead of placing the caret at
+the beginning of the element, it selects the entire element.
+
+The `yv` command brings up the same hint markers as `zv` does, and then takes
+the text that `zv` would have selected and copies it to the clipboard. It does
+not enter Caret mode at all.
+
+The letter `v` was chosen for these shortcuts because that’s what Vim uses to
+enter its Visual mode, which was an inspiration for VimFx’s Caret mode.
+
+### Caret mode commands
+
+Caret mode uses [Firefox’s own Caret mode] under the hood. This means that you
+can use the arrows keys, `<home>`, `<end>`, `<pageup>` and `<pagedown>`
+(optionally holding ctrl) to move the caret as usual. Hold shift while moving
+the caret to select text.
+
+In addition to the above, VimFx provides a few commands inspired by Vim.
+
+- `h`, `j`, `k`, `l`: Move the caret left, down, up or right, like the arrow
+  keys.
+
+- `b`, `w`: Move the caret one word backward or forward, like `<c-left>` and
+  `<c-right>` but a bit “Vim-adjusted” (see the section on Vim below) in order
+  to be more useful.
+
+- `0` (or `^`), `$`: Move the caret to the start or end of the line.
+
+The above commands (except the ones moving to the start or end of the line)
+accept a _count._ For example, press `3w` to move three words forward.
+
+Press `v` to start selecting text. After doing so, VimFx’s commands for moving
+the caret select the text instead of just moving the caret. Press `v` again to
+collapse the selection again. (Note that after pressing `v`, only VimFx’s
+commands goes into “selection mode,” while Firefox’s work as usual, requiring
+shift to be held to select text.)
+
+`o` moves the caret to the “other end” of the selection. If the caret is at the
+end of the selection, `o` will move it to the start (while keeping the selection
+intact), and vice versa. This let’s you adjust the selection in both ends.
+
+Finally, `y` is a possibly faster alternative to the good old `<c-c>`. Other
+than copying the selection to the clipboard, it also exits Caret mode, saving
+you yet a keystroke. (`<escape>` is unsurprisingly used to exit Caret mode
+otherwise.)
+
+[Firefox’s own Caret mode]: http://kb.mozillazine.org/Accessibility_features_of_Firefox#Allow_text_to_be_selected_with_the_keyboard
+
+### Workflow tips
+
+If you’re lucky, the text you want to copy is located within a single element
+that contains no other text, such as the text of a link or an inline code
+snippet. If so, using the `yv` command (which copies an entire element without
+entering Caret mode) is the fastest.
+
+If you want to copy _almost_ all text of an element, or a bit more than it, use
+the `zv` command (which selects an entire element). Then adjust the selection
+using the various Caret mode commands. Remember that `o` lets you adjust both
+ends of the selection.
+
+In all other cases, use the `v` command to place the caret close to the text you
+want to copy. Then move the caret in place using the various Caret
+mode commands, hit `v` to start selecting, and move the again.
+
+Use `y` to finish (or `<escape>` to abort). Alternatively, use the `<menu>` key
+to open the context menu for the selection.
+
+### For Vim users
+
+As seen above, Caret mode is obviously inspired by Vim’s Visual mode. However,
+keep in mind that the point of Caret mode is to **copy text using the keyboard,
+not mimicing Vim’s visual mode.** I’ve found that selecting text for _copying_
+is different than selecting code for _editing._ Keep that in mind.
+
+Working with text selection in webpages using code is a terrible mess full of
+hacks. New commands will only be added if they _really_ are worth it.
+
+A note on VimFx’s `b` and `w`: They work like Vim’s `b` and `w` (but a “word” is
+according to Firefox’s definition, not Vim’s), except when there is selected
+text and the caret is at the end of the selection. Then `b` works like Vim’s
+`ge` and `w` works like Vim’s `e`. The idea is to keep it simple and only
+provide two commands that do what you want, rather than many just to mimic Vim.
+
+
 ## Ignore mode `<s-f1>`
 
 Ignore mode is all about ignoring VimFx commands and sending the keys to the

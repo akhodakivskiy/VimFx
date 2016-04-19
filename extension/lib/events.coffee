@@ -106,6 +106,9 @@ class UIEventManager
         focusType = utils.getFocusType(utils.getActiveElement(@window))
         vim._setFocusType(focusType)
 
+        if focusType == 'editable' and vim.mode == 'caret'
+          vim.enterMode('normal')
+
     @listen('focus', handleFocusRelatedEvent)
     @listen('blur',  handleFocusRelatedEvent)
 
