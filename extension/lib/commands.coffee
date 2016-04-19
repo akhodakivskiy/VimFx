@@ -556,24 +556,25 @@ commands.click_browser_element = ({vim}) ->
         utils.focusElement(element)
         utils.simulateMouseEvents(element, sequence)
 
-  createMarkers = ({wrappers, viewport}) ->
+  createMarkers = (wrappers) ->
+    viewport = utils.getWindowViewport(vim.window)
     {markers} = hints.injectHints(vim.window, wrappers, viewport, {
       hint_chars: vim.options.hint_chars
       ui: true
     })
     return markers
 
-  result = hints.getMarkableElementsAndViewport(
+  wrappers = hints.getMarkableElements(
     vim.window, filter.bind(null, {markEverything: false})
   )
 
-  if result.wrappers.length > 0
-    storage = vim.enterMode('hints', createMarkers(result), callback)
+  if wrappers.length > 0
+    storage = vim.enterMode('hints', createMarkers(wrappers), callback)
     storage.markEverything = ->
-      newResult = hints.getMarkableElementsAndViewport(
+      newWrappers = hints.getMarkableElements(
         vim.window, filter.bind(null, {markEverything: true})
       )
-      storage.markers = createMarkers(newResult)
+      storage.markers = createMarkers(newWrappers)
   else
     vim.notify(translate('notification.follow.none'))
 

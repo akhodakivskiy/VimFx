@@ -153,7 +153,10 @@ helper_follow = ({id, combine = true}, matcher, args) ->
 
     return wrapper
 
-  return hints.getMarkableElementsAndViewport(vim.content, filter)
+  return {
+    viewport: utils.getWindowViewport(vim.content)
+    wrappers: hints.getMarkableElements(vim.content, filter)
+  }
 
 commands.follow = helper_follow.bind(null, {id: 'normal'},
   ({vim, element, getElementShape}) ->

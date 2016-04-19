@@ -51,6 +51,8 @@ EVENTS_CLICK_XUL   = ['click', 'command']
 EVENTS_HOVER_START = ['mouseover', 'mouseenter', 'mousemove']
 EVENTS_HOVER_END   = ['mouseout',  'mouseleave']
 
+MINIMUM_EDGE_DISTANCE = 4
+
 
 
 # Element classification helpers
@@ -335,6 +337,44 @@ createBox = (document, className = '', parent = null, text = null) ->
   parent.appendChild(box) if parent?
   return box
 
+getFrameViewport = (frame, parentViewport) ->
+  rect = frame.getBoundingClientRect()
+  return null unless isInsideViewport(rect, parentViewport)
+
+  # `.getComputedStyle()` may return `null` if the computed style isn’t availble
+  # yet. If so, consider the element not visible.
+  return null unless computedStyle = frame.ownerGlobal.getComputedStyle(frame)
+  offset = {
+    left: rect.left +
+      parseFloat(computedStyle.getPropertyValue('border-left-width')) +
+      parseFloat(computedStyle.getPropertyValue('padding-left'))
+    top: rect.top +
+      parseFloat(computedStyle.getPropertyValue('border-top-width')) +
+      parseFloat(computedStyle.getPropertyValue('padding-top'))
+    right: rect.right -
+      parseFloat(computedStyle.getPropertyValue('border-right-width')) -
+      parseFloat(computedStyle.getPropertyValue('padding-right'))
+    bottom: rect.bottom -
+      parseFloat(computedStyle.getPropertyValue('border-bottom-width')) -
+      parseFloat(computedStyle.getPropertyValue('padding-bottom'))
+  }
+
+  # Calculate the visible part of the frame, according to the parent.
+  viewport = getWindowViewport(frame.contentWindow)
+  left = viewport.left + Math.max(parentViewport.left - offset.left, 0)
+  top  = viewport.top  + Math.max(parentViewport.top  - offset.top,  0)
+  right  = viewport.right  + Math.min(parentViewport.right  - offset.right,  0)
+  bottom = viewport.bottom + Math.min(parentViewport.bottom - offset.bottom, 0)
+
+  return {
+    viewport: {
+      left, top, right, bottom
+      width: right - left
+      height: bottom - top
+    }
+    offset
+  }
+
 # In quirks mode (when the page lacks a doctype), such as on Hackernews,
 # `<body>` is considered the root element rather than `<html>`.
 getRootElement = (document) ->
@@ -416,6 +456,13 @@ insertText = (input, value) ->
 
 isDetached = (element) ->
   return not element.ownerDocument?.documentElement?.contains?(element)
+
+isInsideViewport = (rect, viewport) ->
+  return \
+    rect.left   <= viewport.right  - MINIMUM_EDGE_DISTANCE and
+    rect.top    <= viewport.bottom + MINIMUM_EDGE_DISTANCE and
+    rect.right  >= viewport.left   + MINIMUM_EDGE_DISTANCE and
+    rect.bottom >= viewport.top    - MINIMUM_EDGE_DISTANCE
 
 isPositionFixed = (element) ->
   computedStyle = element.ownerGlobal.getComputedStyle(element)
@@ -605,11 +652,13 @@ module.exports = {
   containsDeep
   createBox
   getRootElement
+  getFrameViewport
   getViewportCappedClientHeight
   getWindowViewport
   injectTemporaryPopup
   insertText
   isDetached
+  isInsideViewport
   isPositionFixed
   querySelectorAllDeep
   scroll

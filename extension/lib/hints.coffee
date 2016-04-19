@@ -142,11 +142,11 @@ injectHints = (window, wrappers, viewport, options) ->
 
   return {markers, markerMap}
 
-getMarkableElementsAndViewport = (window, filter) ->
+getMarkableElements = (window, filter) ->
   viewport = utils.getWindowViewport(window)
   wrappers = []
-  getMarkableElements(window, viewport, wrappers, filter)
-  return {wrappers, viewport}
+  _getMarkableElements(window, viewport, wrappers, filter)
+  return wrappers
 
 # `filter` is a function that is given every element in every frame of the page.
 # It should return wrapper objects for markable elements and a falsy value for
@@ -155,7 +155,7 @@ getMarkableElementsAndViewport = (window, filter) ->
 # each frame. It might sound expensive to go through _every_ element, but that’s
 # actually what other methods like using XPath or CSS selectors would need to do
 # anyway behind the scenes.
-getMarkableElements = (window, viewport, wrappers, filter, parents = []) ->
+_getMarkableElements = (window, viewport, wrappers, filter, parents = []) ->
   {document} = window
 
   for element in getAllElements(document) when element instanceof Element
@@ -172,33 +172,11 @@ getMarkableElements = (window, viewport, wrappers, filter, parents = []) ->
     wrappers.push(wrapper)
 
   for frame in window.frames when frame.frameElement
-    rect = frame.frameElement.getBoundingClientRect() # Frames only have one.
-    continue unless isInsideViewport(rect, viewport)
-
-    # Calculate the visible part of the frame, according to the parent.
-    # coffeelint: disable=colon_assignment_spacing
-    {clientWidth, clientHeight} = frame.document.documentElement
-    frameViewport = {
-      left:   Math.max(viewport.left - rect.left, 0)
-      top:    Math.max(viewport.top  - rect.top,  0)
-      right:  clientWidth  + Math.min(viewport.right  - rect.right,  0)
-      bottom: clientHeight + Math.min(viewport.bottom - rect.bottom, 0)
-    }
-    # coffeelint: enable=colon_assignment_spacing
-
-    # `.getComputedStyle()` may return `null` if the computed style isn’t
-    # availble yet. If so, consider the element not visible.
-    continue unless computedStyle = window.getComputedStyle(frame.frameElement)
-    offset = {
-      left: rect.left +
-        parseFloat(computedStyle.getPropertyValue('border-left-width')) +
-        parseFloat(computedStyle.getPropertyValue('padding-left'))
-      top: rect.top +
-        parseFloat(computedStyle.getPropertyValue('border-top-width')) +
-        parseFloat(computedStyle.getPropertyValue('padding-top'))
-    }
-
-    getMarkableElements(
+    continue unless result = utils.getFrameViewport(
+      frame.frameElement, viewport
+    )
+    {viewport: frameViewport, offset} = result
+    _getMarkableElements(
       frame, frameViewport, wrappers, filter, parents.concat({window, offset})
     )
 
@@ -234,7 +212,7 @@ getRects = (element, viewport) ->
   # rectangle for each line, since each line may be of different length, for
   # example. That allows us to properly add hints to line-wrapped links.
   return Array.filter(
-    element.getClientRects(), (rect) -> isInsideViewport(rect, viewport)
+    element.getClientRects(), (rect) -> utils.isInsideViewport(rect, viewport)
   )
 
 # Returns the “shape” of `element`:
@@ -284,14 +262,6 @@ getElementShape = (window, viewport, parents, element, rects = null) ->
   return {
     nonCoveredPoint, area: totalArea
   }
-
-MINIMUM_EDGE_DISTANCE = 4
-isInsideViewport = (rect, viewport) ->
-  return \
-    rect.left   <= viewport.right  - MINIMUM_EDGE_DISTANCE and
-    rect.top    <= viewport.bottom + MINIMUM_EDGE_DISTANCE and
-    rect.right  >= viewport.left   + MINIMUM_EDGE_DISTANCE and
-    rect.bottom >= viewport.top    - MINIMUM_EDGE_DISTANCE
 
 adjustRectToViewport = (rect, viewport) ->
   # The right and bottom values are subtracted by 1 because
@@ -438,5 +408,5 @@ contains = (element, elementAtPoint) ->
 module.exports = {
   removeHints
   injectHints
-  getMarkableElementsAndViewport
+  getMarkableElements
 }
