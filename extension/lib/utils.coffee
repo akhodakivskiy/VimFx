@@ -51,8 +51,6 @@ EVENTS_CLICK_XUL   = ['click', 'command']
 EVENTS_HOVER_START = ['mouseover', 'mouseenter', 'mousemove']
 EVENTS_HOVER_END   = ['mouseout',  'mouseleave']
 
-MINIMUM_EDGE_DISTANCE = 4
-
 
 
 # Element classification helpers
@@ -347,54 +345,6 @@ createBox = (document, className = '', parent = null, text = null) ->
   parent.appendChild(box) if parent?
   return box
 
-getFirstNonWhitespace = (element) ->
-  for node in element.childNodes then switch node.nodeType
-    when 3 # TextNode.
-      offset = node.data.search(/\S/)
-      return [node, offset] if offset >= 0
-    when 1 # Element
-      result = getFirstNonWhitespace(node)
-      return result if result
-  return null
-
-getFrameViewport = (frame, parentViewport) ->
-  rect = frame.getBoundingClientRect()
-  return null unless isInsideViewport(rect, parentViewport)
-
-  # `.getComputedStyle()` may return `null` if the computed style isn’t availble
-  # yet. If so, consider the element not visible.
-  return null unless computedStyle = frame.ownerGlobal.getComputedStyle(frame)
-  offset = {
-    left: rect.left +
-      parseFloat(computedStyle.getPropertyValue('border-left-width')) +
-      parseFloat(computedStyle.getPropertyValue('padding-left'))
-    top: rect.top +
-      parseFloat(computedStyle.getPropertyValue('border-top-width')) +
-      parseFloat(computedStyle.getPropertyValue('padding-top'))
-    right: rect.right -
-      parseFloat(computedStyle.getPropertyValue('border-right-width')) -
-      parseFloat(computedStyle.getPropertyValue('padding-right'))
-    bottom: rect.bottom -
-      parseFloat(computedStyle.getPropertyValue('border-bottom-width')) -
-      parseFloat(computedStyle.getPropertyValue('padding-bottom'))
-  }
-
-  # Calculate the visible part of the frame, according to the parent.
-  viewport = getWindowViewport(frame.contentWindow)
-  left = viewport.left + Math.max(parentViewport.left - offset.left, 0)
-  top  = viewport.top  + Math.max(parentViewport.top  - offset.top,  0)
-  right  = viewport.right  + Math.min(parentViewport.right  - offset.right,  0)
-  bottom = viewport.bottom + Math.min(parentViewport.bottom - offset.bottom, 0)
-
-  return {
-    viewport: {
-      left, top, right, bottom
-      width: right - left
-      height: bottom - top
-    }
-    offset
-  }
-
 # In quirks mode (when the page lacks a doctype), such as on Hackernews,
 # `<body>` is considered the root element rather than `<html>`.
 getRootElement = (document) ->
@@ -402,64 +352,6 @@ getRootElement = (document) ->
     return document.body
   else
     return document.documentElement
-
-
-# Returns the minimum of `element.clientHeight` and the height of the viewport,
-# taking fixed headers and footers into account. Adapted from Firefox’s source
-# code for `<space>` scrolling (which is where the arbitrary constants below
-# come from).
-#
-# coffeelint: disable=max_line_length
-# <https://hg.mozilla.org/mozilla-central/file/4d75bd6fd234/layout/generic/nsGfxScrollFrame.cpp#l3829>
-# coffeelint: enable=max_line_length
-getViewportCappedClientHeight = (element) ->
-  window = element.ownerGlobal
-  viewport = getWindowViewport(window)
-  headerBottom = viewport.top
-  footerTop = viewport.bottom
-  maxHeight = viewport.height / 3
-  minWidth = Math.min(viewport.width / 2, 800)
-
-  # Restricting the candidates for headers and footers to the most likely set of
-  # elements results in a noticeable performance boost.
-  candidates = window.document.querySelectorAll(
-    'div, ul, nav, header, footer, section'
-  )
-
-  for candidate in candidates
-    rect = candidate.getBoundingClientRect()
-    continue unless rect.height <= maxHeight and rect.width >= minWidth
-    # Checking for `position: fixed;` is the absolutely most expensive
-    # operation, so that is done last.
-    switch
-      when rect.top <= headerBottom and rect.bottom > headerBottom and
-           isPositionFixed(candidate)
-        headerBottom = rect.bottom
-      when rect.bottom >= footerTop and rect.top < footerTop and
-           isPositionFixed(candidate)
-        footerTop = rect.top
-
-  return Math.min(element.clientHeight, footerTop - headerBottom)
-
-getWindowViewport = (window) ->
-  {
-    clientWidth, clientHeight # Viewport size excluding scrollbars, usually.
-    scrollWidth, scrollHeight
-  } = getRootElement(window.document)
-  {innerWidth, innerHeight} = window # Viewport size including scrollbars.
-  # We don’t want markers to cover the scrollbars, so we should use
-  # `clientWidth` and `clientHeight`. However, when there are no scrollbars
-  # those might be too small. Then we use `innerWidth` and `innerHeight`.
-  width  = if scrollWidth  > innerWidth  then clientWidth  else innerWidth
-  height = if scrollHeight > innerHeight then clientHeight else innerHeight
-  return {
-    left: 0
-    top: 0
-    right: width
-    bottom: height
-    width
-    height
-  }
 
 injectTemporaryPopup = (document, contents) ->
   popup = document.createElement('menupopup')
@@ -477,13 +369,6 @@ insertText = (input, value) ->
 isDetached = (element) ->
   return not element.ownerDocument?.documentElement?.contains?(element)
 
-isInsideViewport = (rect, viewport) ->
-  return \
-    rect.left   <= viewport.right  - MINIMUM_EDGE_DISTANCE and
-    rect.top    <= viewport.bottom + MINIMUM_EDGE_DISTANCE and
-    rect.right  >= viewport.left   + MINIMUM_EDGE_DISTANCE and
-    rect.bottom >= viewport.top    - MINIMUM_EDGE_DISTANCE
-
 isPositionFixed = (element) ->
   computedStyle = element.ownerGlobal.getComputedStyle(element)
   return computedStyle?.getPropertyValue('position') == 'fixed'
@@ -493,25 +378,6 @@ querySelectorAllDeep = (window, selector) ->
   for frame in window.frames
     elements.push(querySelectorAllDeep(frame, selector)...)
   return elements
-
-scroll = (element, args) ->
-  {method, type, directions, amounts, properties, adjustment, smooth} = args
-  options = {}
-  for direction, index in directions
-    amount = amounts[index]
-    options[direction] = -Math.sign(amount) * adjustment + switch type
-      when 'lines'
-        amount
-      when 'pages'
-        amount *
-          if properties[index] == 'clientHeight'
-            getViewportCappedClientHeight(element)
-          else
-            element[properties[index]]
-      when 'other'
-        Math.min(amount, element[properties[index]])
-  options.behavior = 'smooth' if smooth
-  element[method](options)
 
 setAttributes = (element, attributes) ->
   for attribute, value of attributes
@@ -547,6 +413,30 @@ class EventEmitter
     @listeners[event]?.forEach((listener) ->
       listener(data)
     )
+
+bisect = (min, max, fn) ->
+  return [null, null] unless max - min >= 0 and min % 1 == 0 and max % 1 == 0
+
+  while max - min > 1
+    mid = min + (max - min) // 2
+    match = fn(mid)
+    if match
+      max = mid
+    else
+      min = mid
+
+  matchMin = fn(min)
+  matchMax = fn(max)
+
+  return switch
+    when matchMin and matchMax
+      [null, min]
+    when not matchMin and not matchMax
+      [max, null]
+    when not matchMin and matchMax
+      [min, max]
+    else
+      [null, null]
 
 has = (obj, prop) -> Object::hasOwnProperty.call(obj, prop)
 
@@ -667,23 +557,18 @@ module.exports = {
   clearSelectionDeep
   containsDeep
   createBox
-  getFirstNonWhitespace
-  getFrameViewport
   getRootElement
-  getViewportCappedClientHeight
-  getWindowViewport
   injectTemporaryPopup
   insertText
   isDetached
-  isInsideViewport
   isPositionFixed
   querySelectorAllDeep
-  scroll
   setAttributes
   setHover
 
   Counter
   EventEmitter
+  bisect
   has
   includes
   nextTick

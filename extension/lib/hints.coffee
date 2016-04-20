@@ -24,6 +24,7 @@
 huffman = require('n-ary-huffman')
 {Marker} = require('./marker')
 utils = require('./utils')
+viewportUtils = require('./viewport')
 
 {devtools} = Cu.import('resource://devtools/shared/Loader.jsm', {})
 
@@ -143,7 +144,7 @@ injectHints = (window, wrappers, viewport, options) ->
   return {markers, markerMap}
 
 getMarkableElements = (window, filter) ->
-  viewport = utils.getWindowViewport(window)
+  viewport = viewportUtils.getWindowViewport(window)
   wrappers = []
   _getMarkableElements(window, viewport, wrappers, filter)
   return wrappers
@@ -172,7 +173,7 @@ _getMarkableElements = (window, viewport, wrappers, filter, parents = []) ->
     wrappers.push(wrapper)
 
   for frame in window.frames when frame.frameElement
-    continue unless result = utils.getFrameViewport(
+    continue unless result = viewportUtils.getFrameViewport(
       frame.frameElement, viewport
     )
     {viewport: frameViewport, offset} = result
@@ -212,7 +213,8 @@ getRects = (element, viewport) ->
   # rectangle for each line, since each line may be of different length, for
   # example. That allows us to properly add hints to line-wrapped links.
   return Array.filter(
-    element.getClientRects(), (rect) -> utils.isInsideViewport(rect, viewport)
+    element.getClientRects(),
+    (rect) -> viewportUtils.isInsideViewport(rect, viewport)
   )
 
 # Returns the “shape” of `element`:
@@ -230,7 +232,7 @@ getElementShape = (window, viewport, parents, element, rects = null) ->
   totalArea = 0
   visibleRects = []
   for rect in rects
-    visibleRect = adjustRectToViewport(rect, viewport)
+    visibleRect = viewportUtils.adjustRectToViewport(rect, viewport)
     continue if visibleRect.area == 0
     totalArea += visibleRect.area
     visibleRects.push(visibleRect)
@@ -261,29 +263,6 @@ getElementShape = (window, viewport, parents, element, rects = null) ->
 
   return {
     nonCoveredPoint, area: totalArea
-  }
-
-adjustRectToViewport = (rect, viewport) ->
-  # The right and bottom values are subtracted by 1 because
-  # `document.elementFromPoint(right, bottom)` does not return the element
-  # otherwise.
-  left   = Math.max(rect.left,       viewport.left)
-  right  = Math.min(rect.right - 1,  viewport.right)
-  top    = Math.max(rect.top,        viewport.top)
-  bottom = Math.min(rect.bottom - 1, viewport.bottom)
-
-  # Make sure that `right >= left and bottom >= top`, since we subtracted by 1
-  # above.
-  right  = Math.max(right, left)
-  bottom = Math.max(bottom, top)
-
-  width  = right - left
-  height = bottom - top
-  area   = Math.floor(width * height)
-
-  return {
-    left, right, top, bottom
-    height, width, area
   }
 
 getFirstNonCoveredPoint = (window, viewport, element, elementRect, parents) ->

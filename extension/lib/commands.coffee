@@ -161,7 +161,7 @@ helper_scroll = (vim, uiEvent, args...) ->
   if uiEvent or helpScroll
     activeElement = helpScroll or utils.getActiveElement(vim.window)
     if vim._state.scrollableElements.has(activeElement) or helpScroll
-      utils.scroll(activeElement, options)
+      viewportUtils.scroll(activeElement, options)
       reset()
       return
 
@@ -567,7 +567,7 @@ commands.click_browser_element = ({vim}) ->
         utils.simulateMouseEvents(element, sequence)
 
   createMarkers = (wrappers) ->
-    viewport = utils.getWindowViewport(vim.window)
+    viewport = viewportUtils.getWindowViewport(vim.window)
     {markers} = hints.injectHints(vim.window, wrappers, viewport, {
       hint_chars: vim.options.hint_chars
       ui: true

@@ -27,6 +27,7 @@ prefs = require('./prefs')
 SelectionManager = require('./selection')
 translate = require('./l10n')
 utils = require('./utils')
+viewportUtils = require('./viewport')
 
 {isProperLink, isTextInputElement, isTypingElement, isContentEditable} = utils
 
@@ -70,7 +71,7 @@ commands.scroll = (args) ->
       activeElement
     else
       vim.state.scrollableElements.filterSuitableDefault()
-  utils.scroll(element, args)
+  viewportUtils.scroll(element, args)
 
 commands.mark_scroll_position = ({vim, keyStr, notify = true}) ->
   element = vim.state.scrollableElements.filterSuitableDefault()
@@ -86,7 +87,7 @@ commands.scroll_to_mark = (args) ->
 
   args.amounts = vim.state.marks[keyStr]
   element = vim.state.scrollableElements.filterSuitableDefault()
-  utils.scroll(element, args)
+  viewportUtils.scroll(element, args)
 
 helper_follow = ({id, combine = true}, matcher, args) ->
   {vim, markEverything = false} = args
@@ -156,7 +157,7 @@ helper_follow = ({id, combine = true}, matcher, args) ->
     return wrapper
 
   return {
-    viewport: utils.getWindowViewport(vim.content)
+    viewport: viewportUtils.getWindowViewport(vim.content)
     wrappers: hints.getMarkableElements(vim.content, filter)
   }
 
@@ -362,11 +363,14 @@ commands.element_text_select = ({vim, elementIndex, full}) ->
       })
 
   else
-    result = utils.getFirstNonWhitespace(element)
-    return unless result
-    [node, offset] = result
-    range.setStart(node, offset)
-    range.setEnd(node, offset)
+    result = viewportUtils.getFirstNonWhitespace(element)
+    if result
+      [node, offset] = result
+      range.setStart(node, offset)
+      range.setEnd(node, offset)
+    else
+      range.setStartBefore(element)
+      range.setEndBefore(element)
 
   utils.clearSelectionDeep(vim.content)
   window.focus()

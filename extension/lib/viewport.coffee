@@ -1,0 +1,228 @@
+###
+# Copyright Simon Lydell 2016.
+#
+# This file is part of VimFx.
+#
+# VimFx is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# VimFx is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with VimFx.  If not, see <http://www.gnu.org/licenses/>.
+###
+
+# This file provides utility functions for working with the viewport.
+
+utils = require('./utils')
+
+MINIMUM_EDGE_DISTANCE = 4
+
+adjustRectToViewport = (rect, viewport) ->
+  # The right and bottom values are subtracted by 1 because
+  # `document.elementFromPoint(right, bottom)` does not return the element
+  # otherwise.
+  left   = Math.max(rect.left,       viewport.left)
+  right  = Math.min(rect.right - 1,  viewport.right)
+  top    = Math.max(rect.top,        viewport.top)
+  bottom = Math.min(rect.bottom - 1, viewport.bottom)
+
+  # Make sure that `right >= left and bottom >= top`, since we subtracted by 1
+  # above.
+  right  = Math.max(right, left)
+  bottom = Math.max(bottom, top)
+
+  width  = right - left
+  height = bottom - top
+  area   = Math.floor(width * height)
+
+  return {
+    left, right, top, bottom
+    height, width, area
+  }
+
+getFirstNonWhitespace = (element) ->
+  window = element.ownerGlobal
+  viewport = getWindowViewport(window)
+  for node in element.childNodes then switch node.nodeType
+    when 3 # TextNode.
+      firstVisibleOffset = getFirstVisibleOffset(node, viewport)
+      if firstVisibleOffset?
+        offset = node.data.slice(firstVisibleOffset).search(/\S/)
+        return [node, firstVisibleOffset + offset] if offset >= 0
+    when 1 # Element.
+      result = getFirstNonWhitespace(node)
+      return result if result
+  return null
+
+getFirstVisibleOffset = (textNode, viewport) ->
+  {length} = textNode.data
+  return null if length == 0
+  [header] = getFixedHeaderAndFooter(textNode.ownerGlobal, viewport)
+  headerBottom =
+    if header then header.getBoundingClientRect().bottom else viewport.top
+  [nonMatch, match] = utils.bisect(0, length - 1, (offset) ->
+    range = textNode.ownerDocument.createRange()
+    # Using a zero-width range sometimes gives a bad rect, so make it span one
+    # character instead.
+    range.setStart(textNode, offset)
+    range.setEnd(textNode, offset + 1)
+    rect = range.getBoundingClientRect()
+    # Ideally, we should also make sure that the text node is visible
+    # horizintally, but there seems to be no performant way of doing so.
+    # Luckily, horizontal scrolling is much less common than vertical.
+    return rect.top >= headerBottom - MINIMUM_EDGE_DISTANCE
+  )
+  return match
+
+# Adapted from Firefox’s source code for `<space>` scrolling (which is where the
+# arbitrary constants below come from).
+#
+# coffeelint: disable=max_line_length
+# <https://hg.mozilla.org/mozilla-central/file/4d75bd6fd234/layout/generic/nsGfxScrollFrame.cpp#l3829>
+# coffeelint: enable=max_line_length
+getFixedHeaderAndFooter = (window) ->
+  viewport = getWindowViewport(window)
+  header = null
+  headerBottom = viewport.top
+  footer = null
+  footerTop = viewport.bottom
+  maxHeight = viewport.height / 3
+  minWidth = Math.min(viewport.width / 2, 800)
+
+  # Restricting the candidates for headers and footers to the most likely set of
+  # elements results in a noticeable performance boost.
+  candidates = window.document.querySelectorAll(
+    'div, ul, nav, header, footer, section'
+  )
+
+  for candidate in candidates
+    rect = candidate.getBoundingClientRect()
+    continue unless rect.height <= maxHeight and rect.width >= minWidth
+    # Checking for `position: fixed;` is the absolutely most expensive
+    # operation, so that is done last.
+    switch
+      when rect.top <= headerBottom and rect.bottom > headerBottom and
+           utils.isPositionFixed(candidate)
+        header = candidate
+        headerBottom = rect.bottom
+      when rect.bottom >= footerTop and rect.top < footerTop and
+           utils.isPositionFixed(candidate)
+        footer = candidate
+        footerTop = rect.top
+
+  return [header, footer]
+
+getFrameViewport = (frame, parentViewport) ->
+  rect = frame.getBoundingClientRect()
+  return null unless isInsideViewport(rect, parentViewport)
+
+  # `.getComputedStyle()` may return `null` if the computed style isn’t availble
+  # yet. If so, consider the element not visible.
+  return null unless computedStyle = frame.ownerGlobal.getComputedStyle(frame)
+  offset = {
+    left: rect.left +
+      parseFloat(computedStyle.getPropertyValue('border-left-width')) +
+      parseFloat(computedStyle.getPropertyValue('padding-left'))
+    top: rect.top +
+      parseFloat(computedStyle.getPropertyValue('border-top-width')) +
+      parseFloat(computedStyle.getPropertyValue('padding-top'))
+    right: rect.right -
+      parseFloat(computedStyle.getPropertyValue('border-right-width')) -
+      parseFloat(computedStyle.getPropertyValue('padding-right'))
+    bottom: rect.bottom -
+      parseFloat(computedStyle.getPropertyValue('border-bottom-width')) -
+      parseFloat(computedStyle.getPropertyValue('padding-bottom'))
+  }
+
+  # Calculate the visible part of the frame, according to the parent.
+  viewport = getWindowViewport(frame.contentWindow)
+  left = viewport.left + Math.max(parentViewport.left - offset.left, 0)
+  top  = viewport.top  + Math.max(parentViewport.top  - offset.top,  0)
+  right  = viewport.right  + Math.min(parentViewport.right  - offset.right,  0)
+  bottom = viewport.bottom + Math.min(parentViewport.bottom - offset.bottom, 0)
+
+  return {
+    viewport: {
+      left, top, right, bottom
+      width: right - left
+      height: bottom - top
+    }
+    offset
+  }
+
+# Returns the minimum of `element.clientHeight` and the height of the viewport,
+# taking fixed headers and footers into account.
+getViewportCappedClientHeight = (element) ->
+  window = element.ownerGlobal
+  viewport = getWindowViewport(window)
+  [header, footer] = getFixedHeaderAndFooter(window)
+  headerBottom =
+    if header then header.getBoundingClientRect().bottom else viewport.top
+  footerTop =
+    if footer then footer.getBoundingClientRect().bottom else viewport.bottom
+  return Math.min(element.clientHeight, footerTop - headerBottom)
+
+getWindowViewport = (window) ->
+  {
+    clientWidth, clientHeight # Viewport size excluding scrollbars, usually.
+    scrollWidth, scrollHeight
+  } = utils.getRootElement(window.document)
+  {innerWidth, innerHeight} = window # Viewport size including scrollbars.
+  # When there are no scrollbars `clientWidth` and `clientHeight` might be too
+  # small. Then we use `innerWidth` and `innerHeight` instead.
+  width  = if scrollWidth  > innerWidth  then clientWidth  else innerWidth
+  height = if scrollHeight > innerHeight then clientHeight else innerHeight
+  return {
+    left: 0
+    top: 0
+    right: width
+    bottom: height
+    width
+    height
+  }
+
+isInsideViewport = (rect, viewport) ->
+  return \
+    rect.left   <= viewport.right  - MINIMUM_EDGE_DISTANCE and
+    rect.top    <= viewport.bottom + MINIMUM_EDGE_DISTANCE and
+    rect.right  >= viewport.left   + MINIMUM_EDGE_DISTANCE and
+    rect.bottom >= viewport.top    - MINIMUM_EDGE_DISTANCE
+
+scroll = (element, args) ->
+  {method, type, directions, amounts, properties, adjustment, smooth} = args
+  options = {
+    behavior: if smooth then 'smooth' else 'instant'
+  }
+  for direction, index in directions
+    amount = amounts[index]
+    options[direction] = -Math.sign(amount) * adjustment + switch type
+      when 'lines'
+        amount
+      when 'pages'
+        amount *
+          if properties[index] == 'clientHeight'
+            getViewportCappedClientHeight(element)
+          else
+            element[properties[index]]
+      when 'other'
+        Math.min(amount, element[properties[index]])
+  element[method](options)
+
+module.exports = {
+  MINIMUM_EDGE_DISTANCE
+  adjustRectToViewport
+  getFirstNonWhitespace
+  getFirstVisibleOffset
+  getFixedHeaderAndFooter
+  getFrameViewport
+  getViewportCappedClientHeight
+  getWindowViewport
+  isInsideViewport
+  scroll
+}
