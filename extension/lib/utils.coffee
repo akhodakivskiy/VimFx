@@ -616,11 +616,6 @@ openPopup = (popup) ->
     window.screenY + window.outerHeight / 2 - popup.clientHeight / 2
   )
 
-openTab = (window, url, options) ->
-  {gBrowser} = window
-  window.TreeStyleTabService?.readyToOpenChildTab(gBrowser.selectedTab)
-  gBrowser.loadOneTab(url, options)
-
 writeToClipboard = (text) -> nsIClipboardHelper.copyString(text)
 
 
@@ -683,6 +678,5 @@ module.exports = {
   loadCss
   observe
   openPopup
-  openTab
   writeToClipboard
 }

@@ -33,6 +33,8 @@ prefs = require('./prefs')
 translate = require('./l10n')
 utils = require('./utils')
 
+{ContentClick} = Cu.import('resource:///modules/ContentClick.jsm', {})
+
 commands = {}
 
 
@@ -466,10 +468,18 @@ helper_follow_clickable = (options, {vim, count = 1}) ->
 
     if inTab
       utils.nextTick(vim.window, ->
-        utils.openTab(vim.window, marker.wrapper.href, {
-          inBackground
-          relatedToCurrent: true
-        })
+        # `ContentClick.contentAreaClick` is what Firefox invokes when you click
+        # links using the mouse. Using that instead of simply
+        # `gBrowser.loadOneTab(url, options)` gives better interoperability with
+        # other add-ons, such as Tree Style Tab and BackTrack Tab History.
+        reset = prefs.root.tmp('browser.tabs.loadInBackground', true)
+        ContentClick.contentAreaClick({
+          href: marker.wrapper.href
+          shiftKey: not inBackground
+          ctrlKey: true
+          metaKey: true
+        }, vim.browser)
+        reset()
       )
     else
       vim._run('click_marker_element', {
