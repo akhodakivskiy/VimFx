@@ -32,6 +32,7 @@ hints = require('./hints')
 prefs = require('./prefs')
 translate = require('./l10n')
 utils = require('./utils')
+viewportUtils = require('./viewport')
 
 {ContentClick} = Cu.import('resource:///modules/ContentClick.jsm', {})
 
