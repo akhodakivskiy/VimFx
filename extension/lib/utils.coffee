@@ -414,6 +414,18 @@ class EventEmitter
       listener(data)
     )
 
+# Returns `[nonMatch, adjacentMatchAfter]`, where `adjacentMatchAfter - nonMatch
+# == 1`. `fn(n)` is supposed to return `false` for `n <= nonMatch` and `true`
+# for `n >= adjacentMatchAfter`. Both `nonMatch` and `adjacentMatchAfter` may be
+# `null` if they cannot be found. Otherwise they’re in the range `min <= n <=
+# max`. `[null, null]` is returned in non-sensical cases. This function is
+# intended to be used as a faster alternative to something like this:
+#
+#     adjacentMatchAfter = null
+#     for n in [min..max]
+#       if fn(n)
+#         adjacentMatchAfter = n
+#         break
 bisect = (min, max, fn) ->
   return [null, null] unless max - min >= 0 and min % 1 == 0 and max % 1 == 0
 
