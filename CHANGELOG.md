@@ -1,3 +1,23 @@
+### 0.14.0 (2016-04-29)
+
+- Added: [Caret mode], which lets you copy text from web pages using the
+  keyboard.
+- Improved: The Find commands (such as `/`, `n` and `N`) now search from the top
+  of the viewport, instead of from the top of the document, which is more
+  Vim-like and less disorienting. To read more about it (or to return to the
+  Firefox default behavior) please see the [`find_from_top_of_viewport`] pref.
+- Improved: Compatibility with the [BackTrack Tab History] add-on.
+- Added: The `<c-enter>` Hints mode command, which creates hint markers for
+  _all_ elements.
+- Fixed: `__dirname` inside config files now works on Windows. Thanks to
+  Zhong Jianxin (@azuwis)!
+- Fixed: Unnecessary full-page hint markers on some sites, such as Hackernews,
+  no longer appear.
+
+[Caret mode]: https://github.com/akhodakivskiy/VimFx/blob/4ffda62560096f91244f3f7731171002ed174f05/documentation/commands.md#the-v-commands--caret-mode
+[`find_from_top_of_viewport`]: https://github.com/akhodakivskiy/VimFx/blob/4ffda62560096f91244f3f7731171002ed174f05/documentation/options.md#find_from_top_of_viewport
+[BackTrack Tab History]: https://addons.mozilla.org/firefox/addon/backtrack-tab-history/
+
 ### 0.13.2 (2016-04-08)
 
 - Improved: The “last position mark” `` ` `` now works more reliably.
