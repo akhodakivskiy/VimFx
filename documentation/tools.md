@@ -20,12 +20,11 @@ This section describes how to install and use the tools needed to:
 
 2. Run `npm install` to download dependencies and development dependencies.
 
-3. Optional: Run `npm install -g gulp` to be able to run [`gulp`][gulp] tasks.
+3. Optional: Run `npm install --global gulp` to be able to run [`gulp`][gulp]
+   from the terminal.
 
-   If you prefer not to install gulp globally, you can use `npm run gulp`
-   instead. For example, to create an .xpi file: `npm run gulp -- xpi`. (Note
-   that you might need to update `npm` for this to run; try `npm update -g
-   npm`.)
+   If you prefer not to install `gulp` globally, you can use `npm run gulp`
+   instead. For example, to create an .xpi file: `npm run gulp -- xpi`.
 
 [Node.js]: http://nodejs.org/
 [gulp]: https://github.com/gulpjs/gulp
@@ -55,16 +54,13 @@ Note that the built .xpi file is [unsigned].
 An easy workflow is code, `gulp`, test, repeat. (Use `gulp -t` to also run the
 unit tests.)
 
-If you’re having problems, don’t forget to try `npm update`. Your problem might
-be in a dependency and already have been fixed.
-
 [Firefox Profile]: https://support.mozilla.org/en-US/kb/profile-manager-create-and-remove-firefox-profiles
 [Extension Auto-Installer]: https://addons.mozilla.org/firefox/addon/autoinstaller
 
 
 ## Gulp tasks
 
-[gulp] is the task runner used to automate most of the common VimFx tasks.
+[gulp] is a task runner, which is used to automate most VimFx tasks.
 
 The tasks are defined in [gulpfile.coffee]. They are summarized in the following
 sub-sections.
@@ -77,19 +73,19 @@ internally by other tasks.)
 ### Building
 
 - `gulp build` creates the `build/` directory. It is basically a copy of the
-  `extension/` directory, with some of the files being compiled. For example,
-  the `.coffee` files compiled to `.js`.
+  `extension/` directory, except some of the files have been compiled. For
+  example, the .coffee files are compiled to .js.
 
 - `gulp xpi` runs `gulp build` and then zips the `build/` directory into
-  `build/VimFx.xpi`.
+  `build/VimFx.xpi` (an .xpi file is a renamed .zip file).
 
 - `gulp push` (or just `gulp`) runs `gulp xpi` and then pushes `build/VimFx.xpi`
   to `http://localhost:8888`, which causes the [Extension Auto-Installer] to
   automatically install it. (No need to restart Firefox.)
 
-- Use the `--test` or `-t` option to include the unit test files. The output of
-  the tests are `console.log`ed. See the [browser console], or start Firefox
-  from the command line to see it.
+- Use the `--test` or `-t` option to include the unit test files into the build.
+  The output of the tests are `console.log`ed. Use the [browser console], or
+  start Firefox from the terminal to see it.
 
 - Use the `--unlisted` or `-u` option to append `-unlisted` to the extension ID.
   This is used when adding .xpi files to github releases.
@@ -100,7 +96,7 @@ internally by other tasks.)
 
 ### Management
 
-- `gulp lint` lints all `.coffee` files. There’s also `npm run addons-linter` to
+- `gulp lint` lints all .coffee files. There’s also `npm run addons-linter` to
   run [`addons-linter`] on a freshly built VimFx .xpi.
 
 - `gulp sloc` prints comment and source code line counts.
@@ -115,7 +111,7 @@ internally by other tasks.)
 
 - `gulp faster` compiles `gulpfile.coffee` to `gulpfile.js`. If you run `gulp` a
   lot and wish it ran faster, just tell it and it will! You’ll have to remember
-  to re-run it whenever gulpfile.coffee is updated, though.
+  to re-run `gulp faster` whenever `gulpfile.coffee` is updated, though.
 
 - `gulp help.html` dumps VimFx’s Keyboard Shortcuts help dialog into
   `help.html`. You can then open up `help.html` in Firefox and style it live
@@ -134,7 +130,8 @@ See the [“Making a release”][release] section below for more information.
 - `gulp readme` prints `README.md` as HTML to stdout.
 
 Tip: Add `--silent` at the end of the gulp command to suppress gulp’s standard
-progress output, allowing to pipe stdout to the clipboard.
+progress output. This allows to pipe stdout to the clipboard, without getting
+unwanted cruft around the output.
 
 [release]: #making-a-release
 
@@ -162,7 +159,7 @@ edit all other locales by hand to save as much translated text as possible.
 
 Note that `gulp sync-locales` requires every translation to be in a single line.
 In other words, do not line-wrap translations. Also don’t bother adding comments
-when translating locale files, since they’ll likely be removed by `gulp
+when translating locale files, since they will be removed by `gulp
 sync-locales`.
 
 If you run `gulp sync-locales` with “en-US” as the base locale, a report is
@@ -193,8 +190,8 @@ Steps:
 3. Run `gulp release`, which does the following for you:
 
   - Adds a heading with the new version number and today’s date at the top of
-    CHANGELOG.md.
-  - Commits CHANGELOG.md and package.json.
+    `CHANGELOG.md`.
+  - Commits `CHANGELOG.md` and `package.json`.
   - Tags the commit.
 
 4. Run `gulp xpi` to rebuild with the new version number.

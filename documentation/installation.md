@@ -6,7 +6,6 @@ See the file README.md for copying conditions.
 
 # Installation
 
-
 ## Option 1: [addons.mozilla.org] \(AMO)
 
 **<https://addons.mozilla.org/firefox/addon/VimFx>**
@@ -14,7 +13,7 @@ See the file README.md for copying conditions.
 Follow the above link and hit the green “Install” button and you should be ready
 to go!
 
-- [Signed][signed] and Reviewed by Mozilla.
+- [Signed][signed] and reviewed by Mozilla.
 - Hosted on AMO.
 - Automatic updates.
 
@@ -24,7 +23,7 @@ to go!
 ## Option 2: [GitHub releases][releases]
 
 Go to VimFx’s [releases] page and click the link to “VimFx.xpi” for the version
-you’re interested (most likely the latest). Firefox should then ask you about
+you’re interested in (most likely the latest). Firefox should then ask you about
 allowing the installation. (If not, download the .xpi file and [open it in
 Firefox][open-xpi].)
 

@@ -6,7 +6,6 @@ See the file README.md for copying conditions.
 
 # Modes
 
-
 ## Summary
 
 VimFx’s functionality is contained in an hierarchy.
