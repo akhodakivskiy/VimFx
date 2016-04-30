@@ -1,3 +1,8 @@
+### 0.14.1 (2016-04-30)
+
+- Fixed: The Find commands (such as `/`, `n` and `N`) no longer crash on some
+  sites (regression since 0.14.0).
+
 ### 0.14.0 (2016-04-29)
 
 - Added: [Caret mode], which lets you copy text from web pages using the
