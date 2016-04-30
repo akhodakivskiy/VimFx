@@ -68,8 +68,8 @@ getAllRangesInsideViewport = (window, viewport, offset = {left: 0, top: 0}) ->
       rect = range.getBoundingClientRect()
       if (rect.top >= headerBottom - MINIMUM_EDGE_DISTANCE and
           rect.bottom <= footerTop + MINIMUM_EDGE_DISTANCE) or
-         header.contains(range.commonAncestorContainer) or
-         footer.contains(range.commonAncestorContainer)
+         header?.contains(range.commonAncestorContainer) or
+         footer?.contains(range.commonAncestorContainer)
         adjustedRect = {
           left: offset.left + rect.left
           top: offset.top + rect.top
