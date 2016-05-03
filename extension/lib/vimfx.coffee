@@ -74,6 +74,7 @@ class VimFx extends utils.EventEmitter
     {@keyTrees, @errors} = createKeyTrees(@getGroupedCommands(), @SPECIAL_KEYS)
 
   stringifyKeyEvent: (event) ->
+    return '' if event.key.endsWith('Lock')
     return notation.stringify(event, {
       ignoreCtrlAlt: @options.ignore_ctrl_alt
       ignoreKeyboardLayout: @options.ignore_keyboard_layout
