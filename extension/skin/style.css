@@ -209,15 +209,16 @@ toolbarpaletteitem[place="palette"] > #VimFxButton {
       display: inline;
       margin-right: 0.5ch;
       color: #349938;
+      font-family: Helvetica, Arial, Verdana, sans-serif;
       font-style: italic;
-      letter-spacing: -0.06em;
+      letter-spacing: -0.035em;
       text-shadow: 0.04em 0.02em black;
     }
 
       #VimFxHelpDialogContainer .logo::before {
         content: 'ım';
         margin-left: -0.15em;
-        padding-left: 1.34ch;
+        padding-left: 1.67ch;
         background: url(icon128.png) no-repeat;
         background-size: contain;
       }
@@ -305,8 +306,7 @@ toolbarpaletteitem[place="palette"] > #VimFxButton {
 
     #VimFxHelpDialogContainer .description {
       float: right;
-      /* The space to the left should be wide enough to fit `<c-w>`. */
-      width: calc(100% - 3.5em);
+      width: calc(100% - 3.7em);
     }
 
   #VimFxHelpDialogContainer .search-input {
