@@ -170,6 +170,7 @@ advanced_options =
   'smoothScroll.lines.spring-constant': '1000'
   'smoothScroll.pages.spring-constant': '2500'
   'smoothScroll.other.spring-constant': '2500'
+  'scroll.reset_timeout':               1000
   'scroll.full_page_adjustment':        40
   'scroll.half_page_adjustment':        20
   'scroll.last_position_mark':          '`'

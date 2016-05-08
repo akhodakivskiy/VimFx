@@ -38,6 +38,8 @@ viewportUtils = require('./viewport')
 {ContentClick} = Cu.import('resource:///modules/ContentClick.jsm', {})
 {FORWARD, BACKWARD} = SelectionManager
 
+SPRING_CONSTANT_PREF = 'layout.css.scroll-behavior.spring-constant'
+
 commands = {}
 
 
@@ -143,6 +145,11 @@ commands.stop_all = ({vim}) ->
 
 
 
+springConstant = {
+  nonce: null
+  value: null
+}
+
 helper_scroll = (vim, uiEvent, args...) ->
   [
     method, type, directions, amounts
@@ -155,10 +162,23 @@ helper_scroll = (vim, uiEvent, args...) ->
       prefs.root.get("general.smoothScroll.#{type}")
     )
   }
-  reset = prefs.root.tmp(
-    'layout.css.scroll-behavior.spring-constant',
+
+  # Temporarily set Firefox’s “spring constant” pref to get the desired smooth
+  # scrolling speed. Reset it `reset_timeout` milliseconds after the last
+  # scrolling command was invoked.
+  springConstant.nonce = nonce = {}
+  springConstant.value ?= prefs.root.get(SPRING_CONSTANT_PREF)
+  prefs.root.set(
+    SPRING_CONSTANT_PREF,
     vim.options["smoothScroll.#{type}.spring-constant"]
   )
+  reset = ->
+    vim.window.setTimeout((->
+      return unless springConstant.nonce == nonce
+      prefs.root.set(SPRING_CONSTANT_PREF, springConstant.value)
+      springConstant.nonce = null
+      springConstant.value = null
+    ), vim.options.reset_timeout)
 
   helpScroll = help.getHelp(vim.window)?.querySelector('.wrapper')
   if uiEvent or helpScroll

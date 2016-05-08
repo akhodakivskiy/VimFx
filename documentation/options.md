@@ -310,9 +310,15 @@ These are VimFx’s variants, and the commands they affect:
 
 - `smoothScroll.lines.spring-constant`: `h`, `l`, `j`, `k`
 - `smoothScroll.pages.spring-constant`: `d`, `u`, `<space>`, `<s-space>`
-- `smoothScroll.other.spring-constant`: `gg`, `G`, `0`, `^`, `$`
+- `smoothScroll.other.spring-constant`: `gg`, `G`, `0`, `^`, `$`, `` ` ``
 
 Note that the value of these prefs are _strings,_ not numbers!
+
+Unfortunately, Firefox provides no way for code to tell which “spring constant”
+it wants when scrolling smoothly. All VimFx can do is to temporarily set
+Firefox’s `layout.css.scroll-behavior.spring-constant` pref. It is reset again
+after one second (by default). If that doesn’t work out for you, you can
+customize that timeout using the `scroll.reset_timeout` pref.
 
 The Firefox pref `general.smoothScroll` lets you turn off smooth scrolling
 entirely, including all of VimFx’s scrolling commands.
