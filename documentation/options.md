@@ -26,9 +26,47 @@ These options are available in VimFx’s settings page in the Add-ons Manager
 ### Hint chars
 
 The characters used for the hints in Hints mode, which can be entered using one
-of the many `f` commands. See also [The `f` commands].
+of the many [`f` commands] \(and a few `v` commands).
 
-[The `f` commands]: commands.md#the-f-commands--hints-mode
+Quick suggestion: Put more easily reachable keys longer to the left. Put two
+pretty good (but not the best) keys at the end, after the space.
+
+Some hint characters are easier to type than others. Many people think that the
+ones on the home row are the best. VimFx favors keys to the left. That’s why you
+should put better keys longer to the left.
+
+The hint characters always contain a single space. This splits them into two
+groups: _primary_ hint characters (before the space), and _secondary_ hint
+characters (after the space). Read on to find out why.
+
+Some markable elements are quicker to find than others. Therefore, VimFx looks
+for markable elements in two passes for some commands, such as the `f` command.
+(This is why all hints don’t always appear on screen at the same time). If two
+passes are used, hints from the _first_ pass can only begin with _primary_ hint
+characters. In all other cases hints may start with _any_ hint character.
+
+When choosing how many secondary hint characters you want (there are two by
+default), think about this: Usually most markable elements are found in the
+first pass, while fewer are found in the second pass. So it makes sense to have
+more primary hint characters than secondary. It’s a tradeoff. If you think the
+hints from the first pass are too long, you probably need more primary hint
+characters. On the other hand, if you think the hints from the _second_ pass are
+too long, you might need a few extra secondary hint characters, but remember
+that it might be at the expense of longer hints in the first pass.
+
+All of this also help you understand why hints may be slow on some pages:
+
+- One reason could be that most hints come from a second pass, which are slower
+  to compute (and are worse than first pass hints).
+
+  If a site gets an unusual amount of second pass hints, it might be because the
+  site is badly coded accessibility-wise. If so, consider contacting the site
+  and telling them so, which improves their accessibility for everyone!
+
+- Another reason could be that a page has a _huge_ amount of links. If that
+  bothers you regularly, feel free to send a pull request with faster code!
+
+[`f` commands]: commands.md#the-f-commands--hints-mode
 
 ### “Previous”/“Next” link patterns
 

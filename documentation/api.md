@@ -721,9 +721,9 @@ If you call `vimfx.setHintMatcher(hintMatcher)` more than once, only the
 `hintMatcher` provided the last time will be used.
 
 ```js
-vimfx.setHintMatcher((id, element, {type, semantic}) => {
-  // Inspect `element` and change `type` and `semantic` if needed.
-  return {type, semantic}
+vimfx.setHintMatcher((id, element, type) => {
+  // Inspect `element` and return a different `type` if needed.
+  return type
 })
 ```
 
@@ -735,19 +735,16 @@ The arguments passed to the `hintMatcher` function are:
   - `'tab'`: `F`, `gf` or `gF`.
   - `'copy'`: `yf`.
   - `'focus'`: `zf`.
+  - `'select'`: `v`, `zv` or `yv`.
 
 - element: `Element`. One out of all elements currently inside the viewport.
 
-- info: `Object`. It has the following properties:
+- type: `String` or `null`. If a string, it means that `element` should get a
+  hint. If `null`, it won’t. See the available strings below. When a marker
+  is matched, `type` decides what happens to `element`.
 
-  - type: `String` or `null`. If a string, it means that `element` should get a
-    hint. If `null`, it won’t. See the available strings below. When a marker
-    is matched, `type` decides what happens to `element`.
-  - semantic: `Boolean`. Indicates whether or not the element is “semantic.”
-    Semantic elements get better hints.
-
-  This object contains information on how VimFx has matched `element`. You have
-  the opportunity to change this.
+  This parameter tells how VimFx has matched `element`. You have the opportunity
+  to change that.
 
 The available type strings depend on `id`:
 
@@ -781,11 +778,7 @@ The available type strings depend on `id`:
 
   - selectable: An element with selectable text (but not text inputs).
 
-The type string can also be `'other'`, regardless of what `id` is. That is the
-case for elements for markers added by the `<c-enter>` Hints mode command.
-
-The function must return an object like the `info` parameter (with the `type`
-and `semantic` properties).
+The function must return `null` or a string like the `type` parameter.
 
 
 ## Stability

@@ -136,7 +136,7 @@ shortcuts =
       '<s-space>':       'rotate_markers_backward'
       '<backspace>':     'delete_hint_char'
       '<enter>':         'increase_count'
-      '<c-enter>':       'mark_everything'
+      '<c-enter>':       'toggle_complementary'
 
   'ignore':
     '':
@@ -148,7 +148,7 @@ shortcuts =
       '<escape>    <enter>': 'exit'
 
 options =
-  'hint_chars':             'fjdkslaghrueiwovncm'
+  'hint_chars':             'fjdkslaghrueiwonc mv'
   'prev_patterns':          'prev  previous  ‹  «  ◀  ←  <<  <  back  newer'
   'next_patterns':          'next  ›  »  ▶  →  >>  >  more  older'
   'blacklist':              '*example.com*  http://example.org/editor/*'

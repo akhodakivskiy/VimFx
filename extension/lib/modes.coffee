@@ -25,9 +25,7 @@
 {commands, findStorage} = require('./commands')
 defaults = require('./defaults')
 help = require('./help')
-hints = require('./hints')
 translate = require('./l10n')
-{rotateOverlappingMarkers} = require('./marker')
 prefs = require('./prefs')
 SelectionManager = require('./selection')
 utils = require('./utils')
@@ -195,35 +193,28 @@ mode('caret', {
 
 
 mode('hints', {
-  onEnter: ({vim, storage}, markers, callback, count = 1, sleep = -1) ->
-    storage.markers = markers
-    storage.markerMap = null
+  onEnter: ({vim, storage}, options) ->
+    {markerContainer, callback, count = 1, sleep = -1} = options
+    storage.markerContainer = markerContainer
     storage.callback = callback
     storage.count = count
-    storage.numEnteredChars = 0
-    storage.markEverything = null
 
     if sleep >= 0
       storage.clearInterval = utils.interval(vim.window, sleep, (next) ->
-        unless storage.markerMap
+        if markerContainer.markers.length == 0
           next()
           return
         vim._send('getMarkableElementsMovements', null, (diffs) ->
           for {dx, dy}, index in diffs when not (dx == 0 and dy == 0)
-            storage.markerMap[index].updatePosition(dx, dy)
+            markerContainer.markerMap[index].updatePosition(dx, dy)
           next()
         )
       )
 
-    # Expose the storage so asynchronously computed markers can be set
-    # retroactively.
-    return storage
-
   onLeave: ({vim, storage}) ->
-    # When clicking VimFx’s disable button in the Add-ons Manager, `hints` will
-    # have been `null`ed out when the timeout has passed.
+    {markerContainer} = storage
     vim.window.setTimeout(
-      (-> hints?.removeHints(vim.window)),
+      (-> markerContainer.remove()),
       vim.options.hints_timeout
     )
     storage.clearInterval?()
@@ -233,20 +224,12 @@ mode('hints', {
 
   onInput: (args, match) ->
     {vim, storage} = args
-    {markers, callback} = storage
+    {markerContainer, callback} = storage
 
     if match.type == 'full'
       match.command.run(args)
-    else if match.unmodifiedKey in vim.options.hint_chars and markers.length > 0
-      matchedMarkers = []
-
-      for marker in markers when marker.hintIndex == storage.numEnteredChars
-        matched = marker.matchHintChar(match.unmodifiedKey)
-        marker.hide() unless matched
-        if marker.isMatched()
-          marker.markMatched(true)
-          matchedMarkers.push(marker)
-
+    else if match.unmodifiedKey in vim.options.hint_chars
+      matchedMarkers = markerContainer.matchHintChar(match.unmodifiedKey)
       if matchedMarkers.length > 0
         again = callback(matchedMarkers[0], storage.count, match.keyStr)
         storage.count -= 1
@@ -255,14 +238,11 @@ mode('hints', {
             marker.markMatched(false) for marker in matchedMarkers
             return
           ), vim.options.hints_timeout)
-          marker.reset() for marker in markers
-          storage.numEnteredChars = 0
+          markerContainer.reset()
         else
           # The callback might have entered another mode. Only go back to Normal
           # mode if we’re still in Hints mode.
           vim.enterMode('normal') if vim.mode == 'hints'
-      else
-        storage.numEnteredChars += 1
 
     return true
 
@@ -270,28 +250,23 @@ mode('hints', {
   exit: ({vim, storage}) ->
     # The hints are removed automatically when leaving the mode, but after a
     # timeout. When aborting the mode we should remove the hints immediately.
-    hints.removeHints(vim.window)
+    storage.markerContainer.remove()
     vim.enterMode('normal')
 
   rotate_markers_forward: ({storage}) ->
-    rotateOverlappingMarkers(storage.markers, true)
+    storage.markerContainer.rotateOverlapping(true)
 
   rotate_markers_backward: ({storage}) ->
-    rotateOverlappingMarkers(storage.markers, false)
+    storage.markerContainer.rotateOverlapping(false)
 
   delete_hint_char: ({storage}) ->
-    for marker in storage.markers
-      switch marker.hintIndex - storage.numEnteredChars
-        when 0
-          marker.deleteHintChar()
-        when -1
-          marker.show()
-    storage.numEnteredChars -= 1 unless storage.numEnteredChars == 0
+    storage.markerContainer.deleteHintChar()
 
-  increase_count: ({storage}) -> storage.count += 1
+  increase_count: ({storage}) ->
+    storage.count += 1
 
-  mark_everything: ({storage}) ->
-    storage.markEverything?()
+  toggle_complementary: ({storage}) ->
+    storage.markerContainer.toggleComplementary()
 })
 
 

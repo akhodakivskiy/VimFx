@@ -18,135 +18,20 @@
 # along with VimFx.  If not, see <http://www.gnu.org/licenses/>.
 ###
 
-# This file contains functions for getting markable elements, and related data,
-# as well as for creating and inserting markers for markable elements.
+# This file contains functions for getting markable elements and related data.
 
-huffman = require('n-ary-huffman')
-{Marker} = require('./marker')
 utils = require('./utils')
 viewportUtils = require('./viewport')
 
 {devtools} = Cu.import('resource://devtools/shared/Loader.jsm', {})
 
-CONTAINER_ID = 'VimFxMarkersContainer'
-
 Element = Ci.nsIDOMElement
 XULDocument = Ci.nsIDOMXULDocument
 
-shutdownHandlerAdded = false
-
-# For some time we used to return the hints container from `injectHints`, and
-# use that reference to remove the hints when needed. That’s fine in theory, but
-# in case anything breaks we might loose that reference and end up with
-# unremovable hints on the screen. Explicitly looking for an element with the
-# container ID is more fail-safe.
-removeHints = (window) ->
-  window.document.getElementById(CONTAINER_ID)?.remove()
-
-# Create `Marker`s for every element (represented by a regular object of data
-# about the element—a “wrapper,” a stand-in for the real element, which is only
-# accessible in frame scripts) in `wrappers`, and insert them into `window`.
-injectHints = (window, wrappers, viewport, options) ->
-  semantic = []
-  unsemantic = []
-  combined = []
-  markerMap = {}
-
-  for wrapper in wrappers
-    marker = new Marker(wrapper, window.document)
-    group = switch
-      when wrapper.parentIndex?
-        combined
-      when wrapper.semantic
-        semantic
-      else
-        unsemantic
-    group.push(marker)
-    markerMap[wrapper.elementIndex] = marker
-
-  markers = semantic.concat(unsemantic)
-
-  # Each marker gets a unique `z-index`, so that it can be determined if a
-  # marker overlaps another. Put more important markers (higher weight) at the
-  # end, so that they get higher `z-index`, in order not to be overlapped.
-  zIndex = 0
-  setZIndexes = (markers) ->
-    markers.sort((a, b) -> a.weight - b.weight)
-    for marker in markers when marker not instanceof huffman.BranchPoint
-      marker.markerElement.style.zIndex = zIndex
-      zIndex += 1
-      # Add `z-index` space for all the children of the marker.
-      zIndex += marker.wrapper.numChildren if marker.wrapper.numChildren?
-    return
-
-  # The `markers` passed to this function have been sorted by `setZIndexes` in
-  # advance, so we can skip sorting in the `huffman.createTree` function.
-  hintChars = options.hint_chars
-  createHuffmanTree = (markers) ->
-    return huffman.createTree(markers, hintChars.length, {sorted: true})
-
-  # Semantic elements should always get better hints and higher `z-index`:es
-  # than unsemantic ones, even if they are smaller. The former is achieved by
-  # putting the unsemantic elements in their own branch of the huffman tree.
-  if unsemantic.length > 0
-    if markers.length > hintChars.length
-      setZIndexes(unsemantic)
-      subTree = createHuffmanTree(unsemantic)
-      semantic.push(subTree)
-    else
-      semantic.push(unsemantic...)
-
-  setZIndexes(semantic)
-
-  tree = createHuffmanTree(semantic)
-  tree.assignCodeWords(hintChars, (marker, hint) -> marker.setHint(hint))
-
-  # Markers for links with the same href can be combined to use the same hint.
-  # They should all have the same `z-index` (because they all have the same
-  # combined weight), but in case any of them cover another they still get a
-  # unique `z-index` (space for this was added in `setZIndexes`).
-  for marker in combined
-    parent = markerMap[marker.wrapper.parentIndex]
-    parentZIndex = Number(parent.markerElement.style.zIndex)
-    marker.markerElement.style.zIndex = parentZIndex
-    parent.markerElement.style.zIndex = parentZIndex + 1
-    marker.setHint(parent.hint)
-  markers.push(combined...)
-
-  removeHints(window) # Better safe than sorry.
-  container = window.document.createElement('box')
-  container.id = CONTAINER_ID
-
-  zoom = 1
-
-  if options.ui
-    container.classList.add('ui')
-    window.document.getElementById('browser-panel').appendChild(container)
-  else
-    {ZoomManager, gBrowser: {selectedBrowser: browser}} = window
-    browser.parentNode.appendChild(container)
-    # If “full zoom” is not used, it means that “Zoom text only” is enabled.
-    # If so, that “zoom” does not need to be taken into account.
-    # `.getCurrentMode()` is added by the “Default FullZoom Level” extension.
-    if ZoomManager.getCurrentMode?(browser) ? ZoomManager.useFullZoom
-      zoom = ZoomManager.getZoomForBrowser(browser)
-
-  for marker in markers
-    container.appendChild(marker.markerElement)
-    # Must be done after the hints have been inserted into the DOM (see
-    # marker.coffee).
-    marker.setPosition(viewport, zoom)
-
-  unless shutdownHandlerAdded
-    module.onShutdown(removeHints.bind(null, window))
-    shutdownHandlerAdded = true
-
-  return {markers, markerMap}
-
-getMarkableElements = (window, filter) ->
+find = (window, filter, selector = '*') ->
   viewport = viewportUtils.getWindowViewport(window)
   wrappers = []
-  _getMarkableElements(window, viewport, wrappers, filter)
+  _getMarkableElements(window, viewport, wrappers, filter, selector)
   return wrappers
 
 # `filter` is a function that is given every element in every frame of the page.
@@ -155,11 +40,16 @@ getMarkableElements = (window, filter) ->
 # is modified instead of using return values to avoid array concatenation for
 # each frame. It might sound expensive to go through _every_ element, but that’s
 # actually what other methods like using XPath or CSS selectors would need to do
-# anyway behind the scenes.
-_getMarkableElements = (window, viewport, wrappers, filter, parents = []) ->
+# anyway behind the scenes. However, it is possible to pass in a CSS selector,
+# which allows getting markable elements in several passes with different sets
+# of candidates.
+_getMarkableElements = (
+  window, viewport, wrappers, filter, selector, parents = []
+) ->
   {document} = window
 
-  for element in getAllElements(document) when element instanceof Element
+  for element in getAllElements(document, selector)
+    continue unless element instanceof Element
     # `getRects` is fast and filters out most elements, so run it first of all.
     rects = getRects(element, viewport)
     continue unless rects.length > 0
@@ -178,21 +68,24 @@ _getMarkableElements = (window, viewport, wrappers, filter, parents = []) ->
     )
     {viewport: frameViewport, offset} = result
     _getMarkableElements(
-      frame, frameViewport, wrappers, filter, parents.concat({window, offset})
+      frame, frameViewport, wrappers, filter, selector,
+      parents.concat({window, offset})
     )
 
   return
 
-getAllElements = (document) ->
+getAllElements = (document, selector) ->
   unless document instanceof XULDocument
-    return document.getElementsByTagName('*')
+    return document.querySelectorAll(selector)
 
   # Use a `Set` since this algorithm may find the same element more than once.
   # Ideally we should find a way to find all elements without duplicates.
   elements = new Set()
   getAllRegular = (element) ->
     # The first time `zF` is run `.getElementsByTagName('*')` may oddly include
-    # `undefined` in its result! Filter those out.
+    # `undefined` in its result! Filter those out. (Also, `selector` is ignored
+    # here since it doesn’t make sense in XUL documents because of all the
+    # trickery around anonymous elements.)
     for child in element.getElementsByTagName('*') when child
       elements.add(child)
       getAllAnonymous(child)
@@ -385,7 +278,5 @@ contains = (element, elementAtPoint) ->
     return container == elementAtPoint or container.contains(elementAtPoint)
 
 module.exports = {
-  removeHints
-  injectHints
-  getMarkableElements
+  find
 }

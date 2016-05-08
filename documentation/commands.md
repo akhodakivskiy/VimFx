@@ -216,28 +216,13 @@ shorter the hints. (Also, what should happen if you tried to `F` a button?)
 (You can also customize [which elements do and don’t get hints][hint-matcher].)
 
 Another way to make hints shorter is to assign the same hint to all links with
-the same URL. So don’t get surprised if you see the same hint repeated several
+the same URL. So don’t be surprised if you see the same hint repeated several
 times.
 
 VimFx also tries to give you shorter hints for elements that you are more likely
 to click. This is done by the surprisingly simple rule: The larger the element,
-the shorter the hint.
-
-There are standardized elements which are always clickable—_semantically_
-clickable elements. Unfortunately, many sites use unclickable elements and then
-make them clickable using JavaScript—<em>un</em>semantically clickable elements.
-Such elements are difficult to find. VimFx has a few techniques for doing so,
-which works many times but not always, but unfortunately they sometimes produce
-false positives. Many times those false positives are pretty large elements,
-which according to the last paragraph would give them really short hints, making
-other more important elements suffer by getting longer ones. Therefore VimFx
-favors semantic elements over unsemantic ones and takes that into account when
-deciding the hint length for elements.
-
-Some hint characters are easier to type than others. The ones on the home row
-are of course the best. When customizing the [hint chars] option you should put
-the best keys to the left and the worst ones to the right. VimFx favors keys to
-the left, so that should give you the optimal hints.
+the shorter the hint. To learn more about hint characters and hint length, read
+about the [hint chars] option.
 
 Hints are added on top of the corresponding element. If they obscure the display
 too much you can hold shift to make them transparent. (See [Styling] if you’d
@@ -283,9 +268,11 @@ like `F`.
 
 Finally, if the element you wanted to interact with didn’t get a hint marker you
 can try pressing `<c-enter>` while the hints are still shown. That will give
-hint markers to _every_ element on screen. Warning: This can be very slow, and
-result in an overwhelming amount of hint markers. See this as an escape hatch if
-you _really_ want to avoid using the mouse at all costs.
+hint markers to all _other_ elements. Warning: This can be very slow, and result
+in an overwhelming amount of hint markers (making it difficult to know which
+hint to activate sometimes). See this as an escape hatch if you _really_ want to
+avoid using the mouse at all costs. (Press `<c-enter>` again to toggle back to
+the previous hints.)
 
 [hint-matcher]: api.md#vimfxhintmatcher
 [hint chars]: options.md#hint-chars

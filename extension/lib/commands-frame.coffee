@@ -22,7 +22,7 @@
 # same name as the command in commands.coffee that calls it. There are also a
 # few more generalized “commands” used in more than one place.
 
-hints = require('./hints')
+markableElements = require('./markable-elements')
 prefs = require('./prefs')
 SelectionManager = require('./selection')
 translate = require('./l10n')
@@ -40,6 +40,20 @@ CLICKABLE_ARIA_ROLES = [
   'checkbox', 'radio', 'combobox', 'option', 'slider', 'textbox'
   'menuitem', 'menuitemcheckbox', 'menuitemradio'
 ]
+
+createComplementarySelectors = (selectors) ->
+  return [
+    selectors.join(',')
+    selectors.map((selector) -> ":not(#{selector})").join('')
+  ]
+
+FOLLOW_DEFAULT_SELECTORS = createComplementarySelectors([
+  'a', 'button', 'input', 'textarea', 'select'
+  '[role]', '[contenteditable]'
+])
+
+FOLLOW_SELECTABLE_SELECTORS =
+  createComplementarySelectors(['div', 'span']).reverse()
 
 commands = {}
 
@@ -90,22 +104,25 @@ commands.scroll_to_mark = (args) ->
   element = vim.state.scrollableElements.filterSuitableDefault()
   viewportUtils.scroll(element, args)
 
-helper_follow = ({id, combine = true}, matcher, args) ->
-  {vim, markEverything = false} = args
+helper_follow = (options, matcher, {vim, pass}) ->
+  {id, combine = true, selectors = FOLLOW_DEFAULT_SELECTORS} = options
+  if vim.content.document instanceof XULDocument
+    selectors = ['*']
+
+  if pass == 'auto'
+    pass = if selectors.length == 2 then 'first' else 'single'
+
+  vim.state.markerElements = [] if pass in ['single', 'first']
   hrefs = {}
-  vim.state.markerElements = []
 
   filter = (element, getElementShape) ->
-    {type, semantic} = matcher({vim, element, getElementShape})
-
-    if markEverything and not type
-      type = 'other'
-      semantic = false
-
+    type = matcher({vim, element, getElementShape})
     if vim.hintMatcher
-      {type, semantic} = vim.hintMatcher(id, element, {type, semantic})
-
+      type = vim.hintMatcher(id, element, type)
+    if pass == 'complementary'
+      type = if type then null else 'complementary'
     return unless type
+
     shape = getElementShape(element)
 
     # CodeMirror editor uses a tiny hidden textarea positioned at the caret.
@@ -130,7 +147,7 @@ helper_follow = ({id, combine = true}, matcher, args) ->
 
     originalRect = element.getBoundingClientRect()
     length = vim.state.markerElements.push({element, originalRect})
-    wrapper = {type, semantic, shape, elementIndex: length - 1}
+    wrapper = {type, shape, elementIndex: length - 1}
 
     if wrapper.type == 'link'
       {href} = element
@@ -157,17 +174,23 @@ helper_follow = ({id, combine = true}, matcher, args) ->
 
     return wrapper
 
+  selector =
+    if pass == 'complementary'
+      '*'
+    else
+      selectors[if pass == 'second' then 1 else 0]
   return {
+    wrappers: markableElements.find(vim.content, filter, selector)
     viewport: viewportUtils.getWindowViewport(vim.content)
-    wrappers: hints.getMarkableElements(vim.content, filter)
+    pass
   }
 
-commands.follow = helper_follow.bind(null, {id: 'normal'},
+commands.follow = helper_follow.bind(
+  null, {id: 'normal'},
   ({vim, element, getElementShape}) ->
     document = element.ownerDocument
     isXUL = (document instanceof XULDocument)
     type = null
-    semantic = true
     switch
       # Bootstrap. Match these before regular links, because especially slider
       # “buttons” often get the same hint otherwise.
@@ -175,14 +198,13 @@ commands.follow = helper_follow.bind(null, {id: 'normal'},
            element.hasAttribute?('data-dismiss') or
            element.hasAttribute?('data-slide') or
            element.hasAttribute?('data-slide-to')
-        # Some elements may not be semantic, but _should be_ and still deserve a
-        # good hint.
         type = 'clickable'
       when isProperLink(element)
         type = 'link'
       when isTypingElement(element)
         type = 'text'
-      when element.getAttribute?('role') in CLICKABLE_ARIA_ROLES or
+      when element.localName in ['a', 'button'] or
+           element.getAttribute?('role') in CLICKABLE_ARIA_ROLES or
            # <http://www.w3.org/TR/wai-aria/states_and_properties>
            element.hasAttribute?('aria-controls') or
            element.hasAttribute?('aria-pressed') or
@@ -195,8 +217,6 @@ commands.follow = helper_follow.bind(null, {id: 'normal'},
            # real hint that allows you to focus the document to start typing.
            element.id != 'docs-editor'
         type = 'clickable'
-        unless isXUL or element.localName in ['a', 'input', 'button']
-          semantic = false
       when element != vim.state.scrollableElements.largest and
            vim.state.scrollableElements.has(element)
         type = 'scrollable'
@@ -213,7 +233,6 @@ commands.follow = helper_follow.bind(null, {id: 'normal'},
            # Google Drive Document.
            element.classList?.contains('kix-appview-editor')
         type = 'clickable'
-        semantic = false
       # Facebook comment fields.
       when element.parentElement?.classList?.contains('UFIInputContainer')
         type = 'clickable-special'
@@ -245,7 +264,6 @@ commands.follow = helper_follow.bind(null, {id: 'normal'},
         # a large element with a click-tracking event listener.
         unless element.querySelector?('a, button, input, [class*=button]')
           type = 'clickable'
-          semantic = false
       # When viewing an image it should get a marker to toggle zoom. This is the
       # most unlikely rule to match, so keep it last.
       when document.body?.childElementCount == 1 and
@@ -254,16 +272,18 @@ commands.follow = helper_follow.bind(null, {id: 'normal'},
             element.classList?.contains('shrinkToFit'))
         type = 'clickable'
     type = null if isXUL and element.classList?.contains('textbox-input')
-    return {type, semantic}
+    return type
 )
 
-commands.follow_in_tab = helper_follow.bind(null, {id: 'tab'},
+commands.follow_in_tab = helper_follow.bind(
+  null, {id: 'tab', selectors: ['a']},
   ({element}) ->
     type = if isProperLink(element) then 'link' else null
-    return {type, semantic: true}
+    return type
 )
 
-commands.follow_copy = helper_follow.bind(null, {id: 'copy'},
+commands.follow_copy = helper_follow.bind(
+  null, {id: 'copy'},
   ({element}) ->
     type = switch
       when isProperLink(element)
@@ -274,10 +294,11 @@ commands.follow_copy = helper_follow.bind(null, {id: 'copy'},
         'text'
       else
         null
-    return {type, semantic: true}
+    return type
 )
 
-commands.follow_focus = helper_follow.bind(null, {id: 'focus', combine: false},
+commands.follow_focus = helper_follow.bind(
+  null, {id: 'focus', combine: false},
   ({vim, element}) ->
     type = switch
       when element.tabIndex > -1
@@ -287,10 +308,11 @@ commands.follow_focus = helper_follow.bind(null, {id: 'focus', combine: false},
         'scrollable'
       else
         null
-    return {type, semantic: true}
+    return type
 )
 
-commands.follow_selectable = helper_follow.bind(null, {id: 'selectable'},
+commands.follow_selectable = helper_follow.bind(
+  null, {id: 'selectable', selectors: FOLLOW_SELECTABLE_SELECTORS},
   ({element}) ->
     isRelevantTextNode = (node) ->
       # Ignore whitespace-only text nodes, and single-letter ones (which are
@@ -301,7 +323,7 @@ commands.follow_selectable = helper_follow.bind(null, {id: 'selectable'},
         'selectable'
       else
         null
-    return {type, semantic: true}
+    return type
 )
 
 commands.focus_marker_element = ({vim, elementIndex, options}) ->
@@ -312,8 +334,9 @@ commands.focus_marker_element = ({vim, elementIndex, options}) ->
   vim.clearHover()
   vim.setHover(element)
 
-commands.click_marker_element = (args) ->
-  {vim, elementIndex, type, preventTargetBlank} = args
+commands.click_marker_element = (
+  {vim, elementIndex, type, preventTargetBlank}
+) ->
   {element} = vim.state.markerElements[elementIndex]
   if element.target == '_blank' and preventTargetBlank
     targetReset = element.target

@@ -1,5 +1,5 @@
 ###
-# Copyright Simon Lydell 2015.
+# Copyright Simon Lydell 2015, 2016.
 #
 # This file is part of VimFx.
 #
@@ -71,10 +71,20 @@ parsePatterns = (value) ->
 
 parsers = {
   hint_chars: (value, defaultValue) ->
-    parsed = utils.removeDuplicateCharacters(value).replace(/\s/g, '')
+    [leading..., end] = value.trim().split(/\s+/)
+    parsed = if leading.length > 0 then "#{leading.join('')} #{end}" else end
+    parsed = utils.removeDuplicateCharacters(parsed)
+
     # Make sure that hint chars contain at least the required amount of chars.
     if parsed.length < MIN_NUM_HINT_CHARS
       parsed = defaultValue[...MIN_NUM_HINT_CHARS]
+
+    unless parsed.includes(' ')
+      numDefaultSecondaryHintChars =
+        defaultValue.length - 1 - defaultValue.indexOf(' ')
+      index = Math.min(parsed.length // 2, numDefaultSecondaryHintChars)
+      parsed = "#{parsed[...-index]} #{parsed[-index..]}"
+
     return {parsed, normalized: parsed}
 
   prev_patterns: parsePatterns

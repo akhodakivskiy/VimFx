@@ -265,8 +265,9 @@ isInsideViewport = (rect, viewport) ->
     rect.right  >= viewport.left   + MINIMUM_EDGE_DISTANCE and
     rect.bottom >= viewport.top    + MINIMUM_EDGE_DISTANCE
 
-scroll = (element, args) ->
-  {method, type, directions, amounts, properties, adjustment, smooth} = args
+scroll = (
+  element, {method, type, directions, amounts, properties, adjustment, smooth}
+) ->
   options = {
     behavior: if smooth then 'smooth' else 'instant'
   }

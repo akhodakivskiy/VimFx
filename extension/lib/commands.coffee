@@ -28,7 +28,8 @@
 
 config = require('./config')
 help = require('./help')
-hints = require('./hints')
+MarkerContainer = require('./marker-container')
+markableElements = require('./markable-elements')
 prefs = require('./prefs')
 translate = require('./l10n')
 utils = require('./utils')
@@ -428,41 +429,52 @@ commands.tab_close_other = ({vim}) ->
 
 
 helper_follow = (name, vim, callback, count = null) ->
+  {window} = vim
   vim.markPageInteraction()
-  help.removeHelp(vim.window)
+  help.removeHelp(window)
 
-  # Enter hints mode immediately, with an empty set of markers. The user might
-  # press keys before the `vim._run` callback is invoked. Those key presses
-  # should be handled in hints mode, not normal mode.
-  initialMarkers = []
-  storage = vim.enterMode(
-    'hints', initialMarkers, callback, count, vim.options.hints_sleep
+  markerContainer = new MarkerContainer({
+    window
+    hintChars: vim.options.hint_chars
+    getComplementaryWrappers: (callback) ->
+      vim._run(name, {pass: 'complementary'}, ({wrappers, viewport}) ->
+        # `markerContainer.container` is `null`ed out when leaving Hints mode.
+        # If this callback is called after we’ve left Hints mode (and perhaps
+        # even entered it again), simply discard the result.
+        return unless markerContainer.container
+        if wrappers.length == 0
+          vim.notify(translate('notification.follow.none'))
+        callback({wrappers, viewport})
+      )
+  })
+  MarkerContainer.remove(window) # Better safe than sorry.
+  window.gBrowser.selectedBrowser.parentNode.appendChild(
+    markerContainer.container
   )
 
-  setMarkers = ({wrappers, viewport}) ->
-    if wrappers.length > 0
-      {markers, markerMap} = hints.injectHints(
-        vim.window, wrappers, viewport, vim.options
-      )
-      storage.markers = markers
-      storage.markerMap = markerMap
+  # Enter Hints mode immediately, with an empty set of markers. The user might
+  # press keys before any hints have been generated. Those key presses should be
+  # handled in Hints mode, not Normal mode.
+  vim.enterMode('hints', {
+    markerContainer, callback, count
+    sleep: vim.options.hints_sleep
+  })
+
+  injectHints = ({wrappers, viewport, pass}) ->
+    # See `getComplementaryWrappers` above.
+    return unless markerContainer.container
+
+    if wrappers.length == 0
+      if pass in ['single', 'second'] and markerContainer.markers.length == 0
+        vim.notify(translate('notification.follow.none'))
+        vim.enterMode('normal')
     else
-      vim.notify(translate('notification.follow.none'))
-      vim.enterMode('normal')
+      markerContainer.injectHints(wrappers, viewport, pass)
 
-  vim._run(name, {}, (result) ->
-    # The user might have exited hints mode (and perhaps even entered it again)
-    # before this callback is invoked. If so, `storage.markers` has been
-    # cleared, or set to a new value. Only proceed if it is unchanged.
-    return unless storage.markers == initialMarkers
-    setMarkers(result)
-    storage.markEverything = ->
-      lastMarkers = storage.markers
-      vim._run(name, {markEverything: true}, (newResult) ->
-        return unless storage.markers == lastMarkers
-        setMarkers(newResult)
-      )
-  )
+    if pass == 'first'
+      vim._run(name, {pass: 'second'}, injectHints)
+
+  vim._run(name, {pass: 'auto'}, injectHints)
 
 helper_follow_clickable = (options, {vim, count = 1}) ->
   callback = (marker, timesLeft, keyStr) ->
@@ -529,6 +541,7 @@ commands.follow_in_window = ({vim}) ->
     vim._focusMarkerElement(marker.wrapper.elementIndex)
     {href} = marker.wrapper
     vim.window.openLinkIn(href, 'window', {}) if href
+    return false
   helper_follow('follow_in_tab', vim, callback)
 
 commands.follow_multiple = (args) ->
@@ -542,22 +555,23 @@ commands.follow_copy = ({vim}) ->
         'href'
       when 'text'
         'value'
-      when 'contenteditable', 'other'
+      when 'contenteditable', 'complementary'
         '_selection'
     helper_copy_marker_element(vim, marker.wrapper.elementIndex, property)
+    return false
   helper_follow('follow_copy', vim, callback)
 
 commands.follow_focus = ({vim}) ->
   callback = (marker) ->
     vim._focusMarkerElement(marker.wrapper.elementIndex, {select: true})
+    return false
   helper_follow('follow_focus', vim, callback)
 
 commands.click_browser_element = ({vim}) ->
+  {window} = vim
   markerElements = []
 
-  filter = ({markEverything}, element, getElementShape) ->
-    document = element.ownerDocument
-    semantic = true
+  filter = ({complementary}, element, getElementShape) ->
     type = switch
       when vim._state.scrollableElements.has(element)
         'scrollable'
@@ -565,21 +579,20 @@ commands.click_browser_element = ({vim}) ->
            (element.onclick and element.localName != 'statuspanel')
         'clickable'
 
-    if markEverything and not type
-      type = 'other'
-      semantic = false
+    if complementary
+      type = if type then null else 'complementary'
 
     return unless type
     return unless shape = getElementShape(element)
     length = markerElements.push(element)
-    return {type, semantic, shape, elementIndex: length - 1}
+    return {type, shape, elementIndex: length - 1}
 
   callback = (marker) ->
     element = markerElements[marker.wrapper.elementIndex]
     switch marker.wrapper.type
       when 'scrollable'
         utils.focusElement(element, {flag: 'FLAG_BYKEY'})
-      when 'clickable', 'other'
+      when 'clickable', 'complementary'
         sequence =
           if element.localName == 'tab'
             ['mousedown']
@@ -587,26 +600,34 @@ commands.click_browser_element = ({vim}) ->
             'click-xul'
         utils.focusElement(element)
         utils.simulateMouseEvents(element, sequence)
+    return false
 
-  createMarkers = (wrappers) ->
-    viewport = viewportUtils.getWindowViewport(vim.window)
-    {markers} = hints.injectHints(vim.window, wrappers, viewport, {
-      hint_chars: vim.options.hint_chars
-      ui: true
-    })
-    return markers
-
-  wrappers = hints.getMarkableElements(
-    vim.window, filter.bind(null, {markEverything: false})
+  wrappers = markableElements.find(
+    window, filter.bind(null, {complementary: false})
   )
 
   if wrappers.length > 0
-    storage = vim.enterMode('hints', createMarkers(wrappers), callback)
-    storage.markEverything = ->
-      newWrappers = hints.getMarkableElements(
-        vim.window, filter.bind(null, {markEverything: true})
-      )
-      storage.markers = createMarkers(newWrappers)
+    viewport = viewportUtils.getWindowViewport(window)
+
+    markerContainer = new MarkerContainer({
+      window
+      hintChars: vim.options.hint_chars
+      adjustZoom: false
+      getComplementaryWrappers: (callback) ->
+        newWrappers = markableElements.find(
+          window, filter.bind(null, {complementary: true})
+        )
+        callback({wrappers: newWrappers, viewport})
+    })
+    MarkerContainer.remove(window) # Better safe than sorry.
+    markerContainer.container.classList.add('ui')
+    window.document.getElementById('browser-panel').appendChild(
+      markerContainer.container
+    )
+
+    markerContainer.injectHints(wrappers, viewport, 'single')
+    vim.enterMode('hints', {markerContainer, callback})
+
   else
     vim.notify(translate('notification.follow.none'))
 
@@ -634,6 +655,7 @@ helper_follow_selectable = ({select}, {vim}) ->
       scroll: select
     })
     vim.enterMode('caret', select)
+    return false
   helper_follow('follow_selectable', vim, callback)
 
 commands.element_text_caret =
@@ -645,6 +667,7 @@ commands.element_text_select =
 commands.element_text_copy = ({vim}) ->
   callback = (marker) ->
     helper_copy_marker_element(vim, marker.wrapper.elementIndex, '_selection')
+    return false
   helper_follow('follow_selectable', vim, callback)
 
 helper_copy_marker_element = (vim, elementIndex, property) ->
@@ -758,7 +781,7 @@ commands.esc = ({vim}) ->
   vim._run('esc')
   utils.blurActiveBrowserElement(vim)
   vim.window.gBrowser.getFindBar().close()
-  hints.removeHints(vim.window) # Better safe than sorry.
+  MarkerContainer.remove(vim.window) # Better safe than sorry.
 
   # Calling `.hide()` when the toolbar is not open can destroy it for the rest
   # of the Firefox session. The code here is taken from the `.toggle()` method.
