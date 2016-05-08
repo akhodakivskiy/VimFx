@@ -517,15 +517,14 @@ commands.follow_multiple = (args) ->
 
 commands.follow_copy = ({vim}) ->
   callback = (marker) ->
-    {elementIndex} = marker.wrapper
     property = switch marker.wrapper.type
       when 'link'
         'href'
       when 'text'
         'value'
       when 'contenteditable', 'other'
-        'textContent'
-    vim._run('copy_marker_element', {elementIndex, property})
+        '_selection'
+    helper_copy_marker_element(vim, marker.wrapper.elementIndex, property)
   helper_follow('follow_copy', vim, callback)
 
 commands.follow_focus = ({vim}) ->
@@ -612,6 +611,7 @@ helper_follow_selectable = ({select}, {vim}) ->
     vim._run('element_text_select', {
       elementIndex: marker.wrapper.elementIndex
       full: select
+      scroll: select
     })
     vim.enterMode('caret', select)
   helper_follow('follow_selectable', vim, callback)
@@ -624,11 +624,22 @@ commands.element_text_select =
 
 commands.element_text_copy = ({vim}) ->
   callback = (marker) ->
-    vim._run('copy_marker_element', {
-      elementIndex: marker.wrapper.elementIndex
-      property: 'textContent'
-    })
+    helper_copy_marker_element(vim, marker.wrapper.elementIndex, '_selection')
   helper_follow('follow_selectable', vim, callback)
+
+helper_copy_marker_element = (vim, elementIndex, property) ->
+  if property == '_selection'
+    # Selecting the text and then copying that selection is better than copying
+    # `.textContent`. Slack uses markdown-style backtick syntax for code spans
+    # and then includes those backticks in the compiled output (!), in hidden
+    # `<span>`s, so `.textContent` would copy those too. In `contenteditable`
+    # elements, text selection gives better whitespace than `.textContent`.
+    vim._run('element_text_select', {elementIndex, full: true}, ->
+      vim.window.goDoCommand('cmd_copy') # See `caret.copy_selection_and_exit`.
+      vim._run('clear_selection')
+    )
+  else
+    vim._run('copy_marker_element', {elementIndex, property})
 
 
 

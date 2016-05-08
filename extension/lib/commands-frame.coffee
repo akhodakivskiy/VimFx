@@ -334,16 +334,14 @@ commands.copy_marker_element = ({vim, elementIndex, property}) ->
   {element} = vim.state.markerElements[elementIndex]
   utils.writeToClipboard(element[property])
 
-commands.element_text_select = ({vim, elementIndex, full}) ->
+commands.element_text_select = ({vim, elementIndex, full, scroll = false}) ->
   {element} = vim.state.markerElements[elementIndex]
   window = element.ownerGlobal
   selection = window.getSelection()
   range = window.document.createRange()
 
-  if full
-    range.selectNodeContents(element)
-
-    # Try to scroll the element into view, but keep the caret visible.
+  # Try to scroll the element into view, but keep the caret visible.
+  if scroll
     viewport = viewportUtils.getWindowViewport(window)
     rect = element.getBoundingClientRect()
     block = switch
@@ -363,6 +361,8 @@ commands.element_text_select = ({vim, elementIndex, full}) ->
         behavior: if smooth then 'smooth' else 'instant'
       })
 
+  if full
+    range.selectNodeContents(element)
   else
     result = viewportUtils.getFirstNonWhitespace(element)
     if result
