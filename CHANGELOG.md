@@ -1,3 +1,9 @@
+### 0.14.3 (2016-05-08)
+
+- Fixed: Version 0.14.2 attempted to fix smooth scrolling speed in newer Firefox
+  versions. However, there was a tiny typo that caused the fix not to work. That
+  typo has been corrected.
+
 ### 0.14.2 (2016-05-08)
 
 - Fixed: Smooth scrolling speed is now correct again in newer Firefox versions.
