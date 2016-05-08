@@ -757,9 +757,14 @@ commands.dev = ({vim}) ->
 commands.esc = ({vim}) ->
   vim._run('esc')
   utils.blurActiveBrowserElement(vim)
-  vim.window.DeveloperToolbar.hide()
   vim.window.gBrowser.getFindBar().close()
   hints.removeHints(vim.window) # Better safe than sorry.
+
+  # Calling `.hide()` when the toolbar is not open can destroy it for the rest
+  # of the Firefox session. The code here is taken from the `.toggle()` method.
+  {DeveloperToolbar} = vim.window
+  if DeveloperToolbar.visible
+    DeveloperToolbar.hide().catch(console.error)
 
   unless help.getSearchInput(vim.window)?.getAttribute('focused')
     help.removeHelp(vim.window)
