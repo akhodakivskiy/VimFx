@@ -178,7 +178,7 @@ helper_scroll = (vim, uiEvent, args...) ->
       prefs.root.set(SPRING_CONSTANT_PREF, springConstant.value)
       springConstant.nonce = null
       springConstant.value = null
-    ), vim.options.reset_timeout)
+    ), vim.options['scroll.reset_timeout'])
 
   helpScroll = help.getHelp(vim.window)?.querySelector('.wrapper')
   if uiEvent or helpScroll
