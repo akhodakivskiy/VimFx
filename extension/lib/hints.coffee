@@ -291,8 +291,8 @@ getFirstNonCoveredPoint = (window, viewport, element, elementRect, parents) ->
       currentWindow = window
       for parent in parents by -1
         # If leaving the devtools container take the devtools zoom into account.
-        if currentWindow.DevTools and not parent.window.DevTools
-          toolbox = window.gDevTools.getToolbox(
+        if utils.isDevtoolsWindow(currentWindow)
+          toolbox = window.top.gDevTools.getToolbox(
             devtools.TargetFactory.forTab(window.top.gBrowser.selectedTab)
           )
           if toolbox

@@ -76,7 +76,7 @@ isAdjustable = (element) ->
          element.classList?.contains('ytp-button') or
          # Allow navigating object inspection trees in th devtools with the
          # arrow keys, even if the arrow keys are used as VimFx shortcuts.
-         element.ownerGlobal?.DevTools
+         isDevtoolsElement(element)
 
 isContentEditable = (element) ->
   return element.isContentEditable or
@@ -86,6 +86,16 @@ isContentEditable = (element) ->
          element.ownerDocument?.body?.getAttribute?('g_editable') == 'true' or
          # Codeacademy terminals.
          element.classList?.contains('real-terminal')
+
+isDevtoolsElement = (element) ->
+  return false unless element.ownerGlobal
+  return Array.some(element.ownerGlobal.top.frames, isDevtoolsWindow)
+
+isDevtoolsWindow = (window) ->
+  return window.location?.href in [
+    'about:devtools-toolbox'
+    'chrome://devtools/content/framework/toolbox.xul'
+  ]
 
 isFocusable = (element) ->
   return element.tabIndex > -1 and
@@ -556,6 +566,8 @@ module.exports = {
   isActivatable
   isAdjustable
   isContentEditable
+  isDevtoolsElement
+  isDevtoolsWindow
   isFocusable
   isIframeEditor
   isIgnoreModeFocusType

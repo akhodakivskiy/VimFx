@@ -100,7 +100,7 @@ mode('normal', {
       # dialog (<c-d>). However, an exception is made for the devtools (<c-K>).
       # There, trying to unfocus the devtools using Escape would annoyingly
       # open the split console.
-      return uiEvent.originalTarget.ownerGlobal.DevTools?
+      return utils.isDevtoolsElement(uiEvent.originalTarget)
     else
       # In web pages content, an exception is made if an element that VimFx
       # cares about is focused. That allows for blurring an input in a custom
