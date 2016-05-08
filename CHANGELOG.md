@@ -1,3 +1,21 @@
+### 0.14.2 (2016-05-08)
+
+- Fixed: Smooth scrolling speed is now correct again in newer Firefox versions.
+- Fixed: The `yv` Caret mode command now only copies text that you can see on
+  screen (not any hidden text that might be on the page), making it truly work
+  like `zv` followed by `y`, as intended. This problem was very noticeable on
+  Slack. This also improves copying of 'contenteditable' elements using `yf`.
+- Fixed: `<escape>` and arrow key handling as well as hint markers in the
+  devtools now work correctly again in newer Firefox versions.
+- Fixed: VimFx no longer makes it impossible to open the Developer Toolbar.
+- Improved: VimFx now ignores `<numlock>` and `<capslock>`. If your keyboard
+  sends `<numlock>` before some symbols, such as `<numlock>$` instead of just
+  `$`, shortcuts like `gx$` now work out of the box. This also means that you
+  can use `<capslock>` instead of `<shift>` when typing the `J` in `gJ`, for
+  example.
+- Improved: Some minor cosmetic tweaks in VimFx’s Keyboard Shortcuts help
+  dialog.
+
 ### 0.14.1 (2016-04-30)
 
 - Fixed: The Find commands (such as `/`, `n` and `N`) no longer crash on some
