@@ -261,9 +261,9 @@ getWindowViewport = (window) ->
 isInsideViewport = (rect, viewport) ->
   return \
     rect.left   <= viewport.right  - MINIMUM_EDGE_DISTANCE and
-    rect.top    <= viewport.bottom + MINIMUM_EDGE_DISTANCE and
+    rect.top    <= viewport.bottom - MINIMUM_EDGE_DISTANCE and
     rect.right  >= viewport.left   + MINIMUM_EDGE_DISTANCE and
-    rect.bottom >= viewport.top    - MINIMUM_EDGE_DISTANCE
+    rect.bottom >= viewport.top    + MINIMUM_EDGE_DISTANCE
 
 scroll = (element, args) ->
   {method, type, directions, amounts, properties, adjustment, smooth} = args
