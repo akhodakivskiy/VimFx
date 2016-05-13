@@ -123,7 +123,13 @@ module.exports = (data, reason) ->
     callback(true)
   )
 
-  messageManager.load("#{ADDON_PATH}/content/bootstrap.js")
+  # For tabs not visited yet since a session restore (“pending” tabs), Firefox
+  # seems to not load the frame script immediately, but instead remember the URI
+  # and load it when the user eventually visits that tab. If VimFx is updated
+  # during that time this means that the below URI is saved several times, and
+  # will be loaded that many times. Therefore the URI is changed with each
+  # build, causing remembered URIs to point to non-existent files.
+  messageManager.load("#{ADDON_PATH}/content/bootstrap-frame-#{BUILD_TIME}.js")
 
   # @if TESTS
   test(vimfx)
