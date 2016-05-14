@@ -17,7 +17,7 @@
   },
   "devDependencies": {
     "addons-linter": "^0.3.1",
-    "coffee-script": "jashkenas/coffeescript",
+    "coffee-script": "jashkenas/coffeescript#87216ea5b64804aac584966b60063ddc77c69f2b",
     "coffeelint": "^1.15.7",
     "coffeelint-forbidden-keywords": "^0.1.1",
     "gulp": "^3.9.1",
