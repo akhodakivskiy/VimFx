@@ -95,7 +95,7 @@ exports['test customization'] = (assert, $vimfx, teardown) ->
   )
 
   nonce = {}
-  event = {code: 'KeyQ'}
+  event = {code: 'KeyQ', key: 'q'}
 
   # Add a simple test command.
   vimfx.addCommand({
