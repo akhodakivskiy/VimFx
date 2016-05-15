@@ -48,6 +48,24 @@ parseSpaceDelimitedString = (value) ->
   parsed = utils.removeDuplicates(value.split(/\s+/)).filter(Boolean)
   return {parsed, normalized: parsed.join('  ')}
 
+parseHintChars = (value, defaultValue) ->
+  [leading..., end] = value.trim().split(/\s+/)
+  parsed = if leading.length > 0 then "#{leading.join('')} #{end}" else end
+  parsed = utils.removeDuplicateCharacters(parsed)
+
+  # Make sure that hint chars contain at least the required amount of chars.
+  diff = MIN_NUM_HINT_CHARS - parsed.length
+  if diff > 0
+    parsed = parsed + defaultValue[...diff]
+
+  unless parsed.includes(' ')
+    numDefaultSecondaryHintChars =
+      defaultValue.length - 1 - defaultValue.indexOf(' ')
+    index = Math.min(parsed.length // 2, numDefaultSecondaryHintChars)
+    parsed = "#{parsed[...-index]} #{parsed[-index..]}"
+
+  return {parsed, normalized: parsed}
+
 parsePatterns = (value) ->
   result = parseSpaceDelimitedString(value)
   # The patterns are case insensitive regexes and must match either in the
@@ -69,33 +87,20 @@ parsePatterns = (value) ->
   )
   return result
 
+parseBlacklist = (value) ->
+  result = parseSpaceDelimitedString(value)
+  result.parsed = result.parsed.map((pattern) ->
+    return ///^#{utils.regexEscape(pattern).replace(/\\\*/g, '.*')}$///i
+  )
+  return result
+
 parsers = {
-  hint_chars: (value, defaultValue) ->
-    [leading..., end] = value.trim().split(/\s+/)
-    parsed = if leading.length > 0 then "#{leading.join('')} #{end}" else end
-    parsed = utils.removeDuplicateCharacters(parsed)
-
-    # Make sure that hint chars contain at least the required amount of chars.
-    if parsed.length < MIN_NUM_HINT_CHARS
-      parsed = defaultValue[...MIN_NUM_HINT_CHARS]
-
-    unless parsed.includes(' ')
-      numDefaultSecondaryHintChars =
-        defaultValue.length - 1 - defaultValue.indexOf(' ')
-      index = Math.min(parsed.length // 2, numDefaultSecondaryHintChars)
-      parsed = "#{parsed[...-index]} #{parsed[-index..]}"
-
-    return {parsed, normalized: parsed}
+  hint_chars: parseHintChars
 
   prev_patterns: parsePatterns
   next_patterns: parsePatterns
 
-  blacklist: (value) ->
-    result = parseSpaceDelimitedString(value)
-    result.parsed = result.parsed.map((pattern) ->
-      return ///^#{utils.regexEscape(pattern).replace(/\\\*/g, '.*')}$///i
-    )
-    return result
+  blacklist: parseBlacklist
 
   prevent_autofocus_modes: parseSpaceDelimitedString
 
