@@ -6,11 +6,12 @@ See the file README.md for copying conditions.
 
 # Styling
 
-It is possible to change the style of VimFx’s hint markers, help dialog and
-button with CSS. In fact, using the techniques shown here you can re-style
-almost _any_ part of Firefox.
+It is possible to change the style of VimFx’s hint markers (such as the font
+size), help dialog and button with CSS. In fact, using the techniques shown here
+you can re-style almost _any_ part of Firefox.
 
-1. Copy rules from [style.css] into [userChrome.css] or a new [Stylish] style.
+1. Copy stuff from the below examples or from [style.css] into [userChrome.css]
+   or a new [Stylish] style. You get far just by copying and pasting.
 
 2. Make sure that the following code is at the top of the file:
 
@@ -18,11 +19,10 @@ almost _any_ part of Firefox.
    @namespace url(http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul);
    ```
 
-   It makes sure that your CSS only affects the browser chrome and not web
-   pages.
+   It makes sure that your CSS only affects the browser UI and not web pages.
 
-3. Adjust the rules to your likings. Make sure to end all declarations with
-   `!important` so that they override VimFx’d default styles properly.
+3. Adjust the CSS to your likings. Make sure to end lines with `!important`, so
+   that they override VimFx’s default styles properly.
 
 If you use `userChrome.css` you need to restart Firefox for your changes to take
 effect, while Stylish applies them instantly.
@@ -34,11 +34,11 @@ effect, while Stylish applies them instantly.
 
 ## Examples
 
-Making small adjustments to hint markers:
+Making small adjustments to hint markers (such as font size):
 
 ```css
 #VimFxMarkersContainer .marker {
-  font-size: 1.2em !important; /* Larger text. */
+  font-size: 12px !important; /* Specific font size. */
   text-transform: lowercase !important; /* Lowercase text. */
   opacity: 0.8 !important; /* Semi-transparent. Warning: Might be slow! */
 }

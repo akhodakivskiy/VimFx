@@ -20,6 +20,9 @@ License"](GNU%20Free%20Documentation%20License).
 - [Options](options.md)
   – All of VimFx’s _options_ listed and explained in one place.
 
+- [Styling](styling.md)
+  – Customize the looks of VimFx, such as hint marker font size.
+
 - [Modes](modes.md)
   – An introduction to VimFx’s _modes._
 
@@ -43,9 +46,6 @@ Also check out the [wiki](https://github.com/akhodakivskiy/VimFx/wiki)!
 [button-icon]: ../extension/skin/icon16.png
 
 ### For advanced users
-
-- [Styling](styling.md)
-  – Customize the looks of VimFx.
 
 - [Config file](config-file.md)
   – Add custom commands and customize VimFx using a text file.

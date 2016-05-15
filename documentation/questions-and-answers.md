@@ -50,6 +50,12 @@ the [Ignore keyboard layout] option.
 
 [Ignore keyboard layout]: options.md#ignore-keyboard-layout
 
+## How do I change the font size of hint markers?
+
+Head over to the [Styling] documentation to learn how to do that.
+
+[Styling]: styling.md
+
 ## Going back/forward doesn’t work!
 
 Pressing `H` is like hitting the back button. Use `L` for the forward button.
