@@ -478,7 +478,6 @@ includes = (string, search) ->
   return false unless typeof string == 'string'
   return string.toLowerCase().includes(search)
 
-
 nextTick = (window, fn) -> window.setTimeout((-> fn()) , 0)
 
 regexEscape = (s) -> s.replace(/[|\\{}()[\]^$+*?.]/g, '\\$&')
