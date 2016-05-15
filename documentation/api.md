@@ -308,7 +308,8 @@ The event is useful for knowing when to update UI showing the current mode.
 
 #### The `focusTypeChange` event
 
-Occurs when focusing or blurring any element.
+Occurs when focusing or blurring any element. See also the [`blur_timeout`]
+pref.
 
 `data`:
 
@@ -814,6 +815,7 @@ backwards compatibility will be a priority and won’t be broken until VimFx
 [autofocus prevention]: options.md#prevent-autofocus
 [`activatable_element_keys`]: options.md#activatable_element_keys
 [`adjustable_element_keys`]: options.md#adjustable_element_keys
+[`blur_timeout`]: options.md#blur_timeout
 [`notifications_enabled`]: options.md#notifications_enabled
 
 [button]: button.md

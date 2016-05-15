@@ -313,6 +313,18 @@ exists. See the [config file] documentation for more information.
 
 [config file]: config-file.md
 
+### `blur_timeout`
+
+The number of milliseconds VimFx should wait after an element has been blurred
+before checking if you’re inside a text input or not.
+
+Some sites with fancy text inputs (such as twitter) blur the text input for a
+split second and then re-focus it again while typing (for some reason). If you
+happen to press a key during that split second, that key might trigger a VimFx
+shortcut instead of typing into the text input, which can be quite annoying. To
+avoid the problem, VimFx waits a bit before checking if you have left the text
+input.
+
 ### `hints_timeout`
 
 The number of milliseconds a matched hint marker should stay on screen before

@@ -165,6 +165,7 @@ advanced_options =
   'ignore_ctrl_alt':                    (Services.appinfo.OS == 'WINNT')
   'prevent_autofocus_modes':            'normal'
   'config_file_directory':              ''
+  'blur_timeout':                       50
   'hints_timeout':                      200
   'hints_sleep':                        15
   'smoothScroll.lines.spring-constant': '1000'

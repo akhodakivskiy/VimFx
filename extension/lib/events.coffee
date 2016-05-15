@@ -99,7 +99,6 @@ class UIEventManager
     )
 
     handleFocusRelatedEvent = (event) =>
-      target = event.originalTarget
       return unless vim = @vimfx.getCurrentVim(@window)
 
       if vim.isUIEvent(event)
@@ -110,7 +109,11 @@ class UIEventManager
           vim.enterMode('normal')
 
     @listen('focus', handleFocusRelatedEvent)
-    @listen('blur',  handleFocusRelatedEvent)
+    @listen('blur', (event) =>
+      @window.setTimeout((->
+        handleFocusRelatedEvent(event)
+      ), @vimfx.options.blur_timeout)
+    )
 
     @listen('click', (event) =>
       target = event.originalTarget

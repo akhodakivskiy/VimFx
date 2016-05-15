@@ -241,7 +241,9 @@ class FrameEventManager
 
       @vim.clearHover() if target == @vim.state.lastHoveredElement
 
-      @sendFocusType()
+      @vim.content.setTimeout((=>
+        @sendFocusType()
+      ), prefs.get('blur_timeout'))
 
       # If a text input is blurred immediately before the document loses focus,
       # it most likely means that the user switched tab, for example by pressing
