@@ -1,3 +1,27 @@
+### 0.15.0 (2016-05-18)
+
+- Improved: Hint markers now appear up to twice as fast on many pages. This is
+  done by creating the hint markers in two phases. Most are created in the
+  first, fast, phase. The rest take the same time as older VimFx versions to
+  show up.
+- Fixed: VimFx no longer triggers commands while typing in fancy text inputs on
+  some sites, such as when composing a new tweet on Twitter. (See also the
+  [`blur_timeout`] pref.)
+- Changed: The `<c-enter>` Hints mode command no longer _replaces_ all hint
+  markers on screen (with new ones for all elements on screen). Instead, it
+  _toggles_ your current hint markers with ones for all _other_ elements on
+  screen.
+- Changed: There was a breaking change to the [`vimfx.setHintMatcher`] function
+  of the `frame.js` config file API. It no longer receives and returns an object
+  (of the shape `{type, semantic}`), but instead simply receives and returns the
+  `type` of the element.
+- Improved: Some internal robustness refactoring.
+- Updated locales: de, id, nl and zh-CN. Thanks to @just-barcodes, Yoppy
+  Halilintar (@comepradz), @HJTP, @av2000ii and @mozillazg.
+
+[`blur_timeout`]: https://github.com/akhodakivskiy/VimFx/blob/4a1d2468ee558ad1fdf9a4ab60f942d81bbc0b57/documentation/options.md#blur_timeout
+[`vimfx.setHintMatcher`]: https://github.com/akhodakivskiy/VimFx/blob/4a1d2468ee558ad1fdf9a4ab60f942d81bbc0b57/documentation/api.md#vimfxsethintmatcherhintmatcher
+
 ### 0.14.3 (2016-05-08)
 
 - Fixed: Version 0.14.2 attempted to fix smooth scrolling speed in newer Firefox
