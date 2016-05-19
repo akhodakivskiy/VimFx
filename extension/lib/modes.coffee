@@ -144,7 +144,6 @@ mode('caret', {
     storage.removeListener = null
 
   onInput: (args, match) ->
-    {vim, storage} = args
     if match.type == 'full'
       match.command.run(args)
       return true
