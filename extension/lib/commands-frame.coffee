@@ -259,6 +259,8 @@ commands.follow = helper_follow.bind(
             utils.includes(element.getAttribute?('aria-label'), 'close') or
             # Do this last as it’s a potentially expensive check.
             utils.hasEventListeners(element, 'click'))
+        # on Twitter, the hint for this element covers the actual hint
+        return null if element.classList?.contains('js-new-items-bar-container')
         # Make a quick check for likely clickable descendants, to reduce the
         # number of false positives. the element might be a “button-wrapper” or
         # a large element with a click-tracking event listener.
