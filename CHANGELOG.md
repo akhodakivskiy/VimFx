@@ -1,3 +1,12 @@
+### 0.15.1 (2016-05-22)
+
+- Improved: Better hints on Twitter.
+- Improved: Compatibility with the [Evernote Web Clipper] add-on (and
+  potentially other add-ons with similar UI).
+- Updated locale: ja. Thanks to Kaoru Esashika (@pluser)!
+
+[Evernote Web Clipper]: https://addons.mozilla.org/firefox/addon/evernote-web-clipper/
+
 ### 0.15.0 (2016-05-18)
 
 - Improved: Hint markers now appear up to twice as fast on many pages. This is
