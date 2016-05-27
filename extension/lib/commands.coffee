@@ -729,9 +729,19 @@ helper_find_again = (direction, {vim}) ->
   helper_mark_last_scroll_position(vim)
   helper_find_from_top_of_viewport(vim, direction, ->
     findBar._findField.value = findStorage.lastSearchString
+
+    # Temporarily hack `.onFindResult` to be able to know when the asynchronous
+    # `.onFindAgainCommand` is done.
+    originalOnFindResult = findBar.onFindResult
+    findBar.onFindResult = (data) ->
+      # Prevent the find bar from re-opening if there are no matches.
+      data.storeResult = false
+      findBar.onFindResult = originalOnFindResult
+      findBar.onFindResult(data)
+      message = findBar._findStatusDesc.textContent
+      vim.notify(message) if message
+
     findBar.onFindAgainCommand(not direction)
-    message = findBar._findStatusDesc.textContent
-    vim.notify(message) if message
   )
 
 commands.find_next     = helper_find_again.bind(null, FORWARD)
