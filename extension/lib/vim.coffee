@@ -179,7 +179,9 @@ class Vim
     @browser.focus()
     @_run('focus_marker_element', {elementIndex, options})
 
-  _setFocusType: (@focusType) ->
+  _setFocusType: (focusType) ->
+    return if focusType == @focusType
+    @focusType = focusType
     switch
       when @focusType == 'ignore'
         @enterMode('ignore', {type: 'focusType'})

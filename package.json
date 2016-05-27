@@ -1,6 +1,6 @@
 {
   "name": "VimFx",
-  "version": "0.14.3",
+  "version": "0.15.1",
   "firefoxVersions": {
     "min": "45.0",
     "max": "*"
@@ -16,7 +16,7 @@
     "vim-like-key-notation": "^1.0.0"
   },
   "devDependencies": {
-    "addons-linter": "^0.3.1",
+    "addons-linter": "^0.4.0",
     "coffee-script": "jashkenas/coffeescript#87216ea5b64804aac584966b60063ddc77c69f2b",
     "coffeelint": "^1.15.7",
     "coffeelint-forbidden-keywords": "^0.1.1",
@@ -35,6 +35,6 @@
     "request": "^2.72.0",
     "require-precompute": "^0.2.0",
     "rimraf": "^2.5.2",
-    "run-sequence": "^1.1.5"
+    "run-sequence": "^1.2.0"
   }
 }

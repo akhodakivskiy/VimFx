@@ -101,12 +101,18 @@ class UIEventManager
     handleFocusRelatedEvent = (event) =>
       return unless vim = @vimfx.getCurrentVim(@window)
 
-      if vim.isUIEvent(event)
-        focusType = utils.getFocusType(utils.getActiveElement(@window))
-        vim._setFocusType(focusType)
+      # We used to only continue if `vim.isUIEvent(event)` here, but that’s not
+      # entirely reliable. Elements focused and blurred inside the Evernote Web
+      # Clipper extension’s popup (which is an `<iframe>` injected into the
+      # browser UI) _are_ UI elements, but seem to be indistinguishable from
+      # non-UI elements. Luckily, it doesn’t matter if we happen to handle
+      # non-UI elements when determining the focus type. TODO: Remove this
+      # comment when non-multi-process is removed from Firefox.
+      focusType = utils.getFocusType(utils.getActiveElement(@window))
+      vim._setFocusType(focusType)
 
-        if focusType == 'editable' and vim.mode == 'caret'
-          vim.enterMode('normal')
+      if focusType == 'editable' and vim.mode == 'caret'
+        vim.enterMode('normal')
 
     @listen('focus', handleFocusRelatedEvent)
     @listen('blur', (event) =>
