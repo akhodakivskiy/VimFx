@@ -1,3 +1,7 @@
+### 0.16.1 (2016-05-29)
+
+- Fixed: The `zF` command no longer crashes (regression since 0.16.0).
+
 ### 0.16.0 (2016-05-29)
 
 - Fixed: The text input focus detection problems introduced in 0.15.1, which
