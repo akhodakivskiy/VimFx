@@ -31,7 +31,7 @@ XULDocument = Ci.nsIDOMXULDocument
 find = (window, filter, selector = '*') ->
   viewport = viewportUtils.getWindowViewport(window)
   wrappers = []
-  _getMarkableElements(window, viewport, wrappers, filter, selector)
+  getMarkableElements(window, viewport, wrappers, filter, selector)
   return wrappers
 
 # `filter` is a function that is given every element in every frame of the page.
@@ -43,7 +43,7 @@ find = (window, filter, selector = '*') ->
 # anyway behind the scenes. However, it is possible to pass in a CSS selector,
 # which allows getting markable elements in several passes with different sets
 # of candidates.
-_getMarkableElements = (
+getMarkableElements = (
   window, viewport, wrappers, filter, selector, parents = []
 ) ->
   {document} = window
@@ -54,9 +54,9 @@ _getMarkableElements = (
     rects = getRects(element, viewport)
     continue unless rects.length > 0
     continue unless wrapper = filter(
-      element, (elementArg) ->
+      element, (elementArg, tryRight = 1) ->
         return getElementShape(
-          window, viewport, parents, elementArg,
+          {window, viewport, parents, element: elementArg}, tryRight,
           if elementArg == element then rects else null
         )
     )
@@ -67,7 +67,7 @@ _getMarkableElements = (
       frame.frameElement, viewport
     )
     {viewport: frameViewport, offset} = result
-    _getMarkableElements(
+    getMarkableElements(
       frame, frameViewport, wrappers, filter, selector,
       parents.concat({window, offset})
     )
@@ -110,17 +110,18 @@ getRects = (element, viewport) ->
     (rect) -> viewportUtils.isInsideViewport(rect, viewport)
   )
 
-# Returns the “shape” of `element`:
+# Returns the “shape” of an element:
 #
-# - `nonCoveredPoint`: The coordinates of the first point of `element` that
-#   isn’t covered by another element (except children of `element`). It also
+# - `nonCoveredPoint`: The coordinates of the first point of the element that
+#   isn’t covered by another element (except children of the element). It also
 #   contains the offset needed to make those coordinates relative to the top
-#   frame, as well as the rectangle that the coordinates occur in.
-# - `area`: The area of the part of `element` that is inside `viewport`.
-#
-# Returns `null` if `element` is outside `viewport` or entirely covered by other
-# elements.
-getElementShape = (window, viewport, parents, element, rects = null) ->
+#   frame, as well as the rectangle that the coordinates occur in. It is `null`
+#   if the element is outside `viewport` or entirely covered by other elements.
+# - `area`: The area of the part of the element that is inside the viewport.
+getElementShape = (elementData, tryRight, rects = null) ->
+  {viewport, element} = elementData
+  result = {nonCoveredPoint: null, area: 0}
+
   rects ?= getRects(element, viewport)
   totalArea = 0
   visibleRects = []
@@ -141,116 +142,114 @@ getElementShape = (window, viewport, parents, element, rects = null) ->
         # Those are still clickable. Therefore we return the shape of the first
         # visible child instead. At least in that example, that’s the best bet.
         for child in element.children
-          shape = getElementShape(window, viewport, parents, child)
+          childData = Object.assign({}, elementData, {element: child})
+          shape = getElementShape(childData, tryRight)
           return shape if shape
-    return null
+    return result
+
+  result.area = totalArea
 
   # Even if `element` has a visible rect, it might be covered by other elements.
   for visibleRect in visibleRects
     nonCoveredPoint = getFirstNonCoveredPoint(
-      window, viewport, element, visibleRect, parents
+      elementData, visibleRect, tryRight
     )
     break if nonCoveredPoint
 
-  return null unless nonCoveredPoint
+  result.nonCoveredPoint = nonCoveredPoint
+  return result
 
-  return {
-    nonCoveredPoint, area: totalArea
-  }
-
-getFirstNonCoveredPoint = (window, viewport, element, elementRect, parents) ->
-  # Tries a point `(x + dx, y + dy)`. Returns `(x, y)` (and the frame offset)
-  # if it passes the tests. Otherwise it tries to the right of whatever is at
-  # `(x, y)`, `tryRight` times . If nothing succeeds, `false` is returned. `dx`
-  # and `dy` are used to offset the wanted point `(x, y)` while trying (see the
-  # invocations of `tryPoint` below).
-  tryPoint = (x, dx, y, dy, tryRight = 0) ->
-    elementAtPoint = window.document.elementFromPoint(x + dx, y + dy)
-    offset = {left: 0, top: 0}
-    found = false
-    firstLevel = true
-
-    # Ensure that `element`, or a child of `element` (anything inside an `<a>`
-    # is clickable too), really is present at (x,y). Note that this is not 100%
-    # bullet proof: Combinations of CSS can cause this check to fail, even
-    # though `element` isn’t covered. We don’t try to temporarily reset such CSS
-    # because of performance. Instead we rely on that some of the attempts below
-    # will work. (See further down for the special value `-1` of `tryRight`.)
-    if contains(element, elementAtPoint) or tryRight == -1
-      found = true
-      # If we’re currently in a frame, there might be something on top of the
-      # frame that covers `element`. Therefore we ensure that the frame really
-      # is present at the point for each parent in `parents`.
-      currentWindow = window
-      for parent in parents by -1
-        # If leaving the devtools container take the devtools zoom into account.
-        if utils.isDevtoolsWindow(currentWindow)
-          toolbox = window.top.gDevTools.getToolbox(
-            devtools.TargetFactory.forTab(window.top.gBrowser.selectedTab)
-          )
-          if toolbox
-            devtoolsZoom = toolbox.zoomValue
-            offset.left *= devtoolsZoom
-            offset.top  *= devtoolsZoom
-            x  *= devtoolsZoom
-            y  *= devtoolsZoom
-            dx *= devtoolsZoom
-            dy *= devtoolsZoom
-
-        offset.left += parent.offset.left
-        offset.top  += parent.offset.top
-        elementAtPoint = parent.window.document.elementFromPoint(
-          offset.left + x + dx, offset.top + y + dy
-        )
-        firstLevel = false
-        unless contains(currentWindow.frameElement, elementAtPoint)
-          found = false
-          break
-        currentWindow = parent.window
-
-    return {x, y, offset} if found
-
-    return false if elementAtPoint == null or tryRight <= 0
-    rect = elementAtPoint.getBoundingClientRect()
-
-    # `.getBoundingClientRect()` does not include pseudo-elements that are
-    # absolutely positioned so that they go outside of the element (which is
-    # common for `/###\`-looking tabs), but calling `.elementAtPoint()` on the
-    # pseudo-element _does_ return the element. This means that the covering
-    # element’s _rect_ won’t cover the element we’re looking for. If so, it’s
-    # better to try again, forcing the element to be considered located at this
-    # point. That’s what `-1` for the `tryRight` argument means.
-    if firstLevel and rect.right <= x + offset.left
-      return tryPoint(x, dx, y, dy, -1)
-
-    x = rect.right - offset.left + 1
-    return false if x > viewport.right
-    return tryPoint(x, 0, y, 0, tryRight - 1)
-
-
+getFirstNonCoveredPoint = (elementData, elementRect, tryRight) ->
   # Try the left-middle point, or immediately to the right of a covering element
-  # at that point. If both of those are covered the whole element is considered
-  # to be covered. The reasoning is:
+  # at that point (when `tryRight == 1`). If both of those are covered the whole
+  # element is considered to be covered. The reasoning is:
   #
   # - A marker should show up as near the left edge of its visible area as
   #   possible. Having it appear to the far right (for example) is confusing.
   # - We can’t try too many times because of performance.
-  # - We used to try left-top first, but if `element` has `border-radius`, the
-  #   corners won’t really belong to `element`, so `document.elementFromPoint()`
-  #   will return whatever is behind. This will result in missing or
-  #   out-of-place markers. The solution is to temporarily add a CSS class that
-  #   removes `border-radius`, but that turned out to be rather slow, making it
-  #   not worth it. Usually you don’t see the difference between left-top and
-  #   left-middle, because links are usually not that high.
+  # - We used to try left-top first, but if the element has `border-radius`, the
+  #   corners won’t belong to the element, so `document.elementFromPoint()` will
+  #   return whatever is behind. One _could_ temporarily add a CSS class that
+  #   removes `border-radius`, but that turned out to be too slow. Trying
+  #   left-middle instead avoids the problem, and looks quite nice, actually.
   # - We used to try left-bottom as well, but that is so rare that it’s not
   #   worth it.
   #
   # It is safer to try points at least one pixel into the element from the
   # edges, hence the `+1`.
   {left, top, bottom, height} = elementRect
-  nonCoveredPoint = tryPoint(left, +1, Math.floor(top + height / 2), 0, 1)
+  return tryPoint(
+    elementData, left, +1, Math.floor(top + height / 2), 0, tryRight
+  )
 
-  return nonCoveredPoint
+# Tries a point `(x + dx, y + dy)`. Returns `(x, y)` (and the frame offset) if
+# the element passes the tests. Otherwise it tries to the right of whatever is
+# at `(x, y)`, `tryRight` times . If nothing succeeds, `false` is returned. `dx`
+# and `dy` are used to offset the wanted point `(x, y)` while trying.
+tryPoint = (elementData, x, dx, y, dy, tryRight = 0) ->
+  {window, viewport, parents, element} = elementData
+  elementAtPoint = window.document.elementFromPoint(x + dx, y + dy)
+  offset = {left: 0, top: 0}
+  found = false
+  firstLevel = true
+
+  # Ensure that `element`, or a child of `element` (anything inside an `<a>` is
+  # clickable too), really is present at (x,y). Note that this is not 100%
+  # bullet proof: Combinations of CSS can cause this check to fail, even though
+  # `element` isn’t covered. We don’t try to temporarily reset such CSS because
+  # of performance. (See further down for the special value `-1` of `tryRight`.)
+  if contains(element, elementAtPoint) or tryRight == -1
+    found = true
+    # If we’re currently in a frame, there might be something on top of the
+    # frame that covers `element`. Therefore we ensure that the frame really is
+    # present at the point for each parent in `parents`.
+    currentWindow = window
+    for parent in parents by -1
+      # If leaving the devtools container take the devtools zoom into account.
+      if utils.isDevtoolsWindow(currentWindow)
+        toolbox = window.top.gDevTools.getToolbox(
+          devtools.TargetFactory.forTab(window.top.gBrowser.selectedTab)
+        )
+        if toolbox
+          devtoolsZoom = toolbox.zoomValue
+          offset.left *= devtoolsZoom
+          offset.top  *= devtoolsZoom
+          x  *= devtoolsZoom
+          y  *= devtoolsZoom
+          dx *= devtoolsZoom
+          dy *= devtoolsZoom
+
+      offset.left += parent.offset.left
+      offset.top  += parent.offset.top
+      elementAtPoint = parent.window.document.elementFromPoint(
+        offset.left + x + dx, offset.top + y + dy
+      )
+      firstLevel = false
+      unless contains(currentWindow.frameElement, elementAtPoint)
+        found = false
+        break
+      currentWindow = parent.window
+
+  return {x, y, offset} if found
+
+  return false if elementAtPoint == null or tryRight <= 0
+  rect = elementAtPoint.getBoundingClientRect()
+
+  # `.getBoundingClientRect()` does not include pseudo-elements that are
+  # absolutely positioned so that they go outside of the element (which is
+  # common for `/###\`-looking tabs), but calling `.elementAtPoint()` on the
+  # pseudo-element _does_ return the element. This means that the covering
+  # element’s _rect_ won’t cover the element we’re looking for. If so, it’s
+  # better to try again, forcing the element to be considered located at this
+  # point. That’s what `-1` for the `tryRight` argument means. This is also used
+  # in the 'complementary' pass, to include elements considered covered in
+  # earlier passes (which might have been false positives).
+  if firstLevel and rect.right <= x + offset.left
+    return tryPoint(elementData, x, dx, y, dy, -1)
+
+  x = rect.right - offset.left + 1
+  return false if x > viewport.right
+  return tryPoint(elementData, x, 0, y, 0, tryRight - 1)
 
 # In XUL documents there are “anonymous” elements. These are never returned by
 # `document.elementFromPoint` but their closest non-anonymous parents are.

@@ -128,8 +128,8 @@ helper_follow = (options, matcher, {vim, pass}) ->
     # CodeMirror editor uses a tiny hidden textarea positioned at the caret.
     # Targeting those are the only reliable way of focusing CodeMirror editors,
     # and doing so without moving the caret.
-    if not shape and id == 'normal' and element.nodeName == 'TEXTAREA' and
-       element.ownerGlobal == vim.content
+    if not shape.nonCoveredPoint and id == 'normal' and
+       element.nodeName == 'TEXTAREA' and element.ownerGlobal == vim.content
       rect = element.getBoundingClientRect()
       # Use `.clientWidth` instead of `rect.width` because the latter includes
       # the width of the borders of the textarea, which are unreliable.
@@ -143,7 +143,10 @@ helper_follow = (options, matcher, {vim, pass}) ->
           area: rect.width * rect.height
         }
 
-    return unless shape
+    if not shape.nonCoveredPoint and pass == 'complementary'
+      shape = getElementShape(element, -1)
+
+    return unless shape.nonCoveredPoint
 
     originalRect = element.getBoundingClientRect()
     length = vim.state.markerElements.push({element, originalRect})
@@ -248,7 +251,7 @@ commands.follow = helper_follow.bind(
             document.getElementById?(element.htmlFor)
           else
             element.querySelector?('input, textarea, select')
-        if input and not getElementShape(input)
+        if input and not getElementShape(input).nonCoveredPoint
           type = 'clickable'
       # Last resort checks for elements that might be clickable because of
       # JavaScript.

@@ -583,7 +583,12 @@ commands.click_browser_element = ({vim}) ->
       type = if type then null else 'complementary'
 
     return unless type
+
+    # `getElementShape(element, -1)` is intentionally _not_ used in the
+    # `complementary` run, because it results in tons of useless hints for
+    # hidden context menus.
     return unless shape = getElementShape(element)
+
     length = markerElements.push(element)
     return {type, shape, elementIndex: length - 1}
 
