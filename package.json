@@ -16,14 +16,14 @@
     "vim-like-key-notation": "^1.0.0"
   },
   "devDependencies": {
-    "addons-linter": "^0.4.0",
+    "addons-linter": "^0.6.0",
     "coffee-script": "jashkenas/coffeescript#87216ea5b64804aac584966b60063ddc77c69f2b",
     "coffeelint": "^1.15.7",
     "coffeelint-forbidden-keywords": "^0.1.1",
     "gulp": "^3.9.1",
     "gulp-coffee": "^2.3.2",
     "gulp-coffeelint": "^0.6.0",
-    "gulp-git": "^1.7.1",
+    "gulp-git": "^1.7.2",
     "gulp-header": "^1.8.2",
     "gulp-mustache": "^2.2.0",
     "gulp-preprocess": "^2.0.0",
@@ -35,6 +35,6 @@
     "request": "^2.72.0",
     "require-precompute": "^0.2.0",
     "rimraf": "^2.5.2",
-    "run-sequence": "^1.2.0"
+    "run-sequence": "^1.2.1"
   }
 }
