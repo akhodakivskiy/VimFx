@@ -179,14 +179,15 @@ getFirstNonCoveredPoint = (elementData, elementRect, tryRight) ->
   # edges, hence the `+1`.
   {left, top, bottom, height} = elementRect
   return tryPoint(
-    elementData, left, +1, Math.floor(top + height / 2), 0, tryRight
+    elementData, elementRect,
+    left, +1, Math.floor(top + height / 2), 0, tryRight
   )
 
 # Tries a point `(x + dx, y + dy)`. Returns `(x, y)` (and the frame offset) if
 # the element passes the tests. Otherwise it tries to the right of whatever is
 # at `(x, y)`, `tryRight` times . If nothing succeeds, `false` is returned. `dx`
 # and `dy` are used to offset the wanted point `(x, y)` while trying.
-tryPoint = (elementData, x, dx, y, dy, tryRight = 0) ->
+tryPoint = (elementData, elementRect, x, dx, y, dy, tryRight = 0) ->
   {window, viewport, parents, element} = elementData
   elementAtPoint = window.document.elementFromPoint(x + dx, y + dy)
   offset = {left: 0, top: 0}
@@ -245,11 +246,21 @@ tryPoint = (elementData, x, dx, y, dy, tryRight = 0) ->
   # in the 'complementary' pass, to include elements considered covered in
   # earlier passes (which might have been false positives).
   if firstLevel and rect.right <= x + offset.left
-    return tryPoint(elementData, x, dx, y, dy, -1)
+    return tryPoint(elementData, elementRect, x, dx, y, dy, -1)
 
-  x = rect.right - offset.left + 1
-  return false if x > viewport.right
-  return tryPoint(elementData, x, 0, y, 0, tryRight - 1)
+  # If `elementAtPoint` is a parent to `element`, it most likely means that
+  # `element` is hidden some way. It can also mean that a pseudo-element of
+  # `elementAtPoint` covers `element` partly. Therefore, try once at the most
+  # likely point: The center of the part of the rect to the right of `x`.
+  if elementRect.right > x and contains(elementAtPoint, element)
+    return tryPoint(
+      elementData, elementRect,
+      (x + elementRect.right) / 2, 0, y, 0, 0
+    )
+
+  newX = rect.right - offset.left + 1
+  return false if newX > viewport.right or newX > elementRect.right
+  return tryPoint(elementData, elementRect, newX, 0, y, 0, tryRight - 1)
 
 # In XUL documents there are “anonymous” elements. These are never returned by
 # `document.elementFromPoint` but their closest non-anonymous parents are.
