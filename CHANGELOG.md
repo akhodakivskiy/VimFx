@@ -1,3 +1,15 @@
+### 0.16.0 (2016-05-29)
+
+- Fixed: The text input focus detection problems introduced in 0.15.1, which
+  sometimes caused VimFx commands to be triggered while typing in text inputs,
+  have been fixed.
+- Improved: If you press `n` or `N` when there are are no matches for your
+  search, the find bar is no longer opened. Only a notification is shown. The
+  reliability of those notifications has also been improved.
+- Improved: Hints mode now finds more links.
+- Improved: Pressing `<c-enter>` in Hints mode now includes more elements.
+- Updated locales: es, zh-CN. Thanks to @strel and @av2000ii!
+
 ### 0.15.1 (2016-05-22)
 
 - Improved: Better hints on Twitter.
