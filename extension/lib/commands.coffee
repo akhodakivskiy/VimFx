@@ -706,6 +706,10 @@ helper_find = ({highlight, linksOnly = false}, {vim}) ->
     helpSearchInput.select()
     return
 
+  # In case `helper_find_from_top_of_viewport` is slow, make sure that keys
+  # pressed before the find bar input is focsued doesn’t trigger commands.
+  vim.enterMode('find')
+
   helper_mark_last_scroll_position(vim)
   helper_find_from_top_of_viewport(vim, FORWARD, ->
     findBar = vim.window.gBrowser.getFindBar()
