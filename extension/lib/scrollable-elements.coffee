@@ -77,6 +77,20 @@ class ScrollableElements
            not @isScrollable(element)
       @add(element)
 
+      # The following scenario can happen (found on 2ality.com): First, the root
+      # element overflows just a pixel. That causes an 'overflow' event, but we
+      # don’t store it because the overflow is too small. Then, the overflow
+      # grows. That does _not_ cause new 'overflow' events. This way, the root
+      # element actually becomes scrollable, but we don’t get to know about it,
+      # making the root element impossible to scroll if there are other
+      # scrollable elements on the page. Therefore, always re-check the root
+      # element when adding new scrollable elements. This could in theory happen
+      # to _any_ scrollable element, but the by far most common thing is that
+      # the root element is scrollable.
+      root = @quirks(@window.document.documentElement)
+      unless @quirks(element) == root
+        @addChecked(root)
+
   deleteChecked: (element) ->
     # On some pages, such as Gmail, 'underflow' events may occur for elements
     # that are actually still scrollable! If so, keep the element.
