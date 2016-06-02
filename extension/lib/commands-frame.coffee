@@ -76,10 +76,10 @@ commands.scroll = (args) ->
   {vim} = args
   return unless activeElement = utils.getActiveElement(vim.content)
   element =
-    # If no element is focused on the page, the the active element is the
-    # topmost `<body>`, and blurring it is a no-op. If it is scrollable, it
-    # means that you can’t blur it in order to scroll `<html>`. Therefore it may
-    # only be scrolled if it has been explicitly focused.
+    # If no element is focused on the page, the active element is the topmost
+    # `<body>`, and blurring it is a no-op. If it is scrollable, it means that
+    # you can’t blur it in order to scroll `<html>`. Therefore it may only be
+    # scrolled if it has been explicitly focused.
     if vim.state.scrollableElements.has(activeElement) and
        (activeElement != vim.content.document.body or
         vim.state.explicitBodyFocus)
