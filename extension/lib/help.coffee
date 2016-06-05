@@ -123,7 +123,7 @@ createContent = (window, vimfx) ->
 
       for {command, name, enabledSequences} in category.commands
         commandContainer = $('command search-item', categoryContainer)
-        commandContainer.setAttribute('data-command', command.name)
+        commandContainer.setAttribute('data-command', name)
         commandContainer.onclick = goToCommandSetting.bind(
           null, window, vimfx, command
         )
