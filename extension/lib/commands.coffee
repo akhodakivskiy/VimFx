@@ -692,11 +692,19 @@ helper_copy_marker_element = (vim, elementIndex, property) ->
 
 
 
-findStorage = {lastSearchString: ''}
+findStorage = {
+  lastSearchString: ''
+  busy: false
+}
 
 helper_find_from_top_of_viewport = (vim, direction, callback) ->
+  return if findStorage.busy
   if vim.options.find_from_top_of_viewport
-    vim._run('find_from_top_of_viewport', {direction}, callback)
+    findStorage.busy = true
+    vim._run('find_from_top_of_viewport', {direction}, ->
+      findStorage.busy = false
+      callback()
+    )
   else
     callback()
 
@@ -712,6 +720,7 @@ helper_find = ({highlight, linksOnly = false}, {vim}) ->
 
   helper_mark_last_scroll_position(vim)
   helper_find_from_top_of_viewport(vim, FORWARD, ->
+    return unless vim.mode == 'find'
     findBar = vim.window.gBrowser.getFindBar()
 
     mode = if linksOnly then findBar.FIND_LINKS else findBar.FIND_NORMAL

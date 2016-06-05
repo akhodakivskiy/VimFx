@@ -323,7 +323,9 @@ mode('find', {
     return false
 
 }, {
-  exit: ({findBar}) -> findBar.close()
+  exit: ({vim, findBar}) ->
+    vim.enterMode('normal')
+    findBar.close()
 })
 
 
