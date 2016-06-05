@@ -331,15 +331,27 @@ mode('find', {
 
 
 mode('marks', {
-  onEnter: ({storage}, callback) ->
+  onEnter: ({vim, storage}, callback) ->
     storage.callback = callback
+    storage.timeoutId = vim.window.setTimeout((->
+      vim.hideNotification()
+      vim.enterMode('normal')
+    ), vim.options.timeout)
 
-  onLeave: ({storage}) ->
+  onLeave: ({vim, storage}) ->
     storage.callback = null
+    vim.window.clearTimeout(storage.timeoutId) if storage.timeoutId?
+    storage.timeoutId = null
 
   onInput: (args, match) ->
     {vim, storage} = args
-    storage.callback(match.keyStr)
-    vim.enterMode('normal')
+    if match.type == 'full'
+      match.command.run(args)
+    else
+      storage.callback(match.keyStr)
+      vim.enterMode('normal')
     return true
+}, {
+  exit: ({vim}) ->
+    vim.enterMode('normal')
 })

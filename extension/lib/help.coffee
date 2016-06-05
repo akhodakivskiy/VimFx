@@ -105,8 +105,6 @@ createContent = (window, vimfx) ->
 
     for category, index in mode.categories
       categoryContainer = $('category', content)
-      # `data-` attributes are currently unused by VimFx, but provide a great
-      # way to customize the help dialog with custom CSS.
       utils.setAttributes(categoryContainer, {
         'data-mode': mode._name
         'data-category': category._name

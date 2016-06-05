@@ -147,6 +147,10 @@ shortcuts =
     '':
       '<escape>    <enter>': 'exit'
 
+  'marks':
+    '':
+      '<escape> ':       'exit'
+
 options =
   'hint_chars':             'fjdkslaghrueiwonc mv'
   'prev_patterns':          'prev  previous  ‹  «  ◀  ←  <<  <  back  newer'

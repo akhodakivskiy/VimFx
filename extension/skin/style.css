@@ -257,6 +257,10 @@ toolbarpaletteitem[place="palette"] > #VimFxButton {
     margin-bottom: calc(var(--page-padding) / 2);
   }
 
+  #VimFxHelpDialogContainer :-moz-any([data-mode="find"], [data-mode="marks"]) {
+    display: none;
+  }
+
   #VimFxHelpDialogContainer .heading-mode,
   #VimFxHelpDialogContainer .category:not(.first)::before {
     font-size: 2em;
