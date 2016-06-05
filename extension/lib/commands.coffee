@@ -801,7 +801,7 @@ commands.reload_config_file = ({vim}) ->
   )
 
 commands.help = ({vim}) ->
-  help.injectHelp(vim.window, vim._parent)
+  help.toggleHelp(vim.window, vim._parent)
 
 commands.dev = ({vim}) ->
   vim.window.DeveloperToolbar.show(true) # `true` to focus.

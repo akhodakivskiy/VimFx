@@ -39,7 +39,7 @@ injectButton = (vimfx) ->
       return unless vim = vimfx.getCurrentVim(window)
 
       if vim.mode == 'normal'
-        help.injectHelp(window, vimfx)
+        help.toggleHelp(window, vimfx)
       else
         vim.enterMode('normal')
   })

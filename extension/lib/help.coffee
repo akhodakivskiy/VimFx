@@ -70,6 +70,13 @@ injectHelp = (window, vimfx) ->
 
 removeHelp = (window) -> getHelp(window)?.remove()
 
+toggleHelp = (window, vimfx) ->
+  helpContainer = getHelp(window)
+  if helpContainer
+    helpContainer.remove()
+  else
+    injectHelp(window, vimfx)
+
 getHelp = (window) -> window.document.getElementById(CONTAINER_ID)
 
 getSearchInput = (window) -> getHelp(window)?.querySelector('.search-input')
@@ -184,6 +191,7 @@ search = (content, term) ->
 module.exports = {
   injectHelp
   removeHelp
+  toggleHelp
   getHelp
   getSearchInput
 }
