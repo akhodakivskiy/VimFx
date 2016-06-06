@@ -205,7 +205,7 @@ class UIEventManager
     match = vim._consumeKeyEvent(event)
 
     if match
-      if @vimfx.options.notify_entered_keys
+      if @vimfx.options.notify_entered_keys and vim.mode != 'ignore'
         if match.type in ['none', 'full'] or match.likelyConflict
           @enteredKeys.clear(vim)
         else

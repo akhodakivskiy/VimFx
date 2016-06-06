@@ -287,6 +287,7 @@ mode('ignore', {
 
   onInput: (args, match) ->
     {vim, storage} = args
+    args.count = 1
     switch storage.count
       when null
         if match.type == 'full'
