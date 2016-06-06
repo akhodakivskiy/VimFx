@@ -2,6 +2,7 @@
 # Copyright Anton Khodakivskiy 2012, 2013, 2014.
 # Copyright Simon Lydell 2013, 2014, 2015, 2016.
 # Copyright Wang Zhuochun 2013.
+# Copyright Alan Wu 2016.
 #
 # This file is part of VimFx.
 #
@@ -45,7 +46,7 @@ XULMenuListElement = Ci.nsIDOMXULMenuListElement
 XULTextBoxElement = Ci.nsIDOMXULTextBoxElement
 
 # Full chains of events for different mouse actions. Note: 'click' is fired
-# by Firefox automatically after 'mousedown' and 'mouseup'
+# by Firefox automatically after 'mousedown' and 'mouseup'.
 EVENTS_CLICK       = ['mousedown', 'mouseup']
 EVENTS_CLICK_XUL   = ['click', 'command']
 EVENTS_HOVER_START = ['mouseover', 'mouseenter', 'mousemove']
@@ -315,6 +316,9 @@ simulateMouseEvents = (element, sequence) ->
       screenX: window.screenX + rect.left
       screenY: window.screenY + rect.top
     })
+    # The last `true` below marks the event as trusted, which some APIs require,
+    # such as `requestFullscreen()`. (`element.dispatchEvent(mouseEvent)` is not
+    # able to do this.)
     window.QueryInterface(Ci.nsIInterfaceRequestor)
       .getInterface(Ci.nsIDOMWindowUtils)
       .dispatchDOMEventViaPresShell(element, mouseEvent, true)

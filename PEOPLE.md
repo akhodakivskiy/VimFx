@@ -6,6 +6,7 @@ Anton Khodakivskiy (@akhodakivskiy)
 
 # Contributors
 - Wang Zhuochun (@zhuochun)
+- Alan Wu (@XrXr)
 - Heidi Xu – icon design
 
 # Translators
