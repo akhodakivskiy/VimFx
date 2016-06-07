@@ -19,7 +19,7 @@
 
 # This file creates VimFx’s Keyboard Shortcuts help screen.
 
-translate = require('./l10n')
+translate = require('./translate')
 utils = require('./utils')
 
 CONTAINER_ID = 'VimFxHelpDialogContainer'

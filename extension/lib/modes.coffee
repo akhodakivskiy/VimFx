@@ -25,9 +25,9 @@
 {commands, findStorage} = require('./commands')
 defaults = require('./defaults')
 help = require('./help')
-translate = require('./l10n')
 prefs = require('./prefs')
 SelectionManager = require('./selection')
+translate = require('./translate')
 utils = require('./utils')
 
 {FORWARD, BACKWARD} = SelectionManager

@@ -20,7 +20,7 @@
 # This file creates VimFx’s toolbar button.
 
 help = require('./help')
-translate = require('./l10n')
+translate = require('./translate')
 utils = require('./utils')
 
 cui = Cu.import('resource:///modules/CustomizableUI.jsm', {}).CustomizableUI

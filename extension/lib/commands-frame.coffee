@@ -25,7 +25,7 @@
 markableElements = require('./markable-elements')
 prefs = require('./prefs')
 SelectionManager = require('./selection')
-translate = require('./l10n')
+translate = require('./translate')
 utils = require('./utils')
 viewportUtils = require('./viewport')
 

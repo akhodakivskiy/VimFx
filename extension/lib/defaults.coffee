@@ -206,7 +206,7 @@ parsed_options =
 # coffeelint: enable=colon_assignment_spacing
 # coffeelint: enable=no_implicit_braces
 
-translate = require('./l10n')
+translate = require('./translate')
 utils = require('./utils')
 
 addCategory = (category, order) ->
