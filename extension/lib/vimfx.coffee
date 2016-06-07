@@ -275,8 +275,6 @@ parseShortcutPref = (pref) ->
   shortcuts = []
   errors = []
 
-  # The shorcut prefs are read from root in order to support other extensions to
-  # extend VimFx with custom commands.
   prefValue = prefs.root.get(pref).trim()
 
   unless prefValue == ''
