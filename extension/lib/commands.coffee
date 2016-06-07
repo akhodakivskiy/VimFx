@@ -28,12 +28,12 @@
 
 config = require('./config')
 help = require('./help')
-MarkerContainer = require('./marker-container')
 markableElements = require('./markable-elements')
+MarkerContainer = require('./marker-container')
 prefs = require('./prefs')
+SelectionManager = require('./selection')
 translate = require('./translate')
 utils = require('./utils')
-SelectionManager = require('./selection')
 viewportUtils = require('./viewport')
 
 {ContentClick} = Cu.import('resource:///modules/ContentClick.jsm', {})
