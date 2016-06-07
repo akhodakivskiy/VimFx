@@ -91,7 +91,7 @@ createHeader = (window, vimfx) ->
   $('title', mainHeading, translate('help.title'))
 
   closeButton = $('close-button', header, '×')
-  closeButton.onclick = removeHelp.bind(null, window)
+  closeButton.onclick = -> removeHelp(window)
 
   return header
 

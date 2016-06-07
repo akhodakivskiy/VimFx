@@ -43,7 +43,7 @@ injectButton = (vimfx) ->
       else
         vim.enterMode('normal')
   })
-  module.onShutdown(cui.destroyWidget.bind(cui, BUTTON_ID))
+  module.onShutdown(-> cui.destroyWidget(BUTTON_ID))
 
   vimfx.on('modeDisplayChange', ({vim}) ->
     {window} = vim
