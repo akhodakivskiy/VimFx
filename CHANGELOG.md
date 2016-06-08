@@ -1,3 +1,37 @@
+### 0.17.0 (2016-06-08)
+
+- Fixed: VimFx no longer scrolls smaller elements on a page instead of the
+  entire page on some sites.
+- Improved: The `/`, `n` and `N` have been drastically sped up (when
+  [`find_from_top_of_viewport`][find_from_top_of_viewport-1] is on). Previously,
+  they appeared to freeze on some sites, but not anymore.
+- Improved: You can no longer accidentally trigger VimFx between pressing `/`
+  and the find bar input being is focused.
+- Improved: The `n` and `N` commands are now more robust.
+- Improved: “Fullscreen” buttons and “Copy to clipboard” buttons can now be
+  activated the `f` command. Thanks to Alan Wu (@XrXr)!
+- Changed: After having pressed `m` or `` ` `` VimFx no longer waits
+  indefinitely for you to press a mark key. Instead, the [timeout] option is
+  honored.
+- Changed: After having pressed `m` or `` ` `` you can now press `<escape>` to
+  abort those commands.
+- Changed: Find mode is no longer shown in VimFx’s Keyboard Shortcuts help
+  dialog, to reduce clutter. (This can be changed through custom
+  [styling][styling-1].)
+- Changed: The `?` command as well as the toolbar button now _toggle_ VimFx’s
+  Keyboard Shortcuts help dialog (instead of always showing it, even if it was
+  already shown.)
+- Changed: Counts are now ignored in Ignore mode. Previously, pressing number
+  keys would both send those key presses to the page _and_ contribute to the
+  count for commands (showing up in the bottom-right corner). This is no longer
+  the case.
+- Updated locales: fr, zh-CN and zh-TW. Thanks to Mickaël RAYBAUD-ROIG (@m-r-r),
+  @av2000ii and Robert Wang (@cyberrob)!
+
+[find_from_top_of_viewport-1]: https://github.com/akhodakivskiy/VimFx/blob/288bd3317cbed3a57e42a754099b96efe6c1e38d/documentation/options.md#find_from_top_of_viewport
+[timeout]: https://github.com/akhodakivskiy/VimFx/blob/288bd3317cbed3a57e42a754099b96efe6c1e38d/documentation/options.md#timeout
+[styling-1]: https://github.com/akhodakivskiy/VimFx/blob/288bd3317cbed3a57e42a754099b96efe6c1e38d/documentation/styling.md
+
 ### 0.16.1 (2016-05-29)
 
 - Fixed: The `zF` command no longer crashes (regression since 0.16.0).
