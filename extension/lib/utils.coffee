@@ -147,7 +147,7 @@ isProperLink = (element) ->
 
 isTextInputElement = (element) ->
   return (element.localName == 'input' and element.type in [
-           'text', 'search', 'tel', 'url', 'email', 'password', 'number'
+           'text', 'search', 'tel', 'url', 'email', 'password', 'number', 'file'
          ]) or
          element.localName == 'textarea' or
          element instanceof XULTextBoxElement or
