@@ -208,11 +208,12 @@ tryPoint = (elementData, elementRect, x, dx, y, dy, tryRight = 0) ->
     for parent in parents by -1
       # If leaving the devtools container take the devtools zoom into account.
       if utils.isDevtoolsWindow(currentWindow)
-        toolbox = window.top.gDevTools.getToolbox(
-          devtools.TargetFactory.forTab(window.top.gBrowser.selectedTab)
-        )
-        if toolbox
-          devtoolsZoom = toolbox.zoomValue
+        docShell = currentWindow
+          .QueryInterface(Ci.nsIInterfaceRequestor)
+          .getInterface(Ci.nsIWebNavigation)
+          .QueryInterface(Ci.nsIDocShell)
+        if docShell
+          devtoolsZoom = docShell.contentViewer.fullZoom
           offset.left *= devtoolsZoom
           offset.top  *= devtoolsZoom
           x  *= devtoolsZoom
