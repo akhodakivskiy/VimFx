@@ -316,12 +316,18 @@ simulateMouseEvents = (element, sequence) ->
       screenX: window.screenX + rect.left
       screenY: window.screenY + rect.top
     })
-    # The last `true` below marks the event as trusted, which some APIs require,
-    # such as `requestFullscreen()`. (`element.dispatchEvent(mouseEvent)` is not
-    # able to do this.)
-    window.QueryInterface(Ci.nsIInterfaceRequestor)
-      .getInterface(Ci.nsIDOMWindowUtils)
-      .dispatchDOMEventViaPresShell(element, mouseEvent, true)
+    if type == 'mousemove'
+      # If the below technique is used for this event, the “URL popup” (shown
+      # when hovering or focusing links) does not appear.
+      element.dispatchEvent(mouseEvent)
+    else
+      # The last `true` below marks the event as trusted, which some APIs
+      # require, such as `requestFullscreen()`.
+      # (`element.dispatchEvent(mouseEvent)` is not able to do this.)
+      window
+        .QueryInterface(Ci.nsIInterfaceRequestor)
+        .getInterface(Ci.nsIDOMWindowUtils)
+        .dispatchDOMEventViaPresShell(element, mouseEvent, true)
 
   return
 
