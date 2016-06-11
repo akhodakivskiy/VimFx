@@ -46,9 +46,10 @@ XULMenuListElement = Ci.nsIDOMXULMenuListElement
 XULTextBoxElement = Ci.nsIDOMXULTextBoxElement
 
 # Full chains of events for different mouse actions. Note: 'click' is fired
-# by Firefox automatically after 'mousedown' and 'mouseup'.
+# by Firefox automatically after 'mousedown' and 'mouseup'. Similarly,
+# 'command' is fired automatically after 'click' on xul pages.
 EVENTS_CLICK       = ['mousedown', 'mouseup']
-EVENTS_CLICK_XUL   = ['click', 'command']
+EVENTS_CLICK_XUL   = ['click']
 EVENTS_HOVER_START = ['mouseover', 'mouseenter', 'mousemove']
 EVENTS_HOVER_END   = ['mouseout',  'mouseleave']
 
