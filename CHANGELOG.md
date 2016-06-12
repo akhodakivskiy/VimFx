@@ -1,3 +1,12 @@
+### 0.17.1 (2016-06-12)
+
+- Fixed: The `zF` command no longer accidentally double-clicks instead of
+  single-clicking. Thanks to Alan Wu (@XrXr)!
+- Fixed: The `zF` command no longer crashes in Firefox 49+.
+- Fixed: The “URL popup,” shown when hovering or focusing links, now appears
+  again when focusing links using `zf` (regression since 0.17.0).
+- Updated locale: it. Thanks to Carlo Bertoldi (@cbertoldi)!
+
 ### 0.17.0 (2016-06-08)
 
 - Fixed: VimFx no longer scrolls smaller elements on a page instead of the
