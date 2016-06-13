@@ -482,6 +482,7 @@ helper_follow_clickable = (options, {vim, count = 1}) ->
     {type, elementIndex} = marker.wrapper
     isLast = (timesLeft == 1)
     isLink = (type == 'link')
+    {window} = vim
 
     switch
       when keyStr.startsWith(vim.options.hints_toggle_in_tab)
@@ -502,7 +503,7 @@ helper_follow_clickable = (options, {vim, count = 1}) ->
     vim._focusMarkerElement(elementIndex)
 
     if inTab
-      utils.nextTick(vim.window, ->
+      utils.nextTick(window, ->
         # `ContentClick.contentAreaClick` is what Firefox invokes when you click
         # links using the mouse. Using that instead of simply
         # `gBrowser.loadOneTab(url, options)` gives better interoperability with
@@ -513,6 +514,7 @@ helper_follow_clickable = (options, {vim, count = 1}) ->
           shiftKey: not inBackground
           ctrlKey: true
           metaKey: true
+          originAttributes: window.document.nodePrincipal?.originAttributes ? {}
         }, vim.browser)
         reset()
       )
