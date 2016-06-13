@@ -508,11 +508,14 @@ helper_follow_clickable = (options, {vim, count = 1}) ->
         # `gBrowser.loadOneTab(url, options)` gives better interoperability with
         # other add-ons, such as Tree Style Tab and BackTrack Tab History.
         reset = prefs.root.tmp('browser.tabs.loadInBackground', true)
+        principal = vim.window.document.nodePrincipal
         ContentClick.contentAreaClick({
           href: marker.wrapper.href
           shiftKey: not inBackground
           ctrlKey: true
           metaKey: true
+          # see mozilla-central/rev/07dc0094e76f for details about this property
+          originAttributes: if principal then principal.originAttributes else {}
         }, vim.browser)
         reset()
       )
