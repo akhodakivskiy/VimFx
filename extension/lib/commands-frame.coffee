@@ -358,6 +358,7 @@ commands.click_marker_element = (
       else
         'click'
     utils.simulateMouseEvents(element, sequence)
+    utils.openDropdown(element)
   element.target = targetReset if targetReset
 
 commands.copy_marker_element = ({vim, elementIndex, property}) ->

@@ -560,6 +560,13 @@ observe = (topic, observer) ->
     Services.obs.removeObserver(observer, topic, false)
   )
 
+# Try to open a button’s dropdown menu, if any.
+openDropdown = (element) ->
+  if element.ownerDocument instanceof XULDocument and
+     element.getAttribute?('type') == 'menu' and
+     element.open == false # Only change `.open` if it is already a boolean.
+    element.open = true
+
 openPopup = (popup) ->
   window = popup.ownerGlobal
   # Show the popup so it gets a height and width.
@@ -632,6 +639,7 @@ module.exports = {
   hasEventListeners
   loadCss
   observe
+  openDropdown
   openPopup
   writeToClipboard
 }

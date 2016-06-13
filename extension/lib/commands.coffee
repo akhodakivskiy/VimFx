@@ -601,13 +601,25 @@ commands.click_browser_element = ({vim}) ->
       when 'scrollable'
         utils.focusElement(element, {flag: 'FLAG_BYKEY'})
       when 'clickable', 'complementary'
-        sequence =
-          if element.localName == 'tab'
-            ['mousedown']
-          else
-            'click-xul'
-        utils.focusElement(element)
-        utils.simulateMouseEvents(element, sequence)
+        # VimFx’s own button won’t trigger unless the click is simulated in the
+        # next tick. This might be true for other buttons as well.
+        utils.nextTick(window, ->
+          utils.focusElement(element)
+          switch
+            when element.localName == 'tab'
+              # Only 'mousedown' seems to be able to activate tabs.
+              utils.simulateMouseEvents(element, ['mousedown'])
+            when element.closest('tab')
+              # If `.click()` is used on a tab close button, its tab will be
+              # selected first, which might cause the selected tab to change.
+              utils.simulateMouseEvents(element, 'click-xul')
+            else
+              # `.click()` seems to trigger more buttons (such as NoScript’s
+              # button and Firefox’s “hamburger” menu button) than simulating
+              # 'click-xul'.
+              element.click()
+              utils.openDropdown(element)
+        )
     return false
 
   wrappers = markableElements.find(
