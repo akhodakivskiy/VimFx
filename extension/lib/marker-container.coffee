@@ -223,9 +223,8 @@ class MarkerContainer
 # (#1), and rotates their `z-index`:es (#2), thus alternating which markers are
 # visible.
 rotateOverlappingMarkers = (originalMarkers, forward) ->
-  # Shallow working copy. This is necessary since `markers` will be mutated and
-  # eventually empty.
-  markers = originalMarkers[..]
+  # `markers` will be mutated and eventually empty.
+  markers = originalMarkers.filter((marker) -> marker.visible)
 
   # (#1)
   stacks = (getStackFor(markers.pop(), markers) while markers.length > 0)
