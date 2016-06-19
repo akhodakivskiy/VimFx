@@ -90,7 +90,11 @@ commands.scroll = (args) ->
 
 commands.mark_scroll_position = ({vim, keyStr, notify = true}) ->
   element = vim.state.scrollableElements.filterSuitableDefault()
-  vim.state.marks[keyStr] = [element.scrollTop, element.scrollLeft]
+  vim.state.marks[keyStr] =
+    if element.ownerDocument.documentElement.localName == 'svg'
+      [element.ownerGlobal.scrollY, element.ownerGlobal.scrollX]
+    else
+      [element.scrollTop, element.scrollLeft]
   if notify
     vim.notify(translate('notification.mark_scroll_position.success', keyStr))
 

@@ -274,12 +274,25 @@ isInsideViewport = (rect, viewport) ->
     rect.right  >= viewport.left   + MINIMUM_EDGE_DISTANCE and
     rect.bottom >= viewport.top    + MINIMUM_EDGE_DISTANCE
 
+windowScrollProperties = {
+  clientHeight: 'innerHeight'
+  scrollTopMax: 'scrollMaxY'
+  scrollLeftMax: 'scrollMaxX'
+}
+
 scroll = (
   element, {method, type, directions, amounts, properties, adjustment, smooth}
 ) ->
+  if element.ownerDocument.documentElement.localName == 'svg'
+    element = element.ownerGlobal
+    properties = properties?.map(
+      (property) -> windowScrollProperties[property] ? property
+    )
+
   options = {
     behavior: if smooth then 'smooth' else 'instant'
   }
+
   for direction, index in directions
     amount = amounts[index]
     options[direction] = -Math.sign(amount) * adjustment + switch type
@@ -293,6 +306,7 @@ scroll = (
             element[properties[index]]
       when 'other'
         Math.min(amount, element[properties[index]])
+
   element[method](options)
 
 module.exports = {
