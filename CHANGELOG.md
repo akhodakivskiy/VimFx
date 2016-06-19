@@ -1,3 +1,15 @@
+### 0.17.2 (2016-06-19)
+
+- Improved: The `zF` command now works with more buttons and is able to open
+  dropdown menus of buttons.
+- Fixed: The `f` commands now recognize more file upload buttons.
+- Fixed: Rotating hint markers now works more as expected after having entered a
+  few hint chars.
+- Fixed: Scrolling now works in SVG documents.
+- Fixed: Opening links in new tabs in Firefox 50.
+- Updated locales: pt-BR and ru. Thanks to Átila Camurça Alves (@atilacamurca)
+  and Nicholas Guriev (@mymedia2)!
+
 ### 0.17.1 (2016-06-12)
 
 - Fixed: The `zF` command no longer accidentally double-clicks instead of
