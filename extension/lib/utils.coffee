@@ -103,6 +103,8 @@ isFocusable = (element) ->
   return element.tabIndex > -1 and
          not (element.localName?.endsWith?('box') and
               element.localName != 'checkbox') and
+         not (element.localName == 'toolbarbutton' and
+              element.parentNode?.localName == 'toolbarbutton') and
          element.localName not in ['tabs', 'menuitem', 'menuseparator']
 
 isIframeEditor = (element) ->

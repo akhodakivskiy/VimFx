@@ -573,10 +573,19 @@ commands.click_browser_element = ({vim}) ->
   {window} = vim
   markerElements = []
 
+  getButtonMenu = (element) ->
+    if element.localName == 'dropmarker' and
+       element.parentNode?.localName == 'toolbarbutton'
+      return element.parentNode.querySelector('menupopup')
+    else
+      return null
+
   filter = ({complementary}, element, getElementShape) ->
     type = switch
       when vim._state.scrollableElements.has(element)
         'scrollable'
+      when getButtonMenu(element)
+        'dropmarker'
       when utils.isFocusable(element) or
            (element.onclick and element.localName != 'statuspanel')
         'clickable'
@@ -600,6 +609,14 @@ commands.click_browser_element = ({vim}) ->
     switch marker.wrapper.type
       when 'scrollable'
         utils.focusElement(element, {flag: 'FLAG_BYKEY'})
+      when 'dropmarker'
+        getButtonMenu(element).openPopup(
+          element.parentNode, # Anchor node.
+          'after_end', # Position.
+          0, 0, # Offset.
+          false, # Isn’t a context menu.
+          true, # Allow the 'position' attribute to override the above position.
+        )
       when 'clickable', 'complementary'
         # VimFx’s own button won’t trigger unless the click is simulated in the
         # next tick. This might be true for other buttons as well.
