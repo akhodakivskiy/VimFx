@@ -38,7 +38,7 @@ Making small adjustments to hint markers (such as font size):
 
 ```css
 #VimFxMarkersContainer .marker {
-  font-size: 14px !important; /* Specific font size. */
+  font-size: 20px !important; /* Specific font size. */
   text-transform: lowercase !important; /* Lowercase text. */
   opacity: 0.8 !important; /* Semi-transparent. Warning: Might be slow! */
 }
