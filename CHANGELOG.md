@@ -1,3 +1,7 @@
+### 0.17.3 (2016-06-27)
+
+- Improved: The `zF` command can now open even more dropdown menus of buttons.
+
 ### 0.17.2 (2016-06-19)
 
 - Improved: The `zF` command now works with more buttons and is able to open
