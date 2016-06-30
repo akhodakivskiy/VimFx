@@ -258,14 +258,9 @@ commands.follow = helper_follow.bind(
       # but keeps the `<label>` to click, either for styling purposes or to keep
       # the `<input>` hidden until it is used. In those cases we should add a
       # marker for the `<label>`.
-      when element.localName == 'label'
-        input =
-          if element.htmlFor
-            document.getElementById?(element.htmlFor)
-          else
-            element.querySelector?('input, textarea, select')
-        if input and not getElementShape(input).nonCoveredPoint
-          type = 'clickable'
+      when element.localName == 'label' and element.control and
+           not getElementShape(element.control).nonCoveredPoint
+        type = 'clickable'
       # Last resort checks for elements that might be clickable because of
       # JavaScript.
       when (not isXUL and
