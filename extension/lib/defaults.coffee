@@ -183,6 +183,7 @@ advanced_options =
                                            a, button, input[type="button"]
                                          ):not([role="menu"]):not([role="tab"])'
   'pattern_attrs':                      'rel  role  data-tooltip  aria-label'
+  'hints_peek_through':                 '<s->'
   'hints_toggle_in_tab':                '<c-'
   'hints_toggle_in_background':         '<a-'
   'activatable_element_keys':           '<enter>'

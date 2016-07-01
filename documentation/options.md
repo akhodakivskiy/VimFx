@@ -427,6 +427,16 @@ should be matched against.
 
 [“Previous”/“Next” link patterns]: #previousnext-link-patterns
 
+### `hints_peek_through`
+
+This pref doesn’t do much. If you’ve used custom [styling] to change which
+modifier lets you peek through markers in [Hints mode], you might want to change
+this pref as well. Otherwise VimFx’s Keyboard Shortcuts dialog will still tell
+you to press shift for this task.
+
+[styling]: styling.md
+[Hints mode]: commands.md#the-f-commands--hints-mode
+
 ### `hints_toggle_in_tab`
 
 If the keypress that matched a hint starts with this string, toggle whether to
