@@ -136,7 +136,7 @@ createContent = (window, vimfx) ->
 
       categoryExtraCommands = extraCommands[mode._name]?[category._name]
       if categoryExtraCommands
-        for name, sequences of categoryExtraCommands
+        for name, sequences of categoryExtraCommands when sequences.length > 0
           commandContainer = $('command search-item', categoryContainer)
           commandContainer.setAttribute('data-command', name)
           for sequence in sequences
