@@ -66,9 +66,12 @@ You can temporarily disable VimFx by using Ignore mode. Press <kbd>i</kbd> to
 enter it, and <kbd>shift-escape</kbd> to exit. Use the [blacklist] to
 automatically enter Ignore mode on specific sites.
 
+There’s also an [article on ghacks.net][ghacks] which is a good introduction.
+
 [settings]: https://github.com/akhodakivskiy/VimFx/blob/master/documentation/options.md
 [default shortcuts]: https://github.com/akhodakivskiy/VimFx/blob/master/extension/lib/defaults.coffee
 [blacklist]: https://github.com/akhodakivskiy/VimFx/blob/master/documentation/options.md#blacklist
+[ghacks]: http://www.ghacks.net/2016/07/01/vimfx-improve-firefox-keyboard-use/
 
 ## Feedback
 
