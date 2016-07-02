@@ -25,9 +25,9 @@
 {commands, findStorage} = require('./commands')
 defaults = require('./defaults')
 help = require('./help')
-translate = require('./l10n')
 prefs = require('./prefs')
 SelectionManager = require('./selection')
+translate = require('./translate')
 utils = require('./utils')
 
 {FORWARD, BACKWARD} = SelectionManager
@@ -287,6 +287,7 @@ mode('ignore', {
 
   onInput: (args, match) ->
     {vim, storage} = args
+    args.count = 1
     switch storage.count
       when null
         if match.type == 'full'
@@ -323,21 +324,35 @@ mode('find', {
     return false
 
 }, {
-  exit: ({findBar}) -> findBar.close()
+  exit: ({vim, findBar}) ->
+    vim.enterMode('normal')
+    findBar.close()
 })
 
 
 
 mode('marks', {
-  onEnter: ({storage}, callback) ->
+  onEnter: ({vim, storage}, callback) ->
     storage.callback = callback
+    storage.timeoutId = vim.window.setTimeout((->
+      vim.hideNotification()
+      vim.enterMode('normal')
+    ), vim.options.timeout)
 
-  onLeave: ({storage}) ->
+  onLeave: ({vim, storage}) ->
     storage.callback = null
+    vim.window.clearTimeout(storage.timeoutId) if storage.timeoutId?
+    storage.timeoutId = null
 
   onInput: (args, match) ->
     {vim, storage} = args
-    storage.callback(match.keyStr)
-    vim.enterMode('normal')
+    if match.type == 'full'
+      match.command.run(args)
+    else
+      storage.callback(match.keyStr)
+      vim.enterMode('normal')
     return true
+}, {
+  exit: ({vim}) ->
+    vim.enterMode('normal')
 })

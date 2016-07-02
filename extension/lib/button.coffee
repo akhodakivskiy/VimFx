@@ -20,7 +20,7 @@
 # This file creates VimFx’s toolbar button.
 
 help = require('./help')
-translate = require('./l10n')
+translate = require('./translate')
 utils = require('./utils')
 
 cui = Cu.import('resource:///modules/CustomizableUI.jsm', {}).CustomizableUI
@@ -39,11 +39,11 @@ injectButton = (vimfx) ->
       return unless vim = vimfx.getCurrentVim(window)
 
       if vim.mode == 'normal'
-        help.injectHelp(window, vimfx)
+        help.toggleHelp(window, vimfx)
       else
         vim.enterMode('normal')
   })
-  module.onShutdown(cui.destroyWidget.bind(cui, BUTTON_ID))
+  module.onShutdown(-> cui.destroyWidget(BUTTON_ID))
 
   vimfx.on('modeDisplayChange', ({vim}) ->
     {window} = vim

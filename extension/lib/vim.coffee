@@ -53,12 +53,12 @@ class Vim
 
   _addListeners: ->
     @_listen('vimMethod', ({method, args = []}, callback = null) =>
-      result = @[method](args...)
+      result = this[method](args...)
       callback?(result)
     )
 
     @_listen('vimMethodSync', ({method, args = []}) =>
-      return @[method](args...)
+      return this[method](args...)
     )
 
     @_listen('locationChange', @_onLocationChange.bind(this))
@@ -82,7 +82,7 @@ class Vim
 
     @_statusPanel?.remove()
     @_statusPanel = statusPanel.injectStatusPanel(@browser)
-    @_statusPanel.onclick = @hideNotification.bind(this)
+    @_statusPanel.onclick = => @hideNotification()
 
     @_addListeners() if addListeners
 

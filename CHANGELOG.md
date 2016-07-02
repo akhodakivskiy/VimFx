@@ -1,3 +1,78 @@
+### 0.17.3 (2016-06-27)
+
+- Improved: The `zF` command can now open even more dropdown menus of buttons.
+
+### 0.17.2 (2016-06-19)
+
+- Improved: The `zF` command now works with more buttons and is able to open
+  dropdown menus of buttons.
+- Fixed: The `f` commands now recognize more file upload buttons.
+- Fixed: Rotating hint markers now works more as expected after having entered a
+  few hint chars.
+- Fixed: Scrolling now works in SVG documents.
+- Fixed: Opening links in new tabs in Firefox 50.
+- Updated locales: pt-BR and ru. Thanks to Átila Camurça Alves (@atilacamurca)
+  and Nicholas Guriev (@mymedia2)!
+
+### 0.17.1 (2016-06-12)
+
+- Fixed: The `zF` command no longer accidentally double-clicks instead of
+  single-clicking. Thanks to Alan Wu (@XrXr)!
+- Fixed: The `zF` command no longer crashes in Firefox 49+.
+- Fixed: The “URL popup,” shown when hovering or focusing links, now appears
+  again when focusing links using `zf` (regression since 0.17.0).
+- Updated locale: it. Thanks to Carlo Bertoldi (@cbertoldi)!
+
+### 0.17.0 (2016-06-08)
+
+- Fixed: VimFx no longer scrolls smaller elements on a page instead of the
+  entire page on some sites.
+- Improved: The `/`, `n` and `N` have been drastically sped up (when
+  [`find_from_top_of_viewport`][find_from_top_of_viewport-1] is on). Previously,
+  they appeared to freeze on some sites, but not anymore.
+- Improved: You can no longer accidentally trigger VimFx between pressing `/`
+  and the find bar input being is focused.
+- Improved: The `n` and `N` commands are now more robust.
+- Improved: “Fullscreen” buttons and “Copy to clipboard” buttons can now be
+  activated the `f` command. Thanks to Alan Wu (@XrXr)!
+- Changed: After having pressed `m` or `` ` `` VimFx no longer waits
+  indefinitely for you to press a mark key. Instead, the [timeout] option is
+  honored.
+- Changed: After having pressed `m` or `` ` `` you can now press `<escape>` to
+  abort those commands.
+- Changed: Find mode is no longer shown in VimFx’s Keyboard Shortcuts help
+  dialog, to reduce clutter. (This can be changed through custom
+  [styling][styling-1].)
+- Changed: The `?` command as well as the toolbar button now _toggle_ VimFx’s
+  Keyboard Shortcuts help dialog (instead of always showing it, even if it was
+  already shown.)
+- Changed: Counts are now ignored in Ignore mode. Previously, pressing number
+  keys would both send those key presses to the page _and_ contribute to the
+  count for commands (showing up in the bottom-right corner). This is no longer
+  the case.
+- Updated locales: fr, zh-CN and zh-TW. Thanks to Mickaël RAYBAUD-ROIG (@m-r-r),
+  @av2000ii and Robert Wang (@cyberrob)!
+
+[find_from_top_of_viewport-1]: https://github.com/akhodakivskiy/VimFx/blob/288bd3317cbed3a57e42a754099b96efe6c1e38d/documentation/options.md#find_from_top_of_viewport
+[timeout]: https://github.com/akhodakivskiy/VimFx/blob/288bd3317cbed3a57e42a754099b96efe6c1e38d/documentation/options.md#timeout
+[styling-1]: https://github.com/akhodakivskiy/VimFx/blob/288bd3317cbed3a57e42a754099b96efe6c1e38d/documentation/styling.md
+
+### 0.16.1 (2016-05-29)
+
+- Fixed: The `zF` command no longer crashes (regression since 0.16.0).
+
+### 0.16.0 (2016-05-29)
+
+- Fixed: The text input focus detection problems introduced in 0.15.1, which
+  sometimes caused VimFx commands to be triggered while typing in text inputs,
+  have been fixed.
+- Improved: If you press `n` or `N` when there are are no matches for your
+  search, the find bar is no longer opened. Only a notification is shown. The
+  reliability of those notifications has also been improved.
+- Improved: Hints mode now finds more links.
+- Improved: Pressing `<c-enter>` in Hints mode now includes more elements.
+- Updated locales: es, zh-CN. Thanks to @strel and @av2000ii!
+
 ### 0.15.1 (2016-05-22)
 
 - Improved: Better hints on Twitter.

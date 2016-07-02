@@ -19,7 +19,7 @@
 
 # This file creates VimFx’s Keyboard Shortcuts help screen.
 
-translate = require('./l10n')
+translate = require('./translate')
 utils = require('./utils')
 
 CONTAINER_ID = 'VimFxHelpDialogContainer'
@@ -70,6 +70,13 @@ injectHelp = (window, vimfx) ->
 
 removeHelp = (window) -> getHelp(window)?.remove()
 
+toggleHelp = (window, vimfx) ->
+  helpContainer = getHelp(window)
+  if helpContainer
+    helpContainer.remove()
+  else
+    injectHelp(window, vimfx)
+
 getHelp = (window) -> window.document.getElementById(CONTAINER_ID)
 
 getSearchInput = (window) -> getHelp(window)?.querySelector('.search-input')
@@ -84,7 +91,7 @@ createHeader = (window, vimfx) ->
   $('title', mainHeading, translate('help.title'))
 
   closeButton = $('close-button', header, '×')
-  closeButton.onclick = removeHelp.bind(null, window)
+  closeButton.onclick = -> removeHelp(window)
 
   return header
 
@@ -98,8 +105,6 @@ createContent = (window, vimfx) ->
 
     for category, index in mode.categories
       categoryContainer = $('category', content)
-      # `data-` attributes are currently unused by VimFx, but provide a great
-      # way to customize the help dialog with custom CSS.
       utils.setAttributes(categoryContainer, {
         'data-mode': mode._name
         'data-category': category._name
@@ -116,7 +121,7 @@ createContent = (window, vimfx) ->
 
       for {command, name, enabledSequences} in category.commands
         commandContainer = $('command search-item', categoryContainer)
-        commandContainer.setAttribute('data-command', command.name)
+        commandContainer.setAttribute('data-command', name)
         commandContainer.onclick = goToCommandSetting.bind(
           null, window, vimfx, command
         )
@@ -184,6 +189,7 @@ search = (content, term) ->
 module.exports = {
   injectHelp
   removeHelp
+  toggleHelp
   getHelp
   getSearchInput
 }

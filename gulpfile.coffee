@@ -67,20 +67,24 @@ gulp.task('copy', ->
 
 gulp.task('node_modules', ->
   dependencies = (name for name of pkg.dependencies)
-  # Note! When installing or updating node modules, make sure that the following
+  # Note: When installing or updating node modules, make sure that the following
   # glob does not include too much or too little!
-  gulp.src("node_modules/+(#{dependencies.join('|')})/\
-            {LICENSE*,{,**/!(test|examples)/}!(*min|*test*|*bench*).js}")
+  gulp.src(
+    "node_modules/+(#{dependencies.join('|')})/\
+     {LICENSE*,{,**/!(test|examples)/}!(*min|*test*|*bench*).js}"
+  )
     .pipe(gulp.dest("#{DEST}/node_modules"))
 )
 
 gulp.task('coffee', ->
   test = '--test' in argv or '-t' in argv
-  gulp.src([
-    'extension/bootstrap.coffee'
-    'extension/lib/**/*.coffee'
-  ].concat(if test then 'extension/test/**/*.coffee' else []),
-  {base: 'extension'})
+  gulp.src(
+    [
+      'extension/bootstrap.coffee'
+      'extension/lib/**/*.coffee'
+    ].concat(if test then 'extension/test/**/*.coffee' else []),
+    {base: 'extension'}
+  )
     .pipe(preprocess({context: {
       BUILD_TIME
       ADDON_PATH: JSON.stringify(ADDON_PATH)

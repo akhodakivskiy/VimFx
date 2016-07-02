@@ -20,8 +20,8 @@
 # This file constructs VimFx’s options UI in the Add-ons Manager.
 
 defaults = require('./defaults')
-translate = require('./l10n')
 prefs = require('./prefs')
+translate = require('./translate')
 utils = require('./utils')
 
 TYPE_MAP = {

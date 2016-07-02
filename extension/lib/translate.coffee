@@ -27,7 +27,7 @@ stringBundle = Services.strings.createBundle(
   "#{ADDON_PATH}/locale/#{PROPERTIES_FILE}?#{Math.random()}"
 )
 
-module.exports = (name, values...) ->
+translate = (name, values...) ->
   try
     return stringBundle.formatStringFromName(name, values, values.length)
   catch error
@@ -35,3 +35,5 @@ module.exports = (name, values...) ->
     # file the thrown error is terrible. It only tells you that an error
     # occurred, but not why. Wrap in a try-catch to fix that.
     console.error('VimFx: Translation error', name, values, error)
+
+module.exports = translate

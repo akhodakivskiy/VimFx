@@ -2,6 +2,7 @@
 # Copyright Anton Khodakivskiy 2012, 2013, 2014.
 # Copyright Simon Lydell 2013, 2014, 2015, 2016.
 # Copyright Wang Zhuochun 2013.
+# Copyright Alan Wu 2016.
 #
 # This file is part of VimFx.
 #
@@ -44,10 +45,11 @@ XULControlElement = Ci.nsIDOMXULControlElement
 XULMenuListElement = Ci.nsIDOMXULMenuListElement
 XULTextBoxElement = Ci.nsIDOMXULTextBoxElement
 
-# Full chains of events for different mouse actions. Note: 'mouseup' is actually
-# fired before 'click'!
-EVENTS_CLICK       = ['mousedown', 'mouseup', 'click']
-EVENTS_CLICK_XUL   = ['click', 'command']
+# Full chains of events for different mouse actions. Note: 'click' is fired
+# by Firefox automatically after 'mousedown' and 'mouseup'. Similarly,
+# 'command' is fired automatically after 'click' on xul pages.
+EVENTS_CLICK       = ['mousedown', 'mouseup']
+EVENTS_CLICK_XUL   = ['click']
 EVENTS_HOVER_START = ['mouseover', 'mouseenter', 'mousemove']
 EVENTS_HOVER_END   = ['mouseout',  'mouseleave']
 
@@ -101,6 +103,8 @@ isFocusable = (element) ->
   return element.tabIndex > -1 and
          not (element.localName?.endsWith?('box') and
               element.localName != 'checkbox') and
+         not (element.localName == 'toolbarbutton' and
+              element.parentNode?.localName == 'toolbarbutton') and
          element.localName not in ['tabs', 'menuitem', 'menuseparator']
 
 isIframeEditor = (element) ->
@@ -315,7 +319,18 @@ simulateMouseEvents = (element, sequence) ->
       screenX: window.screenX + rect.left
       screenY: window.screenY + rect.top
     })
-    element.dispatchEvent(mouseEvent)
+    if type == 'mousemove'
+      # If the below technique is used for this event, the “URL popup” (shown
+      # when hovering or focusing links) does not appear.
+      element.dispatchEvent(mouseEvent)
+    else
+      # The last `true` below marks the event as trusted, which some APIs
+      # require, such as `requestFullscreen()`.
+      # (`element.dispatchEvent(mouseEvent)` is not able to do this.)
+      window
+        .QueryInterface(Ci.nsIInterfaceRequestor)
+        .getInterface(Ci.nsIDOMWindowUtils)
+        .dispatchDOMEventViaPresShell(element, mouseEvent, true)
 
   return
 
@@ -547,6 +562,13 @@ observe = (topic, observer) ->
     Services.obs.removeObserver(observer, topic, false)
   )
 
+# Try to open a button’s dropdown menu, if any.
+openDropdown = (element) ->
+  if element.ownerDocument instanceof XULDocument and
+     element.getAttribute?('type') == 'menu' and
+     element.open == false # Only change `.open` if it is already a boolean.
+    element.open = true
+
 openPopup = (popup) ->
   window = popup.ownerGlobal
   # Show the popup so it gets a height and width.
@@ -619,6 +641,7 @@ module.exports = {
   hasEventListeners
   loadCss
   observe
+  openDropdown
   openPopup
   writeToClipboard
 }

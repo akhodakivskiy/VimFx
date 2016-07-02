@@ -98,14 +98,20 @@ getFirstNonWhitespace = (element) ->
   viewport = getWindowViewport(window)
   for node in element.childNodes then switch node.nodeType
     when 3 # TextNode.
-      firstVisibleOffset = getFirstVisibleOffset(node, viewport)
-      if firstVisibleOffset?
-        offset = node.data.slice(firstVisibleOffset).search(/\S/)
-        return [node, firstVisibleOffset + offset] if offset >= 0
+      continue unless /\S/.test(node.data)
+      offset = getFirstVisibleNonWhitespaceOffset(node, viewport)
+      return [node, offset] if offset >= 0
     when 1 # Element.
       result = getFirstNonWhitespace(node)
       return result if result
   return null
+
+getFirstVisibleNonWhitespaceOffset = (textNode, viewport) ->
+  firstVisibleOffset = getFirstVisibleOffset(textNode, viewport)
+  if firstVisibleOffset?
+    offset = textNode.data.slice(firstVisibleOffset).search(/\S/)
+    return firstVisibleOffset + offset if offset >= 0
+  return -1
 
 getFirstVisibleOffset = (textNode, viewport) ->
   {length} = textNode.data
@@ -146,12 +152,15 @@ getFirstVisibleText = (window, viewport) ->
       return result if result
       continue
 
-    continue unless Array.some(element.childNodes, utils.isNonEmptyTextNode)
+    nonEmptyTextNodes =
+      Array.filter(element.childNodes, utils.isNonEmptyTextNode)
+    continue if nonEmptyTextNodes.length == 0
 
     continue if utils.checkElementOrAncestor(element, utils.isPositionFixed)
 
-    result = getFirstNonWhitespace(element)
-    return result if result
+    for textNode in nonEmptyTextNodes
+      offset = getFirstVisibleNonWhitespaceOffset(textNode, viewport)
+      return [textNode, offset] if offset >= 0
 
   return null
 
@@ -265,12 +274,25 @@ isInsideViewport = (rect, viewport) ->
     rect.right  >= viewport.left   + MINIMUM_EDGE_DISTANCE and
     rect.bottom >= viewport.top    + MINIMUM_EDGE_DISTANCE
 
+windowScrollProperties = {
+  clientHeight: 'innerHeight'
+  scrollTopMax: 'scrollMaxY'
+  scrollLeftMax: 'scrollMaxX'
+}
+
 scroll = (
   element, {method, type, directions, amounts, properties, adjustment, smooth}
 ) ->
+  if element.ownerDocument.documentElement.localName == 'svg'
+    element = element.ownerGlobal
+    properties = properties?.map(
+      (property) -> windowScrollProperties[property] ? property
+    )
+
   options = {
     behavior: if smooth then 'smooth' else 'instant'
   }
+
   for direction, index in directions
     amount = amounts[index]
     options[direction] = -Math.sign(amount) * adjustment + switch type
@@ -284,6 +306,7 @@ scroll = (
             element[properties[index]]
       when 'other'
         Math.min(amount, element[properties[index]])
+
   element[method](options)
 
 module.exports = {
@@ -291,6 +314,7 @@ module.exports = {
   adjustRectToViewport
   getAllRangesInsideViewport
   getFirstNonWhitespace
+  getFirstVisibleNonWhitespaceOffset
   getFirstVisibleOffset
   getFirstVisibleRange
   getFirstVisibleText

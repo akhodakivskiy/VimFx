@@ -28,12 +28,12 @@
 
 config = require('./config')
 help = require('./help')
-MarkerContainer = require('./marker-container')
 markableElements = require('./markable-elements')
+MarkerContainer = require('./marker-container')
 prefs = require('./prefs')
-translate = require('./l10n')
-utils = require('./utils')
 SelectionManager = require('./selection')
+translate = require('./translate')
+utils = require('./utils')
 viewportUtils = require('./viewport')
 
 {ContentClick} = Cu.import('resource:///modules/ContentClick.jsm', {})
@@ -482,6 +482,7 @@ helper_follow_clickable = (options, {vim, count = 1}) ->
     {type, elementIndex} = marker.wrapper
     isLast = (timesLeft == 1)
     isLink = (type == 'link')
+    {window} = vim
 
     switch
       when keyStr.startsWith(vim.options.hints_toggle_in_tab)
@@ -502,7 +503,7 @@ helper_follow_clickable = (options, {vim, count = 1}) ->
     vim._focusMarkerElement(elementIndex)
 
     if inTab
-      utils.nextTick(vim.window, ->
+      utils.nextTick(window, ->
         # `ContentClick.contentAreaClick` is what Firefox invokes when you click
         # links using the mouse. Using that instead of simply
         # `gBrowser.loadOneTab(url, options)` gives better interoperability with
@@ -513,6 +514,7 @@ helper_follow_clickable = (options, {vim, count = 1}) ->
           shiftKey: not inBackground
           ctrlKey: true
           metaKey: true
+          originAttributes: window.document.nodePrincipal?.originAttributes ? {}
         }, vim.browser)
         reset()
       )
@@ -571,10 +573,19 @@ commands.click_browser_element = ({vim}) ->
   {window} = vim
   markerElements = []
 
+  getButtonMenu = (element) ->
+    if element.localName == 'dropmarker' and
+       element.parentNode?.localName == 'toolbarbutton'
+      return element.parentNode.querySelector('menupopup')
+    else
+      return null
+
   filter = ({complementary}, element, getElementShape) ->
     type = switch
       when vim._state.scrollableElements.has(element)
         'scrollable'
+      when getButtonMenu(element)
+        'dropmarker'
       when utils.isFocusable(element) or
            (element.onclick and element.localName != 'statuspanel')
         'clickable'
@@ -583,7 +594,13 @@ commands.click_browser_element = ({vim}) ->
       type = if type then null else 'complementary'
 
     return unless type
-    return unless shape = getElementShape(element)
+
+    # `getElementShape(element, -1)` is intentionally _not_ used in the
+    # `complementary` run, because it results in tons of useless hints for
+    # hidden context menus.
+    shape = getElementShape(element)
+    return unless shape.nonCoveredPoint
+
     length = markerElements.push(element)
     return {type, shape, elementIndex: length - 1}
 
@@ -592,14 +609,34 @@ commands.click_browser_element = ({vim}) ->
     switch marker.wrapper.type
       when 'scrollable'
         utils.focusElement(element, {flag: 'FLAG_BYKEY'})
+      when 'dropmarker'
+        getButtonMenu(element).openPopup(
+          element.parentNode, # Anchor node.
+          'after_end', # Position.
+          0, 0, # Offset.
+          false, # Isn’t a context menu.
+          true, # Allow the 'position' attribute to override the above position.
+        )
       when 'clickable', 'complementary'
-        sequence =
-          if element.localName == 'tab'
-            ['mousedown']
-          else
-            'click-xul'
-        utils.focusElement(element)
-        utils.simulateMouseEvents(element, sequence)
+        # VimFx’s own button won’t trigger unless the click is simulated in the
+        # next tick. This might be true for other buttons as well.
+        utils.nextTick(window, ->
+          utils.focusElement(element)
+          switch
+            when element.localName == 'tab'
+              # Only 'mousedown' seems to be able to activate tabs.
+              utils.simulateMouseEvents(element, ['mousedown'])
+            when element.closest('tab')
+              # If `.click()` is used on a tab close button, its tab will be
+              # selected first, which might cause the selected tab to change.
+              utils.simulateMouseEvents(element, 'click-xul')
+            else
+              # `.click()` seems to trigger more buttons (such as NoScript’s
+              # button and Firefox’s “hamburger” menu button) than simulating
+              # 'click-xul'.
+              element.click()
+              utils.openDropdown(element)
+        )
     return false
 
   wrappers = markableElements.find(
@@ -686,11 +723,19 @@ helper_copy_marker_element = (vim, elementIndex, property) ->
 
 
 
-findStorage = {lastSearchString: ''}
+findStorage = {
+  lastSearchString: ''
+  busy: false
+}
 
 helper_find_from_top_of_viewport = (vim, direction, callback) ->
+  return if findStorage.busy
   if vim.options.find_from_top_of_viewport
-    vim._run('find_from_top_of_viewport', {direction}, callback)
+    findStorage.busy = true
+    vim._run('find_from_top_of_viewport', {direction}, ->
+      findStorage.busy = false
+      callback()
+    )
   else
     callback()
 
@@ -700,8 +745,13 @@ helper_find = ({highlight, linksOnly = false}, {vim}) ->
     helpSearchInput.select()
     return
 
+  # In case `helper_find_from_top_of_viewport` is slow, make sure that keys
+  # pressed before the find bar input is focsued doesn’t trigger commands.
+  vim.enterMode('find')
+
   helper_mark_last_scroll_position(vim)
   helper_find_from_top_of_viewport(vim, FORWARD, ->
+    return unless vim.mode == 'find'
     findBar = vim.window.gBrowser.getFindBar()
 
     mode = if linksOnly then findBar.FIND_LINKS else findBar.FIND_NORMAL
@@ -729,9 +779,19 @@ helper_find_again = (direction, {vim}) ->
   helper_mark_last_scroll_position(vim)
   helper_find_from_top_of_viewport(vim, direction, ->
     findBar._findField.value = findStorage.lastSearchString
+
+    # Temporarily hack `.onFindResult` to be able to know when the asynchronous
+    # `.onFindAgainCommand` is done.
+    originalOnFindResult = findBar.onFindResult
+    findBar.onFindResult = (data) ->
+      # Prevent the find bar from re-opening if there are no matches.
+      data.storeResult = false
+      findBar.onFindResult = originalOnFindResult
+      findBar.onFindResult(data)
+      message = findBar._findStatusDesc.textContent
+      vim.notify(message) if message
+
     findBar.onFindAgainCommand(not direction)
-    message = findBar._findStatusDesc.textContent
-    vim.notify(message) if message
   )
 
 commands.find_next     = helper_find_again.bind(null, FORWARD)
@@ -772,7 +832,7 @@ commands.reload_config_file = ({vim}) ->
   )
 
 commands.help = ({vim}) ->
-  help.injectHelp(vim.window, vim._parent)
+  help.toggleHelp(vim.window, vim._parent)
 
 commands.dev = ({vim}) ->
   vim.window.DeveloperToolbar.show(true) # `true` to focus.

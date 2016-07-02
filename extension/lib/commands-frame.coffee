@@ -25,7 +25,7 @@
 markableElements = require('./markable-elements')
 prefs = require('./prefs')
 SelectionManager = require('./selection')
-translate = require('./l10n')
+translate = require('./translate')
 utils = require('./utils')
 viewportUtils = require('./viewport')
 
@@ -76,10 +76,10 @@ commands.scroll = (args) ->
   {vim} = args
   return unless activeElement = utils.getActiveElement(vim.content)
   element =
-    # If no element is focused on the page, the the active element is the
-    # topmost `<body>`, and blurring it is a no-op. If it is scrollable, it
-    # means that you can’t blur it in order to scroll `<html>`. Therefore it may
-    # only be scrolled if it has been explicitly focused.
+    # If no element is focused on the page, the active element is the topmost
+    # `<body>`, and blurring it is a no-op. If it is scrollable, it means that
+    # you can’t blur it in order to scroll `<html>`. Therefore it may only be
+    # scrolled if it has been explicitly focused.
     if vim.state.scrollableElements.has(activeElement) and
        (activeElement != vim.content.document.body or
         vim.state.explicitBodyFocus)
@@ -90,7 +90,11 @@ commands.scroll = (args) ->
 
 commands.mark_scroll_position = ({vim, keyStr, notify = true}) ->
   element = vim.state.scrollableElements.filterSuitableDefault()
-  vim.state.marks[keyStr] = [element.scrollTop, element.scrollLeft]
+  vim.state.marks[keyStr] =
+    if element.ownerDocument.documentElement.localName == 'svg'
+      [element.ownerGlobal.scrollY, element.ownerGlobal.scrollX]
+    else
+      [element.scrollTop, element.scrollLeft]
   if notify
     vim.notify(translate('notification.mark_scroll_position.success', keyStr))
 
@@ -125,25 +129,37 @@ helper_follow = (options, matcher, {vim, pass}) ->
 
     shape = getElementShape(element)
 
-    # CodeMirror editor uses a tiny hidden textarea positioned at the caret.
-    # Targeting those are the only reliable way of focusing CodeMirror editors,
-    # and doing so without moving the caret.
-    if not shape and id == 'normal' and element.nodeName == 'TEXTAREA' and
-       element.ownerGlobal == vim.content
-      rect = element.getBoundingClientRect()
-      # Use `.clientWidth` instead of `rect.width` because the latter includes
-      # the width of the borders of the textarea, which are unreliable.
-      if element.clientWidth == 1 and rect.height > 0
-        shape = {
-          nonCoveredPoint: {
-            x: rect.left
-            y: rect.top + rect.height / 2
-            offset: {left: 0, top: 0}
+    unless shape.nonCoveredPoint then switch
+      # CodeMirror editor uses a tiny hidden textarea positioned at the caret.
+      # Targeting those are the only reliable way of focusing CodeMirror
+      # editors, and doing so without moving the caret.
+      when id == 'normal' and element.localName == 'textarea' and
+           element.ownerGlobal == vim.content
+        rect = element.getBoundingClientRect()
+        # Use `.clientWidth` instead of `rect.width` because the latter includes
+        # the width of the borders of the textarea, which are unreliable.
+        if element.clientWidth == 1 and rect.height > 0
+          shape = {
+            nonCoveredPoint: {
+              x: rect.left
+              y: rect.top + rect.height / 2
+              offset: {left: 0, top: 0}
+            }
+            area: rect.width * rect.height
           }
-          area: rect.width * rect.height
-        }
 
-    return unless shape
+      # Putting a large `<input type="file">` inside a smaller wrapper element
+      # with `overflow: hidden;` seems to be a common pattern, used both on
+      # addons.mozilla.org and <https://blueimp.github.io/jQuery-File-Upload/>.
+      when id in ['normal', 'focus'] and element.localName == 'input' and
+           element.type == 'file' and element.parentElement?
+        parentShape = getElementShape(element.parentElement)
+        shape = parentShape if parentShape.area <= shape.area
+
+    if not shape.nonCoveredPoint and pass == 'complementary'
+      shape = getElementShape(element, -1)
+
+    return unless shape.nonCoveredPoint
 
     originalRect = element.getBoundingClientRect()
     length = vim.state.markerElements.push({element, originalRect})
@@ -248,7 +264,7 @@ commands.follow = helper_follow.bind(
             document.getElementById?(element.htmlFor)
           else
             element.querySelector?('input, textarea, select')
-        if input and not getElementShape(input)
+        if input and not getElementShape(input).nonCoveredPoint
           type = 'clickable'
       # Last resort checks for elements that might be clickable because of
       # JavaScript.
@@ -355,6 +371,7 @@ commands.click_marker_element = (
       else
         'click'
     utils.simulateMouseEvents(element, sequence)
+    utils.openDropdown(element)
   element.target = targetReset if targetReset
 
 commands.copy_marker_element = ({vim, elementIndex, property}) ->

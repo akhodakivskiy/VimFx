@@ -35,6 +35,7 @@ class Marker
     @height = 0
     @hint = ''
     @hintIndex = 0
+    @visible = true
     @zoom = 1
     @viewport = null
     @position = null
@@ -47,8 +48,8 @@ class Marker
   show: -> @setVisibility(true)
   hide: -> @setVisibility(false)
 
-  setVisibility: (visible) ->
-    @markerElement.classList.toggle('marker--hidden', not visible)
+  setVisibility: (@visible) ->
+    @markerElement.classList.toggle('marker--hidden', not @visible)
 
   # To be called when the marker has been both assigned a hint and inserted
   # into the DOM, and thus gotten a width and height.

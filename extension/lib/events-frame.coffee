@@ -263,6 +263,8 @@ class FrameEventManager
         )
     )
 
+    messageManager.listen('checkFocusType', @sendFocusType.bind(this))
+
   sendFocusType: ({ignore = []} = {}) ->
     return unless activeElement = utils.getActiveElement(@vim.content)
     focusType = utils.getFocusType(activeElement)

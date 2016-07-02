@@ -98,26 +98,10 @@ class UIEventManager
       @setHeldModifiers(event, {filterCurrentOnly: true})
     )
 
-    handleFocusRelatedEvent = (event) =>
-      return unless vim = @vimfx.getCurrentVim(@window)
-
-      # We used to only continue if `vim.isUIEvent(event)` here, but that’s not
-      # entirely reliable. Elements focused and blurred inside the Evernote Web
-      # Clipper extension’s popup (which is an `<iframe>` injected into the
-      # browser UI) _are_ UI elements, but seem to be indistinguishable from
-      # non-UI elements. Luckily, it doesn’t matter if we happen to handle
-      # non-UI elements when determining the focus type. TODO: Remove this
-      # comment when non-multi-process is removed from Firefox.
-      focusType = utils.getFocusType(utils.getActiveElement(@window))
-      vim._setFocusType(focusType)
-
-      if focusType == 'editable' and vim.mode == 'caret'
-        vim.enterMode('normal')
-
-    @listen('focus', handleFocusRelatedEvent)
-    @listen('blur', (event) =>
-      @window.setTimeout((->
-        handleFocusRelatedEvent(event)
+    @listen('focus', => @setFocusType())
+    @listen('blur', =>
+      @window.setTimeout((=>
+        @setFocusType()
       ), @vimfx.options.blur_timeout)
     )
 
@@ -170,6 +154,7 @@ class UIEventManager
 
       return unless vim = @vimfx.getCurrentVim(@window)
       vim.hideNotification()
+      @vimfx.emit('focusTypeChange', {vim})
     )
 
     @listen('TabClose', (event) =>
@@ -201,11 +186,26 @@ class UIEventManager
       callback(true)
     ), {messageManager: @window.messageManager})
 
+  setFocusType: ->
+    return unless vim = @vimfx.getCurrentVim(@window)
+
+    activeElement = utils.getActiveElement(@window)
+
+    if activeElement == @window.gBrowser.selectedBrowser
+      vim._send('checkFocusType')
+      return
+
+    focusType = utils.getFocusType(activeElement)
+    vim._setFocusType(focusType)
+
+    if focusType == 'editable' and vim.mode == 'caret'
+      vim.enterMode('normal')
+
   consumeKeyEvent: (vim, event) ->
     match = vim._consumeKeyEvent(event)
 
     if match
-      if @vimfx.options.notify_entered_keys
+      if @vimfx.options.notify_entered_keys and vim.mode != 'ignore'
         if match.type in ['none', 'full'] or match.likelyConflict
           @enteredKeys.clear(vim)
         else
