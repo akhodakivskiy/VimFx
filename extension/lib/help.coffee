@@ -97,6 +97,7 @@ createHeader = (window, vimfx) ->
 
 createContent = (window, vimfx) ->
   $ = utils.createBox.bind(null, window.document)
+  extraCommands = getExtraCommands(vimfx)
 
   content = $('content')
 
@@ -120,7 +121,7 @@ createContent = (window, vimfx) ->
         $('heading-category search-item', categoryContainer, category.name)
 
       for {command, name, enabledSequences} in category.commands
-        commandContainer = $('command search-item', categoryContainer)
+        commandContainer = $('command has-click search-item', categoryContainer)
         commandContainer.setAttribute('data-command', name)
         commandContainer.onclick = goToCommandSetting.bind(
           null, window, vimfx, command
@@ -133,7 +134,42 @@ createContent = (window, vimfx) ->
           $('key-sequence-rest search-text', keySequence, rest)
         $('description search-text', commandContainer, command.description)
 
+      categoryExtraCommands = extraCommands[mode._name]?[category._name]
+      if categoryExtraCommands
+        for name, sequences of categoryExtraCommands when sequences.length > 0
+          commandContainer = $('command search-item', categoryContainer)
+          commandContainer.setAttribute('data-command', name)
+          for sequence in sequences
+            keySequence = $('key-sequence', commandContainer)
+            $('key-sequence-rest search-text', keySequence, sequence)
+          description = translate("mode.#{mode._name}.#{name}")
+          $('description search-text', commandContainer, description)
+
   return content
+
+getExtraCommands = (vimfx) ->
+  lastHintChar = translate('help.last_hint_char')
+  return {
+    'hints': {
+      '': {
+        'peek_through':
+          if vimfx.options.hints_peek_through
+            [vimfx.options.hints_peek_through]
+          else
+            []
+        'toggle_in_tab':
+          if vimfx.options.hints_toggle_in_tab
+            ["#{vimfx.options.hints_toggle_in_tab}#{lastHintChar}>"]
+          else
+            []
+        'toggle_in_background':
+          if vimfx.options.hints_toggle_in_background
+            ["#{vimfx.options.hints_toggle_in_background}#{lastHintChar}>"]
+          else
+            []
+      }
+    }
+  }
 
 splitSequence = (sequence, specialKeys) ->
   specialKeyEnds = specialKeys.map((key) ->

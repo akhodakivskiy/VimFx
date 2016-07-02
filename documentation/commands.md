@@ -225,9 +225,10 @@ the shorter the hint. To learn more about hint characters and hint length, read
 about the [hint chars] option.
 
 Hints are added on top of the corresponding element. If they obscure the display
-too much you can hold shift to make them transparent. (See [Styling] if you’d
-like to change that.) The hints can also sometimes cover each other. Press
-`<space>` and `<s-space>` to switch which one should be on top.
+too much you can hold shift to make them transparent, letting you peek through
+them. (See [Styling] and the [hints\_peek\_through] pref if you’d like to change
+that.) The hints can also sometimes cover each other. Press `<space>` and
+`<s-space>` to switch which one should be on top.
 
 When giving a count to an `f` command, all markers will be re-shown after you’ve
 typed the hint characters of one of them, _count_ minus one times. All but the
@@ -277,6 +278,7 @@ the previous hints.)
 [hint-matcher]: api.md#vimfxhintmatcher
 [hint chars]: options.md#hint-chars
 [Styling]: styling.md
+[hints\_peek\_through]: options.md#hints_peek_through
 [hints\_toggle\_in\_tab]: options.md#hints_toggle_in_tab
 [hints\_toggle\_in\_background]: options.md#hints_toggle_in_background
 

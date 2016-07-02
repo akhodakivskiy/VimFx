@@ -125,6 +125,14 @@ class FrameEventManager
       @vim.state.scrollableElements.deleteChecked(target)
     )
 
+    @listen('submit', ((event) ->
+      return if event.defaultPrevented
+      target = event.originalTarget
+      {activeElement} = target.ownerDocument
+      if activeElement?.form == target and utils.isTypingElement(activeElement)
+        activeElement.blur()
+    ), false)
+
     @listen('keydown', (event) =>
       @keepInputs = false
     )
