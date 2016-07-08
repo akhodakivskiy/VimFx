@@ -852,6 +852,8 @@ commands.esc = ({vim}) ->
   unless help.getSearchInput(vim.window)?.getAttribute('focused')
     help.removeHelp(vim.window)
 
+  vim._setFocusType('none') # Better safe than sorry.
+
 
 
 module.exports = {
