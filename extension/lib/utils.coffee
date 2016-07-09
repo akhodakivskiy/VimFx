@@ -117,6 +117,8 @@ isIframeEditor = (element) ->
           element.classList?.contains('editable')) or
          # vBulletin.
          element.classList?.contains('wysiwyg') or
+         # TYPO3 CMS.
+         element.classList?.contains('htmlarea-content-body') or
          # The wasavi extension.
          element.hasAttribute?('data-wasavi-state')
 
