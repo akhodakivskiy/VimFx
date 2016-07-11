@@ -59,7 +59,7 @@ commands = {}
 
 commands.go_up_path = ({vim, count = 1}) ->
   {pathname}  = vim.content.location
-  newPathname = pathname.replace(/// (?: /[^/]+ ){1,#{count}} /?$ ///, '')
+  newPathname = pathname.replace(/// (?: [^/]+ (/|$)){1,#{count}} $ ///, '')
   if newPathname == pathname
     vim.notify(translate('notification.go_up_path.limit'))
   else
