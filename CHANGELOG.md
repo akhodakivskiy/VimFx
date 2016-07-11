@@ -1,3 +1,20 @@
+### 0.17.4 (2016-07-11)
+
+- Improved: The usage of modifier keys in Hints mode is now shown in VimFx’s
+  Keyboard Shortcuts help dialog. The functionality has been there for a long
+  time, but should now be easier to find. Thanks to our awesome translators,
+  the new help text is already available in most supported locales!
+- Improved: If you submit a form while still being inside one of its text
+  inputs, that text input is now automatically blurred. This lets you use VimFx
+  commands while waiting for the form to submit without having to press
+  `<escape>` first.
+- Improved: The `gu` command now works better on some pages, by preserving a
+  trailing slash. Thanks to @sinkuu!
+- Improved: VimFx now recognizes text areas in the TYPO3 CMS.
+- Improved: The `<escape>` command and the toolbar button now let you escape
+  back to Normal mode if VimFx ever gets stuck thinking that you are typing in a
+  text input.
+
 ### 0.17.3 (2016-06-27)
 
 - Improved: The `zF` command can now open even more dropdown menus of buttons.
