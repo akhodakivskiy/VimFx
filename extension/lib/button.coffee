@@ -38,12 +38,14 @@ injectButton = (vimfx) ->
       window = button.ownerGlobal
       return unless vim = vimfx.getCurrentVim(window)
 
+      helpVisible = help.getHelp(window)
+
       # If we somehow have gotten stuck with `vim.focusType == 'editable'`,
-      # allow the buttton to reset to 'none'.
+      # allow the buttton to reset to 'none'. (This also hides the help dialog.)
       vimfx.modes.normal.commands.esc.run({vim})
 
-      if vim.mode == 'normal'
-        help.toggleHelp(window, vimfx)
+      if vim.mode == 'normal' and not helpVisible
+        help.injectHelp(window, vimfx)
       else
         vim.enterMode('normal')
   })
