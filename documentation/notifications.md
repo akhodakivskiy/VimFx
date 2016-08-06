@@ -16,7 +16,7 @@ pressed the correct keys or not.
 VimFx’s notifications are similar to the “URL popup,” shown when hovering or
 focusing links, but is placed on the opposite side.
 
-Notifications are shown until you click them, press a key or switch tab.
+Notifications are shown until you click something, press a key or switch tab.
 
 (See also the [`notifications_enabled`] pref.)
 

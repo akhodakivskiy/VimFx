@@ -109,6 +109,8 @@ class UIEventManager
       target = event.originalTarget
       return unless vim = @vimfx.getCurrentVim(@window)
 
+      vim.hideNotification()
+
       # In multi-process, clicks simulated by VimFx cannot be caught here. In
       # non-multi-process, they unfortunately can. This hack should be
       # sufficient for that case until non-multi-process is removed from

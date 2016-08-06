@@ -82,7 +82,6 @@ class Vim
 
     @_statusPanel?.remove()
     @_statusPanel = statusPanel.injectStatusPanel(@browser)
-    @_statusPanel.onclick = => @hideNotification()
 
     @_addListeners() if addListeners
 

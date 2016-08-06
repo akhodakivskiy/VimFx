@@ -182,6 +182,8 @@ class FrameEventManager
       # Clicks are always counted as page interaction. Listen for 'mousedown'
       # instead of 'click' to mark the interaction as soon as possible.
       @vim.markPageInteraction()
+
+      @vim.hideNotification()
     )
 
     messageManager.listen('browserRefocus', =>

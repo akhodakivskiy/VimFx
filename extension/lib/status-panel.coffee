@@ -1,5 +1,5 @@
 ###
-# Copyright Simon Lydell 2015.
+# Copyright Simon Lydell 2015, 2016.
 #
 # This file is part of VimFx.
 #
@@ -31,7 +31,6 @@ injectStatusPanel = (browser) ->
     layer: 'true'
     mirror: 'true'
   })
-  statusPanel.style.pointerEvents = 'auto'
 
   window.gBrowser.getBrowserContainer(browser).appendChild(statusPanel)
   module.onShutdown(-> statusPanel.remove())
