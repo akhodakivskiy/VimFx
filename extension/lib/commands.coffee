@@ -727,10 +727,12 @@ commands.element_text_select =
 
 commands.element_text_copy = (args) ->
   {vim} = args
+
   callback = (marker) ->
     helper_copy_marker_element(vim, marker.wrapper.elementIndex, '_selection')
     return false
-  helper_follow(args, {name: 'follow_selectable', callback})
+
+  helper_follow({name: 'follow_selectable', callback}, args)
 
 helper_copy_marker_element = (vim, elementIndex, property) ->
   if property == '_selection'
