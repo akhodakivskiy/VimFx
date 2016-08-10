@@ -113,7 +113,7 @@ one using `vimfx.set(...)` to able to use the new command.
 vimfx.addCommand({
   name: 'hello',
   description: 'Log Hello World',
-}, => {
+}, () => {
   console.log('Hello World!')
 })
 // Optional:
@@ -246,7 +246,7 @@ can be used to replace the blacklist option).
 ```js
 vimfx.on('locationChange', ({vim, location}) => {
   if (location.hostname === 'example.com') {
-    vim.enterMode('ignore', {type: 'blacklist'})
+    vimfx.modes.normal.commands.enter_mode_ignore.run({vim, blacklist: true})
   }
 })
 ```
@@ -458,6 +458,101 @@ categories.custom = {
   [categories.tabs.order, commands.focus_location_bar.order]
 ```
 
+### Custom hints commands
+
+Apart from the standard `f` commands, you can create your own.
+
+You may run any VimFx command by using the following pattern:
+
+```js
+// config.js
+vimfx.addCommand({
+  name: 'run_other_command_example',
+  description: 'Run other command example',
+}, (args) => {
+  // Replace 'follow' with any command name here:
+  vimfx.modes.normal.commands.follow.run(args)
+})
+```
+
+All `f` commands (except `zF`) also support `args.callbackOverride`:
+
+```js
+// config.js
+vimfx.addCommand({
+  name: 'custom_hints_command_example',
+  description: 'Custom hints command example',
+}, (args) => {
+  vimfx.modes.normal.commands.follow.run(Object.assign({}, args, {
+    callbackOverride({type, href, id, timesLeft}) {
+      console.log('Marker data:', {type, href, id, timesLeft})
+      return (timesLeft > 1)
+    },
+  ))
+})
+```
+
+This lets you piggy-back on one of the existing `f` commands by getting the same
+hints on screen as that command, but then doing something different with the
+matched hint marker.
+
+`callbackOverride` is called with an object with the following properties:
+
+- type: `String`. The type of the element of the matched hint marker. See
+  [`vimfx.setHintMatcher(...)`] for all possible values.
+
+- href: `String` or `null`. If `type` is `'link'`, then this is the `href`
+  attribute of the element of the matched hint marker.
+
+- id: An id that you can pass to [`vimfx.getMarkerElement(...)`] to get the
+  element of the matched hint marker.
+
+- timesLeft: `Number`. Calling an `f` command means that you want to run it
+  _count_ times in a row. This number tells how many times there are left to
+  run. If you don’t provide a count, the number is `1`.
+
+`callbackOverride` should return `true` if you want the hint markers to
+re-appear on screen after you’ve matched one of them (as in the `af` command),
+and `false` if you wish to exit Hints mode. If your command ignores counts,
+simply always return `false`. Otherwise you most likely want to return
+`timesLeft > 1`.
+
+Here’s an example which adds a command for opening a link in a new private
+window using hint markers. It also highlights those links with a red background.
+
+```js
+// config.js
+let {commands} = vimfx.modes.normal
+
+vimfx.addCommand({
+  name: 'follow_in_private_window',
+  category: 'browsing',
+  order: commands.follow_in_window.order + 1,
+  description: 'Follow link in a new private window',
+}, (args) => {
+  let {vim} = args
+  commands.follow_in_window.run(Object.assign({}, args, {
+    callbackOverride({type, href, id, timesLeft}) {
+      if (href) {
+        vim.window.openLinkIn(href, 'window', {private: true})
+        vimfx.send(vim, 'highlight_marker_element', {id})
+      }
+      return false
+    },
+  }))
+})
+```
+
+```js
+// frame.js
+vimfx.listen('highlight_marker_element', ({id}) => {
+  let element = vimfx.getMarkerElement(id)
+  if (element) {
+    element.style.backgroundColor = 'red'
+  }
+})
+```
+
 ### Mode object
 
 A mode is an object with the following properties:
@@ -488,11 +583,8 @@ properties:
 ##### onEnter
 
 This method is called with an object as mentioned above, and after that there
-may be any number of arguments (`args` in `vim.enterMode(modeName, ...args)`)
-that the mode is free to do whatever it wants with.
-
-Whatever is returned from `onEnter` will be returned from
-`vim.enterMode(modeName, ...args)`.
+may be any number of arguments that the mode is free to do whatever it wants
+with.
 
 ##### onInput
 
@@ -646,12 +738,6 @@ A `vim` object has the following properties:
 
   `match.likelyConflict` of [match object]s depend on `focusType`.
 
-- enterMode(modeName, ...args): `Function`. Enter mode `modeName`, passing
-  `...args` to the mode. It is up to every mode to do whatever it wants to with
-  `...args`. If `modeName` was already the current mode, nothing is done and
-  `undefined` is returned. Otherwise it us up to the mode to return whatever it
-  wants to.
-
 - isUIEvent(event): `Function`. Returns `true` if `event` occurred in the
   browser UI, and `false` otherwise (if it occurred in web page content).
 
@@ -781,6 +867,12 @@ The available type strings depend on `id`:
 
 The function must return `null` or a string like the `type` parameter.
 
+### `vimfx.getMarkerElement(id)`
+
+Takes an id that has been given to you when creating [custom hints commands] and
+returns the DOM element associated with that id. If no element can be found,
+`null` is returned.
+
 
 ## Stability
 
@@ -796,6 +888,7 @@ backwards compatibility will be a priority and won’t be broken until VimFx
 [`vimfx.send(...)`]: #vimfxsendvim-message-data--null-callback--null
 [`vimfx.listen(...)`]: #vimfxlistenmessage-listener
 [categories]: #vimfxgetcategories
+[custom hints commands]: #custom-hints-commands
 [`vimfx.modes`]: #vimfxmodes
 [onInput]: #oninput
 [mode object]: #mode-object
@@ -807,6 +900,8 @@ backwards compatibility will be a priority and won’t be broken until VimFx
 [location object]: #location-object
 [The `focusTypeChange` event]: #the-focustypechange-event
 [the `shutdown` event]: #the-shutdown-event
+[`vimfx.setHintMatcher(...)`]: #vimfxsethintmatcherhintmatcher
+[`vimfx.getMarkerElement(...)`]: #vimfxgetmarkerelementid
 
 [blacklisted]: options.md#blacklist
 [special options]: options.md#special-options

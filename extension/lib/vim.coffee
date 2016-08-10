@@ -104,7 +104,7 @@ class Vim
            element != @window.gBrowser.selectedBrowser
 
   # `args...` is passed to the mode's `onEnter` method.
-  enterMode: (mode, args...) ->
+  _enterMode: (mode, args...) ->
     return if @mode == mode
 
     unless utils.has(@_parent.modes, mode)
@@ -115,10 +115,9 @@ class Vim
 
     @_call('onLeave') if @mode?
     @mode = mode
-    result = @_call('onEnter', null, args...)
+    @_call('onEnter', null, args...)
     @_parent.emit('modeChange', {vim: this})
     @_send('modeChange', {mode})
-    return result
 
   _consumeKeyEvent: (event) ->
     return @_parent.consumeKeyEvent(event, this)
@@ -131,10 +130,10 @@ class Vim
   _onLocationChange: (url) ->
     switch
       when @_isBlacklisted(url)
-        @enterMode('ignore', {type: 'blacklist'})
+        @_enterMode('ignore', {type: 'blacklist'})
       when (@mode == 'ignore' and @_storage.ignore.type == 'blacklist') or
            not @mode
-        @enterMode('normal')
+        @_enterMode('normal')
     @_parent.emit('locationChange', {vim: this, location: new @window.URL(url)})
 
   _call: (method, data = {}, extraArgs...) ->
@@ -183,13 +182,13 @@ class Vim
     @focusType = focusType
     switch
       when @focusType == 'ignore'
-        @enterMode('ignore', {type: 'focusType'})
+        @_enterMode('ignore', {type: 'focusType'})
       when @mode == 'ignore' and @_storage.ignore.type == 'focusType'
-        @enterMode('normal')
+        @_enterMode('normal')
       when @mode == 'normal' and @focusType == 'findbar'
-        @enterMode('find')
+        @_enterMode('find')
       when @mode == 'find' and @focusType != 'findbar'
-        @enterMode('normal')
+        @_enterMode('normal')
     @_parent.emit('focusTypeChange', {vim: this})
 
 module.exports = Vim

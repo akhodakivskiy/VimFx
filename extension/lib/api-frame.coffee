@@ -44,6 +44,10 @@ createConfigAPI = (vim, onShutdown = module.onShutdown) -> {
       )
     vim.hintMatcher = hintMatcher
     onShutdown(-> vim.hintMatcher = null)
+
+  getMarkerElement: (id) ->
+    data = vim.state.markerElements[id]
+    return if data then data.element else null
 }
 
 module.exports = createConfigAPI

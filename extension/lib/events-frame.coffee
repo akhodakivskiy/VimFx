@@ -95,7 +95,7 @@ class FrameEventManager
 
       if target == @vim.content.document
         messageManager.send('frameCanReceiveEvents', false)
-        @vim.enterMode('normal') if @vim.mode == 'hints'
+        @vim._enterMode('normal') if @vim.mode == 'hints'
 
       # If the target isn’t the topmost document, it means that a frame has
       # changed: It could have been removed or its `src` attribute could have
@@ -224,7 +224,7 @@ class FrameEventManager
         @vim.state.hasFocusedTextInput = true
 
         if @vim.mode == 'caret' and not utils.isContentEditable(target)
-          @vim.enterMode('normal')
+          @vim._enterMode('normal')
 
       # Blur the focus target, if autofocus prevention is enabled…
       if prefs.get('prevent_autofocus') and

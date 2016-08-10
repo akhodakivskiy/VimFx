@@ -241,11 +241,13 @@ helper_mark_last_scroll_position = (vim) ->
   vim._run('mark_scroll_position', {keyStr, notify: false})
 
 commands.mark_scroll_position = ({vim}) ->
-  vim.enterMode('marks', (keyStr) -> vim._run('mark_scroll_position', {keyStr}))
+  vim._enterMode('marks', (keyStr) ->
+    vim._run('mark_scroll_position', {keyStr})
+  )
   vim.notify(translate('notification.mark_scroll_position.enter'))
 
 commands.scroll_to_mark = ({vim}) ->
-  vim.enterMode('marks', (keyStr) ->
+  vim._enterMode('marks', (keyStr) ->
     unless keyStr == vim.options['scroll.last_position_mark']
       helper_mark_last_scroll_position(vim)
     helper_scroll(
@@ -428,7 +430,7 @@ commands.tab_close_other = ({vim}) ->
 
 
 
-helper_follow = (name, vim, callback, count = null) ->
+helper_follow = ({name, callback}, {vim, count, callbackOverride = null}) ->
   {window} = vim
   vim.markPageInteraction()
   help.removeHelp(window)
@@ -452,11 +454,19 @@ helper_follow = (name, vim, callback, count = null) ->
     markerContainer.container
   )
 
+  chooseCallback = (marker, timesLeft, keyStr) ->
+    if callbackOverride
+      {type, href = null, elementIndex} = marker.wrapper
+      return callbackOverride({type, href, id: elementIndex, timesLeft})
+    else
+      return callback(marker, timesLeft, keyStr)
+
   # Enter Hints mode immediately, with an empty set of markers. The user might
   # press keys before any hints have been generated. Those key presses should be
   # handled in Hints mode, not Normal mode.
-  vim.enterMode('hints', {
-    markerContainer, callback, count
+  vim._enterMode('hints', {
+    markerContainer, count
+    callback: chooseCallback
     sleep: vim.options.hints_sleep
   })
 
@@ -467,7 +477,7 @@ helper_follow = (name, vim, callback, count = null) ->
     if wrappers.length == 0
       if pass in ['single', 'second'] and markerContainer.markers.length == 0
         vim.notify(translate('notification.follow.none'))
-        vim.enterMode('normal')
+        vim._enterMode('normal')
     else
       markerContainer.injectHints(wrappers, viewport, pass)
 
@@ -476,7 +486,9 @@ helper_follow = (name, vim, callback, count = null) ->
 
   vim._run(name, {pass: 'auto'}, injectHints)
 
-helper_follow_clickable = (options, {vim, count = 1}) ->
+helper_follow_clickable = (options, args) ->
+  {vim} = args
+
   callback = (marker, timesLeft, keyStr) ->
     {inTab, inBackground} = options
     {type, elementIndex} = marker.wrapper
@@ -527,7 +539,7 @@ helper_follow_clickable = (options, {vim, count = 1}) ->
     return not isLast
 
   name = if options.inTab then 'follow_in_tab' else 'follow'
-  helper_follow(name, vim, callback, count)
+  helper_follow({name, callback}, args)
 
 commands.follow =
   helper_follow_clickable.bind(null, {inTab: false, inBackground: true})
@@ -538,19 +550,24 @@ commands.follow_in_tab =
 commands.follow_in_focused_tab =
   helper_follow_clickable.bind(null, {inTab: true, inBackground: false})
 
-commands.follow_in_window = ({vim}) ->
+commands.follow_in_window = (args) ->
+  {vim} = args
+
   callback = (marker) ->
     vim._focusMarkerElement(marker.wrapper.elementIndex)
     {href} = marker.wrapper
     vim.window.openLinkIn(href, 'window', {}) if href
     return false
-  helper_follow('follow_in_tab', vim, callback)
+
+  helper_follow({name: 'follow_in_tab', callback}, args)
 
 commands.follow_multiple = (args) ->
   args.count = Infinity
   commands.follow(args)
 
-commands.follow_copy = ({vim}) ->
+commands.follow_copy = (args) ->
+  {vim} = args
+
   callback = (marker) ->
     property = switch marker.wrapper.type
       when 'link'
@@ -561,13 +578,17 @@ commands.follow_copy = ({vim}) ->
         '_selection'
     helper_copy_marker_element(vim, marker.wrapper.elementIndex, property)
     return false
-  helper_follow('follow_copy', vim, callback)
 
-commands.follow_focus = ({vim}) ->
+  helper_follow({name: 'follow_copy', callback}, args)
+
+commands.follow_focus = (args) ->
+  {vim} = args
+
   callback = (marker) ->
     vim._focusMarkerElement(marker.wrapper.elementIndex, {select: true})
     return false
-  helper_follow('follow_focus', vim, callback)
+
+  helper_follow({name: 'follow_focus', callback}, args)
 
 commands.click_browser_element = ({vim}) ->
   {window} = vim
@@ -663,7 +684,7 @@ commands.click_browser_element = ({vim}) ->
     )
 
     markerContainer.injectHints(wrappers, viewport, 'single')
-    vim.enterMode('hints', {markerContainer, callback})
+    vim._enterMode('hints', {markerContainer, callback})
 
   else
     vim.notify(translate('notification.follow.none'))
@@ -684,16 +705,19 @@ commands.focus_text_input = ({vim, count}) ->
   vim.markPageInteraction()
   vim._run('focus_text_input', {count})
 
-helper_follow_selectable = ({select}, {vim}) ->
+helper_follow_selectable = ({select}, args) ->
+  {vim} = args
+
   callback = (marker) ->
     vim._run('element_text_select', {
       elementIndex: marker.wrapper.elementIndex
       full: select
       scroll: select
     })
-    vim.enterMode('caret', select)
+    vim._enterMode('caret', {select})
     return false
-  helper_follow('follow_selectable', vim, callback)
+
+  helper_follow({name: 'follow_selectable', callback}, args)
 
 commands.element_text_caret =
   helper_follow_selectable.bind(null, {select: false})
@@ -701,11 +725,12 @@ commands.element_text_caret =
 commands.element_text_select =
   helper_follow_selectable.bind(null, {select: true})
 
-commands.element_text_copy = ({vim}) ->
+commands.element_text_copy = (args) ->
+  {vim} = args
   callback = (marker) ->
     helper_copy_marker_element(vim, marker.wrapper.elementIndex, '_selection')
     return false
-  helper_follow('follow_selectable', vim, callback)
+  helper_follow(args, {name: 'follow_selectable', callback})
 
 helper_copy_marker_element = (vim, elementIndex, property) ->
   if property == '_selection'
@@ -747,7 +772,7 @@ helper_find = ({highlight, linksOnly = false}, {vim}) ->
 
   # In case `helper_find_from_top_of_viewport` is slow, make sure that keys
   # pressed before the find bar input is focsued doesn’t trigger commands.
-  vim.enterMode('find')
+  vim._enterMode('find')
 
   helper_mark_last_scroll_position(vim)
   helper_find_from_top_of_viewport(vim, FORWARD, ->
@@ -806,12 +831,13 @@ commands.window_new = ({vim}) ->
 commands.window_new_private = ({vim}) ->
   vim.window.OpenBrowserWindow({private: true})
 
-commands.enter_mode_ignore = ({vim}) ->
-  vim.enterMode('ignore', {type: 'explicit'})
+commands.enter_mode_ignore = ({vim, blacklist = false}) ->
+  type = if blacklist then 'blacklist' else 'explicit'
+  vim._enterMode('ignore', {type})
 
 # Quote next keypress (pass it through to the page).
 commands.quote = ({vim, count = 1}) ->
-  vim.enterMode('ignore', {type: 'explicit', count})
+  vim._enterMode('ignore', {type: 'explicit', count})
 
 commands.enter_reader_view = ({vim}) ->
   button = vim.window.document.getElementById('reader-mode-button')

@@ -27,6 +27,7 @@ exports['test exports'] = (assert, $vim) ->
 
   assert.equal(typeof vimfx.listen, 'function', 'listen')
   assert.equal(typeof vimfx.setHintMatcher, 'function', 'setHintMatcher')
+  assert.equal(typeof vimfx.getMarkerElement, 'function', 'getMarkerElement')
 
 exports['test vimfx.listen'] = (assert, $vim, teardown) ->
   shutdownHandlers = []
@@ -70,6 +71,22 @@ exports['test vimfx.setHintMatcher'] = (assert, $vim) ->
   assert.equal(shutdownHandlers.length, 1)
   shutdownHandlers[0]()
   assert.ok(not $vim.hintMatcher)
+
+exports['test vimfx.getMarkerElement'] = (assert, $vim, teardown) ->
+  teardown(->
+    $vim.state.markerElements = []
+  )
+
+  vimfx = createConfigAPI($vim)
+  element = {}
+  $vim.state.markerElements = [{element}]
+
+  assert.equal(vimfx.getMarkerElement(0), element)
+  assert.equal(vimfx.getMarkerElement(1), null)
+  assert.equal(vimfx.getMarkerElement(null), null)
+
+  $vim.state.markerElements = []
+  assert.equal(vimfx.getMarkerElement(0), null)
 
 exports['test vimfx.listen errors'] = (assert, $vim) ->
   vimfx = createConfigAPI($vim)

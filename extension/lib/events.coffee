@@ -130,7 +130,7 @@ class UIEventManager
          # mode. Otherwise we’d first return to normal mode and then the button
          # would open the help dialog.
          target != button.getButton(@window)
-        vim.enterMode('normal')
+        vim._enterMode('normal')
 
       vim._send('clearHover') unless isVimFxGeneratedEvent
     )
@@ -201,7 +201,7 @@ class UIEventManager
     vim._setFocusType(focusType)
 
     if focusType == 'editable' and vim.mode == 'caret'
-      vim.enterMode('normal')
+      vim._enterMode('normal')
 
   consumeKeyEvent: (vim, event) ->
     match = vim._consumeKeyEvent(event)

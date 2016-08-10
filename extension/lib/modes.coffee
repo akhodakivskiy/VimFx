@@ -52,11 +52,11 @@ mode = (modeName, obj, commands = null) ->
 
 
 mode('normal', {
-  onEnter: ({vim, storage}, options = {}) ->
-    if options.returnTo
-      storage.returnTo = options.returnTo
+  onEnter: ({vim, storage}, {returnTo = null} = {}) ->
+    if returnTo
+      storage.returnTo = returnTo
     else if storage.returnTo
-      vim.enterMode(storage.returnTo)
+      vim._enterMode(storage.returnTo)
       storage.returnTo = null
 
   onLeave: ({vim}) ->
@@ -70,7 +70,7 @@ mode('normal', {
        (match.likelyConflict and not match.specialKeys['<force>'])
       match.discard()
       if storage.returnTo
-        vim.enterMode(storage.returnTo)
+        vim._enterMode(storage.returnTo)
         storage.returnTo = null
       # If you press `aa` (and `a` is a prefix key, but there’s no `aa`
       # shortcut), don’t pass the second `a` to the page.
@@ -82,7 +82,7 @@ mode('normal', {
       # If the command changed the mode, wait until coming back from that mode
       # before switching to `storage.returnTo` if any (see `onEnter` above).
       if storage.returnTo and vim.mode == 'normal'
-        vim.enterMode(storage.returnTo)
+        vim._enterMode(storage.returnTo)
         storage.returnTo = null
 
     # At this point the match is either full, partial or part of a count. Then
@@ -122,7 +122,7 @@ helper_move_caret = (method, direction, {vim, storage, count = 1}) ->
   })
 
 mode('caret', {
-  onEnter: ({vim, storage}, select = false) ->
+  onEnter: ({vim, storage}, {select = false} = {}) ->
     storage.select = select
     storage.caretBrowsingPref = prefs.root.get(CARET_BROWSING_PREF)
     prefs.root.set(CARET_BROWSING_PREF, true)
@@ -182,11 +182,11 @@ mode('caret', {
         # clipboard, since `window.getSelection().toString()` sadly collapses
         # whitespace in `<pre>` elements.
         vim.window.goDoCommand('cmd_copy')
-        vim.enterMode('normal')
+        vim._enterMode('normal')
     )
 
   exit: ({vim}) ->
-    vim.enterMode('normal')
+    vim._enterMode('normal')
 })
 
 
@@ -241,7 +241,7 @@ mode('hints', {
         else
           # The callback might have entered another mode. Only go back to Normal
           # mode if we’re still in Hints mode.
-          vim.enterMode('normal') if vim.mode == 'hints'
+          vim._enterMode('normal') if vim.mode == 'hints'
 
     return true
 
@@ -250,7 +250,7 @@ mode('hints', {
     # The hints are removed automatically when leaving the mode, but after a
     # timeout. When aborting the mode we should remove the hints immediately.
     storage.markerContainer.remove()
-    vim.enterMode('normal')
+    vim._enterMode('normal')
 
   rotate_markers_forward: ({storage}) ->
     storage.markerContainer.rotateOverlapping(true)
@@ -294,7 +294,7 @@ mode('ignore', {
           match.command.run(args)
           return true
       when 1
-        vim.enterMode('normal')
+        vim._enterMode('normal')
       else
         storage.count -= 1
     return false
@@ -302,9 +302,9 @@ mode('ignore', {
 }, {
   exit: ({vim, storage}) ->
     storage.type = null
-    vim.enterMode('normal')
+    vim._enterMode('normal')
   unquote: ({vim}) ->
-    vim.enterMode('normal', {returnTo: 'ignore'})
+    vim._enterMode('normal', {returnTo: 'ignore'})
 })
 
 
@@ -325,7 +325,7 @@ mode('find', {
 
 }, {
   exit: ({vim, findBar}) ->
-    vim.enterMode('normal')
+    vim._enterMode('normal')
     findBar.close()
 })
 
@@ -336,7 +336,7 @@ mode('marks', {
     storage.callback = callback
     storage.timeoutId = vim.window.setTimeout((->
       vim.hideNotification()
-      vim.enterMode('normal')
+      vim._enterMode('normal')
     ), vim.options.timeout)
 
   onLeave: ({vim, storage}) ->
@@ -350,9 +350,9 @@ mode('marks', {
       match.command.run(args)
     else
       storage.callback(match.keyStr)
-      vim.enterMode('normal')
+      vim._enterMode('normal')
     return true
 }, {
   exit: ({vim}) ->
-    vim.enterMode('normal')
+    vim._enterMode('normal')
 })

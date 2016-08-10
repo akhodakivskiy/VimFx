@@ -47,7 +47,7 @@ injectButton = (vimfx) ->
       if vim.mode == 'normal' and not helpVisible
         help.injectHelp(window, vimfx)
       else
-        vim.enterMode('normal')
+        vim._enterMode('normal')
   })
   module.onShutdown(-> cui.destroyWidget(BUTTON_ID))
 
