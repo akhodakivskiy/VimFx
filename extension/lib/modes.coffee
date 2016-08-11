@@ -242,6 +242,21 @@ mode('hints', {
           # The callback might have entered another mode. Only go back to Normal
           # mode if we’re still in Hints mode.
           vim._enterMode('normal') if vim.mode == 'hints'
+    else
+      matchedMarkers = markerContainer.matchTextChar(match.unmodifiedKey)
+      if matchedMarkers.length > 0
+        again = callback(matchedMarkers[0], storage.count, match.keyStr)
+        storage.count -= 1
+        if again
+          vim.window.setTimeout((->
+            marker.markMatched(false) for marker in matchedMarkers
+            return
+          ), vim.options.hints_timeout)
+          markerContainer.reset()
+        else
+          # The callback might have entered another mode. Only go back to Normal
+          # mode if we’re still in Hints mode.
+          vim._enterMode('normal') if vim.mode == 'hints'
 
     return true
 

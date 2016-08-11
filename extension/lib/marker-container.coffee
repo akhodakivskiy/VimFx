@@ -206,6 +206,24 @@ class MarkerContainer
     @numEnteredChars += 1
     return matchedMarkers
 
+  matchTextChar: (char) ->
+    matchedMarkers = []
+
+    for marker in @markers
+      if marker.isComplementary == @isComplementary
+        matched = marker.matchTextChar(char)
+        if matched
+          matchedMarkers.push(marker)
+        else
+          marker.hide()
+
+    if matchedMarkers.length == 1
+      matchedMarkers[0].markMatched(true)
+    else
+      matchedMarkers = []
+
+    return matchedMarkers
+
   deleteHintChar: ->
     for marker in @markers
       switch marker.hintIndex - @numEnteredChars

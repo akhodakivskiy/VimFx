@@ -34,7 +34,9 @@ class Marker
     @width = 0
     @height = 0
     @hint = ''
+    @text = @wrapper.text
     @hintIndex = 0
+    @textChars = ''
     @visible = true
     @zoom = 1
     @viewport = null
@@ -109,6 +111,10 @@ class Marker
       @hintIndex += 1
       return true
     return false
+
+  matchTextChar: (char) ->
+    @textChars += char
+    return @text.indexOf(@textChars) != -1
 
   deleteHintChar: ->
     if @hintIndex > 0
