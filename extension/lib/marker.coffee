@@ -26,7 +26,7 @@ utils = require('./utils')
 class Marker
   # `@wrapper` is a stand-in for the element that the marker represents. See
   # `MarkerContainer::injectHints` for more information.
-  constructor: (@wrapper, @document, {@isComplementary}) ->
+  constructor: (@wrapper, @document, {@isComplementary, @pass}) ->
     @elementShape  = @wrapper.shape
     @markerElement = utils.createBox(@document, 'marker')
     @markerElement.setAttribute('data-type', @wrapper.type)

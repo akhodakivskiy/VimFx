@@ -66,12 +66,26 @@ class MarkerContainer
     @numEnteredChars = 0
     marker.reset() for marker in @markers when marker.hintIndex > 0 || marker.textChars != ""
     @refreshComplementaryVisiblity()
-    @recalculateHints(
-      @markers.filter((marker) -> !marker.wrapper.parentIndex?),
-      @markers.filter((marker) -> marker.wrapper.parentIndex?),
-      @markerMap,
-      "reset"
-    )
+    if @markers.find((marker) -> marker.pass == "first" || marker.pass == "second")
+      @recalculateHints(
+        @markers.filter((marker) -> marker.pass != "second" && !marker.wrapper.parentIndex?),
+        @markers.filter((marker) -> marker.pass != "second" && marker.wrapper.parentIndex?),
+        @markerMap,
+        "first"
+      )
+      @recalculateHints(
+        @markers.filter((marker) -> marker.pass == "second" && !marker.wrapper.parentIndex?),
+        @markers.filter((marker) -> marker.pass == "second" && marker.wrapper.parentIndex?),
+        @markerMap,
+        "second"
+      )
+    else
+      @recalculateHints(
+        @markers.filter((marker) -> !marker.wrapper.parentIndex?),
+        @markers.filter((marker) -> marker.wrapper.parentIndex?),
+        @markerMap,
+        "reset"
+      )
 
   refreshComplementaryVisiblity: ->
     for marker in @markers
@@ -89,7 +103,7 @@ class MarkerContainer
     markerMap = {}
 
     for wrapper in wrappers
-      marker = new Marker(wrapper, @window.document, {isComplementary})
+      marker = new Marker(wrapper, @window.document, {isComplementary, pass})
       if wrapper.parentIndex?
         combined.push(marker)
       else
