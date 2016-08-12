@@ -34,7 +34,7 @@ class Marker
     @width = 0
     @height = 0
     @hint = ''
-    @text = @wrapper.text
+    @text = @wrapper.text.toLowerCase()
     @hintIndex = 0
     @textChars = ''
     @visible = true
@@ -113,7 +113,7 @@ class Marker
     return false
 
   matchTextChar: (char) ->
-    @textChars += char
+    @textChars += char.toLowerCase()
     return @text.indexOf(@textChars) != -1
 
   deleteHintChar: ->
