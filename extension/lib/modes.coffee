@@ -197,6 +197,7 @@ mode('hints', {
     storage.markerContainer = markerContainer
     storage.callback = callback
     storage.count = count
+    storage.textChars = ''
 
     if sleep >= 0
       storage.clearInterval = utils.interval(vim.window, sleep, (next) ->
@@ -244,6 +245,9 @@ mode('hints', {
           vim._enterMode('normal') if vim.mode == 'hints'
     else
       matchedMarkers = markerContainer.matchTextChar(match.unmodifiedKey)
+      storage.textChars += match.unmodifiedKey
+      if vim.options.notify_entered_keys
+        vim.notify(storage.textChars)
       if matchedMarkers.length > 0
         again = callback(matchedMarkers[0], storage.count, match.keyStr)
         storage.count -= 1
@@ -273,8 +277,11 @@ mode('hints', {
   rotate_markers_backward: ({storage}) ->
     storage.markerContainer.rotateOverlapping(false)
 
-  delete_hint_char: ({storage}) ->
+  delete_hint_char: ({vim, storage}) ->
     storage.markerContainer.deleteHintChar()
+    storage.textChars = storage.textChars.slice(0, -1)
+    if vim.options.notify_entered_keys
+      vim.notify(storage.textChars) if storage.textChars.length > 0
 
   increase_count: ({storage}) ->
     storage.count += 1
