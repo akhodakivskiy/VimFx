@@ -66,26 +66,21 @@ class MarkerContainer
     @numEnteredChars = 0
     marker.reset() for marker in @markers when marker.hintIndex > 0 || marker.textChars != ""
     @refreshComplementaryVisiblity()
-    if @markers.find((marker) -> marker.pass == "first" || marker.pass == "second")
+    wasTwoPass = (marker) ->
+      marker.pass = "first" || marker.pass == "second"
+    if @markers.find((marker) -> wasTwoPass(marker))
       @recalculateHints(
-        @markers.filter((marker) -> marker.pass != "second" && !marker.wrapper.parentIndex?),
-        @markers.filter((marker) -> marker.pass != "second" && marker.wrapper.parentIndex?),
+        @markers.filter((marker) -> marker.pass != "second"),
         @markerMap,
         "first"
       )
       @recalculateHints(
-        @markers.filter((marker) -> marker.pass == "second" && !marker.wrapper.parentIndex?),
-        @markers.filter((marker) -> marker.pass == "second" && marker.wrapper.parentIndex?),
+        @markers.filter((marker) -> marker.pass == "second"),
         @markerMap,
         "second"
       )
     else
-      @recalculateHints(
-        @markers.filter((marker) -> !marker.wrapper.parentIndex?),
-        @markers.filter((marker) -> marker.wrapper.parentIndex?),
-        @markerMap,
-        "reset"
-      )
+      @recalculateHints(@markers, @markerMap, "reset")
 
   refreshComplementaryVisiblity: ->
     for marker in @markers
@@ -127,8 +122,8 @@ class MarkerContainer
       # Add `z-index` space for all the children of the marker.
       zIndex += marker.wrapper.numChildren if marker.wrapper.numChildren?
 
-    @recalculateHints(markers, combined, markerMap, pass)
     markers.push(combined...)
+    @recalculateHints(markers, markerMap, pass)
 
     zoom = 1
     if @adjustZoom
@@ -150,7 +145,9 @@ class MarkerContainer
     @markers.push(markers...)
     Object.assign(@markerMap, markerMap)
 
-  recalculateHints: (markers, combined, markerMap, pass) ->
+  recalculateHints: (allMarkers, markerMap, pass) ->
+    markers = allMarkers.filter((marker) -> !marker.wrapper.parentIndex?)
+    combined = allMarkers.filter((marker) -> marker.wrapper.parentIndex?)
     prefixes = switch pass
       when 'first'
         @primaryHintChars
@@ -242,12 +239,7 @@ class MarkerContainer
         else
           marker.hide()
 
-    @recalculateHints(
-      matchedMarkers.filter((marker) -> !marker.wrapper.parentIndex?),
-      matchedMarkers.filter((marker) -> marker.wrapper.parentIndex?),
-      @markerMap,
-      "recalc"
-    )
+    @recalculateHints(matchedMarkers, @markerMap, "recalc")
 
     if matchedMarkers.length == 1
       matchedMarkers[0].markMatched(true)
