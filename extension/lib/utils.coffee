@@ -237,9 +237,11 @@ getFocusType = (element) -> switch
   else
     'none'
 
-getText = (element) ->
-  # XXX do a more intelligent thing here for input, images, etc
-  return element.innerText
+getText = (element) -> switch
+  when isTextInputElement(element)
+    element.value || element.placeholder || ""
+  else
+    element.innerText || ""
 
 
 
