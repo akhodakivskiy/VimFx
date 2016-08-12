@@ -66,6 +66,12 @@ class MarkerContainer
     @numEnteredChars = 0
     marker.reset() for marker in @markers when marker.hintIndex > 0 || marker.textChars != ""
     @refreshComplementaryVisiblity()
+    @recalculateHints(
+      @markers.filter((marker) -> !marker.wrapper.parentIndex?),
+      @markers.filter((marker) -> marker.wrapper.parentIndex?),
+      @markerMap,
+      "reset"
+    )
 
   refreshComplementaryVisiblity: ->
     for marker in @markers
