@@ -45,6 +45,7 @@ class Marker
 
   reset: ->
     @setHint(@hint)
+    @textChars = ''
     @show()
 
   show: -> @setVisibility(true)
