@@ -113,14 +113,19 @@ class Marker
       return true
     return false
 
-  matchTextChar: (char) ->
+  addTextChar: (char) ->
     @textChars += char.toLowerCase()
+
+  matchesText: ->
     return @text.indexOf(@textChars) != -1
 
   deleteHintChar: ->
     if @hintIndex > 0
       @hintIndex -= 1
       @toggleLastHintChar(false)
+
+  deleteTextChar: ->
+    @textChars = @textChars.slice(0, -1)
 
   toggleLastHintChar: (visible) ->
     @markerElement.children[@hintIndex]

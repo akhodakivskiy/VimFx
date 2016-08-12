@@ -66,21 +66,7 @@ class MarkerContainer
     @numEnteredChars = 0
     marker.reset() for marker in @markers when marker.hintIndex > 0 || marker.textChars != ""
     @refreshComplementaryVisiblity()
-    wasTwoPass = (marker) ->
-      marker.pass = "first" || marker.pass == "second"
-    if @markers.find((marker) -> wasTwoPass(marker))
-      @recalculateHints(
-        @markers.filter((marker) -> marker.pass != "second"),
-        @markerMap,
-        "first"
-      )
-      @recalculateHints(
-        @markers.filter((marker) -> marker.pass == "second"),
-        @markerMap,
-        "second"
-      )
-    else
-      @recalculateHints(@markers, @markerMap, "reset")
+    @recalculateHintsWithPasses(@markers, @markerMap)
 
   refreshComplementaryVisiblity: ->
     for marker in @markers
@@ -192,6 +178,23 @@ class MarkerContainer
       parent.markerElement.style.zIndex = parentZIndex + 1
       marker.setHint(parent.hint)
 
+  recalculateHintsWithPasses: (markers, markerMap) ->
+    wasTwoPass = (marker) ->
+      marker.pass = "first" || marker.pass == "second"
+    if markers.find((marker) -> wasTwoPass(marker))
+      @recalculateHints(
+        markers.filter((marker) -> marker.pass != "second"),
+        markerMap,
+        "first"
+      )
+      @recalculateHints(
+        markers.filter((marker) -> marker.pass == "second"),
+        markerMap,
+        "second"
+      )
+    else
+      @recalculateHints(markers, markerMap, "single")
+
   toggleComplementary: ->
     if not @isComplementary and not @hasLookedForComplementaryWrappers
       @isComplementary = true
@@ -233,13 +236,13 @@ class MarkerContainer
 
     for marker in @markers
       if marker.isComplementary == @isComplementary
-        matched = marker.matchTextChar(char)
-        if matched
+        marker.addTextChar(char)
+        if marker.matchesText()
           matchedMarkers.push(marker)
         else
           marker.hide()
 
-    @recalculateHints(matchedMarkers, @markerMap, "recalc")
+    @recalculateHintsWithPasses(matchedMarkers, @markerMap)
 
     if matchedMarkers.length == 1
       matchedMarkers[0].markMatched(true)
@@ -249,13 +252,23 @@ class MarkerContainer
     return matchedMarkers
 
   deleteHintChar: ->
-    for marker in @markers
-      switch marker.hintIndex - @numEnteredChars
-        when 0
-          marker.deleteHintChar()
-        when -1
-          marker.show()
-    @numEnteredChars -= 1 unless @numEnteredChars == 0
+    if @numEnteredChars > 0
+      for marker in @markers
+        switch marker.hintIndex - @numEnteredChars
+          when 0
+            marker.deleteHintChar()
+          when -1
+            marker.show()
+      @numEnteredChars -= 1
+    else
+      matchedMarkers = []
+      for marker in @markers
+        if marker.isComplementary == @isComplementary
+          marker.deleteTextChar()
+          if marker.matchesText()
+            marker.show()
+            matchedMarkers.push(marker)
+      @recalculateHintsWithPasses(matchedMarkers, @markerMap)
 
   clearHintChars: ->
     @deleteHintChar() while @numEnteredChars > 0
