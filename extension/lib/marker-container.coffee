@@ -107,6 +107,30 @@ class MarkerContainer
       # Add `z-index` space for all the children of the marker.
       zIndex += marker.wrapper.numChildren if marker.wrapper.numChildren?
 
+    @recalculateHints(markers, combined, markerMap, pass)
+    markers.push(combined...)
+
+    zoom = 1
+    if @adjustZoom
+      {ZoomManager, gBrowser: {selectedBrowser: browser}} = @window
+      # If “full zoom” is not used, it means that “Zoom text only” is enabled.
+      # If so, that “zoom” does not need to be taken into account.
+      # `.getCurrentMode()` is added by the “Default FullZoom Level” extension.
+      if ZoomManager.getCurrentMode?(browser) ? ZoomManager.useFullZoom
+        zoom = ZoomManager.getZoomForBrowser(browser)
+
+    fragment = @window.document.createDocumentFragment()
+    fragment.appendChild(marker.markerElement) for marker in markers
+    @container.appendChild(fragment)
+
+    # Must be done after the hints have been inserted into the DOM (see
+    # `Marker::setPosition`).
+    marker.setPosition(viewport, zoom) for marker in markers
+
+    @markers.push(markers...)
+    Object.assign(@markerMap, markerMap)
+
+  recalculateHints: (markers, combined, markerMap, pass) ->
     prefixes = switch pass
       when 'first'
         @primaryHintChars
@@ -150,27 +174,6 @@ class MarkerContainer
       marker.markerElement.style.zIndex = parentZIndex
       parent.markerElement.style.zIndex = parentZIndex + 1
       marker.setHint(parent.hint)
-    markers.push(combined...)
-
-    zoom = 1
-    if @adjustZoom
-      {ZoomManager, gBrowser: {selectedBrowser: browser}} = @window
-      # If “full zoom” is not used, it means that “Zoom text only” is enabled.
-      # If so, that “zoom” does not need to be taken into account.
-      # `.getCurrentMode()` is added by the “Default FullZoom Level” extension.
-      if ZoomManager.getCurrentMode?(browser) ? ZoomManager.useFullZoom
-        zoom = ZoomManager.getZoomForBrowser(browser)
-
-    fragment = @window.document.createDocumentFragment()
-    fragment.appendChild(marker.markerElement) for marker in markers
-    @container.appendChild(fragment)
-
-    # Must be done after the hints have been inserted into the DOM (see
-    # `Marker::setPosition`).
-    marker.setPosition(viewport, zoom) for marker in markers
-
-    @markers.push(markers...)
-    Object.assign(@markerMap, markerMap)
 
   toggleComplementary: ->
     if not @isComplementary and not @hasLookedForComplementaryWrappers
@@ -209,6 +212,8 @@ class MarkerContainer
   matchTextChar: (char) ->
     matchedMarkers = []
 
+    @clearHintChars()
+
     for marker in @markers
       if marker.isComplementary == @isComplementary
         matched = marker.matchTextChar(char)
@@ -216,6 +221,13 @@ class MarkerContainer
           matchedMarkers.push(marker)
         else
           marker.hide()
+
+    @recalculateHints(
+      matchedMarkers.filter((marker) -> !marker.wrapper.parentIndex?),
+      matchedMarkers.filter((marker) -> marker.wrapper.parentIndex?),
+      @markerMap,
+      "recalc"
+    )
 
     if matchedMarkers.length == 1
       matchedMarkers[0].markMatched(true)
@@ -232,6 +244,9 @@ class MarkerContainer
         when -1
           marker.show()
     @numEnteredChars -= 1 unless @numEnteredChars == 0
+
+  clearHintChars: ->
+    @deleteHintChar() while @numEnteredChars > 0
 
 
   rotateOverlapping: (forward) ->
