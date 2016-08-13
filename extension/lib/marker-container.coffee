@@ -254,23 +254,23 @@ class MarkerContainer
     return matchedMarkers
 
   deleteHintChar: ->
-    if @numEnteredChars > 0
-      for marker in @markers
-        switch marker.hintIndex - @numEnteredChars
-          when 0
-            marker.deleteHintChar()
-          when -1
-            marker.show()
-      @numEnteredChars -= 1
-    else
-      matchedMarkers = []
-      for marker in @markers
-        if marker.isComplementary == @isComplementary
-          marker.deleteTextChar()
-          if marker.matchesText()
-            marker.show()
-            matchedMarkers.push(marker)
-      @recalculateHintsWithPasses(matchedMarkers, @markerMap)
+    for marker in @markers
+      switch marker.hintIndex - @numEnteredChars
+        when 0
+          marker.deleteHintChar()
+        when -1
+          marker.show()
+    @numEnteredChars -= 1 unless @numEnteredChars == 0
+
+  deleteTextChar: ->
+    matchedMarkers = []
+    for marker in @markers
+      if marker.isComplementary == @isComplementary
+        marker.deleteTextChar()
+        if marker.matchesText()
+          marker.show()
+          matchedMarkers.push(marker)
+    @recalculateHintsWithPasses(matchedMarkers, @markerMap)
 
   clearHintChars: ->
     @deleteHintChar() while @numEnteredChars > 0

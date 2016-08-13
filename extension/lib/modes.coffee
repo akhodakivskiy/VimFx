@@ -280,8 +280,11 @@ mode('hints', {
     storage.markerContainer.rotateOverlapping(false)
 
   delete_hint_char: ({storage}) ->
-    storage.markerContainer.deleteHintChar()
-    storage.textChars = storage.textChars.slice(0, -1)
+    if storage.markerContainer.numEnteredChars > 0
+      storage.markerContainer.deleteHintChar()
+    else
+      storage.markerContainer.deleteTextChar()
+      storage.textChars = storage.textChars.slice(0, -1)
 
   increase_count: ({storage}) ->
     storage.count += 1
