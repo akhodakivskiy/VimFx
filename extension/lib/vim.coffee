@@ -35,6 +35,7 @@ class Vim
   constructor: (browser, @_parent) ->
     @mode = undefined
     @focusType = 'none'
+    @eatingKeys = false
     @_setBrowser(browser, {addListeners: false})
     @_storage = {}
 
@@ -121,6 +122,13 @@ class Vim
 
   _consumeKeyEvent: (event) ->
     return @_parent.consumeKeyEvent(event, this)
+
+  eatKeys: (timeout) ->
+    @eatingKeys = true
+    vim = this
+    @window.setTimeout((->
+      vim.eatingKeys = false
+    ), timeout)
 
   _onInput: (match, event) ->
     uiEvent = if @isUIEvent(event) then event else false

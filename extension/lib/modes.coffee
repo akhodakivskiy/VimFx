@@ -251,6 +251,7 @@ mode('hints', {
         again = callback(matchedMarkers[0], storage.count, match.keyStr)
         storage.count -= 1
         storage.textChars = ''
+        vim.eatKeys(vim.options.hints_timeout)
         if again
           vim.window.setTimeout((->
             marker.markMatched(false) for marker in matchedMarkers

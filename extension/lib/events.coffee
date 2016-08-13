@@ -204,6 +204,10 @@ class UIEventManager
       vim._enterMode('normal')
 
   consumeKeyEvent: (vim, event) ->
+    if vim.eatingKeys
+      @suppress = true
+      return
+
     match = vim._consumeKeyEvent(event)
 
     if match
