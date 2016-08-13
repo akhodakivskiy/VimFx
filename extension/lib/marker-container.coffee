@@ -219,7 +219,8 @@ class MarkerContainer
 
     for marker in @markers
       if marker.isComplementary == @isComplementary and
-         marker.hintIndex == @numEnteredChars
+         marker.hintIndex == @numEnteredChars and
+         marker.visible
         matched = marker.matchHintChar(char)
         marker.hide() unless matched
         if marker.isMatched()
