@@ -64,7 +64,7 @@ class MarkerContainer
 
   reset: ->
     @numEnteredChars = 0
-    for marker in @markers when marker.hintIndex > 0 || marker.textChars != ""
+    for marker in @markers when marker.hintIndex > 0 or marker.textChars != ''
       marker.reset()
     @refreshComplementaryVisiblity()
     @recalculateHintsWithPasses(@markers, @markerMap)
@@ -133,7 +133,7 @@ class MarkerContainer
     Object.assign(@markerMap, markerMap)
 
   recalculateHints: (allMarkers, markerMap, pass) ->
-    markers = allMarkers.filter((marker) -> !marker.wrapper.parentIndex?)
+    markers = allMarkers.filter((marker) -> not marker.wrapper.parentIndex?)
     combined = allMarkers.filter((marker) -> marker.wrapper.parentIndex?)
     prefixes = switch pass
       when 'first'
@@ -181,20 +181,20 @@ class MarkerContainer
 
   recalculateHintsWithPasses: (markers, markerMap) ->
     wasTwoPass = (marker) ->
-      marker.pass = "first" || marker.pass == "second"
+      marker.pass = 'first' or marker.pass == 'second'
     if markers.find((marker) -> wasTwoPass(marker))
       @recalculateHints(
-        markers.filter((marker) -> marker.pass != "second"),
+        markers.filter((marker) -> marker.pass != 'second'),
         markerMap,
-        "first"
+        'first'
       )
       @recalculateHints(
-        markers.filter((marker) -> marker.pass == "second"),
+        markers.filter((marker) -> marker.pass == 'second'),
         markerMap,
-        "second"
+        'second'
       )
     else
-      @recalculateHints(markers, markerMap, "single")
+      @recalculateHints(markers, markerMap, 'single')
 
   toggleComplementary: ->
     if not @isComplementary and not @hasLookedForComplementaryWrappers

@@ -239,9 +239,9 @@ getFocusType = (element) -> switch
 
 getText = (element) -> switch
   when isTextInputElement(element)
-    element.value || element.placeholder || ""
+    element.value or element.placeholder or ''
   else
-    element.innerText || ""
+    element.innerText or ''
 
 
 
