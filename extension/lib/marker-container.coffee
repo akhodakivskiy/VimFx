@@ -64,7 +64,8 @@ class MarkerContainer
 
   reset: ->
     @numEnteredChars = 0
-    marker.reset() for marker in @markers when marker.hintIndex > 0 || marker.textChars != ""
+    for marker in @markers when marker.hintIndex > 0 || marker.textChars != ""
+      marker.reset()
     @refreshComplementaryVisiblity()
     @recalculateHintsWithPasses(@markers, @markerMap)
 
