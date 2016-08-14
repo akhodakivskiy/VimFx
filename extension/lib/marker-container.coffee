@@ -246,8 +246,10 @@ class MarkerContainer
 
     @recalculateHintsWithPasses(matchedMarkers, @markerMap)
 
-    if matchedMarkers.length == 1
-      matchedMarkers[0].markMatched(true)
+    markers = matchedMarkers.filter((marker) -> not marker.wrapper.parentIndex?)
+
+    if markers.length == 1
+      markers[0].markMatched(true)
     else
       matchedMarkers = []
 
