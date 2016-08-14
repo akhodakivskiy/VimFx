@@ -245,8 +245,10 @@ mode('hints', {
           # mode if we’re still in Hints mode.
           vim._enterMode('normal') if vim.mode == 'hints'
     else if vim.options.text_hint_selection
-      matchedMarkers = markerContainer.matchTextChar(match.unmodifiedKey)
-      storage.textChars += match.unmodifiedKey
+      key = match.unmodifiedKey
+      key = ' ' if key == 'space'
+      matchedMarkers = markerContainer.matchTextChar(key)
+      storage.textChars += key
       if matchedMarkers.length > 0
         again = callback(matchedMarkers[0], storage.count, match.keyStr)
         storage.count -= 1
