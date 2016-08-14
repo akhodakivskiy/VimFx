@@ -244,7 +244,7 @@ mode('hints', {
           # The callback might have entered another mode. Only go back to Normal
           # mode if we’re still in Hints mode.
           vim._enterMode('normal') if vim.mode == 'hints'
-    else
+    else if vim.options.text_hint_selection
       matchedMarkers = markerContainer.matchTextChar(match.unmodifiedKey)
       storage.textChars += match.unmodifiedKey
       if matchedMarkers.length > 0
@@ -280,10 +280,10 @@ mode('hints', {
   rotate_markers_backward: ({storage}) ->
     storage.markerContainer.rotateOverlapping(false)
 
-  delete_hint_char: ({storage}) ->
+  delete_hint_char: ({vim, storage}) ->
     if storage.markerContainer.numEnteredChars > 0
       storage.markerContainer.deleteHintChar()
-    else
+    else if vim.options.text_hint_selection
       storage.markerContainer.deleteTextChar()
       storage.textChars = storage.textChars.slice(0, -1)
 
