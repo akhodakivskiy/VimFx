@@ -1,3 +1,53 @@
+### 0.18.0 (2016-08-20)
+
+#### Changed default shortcuts
+
+Some default keyboard shortcuts have been changed.
+
+- Hint commands. Many of the old ones were difficult to remember, and there was
+  no space for adding new ones.
+
+  - `gf` → `et` (t as in tab)
+  - `gF` → `ew` (w as in window)
+  - `zf` → `ef` (f as in focus)
+  - `zF` → `eb` (b as in browser)
+  - `zv` → `av` (you actually select _all_ of the element’s text)
+
+  (`f`, `yf`, `af`, `v` and `yv` stay unchanged.)
+
+  There is a longer [explanation of these new defaults][hint-shortcuts] in the
+  documentation.
+
+- `zr` → `gC`. `zr` was the only shortcut starting with `z`. This frees that key
+  up for other uses.
+
+- `` ` `` → `'`. The `` ` `` shortcut (“scroll to mark”) as well as the `` ` ``
+  mark (“last position mark”) have both been changed to `'`. Both `` ` `` and
+  `'` are used in Vim. `'` is a better default, because it is easier to
+  type–both on an en-US QWERTY keyboard and, more importantly, on some
+  international layouts, such as the sv-SE QWERTY layout.
+
+  Note: If you miss Firefox’s default `'` shortcut to open the Quick Find bar
+  (which is now overridden), remember that VimFx provides `g/` which does the
+  same thing. (You can of course also change VimFx’s shortcuts.)
+
+See also issue [#788].
+
+[hint-shortcuts]: https://github.com/akhodakivskiy/VimFx/blob/e8d9df31dd5c8df999ac22e3b3b8d548a68c6fa7/documentation/commands.md#mnemonics-and-choice-of-default-hint-command-shortcuts
+[#788]: https://github.com/akhodakivskiy/VimFx/issues/788
+
+#### Other updates
+
+- Added: It is now possible to create [custom hint commands].
+- Fixed: The bottom-right corner of the page scrollbars can now be used with the
+  mouse again.
+- Fixed: The toolbar button now correctly toggles VimFx’s Keyboard Shortcuts
+  dialog again.
+- Updated locales: fr, ru. Thanks to Mickaël RAYBAUD-ROIG (@m-r-r) and Nicholas
+  Guriev (@mymedia2)!
+
+[custom hint commands]: https://github.com/akhodakivskiy/VimFx/blob/e8d9df31dd5c8df999ac22e3b3b8d548a68c6fa7/documentation/api.md#custom-hint-commands
+
 ### 0.17.4 (2016-07-11)
 
 - Improved: The usage of modifier keys in Hints mode is now shown in VimFx’s
