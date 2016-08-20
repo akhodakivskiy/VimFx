@@ -297,9 +297,9 @@ many keyboard layouts (and is pretty easy to type).
 
 The second key after `e` was chosen based on mnemonics: There’s `et` as in
 <strong>t</strong>ab, `ew` as in <strong>w</strong>indow, `ef` as in
-<strong>f</strong>ocus and `eb` as in <strong>b</strong>browser.
+<strong>f</strong>ocus and `eb` as in <strong>b</strong>rowser.
 
-[`v` commands]: #the-v-commands-caret-mode
+[`v` commands]: #the-v-commands--caret-mode
 [hint-matcher]: api.md#vimfxhintmatcher
 [hint chars]: options.md#hint-chars
 [Styling]: styling.md
@@ -320,7 +320,7 @@ beginning of it, and Caret mode will be entered.
 
 The `av` command does the same thing as `v`, but instead of placing the caret at
 the beginning of the element, it selects the entire element (it selects
-<stong>a</stong>ll of the element).
+<strong>a</strong>ll of the element).
 
 The `yv` command brings up the same hint markers as `av` does, and then takes
 the text that `av` would have selected and copies it to the clipboard. It does
