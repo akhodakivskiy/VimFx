@@ -152,6 +152,17 @@ vimfx.addOptionOverrides(
     {prevent_autofocus: false}
   ]
 )
+
+vimfx.addOptionOverrides(
+  [ ({hostname}) => hostname === 'imgur.com',
+    {
+      pattern_attrs: ['class'],
+      pattern_selector: 'div.next-prev .btn',
+      prev_patterns: [/\bnavPrev\b/],
+      next_patterns: [/\bnavNext\b/],
+    }
+  ]
+)
 ```
 
 #### `vimfx.addKeyOverrides(...rules)`
