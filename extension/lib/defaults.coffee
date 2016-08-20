@@ -57,7 +57,7 @@ shortcuts =
       '0  ^':      'scroll_to_left'
       '$':         'scroll_to_right'
       'm':         'mark_scroll_position'
-      '`':         'scroll_to_mark'
+      "'":         'scroll_to_mark'
 
     'tabs':
       't':         'tab_new'
@@ -178,7 +178,7 @@ advanced_options =
   'scroll.reset_timeout':               1000
   'scroll.full_page_adjustment':        40
   'scroll.half_page_adjustment':        20
-  'scroll.last_position_mark':          '`'
+  'scroll.last_position_mark':          "'"
   'pattern_selector':                   ':-moz-any(
                                            a, button, input[type="button"]
                                          ):not([role="menu"]):not([role="tab"])'

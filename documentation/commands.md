@@ -141,16 +141,16 @@ eating your best hint char on most pages; see [The hint commands]).
 
 [The hint commands]: #the-hint-commands--hints-mode
 
-### Marks: `m` and `` ` ``
+### Marks: `m` and `'`
 
 Other than traditional scrolling, VimFx has _marks._ Press `m` followed by a
 letter to associate the current scroll position with that letter. For example,
 press `ma` to save the position into mark _a._ Then you can return to that
-position by pressing `` ` `` followed by the same letter, e.g. `` `a ``.
+position by pressing `'` followed by the same letter, e.g. `'a`.
 
-One mark is special: `` ` ``. Pressing ``` `` ``` takes you to the scroll
-position before the last `gg`, `G`, `0`, `$`, `/`, `n`, `N` or `` ` ``. (You can
-change this mark using the [`scroll.last_position_mark`] pref.)
+One mark is special: `'`. Pressing `''` takes you to the scroll position before
+the last `gg`, `G`, `0`, `$`, `/`, `n`, `N` or `'`. (You can change this mark
+using the [`scroll.last_position_mark`] pref.)
 
 [`scroll.last_position_mark`]: options.md#scroll.last_position_mark
 

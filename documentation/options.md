@@ -360,7 +360,7 @@ These are VimFx’s variants, and the commands they affect:
 
 - `smoothScroll.lines.spring-constant`: `h`, `l`, `j`, `k`
 - `smoothScroll.pages.spring-constant`: `d`, `u`, `<space>`, `<s-space>`
-- `smoothScroll.other.spring-constant`: `gg`, `G`, `0`, `^`, `$`, `` ` ``
+- `smoothScroll.other.spring-constant`: `gg`, `G`, `0`, `^`, `$`, `'`
 
 Note that the value of these prefs are _strings,_ not numbers!
 
@@ -411,7 +411,7 @@ different page scrolling commands.
 
 #### `scroll.last_position_mark`
 
-The special mark for the [`` ` ``][scroll-to-mark] command that takes you to the
+The special mark for the [`'`][scroll-to-mark] command that takes you to the
 last position.
 
 [scroll-to-mark]: commands.md#marks-m-and-
