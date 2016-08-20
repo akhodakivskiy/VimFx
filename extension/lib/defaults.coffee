@@ -109,7 +109,7 @@ shortcuts =
       'i':         'enter_mode_ignore'
       'I':         'quote'
       'gr':        'enter_reader_view'
-      'zr':        'reload_config_file'
+      'gC':        'reload_config_file'
       '?':         'help'
       ':':         'dev'
       '<force><escape>': 'esc'

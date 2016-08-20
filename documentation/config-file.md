@@ -49,7 +49,7 @@ Follow these steps to get started with your config file:
    `/home/you/.config/vimfx` or `C:\Users\you\vimfx`, or start with a `~`, which
    is a shortcut to your home directory, such as `~/.config/vimfx` or `~\vimfx`.
 
-4. Run the `zr` command in VimFx. That needs to be done any time
+4. Run the `gC` command in VimFx. That needs to be done any time
    `config_file_directory` is changed, or the contents of `config.js` or
    `frame.js` are changed. This tells VimFx to reload the config file. If
    everything went well, a [notification] should appear telling you that the
@@ -65,7 +65,7 @@ Follow these steps to get started with your config file:
 If you make errors in `config.js` or `frame.js` they will appear in the [browser
 console].
 
-Remember to press `zr` after you’ve edited `config.js` or `frame.js` to reload
+Remember to press `gC` after you’ve edited `config.js` or `frame.js` to reload
 them. A [notification] will appear telling you if there was any trouble
 reloading or not.
 
@@ -144,7 +144,7 @@ Note: Even if you don’t need `frame.js` right now, the file still must exist i
 
 - Every time VimFx starts up. In other words, when Firefox starts up and when
   you update VimFx (or disable and then enable it).
-- Every time you use the `zr` command to reload the config file.
+- Every time you use the `gC` command to reload the config file.
 
 “Executing the config file” means running `config.js` once and `frame.js` for
 each open tab. `frame.js` also runs every time you open a new tab.

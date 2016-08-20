@@ -327,7 +327,7 @@ Occurs when:
 
 - VimFx shuts down: When Firefox shuts down, when VimFx is disabled or when
   VimFx is updated.
-- When the config file is reloaded using the `zr` command.
+- When the config file is reloaded using the `gC` command.
 
 `data`: No data at all is passed.
 
@@ -346,7 +346,7 @@ The following methods don’t need any undoing:
 
 The following methods are automatically undone when the `shutdown` event fires.
 This means that if you, for example, add a custom command in `config.js` but
-then remove it from `config.js` and hit `zr`, the custom command will be gone in
+then remove it from `config.js` and hit `gC`, the custom command will be gone in
 VimFx.
 
 - `vimfx.set(...)`
