@@ -763,10 +763,11 @@ whose keys are VimFx pref names.
 Note that the values are not just simply `vimfx.get(pref)` for the `pref` in
 question; they are _parsed_ (`parse(vimfx.get(pref))`):
 
-- Space-separated prefs are parsed into arrays of strings.
+- Space-separated prefs are parsed into arrays of strings. For example,
+  `pattern_attrs: ['class']`.
 
-- `blacklist` and `{prev,next}_patterns` are parsed into arrays of regular
-  expressions.
+- `blacklist`, `prev_patterns` and `next_patterns` are parsed into arrays of
+  regular expressions. For example, `prev_patterns: [/\bnavPrev\b/]`.
 
 (See [parse-prefs.coffee] for all details.)
 
