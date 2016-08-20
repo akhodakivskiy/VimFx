@@ -83,17 +83,17 @@ shortcuts =
     'browsing':
       'f':         'follow'
       'F':         'follow_in_tab'
-      'gf':        'follow_in_focused_tab'
-      'gF':        'follow_in_window'
+      'et':        'follow_in_focused_tab'
+      'ew':        'follow_in_window'
       'af':        'follow_multiple'
       'yf':        'follow_copy'
-      'zf':        'follow_focus'
-      'zF':        'click_browser_element'
+      'ef':        'follow_focus'
+      'eb':        'click_browser_element'
       '[':         'follow_previous'
       ']':         'follow_next'
       'gi':        'focus_text_input'
       'v':         'element_text_caret'
-      'zv':        'element_text_select'
+      'av':        'element_text_select'
       'yv':        'element_text_copy'
 
     'find':

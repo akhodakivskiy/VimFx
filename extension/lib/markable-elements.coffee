@@ -82,7 +82,7 @@ getAllElements = (document, selector) ->
   # Ideally we should find a way to find all elements without duplicates.
   elements = new Set()
   getAllRegular = (element) ->
-    # The first time `zF` is run `.getElementsByTagName('*')` may oddly include
+    # The first time `eb` is run `.getElementsByTagName('*')` may oddly include
     # `undefined` in its result! Filter those out. (Also, `selector` is ignored
     # here since it doesn’t make sense in XUL documents because of all the
     # trickery around anonymous elements.)

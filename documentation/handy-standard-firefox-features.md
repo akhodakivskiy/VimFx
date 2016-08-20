@@ -46,7 +46,7 @@ This is true for most programs, not just Firefox.
 
 Here are two examples where the above comes especially in handy for VimFx:
 
-- You can use the `zf` command to focus a link or video (or anything) and then
+- You can use the `ef` command to focus a link or video (or anything) and then
   press the `<menu>` key to open the context menu, providing you a plethora of
   things to do with the focused target. For videos, the access key for the
   “Play/Pause” menu item is often `p`. This allows you, for example, to control

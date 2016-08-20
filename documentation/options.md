@@ -26,7 +26,7 @@ These options are available in VimFx’s settings page in the Add-ons Manager
 ### Hint chars
 
 The characters used for the hints in Hints mode, which can be entered using one
-of the many [`f` commands] \(and a few `v` commands).
+of the many [hint commands].
 
 Quick suggestion: Put more easily reachable keys longer to the left. Put two
 pretty good (but not the best) keys at the end, after the space.
@@ -66,7 +66,7 @@ All of this also help you understand why hints may be slow on some pages:
 - Another reason could be that a page has a _huge_ amount of links. If that
   bothers you regularly, feel free to send a pull request with faster code!
 
-[`f` commands]: commands.md#the-f-commands--hints-mode
+[hint commands]: commands.md#the-hint-commands--hints-mode
 
 ### “Previous”/“Next” link patterns
 
@@ -435,19 +435,19 @@ this pref as well. Otherwise VimFx’s Keyboard Shortcuts dialog will still tell
 you to press shift for this task.
 
 [styling]: styling.md
-[Hints mode]: commands.md#the-f-commands--hints-mode
+[Hints mode]: commands.md#the-hint-commands--hints-mode
 
 ### `hints_toggle_in_tab`
 
 If the keypress that matched a hint starts with this string, toggle whether to
-open the matched link in the current tab or a new tab. See [The `f` commands]
+open the matched link in the current tab or a new tab. See [The hint commands]
 for more information.
 
 ### `hints_toggle_in_background`
 
 If the keypress that matched a hint starts with this string, open the matched
 link in a new tab and toggle whether to open that tab in the background or
-foreground. See [The `f` commands] for more information.
+foreground. See [The hint commands] for more information.
 
 ### `activatable_element_keys`
 

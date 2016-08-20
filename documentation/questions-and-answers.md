@@ -82,7 +82,7 @@ which is specialized at searching your keyboard shortcuts.
 
 No, but clicking on any command in it opens VimFx’s settings page in the Add-ons
 Manager and automatically selects the text input for that command. Tip: Use the
-`zF` command to click without using the mouse.
+`eb` command to click without using the mouse.
 
 ## Will VimFx provide advanced Find features?
 

@@ -12,7 +12,7 @@ defaults and trying things out. If not, read on.
 
 In VimFx’s Keyboard Shortcuts help dialog (which can be opened by pressing `?`)
 you can click any command to open VimFx’s settings page in the Add-ons Manager
-and automatically select the text input for that command. Tip: Use the `zF`
+and automatically select the text input for that command. Tip: Use the `eb`
 command to click without using the mouse.
 
 Shortcuts tell which keys to press to activate a command. A command may have

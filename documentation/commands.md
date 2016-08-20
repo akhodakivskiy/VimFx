@@ -108,7 +108,7 @@ Restores the _count_ last closed tabs.
 Passes on the next _count_ keypresses to the page, without activating VimFx
 commands.
 
-### The `f` commands
+### The hint commands
 
 Explained in the their own section below.
 
@@ -127,19 +127,19 @@ They scroll _the currently focused element._ If the currently focused element
 isn’t scrollable, the largest scrollable element on the page (if any, and
 including the entire page itself) is scrolled.
 
-You can focus scrollable elements using the `zf` command (or the `f` command).
+You can focus scrollable elements using the `ef` command (or the `f` command).
 Scrollable browser elements, such as in the dev tools, can be focused using the
-`zF` command. The right border of hint markers for scrollable elements is styled
+`eb` command. The right border of hint markers for scrollable elements is styled
 to remind of a scroll bar, making them easier to recognize among hints for
 links.
 
-Note that `zf` and `f` do _not_ add a hint marker for the _largest_ scrollable
+Note that `ef` and `f` do _not_ add a hint marker for the _largest_ scrollable
 element (such as the entire page). There’s no need to focus that element, since
 it is scrolled by default if no other scrollable element is focused, as
 explained above. (This prevents the largest scrollable element from likely
-eating your best hint char on most pages; see [The `f` commands]).
+eating your best hint char on most pages; see [The hint commands]).
 
-[The `f` commands]: #the-f-commands--hints-mode
+[The hint commands]: #the-hint-commands--hints-mode
 
 ### Marks: `m` and `` ` ``
 
@@ -190,11 +190,12 @@ elements as they usually do. (See also the [`focus_previous_key` and
 [`focus_previous_key` and `focus_next_key`]: options.md#focus_previous_key-and-focus_next_key
 
 
-## The `f` commands / Hints mode
+## The hint commands / Hints mode
 
-When invoking one of the `f` commands you enter Hints mode. In Hints mode,
-markers with hints are shown for some elements. By typing the letters of a hint
-something is done to that element, depending on the command.
+When invoking one of the hint commands (such as `f`, `et` or one of the [`v`
+commands]) you enter Hints mode. In Hints mode, markers with hints are shown for
+some elements. By typing the letters of a hint something is done to that
+element, depending on the command.
 
 Another way to find links on the page is to use `g/`. It’s like the regular find
 command (`/`), except that it searches links only.
@@ -202,12 +203,12 @@ command (`/`), except that it searches links only.
 Which elements get hints depends on the command as well:
 
 - `f` and `af`: Anything clickable—links, buttons, form controls.
-- `F`, `gf` and `gF`: Anything that can be opened in a new tab or window—links.
+- `F`, `et` and `ew`: Anything that can be opened in a new tab or window—links.
 - `yf`: Anything that has something useful to copy—links (their URL) and text
   inputs (their text).
-- `zf`: Anything focusable—links, buttons, form controls, scrollable elements,
+- `ef`: Anything focusable—links, buttons, form controls, scrollable elements,
   frames.
-- `zF`: Browser elements, such as toolbar buttons.
+- `eb`: Browser elements, such as toolbar buttons.
 
 It might seem simpler to match the same set of elements for _all_ of the
 commands. The reason that is not the case is because the fewer elements the
@@ -230,13 +231,13 @@ them. (See [Styling] and the [hints\_peek\_through] pref if you’d like to chan
 that.) The hints can also sometimes cover each other. Press `<space>` and
 `<s-space>` to switch which one should be on top.
 
-When giving a count to an `f` command, all markers will be re-shown after you’ve
+When giving a count to a hint command, all markers will be re-shown after you’ve
 typed the hint characters of one of them, _count_ minus one times. All but the
 last time, the marker’s link will be opened in a new background tab. The last
 time the command opens links as normal (in the current tab (`f`) or in a new
-background (`F`) or foreground tab (`gf`)).
+background (`F`) or foreground tab (`et`)).
 
-Note that the `f` command adds markers not only to links, but to buttons and
+Note that the hint command adds markers not only to links, but to buttons and
 form controls as well. What happens the _count_ minus one times then? Buttons,
 checkboxes and the like are simply clicked, allowing you to quickly check many
 checkboxes in one go, for example. Text inputs cancel the command.
@@ -246,7 +247,7 @@ command is implemented by running the same function as for the `f` command,
 passing `Infinity` as the `count` argument!) Therefore the `af` command does not
 accept a count itself.
 
-The `gF`, `zf`, `yf` and `zF` commands do not accept counts.
+The `et`, `ef`, `yf` and `eb` commands do not accept counts.
 
 Press `<enter>` to increase the count by one. This is useful when you’ve already
 entered Hints mode but realize that you want to interact with yet a marker. This
@@ -257,11 +258,11 @@ can hold ctrl while typing the last hint character. This is similar to how you
 can press `<c-enter>` on a focused link to open it in a new tab (while just
 `<enter>` would have opened it in the same tab). Hold alt to open in a new
 foreground tab. In other words, holding ctrl works as if you’d pressed `F` from
-the beginning, and holding alt works as if you’d pressed `gf`.
+the beginning, and holding alt works as if you’d pressed `et`.
 
-For the `F` and `gf` commands, holding ctrl makes them open links in the same
+For the `F` and `et` commands, holding ctrl makes them open links in the same
 tab instead, as if you’d used the `f` command. Holding alt toggles whether to
-open tabs in the background or foreground—it makes `F` work like `gf`, and `gf`
+open tabs in the background or foreground—it makes `F` work like `et`, and `et`
 like `F`.
 
 (Also see the advanced prefs [hints\_toggle\_in\_tab] and
@@ -275,6 +276,30 @@ hint to activate sometimes). See this as an escape hatch if you _really_ want to
 avoid using the mouse at all costs. (Press `<c-enter>` again to toggle back to
 the previous hints.)
 
+### Mnemonics and choice of default hint command shortcuts
+
+The main command is `f`. It comes from the Vimium and Vimperator extensions. The
+mnemonic is “<strong>f</strong>ollow link.” It is a good key, because on many
+keyboard layouts it is located right under where your left index finger rests.
+
+The most common variations of `f` are centered around that letter: `F`, `yf` and
+`af`. (Some users might want to swap `F` and `et`, though.) In Vim, it is not
+uncommon that an uppercase letter does the same thing as its lowercase
+counterpart, but with some variation (in this case, `F` opens links in new tabs
+instead of in the current tab), and `y` usually means “yank” or “copy.” VimFx
+also has this pattern that `a` means “all.”
+
+You can think of the above commands as the “f commands.” That sounds like
+“eff-commands” when you say it out loud, which is a way of remembering that the
+rest of the `f` variations are behind the `e` key. That’s also a pretty good
+key/letter, because it is close to `f` both alphabetically, and physically in
+many keyboard layouts (and is pretty easy to type).
+
+The second key after `e` was chosen based on mnemonics: There’s `et` as in
+<strong>t</strong>ab, `ew` as in <strong>w</strong>indow, `ef` as in
+<strong>f</strong>ocus and `eb` as in <strong>b</strong>browser.
+
+[`v` commands]: #the-v-commands-caret-mode
 [hint-matcher]: api.md#vimfxhintmatcher
 [hint chars]: options.md#hint-chars
 [Styling]: styling.md
@@ -293,11 +318,12 @@ Pressing `v` will enter Hints mode with hint markers for all elements with text
 inside. When activating a marker, its element will get a blinking caret at the
 beginning of it, and Caret mode will be entered.
 
-The `zv` command does the same thing as `v`, but instead of placing the caret at
-the beginning of the element, it selects the entire element.
+The `av` command does the same thing as `v`, but instead of placing the caret at
+the beginning of the element, it selects the entire element (it selects
+<stong>a</stong>ll of the element).
 
-The `yv` command brings up the same hint markers as `zv` does, and then takes
-the text that `zv` would have selected and copies it to the clipboard. It does
+The `yv` command brings up the same hint markers as `av` does, and then takes
+the text that `av` would have selected and copies it to the clipboard. It does
 not enter Caret mode at all.
 
 The letter `v` was chosen for these shortcuts because that’s what Vim uses to
@@ -349,7 +375,7 @@ snippet. If so, using the `yv` command (which copies an entire element without
 entering Caret mode) is the fastest.
 
 If you want to copy _almost_ all text of an element, or a bit more than it, use
-the `zv` command (which selects an entire element). Then adjust the selection
+the `av` command (which selects an entire element). Then adjust the selection
 using the various Caret mode commands. Remember that `o` lets you adjust both
 ends of the selection.
 

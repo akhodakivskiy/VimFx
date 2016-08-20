@@ -51,7 +51,7 @@ Sets the value of the VimFx pref `pref` to `value`.
 // Set the value of the Hint chars option:
 vimfx.set('hint_chars', 'abcdefghijklmnopqrstuvwxyz')
 // Add yet a keyboard shortcut for the `f` command:
-vimfx.set('mode.normal.follow', vimfx.getDefault('mode.normal.follow') + '  e')
+vimfx.set('mode.normal.follow', vimfx.getDefault('mode.normal.follow') + '  ee')
 ```
 
 When extending a pref (as in the second example above), be sure to use
@@ -458,9 +458,9 @@ categories.custom = {
   [categories.tabs.order, commands.focus_location_bar.order]
 ```
 
-### Custom hints commands
+### Custom hint commands
 
-Apart from the standard `f` commands, you can create your own.
+Apart from the standard hint commands, you can create your own.
 
 You may run any VimFx command by using the following pattern:
 
@@ -475,13 +475,13 @@ vimfx.addCommand({
 })
 ```
 
-All `f` commands (except `zF`) also support `args.callbackOverride`:
+All hint commands (except `eb`) also support `args.callbackOverride`:
 
 ```js
 // config.js
 vimfx.addCommand({
-  name: 'custom_hints_command_example',
-  description: 'Custom hints command example',
+  name: 'custom_hint_command_example',
+  description: 'Custom hint command example',
 }, (args) => {
   vimfx.modes.normal.commands.follow.run(Object.assign({}, args, {
     callbackOverride({type, href, id, timesLeft}) {
@@ -492,9 +492,9 @@ vimfx.addCommand({
 })
 ```
 
-This lets you piggy-back on one of the existing `f` commands by getting the same
-hints on screen as that command, but then doing something different with the
-matched hint marker.
+This lets you piggy-back on one of the existing hint commands by getting the
+same hints on screen as that command, but then doing something different with
+the matched hint marker.
 
 `callbackOverride` is called with an object with the following properties:
 
@@ -507,9 +507,9 @@ matched hint marker.
 - id: An id that you can pass to [`vimfx.getMarkerElement(...)`] to get the
   element of the matched hint marker.
 
-- timesLeft: `Number`. Calling an `f` command means that you want to run it
-  _count_ times in a row. This number tells how many times there are left to
-  run. If you don’t provide a count, the number is `1`.
+- timesLeft: `Number`. Calling a hint command with a count means that you want
+  to run it _count_ times in a row. This number tells how many times there are
+  left to run. If you don’t provide a count, the number is `1`.
 
 `callbackOverride` should return `true` if you want the hint markers to
 re-appear on screen after you’ve matched one of them (as in the `af` command),
@@ -803,7 +803,7 @@ examples.
 ### `vimfx.setHintMatcher(hintMatcher)`
 
 `hintMatcher` is a function that lets you customize which elements do and don’t
-get hints. It might help to read about [the `f` commands] first.
+get hints. It might help to read about [the hint commands] first.
 
 If you call `vimfx.setHintMatcher(hintMatcher)` more than once, only the
 `hintMatcher` provided the last time will be used.
@@ -820,10 +820,10 @@ The arguments passed to the `hintMatcher` function are:
 - id: `String`. A string identifying which command is used:
 
   - `'normal'`: `f` or `af`.
-  - `'tab'`: `F`, `gf` or `gF`.
+  - `'tab'`: `F`, `et` or `ew`.
   - `'copy'`: `yf`.
-  - `'focus'`: `zf`.
-  - `'select'`: `v`, `zv` or `yv`.
+  - `'focus'`: `ef`.
+  - `'select'`: `v`, `av` or `yv`.
 
 - element: `Element`. One out of all elements currently inside the viewport.
 
@@ -870,7 +870,7 @@ The function must return `null` or a string like the `type` parameter.
 
 ### `vimfx.getMarkerElement(id)`
 
-Takes an id that has been given to you when creating [custom hints commands] and
+Takes an id that has been given to you when creating [custom hint commands] and
 returns the DOM element associated with that id. If no element can be found,
 `null` is returned.
 
@@ -889,7 +889,7 @@ backwards compatibility will be a priority and won’t be broken until VimFx
 [`vimfx.send(...)`]: #vimfxsendvim-message-data--null-callback--null
 [`vimfx.listen(...)`]: #vimfxlistenmessage-listener
 [categories]: #vimfxgetcategories
-[custom hints commands]: #custom-hints-commands
+[custom hint commands]: #custom-hints-commands
 [`vimfx.modes`]: #vimfxmodes
 [onInput]: #oninput
 [mode object]: #mode-object
@@ -915,7 +915,7 @@ backwards compatibility will be a priority and won’t be broken until VimFx
 [`notifications_enabled`]: options.md#notifications_enabled
 
 [button]: button.md
-[the `f` commands]: commands.md#the-f-commands--hints-mode
+[the hint commands]: commands.md#the-hint-commands--hints-mode
 [special keys]: shortcuts.md#special-keys
 [styling]: styling.md
 
