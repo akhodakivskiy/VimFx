@@ -152,6 +152,9 @@ One mark is special: `'`. Pressing `''` takes you to the scroll position before
 the last `gg`, `G`, `0`, `$`, `/`, `n`, `N` or `'`. (You can change this mark
 using the [`scroll.last_position_mark`] pref.)
 
+Note: Firefox has a `'` shortcut by default. It opens the Quick Find bar. VimFx
+provides the `g/` shortcut instead.
+
 [`scroll.last_position_mark`]: options.md#scroll.last_position_mark
 
 #### Minor notes
