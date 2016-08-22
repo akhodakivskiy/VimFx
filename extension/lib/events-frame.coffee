@@ -153,7 +153,10 @@ class FrameEventManager
         # There is no need to take `ignore_keyboard_layout` and `translations`
         # into account here, since we want to override the _native_ `<tab>`
         # behavior. Then, `event.key` is the way to go. (Unless the prefs are
-        # customized. YAGNI until requested.)
+        # customized. YAGNI until requested.) Also, since 'keydown' is fired so
+        # often the options are read directly from the prefs system for
+        # performance. That means you can’t override them with
+        # `vimfx.addOptionOverrides`. YAGNI until requested.
         keyStr = notation.stringify(event)
         direction = switch keyStr
           when ''
@@ -226,9 +229,15 @@ class FrameEventManager
         if @vim.mode == 'caret' and not utils.isContentEditable(target)
           @vim._enterMode('normal')
 
+      # When moving a tab to another window, there is a short period of time
+      # when there’s no listener for this call.
+      return unless options = @vim.options(
+        ['prevent_autofocus', 'prevent_autofocus_modes']
+      )
+
       # Blur the focus target, if autofocus prevention is enabled…
-      if prefs.get('prevent_autofocus') and
-         @vim.mode in prefs.get('prevent_autofocus_modes').split(/\s+/) and
+      if options.prevent_autofocus and
+         @vim.mode in options.prevent_autofocus_modes and
          # …and the user has interacted with the page…
          not @vim.state.hasInteraction and
          # …and the event is programmatic (not caused by clicks or keypresses)…

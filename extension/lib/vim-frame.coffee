@@ -75,6 +75,8 @@ class VimFrame
       # `markerElements` and `inputs` could theoretically need to be filtered
       # too at this point. YAGNI until an issue arises from it.
 
+  options: (prefs) -> messageManager.get('options', {prefs})
+
   _enterMode: (@mode, args...) ->
     messageManager.send('vimMethod', {
       method: '_enterMode'
