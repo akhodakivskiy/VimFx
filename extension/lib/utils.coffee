@@ -537,9 +537,10 @@ formatError = (error) ->
   return "#{error}\n#{stack}"
 
 getCurrentLocation = ->
-  window = getCurrentWindow()
+  return unless window = getCurrentWindow()
   return new window.URL(window.gBrowser.selectedBrowser.currentURI.spec)
 
+# This function might return `null` on startup.
 getCurrentWindow = -> nsIWindowMediator.getMostRecentWindow('navigator:browser')
 
 hasEventListeners = (element, type) ->

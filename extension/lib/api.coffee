@@ -102,6 +102,7 @@ createConfigAPI = (vimfx) -> {
       vimfx.options = new Proxy(vimfx.options, {
         get: (options, pref) ->
           location = utils.getCurrentLocation()
+          return options[pref] unless location
           overrides = getOverrides(vimfx.optionOverrides, location)
           return overrides?[pref] ? options[pref]
       })
@@ -113,6 +114,7 @@ createConfigAPI = (vimfx) -> {
       vimfx.keyOverrides = []
       vimfx.options.keyValidator = (keyStr, mode) ->
         location = utils.getCurrentLocation()
+        return true unless location
         overrides = getOverrides(vimfx.keyOverrides, location, mode)
         return keyStr not in (overrides ? [])
       onShutdown(vimfx, -> vimfx.keyOverrides = [])
