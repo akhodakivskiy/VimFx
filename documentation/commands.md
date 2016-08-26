@@ -303,7 +303,7 @@ The second key after `e` was chosen based on mnemonics: There’s `et` as in
 <strong>f</strong>ocus and `eb` as in <strong>b</strong>rowser.
 
 [`v` commands]: #the-v-commands--caret-mode
-[hint-matcher]: api.md#vimfxhintmatcher
+[hint-matcher]: api.md#vimfxsethintmatcherhintmatcher
 [hint chars]: options.md#hint-chars
 [Styling]: styling.md
 [hints\_peek\_through]: options.md#hints_peek_through
@@ -410,7 +410,7 @@ provide two commands that do what you want, rather than many just to mimic Vim.
 
 Ignore mode is all about ignoring VimFx commands and sending the keys to the
 page instead. Sometimes, though, you might want to run some VimFx command even
-when in Insert mode.
+when in Ignore mode.
 
 One way of doing that is to press `<s-escape>` to exit Ignore mode, run your
 command and then enter Ignore mode again using `i`. However, it might be

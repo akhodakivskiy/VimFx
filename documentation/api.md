@@ -499,7 +499,7 @@ vimfx.addCommand({
       console.log('Marker data:', {type, href, id, timesLeft})
       return (timesLeft > 1)
     },
-  ))
+  }))
 })
 ```
 

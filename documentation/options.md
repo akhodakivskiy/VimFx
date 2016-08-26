@@ -135,7 +135,7 @@ default, Vim-style editors use `<escape>` to exit from their Insert mode to
 their Normal mode. In other words, there is a keyboard shortcut conflict here.
 
 It makes the most sense to let the Vim-style editor “win.” That’s why VimFx
-(temporarily) enters Ignore mode when focusing such an editor. In Insert mode,
+(temporarily) enters Ignore mode when focusing such an editor. In Ignore mode,
 there is no `<escape>` shortcut (by default), and thus no conflict. Instead,
 there’s `<s-escape>` to blur the current element and exit Ignore mode.
 `<s-escape>` was chosen because it is very unlikely to cause conflicts. If it
@@ -440,14 +440,14 @@ you to press shift for this task.
 ### `hints_toggle_in_tab`
 
 If the keypress that matched a hint starts with this string, toggle whether to
-open the matched link in the current tab or a new tab. See [The hint commands]
+open the matched link in the current tab or a new tab. See the [hint commands]
 for more information.
 
 ### `hints_toggle_in_background`
 
 If the keypress that matched a hint starts with this string, open the matched
 link in a new tab and toggle whether to open that tab in the background or
-foreground. See [The hint commands] for more information.
+foreground. See the [hint commands] for more information.
 
 ### `activatable_element_keys`
 
