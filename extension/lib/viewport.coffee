@@ -96,15 +96,15 @@ getAllRangesInsideViewport = (window, viewport, offset = {left: 0, top: 0}) ->
 getFirstNonWhitespace = (element) ->
   window = element.ownerGlobal
   viewport = getWindowViewport(window)
-  for node in element.childNodes then switch node.nodeType
-    when 3 # TextNode.
-      continue unless /\S/.test(node.data)
-      offset = getFirstVisibleNonWhitespaceOffset(node, viewport)
-      return [node, offset] if offset >= 0
-    when 1 # Element.
-      result = getFirstNonWhitespace(node)
-      return result if result
-  return null
+  result = null
+  utils.walkTextNodes(element, (textNode) ->
+    return false unless /\S/.test(textNode.data)
+    offset = getFirstVisibleNonWhitespaceOffset(textNode, viewport)
+    if offset >= 0
+      result = [textNode, offset]
+      return true
+  )
+  return result
 
 getFirstVisibleNonWhitespaceOffset = (textNode, viewport) ->
   firstVisibleOffset = getFirstVisibleOffset(textNode, viewport)

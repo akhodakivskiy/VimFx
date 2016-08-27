@@ -153,18 +153,18 @@ getExtraCommands = (vimfx) ->
     'hints': {
       '': {
         'peek_through':
-          if vimfx.options.hints_peek_through
-            [vimfx.options.hints_peek_through]
+          if vimfx.options['hints.peek_through']
+            [vimfx.options['hints.peek_through']]
           else
             []
         'toggle_in_tab':
-          if vimfx.options.hints_toggle_in_tab
-            ["#{vimfx.options.hints_toggle_in_tab}#{lastHintChar}>"]
+          if vimfx.options['hints.toggle_in_tab']
+            ["#{vimfx.options['hints.toggle_in_tab']}#{lastHintChar}>"]
           else
             []
         'toggle_in_background':
-          if vimfx.options.hints_toggle_in_background
-            ["#{vimfx.options.hints_toggle_in_background}#{lastHintChar}>"]
+          if vimfx.options['hints.toggle_in_background']
+            ["#{vimfx.options['hints.toggle_in_background']}#{lastHintChar}>"]
           else
             []
       }

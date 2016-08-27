@@ -115,6 +115,19 @@ class FrameEventManager
       callback(diffs)
     )
 
+    messageManager.listen('highlightMarkableElements', (data) =>
+      {elementIndices, strings} = data
+      utils.clearSelectionDeep(@vim.content)
+      return if strings.length == 0
+      for elementIndex in elementIndices
+        {element} = @vim.state.markerElements[elementIndex]
+        for string in strings
+          utils.selectAllSubstringMatches(
+            element, string, {caseSensitive: false}
+          )
+      return
+    )
+
     @listen('overflow', (event) =>
       target = event.originalTarget
       @vim.state.scrollableElements.addChecked(target)

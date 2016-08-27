@@ -198,7 +198,8 @@ elements as they usually do. (See also the [`focus_previous_key` and
 When invoking one of the hint commands (such as `f`, `et` or one of the [`v`
 commands]) you enter Hints mode. In Hints mode, markers with hints are shown for
 some elements. By typing the letters of a hint something is done to that
-element, depending on the command.
+element, depending on the command. You can also type the text of an element with
+a hint marker: See the [Hint characters] option for more information.
 
 Another way to find links on the page is to use `g/`. It’s like the regular find
 command (`/`), except that it searches links only.
@@ -229,13 +230,22 @@ times.
 VimFx also tries to give you shorter hints for elements that you are more likely
 to click. This is done by the surprisingly simple rule: The larger the element,
 the shorter the hint. To learn more about hint characters and hint length, read
-about the [hint chars] option.
+about the [Hint characters] option.
 
 Hints are added on top of the corresponding element. If they obscure the display
-too much you can hold shift to make them transparent, letting you peek through
-them. (See [Styling] and the [hints\_peek\_through] pref if you’d like to change
-that.) The hints can also sometimes cover each other. Press `<space>` and
-`<s-space>` to switch which one should be on top.
+too much you can hold down ctrl and shift simultaneously to make them
+transparent, letting you peek through them. (See [Styling] and the
+[`hints.peek_through`] pref if you’d like to change that.) The hints can also
+sometimes cover each other. Press `<c-space>` and `<s-space>` to switch which
+one should be on top.
+
+Yet another way to deal with areas crowded with hint markers is to type part of
+a marker’s element text. That will filter out hint markers whose elements
+_don’t_ match what you’ve typed. Pagination links are good examples, like these
+(fake) ones: [1](#1) [2](#2) [3](#3) [4](#4) [5](#5) [6](#6). It’s very hard to
+tell which hint to use to go to page three. But if you type “3” things will be
+much clearer. (It might even [auto-activate][Hint auto-activation] the hint
+marker!)
 
 When giving a count to a hint command, all markers will be re-shown after you’ve
 typed the hint characters of one of them, _count_ minus one times. All but the
@@ -255,7 +265,7 @@ accept a count itself.
 
 The `et`, `ef`, `yf` and `eb` commands do not accept counts.
 
-Press `<enter>` to increase the count by one. This is useful when you’ve already
+Press `<up>` to increase the count by one. This is useful when you’ve already
 entered Hints mode but realize that you want to interact with yet a marker. This
 can be faster than going into Hints mode once more.
 
@@ -269,18 +279,21 @@ the beginning, and holding alt works as if you’d pressed `et`.
 For the `F` and `et` commands, holding ctrl makes them open links in the same
 tab instead, as if you’d used the `f` command. Holding alt toggles whether to
 open tabs in the background or foreground—it makes `F` work like `et`, and `et`
-like `F`.
+like `F`. As mentioned in [Hint auto-activation], the best hint is highlighted
+with a different color, and can be activated by pressing `<enter>`. Holding alt
+or ctrl works there too: `<c-enter>` toggles same/new tab and `<a-enter>`
+toggles background/foreground tab.
 
-(Also see the advanced prefs [hints\_toggle\_in\_tab] and
-[hints\_toggle\_in\_background].)
+(Also see the advanced prefs [`hints.toggle_in_tab`] and
+[`hints.toggle_in_background`].)
 
 Finally, if the element you wanted to interact with didn’t get a hint marker you
-can try pressing `<c-enter>` while the hints are still shown. That will give
+can try pressing `<c-backspace>` while the hints are still shown. That will give
 hint markers to all _other_ elements. Warning: This can be very slow, and result
 in an overwhelming amount of hint markers (making it difficult to know which
 hint to activate sometimes). See this as an escape hatch if you _really_ want to
-avoid using the mouse at all costs. (Press `<c-enter>` again to toggle back to
-the previous hints.)
+avoid using the mouse at all costs. (Press `<c-backspace>` again to toggle back
+to the previous hints.)
 
 ### Mnemonics and choice of default hint command shortcuts
 
@@ -308,11 +321,12 @@ The second key after `e` was chosen based on mnemonics: There’s `et` as in
 
 [`v` commands]: #the-v-commands--caret-mode
 [hint-matcher]: api.md#vimfxsethintmatcherhintmatcher
-[hint chars]: options.md#hint-chars
+[Hint characters]: options.md#hint-characters
+[Hint auto-activation]: options.md#hint-auto-activation
 [Styling]: styling.md
-[hints\_peek\_through]: options.md#hints_peek_through
-[hints\_toggle\_in\_tab]: options.md#hints_toggle_in_tab
-[hints\_toggle\_in\_background]: options.md#hints_toggle_in_background
+[`hints.peek_through`]: options.md#hints.peek_through
+[`hints.toggle_in_tab`]: options.md#hints.toggle_in_tab
+[`hints.toggle_in_background`]: options.md#hints.toggle_in_background
 
 
 ## The `v` commands / Caret mode

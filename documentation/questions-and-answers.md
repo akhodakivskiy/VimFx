@@ -85,6 +85,14 @@ No, but clicking on any command in it opens VimFx’s settings page in the Add-o
 Manager and automatically selects the text input for that command. Tip: Use the
 `eb` command to click without using the mouse.
 
+## Can I make Hints mode work with element text?
+
+… like the modes Vimium, Vimperator and Pentadactyl provide?
+
+Yes! Have a look at [Filtering hints by element text] for more information.
+
+[Filtering hints by element text]: options.md#filtering-hints-by-element-text
+
 ## Will VimFx provide advanced Find features?
 
 One of VimFx’s key features is to embrace standard Firefox features. As long as

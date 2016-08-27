@@ -438,7 +438,7 @@ helper_follow = ({name, callback}, {vim, count, callbackOverride = null}) ->
 
   markerContainer = new MarkerContainer({
     window
-    hintChars: vim.options.hint_chars
+    hintChars: vim.options['hints.chars']
     getComplementaryWrappers: (callback) ->
       vim._run(name, {pass: 'complementary'}, ({wrappers, viewport}) ->
         # `markerContainer.container` is `null`ed out when leaving Hints mode.
@@ -468,7 +468,8 @@ helper_follow = ({name, callback}, {vim, count, callbackOverride = null}) ->
   vim._enterMode('hints', {
     markerContainer, count
     callback: chooseCallback
-    sleep: vim.options.hints_sleep
+    matchText: vim.options['hints.match_text']
+    sleep: vim.options['hints.sleep']
   })
 
   injectHints = ({wrappers, viewport, pass}) ->
@@ -498,9 +499,9 @@ helper_follow_clickable = (options, args) ->
     {window} = vim
 
     switch
-      when keyStr.startsWith(vim.options.hints_toggle_in_tab)
+      when keyStr.startsWith(vim.options['hints.toggle_in_tab'])
         inTab = not inTab
-      when keyStr.startsWith(vim.options.hints_toggle_in_background)
+      when keyStr.startsWith(vim.options['hints.toggle_in_background'])
         inTab = true
         inBackground = not inBackground
       else
@@ -689,9 +690,11 @@ commands.click_browser_element = ({vim}) ->
   if wrappers.length > 0
     viewport = viewportUtils.getWindowViewport(window)
 
+    hintChars =
+      utils.removeDuplicateChars(vim.options['hints.chars'].toLowerCase())
     markerContainer = new MarkerContainer({
       window
-      hintChars: vim.options.hint_chars
+      hintChars
       adjustZoom: false
       getComplementaryWrappers: (callback) ->
         newWrappers = markableElements.find(
@@ -706,7 +709,7 @@ commands.click_browser_element = ({vim}) ->
     )
 
     markerContainer.injectHints(wrappers, viewport, 'single')
-    vim._enterMode('hints', {markerContainer, callback})
+    vim._enterMode('hints', {markerContainer, callback, matchText: false})
 
   else
     vim.notify(translate('notification.follow.none'))
@@ -873,7 +876,7 @@ commands.enter_reader_view = ({vim}) ->
 
 commands.reload_config_file = ({vim}) ->
   vim._parent.emit('shutdown')
-  config.load(vim._parent, (status) -> switch status
+  config.load(vim._parent, {allowDeprecated: false}, (status) -> switch status
     when null
       vim.notify(translate('notification.reload_config_file.none'))
     when true

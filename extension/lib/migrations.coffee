@@ -163,4 +163,18 @@ migrations[5] = ->
   unless oldValue == ''
     prefs.set('blacklist', oldValue.replace(/,(?:\s+|(?=\*))/g, '  '))
 
+migrations[6] = ->
+  prefMap = {
+    'hint_chars': 'hints.chars'
+    'hints_sleep': 'hints.sleep'
+    'hints_timeout': 'hints.matched_timeout'
+    'hints_peek_through': 'hints.peek_through'
+    'hints_toggle_in_tab': 'hints.toggle_in_tab'
+    'hints_toggle_in_background': 'hints.toggle_in_background'
+    'mode.hints.delete_hint_char': 'mode.hints.delete_char'
+  }
+
+  for pref, newPref of prefMap when prefs.has(pref)
+    prefs.set(newPref, prefs.get(pref))
+
 module.exports = migrations

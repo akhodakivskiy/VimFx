@@ -26,34 +26,44 @@ Vim = require('./vim')
 
 counter = new utils.Counter({start: 10000, step: 100})
 
-createConfigAPI = (vimfx) -> {
-  get: (pref) -> switch
-    when pref of defaults.parsed_options
-      vimfx.options[pref]
-    when pref of defaults.all_prefs or pref?.startsWith('custom.')
-      prefs.get(pref)
-    else
-      throw new Error("VimFx: Unknown pref: #{pref}")
+createConfigAPI = (vimfx, {allowDeprecated = true} = {}) -> {
+  get: (inputPref) ->
+    pref = alias(inputPref, allowDeprecated)
+    if pref != inputPref
+      try return prefs.get(inputPref)
+    return switch
+      when pref of defaults.parsed_options
+        vimfx.options[pref]
+      when pref of defaults.all_prefs or pref?.startsWith('custom.')
+        prefs.get(pref)
+      else
+        throw new Error("VimFx: Unknown pref: #{pref}")
 
-  getDefault: (pref) -> switch
-    when pref of defaults.parsed_options or pref?.startsWith('custom.')
-      throw new Error("VimFx: No default for pref: #{pref}")
-    when pref of defaults.all_prefs
-      defaults.all_prefs[pref]
-    else
-      throw new Error("VimFx: Unknown pref: #{pref}")
+  getDefault: (inputPref) ->
+    pref = alias(inputPref, allowDeprecated)
+    if pref != inputPref
+      try return prefs.default.get(inputPref)
+    return switch
+      when pref of defaults.parsed_options or pref?.startsWith('custom.')
+        throw new Error("VimFx: No default for pref: #{pref}")
+      when pref of defaults.all_prefs
+        defaults.all_prefs[pref]
+      else
+        throw new Error("VimFx: Unknown pref: #{pref}")
 
-  set: (pref, value) -> switch
-    when pref of defaults.parsed_options
-      previousValue = vimfx.options[pref]
-      vimfx.options[pref] = value
-      onShutdown(vimfx, -> vimfx.options[pref] = previousValue)
-    when pref of defaults.all_prefs or pref?.startsWith('custom.')
-      previousValue = if prefs.has(pref) then prefs.get(pref) else null
-      prefs.set(pref, value)
-      onShutdown(vimfx, -> prefs.set(pref, previousValue))
-    else
-      throw new Error("VimFx: Unknown pref: #{pref}")
+  set: (inputPref, value) ->
+    pref = alias(inputPref, allowDeprecated)
+    switch
+      when pref of defaults.parsed_options
+        previousValue = vimfx.options[pref]
+        vimfx.options[pref] = value
+        onShutdown(vimfx, -> vimfx.options[pref] = previousValue)
+      when pref of defaults.all_prefs or pref?.startsWith('custom.')
+        previousValue = if prefs.has(pref) then prefs.get(pref) else null
+        prefs.set(pref, value)
+        onShutdown(vimfx, -> prefs.set(pref, previousValue))
+      else
+        throw new Error("VimFx: Unknown pref: #{pref}")
 
   addCommand: ({name, description, mode, category, order} = {}, fn) ->
     mode ?= 'normal'
@@ -146,6 +156,31 @@ createConfigAPI = (vimfx) -> {
 
   off: vimfx.off.bind(vimfx)
   modes: vimfx.modes
+}
+
+# Don’t crash the users’s entire config file on startup if they happen to try to
+# set a renamed pref (only warn), but do throw an error if they reload the
+# config file; then they could update while editing the file anyway.
+alias = (pref, allowDeprecated) ->
+  if pref of renamedPrefs
+    newPref = renamedPrefs[pref]
+    message = "VimFx: `#{pref}` has been renamed to `#{newPref}`."
+    if allowDeprecated
+      console.warn(message)
+      return newPref
+    else
+      throw new Error(message)
+  else
+    return pref
+
+renamedPrefs = {
+  'hint_chars': 'hints.chars'
+  'hints_sleep': 'hints.sleep'
+  'hints_timeout': 'hints.matched_timeout'
+  'hints_peek_through': 'hints.peek_through'
+  'hints_toggle_in_tab': 'hints.toggle_in_tab'
+  'hints_toggle_in_background': 'hints.toggle_in_background'
+  'mode.hints.delete_hint_char': 'mode.hints.delete_char'
 }
 
 getOverrides = (rules, args...) ->

@@ -31,8 +31,8 @@ and `vimfx.set(...)`—in fact, this is the _only_ way of accessing those option
 Gets the value of the VimFx pref `pref`.
 
 ```js
-// Get the value of the Hint chars option:
-vimfx.get('hint_chars')
+// Get the value of the Hint characters option:
+vimfx.get('hints.chars')
 // Get all keyboard shortcuts (as a string) for the `f` command:
 vimfx.get('mode.normal.follow')
 ```
@@ -48,8 +48,8 @@ Useful when you wish to extend a default, rather than replacing it. See below.
 Sets the value of the VimFx pref `pref` to `value`.
 
 ```js
-// Set the value of the Hint chars option:
-vimfx.set('hint_chars', 'abcdefghijklmnopqrstuvwxyz')
+// Set the value of the Hint characters option:
+vimfx.set('hints.chars', 'abcdefghijklmnopqrstuvwxyz')
 // Add yet a keyboard shortcut for the `f` command:
 vimfx.set('mode.normal.follow', vimfx.getDefault('mode.normal.follow') + '  ee')
 ```
@@ -704,6 +704,10 @@ A `match` object has the following properties:
 
 - unmodifiedKey: `String`. `keyStr` without modifiers.
 
+- rawKey: `String`. Unchanged [`event.key`].
+
+- rawCode: `String`. Unchanged [`event.code`].
+
 - toplevel: `Boolean`. Whether or not the match was a toplevel match in the
   shortcut key tree. This is `true` unless the match is part of the tail of a
   multi-key shortcut.
@@ -940,6 +944,8 @@ backwards compatibility will be a priority and won’t be broken until VimFx
 [commands.coffee]: ../extension/lib/commands.coffee
 [vim.coffee]: ../extension/lib/vim.coffee
 
+[`event.key`]: https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key
+[`event.code`]: https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/code
 [`Window`]: https://developer.mozilla.org/en-US/docs/Web/API/Window
 [`Browser`]: https://developer.mozilla.org/en-US/docs/Mozilla/Tech/XUL/browser
 [`window.location`]: https://developer.mozilla.org/en-US/docs/Web/API/Location

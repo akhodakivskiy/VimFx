@@ -43,7 +43,7 @@ exports['test exports'] = (assert, $vimfx) ->
 exports['test vimfx.get and vimfx.set'] = (assert, $vimfx, teardown) ->
   vimfx = createConfigAPI($vimfx)
 
-  resetHintChars = prefs.tmp('hint_chars', 'ab cd')
+  resetHintChars = prefs.tmp('hints.chars', 'ab cd')
   resetBlacklist = prefs.tmp('blacklist', null)
   originalOptions = Object.assign({}, $vimfx.options)
   teardown(->
@@ -52,11 +52,11 @@ exports['test vimfx.get and vimfx.set'] = (assert, $vimfx, teardown) ->
     $vimfx.options = originalOptions
   )
 
-  assert.equal(vimfx.get('hint_chars'), 'ab cd')
+  assert.equal(vimfx.get('hints.chars'), 'ab cd')
   assert.ok(not prefs.has('blacklist'))
 
-  vimfx.set('hint_chars', 'xy z')
-  assert.equal(vimfx.get('hint_chars'), 'xy z')
+  vimfx.set('hints.chars', 'xy z')
+  assert.equal(vimfx.get('hints.chars'), 'xy z')
 
   vimfx.set('blacklist', 'test')
   assert.equal(vimfx.get('blacklist'), 'test')
@@ -65,19 +65,19 @@ exports['test vimfx.get and vimfx.set'] = (assert, $vimfx, teardown) ->
   assert.deepEqual(vimfx.get('translations'), {KeyQ: ['ö', 'Ö']})
 
   $vimfx.emit('shutdown')
-  assert.equal(vimfx.get('hint_chars'), 'ab cd')
+  assert.equal(vimfx.get('hints.chars'), 'ab cd')
   assert.ok(not prefs.has('blacklist'))
   assert.deepEqual(vimfx.get('translations'), {})
 
 exports['test vimfx.getDefault'] = (assert, $vimfx, teardown) ->
   vimfx = createConfigAPI($vimfx)
 
-  reset = prefs.tmp('hint_chars', 'ab cd')
+  reset = prefs.tmp('hints.chars', 'ab cd')
   teardown(->
     reset?()
   )
 
-  assert.equal(vimfx.getDefault('hint_chars'), defaults.options.hint_chars)
+  assert.equal(vimfx.getDefault('hints.chars'), defaults.options['hints.chars'])
 
 exports['test customization'] = (assert, $vimfx, teardown) ->
   vimfx = createConfigAPI($vimfx)
@@ -419,11 +419,11 @@ exports['test vimfx.[gs]et(Default)? errors'] = (assert, $vimfx) ->
   )
 
   throws(assert, /boolean, number, string or null/i, 'undefined', ->
-    vimfx.set('hint_chars')
+    vimfx.set('hints.chars')
   )
 
   throws(assert, /boolean, number, string or null/i, 'object', ->
-    vimfx.set('hint_chars', ['a', 'b', 'c'])
+    vimfx.set('hints.chars', ['a', 'b', 'c'])
   )
 
 exports['test vimfx.addCommand errors'] = (assert, $vimfx) ->

@@ -35,6 +35,7 @@ class VimFx extends utils.EventEmitter
     @vims = new WeakMap()
     @lastClosedVim = null
     @goToCommand = null
+    @ignoreKeyEventsUntilTime = 0
     @skipCreateKeyTrees = false
     @createKeyTrees()
     @reset()
@@ -86,6 +87,9 @@ class VimFx extends utils.EventEmitter
     return unless keyStr = @stringifyKeyEvent(event)
 
     now = Date.now()
+
+    return true if now <= @ignoreKeyEventsUntilTime
+
     @reset(mode) if now - @lastInputTime >= @options.timeout
     @lastInputTime = now
 
@@ -134,8 +138,9 @@ class VimFx extends utils.EventEmitter
 
     @reset(mode) if type == 'full'
     return {
-      type, command, count, specialKeys, keyStr, unmodifiedKey, toplevel
-      likelyConflict
+      type, command, count, toplevel
+      specialKeys, keyStr, unmodifiedKey, likelyConflict
+      rawKey: event.key, rawCode: event.code
       discard: @reset.bind(this, mode)
     }
 

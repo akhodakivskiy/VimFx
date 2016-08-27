@@ -206,6 +206,10 @@ class UIEventManager
   consumeKeyEvent: (vim, event) ->
     match = vim._consumeKeyEvent(event)
 
+    if typeof match == 'boolean'
+      @suppress = match
+      return
+
     if match
       if @vimfx.options.notify_entered_keys and vim.mode != 'ignore'
         if match.type in ['none', 'full'] or match.likelyConflict
@@ -289,9 +293,10 @@ class EnteredKeysManager
     @timeout = null
 
   clear: (notifier) ->
-    @keys = []
     @clearTimeout()
-    notifier.hideNotification()
+    if @keys.length > 0
+      @keys = []
+      notifier.hideNotification()
 
   push: (notifier, keyStr, duration) ->
     @keys.push(keyStr)

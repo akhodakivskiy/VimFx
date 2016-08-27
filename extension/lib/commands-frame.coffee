@@ -168,9 +168,16 @@ helper_follow = (options, matcher, {vim, pass}) ->
 
     return unless shape.nonCoveredPoint
 
+    text = utils.getText(element)
+
     originalRect = element.getBoundingClientRect()
     length = vim.state.markerElements.push({element, originalRect})
-    wrapper = {type, shape, elementIndex: length - 1}
+    wrapper = {
+      type, text, shape,
+      combinedArea: shape.area
+      elementIndex: length - 1
+      parentIndex: null
+    }
 
     if wrapper.type == 'link'
       {href} = element
@@ -189,10 +196,9 @@ helper_follow = (options, matcher, {vim, pass}) ->
         if href of hrefs
           parent = hrefs[href]
           wrapper.parentIndex = parent.elementIndex
-          parent.shape.area += wrapper.shape.area
+          parent.combinedArea += wrapper.shape.area
           parent.numChildren += 1
         else
-          wrapper.numChildren = 0
           hrefs[href] = wrapper
 
     return wrapper
