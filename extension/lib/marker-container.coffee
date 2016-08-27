@@ -89,6 +89,8 @@ class MarkerContainer
       else
         markers.push(marker)
       markerMap[wrapper.elementIndex] = marker
+      if marker.isComplementary == @isComplementary and @numEnteredChars > 0
+        marker.hide()
 
     # Both the `z-index` assignment and the Huffman algorithm below require the
     # markers to be sorted.
