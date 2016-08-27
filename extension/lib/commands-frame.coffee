@@ -138,7 +138,7 @@ helper_follow = (options, matcher, {vim, pass}) ->
         rect = element.getBoundingClientRect()
         # Use `.clientWidth` instead of `rect.width` because the latter includes
         # the width of the borders of the textarea, which are unreliable.
-        if element.clientWidth == 1 and rect.height > 0
+        if element.clientWidth <= 1 and rect.height > 0
           shape = {
             nonCoveredPoint: {
               x: rect.left
