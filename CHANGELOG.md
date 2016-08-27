@@ -1,3 +1,9 @@
+### 0.18.1 (2016-08-27)
+
+- Fixed: `vimfx.addOptionOverrides` no longer crashes on startup.
+- Fixed: `vimfx.addOptionOverrides` can now override the `prevent_autofocus`
+  pref again.
+
 ### 0.18.0 (2016-08-20)
 
 #### Changed default shortcuts
