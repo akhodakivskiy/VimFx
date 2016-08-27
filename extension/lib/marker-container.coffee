@@ -64,8 +64,10 @@ class MarkerContainer
 
   reset: ->
     @numEnteredChars = 0
-    marker.reset() for marker in @markers when marker.hintIndex > 0
+    for marker in @markers when marker.hintIndex > 0 or marker.textChars != ''
+      marker.reset()
     @refreshComplementaryVisiblity()
+    @recalculateHintsWithPasses(@markers, @markerMap)
 
   refreshComplementaryVisiblity: ->
     for marker in @markers
@@ -83,7 +85,7 @@ class MarkerContainer
     markerMap = {}
 
     for wrapper in wrappers
-      marker = new Marker(wrapper, @window.document, {isComplementary})
+      marker = new Marker(wrapper, @window.document, {isComplementary, pass})
       if wrapper.parentIndex?
         combined.push(marker)
       else
@@ -109,6 +111,32 @@ class MarkerContainer
       # Add `z-index` space for all the children of the marker.
       zIndex += marker.wrapper.numChildren if marker.wrapper.numChildren?
 
+    markers.push(combined...)
+    @recalculateHints(markers, markerMap, pass)
+
+    zoom = 1
+    if @adjustZoom
+      {ZoomManager, gBrowser: {selectedBrowser: browser}} = @window
+      # If “full zoom” is not used, it means that “Zoom text only” is enabled.
+      # If so, that “zoom” does not need to be taken into account.
+      # `.getCurrentMode()` is added by the “Default FullZoom Level” extension.
+      if ZoomManager.getCurrentMode?(browser) ? ZoomManager.useFullZoom
+        zoom = ZoomManager.getZoomForBrowser(browser)
+
+    fragment = @window.document.createDocumentFragment()
+    fragment.appendChild(marker.markerElement) for marker in markers
+    @container.appendChild(fragment)
+
+    # Must be done after the hints have been inserted into the DOM (see
+    # `Marker::setPosition`).
+    marker.setPosition(viewport, zoom) for marker in markers
+
+    @markers.push(markers...)
+    Object.assign(@markerMap, markerMap)
+
+  recalculateHints: (allMarkers, markerMap, pass) ->
+    markers = allMarkers.filter((marker) -> not marker.wrapper.parentIndex?)
+    combined = allMarkers.filter((marker) -> marker.wrapper.parentIndex?)
     prefixes = switch pass
       when 'first'
         @primaryHintChars
@@ -152,27 +180,23 @@ class MarkerContainer
       marker.markerElement.style.zIndex = parentZIndex
       parent.markerElement.style.zIndex = parentZIndex + 1
       marker.setHint(parent.hint)
-    markers.push(combined...)
 
-    zoom = 1
-    if @adjustZoom
-      {ZoomManager, gBrowser: {selectedBrowser: browser}} = @window
-      # If “full zoom” is not used, it means that “Zoom text only” is enabled.
-      # If so, that “zoom” does not need to be taken into account.
-      # `.getCurrentMode()` is added by the “Default FullZoom Level” extension.
-      if ZoomManager.getCurrentMode?(browser) ? ZoomManager.useFullZoom
-        zoom = ZoomManager.getZoomForBrowser(browser)
-
-    fragment = @window.document.createDocumentFragment()
-    fragment.appendChild(marker.markerElement) for marker in markers
-    @container.appendChild(fragment)
-
-    # Must be done after the hints have been inserted into the DOM (see
-    # `Marker::setPosition`).
-    marker.setPosition(viewport, zoom) for marker in markers
-
-    @markers.push(markers...)
-    Object.assign(@markerMap, markerMap)
+  recalculateHintsWithPasses: (markers, markerMap) ->
+    wasTwoPass = (marker) ->
+      marker.pass = 'first' or marker.pass == 'second'
+    if markers.find((marker) -> wasTwoPass(marker))
+      @recalculateHints(
+        markers.filter((marker) -> marker.pass != 'second'),
+        markerMap,
+        'first'
+      )
+      @recalculateHints(
+        markers.filter((marker) -> marker.pass == 'second'),
+        markerMap,
+        'second'
+      )
+    else
+      @recalculateHints(markers, markerMap, 'single')
 
   toggleComplementary: ->
     if not @isComplementary and not @hasLookedForComplementaryWrappers
@@ -198,7 +222,8 @@ class MarkerContainer
 
     for marker in @markers
       if marker.isComplementary == @isComplementary and
-         marker.hintIndex == @numEnteredChars
+         marker.hintIndex == @numEnteredChars and
+         marker.visible
         matched = marker.matchHintChar(char)
         marker.hide() unless matched
         if marker.isMatched()
@@ -206,6 +231,30 @@ class MarkerContainer
           matchedMarkers.push(marker)
 
     @numEnteredChars += 1
+    return matchedMarkers
+
+  matchTextChar: (char) ->
+    matchedMarkers = []
+
+    @clearHintChars()
+
+    for marker in @markers
+      if marker.isComplementary == @isComplementary
+        marker.addTextChar(char)
+        if marker.matchesText()
+          matchedMarkers.push(marker)
+        else
+          marker.hide()
+
+    @recalculateHintsWithPasses(matchedMarkers, @markerMap)
+
+    markers = matchedMarkers.filter((marker) -> not marker.wrapper.parentIndex?)
+
+    if markers.length == 1
+      markers[0].markMatched(true)
+    else
+      matchedMarkers = []
+
     return matchedMarkers
 
   deleteHintChar: ->
@@ -216,6 +265,19 @@ class MarkerContainer
         when -1
           marker.show()
     @numEnteredChars -= 1 unless @numEnteredChars == 0
+
+  deleteTextChar: ->
+    matchedMarkers = []
+    for marker in @markers
+      if marker.isComplementary == @isComplementary
+        marker.deleteTextChar()
+        if marker.matchesText()
+          marker.show()
+          matchedMarkers.push(marker)
+    @recalculateHintsWithPasses(matchedMarkers, @markerMap)
+
+  clearHintChars: ->
+    @deleteHintChar() while @numEnteredChars > 0
 
 
   rotateOverlapping: (forward) ->

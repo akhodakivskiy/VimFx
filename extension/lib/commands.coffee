@@ -622,8 +622,9 @@ commands.click_browser_element = ({vim}) ->
     shape = getElementShape(element)
     return unless shape.nonCoveredPoint
 
+    text = utils.getText(element)
     length = markerElements.push(element)
-    return {type, shape, elementIndex: length - 1}
+    return {type, shape, text, elementIndex: length - 1}
 
   callback = (marker) ->
     element = markerElements[marker.wrapper.elementIndex]

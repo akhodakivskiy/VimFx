@@ -153,6 +153,7 @@ shortcuts =
 
 options =
   'hint_chars':             'fjdkslaghrueiwonc mv'
+  'text_hint_selection':    false
   'prev_patterns':          'prev  previous  ‹  «  ◀  ←  <<  <  back  newer'
   'next_patterns':          'next  ›  »  ▶  →  >>  >  more  older'
   'blacklist':              '*example.com*  http://example.org/editor/*'

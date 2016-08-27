@@ -26,7 +26,7 @@ utils = require('./utils')
 class Marker
   # `@wrapper` is a stand-in for the element that the marker represents. See
   # `MarkerContainer::injectHints` for more information.
-  constructor: (@wrapper, @document, {@isComplementary}) ->
+  constructor: (@wrapper, @document, {@isComplementary, @pass}) ->
     @elementShape  = @wrapper.shape
     @markerElement = utils.createBox(@document, 'marker')
     @markerElement.setAttribute('data-type', @wrapper.type)
@@ -34,7 +34,9 @@ class Marker
     @width = 0
     @height = 0
     @hint = ''
+    @text = @wrapper.text.toLowerCase()
     @hintIndex = 0
+    @textChars = ''
     @visible = true
     @zoom = 1
     @viewport = null
@@ -43,6 +45,7 @@ class Marker
 
   reset: ->
     @setHint(@hint)
+    @textChars = ''
     @show()
 
   show: -> @setVisibility(true)
@@ -110,10 +113,19 @@ class Marker
       return true
     return false
 
+  addTextChar: (char) ->
+    @textChars += char.toLowerCase()
+
+  matchesText: ->
+    return @text.indexOf(@textChars) != -1
+
   deleteHintChar: ->
     if @hintIndex > 0
       @hintIndex -= 1
       @toggleLastHintChar(false)
+
+  deleteTextChar: ->
+    @textChars = @textChars.slice(0, -1)
 
   toggleLastHintChar: (visible) ->
     @markerElement.children[@hintIndex]

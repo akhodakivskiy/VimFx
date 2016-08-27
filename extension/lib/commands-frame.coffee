@@ -162,8 +162,9 @@ helper_follow = (options, matcher, {vim, pass}) ->
     return unless shape.nonCoveredPoint
 
     originalRect = element.getBoundingClientRect()
+    text = utils.getText(element)
     length = vim.state.markerElements.push({element, originalRect})
-    wrapper = {type, shape, elementIndex: length - 1}
+    wrapper = {type, shape, text, elementIndex: length - 1}
 
     if wrapper.type == 'link'
       {href} = element

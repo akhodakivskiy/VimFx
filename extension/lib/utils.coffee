@@ -237,6 +237,12 @@ getFocusType = (element) -> switch
   else
     'none'
 
+getText = (element) -> switch
+  when isTextInputElement(element)
+    element.value or element.placeholder or ''
+  else
+    element.innerText or ''
+
 
 
 # Event helpers
@@ -604,6 +610,7 @@ module.exports = {
   blurActiveBrowserElement
   focusElement
   getFocusType
+  getText
 
   listen
   listenOnce

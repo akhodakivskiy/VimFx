@@ -197,6 +197,7 @@ mode('hints', {
     storage.markerContainer = markerContainer
     storage.callback = callback
     storage.count = count
+    storage.textChars = ''
 
     if sleep >= 0
       storage.clearInterval = utils.interval(vim.window, sleep, (next) ->
@@ -232,6 +233,27 @@ mode('hints', {
       if matchedMarkers.length > 0
         again = callback(matchedMarkers[0], storage.count, match.keyStr)
         storage.count -= 1
+        storage.textChars = ''
+        if again
+          vim.window.setTimeout((->
+            marker.markMatched(false) for marker in matchedMarkers
+            return
+          ), vim.options.hints_timeout)
+          markerContainer.reset()
+        else
+          # The callback might have entered another mode. Only go back to Normal
+          # mode if we’re still in Hints mode.
+          vim._enterMode('normal') if vim.mode == 'hints'
+    else if vim.options.text_hint_selection
+      key = match.unmodifiedKey
+      key = ' ' if key == 'space'
+      matchedMarkers = markerContainer.matchTextChar(key)
+      storage.textChars += key
+      if matchedMarkers.length > 0
+        again = callback(matchedMarkers[0], storage.count, match.keyStr)
+        storage.count -= 1
+        storage.textChars = ''
+        vim.eatKeys(vim.options.hints_timeout)
         if again
           vim.window.setTimeout((->
             marker.markMatched(false) for marker in matchedMarkers
@@ -243,6 +265,8 @@ mode('hints', {
           # mode if we’re still in Hints mode.
           vim._enterMode('normal') if vim.mode == 'hints'
 
+    if vim.options.notify_entered_keys
+      vim.notify(storage.textChars) if storage.textChars
     return true
 
 }, {
@@ -258,14 +282,19 @@ mode('hints', {
   rotate_markers_backward: ({storage}) ->
     storage.markerContainer.rotateOverlapping(false)
 
-  delete_hint_char: ({storage}) ->
-    storage.markerContainer.deleteHintChar()
+  delete_hint_char: ({vim, storage}) ->
+    if storage.markerContainer.numEnteredChars > 0
+      storage.markerContainer.deleteHintChar()
+    else if vim.options.text_hint_selection
+      storage.markerContainer.deleteTextChar()
+      storage.textChars = storage.textChars.slice(0, -1)
 
   increase_count: ({storage}) ->
     storage.count += 1
 
   toggle_complementary: ({storage}) ->
     storage.markerContainer.toggleComplementary()
+    storage.textChars = ''
 })
 
 
