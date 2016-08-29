@@ -211,11 +211,7 @@ mode('hints', {
       )
 
   onLeave: ({vim, storage}) ->
-    {markerContainer} = storage
-    vim.window.setTimeout(
-      (-> markerContainer.remove()),
-      vim.options.hints_timeout
-    )
+    storage.markerContainer?.remove()
     storage.clearInterval?()
     for key of storage
       storage[key] = null
@@ -227,18 +223,31 @@ mode('hints', {
 
     if match.type == 'full'
       match.command.run(args)
+
     else if match.unmodifiedKey in vim.options.hint_chars
       matchedMarkers = markerContainer.matchHintChar(match.unmodifiedKey)
+
       if matchedMarkers.length > 0
         again = callback(matchedMarkers[0], storage.count, match.keyStr)
         storage.count -= 1
+
         if again
           vim.window.setTimeout((->
             marker.markMatched(false) for marker in matchedMarkers
             return
           ), vim.options.hints_timeout)
           markerContainer.reset()
+
         else
+          vim.window.setTimeout((->
+            # Don’t remove the marker container if we have re-entered Hints mode
+            # before the timeout has passed.
+            markerContainer.remove() unless vim.mode == 'hints'
+          ), vim.options.hints_timeout)
+
+          # Prevent `onLeave` from removing the markers immediately.
+          storage.markerContainer = null
+
           # The callback might have entered another mode. Only go back to Normal
           # mode if we’re still in Hints mode.
           vim._enterMode('normal') if vim.mode == 'hints'
@@ -246,10 +255,7 @@ mode('hints', {
     return true
 
 }, {
-  exit: ({vim, storage}) ->
-    # The hints are removed automatically when leaving the mode, but after a
-    # timeout. When aborting the mode we should remove the hints immediately.
-    storage.markerContainer.remove()
+  exit: ({vim}) ->
     vim._enterMode('normal')
 
   rotate_markers_forward: ({storage}) ->
