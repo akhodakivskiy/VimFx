@@ -80,6 +80,7 @@ toolbarpaletteitem[place="palette"] > #VimFxButton {
 #VimFxMarkersContainer {
   position: absolute;
   pointer-events: none;
+  font: menu;
 }
 
   #VimFxMarkersContainer.ui {
@@ -101,7 +102,7 @@ toolbarpaletteitem[place="palette"] > #VimFxButton {
   border: solid var(--border-width) var(--border-color);
   background-color: #ffd76e;
   color: #302505;
-  font: menu;
+  font-size: 0.8em;
   line-height: 1;
   font-weight: bold;
   text-transform: uppercase;
