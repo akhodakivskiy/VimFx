@@ -228,10 +228,17 @@ mode('hints', {
       matchedMarkers = markerContainer.matchHintChar(match.unmodifiedKey)
 
       if matchedMarkers.length > 0
+        # Prevent `onLeave` from removing the markers immediately. (The callback
+        # might enter another mode.)
+        storage.markerContainer = null
+
         again = callback(matchedMarkers[0], storage.count, match.keyStr)
         storage.count -= 1
 
         if again
+          # Add the container back again.
+          storage.markerContainer = markerContainer
+
           vim.window.setTimeout((->
             marker.markMatched(false) for marker in matchedMarkers
             return
@@ -244,9 +251,6 @@ mode('hints', {
             # before the timeout has passed.
             markerContainer.remove() unless vim.mode == 'hints'
           ), vim.options.hints_timeout)
-
-          # Prevent `onLeave` from removing the markers immediately.
-          storage.markerContainer = null
 
           # The callback might have entered another mode. Only go back to Normal
           # mode if we’re still in Hints mode.
