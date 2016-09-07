@@ -169,6 +169,38 @@ isTypingElement = (element) ->
 
 # Active/focused element helpers
 
+blurActiveBrowserElement = (vim) ->
+  # - Blurring in the next tick allows to pass `<escape>` to the location bar to
+  #   reset it, for example.
+  # - Focusing the current browser afterwards allows to pass `<escape>` as well
+  #   as unbound keys to the page. However, focusing the browser also triggers
+  #   focus events on `document` and `window` in the current page. Many pages
+  #   re-focus some text input on those events, making it impossible to blur
+  #   those! Therefore we tell the frame script to suppress those events.
+  {window} = vim
+  activeElement = getActiveElement(window)
+  vim._send('browserRefocus')
+  nextTick(window, ->
+    activeElement.blur()
+    window.gBrowser.selectedBrowser.focus()
+  )
+
+blurActiveElement = (window) ->
+  # Blurring a frame element also blurs any active elements inside it. Recursing
+  # into the frames and blurring the “real” active element directly would give
+  # focus to the `<body>` of its containing frame, while blurring the top-most
+  # frame gives focus to the top-most `<body>`. This allows to blur fancy text
+  # editors which use an `<iframe>` as their text area.
+  window.document.activeElement?.blur()
+
+# Focus an element and tell Firefox that the focus happened because of a user
+# action (not just because some random programmatic focus). `.FLAG_BYKEY` might
+# look more appropriate, but it unconditionally selects all text, which
+# `.FLAG_BYMOUSE` does not.
+focusElement = (element, options = {}) ->
+  nsIFocusManager.setFocus(element, options.flag ? 'FLAG_BYMOUSE')
+  element.select?() if options.select
+
 # NOTE: In frame scripts, `document.activeElement` may be `null` when the page
 # is loading. Therefore always check if anything was returned, such as:
 #
@@ -192,38 +224,6 @@ getActiveElement = (window) ->
     return activeElement
   else
     return getActiveElement(activeElement.contentWindow)
-
-blurActiveElement = (window) ->
-  # Blurring a frame element also blurs any active elements inside it. Recursing
-  # into the frames and blurring the “real” active element directly would give
-  # focus to the `<body>` of its containing frame, while blurring the top-most
-  # frame gives focus to the top-most `<body>`. This allows to blur fancy text
-  # editors which use an `<iframe>` as their text area.
-  window.document.activeElement?.blur()
-
-blurActiveBrowserElement = (vim) ->
-  # - Blurring in the next tick allows to pass `<escape>` to the location bar to
-  #   reset it, for example.
-  # - Focusing the current browser afterwards allows to pass `<escape>` as well
-  #   as unbound keys to the page. However, focusing the browser also triggers
-  #   focus events on `document` and `window` in the current page. Many pages
-  #   re-focus some text input on those events, making it impossible to blur
-  #   those! Therefore we tell the frame script to suppress those events.
-  {window} = vim
-  activeElement = getActiveElement(window)
-  vim._send('browserRefocus')
-  nextTick(window, ->
-    activeElement.blur()
-    window.gBrowser.selectedBrowser.focus()
-  )
-
-# Focus an element and tell Firefox that the focus happened because of a user
-# action (not just because some random programmatic focus). `.FLAG_BYKEY` might
-# look more appropriate, but it unconditionally selects all text, which
-# `.FLAG_BYMOUSE` does not.
-focusElement = (element, options = {}) ->
-  nsIFocusManager.setFocus(element, options.flag ? 'FLAG_BYMOUSE')
-  element.select?() if options.select
 
 getFocusType = (element) -> switch
   when isIgnoreModeFocusType(element)
@@ -276,10 +276,6 @@ onRemoved = (element, fn) ->
   module.onShutdown(disconnect)
 
   return disconnect
-
-suppressEvent = (event) ->
-  event.preventDefault()
-  event.stopPropagation()
 
 simulateMouseEvents = (element, sequence) ->
   window = element.ownerGlobal
@@ -335,6 +331,10 @@ simulateMouseEvents = (element, sequence) ->
         .dispatchDOMEventViaPresShell(element, mouseEvent, true)
 
   return
+
+suppressEvent = (event) ->
+  event.preventDefault()
+  event.stopPropagation()
 
 
 
@@ -495,16 +495,6 @@ includes = (string, search) ->
   return false unless typeof string == 'string'
   return string.toLowerCase().includes(search)
 
-nextTick = (window, fn) -> window.setTimeout((-> fn()) , 0)
-
-regexEscape = (s) -> s.replace(/[|\\{}()[\]^$+*?.]/g, '\\$&')
-
-removeDuplicates = (array) -> Array.from(new Set(array))
-
-# Remove duplicate characters from string (case insensitive).
-removeDuplicateCharacters = (str) ->
-  return removeDuplicates( str.toLowerCase().split('') ).join('')
-
 # Calls `fn` repeatedly, with at least `interval` ms between each call.
 interval = (window, interval, fn) ->
   stopped = false
@@ -517,6 +507,16 @@ interval = (window, interval, fn) ->
     window.clearTimeout(currentIntervalId)
   next()
   return clearInterval
+
+nextTick = (window, fn) -> window.setTimeout((-> fn()) , 0)
+
+regexEscape = (s) -> s.replace(/[|\\{}()[\]^$+*?.]/g, '\\$&')
+
+# Remove duplicate characters from string (case insensitive).
+removeDuplicateCharacters = (str) ->
+  return removeDuplicates( str.toLowerCase().split('') ).join('')
+
+removeDuplicates = (array) -> Array.from(new Set(array))
 
 
 
@@ -599,17 +599,17 @@ module.exports = {
   isTextInputElement
   isTypingElement
 
-  getActiveElement
-  blurActiveElement
   blurActiveBrowserElement
+  blurActiveElement
   focusElement
+  getActiveElement
   getFocusType
 
   listen
   listenOnce
   onRemoved
-  suppressEvent
   simulateMouseEvents
+  suppressEvent
 
   area
   checkElementOrAncestor
@@ -631,11 +631,11 @@ module.exports = {
   bisect
   has
   includes
+  interval
   nextTick
   regexEscape
-  removeDuplicates
   removeDuplicateCharacters
-  interval
+  removeDuplicates
 
   expandPath
   formatError
