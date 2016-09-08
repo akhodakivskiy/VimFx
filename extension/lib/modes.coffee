@@ -273,6 +273,8 @@ mode('hints', {
 
   increase_count: ({storage}) ->
     storage.count += 1
+    # Uncomment this line if you want to use `gulp hints.html`!
+    # utils.writeToClipboard(storage.markerContainer.container.outerHTML)
 
   toggle_complementary: ({storage}) ->
     storage.markerContainer.toggleComplementary()

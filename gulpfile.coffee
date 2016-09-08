@@ -299,22 +299,30 @@ parseLocaleFile = (fileContents) ->
       lines.push(line)
   return {keys, template: lines, newline}
 
-helpHTMLFile = 'help.html'
-gulp.task(helpHTMLFile, ->
-  unless fs.existsSync(helpHTMLFile)
-    process.stdout.write("""
-      First enable the “Copy to clipboard” line in help.coffee, show the help
-      dialog and finally dump the clipboard into #{helpHTMLFile}.
-    """)
-    return
-  gulp.src('help.html')
-    .pipe(tap((file) ->
-      file.contents = new Buffer(generateHelpHTML(file.contents.toString()))
-    ))
-    .pipe(gulp.dest('.'))
-)
+generateHTMLTask = (filename, message) ->
+  gulp.task(filename, ->
+    unless fs.existsSync(filename)
+      process.stdout.write(message(filename))
+      return
+    gulp.src(filename)
+      .pipe(tap((file) ->
+        file.contents = new Buffer(generateTestHTML(file.contents.toString()))
+      ))
+      .pipe(gulp.dest('.'))
+  )
 
-helpHTMLPrelude = '''
+generateHTMLTask('help.html', (filename) -> """
+  First enable the “Copy to clipboard” line in help.coffee, show the help
+  dialog and finally dump the clipboard into #{filename}.
+""")
+
+generateHTMLTask('hints.html', (filename) -> """
+  First enable the “Copy to clipboard” line in modes.coffee, show the
+  hint markers, activate the “Increase count” command and finally dump the
+  clipboard into #{filename}.
+""")
+
+testHTMLPrelude = '''
   <!doctype html>
   <meta charset=utf-8>
   <title>VimFx help</title>
@@ -325,8 +333,8 @@ helpHTMLPrelude = '''
   <link rel=stylesheet href=extension/skin/style.css>
 '''
 
-generateHelpHTML = (dumpedHTML) ->
-  return helpHTMLPrelude + dumpedHTML
+generateTestHTML = (dumpedHTML) ->
+  return testHTMLPrelude + dumpedHTML
     .replace(/^<\w+ xmlns="[^"]+"/, '<div')
     .replace(/\w+>$/, 'div>')
     .replace(/<(\w+)([^>]*)\/>/g, '<$1$2></$1>')

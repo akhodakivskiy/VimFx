@@ -17,7 +17,7 @@
  * along with VimFx.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* Allow file:/// prefix for testing using `gulp help.html`. */
+/* Allow file:/// prefix for testing using `gulp {help,hints}.html`. */
 @-moz-document url(chrome://browser/content/browser.xul), url-prefix(file:///)
 {
 

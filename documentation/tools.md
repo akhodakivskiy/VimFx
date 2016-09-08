@@ -118,6 +118,8 @@ internally by other tasks.)
   using the Style Editor! You can even press the “Save” button when done to save
   your changes!
 
+- `gulp hints.html` is like `gulp help.html` but for styling hint markers.
+
 ### Release
 
 See the [“Making a release”][release] section below for more information.
