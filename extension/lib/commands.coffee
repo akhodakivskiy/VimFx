@@ -551,16 +551,22 @@ commands.follow_in_tab =
 commands.follow_in_focused_tab =
   helper_follow_clickable.bind(null, {inTab: true, inBackground: false})
 
-commands.follow_in_window = (args) ->
+helper_follow_in_window = (options, args) ->
   {vim} = args
 
   callback = (marker) ->
     vim._focusMarkerElement(marker.wrapper.elementIndex)
     {href} = marker.wrapper
-    vim.window.openLinkIn(href, 'window', {}) if href
+    vim.window.openLinkIn(href, 'window', options) if href
     return false
 
   helper_follow({name: 'follow_in_tab', callback}, args)
+
+commands.follow_in_window =
+  helper_follow_in_window.bind(null, {})
+
+commands.follow_in_private_window =
+  helper_follow_in_window.bind(null, {private: true})
 
 commands.follow_multiple = (args) ->
   args.count = Infinity

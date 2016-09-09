@@ -206,7 +206,8 @@ command (`/`), except that it searches links only.
 Which elements get hints depends on the command as well:
 
 - `f` and `af`: Anything clickable—links, buttons, form controls.
-- `F`, `et` and `ew`: Anything that can be opened in a new tab or window—links.
+- `F`, `et`, `ew` and `ep`: Anything that can be opened in a new tab or
+  window—links.
 - `yf`: Anything that has something useful to copy—links (their URL) and text
   inputs (their text).
 - `ef`: Anything focusable—links, buttons, form controls, scrollable elements,
@@ -299,8 +300,9 @@ key/letter, because it is close to `f` both alphabetically, and physically in
 many keyboard layouts (and is pretty easy to type).
 
 The second key after `e` was chosen based on mnemonics: There’s `et` as in
-<strong>t</strong>ab, `ew` as in <strong>w</strong>indow, `ef` as in
-<strong>f</strong>ocus and `eb` as in <strong>b</strong>rowser.
+<strong>t</strong>ab, `ew` as in <strong>w</strong>indow, `ep` as in
+<strong>p</strong>rivate window, `ef` as in <strong>f</strong>ocus and `eb` as
+in <strong>b</strong>rowser.
 
 [`v` commands]: #the-v-commands--caret-mode
 [hint-matcher]: api.md#vimfxsethintmatcherhintmatcher

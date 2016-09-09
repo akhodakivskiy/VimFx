@@ -85,6 +85,7 @@ shortcuts =
       'F':         'follow_in_tab'
       'et':        'follow_in_focused_tab'
       'ew':        'follow_in_window'
+      'ep':        'follow_in_private_window'
       'af':        'follow_multiple'
       'yf':        'follow_copy'
       'ef':        'follow_focus'
