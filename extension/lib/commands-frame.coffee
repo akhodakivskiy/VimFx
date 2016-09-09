@@ -621,4 +621,7 @@ commands.collapse_selection = ({vim}) ->
 commands.clear_selection = ({vim}) ->
   utils.clearSelectionDeep(vim.content)
 
+commands.modal = ({vim, type, args}) ->
+  return vim.content[type](args...)
+
 module.exports = commands

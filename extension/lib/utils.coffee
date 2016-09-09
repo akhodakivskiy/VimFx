@@ -179,6 +179,7 @@ blurActiveBrowserElement = (vim) ->
   #   those! Therefore we tell the frame script to suppress those events.
   {window} = vim
   activeElement = getActiveElement(window)
+  activeElement.closest('tabmodalprompt')?.abortPrompt()
   vim._send('browserRefocus')
   nextTick(window, ->
     activeElement.blur()

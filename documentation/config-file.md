@@ -121,6 +121,15 @@ vimfx.set('custom.mode.normal.zoom_in', 'zi')
 If you add custom commands, remember to [add shortcuts to
 them][custom-command-shortcuts]!
 
+Tip: If you already have made customizations in VimFx’s settings page in the
+Add-ons Manager, you can use the “Export all” button there to copy all prefs as
+JSON. Paste it in your config file and either edit it, or iterate of it:
+
+```js
+let prefs = {"hint_chars": "1234567 89"} // Pasted exported prefs.
+Object.entries(prefs).forEach(([pref, value]) => vimfx.set(pref, value))
+```
+
 [custom-command-shortcuts]: api.md#user-content-custom-command-shortcuts
 
 

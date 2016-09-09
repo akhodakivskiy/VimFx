@@ -178,6 +178,9 @@ class Vim
     @_parent.emit('hideNotification', {vim: this})
     @_statusPanel.setAttribute('inactive', 'true')
 
+  _modal: (type, args, callback = null) ->
+    @_run('modal', {type, args}, callback)
+
   markPageInteraction: (value = null) -> @_send('markPageInteraction', value)
 
   _focusMarkerElement: (elementIndex, options = {}) ->
