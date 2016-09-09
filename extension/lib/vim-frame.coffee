@@ -57,7 +57,10 @@ class VimFrame
         explicitBodyFocus: false
         hasFocusedTextInput: false
         lastFocusedTextInput: null
-        lastHoveredElement: null
+        lastHover: {
+          element: null
+          browserOffset: {x: 0, y: 0}
+        }
         scrollableElements: new ScrollableElements(@content)
         markerElements: []
         inputs: null
@@ -66,11 +69,11 @@ class VimFrame
     else
       isDead = (element) ->
         return Cu.isDeadWrapper(element) or element.ownerDocument == target
-      check = (prop) =>
-        @state[prop] = null if @state[prop] and isDead(@state[prop])
+      check = (obj, prop) ->
+        obj[prop] = null if obj[prop] and isDead(obj[prop])
 
-      check('lastFocusedTextInput')
-      check('lastHoveredElement')
+      check(@state, 'lastFocusedTextInput')
+      check(@state.lastHover, 'element')
       @state.scrollableElements.reject(isDead)
       # `markerElements` and `inputs` could theoretically need to be filtered
       # too at this point. YAGNI until an issue arises from it.
@@ -91,15 +94,17 @@ class VimFrame
 
   markPageInteraction: (value = true) -> @state.hasInteraction = value
 
-  setHover: (element) ->
+  setHover: (element, browserOffset) ->
     utils.setHover(element, true)
-    utils.simulateMouseEvents(element, 'hover-start')
-    @state.lastHoveredElement = element
+    utils.simulateMouseEvents(element, 'hover-start', browserOffset)
+    @state.lastHover.element = element
+    @state.lastHover.browserOffset = browserOffset
 
   clearHover: ->
-    if @state.lastHoveredElement
-      utils.setHover(@state.lastHoveredElement, false)
-      utils.simulateMouseEvents(@state.lastHoveredElement, 'hover-end')
-    @state.lastHoveredElement = null
+    if @state.lastHover.element
+      {element, browserOffset} = @state.lastHover
+      utils.setHover(element, false)
+      utils.simulateMouseEvents(element, 'hover-end', browserOffset)
+    @state.lastHover.element = null
 
 module.exports = VimFrame

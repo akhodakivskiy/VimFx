@@ -258,7 +258,7 @@ class FrameEventManager
     @listen('blur', (event) =>
       target = event.originalTarget
 
-      @vim.clearHover() if target == @vim.state.lastHoveredElement
+      @vim.clearHover() if target == @vim.state.lastHover.element
 
       @vim.content.setTimeout((=>
         @sendFocusType()

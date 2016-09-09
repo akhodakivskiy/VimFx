@@ -50,12 +50,20 @@ XULTextBoxElement = Ci.nsIDOMXULTextBoxElement
 # 'command' is fired automatically after 'click' on xul pages.
 EVENTS_CLICK       = ['mousedown', 'mouseup']
 EVENTS_CLICK_XUL   = ['click']
+EVENTS_CONTEXT     = ['contextmenu']
 EVENTS_HOVER_START = ['mouseover', 'mouseenter', 'mousemove']
 EVENTS_HOVER_END   = ['mouseout',  'mouseleave']
 
 
 
 # Element classification helpers
+
+hasMarkableTextNode = (element) ->
+  return Array.some(element.childNodes, (node) ->
+    # Ignore whitespace-only text nodes, and single-letter ones (which are
+    # common in many syntax highlighters).
+    return node.nodeType == 3 and node.data.trim().length > 1
+  )
 
 isActivatable = (element) ->
   return element.localName in ['a', 'button'] or
@@ -278,15 +286,18 @@ onRemoved = (element, fn) ->
 
   return disconnect
 
-simulateMouseEvents = (element, sequence) ->
+simulateMouseEvents = (element, sequence, browserOffset) ->
   window = element.ownerGlobal
   rect = element.getBoundingClientRect()
+  topOffset = getTopOffset(element)
 
   eventSequence = switch sequence
     when 'click'
       EVENTS_CLICK
     when 'click-xul'
       EVENTS_CLICK_XUL
+    when 'context'
+      EVENTS_CONTEXT
     when 'hover-start'
       EVENTS_HOVER_START
     when 'hover-end'
@@ -295,7 +306,14 @@ simulateMouseEvents = (element, sequence) ->
       sequence
 
   for type in eventSequence
-    buttonNum = if type in EVENTS_CLICK then 1 else 0
+    buttonNum = switch
+      when type in EVENTS_CONTEXT
+        2
+      when type in EVENTS_CLICK
+        1
+      else
+        0
+
     mouseEvent = new window.MouseEvent(type, {
       # Let the event bubble in order to trigger delegated event listeners.
       bubbles: type not in ['mouseenter', 'mouseleave']
@@ -311,13 +329,11 @@ simulateMouseEvents = (element, sequence) ->
       # `client{X,Y}`. `{offset,layer,movement}{X,Y}` are not worth the trouble
       # to set.
       clientX: rect.left
-      clientY: rect.top
-      # To exactly calculate `screen{X,Y}` one has to to check where the web
-      # page content area is inside the browser chrome and go through all parent
-      # frames as well. This is good enough. YAGNI for now.
-      screenX: window.screenX + rect.left
-      screenY: window.screenY + rect.top
+      clientY: rect.top + rect.height / 2
+      screenX: browserOffset.x + topOffset.x
+      screenY: browserOffset.y + topOffset.y + rect.height / 2
     })
+
     if type == 'mousemove'
       # If the below technique is used for this event, the “URL popup” (shown
       # when hovering or focusing links) does not appear.
@@ -387,6 +403,16 @@ getRootElement = (document) ->
     return document.body
   else
     return document.documentElement
+
+getTopOffset = (element) ->
+  window = element.ownerGlobal
+  {left: x, top: y} = element.getBoundingClientRect()
+  while window.frameElement
+    frameRect = window.frameElement.getBoundingClientRect()
+    x += frameRect.left
+    y += frameRect.top
+    window = window.parent
+  return {x, y}
 
 injectTemporaryPopup = (document, contents) ->
   popup = document.createElement('menupopup')
@@ -588,6 +614,7 @@ writeToClipboard = (text) -> nsIClipboardHelper.copyString(text)
 
 
 module.exports = {
+  hasMarkableTextNode
   isActivatable
   isAdjustable
   isContentEditable
@@ -618,6 +645,7 @@ module.exports = {
   containsDeep
   createBox
   getRootElement
+  getTopOffset
   injectTemporaryPopup
   insertText
   isDetached

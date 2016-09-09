@@ -212,6 +212,8 @@ Which elements get hints depends on the command as well:
   inputs (their text).
 - `ef`: Anything focusable—links, buttons, form controls, scrollable elements,
   frames.
+- `ec`: Most things that have a context menu—images, links, videos and text
+  inputs, but also many textual elements.
 - `eb`: Browser elements, such as toolbar buttons.
 
 It might seem simpler to match the same set of elements for _all_ of the
@@ -301,8 +303,8 @@ many keyboard layouts (and is pretty easy to type).
 
 The second key after `e` was chosen based on mnemonics: There’s `et` as in
 <strong>t</strong>ab, `ew` as in <strong>w</strong>indow, `ep` as in
-<strong>p</strong>rivate window, `ef` as in <strong>f</strong>ocus and `eb` as
-in <strong>b</strong>rowser.
+<strong>p</strong>rivate window, `ef` as in <strong>f</strong>ocus, `ec` as in
+<strong>c</strong>ontext menu and `eb` as in <strong>b</strong>rowser.
 
 [`v` commands]: #the-v-commands--caret-mode
 [hint-matcher]: api.md#vimfxsethintmatcherhintmatcher

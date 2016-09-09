@@ -833,6 +833,7 @@ The arguments passed to the `hintMatcher` function are:
   - `'tab'`: `F`, `et`, `ew` or `ep`.
   - `'copy'`: `yf`.
   - `'focus'`: `ef`.
+  - `'context'`: `ec`.
   - `'select'`: `v`, `av` or `yv`.
 
 - element: `Element`. One out of all elements currently inside the viewport.
@@ -871,6 +872,10 @@ The available type strings depend on `id`:
 
   - focusable: Any focusable element not falling into another category.
   - scrollable: Like “scrollable” when `id` is “normal” (see above).
+
+- context:
+
+  - context: An element that can have a context menu opened.
 
 - select:
 

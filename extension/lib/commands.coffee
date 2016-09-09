@@ -534,6 +534,7 @@ helper_follow_clickable = (options, args) ->
     else
       vim._run('click_marker_element', {
         elementIndex, type
+        browserOffset: vim._getBrowserOffset()
         preventTargetBlank: vim.options.prevent_target_blank
       })
 
@@ -597,6 +598,19 @@ commands.follow_focus = (args) ->
 
   helper_follow({name: 'follow_focus', callback}, args)
 
+commands.open_context_menu = (args) ->
+  {vim} = args
+
+  callback = (marker) ->
+    {type, elementIndex} = marker.wrapper
+    vim._run('click_marker_element', {
+      elementIndex, type
+      browserOffset: vim._getBrowserOffset()
+    })
+    return false
+
+  helper_follow({name: 'follow_context', callback}, args)
+
 commands.click_browser_element = ({vim}) ->
   {window} = vim
   markerElements = []
@@ -650,14 +664,15 @@ commands.click_browser_element = ({vim}) ->
         # next tick. This might be true for other buttons as well.
         utils.nextTick(window, ->
           utils.focusElement(element)
+          browserOffset = {x: window.screenX, y: window.screenY}
           switch
             when element.localName == 'tab'
               # Only 'mousedown' seems to be able to activate tabs.
-              utils.simulateMouseEvents(element, ['mousedown'])
+              utils.simulateMouseEvents(element, ['mousedown'], browserOffset)
             when element.closest('tab')
               # If `.click()` is used on a tab close button, its tab will be
               # selected first, which might cause the selected tab to change.
-              utils.simulateMouseEvents(element, 'click-xul')
+              utils.simulateMouseEvents(element, 'click-xul', browserOffset)
             else
               # `.click()` seems to trigger more buttons (such as NoScript’s
               # button and Firefox’s “hamburger” menu button) than simulating
@@ -702,7 +717,8 @@ helper_follow_pattern = (type, {vim}) ->
     pattern_attrs: vim.options.pattern_attrs
     patterns: vim.options["#{type}_patterns"]
   }
-  vim._run('follow_pattern', {type, options})
+  browserOffset = vim._getBrowserOffset()
+  vim._run('follow_pattern', {type, browserOffset, options})
 
 commands.follow_previous = helper_follow_pattern.bind(null, 'prev')
 

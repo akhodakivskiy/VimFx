@@ -89,6 +89,7 @@ shortcuts =
       'af':        'follow_multiple'
       'yf':        'follow_copy'
       'ef':        'follow_focus'
+      'ec':        'open_context_menu'
       'eb':        'click_browser_element'
       '[':         'follow_previous'
       ']':         'follow_next'
