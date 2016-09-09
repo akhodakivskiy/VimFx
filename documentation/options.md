@@ -99,10 +99,16 @@ Note: If you need to include a space in your pattern, use `\s`. For example:
 
 ### Blacklist
 
-Space separated list of URLs where VimFx should automatically enter Ignore mode.
-Example:
+Space separated list of URL patterns where VimFx should automatically enter
+Ignore mode. Example:
 
     *example.com*  http://example.org/editor/*
+
+The fastest way to blacklist the page you’re currently on, is to use the `gB`
+command. It opens a modal with a text input filled in with the blacklist, and
+with `*currentdomain.com*` added at the start for you! Edit it if needed, or
+just press `<enter>` straight away to save. Ignore mode is then automatically
+entered (if the URL patterns apply).
 
 Note that the URLs in the list must match the current URL _entirely_ for it to
 apply. Therefore it is easiest to always use the `*` wildcard (which matches

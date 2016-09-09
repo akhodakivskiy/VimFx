@@ -30,6 +30,7 @@ config = require('./config')
 help = require('./help')
 markableElements = require('./markable-elements')
 MarkerContainer = require('./marker-container')
+parsePrefs = require('./parse-prefs')
 prefs = require('./prefs')
 SelectionManager = require('./selection')
 translate = require('./translate')
@@ -857,6 +858,30 @@ commands.reload_config_file = ({vim}) ->
       vim.notify(translate('notification.reload_config_file.success'))
     else
       vim.notify(translate('notification.reload_config_file.failure'))
+  )
+
+commands.edit_blacklist = ({vim}) ->
+  url = vim.browser.currentURI.spec
+  location = new vim.window.URL(url)
+  domain = location.host or location.href
+  newPattern = "*#{domain}*"
+
+  blacklist = prefs.get('blacklist')
+  {parsed} = parsePrefs.parseSpaceDelimitedString(blacklist)
+  filteredList = parsed.filter((pattern) -> pattern != newPattern)
+  newBlacklist = [newPattern, filteredList...].join('  ')
+
+  message = """
+    #{translate('pref.blacklist.title')}: #{translate('pref.blacklist.desc')}
+
+    #{translate('pref.blacklist.extra', newPattern)}
+  """
+  vim._modal('prompt', [message, newBlacklist], (input) ->
+    return if input == null
+    # Just set the blacklist as if the user had typed it in the Add-ons Manager,
+    # and let the regular pref parsing take care of it.
+    prefs.set('blacklist', input)
+    vim._onLocationChange(url)
   )
 
 commands.help = ({vim}) ->

@@ -18,7 +18,8 @@ installed.
 
 By adding `*currentdomain.com*` to the [blacklist] option you can make VimFx
 start out in Ignore mode on currentdomain.com. (Set the option to `*` to make
-VimFx start out in Ignore mode _everywhere._)
+VimFx start out in Ignore mode _everywhere._) The quickest way to edit the
+blacklist is to use the `gB` command.
 
 Finally, there’s nothing stopping you from hitting the “Disable” button in the
 Add-ons Manager if you want to disable VimFx completely (just like you can with

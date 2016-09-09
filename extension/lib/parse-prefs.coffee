@@ -110,4 +110,7 @@ parsers = {
   pattern_attrs: parseSpaceDelimitedString
 }
 
-module.exports = parsePref
+module.exports = {
+  parsePref
+  parseSpaceDelimitedString
+}

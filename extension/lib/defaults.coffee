@@ -109,6 +109,7 @@ shortcuts =
       'i':         'enter_mode_ignore'
       'I':         'quote'
       'gr':        'enter_reader_view'
+      'gB':        'edit_blacklist'
       'gC':        'reload_config_file'
       '?':         'help'
       ':':         'dev'
