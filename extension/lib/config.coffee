@@ -25,14 +25,14 @@ utils = require('./utils')
 
 {OS} = Components.utils.import('resource://gre/modules/osfile.jsm', {})
 
-load = (vimfx, callback = ->) ->
+load = (vimfx, options = null, callback = ->) ->
   configDir = vimfx.options.config_file_directory
 
   unless configDir
     callback(null)
     return
 
-  scope = {vimfx: createConfigAPI(vimfx)}
+  scope = {vimfx: createConfigAPI(vimfx, options)}
 
   # Calling `vimfx.createKeyTrees()` after each `vimfx.set()` that modifies a
   # shortcut is absolutely redundant and may make Firefox start slower. Do it

@@ -50,12 +50,20 @@ XULTextBoxElement = Ci.nsIDOMXULTextBoxElement
 # 'command' is fired automatically after 'click' on xul pages.
 EVENTS_CLICK       = ['mousedown', 'mouseup']
 EVENTS_CLICK_XUL   = ['click']
+EVENTS_CONTEXT     = ['contextmenu']
 EVENTS_HOVER_START = ['mouseover', 'mouseenter', 'mousemove']
 EVENTS_HOVER_END   = ['mouseout',  'mouseleave']
 
 
 
 # Element classification helpers
+
+hasMarkableTextNode = (element) ->
+  return Array.some(element.childNodes, (node) ->
+    # Ignore whitespace-only text nodes, and single-letter ones (which are
+    # common in many syntax highlighters).
+    return node.nodeType == 3 and node.data.trim().length > 1
+  )
 
 isActivatable = (element) ->
   return element.localName in ['a', 'button'] or
@@ -179,6 +187,7 @@ blurActiveBrowserElement = (vim) ->
   #   those! Therefore we tell the frame script to suppress those events.
   {window} = vim
   activeElement = getActiveElement(window)
+  activeElement.closest('tabmodalprompt')?.abortPrompt()
   vim._send('browserRefocus')
   nextTick(window, ->
     activeElement.blur()
@@ -277,15 +286,18 @@ onRemoved = (element, fn) ->
 
   return disconnect
 
-simulateMouseEvents = (element, sequence) ->
+simulateMouseEvents = (element, sequence, browserOffset) ->
   window = element.ownerGlobal
   rect = element.getBoundingClientRect()
+  topOffset = getTopOffset(element)
 
   eventSequence = switch sequence
     when 'click'
       EVENTS_CLICK
     when 'click-xul'
       EVENTS_CLICK_XUL
+    when 'context'
+      EVENTS_CONTEXT
     when 'hover-start'
       EVENTS_HOVER_START
     when 'hover-end'
@@ -294,7 +306,14 @@ simulateMouseEvents = (element, sequence) ->
       sequence
 
   for type in eventSequence
-    buttonNum = if type in EVENTS_CLICK then 1 else 0
+    buttonNum = switch
+      when type in EVENTS_CONTEXT
+        2
+      when type in EVENTS_CLICK
+        1
+      else
+        0
+
     mouseEvent = new window.MouseEvent(type, {
       # Let the event bubble in order to trigger delegated event listeners.
       bubbles: type not in ['mouseenter', 'mouseleave']
@@ -310,13 +329,11 @@ simulateMouseEvents = (element, sequence) ->
       # `client{X,Y}`. `{offset,layer,movement}{X,Y}` are not worth the trouble
       # to set.
       clientX: rect.left
-      clientY: rect.top
-      # To exactly calculate `screen{X,Y}` one has to to check where the web
-      # page content area is inside the browser chrome and go through all parent
-      # frames as well. This is good enough. YAGNI for now.
-      screenX: window.screenX + rect.left
-      screenY: window.screenY + rect.top
+      clientY: rect.top + rect.height / 2
+      screenX: browserOffset.x + topOffset.x
+      screenY: browserOffset.y + topOffset.y + rect.height / 2
     })
+
     if type == 'mousemove'
       # If the below technique is used for this event, the “URL popup” (shown
       # when hovering or focusing links) does not appear.
@@ -379,6 +396,17 @@ createBox = (document, className = '', parent = null, text = null) ->
   parent.appendChild(box) if parent?
   return box
 
+getFirstNonEmptyTextNodeBoxQuads = (element) ->
+  for node in element.childNodes then switch node.nodeType
+    when 3 # TextNode.
+      unless node.data.trim() == ''
+        boxQuads = node.getBoxQuads()
+        return boxQuads if boxQuads?.length > 0
+    when 1 # Element.
+      result = getFirstNonEmptyTextNodeBoxQuads(node)
+      return result if result
+  return null
+
 # In quirks mode (when the page lacks a doctype), such as on Hackernews,
 # `<body>` is considered the root element rather than `<html>`.
 getRootElement = (document) ->
@@ -386,6 +414,20 @@ getRootElement = (document) ->
     return document.body
   else
     return document.documentElement
+
+getText = (element) ->
+  text = element.textContent or element.value or element.placeholder or ''
+  return text.trim().replace(/\s+/, ' ')
+
+getTopOffset = (element) ->
+  window = element.ownerGlobal
+  {left: x, top: y} = element.getBoundingClientRect()
+  while window.frameElement
+    frameRect = window.frameElement.getBoundingClientRect()
+    x += frameRect.left
+    y += frameRect.top
+    window = window.parent
+  return {x, y}
 
 injectTemporaryPopup = (document, contents) ->
   popup = document.createElement('menupopup')
@@ -416,6 +458,49 @@ querySelectorAllDeep = (window, selector) ->
     elements.push(querySelectorAllDeep(frame, selector)...)
   return elements
 
+selectAllSubstringMatches = (element, substring, {caseSensitive = true} = {}) ->
+  window = element.ownerGlobal
+  selection = window.getSelection()
+  {textContent} = element
+
+  format = (string) -> if caseSensitive then string else string.toLowerCase()
+  offsets =
+    getAllNonOverlappingRangeOffsets(format(textContent), format(substring))
+  offsetsLength = offsets.length
+  return if offsetsLength == 0
+
+  textIndex = 0
+  offsetsIndex = 0
+  [currentOffset] = offsets
+  searchIndex = currentOffset.start
+  start = null
+
+  walkTextNodes(element, (textNode) ->
+    {length} = textNode.data
+    return false if length == 0
+
+    while textIndex + length > searchIndex
+      if start
+        range = window.document.createRange()
+        range.setStart(start.textNode, start.offset)
+        range.setEnd(textNode, currentOffset.end - textIndex)
+        selection.addRange(range)
+
+        offsetsIndex += 1
+        return true if offsetsIndex >= offsetsLength
+        currentOffset = offsets[offsetsIndex]
+
+        start = null
+        searchIndex = currentOffset.start
+
+      else
+        start = {textNode, offset: currentOffset.start - textIndex}
+        searchIndex = currentOffset.end - 1
+
+    textIndex += length
+    return false
+  )
+
 setAttributes = (element, attributes) ->
   for attribute, value of attributes
     element.setAttribute(attribute, value)
@@ -427,6 +512,16 @@ setHover = (element, hover) ->
     nsIDomUtils[method](element, ':hover')
     element = element.parentElement
   return
+
+walkTextNodes = (element, fn) ->
+  for node in element.childNodes then switch node.nodeType
+    when 3 # TextNode.
+      stop = fn(node)
+      return true if stop
+    when 1 # Element.
+      stop = walkTextNodes(node, fn)
+      return true if stop
+  return false
 
 
 
@@ -487,6 +582,25 @@ bisect = (min, max, fn) ->
     else
       [null, null]
 
+getAllNonOverlappingRangeOffsets = (string, substring) ->
+  {length} = substring
+  return [] if length == 0
+
+  offsets = []
+  lastOffset = {start: -Infinity, end: -Infinity}
+  index = -1
+
+  loop
+    index = string.indexOf(substring, index + 1)
+    break if index == -1
+    if index > lastOffset.end
+      lastOffset = {start: index, end: index + length}
+      offsets.push(lastOffset)
+    else
+      lastOffset.end = index + length
+
+  return offsets
+
 has = (obj, prop) -> Object::hasOwnProperty.call(obj, prop)
 
 # Check if `search` exists in `string` (case insensitively). Returns `false` if
@@ -512,11 +626,11 @@ nextTick = (window, fn) -> window.setTimeout((-> fn()) , 0)
 
 regexEscape = (s) -> s.replace(/[|\\{}()[\]^$+*?.]/g, '\\$&')
 
-# Remove duplicate characters from string (case insensitive).
-removeDuplicateCharacters = (str) ->
-  return removeDuplicates( str.toLowerCase().split('') ).join('')
+removeDuplicateChars = (string) -> removeDuplicates(string.split('')).join('')
 
 removeDuplicates = (array) -> Array.from(new Set(array))
+
+sum = (numbers) -> numbers.reduce(((sum, number) -> sum + number), 0)
 
 
 
@@ -587,6 +701,7 @@ writeToClipboard = (text) -> nsIClipboardHelper.copyString(text)
 
 
 module.exports = {
+  hasMarkableTextNode
   isActivatable
   isAdjustable
   isContentEditable
@@ -616,26 +731,33 @@ module.exports = {
   clearSelectionDeep
   containsDeep
   createBox
+  getFirstNonEmptyTextNodeBoxQuads
   getRootElement
+  getText
+  getTopOffset
   injectTemporaryPopup
   insertText
   isDetached
   isNonEmptyTextNode
   isPositionFixed
   querySelectorAllDeep
+  selectAllSubstringMatches
   setAttributes
   setHover
+  walkTextNodes
 
   Counter
   EventEmitter
   bisect
+  getAllNonOverlappingRangeOffsets
   has
   includes
   interval
   nextTick
   regexEscape
-  removeDuplicateCharacters
+  removeDuplicateChars
   removeDuplicates
+  sum
 
   expandPath
   formatError

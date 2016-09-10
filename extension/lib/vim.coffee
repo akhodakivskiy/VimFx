@@ -178,6 +178,9 @@ class Vim
     @_parent.emit('hideNotification', {vim: this})
     @_statusPanel.setAttribute('inactive', 'true')
 
+  _modal: (type, args, callback = null) ->
+    @_run('modal', {type, args}, callback)
+
   markPageInteraction: (value = null) -> @_send('markPageInteraction', value)
 
   _focusMarkerElement: (elementIndex, options = {}) ->
@@ -185,7 +188,8 @@ class Vim
     # `<esc>` and then try to focus a link or text input in a web page the focus
     # won’t work unless `@browser` is focused first.
     @browser.focus()
-    @_run('focus_marker_element', {elementIndex, options})
+    browserOffset = @_getBrowserOffset()
+    @_run('focus_marker_element', {elementIndex, browserOffset, options})
 
   _setFocusType: (focusType) ->
     return if focusType == @focusType
@@ -200,5 +204,12 @@ class Vim
       when @mode == 'find' and @focusType != 'findbar'
         @_enterMode('normal')
     @_parent.emit('focusTypeChange', {vim: this})
+
+  _getBrowserOffset: ->
+    browserRect = @browser.getBoundingClientRect()
+    return {
+      x: @window.screenX + browserRect.left
+      y: @window.screenY + browserRect.top
+    }
 
 module.exports = Vim

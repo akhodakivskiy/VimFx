@@ -30,6 +30,7 @@ config = require('./config')
 help = require('./help')
 markableElements = require('./markable-elements')
 MarkerContainer = require('./marker-container')
+parsePrefs = require('./parse-prefs')
 prefs = require('./prefs')
 SelectionManager = require('./selection')
 translate = require('./translate')
@@ -437,7 +438,7 @@ helper_follow = ({name, callback}, {vim, count, callbackOverride = null}) ->
 
   markerContainer = new MarkerContainer({
     window
-    hintChars: vim.options.hint_chars
+    hintChars: vim.options['hints.chars']
     getComplementaryWrappers: (callback) ->
       vim._run(name, {pass: 'complementary'}, ({wrappers, viewport}) ->
         # `markerContainer.container` is `null`ed out when leaving Hints mode.
@@ -467,7 +468,8 @@ helper_follow = ({name, callback}, {vim, count, callbackOverride = null}) ->
   vim._enterMode('hints', {
     markerContainer, count
     callback: chooseCallback
-    sleep: vim.options.hints_sleep
+    matchText: vim.options['hints.match_text']
+    sleep: vim.options['hints.sleep']
   })
 
   injectHints = ({wrappers, viewport, pass}) ->
@@ -497,9 +499,9 @@ helper_follow_clickable = (options, args) ->
     {window} = vim
 
     switch
-      when keyStr.startsWith(vim.options.hints_toggle_in_tab)
+      when keyStr.startsWith(vim.options['hints.toggle_in_tab'])
         inTab = not inTab
-      when keyStr.startsWith(vim.options.hints_toggle_in_background)
+      when keyStr.startsWith(vim.options['hints.toggle_in_background'])
         inTab = true
         inBackground = not inBackground
       else
@@ -533,6 +535,7 @@ helper_follow_clickable = (options, args) ->
     else
       vim._run('click_marker_element', {
         elementIndex, type
+        browserOffset: vim._getBrowserOffset()
         preventTargetBlank: vim.options.prevent_target_blank
       })
 
@@ -550,16 +553,22 @@ commands.follow_in_tab =
 commands.follow_in_focused_tab =
   helper_follow_clickable.bind(null, {inTab: true, inBackground: false})
 
-commands.follow_in_window = (args) ->
+helper_follow_in_window = (options, args) ->
   {vim} = args
 
   callback = (marker) ->
     vim._focusMarkerElement(marker.wrapper.elementIndex)
     {href} = marker.wrapper
-    vim.window.openLinkIn(href, 'window', {}) if href
+    vim.window.openLinkIn(href, 'window', options) if href
     return false
 
   helper_follow({name: 'follow_in_tab', callback}, args)
+
+commands.follow_in_window =
+  helper_follow_in_window.bind(null, {})
+
+commands.follow_in_private_window =
+  helper_follow_in_window.bind(null, {private: true})
 
 commands.follow_multiple = (args) ->
   args.count = Infinity
@@ -589,6 +598,19 @@ commands.follow_focus = (args) ->
     return false
 
   helper_follow({name: 'follow_focus', callback}, args)
+
+commands.open_context_menu = (args) ->
+  {vim} = args
+
+  callback = (marker) ->
+    {type, elementIndex} = marker.wrapper
+    vim._run('click_marker_element', {
+      elementIndex, type
+      browserOffset: vim._getBrowserOffset()
+    })
+    return false
+
+  helper_follow({name: 'follow_context', callback}, args)
 
 commands.click_browser_element = ({vim}) ->
   {window} = vim
@@ -643,14 +665,15 @@ commands.click_browser_element = ({vim}) ->
         # next tick. This might be true for other buttons as well.
         utils.nextTick(window, ->
           utils.focusElement(element)
+          browserOffset = {x: window.screenX, y: window.screenY}
           switch
             when element.localName == 'tab'
               # Only 'mousedown' seems to be able to activate tabs.
-              utils.simulateMouseEvents(element, ['mousedown'])
+              utils.simulateMouseEvents(element, ['mousedown'], browserOffset)
             when element.closest('tab')
               # If `.click()` is used on a tab close button, its tab will be
               # selected first, which might cause the selected tab to change.
-              utils.simulateMouseEvents(element, 'click-xul')
+              utils.simulateMouseEvents(element, 'click-xul', browserOffset)
             else
               # `.click()` seems to trigger more buttons (such as NoScript’s
               # button and Firefox’s “hamburger” menu button) than simulating
@@ -667,9 +690,11 @@ commands.click_browser_element = ({vim}) ->
   if wrappers.length > 0
     viewport = viewportUtils.getWindowViewport(window)
 
+    hintChars =
+      utils.removeDuplicateChars(vim.options['hints.chars'].toLowerCase())
     markerContainer = new MarkerContainer({
       window
-      hintChars: vim.options.hint_chars
+      hintChars
       adjustZoom: false
       getComplementaryWrappers: (callback) ->
         newWrappers = markableElements.find(
@@ -684,7 +709,7 @@ commands.click_browser_element = ({vim}) ->
     )
 
     markerContainer.injectHints(wrappers, viewport, 'single')
-    vim._enterMode('hints', {markerContainer, callback})
+    vim._enterMode('hints', {markerContainer, callback, matchText: false})
 
   else
     vim.notify(translate('notification.follow.none'))
@@ -695,7 +720,8 @@ helper_follow_pattern = (type, {vim}) ->
     pattern_attrs: vim.options.pattern_attrs
     patterns: vim.options["#{type}_patterns"]
   }
-  vim._run('follow_pattern', {type, options})
+  browserOffset = vim._getBrowserOffset()
+  vim._run('follow_pattern', {type, browserOffset, options})
 
 commands.follow_previous = helper_follow_pattern.bind(null, 'prev')
 
@@ -850,13 +876,37 @@ commands.enter_reader_view = ({vim}) ->
 
 commands.reload_config_file = ({vim}) ->
   vim._parent.emit('shutdown')
-  config.load(vim._parent, (status) -> switch status
+  config.load(vim._parent, {allowDeprecated: false}, (status) -> switch status
     when null
       vim.notify(translate('notification.reload_config_file.none'))
     when true
       vim.notify(translate('notification.reload_config_file.success'))
     else
       vim.notify(translate('notification.reload_config_file.failure'))
+  )
+
+commands.edit_blacklist = ({vim}) ->
+  url = vim.browser.currentURI.spec
+  location = new vim.window.URL(url)
+  domain = location.host or location.href
+  newPattern = "*#{domain}*"
+
+  blacklist = prefs.get('blacklist')
+  {parsed} = parsePrefs.parseSpaceDelimitedString(blacklist)
+  filteredList = parsed.filter((pattern) -> pattern != newPattern)
+  newBlacklist = [newPattern, filteredList...].join('  ')
+
+  message = """
+    #{translate('pref.blacklist.title')}: #{translate('pref.blacklist.desc')}
+
+    #{translate('pref.blacklist.extra', newPattern)}
+  """
+  vim._modal('prompt', [message, newBlacklist], (input) ->
+    return if input == null
+    # Just set the blacklist as if the user had typed it in the Add-ons Manager,
+    # and let the regular pref parsing take care of it.
+    prefs.set('blacklist', input)
+    vim._onLocationChange(url)
   )
 
 commands.help = ({vim}) ->

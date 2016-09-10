@@ -23,131 +23,6 @@ These options are available in VimFx’s settings page in the Add-ons Manager
 
 [keyboard shortcuts]: shortcuts.md
 
-### Hint chars
-
-The characters used for the hints in Hints mode, which can be entered using one
-of the many [hint commands].
-
-Quick suggestion: Put more easily reachable keys longer to the left. Put two
-pretty good (but not the best) keys at the end, after the space.
-
-Some hint characters are easier to type than others. Many people think that the
-ones on the home row are the best. VimFx favors keys to the left. That’s why you
-should put better keys longer to the left.
-
-The hint characters always contain a single space. This splits them into two
-groups: _primary_ hint characters (before the space), and _secondary_ hint
-characters (after the space). Read on to find out why.
-
-Some markable elements are quicker to find than others. Therefore, VimFx looks
-for markable elements in two passes for some commands, such as the `f` command.
-(This is why all hints don’t always appear on screen at the same time). If two
-passes are used, hints from the _first_ pass can only begin with _primary_ hint
-characters. In all other cases hints may start with _any_ hint character.
-
-When choosing how many secondary hint characters you want (there are two by
-default), think about this: Usually most markable elements are found in the
-first pass, while fewer are found in the second pass. So it makes sense to have
-more primary hint characters than secondary. It’s a tradeoff. If you think the
-hints from the first pass are too long, you probably need more primary hint
-characters. On the other hand, if you think the hints from the _second_ pass are
-too long, you might need a few extra secondary hint characters, but remember
-that it might be at the expense of longer hints in the first pass.
-
-All of this also help you understand why hints may be slow on some pages:
-
-- One reason could be that most hints come from a second pass, which are slower
-  to compute (and are worse than first pass hints).
-
-  If a site gets an unusual amount of second pass hints, it might be because the
-  site is badly coded accessibility-wise. If so, consider contacting the site
-  and telling them so, which improves their accessibility for everyone!
-
-- Another reason could be that a page has a _huge_ amount of links. If that
-  bothers you regularly, feel free to send a pull request with faster code!
-
-[hint commands]: commands.md#the-hint-commands--hints-mode
-
-### “Previous”/“Next” link patterns
-
-Space separated lists of patterns that match links to the previous/next page.
-Used by the `[` and `]` commands.
-
-There is a standardized way for websites to tell browsers the URLs to the
-previous and next page. VimFx looks for that information in the first place.
-Unfortunately, many websites don’t provide this information. Then VimFx falls
-back on looking for links on the page that seem to go to the previous/next page
-using patterns.
-
-The patterns are matched at the beginning and end of link text (and the
-attributes defined by the advanced setting [`pattern_attrs`]). The patterns do
-not match in the middle of words, so “previous” does not match “previously”.
-The matching is case <strong>in</strong>sensitive.
-
-Actually, the patterns are regular expressions. If you do not know what a
-regular expression is, that’s fine. You can type simple patterns like the
-default ones without problems. If you do know what it is, though, you have the
-possibility to create more advanced patterns if needed.
-
-Some of the default patterns are English words. You might want to add
-alternatives in your own language.
-
-Note: If you need to include a space in your pattern, use `\s`. For example:
-`next\spage`.
-
-[`pattern_attrs`]: #pattern_attrs
-
-### Blacklist
-
-Space separated list of URLs where VimFx should automatically enter Ignore mode.
-Example:
-
-    *example.com*  http://example.org/editor/*
-
-Note that the URLs in the list must match the current URL _entirely_ for it to
-apply. Therefore it is easiest to always use the `*` wildcard (which matches
-zero or more characters).
-
-Set the option to `*` to make VimFx start out in Ignore mode _everywhere._
-
-When you’re done editing the blacklist, go to one of the pages you intend to
-match. If you already have a tab open for that page, reload it. Then look at
-VimFx’s [button] to see if your edits work out.
-
-Note that when Ignore mode is automatically entered because of the blacklist, it
-is also automatically exited (returning to Normal mode) if you go to a
-non-blacklisted page in the same tab. On the other hand, if you entered Ignore
-mode by pressing `i`, you’ll stay in Ignore mode in that tab until you exit it,
-even if you navigate to another page.
-
-You might also want to read about the [Ignore mode `<s-f1>` command][s-f1].
-
-[button]: button.md
-[s-f1]: commands.md#ignore-mode-s-f1
-
-#### Blacklisting specific elements
-
-VimFx automatically enters Ignore mode while Vim-style editors are focused, such
-as the [wasavi] extension and [CodeMirror editors in Vim mode][codemirror-vim].
-
-By default, VimFx lets you press `<escape>` to blur text inputs. Also by
-default, Vim-style editors use `<escape>` to exit from their Insert mode to
-their Normal mode. In other words, there is a keyboard shortcut conflict here.
-
-It makes the most sense to let the Vim-style editor “win.” That’s why VimFx
-(temporarily) enters Ignore mode when focusing such an editor. In Ignore mode,
-there is no `<escape>` shortcut (by default), and thus no conflict. Instead,
-there’s `<s-escape>` to blur the current element and exit Ignore mode.
-`<s-escape>` was chosen because it is very unlikely to cause conflicts. If it
-ever does, there’s the [`<s-f1>`] command to the rescue.
-
-There is currently no way of specifying your own elements to be blacklisted, but
-such a feature could be added if there’s demand for it.
-
-[wasavi]: http://appsweets.net/wasavi/
-[codemirror-vim]: https://codemirror.net/demo/vim.html
-[`<s-f1>`]: commands.md#ignore-mode-s-f1
-
 ### Prevent autofocus
 
 Many sites autofocus their search box, for example. This might be annoying when
@@ -193,11 +68,184 @@ if your layout doesn’t contain the letters A–Z and all shortcuts can be type
 the same physical keys on your keyboard regardless of your current keyboard
 layout.
 
+Note that when filtering hints markers by element text (but not when typing hint
+characters) in [Hints mode], your current layout _is_ used, even if you’ve
+enabled ignoring of it. That’s because otherwise you wouldn’t be able to filter
+by element text in any other language than English.
+
 (If you’d like VimFx to pretend that some other keyboard layout than the
 standard en-US QWERTY is always used, you may do so with the special option
 [`translations`].)
 
+[Hints mode]: commands.md#the-hint-commands--hints-mode
 [`translations`]: #translations
+
+### Blacklist
+
+Space separated list of URL patterns where VimFx should automatically enter
+Ignore mode. Example:
+
+    *example.com*  http://example.org/editor/*
+
+The fastest way to blacklist the page you’re currently on, is to use the `gB`
+command. It opens a modal with a text input filled in with the blacklist, and
+with `*currentdomain.com*` added at the start for you! Edit it if needed, or
+just press `<enter>` straight away to save. Ignore mode is then automatically
+entered (if the URL patterns apply).
+
+Note that the URLs in the list must match the current URL _entirely_ for it to
+apply. Therefore it is easiest to always use the `*` wildcard (which matches
+zero or more characters).
+
+Set the option to `*` to make VimFx start out in Ignore mode _everywhere._
+
+When you’re done editing the blacklist, go to one of the pages you intend to
+match. If you already have a tab open for that page, reload it. Then look at
+VimFx’s [button] to see if your edits work out.
+
+Note that when Ignore mode is automatically entered because of the blacklist, it
+is also automatically exited (returning to Normal mode) if you go to a
+non-blacklisted page in the same tab. On the other hand, if you entered Ignore
+mode by pressing `i`, you’ll stay in Ignore mode in that tab until you exit it,
+even if you navigate to another page.
+
+You might also want to read about the [Ignore mode `<s-f1>` command][s-f1].
+
+[button]: button.md
+[s-f1]: commands.md#ignore-mode-s-f1
+
+#### Blacklisting specific elements
+
+VimFx automatically enters Ignore mode while Vim-style editors are focused, such
+as the [wasavi] extension and [CodeMirror editors in Vim mode][codemirror-vim].
+
+By default, VimFx lets you press `<escape>` to blur text inputs. Also by
+default, Vim-style editors use `<escape>` to exit from their Insert mode to
+their Normal mode. In other words, there is a keyboard shortcut conflict here.
+
+It makes the most sense to let the Vim-style editor “win.” That’s why VimFx
+(temporarily) enters Ignore mode when focusing such an editor. In Ignore mode,
+there is no `<escape>` shortcut (by default), and thus no conflict. Instead,
+there’s `<s-escape>` to blur the current element and exit Ignore mode.
+`<s-escape>` was chosen because it is very unlikely to cause conflicts. If it
+ever does, there’s the [`<s-f1>`] command to the rescue.
+
+There is currently no way of specifying your own elements to be blacklisted, but
+such a feature could be added if there’s demand for it.
+
+[wasavi]: http://appsweets.net/wasavi/
+[codemirror-vim]: https://codemirror.net/demo/vim.html
+[`<s-f1>`]: commands.md#ignore-mode-s-f1
+
+### Hint characters
+
+The characters used for the hints in Hints mode, which can be entered using one
+of the many [hint commands].
+
+Tip: Prefer filtering hints by element text? Use only uppercase hint characters,
+or only numbers.
+
+#### Easy-to-type and performant hints
+
+Quick suggestion: Put more easily reachable keys longer to the left. Put two
+pretty good (but not the best) keys at the end, after the space.
+
+Some hint characters are easier to type than others. Many people think that the
+ones on the home row are the best. VimFx favors keys to the left. That’s why you
+should put better keys longer to the left.
+
+The hint characters always contain a single space. This splits them into two
+groups: _primary_ hint characters (before the space), and _secondary_ hint
+characters (after the space). Read on to find out why.
+
+Some markable elements are quicker to find than others. Therefore, VimFx looks
+for markable elements in two passes for some commands, such as the `f` command.
+(This is why all hints don’t always appear on screen at the same time). If two
+passes are used, hints from the _first_ pass can only begin with _primary_ hint
+characters. In all other cases hints may start with _any_ hint character.
+
+When choosing how many secondary hint characters you want (there are two by
+default), think about this: Usually most markable elements are found in the
+first pass, while fewer are found in the second pass. So it makes sense to have
+more primary hint characters than secondary. It’s a tradeoff. If you think the
+hints from the first pass are too long, you probably need more primary hint
+characters. On the other hand, if you think the hints from the _second_ pass are
+too long, you might need a few extra secondary hint characters, but remember
+that it might be at the expense of longer hints in the first pass.
+
+All of this also help you understand why hints may be slow on some pages:
+
+- One reason could be that most hints come from a second pass, which are slower
+  to compute (and are worse than first pass hints).
+
+  If a site gets an unusual amount of second pass hints, it might be because the
+  site is badly coded accessibility-wise. If so, consider contacting the site
+  and telling them so, which improves their accessibility for everyone!
+
+- Another reason could be that a page has a _huge_ amount of links. If that
+  bothers you regularly, feel free to send a pull request with faster code!
+
+#### Filtering hints by element text
+
+All characters other than the hint characters are used to filter hint markers by
+element text.
+
+The filtering works like in Firefox’s location bar. In short, that means:
+
+- It is case insensitive.
+- Your typed characters are split on spaces. Each part must be present in the
+  element text (in any order, and they may overlap).
+
+By default, “f” is a hint character. If you type an “f”, that character is used
+to match the hints on screen. If you type an “F” (uppercase), though, which is
+_not_ a hint character by default, you will filter the hints based on element
+text, causing some hints markers to disappear, and the rest to be replaced. Only
+the markable elements with text containing an “f” or “F” will now get a hint
+marker. All the “f”s and “F”s are highlighted on the page, to help you keep
+track of what’s going on. Keep typing other non-hint characters to further
+reduce the number of hint markers, and make the hints shorter all the time.
+
+Hint markers are usually displayed in uppercase, because it looks nicer.
+However, if you mix both lowercase and uppercase hint characters, they will be
+displayed as-is, so you can tell them apart. It is recommended to either use
+_only_ lowercase or _only_ uppercase characters, though.
+
+Some people prefer to filter hint markers by element text in the first hand,
+rather than typing hint characters. If so, it is a good idea to choose all
+uppercase hint characters, or only numbers. This way, you can press `f` and then
+simply begin typing the text of the link you wish to follow.
+
+[hint commands]: commands.md#the-hint-commands--hints-mode
+
+### Hint auto-activation
+
+The marker (or markers in the case where several links go to the same place and
+have gotten the same hint) with the best hint are highlighted in a different
+color. You may at any time press `<enter>` to activate those markers.
+
+One workflow is to type non-hint characters until the hint marker of the element
+you want to activate gets highlighted, and then hit `<enter>`. However, if _all_
+hint markers end up highlighted (because the text you’ve typed uniquely
+identifies a single link) the highlighted markers will be activated
+_automatically._
+
+If you dislike that, disable this option. Then, you either have to press
+`<enter>` or a hint character to activate hint markers.
+
+### Auto-activation timeout
+
+If you type quickly, you might find that you will keep typing even after a hint
+marker has been automatically activated (see [Hint auto-activation]). You might
+simply not react that quickly. This might cause you to accidentally trigger
+VimFx commands. Therefore, VimFx ignores all your keypresses for a certain
+number of milliseconds when having automatically activated a hint marker after
+filtering by element text. This option controls exactly how many milliseconds
+that is.
+
+If you can’t find a timeout that works for you, you might want to disable [Hint
+auto-activation] instead.
+
+[Hint auto-activation]: #hint-auto-activation
 
 ### Timeout
 
@@ -208,6 +256,35 @@ It’s easy to press, say, `a` by mistake while browsing. Without a timeout, you
 might be surprised that all search results are highlighted when you a bit later
 try to search using the `/` command. (That’s what `a/` does.) _With_ a timeout,
 the `a` would be cancelled when the timeout has passed.
+
+### “Previous”/“Next” link patterns
+
+Space separated lists of patterns that match links to the previous/next page.
+Used by the `[` and `]` commands.
+
+There is a standardized way for websites to tell browsers the URLs to the
+previous and next page. VimFx looks for that information in the first place.
+Unfortunately, many websites don’t provide this information. Then VimFx falls
+back on looking for links on the page that seem to go to the previous/next page
+using patterns.
+
+The patterns are matched at the beginning and end of link text (and the
+attributes defined by the advanced setting [`pattern_attrs`]). The patterns do
+not match in the middle of words, so “previous” does not match “previously”.
+The matching is case <strong>in</strong>sensitive.
+
+Actually, the patterns are regular expressions. If you do not know what a
+regular expression is, that’s fine. You can type simple patterns like the
+default ones without problems. If you do know what it is, though, you have the
+possibility to create more advanced patterns if needed.
+
+Some of the default patterns are English words. You might want to add
+alternatives in your own language.
+
+Note: If you need to include a space in your pattern, use `\s`. For example:
+`next\spage`.
+
+[`pattern_attrs`]: #pattern_attrs
 
 
 ## Advanced options
@@ -237,7 +314,8 @@ You can also choose to show notifications any way you want by listening for the
 
 If enabled, a [notification] is shown with the keys you have entered so far of
 a command. This is only noticeable if you type a multi-key shortcut or use a
-count.
+count, or if you filter hint markers by element text (then, the text you’ve
+typed will be shown).
 
 [notification]: notifications.md
 
@@ -325,24 +403,6 @@ shortcut instead of typing into the text input, which can be quite annoying. To
 avoid the problem, VimFx waits a bit before checking if you have left the text
 input.
 
-### `hints_timeout`
-
-The number of milliseconds a matched hint marker should stay on screen before
-disappearing (or resetting).
-
-### `hints_sleep`
-
-In Hints mode, VimFx continually checks if the element for a hint marker has
-moved. If so, the marker is moved as well. This pref controls how many
-milliseconds VimFx should “sleep” between each check. The shorter, the more CPU
-usage, the longer, the more stuttery marker movement.
-
-The default value should work fine, but if you have a low-performing computer
-and you notice bothering CPU usage during Hints mode you might want to raise the
-sleep time.
-
-Set it to -1 to disable the marker movement feature entirely.
-
 ### Scrolling prefs
 
 Apart from its own prefs, VimFx also respects a few built-in Firefox prefs.
@@ -427,7 +487,33 @@ should be matched against.
 
 [“Previous”/“Next” link patterns]: #previousnext-link-patterns
 
-### `hints_peek_through`
+### `hints.matched_timeout`
+
+The number of milliseconds a matched hint marker should stay on screen before
+disappearing (or resetting).
+
+### `hints.sleep`
+
+In Hints mode, VimFx continually checks if the element for a hint marker has
+moved. If so, the marker is moved as well. This pref controls how many
+milliseconds VimFx should “sleep” between each check. The shorter, the more CPU
+usage, the longer, the more stuttery marker movement.
+
+The default value should work fine, but if you have a low-performing computer
+and you notice bothering CPU usage during Hints mode you might want to raise the
+sleep time.
+
+Set it to -1 to disable the marker movement feature entirely.
+
+### `hints.match_text`
+
+If you strongly dislike that typing non-[Hint characters] filters hint markers
+by element text, disable this pref. (That’ll make things work like it did in
+VimFx 0.18.x and older.)
+
+[Hint characters]: #hint-characters
+
+### `hints.peek_through`
 
 This pref doesn’t do much. If you’ve used custom [styling] to change which
 modifier lets you peek through markers in [Hints mode], you might want to change
@@ -437,13 +523,13 @@ you to press shift for this task.
 [styling]: styling.md
 [Hints mode]: commands.md#the-hint-commands--hints-mode
 
-### `hints_toggle_in_tab`
+### `hints.toggle_in_tab`
 
 If the keypress that matched a hint starts with this string, toggle whether to
 open the matched link in the current tab or a new tab. See the [hint commands]
 for more information.
 
-### `hints_toggle_in_background`
+### `hints.toggle_in_background`
 
 If the keypress that matched a hint starts with this string, open the matched
 link in a new tab and toggle whether to open that tab in the background or

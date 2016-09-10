@@ -80,6 +80,7 @@ toolbarpaletteitem[place="palette"] > #VimFxButton {
 #VimFxMarkersContainer {
   position: absolute;
   pointer-events: none;
+  font: menu;
 }
 
   #VimFxMarkersContainer.ui {
@@ -101,14 +102,17 @@ toolbarpaletteitem[place="palette"] > #VimFxButton {
   border: solid var(--border-width) var(--border-color);
   background-color: #ffd76e;
   color: #302505;
-  font: menu;
+  font-size: 0.8em;
   line-height: 1;
   font-weight: bold;
-  text-transform: uppercase;
   white-space: nowrap;
   /* Some light-weight themes set a `text-shadow` that the hint markers inherit,
    * making them almost unreadable. */
   text-shadow: none;
+}
+
+#VimFxMarkersContainer:not(.has-mixedcase) .marker {
+  text-transform: uppercase;
 }
 
 #VimFxMarkersContainer .marker-char {} /* Keep as documentation. */
@@ -118,12 +122,17 @@ toolbarpaletteitem[place="palette"] > #VimFxButton {
   color: #ffa22a;
 }
 
+#VimFxMarkersContainer .marker--highlighted {
+  filter: hue-rotate(180deg) brightness(85%);
+}
+
 #VimFxMarkersContainer .marker--hidden {
   display: none;
 }
 
-/* alt, ctrl and meta can also be targeted. */
-#main-window[vimfx-held-modifiers~="shift"] #VimFxMarkersContainer {
+/* alt, ctrl, meta and shift can be targeted. */
+#main-window[vimfx-held-modifiers~="ctrl"][vimfx-held-modifiers~="shift"]
+    #VimFxMarkersContainer {
   opacity: 0.2;
 }
 

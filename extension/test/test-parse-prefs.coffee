@@ -48,7 +48,7 @@ testPrefParsed = (pref, fn) ->
       fn2($vimfx.options[pref])
     fn(assert, test)
 
-exports['test hint_chars'] = testPref('hint_chars', (test) ->
+exports['test hints.chars'] = testPref('hints.chars', (test) ->
   # Invalid values.
   test('', /^([a-z]) (?!\1)[a-z]$/)
   test(' ', /^([a-z]) (?!\1)[a-z]$/)
@@ -71,7 +71,7 @@ exports['test hint_chars'] = testPref('hint_chars', (test) ->
   test('ab  cde\tf  ', 'abcde f')
 
   # Remove duplicates.
-  test('aba  fcAde\tf!.!e  ', 'abfcde !.')
+  test('aba  fcAde\tf!.!e  ', 'abfcAde !.')
 )
 
 spaceDelimitedStringPrefs = [

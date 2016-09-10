@@ -18,7 +18,8 @@ installed.
 
 By adding `*currentdomain.com*` to the [blacklist] option you can make VimFx
 start out in Ignore mode on currentdomain.com. (Set the option to `*` to make
-VimFx start out in Ignore mode _everywhere._)
+VimFx start out in Ignore mode _everywhere._) The quickest way to edit the
+blacklist is to use the `gB` command.
 
 Finally, there’s nothing stopping you from hitting the “Disable” button in the
 Add-ons Manager if you want to disable VimFx completely (just like you can with
@@ -83,6 +84,14 @@ which is specialized at searching your keyboard shortcuts.
 No, but clicking on any command in it opens VimFx’s settings page in the Add-ons
 Manager and automatically selects the text input for that command. Tip: Use the
 `eb` command to click without using the mouse.
+
+## Can I make Hints mode work with element text?
+
+… like the modes Vimium, Vimperator and Pentadactyl provide?
+
+Yes! Have a look at [Filtering hints by element text] for more information.
+
+[Filtering hints by element text]: options.md#filtering-hints-by-element-text
 
 ## Will VimFx provide advanced Find features?
 

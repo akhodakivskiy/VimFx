@@ -31,7 +31,7 @@ messageManager = require('./message-manager')
 migrations = require('./migrations')
 modes = require('./modes')
 options = require('./options')
-parsePref = require('./parse-prefs')
+{parsePref} = require('./parse-prefs')
 prefs = require('./prefs')
 UIEventManager = require('./events')
 utils = require('./utils')
@@ -138,10 +138,12 @@ module.exports = (data, reason) ->
   messageManager.load("#{ADDON_PATH}/content/bootstrap-frame-#{BUILD_TIME}.js")
 
   # @if TESTS
-  test(vimfx)
-  runFrameTests = true
+  runTests = true
   messageManager.listen('runTests', (data, callback) ->
-    callback(runFrameTests)
-    runFrameTests = false
+    # Running the regular tests inside this callback means that there will be a
+    # `window` available for tests, if they need one.
+    test(vimfx) if runTests
+    callback(runTests)
+    runTests = false
   )
   # @endif

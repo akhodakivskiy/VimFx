@@ -12,8 +12,8 @@
     "addons-linter": "npm run gulp -- xpi && addons-linter -o text build/VimFx.xpi"
   },
   "dependencies": {
-    "n-ary-huffman": "^2.1.1",
-    "vim-like-key-notation": "^1.0.0"
+    "n-ary-huffman": "^3.0.0",
+    "vim-like-key-notation": "^1.0.1"
   },
   "devDependencies": {
     "addons-linter": "^0.15.1",

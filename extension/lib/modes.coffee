@@ -1,7 +1,5 @@
 ###
-# Copyright Anton Khodakivskiy 2013, 2014.
-# Copyright Simon Lydell 2013, 2014, 2015, 2016.
-# Copyright Wang Zhuochun 2014.
+# Copyright Simon Lydell 2014, 2015, 2016.
 #
 # This file is part of VimFx.
 #
@@ -25,6 +23,7 @@
 {commands, findStorage} = require('./commands')
 defaults = require('./defaults')
 help = require('./help')
+hintsMode = require('./hints-mode')
 prefs = require('./prefs')
 SelectionManager = require('./selection')
 translate = require('./translate')
@@ -193,10 +192,19 @@ mode('caret', {
 
 mode('hints', {
   onEnter: ({vim, storage}, options) ->
-    {markerContainer, callback, count = 1, sleep = -1} = options
+    {
+      markerContainer, callback, matchText = true, count = 1, sleep = -1
+    } = options
     storage.markerContainer = markerContainer
     storage.callback = callback
+    storage.matchText = matchText
     storage.count = count
+    storage.skipOnLeaveCleanup = false
+
+    if matchText
+      markerContainer.visualFeedbackUpdater =
+        hintsMode.updateVisualFeedback.bind(null, vim)
+      vim._run('clear_selection')
 
     if sleep >= 0
       storage.clearInterval = utils.interval(vim.window, sleep, (next) ->
@@ -211,50 +219,32 @@ mode('hints', {
       )
 
   onLeave: ({vim, storage}) ->
-    storage.markerContainer?.remove()
-    storage.clearInterval?()
-    for key of storage
-      storage[key] = null
-    return
+    hintsMode.cleanup(vim, storage) unless storage.skipOnLeaveCleanup
 
   onInput: (args, match) ->
     {vim, storage} = args
-    {markerContainer, callback} = storage
+    {markerContainer, callback, matchText} = storage
+    changed = false
+    visibleMarkers = null
 
     if match.type == 'full'
-      match.command.run(args)
+      match.command.run(Object.assign({match}, args))
 
-    else if match.unmodifiedKey in vim.options.hint_chars
-      matchedMarkers = markerContainer.matchHintChar(match.unmodifiedKey)
+    else
+      {char, isHintChar} = hintsMode.getChar(match, storage)
+      return true unless char
 
-      if matchedMarkers.length > 0
-        # Prevent `onLeave` from removing the markers immediately. (The callback
-        # might enter another mode.)
-        storage.markerContainer = null
+      visibleMarkers = markerContainer.addChar(char, isHintChar)
 
-        again = callback(matchedMarkers[0], storage.count, match.keyStr)
-        storage.count -= 1
+      if (vim.options['hints.auto_activate'] or isHintChar) and
+         new Set(visibleMarkers.map((marker) -> marker.hint)).size == 1
+        hintsMode.activateMatch(
+          vim, storage, match, visibleMarkers, callback
+        )
 
-        if again
-          # Add the container back again.
-          storage.markerContainer = markerContainer
-
-          vim.window.setTimeout((->
-            marker.markMatched(false) for marker in matchedMarkers
-            return
-          ), vim.options.hints_timeout)
-          markerContainer.reset()
-
-        else
-          vim.window.setTimeout((->
-            # Don’t remove the marker container if we have re-entered Hints mode
-            # before the timeout has passed.
-            markerContainer.remove() unless vim.mode == 'hints'
-          ), vim.options.hints_timeout)
-
-          # The callback might have entered another mode. Only go back to Normal
-          # mode if we’re still in Hints mode.
-          vim._enterMode('normal') if vim.mode == 'hints'
+        unless isHintChar
+          vim._parent.ignoreKeyEventsUntilTime =
+            Date.now() + vim.options['hints.timeout']
 
     return true
 
@@ -262,14 +252,25 @@ mode('hints', {
   exit: ({vim}) ->
     vim._enterMode('normal')
 
+  activate_highlighted: ({vim, storage, match}) ->
+    {markerContainer: {markers, highlightedMarkers}, callback} = storage
+    return if highlightedMarkers.length == 0
+
+    for marker in markers when marker.visible
+      marker.hide() unless marker in highlightedMarkers
+
+    hintsMode.activateMatch(
+      vim, storage, match, highlightedMarkers, callback
+    )
+
   rotate_markers_forward: ({storage}) ->
     storage.markerContainer.rotateOverlapping(true)
 
   rotate_markers_backward: ({storage}) ->
     storage.markerContainer.rotateOverlapping(false)
 
-  delete_hint_char: ({storage}) ->
-    storage.markerContainer.deleteHintChar()
+  delete_char: ({storage}) ->
+    storage.markerContainer.deleteChar()
 
   increase_count: ({storage}) ->
     storage.count += 1

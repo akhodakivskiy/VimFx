@@ -118,16 +118,20 @@ getRects = (element, viewport) ->
 #   frame, as well as the rectangle that the coordinates occur in. It is `null`
 #   if the element is outside `viewport` or entirely covered by other elements.
 # - `area`: The area of the part of the element that is inside the viewport.
+# - `width`: The width of the visible rect at `nonCoveredPoint`.
+# - `textOffset`: The distance between the left edge of the element and the left
+#   edge of its text.
 getElementShape = (elementData, tryRight, rects = null) ->
   {viewport, element} = elementData
-  result = {nonCoveredPoint: null, area: 0}
+  result = {nonCoveredPoint: null, area: 0, width: 0, textOffset: null}
 
   rects ?= getRects(element, viewport)
   totalArea = 0
   visibleRects = []
-  for rect in rects
+  for rect, index in rects
     visibleRect = viewportUtils.adjustRectToViewport(rect, viewport)
     continue if visibleRect.area == 0
+    visibleRect.index = index
     totalArea += visibleRect.area
     visibleRects.push(visibleRect)
 
@@ -150,13 +154,37 @@ getElementShape = (elementData, tryRight, rects = null) ->
   result.area = totalArea
 
   # Even if `element` has a visible rect, it might be covered by other elements.
+  nonCoveredPoint = null
+  nonCoveredPointRect = null
   for visibleRect in visibleRects
     nonCoveredPoint = getFirstNonCoveredPoint(
       elementData, visibleRect, tryRight
     )
-    break if nonCoveredPoint
+    if nonCoveredPoint
+      nonCoveredPointRect = visibleRect
+      break
 
+  return result unless nonCoveredPoint
   result.nonCoveredPoint = nonCoveredPoint
+
+  result.width = nonCoveredPointRect.width
+
+  boxQuads = utils.getFirstNonEmptyTextNodeBoxQuads(element)
+  if boxQuads?.length > 0
+    # Care is taken below to ignore negative offsets, such as when text is
+    # hidden using `text-indent: -9999px`.
+    offset = null
+    if rects.length == 1
+      lefts = boxQuads
+        .map(({bounds}) -> bounds.left)
+        .filter((left) -> left >= nonCoveredPointRect.left)
+      offset = if lefts.length == 0 then null else Math.min(lefts...)
+    else
+      {bounds: {left}} =
+        boxQuads[Math.min(nonCoveredPointRect.index, boxQuads.length - 1)]
+      offset = Math.max(nonCoveredPointRect.left, left)
+    result.textOffset = offset - nonCoveredPointRect.left if offset?
+
   return result
 
 getFirstNonCoveredPoint = (elementData, elementRect, tryRight) ->

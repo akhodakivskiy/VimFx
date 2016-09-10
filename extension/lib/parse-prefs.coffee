@@ -51,7 +51,7 @@ parseSpaceDelimitedString = (value) ->
 parseHintChars = (value, defaultValue) ->
   [leading..., end] = value.trim().split(/\s+/)
   parsed = if leading.length > 0 then "#{leading.join('')} #{end}" else end
-  parsed = utils.removeDuplicateCharacters(parsed)
+  parsed = utils.removeDuplicateChars(parsed)
 
   # Make sure that hint chars contain at least the required amount of chars.
   diff = MIN_NUM_HINT_CHARS - parsed.length
@@ -95,7 +95,7 @@ parseBlacklist = (value) ->
   return result
 
 parsers = {
-  hint_chars: parseHintChars
+  'hints.chars': parseHintChars
 
   prev_patterns: parsePatterns
   next_patterns: parsePatterns
@@ -110,4 +110,7 @@ parsers = {
   pattern_attrs: parseSpaceDelimitedString
 }
 
-module.exports = parsePref
+module.exports = {
+  parsePref
+  parseSpaceDelimitedString
+}

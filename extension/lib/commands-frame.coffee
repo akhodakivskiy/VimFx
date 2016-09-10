@@ -52,6 +52,13 @@ FOLLOW_DEFAULT_SELECTORS = createComplementarySelectors([
   '[role]', '[contenteditable]'
 ])
 
+FOLLOW_CONTEXT_TAGS = [
+  'a', 'button', 'input', 'textarea', 'select'
+  'img', 'audio', 'video', 'canvas', 'embed', 'object'
+]
+
+FOLLOW_CONTEXT_SELECTORS = createComplementarySelectors(FOLLOW_CONTEXT_TAGS)
+
 FOLLOW_SELECTABLE_SELECTORS =
   createComplementarySelectors(['div', 'span']).reverse()
 
@@ -161,9 +168,16 @@ helper_follow = (options, matcher, {vim, pass}) ->
 
     return unless shape.nonCoveredPoint
 
+    text = utils.getText(element)
+
     originalRect = element.getBoundingClientRect()
     length = vim.state.markerElements.push({element, originalRect})
-    wrapper = {type, shape, elementIndex: length - 1}
+    wrapper = {
+      type, text, shape,
+      combinedArea: shape.area
+      elementIndex: length - 1
+      parentIndex: null
+    }
 
     if wrapper.type == 'link'
       {href} = element
@@ -182,10 +196,9 @@ helper_follow = (options, matcher, {vim, pass}) ->
         if href of hrefs
           parent = hrefs[href]
           wrapper.parentIndex = parent.elementIndex
-          parent.shape.area += wrapper.shape.area
+          parent.combinedArea += wrapper.shape.area
           parent.numChildren += 1
         else
-          wrapper.numChildren = 0
           hrefs[href] = wrapper
 
     return wrapper
@@ -327,31 +340,39 @@ commands.follow_focus = helper_follow.bind(
     return type
 )
 
+commands.follow_context = helper_follow.bind(
+  null, {id: 'context', selectors: FOLLOW_CONTEXT_SELECTORS},
+  ({element}) ->
+    type =
+      if element.localName in FOLLOW_CONTEXT_TAGS or
+         utils.hasMarkableTextNode(element)
+        'context'
+      else
+        null
+    return type
+)
+
 commands.follow_selectable = helper_follow.bind(
   null, {id: 'selectable', selectors: FOLLOW_SELECTABLE_SELECTORS},
   ({element}) ->
-    isRelevantTextNode = (node) ->
-      # Ignore whitespace-only text nodes, and single-letter ones (which are
-      # common in many syntax highlighters).
-      return node.nodeType == 3 and node.data.trim().length > 1
     type =
-      if Array.some(element.childNodes, isRelevantTextNode)
+      if utils.hasMarkableTextNode(element)
         'selectable'
       else
         null
     return type
 )
 
-commands.focus_marker_element = ({vim, elementIndex, options}) ->
+commands.focus_marker_element = ({vim, elementIndex, browserOffset, options}) ->
   {element} = vim.state.markerElements[elementIndex]
   # To be able to focus scrollable elements, `FLAG_BYKEY` _has_ to be used.
   options.flag = 'FLAG_BYKEY' if vim.state.scrollableElements.has(element)
   utils.focusElement(element, options)
   vim.clearHover()
-  vim.setHover(element)
+  vim.setHover(element, browserOffset)
 
 commands.click_marker_element = (
-  {vim, elementIndex, type, preventTargetBlank}
+  {vim, elementIndex, type, browserOffset, preventTargetBlank}
 ) ->
   {element} = vim.state.markerElements[elementIndex]
   if element.target == '_blank' and preventTargetBlank
@@ -361,12 +382,14 @@ commands.click_marker_element = (
     element.click()
   else
     isXUL = (element.ownerDocument instanceof XULDocument)
-    sequence =
-      if isXUL
+    sequence = switch
+      when isXUL
         if element.localName == 'tab' then ['mousedown'] else 'click-xul'
+      when type == 'context'
+        'context'
       else
         'click'
-    utils.simulateMouseEvents(element, sequence)
+    utils.simulateMouseEvents(element, sequence, browserOffset)
     utils.openDropdown(element)
   element.target = targetReset if targetReset
 
@@ -417,7 +440,7 @@ commands.element_text_select = ({vim, elementIndex, full, scroll = false}) ->
   window.focus()
   selection.addRange(range)
 
-commands.follow_pattern = ({vim, type, options}) ->
+commands.follow_pattern = ({vim, type, browserOffset, options}) ->
   {document} = vim.content
 
   # If there’s a `<link rel=prev/next>` element we use that.
@@ -458,7 +481,7 @@ commands.follow_pattern = ({vim, type, options}) ->
     return null
 
   if matchingLink
-    utils.simulateMouseEvents(matchingLink, 'click')
+    utils.simulateMouseEvents(matchingLink, 'click', browserOffset)
     # When you go to the next page of GitHub’s code search results, the page is
     # loaded with AJAX. GitHub then annoyingly focuses its search input. This
     # autofocus cannot be prevented in a reliable way, because the case is
@@ -620,5 +643,8 @@ commands.collapse_selection = ({vim}) ->
 
 commands.clear_selection = ({vim}) ->
   utils.clearSelectionDeep(vim.content)
+
+commands.modal = ({vim, type, args}) ->
+  return vim.content[type](args...)
 
 module.exports = commands

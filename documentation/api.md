@@ -31,8 +31,8 @@ and `vimfx.set(...)`—in fact, this is the _only_ way of accessing those option
 Gets the value of the VimFx pref `pref`.
 
 ```js
-// Get the value of the Hint chars option:
-vimfx.get('hint_chars')
+// Get the value of the Hint characters option:
+vimfx.get('hints.chars')
 // Get all keyboard shortcuts (as a string) for the `f` command:
 vimfx.get('mode.normal.follow')
 ```
@@ -48,8 +48,8 @@ Useful when you wish to extend a default, rather than replacing it. See below.
 Sets the value of the VimFx pref `pref` to `value`.
 
 ```js
-// Set the value of the Hint chars option:
-vimfx.set('hint_chars', 'abcdefghijklmnopqrstuvwxyz')
+// Set the value of the Hint characters option:
+vimfx.set('hints.chars', 'abcdefghijklmnopqrstuvwxyz')
 // Add yet a keyboard shortcut for the `f` command:
 vimfx.set('mode.normal.follow', vimfx.getDefault('mode.normal.follow') + '  ee')
 ```
@@ -528,25 +528,24 @@ and `false` if you wish to exit Hints mode. If your command ignores counts,
 simply always return `false`. Otherwise you most likely want to return
 `timesLeft > 1`.
 
-Here’s an example which adds a command for opening a link in a new private
-window using hint markers. It also highlights those links with a red background.
+Here’s an example which adds a silly command for marking links with
+color—`http://` links with red and all other links with green.
 
 ```js
 // config.js
 let {commands} = vimfx.modes.normal
 
 vimfx.addCommand({
-  name: 'follow_in_private_window',
+  name: 'mark_link',
   category: 'browsing',
-  order: commands.follow_in_window.order + 1,
-  description: 'Follow link in a new private window',
+  description: 'Mark link with red or green',
 }, (args) => {
   let {vim} = args
-  commands.follow_in_window.run(Object.assign({}, args, {
+  commands.follow_in_tab.run(Object.assign({}, args, {
     callbackOverride({type, href, id, timesLeft}) {
       if (href) {
-        vim.window.openLinkIn(href, 'window', {private: true})
-        vimfx.send(vim, 'highlight_marker_element', {id})
+        let color = href.startsWith('http://') ? 'red' : 'green'
+        vimfx.send(vim, 'highlight_marker_element', {id, color})
       }
       return false
     },
@@ -556,10 +555,10 @@ vimfx.addCommand({
 
 ```js
 // frame.js
-vimfx.listen('highlight_marker_element', ({id}) => {
+vimfx.listen('highlight_marker_element', ({id, color}) => {
   let element = vimfx.getMarkerElement(id)
   if (element) {
-    element.style.backgroundColor = 'red'
+    element.style.backgroundColor = color
   }
 })
 ```
@@ -705,6 +704,10 @@ A `match` object has the following properties:
 
 - unmodifiedKey: `String`. `keyStr` without modifiers.
 
+- rawKey: `String`. Unchanged [`event.key`].
+
+- rawCode: `String`. Unchanged [`event.code`].
+
 - toplevel: `Boolean`. Whether or not the match was a toplevel match in the
   shortcut key tree. This is `true` unless the match is part of the tail of a
   multi-key shortcut.
@@ -831,9 +834,10 @@ The arguments passed to the `hintMatcher` function are:
 - id: `String`. A string identifying which command is used:
 
   - `'normal'`: `f` or `af`.
-  - `'tab'`: `F`, `et` or `ew`.
+  - `'tab'`: `F`, `et`, `ew` or `ep`.
   - `'copy'`: `yf`.
   - `'focus'`: `ef`.
+  - `'context'`: `ec`.
   - `'select'`: `v`, `av` or `yv`.
 
 - element: `Element`. One out of all elements currently inside the viewport.
@@ -872,6 +876,10 @@ The available type strings depend on `id`:
 
   - focusable: Any focusable element not falling into another category.
   - scrollable: Like “scrollable” when `id` is “normal” (see above).
+
+- context:
+
+  - context: An element that can have a context menu opened.
 
 - select:
 
@@ -936,6 +944,8 @@ backwards compatibility will be a priority and won’t be broken until VimFx
 [commands.coffee]: ../extension/lib/commands.coffee
 [vim.coffee]: ../extension/lib/vim.coffee
 
+[`event.key`]: https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key
+[`event.code`]: https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/code
 [`Window`]: https://developer.mozilla.org/en-US/docs/Web/API/Window
 [`Browser`]: https://developer.mozilla.org/en-US/docs/Mozilla/Tech/XUL/browser
 [`window.location`]: https://developer.mozilla.org/en-US/docs/Web/API/Location

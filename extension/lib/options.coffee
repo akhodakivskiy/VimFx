@@ -21,6 +21,7 @@
 
 defaults = require('./defaults')
 prefs = require('./prefs')
+prefsBulk = require('./prefs-bulk')
 translate = require('./translate')
 utils = require('./utils')
 
@@ -87,7 +88,7 @@ class Observer extends BaseObserver
     super({id: @vimfx.id})
 
   injectSettings: ->
-    @injectInstructions()
+    @injectHeader()
     @injectOptions()
     @injectShortcuts()
     @setupKeybindings()
@@ -102,7 +103,7 @@ class Observer extends BaseObserver
         @vimfx.goToCommand = null
       )
 
-  injectInstructions: ->
+  injectHeader: ->
     setting = @appendSetting({
       type: 'control'
       title: translate('prefs.instructions.title')
@@ -115,6 +116,7 @@ class Observer extends BaseObserver
       )
       'first-row': 'true'
     })
+
     href = "#{@vimfx.info.homepageURL}/tree/master/documentation"
     docsLink = @document.createElement('label')
     utils.setAttributes(docsLink, {
@@ -123,7 +125,16 @@ class Observer extends BaseObserver
       crop: 'end'
       class: 'text-link'
     })
+    docsLink.style.MozBoxFlex = '1'
     setting.appendChild(docsLink)
+
+    for key, fn of BUTTONS
+      button = @document.createElement('button')
+      button.setAttribute('label', translate("prefs.#{key}.label"))
+      button.onclick = runWithVim.bind(null, @vimfx, fn)
+      setting.appendChild(button)
+
+    return
 
   injectOptions: ->
     for key, value of defaults.options
@@ -235,6 +246,41 @@ class Observer extends BaseObserver
     for setting in @container.getElementsByClassName('is-shortcut')
       setting.setAttribute('desc', @generateErrorMessage(setting.pref))
     return
+
+resetAllPrefs = (vim) ->
+  vim._modal('confirm', [translate('prefs.reset.enter')], (ok) ->
+    return unless ok
+    prefsBulk.resetAll()
+    vim.notify(translate('prefs.reset.success'))
+  )
+
+exportAllPrefs = (vim) ->
+  exported = prefsBulk.exportAll()
+  if Object.keys(exported).length == 0
+    vim.notify(translate('prefs.export.none'))
+  else
+    utils.writeToClipboard(JSON.stringify(exported, null, 2))
+    vim.notify(translate('prefs.export.success'))
+
+importExportedPrefs = (vim) ->
+  vim._modal('prompt', [translate('prefs.import.enter')], (input) ->
+    return if input == null or input.trim() == ''
+    result = prefsBulk.importExported(input.trim())
+    if result.errors.length == 0
+      vim.notify(translate('prefs.import.success'))
+    else
+      vim._modal('alert', [prefsBulk.createImportErrorReport(result)])
+  )
+
+runWithVim = (vimfx, fn) ->
+  return unless vim = vimfx.getCurrentVim(utils.getCurrentWindow())
+  fn(vim)
+
+BUTTONS = {
+  export: exportAllPrefs
+  import: importExportedPrefs
+  reset: resetAllPrefs
+}
 
 module.exports = {
   observe
