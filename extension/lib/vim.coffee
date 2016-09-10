@@ -99,6 +99,7 @@ class Vim
     @_state = {
       frameCanReceiveEvents: false
       scrollableElements: new ScrollableElements(@window)
+      lastNotification: null
     }
 
   _isBlacklisted: (url) -> @options.blacklist.some((regex) -> regex.test(url))
@@ -169,6 +170,7 @@ class Vim
     messageManager.send(name, data, callback, @_messageManagerOptions(options))
 
   notify: (message) ->
+    @_state.lastNotification = message
     @_parent.emit('notification', {vim: this, message})
     if @options.notifications_enabled
       @_statusPanel.setAttribute('label', message)

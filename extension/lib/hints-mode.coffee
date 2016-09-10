@@ -57,7 +57,9 @@ cleanup = (vim, storage) ->
   {markerContainer, matchText} = storage
   markerContainer?.remove()
   vim._run('clear_selection') if matchText and vim.mode != 'caret'
-  vim.hideNotification() if vim.options.notify_entered_keys
+  if vim.options.notify_entered_keys and
+     markerContainer.enteredText == vim._state.lastNotification
+    vim.hideNotification()
   storage.clearInterval?()
   for key of storage
     storage[key] = null
