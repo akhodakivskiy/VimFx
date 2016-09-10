@@ -25,6 +25,8 @@ These options are available in VimFx’s settings page in the Add-ons Manager
 
 ### Prevent autofocus
 
+`prevent_autofocus`
+
 Many sites autofocus their search box, for example. This might be annoying when
 browsing using the keyboard, as you do with VimFx, because it often feels like
 VimFx isn’t responding, until you realize that you are typing in a text box—not
@@ -56,6 +58,8 @@ you), which makes it safe to prevent all focusing in those time spans.
 
 ### Ignore keyboard layout
 
+`ignore_keyboard_layout`
+
 If you use more than one keyboard layout, you probably want to enable this
 option.
 
@@ -81,6 +85,8 @@ standard en-US QWERTY is always used, you may do so with the special option
 [`translations`]: #translations
 
 ### Blacklist
+
+`blacklist`
 
 Space separated list of URL patterns where VimFx should automatically enter
 Ignore mode. Example:
@@ -138,6 +144,8 @@ such a feature could be added if there’s demand for it.
 [`<s-f1>`]: commands.md#ignore-mode-s-f1
 
 ### Hint characters
+
+`hints.chars`
 
 The characters used for the hints in Hints mode, which can be entered using one
 of the many [hint commands].
@@ -219,6 +227,8 @@ simply begin typing the text of the link you wish to follow.
 
 ### Hint auto-activation
 
+`hints.auto_activate`
+
 The marker (or markers in the case where several links go to the same place and
 have gotten the same hint) with the best hint are highlighted in a different
 color. You may at any time press `<enter>` to activate those markers.
@@ -233,6 +243,8 @@ If you dislike that, disable this option. Then, you either have to press
 `<enter>` or a hint character to activate hint markers.
 
 ### Auto-activation timeout
+
+`hints.timeout`
 
 If you type quickly, you might find that you will keep typing even after a hint
 marker has been automatically activated (see [Hint auto-activation]). You might
@@ -249,6 +261,8 @@ auto-activation] instead.
 
 ### Timeout
 
+`timeout`
+
 The maximum amount of time (in milliseconds) that may pass between two
 keypresses of a shortcut.
 
@@ -258,6 +272,8 @@ try to search using the `/` command. (That’s what `a/` does.) _With_ a timeout
 the `a` would be cancelled when the timeout has passed.
 
 ### “Previous”/“Next” link patterns
+
+`prev_patterns`/`next_patterns`
 
 Space separated lists of patterns that match links to the previous/next page.
 Used by the `[` and `]` commands.
