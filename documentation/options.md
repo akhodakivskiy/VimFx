@@ -77,9 +77,14 @@ characters) in [Hints mode], your current layout _is_ used, even if you’ve
 enabled ignoring of it. That’s because otherwise you wouldn’t be able to filter
 by element text in any other language than English.
 
-(If you’d like VimFx to pretend that some other keyboard layout than the
-standard en-US QWERTY is always used, you may do so with the special option
-[`translations`].)
+If you have modified your keyboard layout slightly using software, such as
+having swapped `<capslock>` and `<escape>`, this option will cause VimFx to
+ignore that as well. If that’s unwanted, you need to tell VimFx about your
+layout customizations by using the special option [`translations`].
+
+If you’d like VimFx to pretend that some other keyboard layout than the standard
+en-US QWERTY is always used, that’s also a job for the special option
+[`translations`].
 
 [Hints mode]: commands.md#the-hint-commands--hints-mode
 [`translations`]: #translations
@@ -578,9 +583,69 @@ a [config file].
 
 ### `translations`
 
-See the description of the `translations` option in [vim-like-key-notation].
+This option is only useful if you use the [Ignore keyboard layout] option. As
+mentioned in the documentation for that option, `translations` exist to let you:
 
-[vim-like-key-notation]: https://github.com/lydell/vim-like-key-notation#api
+- Teach VimFx about layout customizations you’ve made, that otherwise get
+  ignored.
+- Make VimFx pretend that some other keyboard layout than the standard en-US
+  QWERTY is always used.
+
+Here’s some example usage:
+
+```js
+vimfx.set('translations', {
+  // Swapped <capslock> and <escape>.
+  'CapsLock': 'Escape',
+  'Escape': 'CapsLock',
+
+  // AZERTY mappings.
+  'KeyQ': ['a', 'A'],
+  'KeyA': ['q', 'Q'],
+  // etc.
+
+  // Bonus: Distinguish between regular numbers and numpad numbers by
+  // translating the numpad numbers into made-up names (regardless of numlock
+  // state). Then, you can use `<k0>` to `<k9>` in shortcuts.
+  'Numpad0': 'K0',
+  'Numpad1': 'K1',
+  'Numpad2': 'K2',
+  'Numpad3': 'K3',
+  'Numpad4': 'K4',
+  'Numpad5': 'K5',
+  'Numpad6': 'K6',
+  'Numpad7': 'K7',
+  'Numpad8': 'K8',
+  'Numpad9': 'K9',
+})
+```
+
+More formally, `translations` is an object where:
+
+- The object keys are [`event.code`] strings that should be translated.
+
+- The object values are either strings or arrays of two strings.
+
+  If an array is provided, the first value of it is used when shift is _not_
+  held, and the other value when shift _is_ held.
+
+  If only one string is provided, that value is always used (regardless of the
+  shift state).
+
+  The strings are what you want VimFx to treat the pressed key as. For example,
+  providing `Escape` will cause the translated key to match VimFx shortcuts
+  containing `<Escape>` (or `<escape>`—the case doesn’t matter).
+
+At this point, you might be wondering why these options to ignore your keyboard
+layout and translate keys have to exist. It’s all about the data that is
+available in Firefox (basically [`event.key`] and [`event.code`]). There is a
+longer technical explanation in [vim-like-key-notation], the library VimFx uses
+for dealing with keyboard stuff.
+
+[Ignore keyboard layout]: #ignore-keyboard-layout
+[`event.code`]: https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/code
+[`event.key`]: https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key
+[vim-like-key-notation]: https://github.com/lydell/vim-like-key-notation#technical-notes
 
 ### `categories`
 
