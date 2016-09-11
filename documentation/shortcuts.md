@@ -18,7 +18,12 @@ command to click without using the mouse.
 Shortcuts tell which keys to press to activate a command. A command may have
 several different shortcuts. Read about [modes] for more information.
 
+This file documents how the shortcuts work in general, not the [default
+shortcuts] or details on what the [_command_][commands] for a shortcut does.
+
 [modes]: modes.md
+[default shortcuts]: https://github.com/akhodakivskiy/VimFx/blob/master/extension/lib/defaults.coffee
+[commands]: commands.md
 
 
 ## Key notation
