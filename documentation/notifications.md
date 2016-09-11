@@ -13,11 +13,15 @@ command if there are no clickable elements in sight) instead show a notification
 in those cases, so that _something_ happens instead of leaving you unsure if you
 pressed the correct keys or not.
 
+Notifications also show you which keys you’ve typed so far of a multi-key
+shortcut or to filter hint markers by element text in Hints mode.
+
 VimFx’s notifications are similar to the “URL popup,” shown when hovering or
 focusing links, but is placed on the opposite side.
 
 Notifications are shown until you click something, press a key or switch tab.
 
-(See also the [`notifications_enabled`] option.)
+(See also the [`notifications_enabled`] and [`notify_entered_keys`] options.)
 
 [`notifications_enabled`]: options.md#notifications_enabled
+[`notify_entered_keys`]: options.md#notify_entered_keys
