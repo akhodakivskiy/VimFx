@@ -150,7 +150,7 @@ position by pressing `'` followed by the same letter, e.g. `'a`.
 
 One mark is special: `'`. Pressing `''` takes you to the scroll position before
 the last `gg`, `G`, `0`, `$`, `/`, `n`, `N` or `'`. (You can change this mark
-using the [`scroll.last_position_mark`] pref.)
+using the [`scroll.last_position_mark`] option.)
 
 Note: Firefox has a `'` shortcut by default. It opens the Quick Find bar. VimFx
 provides the `g/` shortcut instead.
@@ -235,7 +235,7 @@ about the [Hint characters] option.
 Hints are added on top of the corresponding element. If they obscure the display
 too much you can hold down ctrl and shift simultaneously to make them
 transparent, letting you peek through them. (See [Styling] and the
-[`hints.peek_through`] pref if you’d like to change that.) The hints can also
+[`hints.peek_through`] option if you’d like to change that.) The hints can also
 sometimes cover each other. Press `<c-space>` and `<s-space>` to switch which
 one should be on top.
 
@@ -284,7 +284,7 @@ with a different color, and can be activated by pressing `<enter>`. Holding alt
 or ctrl works there too: `<c-enter>` toggles same/new tab and `<a-enter>`
 toggles background/foreground tab.
 
-(Also see the advanced prefs [`hints.toggle_in_tab`] and
+(Also see the advanced options [`hints.toggle_in_tab`] and
 [`hints.toggle_in_background`].)
 
 Finally, if the element you wanted to interact with didn’t get a hint marker you

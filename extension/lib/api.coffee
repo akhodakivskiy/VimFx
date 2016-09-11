@@ -37,7 +37,7 @@ createConfigAPI = (vimfx, {allowDeprecated = true} = {}) -> {
       when pref of defaults.all_prefs or pref?.startsWith('custom.')
         prefs.get(pref)
       else
-        throw new Error("VimFx: Unknown pref: #{pref}")
+        throw new Error("VimFx: Unknown option: #{pref}")
 
   getDefault: (inputPref) ->
     pref = alias(inputPref, allowDeprecated)
@@ -45,11 +45,11 @@ createConfigAPI = (vimfx, {allowDeprecated = true} = {}) -> {
       try return prefs.default.get(inputPref)
     return switch
       when pref of defaults.parsed_options or pref?.startsWith('custom.')
-        throw new Error("VimFx: No default for pref: #{pref}")
+        throw new Error("VimFx: No default for option: #{pref}")
       when pref of defaults.all_prefs
         defaults.all_prefs[pref]
       else
-        throw new Error("VimFx: Unknown pref: #{pref}")
+        throw new Error("VimFx: Unknown option: #{pref}")
 
   set: (inputPref, value) ->
     pref = alias(inputPref, allowDeprecated)
@@ -63,7 +63,7 @@ createConfigAPI = (vimfx, {allowDeprecated = true} = {}) -> {
         prefs.set(pref, value)
         onShutdown(vimfx, -> prefs.set(pref, previousValue))
       else
-        throw new Error("VimFx: Unknown pref: #{pref}")
+        throw new Error("VimFx: Unknown option: #{pref}")
 
   addCommand: ({name, description, mode, category, order} = {}, fn) ->
     mode ?= 'normal'

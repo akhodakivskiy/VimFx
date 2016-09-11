@@ -386,23 +386,23 @@ exports['test vimfx.on and vimfx.off'] = (assert, $vimfx) ->
 exports['test vimfx.[gs]et(Default)? errors'] = (assert, $vimfx) ->
   vimfx = createConfigAPI($vimfx)
 
-  throws(assert, /unknown pref/i, 'undefined', ->
+  throws(assert, /unknown option/i, 'undefined', ->
     vimfx.get()
   )
 
-  throws(assert, /unknown pref/i, 'undefined', ->
+  throws(assert, /unknown option/i, 'undefined', ->
     vimfx.getDefault()
   )
 
-  throws(assert, /unknown pref/i, 'undefined', ->
+  throws(assert, /unknown option/i, 'undefined', ->
     vimfx.set()
   )
 
-  throws(assert, /unknown pref/i, 'unknown_pref', ->
+  throws(assert, /unknown option/i, 'unknown_pref', ->
     vimfx.get('unknown_pref')
   )
 
-  throws(assert, /unknown pref/i, 'unknown_pref', ->
+  throws(assert, /unknown option/i, 'unknown_pref', ->
     vimfx.getDefault('unknown_pref')
   )
 
@@ -414,7 +414,7 @@ exports['test vimfx.[gs]et(Default)? errors'] = (assert, $vimfx) ->
     vimfx.getDefault('translations')
   )
 
-  throws(assert, /unknown pref/i, 'unknown_pref', ->
+  throws(assert, /unknown option/i, 'unknown_pref', ->
     vimfx.set('unknown_pref', 'foo')
   )
 

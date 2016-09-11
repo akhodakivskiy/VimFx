@@ -18,6 +18,6 @@ focusing links, but is placed on the opposite side.
 
 Notifications are shown until you click something, press a key or switch tab.
 
-(See also the [`notifications_enabled`] pref.)
+(See also the [`notifications_enabled`] option.)
 
 [`notifications_enabled`]: options.md#notifications_enabled

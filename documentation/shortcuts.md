@@ -6,12 +6,12 @@ See the file README.md for copying conditions.
 
 # Shortcuts
 
-All of VimFx’s keyboard shortcuts can be customized in VimFx’s settings page in
+All of VimFx’s keyboard shortcuts can be customized in VimFx’s options page in
 the Add-ons Manager. Doing so is really easy. You get far just by looking at the
 defaults and trying things out. If not, read on.
 
 In VimFx’s Keyboard Shortcuts help dialog (which can be opened by pressing `?`)
-you can click any command to open VimFx’s settings page in the Add-ons Manager
+you can click any command to open VimFx’s options page in the Add-ons Manager
 and automatically select the text input for that command. Tip: Use the `eb`
 command to click without using the mouse.
 
@@ -26,7 +26,7 @@ several different shortcuts. Read about [modes] for more information.
 VimFx’s key notation is inspired by Vim’s key notation.
 
 Here is an example of what you can type into a text input for a command in
-VimFx’s settings page in the Add-ons Manager:
+VimFx’s options page in the Add-ons Manager:
 
     J  <c-s-tab>  <c-j>  gT  g<left>
 

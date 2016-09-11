@@ -19,16 +19,16 @@ In `config.js`, the following API is available as the variable `vimfx`.
 
 ### `vimfx.get(...)`, `vimfx.getDefault(...)` and `vimfx.set(...)`
 
-Gets or sets the (default) value of a VimFx pref.
+Gets or sets the (default) value of a VimFx option.
 
-You can see all prefs in [defaults.coffee], or by opening [about:config] and
+You can see all options in [defaults.coffee], or by opening [about:config] and
 filtering by `extensions.vimfx`. Note that you can also access the [special
 options], which may not be accessed in [about:config], using `vimfx.get(...)`
 and `vimfx.set(...)`—in fact, this is the _only_ way of accessing those options.
 
-#### `vimfx.get(pref)`
+#### `vimfx.get(option)`
 
-Gets the value of the VimFx pref `pref`.
+Gets the value of the VimFx option `option`.
 
 ```js
 // Get the value of the Hint characters option:
@@ -37,15 +37,15 @@ vimfx.get('hints.chars')
 vimfx.get('mode.normal.follow')
 ```
 
-#### `vimfx.getDefault(pref)`
+#### `vimfx.getDefault(option)`
 
-Gets the default value of the VimFx pref `pref`.
+Gets the default value of the VimFx option `option`.
 
 Useful when you wish to extend a default, rather than replacing it. See below.
 
-#### `vimfx.set(pref, value)`
+#### `vimfx.set(option, value)`
 
-Sets the value of the VimFx pref `pref` to `value`.
+Sets the value of the VimFx option `option` to `value`.
 
 ```js
 // Set the value of the Hint characters option:
@@ -54,15 +54,15 @@ vimfx.set('hints.chars', 'abcdefghijklmnopqrstuvwxyz')
 vimfx.set('mode.normal.follow', vimfx.getDefault('mode.normal.follow') + '  ee')
 ```
 
-When extending a pref (as in the second example above), be sure to use
+When extending an option (as in the second example above), be sure to use
 `vimfx.getDefault` rather than `vimfx.get`. Otherwise you get a multiplying
-effect. In the above example, after starting Firefox a few times the pref would
-be `f  e  e  e  e`. Also, if you find that example very verbose: Remember that
-you’re using a programming language! Write a small helper function that suits
-your needs.
+effect. In the above example, after starting Firefox a few times the option
+would be `f  e  e  e  e`. Also, if you find that example very verbose: Remember
+that you’re using a programming language! Write a small helper function that
+suits your needs.
 
 Note: If you produce conflicting keyboard shortcuts, the order of your code does
-not matter. The command that comes first in VimFx’s settings page in the Add-ons
+not matter. The command that comes first in VimFx’s options page in the Add-ons
 Manager (and in the Keyboard Shortcuts help dialog) gets the shortcut; the other
 one(s) do(es) not. See the notes about order in [mode object], [category object]
 and [command object] for more information about order.
@@ -70,7 +70,7 @@ and [command object] for more information about order.
 ```js
 // Even though we set the shortcut for focusing the search bar last, the command
 // for focusing the location bar “wins”, because it comes first in VimFx’s
-// settings page in the Add-ons Manager.
+// options page in the Add-ons Manager.
 vimfx.set('mode.normal.focus_location_bar', 'ö')
 vimfx.set('mode.normal.focus_search_bar', 'ö')
 
@@ -88,10 +88,10 @@ Creates a new command.
 
 - name: `String`. The name used when accessing the command via
   `vimfx.modes[options.mode].commands[options.name]`. It is also used for the
-  pref used to store the shortcuts for the command:
+  option name (preference key) used to store the shortcuts for the command:
   `` `custom.mode.${options.mode}.${options.name}` ``.
 - description: `String`. Shown in the Keyboard Shortcuts help dialog and VimFx’s
-  settings page in the Add-ons Manager.
+  options page in the Add-ons Manager.
 - mode: `String`. Defaults to `'normal'`. The mode to add the command to. The
   value has to be one of the keys of [`vimfx.modes`].
 - category: `String`. Defaults to `'misc'` for Normal mode and `''`
@@ -106,7 +106,7 @@ Creates a new command.
 below for more information.
 
 <strong id="custom-command-shortcuts">Note</strong> that you have to give the
-new command a shortcut in VimFx’s settings page in the Add-ons Manager or set
+new command a shortcut in VimFx’s options page in the Add-ons Manager or set
 one using `vimfx.set(...)` to able to use the new command.
 
 ```js
@@ -137,13 +137,13 @@ found it is applied. No more rules will be applied.
 
 #### `vimfx.addOptionOverrides(...rules)`
 
-The rules are matched any time the value of a VimFx pref is needed.
+The rules are matched any time the value of a VimFx option is needed.
 
 The matching function receives a [location object].
 
-The override is an object whose keys are VimFx pref names and whose values
-override the pref in question. The values should be formatted as in an [options
-object].
+The override is an object whose keys are VimFx option names and whose values
+override the option in question. The values should be formatted as in an
+[options object].
 
 ```js
 vimfx.addOptionOverrides(
@@ -320,7 +320,7 @@ The event is useful for knowing when to update UI showing the current mode.
 #### The `focusTypeChange` event
 
 Occurs when focusing or blurring any element. See also the [`blur_timeout`]
-pref.
+option.
 
 `data`:
 
@@ -568,7 +568,7 @@ vimfx.listen('highlight_marker_element', ({id, color}) => {
 A mode is an object with the following properties:
 
 - name: `String`. A human readable name of the mode used in the Keyboard
-  Shortcuts help dialog and VimFx’s settings page in the Add-ons Manager. Config
+  Shortcuts help dialog and VimFx’s options page in the Add-ons Manager. Config
   file users adding custom modes could simply use a hard-coded string; extension
   authors are encouraged to look up the name from a locale file.
 - order: `Number`. The first of the default modes has the order `100` and then
@@ -619,7 +619,7 @@ to the browser and web pages, and `false` otherwise.
 A category is an object with the following properties:
 
 - name: `String`. A human readable name of the category used in the Keyboard
-  Shortcuts help dialog and VimFx’s settings page in the Add-ons Manager. Config
+  Shortcuts help dialog and VimFx’s options page in the Add-ons Manager. Config
   file users adding custom categories could simply a use hard-coded string;
   extension authors are encouraged to look up the name from a locale file.
 - order: `Number`. The first of the default categories is the “uncategorized”
@@ -630,10 +630,11 @@ A category is an object with the following properties:
 
 A command is an object with the following properties:
 
-- pref: `String`. The pref used to store the shortcuts for the command.
+- pref: `String`. The option name (preference key) used to store the shortcuts
+  for the command.
 - run(args): `Function`. Called when the command is activated.
 - description: `String`. A description of the command, shown in the Keyboard
-  Shortcuts help dialog and VimFx’s settings page in the Add-ons Manager. Config
+  Shortcuts help dialog and VimFx’s options page in the Add-ons Manager. Config
   file users adding custom commands could simply use a hard-coded string;
   extension authors are encouraged to look up the name from a locale file.
 - category: `String`. The category to add the command to. The value has to be
@@ -772,12 +773,12 @@ source code. They may change at any time.
 ### Options object
 
 An `options` object provides access to all of VimFx’s options. It is an object
-whose keys are VimFx pref names.
+whose keys are VimFx option names.
 
-Note that the values are not just simply `vimfx.get(pref)` for the `pref` in
-question; they are _parsed_ (`parse(vimfx.get(pref))`):
+Note that the values are not just simply `vimfx.get(option)` for the `option` in
+question; they are _parsed_ (`parse(vimfx.get(option))`):
 
-- Space-separated prefs are parsed into arrays of strings. For example,
+- Space-separated options are parsed into arrays of strings. For example,
   `pattern_attrs: ['class']`.
 
 - `blacklist`, `prev_patterns` and `next_patterns` are parsed into arrays of

@@ -79,7 +79,7 @@ createImportErrorReport = ({numSuccesses, errors}) ->
       s1 = if numSuccesses == 1 then '' else 's'
       s2 = if errors.length == 1 then '' else 's'
       """
-        #{numSuccesses} preference#{s1} imported successfully.
+        #{numSuccesses} option#{s1} imported successfully.
 
         #{errors.length} error#{s2} occurred:
       """

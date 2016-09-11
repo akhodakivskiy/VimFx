@@ -18,7 +18,7 @@ file].
 
 ## Regular options
 
-These options are available in VimFx’s settings page in the Add-ons Manager
+These options are available in VimFx’s options page in the Add-ons Manager
 (where you can also customize [keyboard shortcuts]).
 
 [keyboard shortcuts]: shortcuts.md
@@ -285,7 +285,7 @@ back on looking for links on the page that seem to go to the previous/next page
 using patterns.
 
 The patterns are matched at the beginning and end of link text (and the
-attributes defined by the advanced setting [`pattern_attrs`]). The patterns do
+attributes defined by the advanced option [`pattern_attrs`]). The patterns do
 not match in the middle of words, so “previous” does not match “previously”.
 The matching is case <strong>in</strong>sensitive.
 
@@ -305,7 +305,7 @@ Note: If you need to include a space in your pattern, use `\s`. For example:
 
 ## Advanced options
 
-These options are _not_ available in VimFx’s settings page in the Add-ons
+These options are _not_ available in VimFx’s options page in the Add-ons
 Manager. They can only be changed in [about:config] or using a [config file].
 They all start with `extensions.VimFx.`.
 
@@ -352,8 +352,8 @@ Controls whether [counts] are enabled or not.
 Toggles whether the various find commands are Vim-style or Firefox
 default-style.
 
-Disable this pref if you want `/` to work more like `<c-f>` and `n`/`N` to work
-more like `<f3>`/`<s-f3>`.
+Disable this option if you want `/` to work more like `<c-f>` and `n`/`N` to
+work more like `<f3>`/`<s-f3>`.
 
 If there is selected text on the page, Firefox starts searching after that.
 VimFx does so too, but only if the selection is currently _visible_ (inside the
@@ -365,7 +365,7 @@ viewport.
 
 The VimFx behavior is designed to be less disorienting. It is also similar to
 how searching in Vim works. Again, you can return to the Firefox default
-behavior (if you prefer that) by disabling this pref.
+behavior (if you prefer that) by disabling this option.
 
 One of the main benefits of the VimFx behavior is that you can scroll past a
 block of the text with lots of search matches and then continue going through
@@ -397,9 +397,9 @@ Space separated list of modes where `prevent_autofocus` should be used.
 ### `config_file_directory`
 
 VimFx can optionally be customized using a [config file]. If you want to that,
-you need to tell VimFx where that file is. That’s what this pref is for.
+you need to tell VimFx where that file is. That’s what this option is for.
 
-By default this pref is blank (the empty string), which means that no config
+By default this option is blank (the empty string), which means that no config
 file should be loaded.
 
 If non-blank, it should be the path to the directory where the config file
@@ -419,15 +419,15 @@ shortcut instead of typing into the text input, which can be quite annoying. To
 avoid the problem, VimFx waits a bit before checking if you have left the text
 input.
 
-### Scrolling prefs
+### Scrolling options
 
-Apart from its own prefs, VimFx also respects a few built-in Firefox prefs.
+Apart from its own options, VimFx also respects a few built-in Firefox options.
 
 #### Smooth scrolling
 
 If you want to customize Firefox’s smooth scrolling, adjusting
 `general.smoothScroll.{lines,pages,other}.duration{Min,Max}MS` is the way to
-go. VimFx has similar prefs for the scrolling commands, but they work like
+go. VimFx has similar options for the scrolling commands, but they work like
 `layout.css.scroll-behavior.spring-constant`.
 
 Basically, the higher the value, the faster the scrolling.
@@ -438,15 +438,15 @@ These are VimFx’s variants, and the commands they affect:
 - `smoothScroll.pages.spring-constant`: `d`, `u`, `<space>`, `<s-space>`
 - `smoothScroll.other.spring-constant`: `gg`, `G`, `0`, `^`, `$`, `'`
 
-Note that the value of these prefs are _strings,_ not numbers!
+Note that the value of these options are _strings,_ not numbers!
 
 Unfortunately, Firefox provides no way for code to tell which “spring constant”
 it wants when scrolling smoothly. All VimFx can do is to temporarily set
-Firefox’s `layout.css.scroll-behavior.spring-constant` pref. It is reset again
+Firefox’s `layout.css.scroll-behavior.spring-constant` option. It is reset again
 after one second (by default). If that doesn’t work out for you, you can
-customize that timeout using the `scroll.reset_timeout` pref.
+customize that timeout using the `scroll.reset_timeout` option.
 
-The Firefox pref `general.smoothScroll` lets you turn off smooth scrolling
+The Firefox option `general.smoothScroll` lets you turn off smooth scrolling
 entirely, including all of VimFx’s scrolling commands.
 
 `general.smoothScroll.lines`, `general.smoothScroll.pages`, and
@@ -457,12 +457,12 @@ categorization as in the above list.
 #### Scroll step
 
 By default you can scroll using the arrow keys in Firefox. You can control how
-much they scroll by adjusting the following prefs:
+much they scroll by adjusting the following options:
 
 - `toolkit.scrollbox.horizontalScrollDistance`: `<left>`, `<right>`, `h`, `l`
 - `toolkit.scrollbox.verticalScrollDistance`:   `<down>`, `<up>`,    `j`, `k`
 
-(VimFx used to have a `scroll_step` pref, but is has been replaced by the
+(VimFx used to have a `scroll_step` option, but is has been replaced by the
 above.)
 
 #### `scroll.full_page_adjustment` and `scroll.half_page_adjustment`
@@ -479,7 +479,7 @@ For this reason, both VimFx and Firefox by default scroll _about a line less
 than a whole page_ when pressing `<space>`. This solves the sliced-last-line
 problem, and provides some context on where you are in the text you’re reading.
 
-These two prefs control how many pixels “about a line” actually means for the
+These two options control how many pixels “about a line” actually means for the
 different page scrolling commands.
 
 - `scroll.full_page_adjustment`: `<space>, `<s-space>`
@@ -511,7 +511,7 @@ disappearing (or resetting).
 ### `hints.sleep`
 
 In Hints mode, VimFx continually checks if the element for a hint marker has
-moved. If so, the marker is moved as well. This pref controls how many
+moved. If so, the marker is moved as well. This option controls how many
 milliseconds VimFx should “sleep” between each check. The shorter, the more CPU
 usage, the longer, the more stuttery marker movement.
 
@@ -524,16 +524,16 @@ Set it to -1 to disable the marker movement feature entirely.
 ### `hints.match_text`
 
 If you strongly dislike that typing non-[Hint characters] filters hint markers
-by element text, disable this pref. (That’ll make things work like it did in
+by element text, disable this option. (That’ll make things work like it did in
 VimFx 0.18.x and older.)
 
 [Hint characters]: #hint-characters
 
 ### `hints.peek_through`
 
-This pref doesn’t do much. If you’ve used custom [styling] to change which
+This option doesn’t do much. If you’ve used custom [styling] to change which
 modifier lets you peek through markers in [Hints mode], you might want to change
-this pref as well. Otherwise VimFx’s Keyboard Shortcuts dialog will still tell
+this option as well. Otherwise VimFx’s Keyboard Shortcuts dialog will still tell
 you to press shift for this task.
 
 [styling]: styling.md
@@ -565,14 +565,14 @@ an “adjustable” element (form control or video player) is focused.
 
 The default values are `<s-tab` and `<tab>`, respectively. Those keys are
 specially handled after focusing a text input using [`gi`]. To disable this
-special handling, set the prefs to the empty string.
+special handling, set the options to the empty string.
 
 [`gi`]: commands.md#gi-1
 
 
 ## Special options
 
-These options are available in neither VimFx’s settings page in the Add-ons
+These options are available in neither VimFx’s options page in the Add-ons
 Manager nor in [about:config]. The only way to change them is by using the
 a [config file].
 

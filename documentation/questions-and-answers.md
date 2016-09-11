@@ -81,7 +81,7 @@ which is specialized at searching your keyboard shortcuts.
 
 ## Can I edit shortcuts in the Keyboard Shortcuts help dialog?
 
-No, but clicking on any command in it opens VimFx’s settings page in the Add-ons
+No, but clicking on any command in it opens VimFx’s options page in the Add-ons
 Manager and automatically selects the text input for that command. Tip: Use the
 `eb` command to click without using the mouse.
 

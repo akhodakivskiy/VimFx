@@ -61,8 +61,8 @@ set = (branch, key, value) ->
         branch.clearUserPref(key)
       else
         throw new Error(
-          "VimFx: Preferences may only be set to a boolean, number, string or
-          null. Got: #{typeof value}"
+          "VimFx: Options may only be set to a boolean, number, string or null.
+          Got: #{typeof value}"
         )
 
 has = (branch, key) ->

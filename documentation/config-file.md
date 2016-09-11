@@ -44,7 +44,7 @@ Follow these steps to get started with your config file:
 2. Create two empty plain text files in your directory, called `config.js` and
    `frame.js`.
 
-3. Set the [`config_file_directory`] pref (that’s an [advanced option]) to the
+3. Set the [`config_file_directory`] option (that’s an [advanced option]) to the
    path of the directory you created above. It can be either absolute, such as
    `/home/you/.config/vimfx` or `C:\Users\you\vimfx`, or start with a `~`, which
    is a shortcut to your home directory, such as `~/.config/vimfx` or `~\vimfx`.
@@ -121,13 +121,13 @@ vimfx.set('custom.mode.normal.zoom_in', 'zi')
 If you add custom commands, remember to [add shortcuts to
 them][custom-command-shortcuts]!
 
-Tip: If you already have made customizations in VimFx’s settings page in the
-Add-ons Manager, you can use the “Export all” button there to copy all prefs as
-JSON. Paste it in your config file and either edit it, or iterate of it:
+Tip: If you already have made customizations in VimFx’s options page in the
+Add-ons Manager, you can use the “Export all” button there to copy all options
+as JSON. Paste it in your config file and either edit it, or iterate of it:
 
 ```js
-let prefs = {"hints.chars": "1234567 89"} // Pasted exported prefs.
-Object.entries(prefs).forEach(([pref, value]) => vimfx.set(pref, value))
+let options = {"hints.chars": "1234567 89"} // Pasted exported options.
+Object.entries(options).forEach(([option, value]) => vimfx.set(option, value))
 ```
 
 [custom-command-shortcuts]: api.md#user-content-custom-command-shortcuts
