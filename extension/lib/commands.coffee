@@ -917,6 +917,7 @@ commands.dev = ({vim}) ->
 
 commands.esc = ({vim}) ->
   vim._run('esc')
+  vim.hideNotification()
   utils.blurActiveBrowserElement(vim)
   vim.window.gBrowser.getFindBar().close()
   MarkerContainer.remove(vim.window) # Better safe than sorry.

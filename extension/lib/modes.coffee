@@ -65,6 +65,8 @@ mode('normal', {
     {vim, storage, uiEvent} = args
     {keyStr} = match
 
+    vim.hideNotification() if match.type in ['none', 'full']
+
     if match.type == 'none' or
        (match.likelyConflict and not match.specialKeys['<force>'])
       match.discard()
@@ -143,6 +145,7 @@ mode('caret', {
     storage.removeListener = null
 
   onInput: (args, match) ->
+    args.vim.hideNotification()
     if match.type == 'full'
       match.command.run(args)
       return true
@@ -367,5 +370,6 @@ mode('marks', {
     return true
 }, {
   exit: ({vim}) ->
+    vim.hideNotification()
     vim._enterMode('normal')
 })
