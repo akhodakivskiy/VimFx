@@ -21,7 +21,7 @@ you can re-style almost _any_ part of Firefox.
 
    It makes sure that your CSS only affects the browser UI and not web pages.
 
-3. Adjust the CSS to your likings. Make sure to end lines with `!important`, so
+3. Adjust the CSS to your likings. Make sure to end lines with `!important;`, so
    that they override VimFx’s default styles properly.
 
 If you use `userChrome.css` you need to restart Firefox for your changes to take
@@ -64,9 +64,12 @@ To make the hint markers look like they did in version 0.5.x:
 #VimFxMarkersContainer .marker-char--matched {
   color: #FFA22A !important;
 }
+#VimFxMarkersContainer .marker--highlighted {
+  filter: none !important;
+}
 ```
 
-Making the location bar red when in ignore mode (you may substitute “ignore”
+Making the location bar red when in Ignore mode (you may substitute “ignore”
 with any mode name below):
 
 ```css
