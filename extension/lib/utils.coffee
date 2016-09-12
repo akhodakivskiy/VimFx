@@ -421,11 +421,23 @@ getText = (element) ->
 
 getTopOffset = (element) ->
   window = element.ownerGlobal
+
   {left: x, top: y} = element.getBoundingClientRect()
   while window.frameElement
-    frameRect = window.frameElement.getBoundingClientRect()
+    frame = window.frameElement
+    frameRect = frame.getBoundingClientRect()
     x += frameRect.left
     y += frameRect.top
+
+    computedStyle = frame.ownerGlobal.getComputedStyle(frame)
+    if computedStyle
+      x +=
+        parseFloat(computedStyle.getPropertyValue('border-left-width')) +
+        parseFloat(computedStyle.getPropertyValue('padding-left'))
+      y +=
+        parseFloat(computedStyle.getPropertyValue('border-top-width')) +
+        parseFloat(computedStyle.getPropertyValue('padding-top'))
+
     window = window.parent
   return {x, y}
 
