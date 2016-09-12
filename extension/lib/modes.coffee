@@ -331,13 +331,28 @@ mode('find', {
   onLeave: ({vim}) ->
     findBar = vim.window.gBrowser.getFindBar()
     findStorage.lastSearchString = findBar._findField.value
+    findStorage.busy = false
 
   onInput: (args, match) ->
-    args.findBar = args.vim.window.gBrowser.getFindBar()
-    if match.type == 'full'
-      match.command.run(args)
-      return true
-    return false
+    {vim} = args
+    switch
+      when match.type == 'full'
+        args.findBar = args.vim.window.gBrowser.getFindBar()
+        match.command.run(args)
+        return true
+      when vim.focusType != 'findbar'
+        # If we’re in Find mode but the find bar input hasn’t been focused yet,
+        # suppress all input, because we don’t want to trigger Firefox commands,
+        # such as `/` (which opens the Quick Find bar). This happens when
+        # `helper_find_from_top_of_viewport` is slow, or when _Firefox_ is slow,
+        # for example to due to heavy page loading. The following URL is a good
+        # stress test: <https://html.spec.whatwg.org/>
+        findStorage.busy = true
+        return true
+      else
+        # At this point we know for sure that the find bar is not busy anymore.
+        findStorage.busy = false
+        return false
 
 }, {
   exit: ({vim, findBar}) ->

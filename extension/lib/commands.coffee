@@ -782,24 +782,27 @@ findStorage = {
 }
 
 helper_find_from_top_of_viewport = (vim, direction, callback) ->
-  return if findStorage.busy
   if vim.options.find_from_top_of_viewport
-    findStorage.busy = true
     vim._run('find_from_top_of_viewport', {direction}, ->
-      findStorage.busy = false
       callback()
     )
   else
     callback()
 
 helper_find = ({highlight, linksOnly = false}, {vim}) ->
+  if findStorage.busy
+    # Make sure to enter find mode here, since that’s where `findStorage.busy`
+    # is reset to `false` again. Otherwise we can get stuck in the “busy” state.
+    vim._enterMode('find')
+    return
+
   helpSearchInput = help.getSearchInput(vim.window)
   if helpSearchInput
     helpSearchInput.select()
     return
 
-  # In case `helper_find_from_top_of_viewport` is slow, make sure that keys
-  # pressed before the find bar input is focsued doesn’t trigger commands.
+  # Important: Enter Find mode immediately. See `onInput` for Find mode.
+  findStorage.busy = true
   vim._enterMode('find')
 
   helper_mark_last_scroll_position(vim)
@@ -824,10 +827,14 @@ commands.find_highlight_all = helper_find.bind(null, {highlight: true})
 commands.find_links_only = helper_find.bind(null, {linksOnly: true})
 
 helper_find_again = (direction, {vim}) ->
+  return if findStorage.busy
+
   findBar = vim.window.gBrowser.getFindBar()
   if findStorage.lastSearchString.length == 0
     vim.notify(translate('notification.find_again.none'))
     return
+
+  findStorage.busy = true
 
   helper_mark_last_scroll_position(vim)
   helper_find_from_top_of_viewport(vim, direction, ->
@@ -843,6 +850,7 @@ helper_find_again = (direction, {vim}) ->
       findBar.onFindResult(data)
       message = findBar._findStatusDesc.textContent
       vim.notify(message) if message
+      findStorage.busy = false
 
     findBar.onFindAgainCommand(not direction)
   )
