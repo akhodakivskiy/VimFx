@@ -624,6 +624,16 @@ interval = (window, interval, fn) ->
 
 nextTick = (window, fn) -> window.setTimeout((-> fn()) , 0)
 
+partition = (array, fn) ->
+  matching = []
+  nonMatching = []
+  for item, index in array
+    if fn(item, index, array)
+      matching.push(item)
+    else
+      nonMatching.push(item)
+  return [matching, nonMatching]
+
 regexEscape = (s) -> s.replace(/[|\\{}()[\]^$+*?.]/g, '\\$&')
 
 removeDuplicateChars = (string) -> removeDuplicates(string.split('')).join('')
@@ -754,6 +764,7 @@ module.exports = {
   includes
   interval
   nextTick
+  partition
   regexEscape
   removeDuplicateChars
   removeDuplicates

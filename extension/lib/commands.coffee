@@ -890,18 +890,31 @@ commands.edit_blacklist = ({vim}) ->
   location = new vim.window.URL(url)
   domain = location.host or location.href
   newPattern = "*#{domain}*"
+  delimiter = '  '
+  blacklistString = prefs.get('blacklist')
 
-  blacklist = prefs.get('blacklist')
-  {parsed} = parsePrefs.parseSpaceDelimitedString(blacklist)
-  filteredList = parsed.filter((pattern) -> pattern != newPattern)
-  newBlacklist = [newPattern, filteredList...].join('  ')
+  if vim._isBlacklisted(url)
+    blacklist = parsePrefs.parseSpaceDelimitedString(blacklistString).parsed
+    [matching, nonMatching] = utils.partition(blacklist, (string, index) ->
+      return vim.options.blacklist[index].test(url)
+    )
+    newBlacklistString = "
+      #{matching.join(delimiter)}\
+      #{delimiter.repeat(7)}\
+      #{nonMatching.join(delimiter)}
+    "
+    extraMessage = translate('pref.blacklist.extra.is_blacklisted')
+  else
+    newBlacklistString = "#{newPattern}#{delimiter}#{blacklistString}"
+    extraMessage = translate('pref.blacklist.extra.added', newPattern)
 
   message = """
     #{translate('pref.blacklist.title')}: #{translate('pref.blacklist.desc')}
 
-    #{translate('pref.blacklist.extra', newPattern)}
+    #{extraMessage}
   """
-  vim._modal('prompt', [message, newBlacklist], (input) ->
+
+  vim._modal('prompt', [message, newBlacklistString.trim()], (input) ->
     return if input == null
     # Just set the blacklist as if the user had typed it in the Add-ons Manager,
     # and let the regular pref parsing take care of it.
