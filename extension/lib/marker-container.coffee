@@ -235,14 +235,23 @@ class MarkerContainer
           markers.push(wrappedMarker)
         else
           combined.push(wrappedMarker)
-          # Make sure that all combined markers use the highest weight.
-          if visibleParent.weight < wrappedMarker.weight
-            visibleParent.weight = wrappedMarker.weight
 
       else
         markers.push(wrappedMarker)
 
-    tree = huffman.createTree(markers, @alphabet.length)
+    # When creating hints after having filtered the markers by their text, it
+    # makes sense to give the elements with the _smallest_ area the best hints.
+    # The idea is that the more of the element’s text is matched, the more
+    # likely it is to be the intended target. However, using the (negative) area
+    # as weight can result in really awful hints (such as “VVVS”) for larger
+    # elements on crowded pages like Reddit and Hackernews, which just looks
+    # broken. Instead this is achieved by using equal weight for all markers
+    # (see `wrapTextFilteredMarker`) and sorting the markers by area (in
+    # ascending order) beforehand.
+    markers
+      .sort((a, b) -> a.marker.wrapper.shape.area - b.marker.wrapper.shape.area)
+
+    tree = huffman.createTree(markers, @alphabet.length, {sorted: true})
     tree.assignCodeWords(@alphabet, ({marker}, hint) -> marker.setHint(hint))
 
     for {marker} in combined
@@ -458,12 +467,8 @@ getStackFor = (marker, markers) ->
 
 setHint = (marker, hint) -> marker.setHint(hint)
 
-# When creating hints after having filtered the markers by their text, it makes
-# sense to give the elements with the _smallest_ area the best hints. The idea
-# is that the more of the element’s text is matched, the more likely it is to be
-# the intended target.
 wrapTextFilteredMarker = (marker) ->
-  return {marker, weight: -marker.wrapper.shape.area}
+  return {marker, weight: 1}
 
 compareHints = (markerA, markerB, alphabet) ->
   lengthDiff = markerA.hint.length - markerB.hint.length
