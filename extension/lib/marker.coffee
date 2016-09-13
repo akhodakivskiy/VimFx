@@ -37,6 +37,7 @@ class Marker
     @originalHint = null
     @text = @wrapper.text?.toLowerCase() ? ''
     @visible = true
+    @highlighted = false
     @zoom = 1
     @viewport = null
     @position = null
@@ -144,7 +145,7 @@ class Marker
   markMatched: (matched) ->
     @markerElement.classList.toggle('marker--matched', matched)
 
-  markHighlighted: (highlighted) ->
-    @markerElement.classList.toggle('marker--highlighted', highlighted)
+  markHighlighted: (@highlighted) ->
+    @markerElement.classList.toggle('marker--highlighted', @highlighted)
 
 module.exports = Marker

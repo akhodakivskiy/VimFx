@@ -513,6 +513,13 @@ selectAllSubstringMatches = (element, substring, {caseSensitive = true} = {}) ->
     return false
   )
 
+selectElement = (element) ->
+  window = element.ownerGlobal
+  selection = window.getSelection()
+  range = window.document.createRange()
+  range.selectNodeContents(element)
+  selection.addRange(range)
+
 setAttributes = (element, attributes) ->
   for attribute, value of attributes
     element.setAttribute(attribute, value)
@@ -764,6 +771,7 @@ module.exports = {
   isPositionFixed
   querySelectorAllDeep
   selectAllSubstringMatches
+  selectElement
   setAttributes
   setHover
   walkTextNodes

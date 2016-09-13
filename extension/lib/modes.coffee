@@ -202,6 +202,7 @@ mode('hints', {
     storage.callback = callback
     storage.matchText = matchText
     storage.count = count
+    storage.isMatched = {byText: false, byHint: false}
     storage.skipOnLeaveCleanup = false
 
     if matchText
@@ -237,10 +238,14 @@ mode('hints', {
       {char, isHintChar} = hintsMode.getChar(match, storage)
       return true unless char
 
-      visibleMarkers = markerContainer.addChar(char, isHintChar)
+      return if storage.isMatched.byText and not isHintChar
 
-      if (vim.options['hints.auto_activate'] or isHintChar) and
-         new Set(visibleMarkers.map((marker) -> marker.hint)).size == 1
+      visibleMarkers = markerContainer.addChar(char, isHintChar)
+      storage.isMatched = hintsMode.isMatched(visibleMarkers, markerContainer)
+
+      if (storage.isMatched.byHint and isHintChar) or
+         (storage.isMatched.byText and not isHintChar and
+          vim.options['hints.auto_activate'])
         hintsMode.activateMatch(
           vim, storage, match, visibleMarkers, callback
         )

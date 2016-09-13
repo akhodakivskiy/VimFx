@@ -116,15 +116,17 @@ class FrameEventManager
     )
 
     messageManager.listen('highlightMarkableElements', (data) =>
-      {elementIndices, strings} = data
+      {elements, strings} = data
       utils.clearSelectionDeep(@vim.content)
-      return if strings.length == 0
-      for elementIndex in elementIndices
+      for {elementIndex, selectAll} in elements
         {element} = @vim.state.markerElements[elementIndex]
-        for string in strings
-          utils.selectAllSubstringMatches(
-            element, string, {caseSensitive: false}
-          )
+        if selectAll
+          utils.selectElement(element)
+        else
+          for string in strings
+            utils.selectAllSubstringMatches(
+              element, string, {caseSensitive: false}
+            )
       return
     )
 

@@ -65,7 +65,7 @@ To make the hint markers look like they did in version 0.5.x:
   color: #FFA22A !important;
 }
 #VimFxMarkersContainer .marker--highlighted {
-  filter: none !important;
+  background-image: none;
 }
 ```
 

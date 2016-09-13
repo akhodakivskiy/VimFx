@@ -123,7 +123,12 @@ toolbarpaletteitem[place="palette"] > #VimFxButton {
 }
 
 #VimFxMarkersContainer .marker--highlighted {
-  filter: hue-rotate(180deg) brightness(85%);
+  background-image: linear-gradient(
+    to bottom right,
+    transparent 25%,
+    white 50%,
+    transparent 75%
+  );
 }
 
 #VimFxMarkersContainer .marker--hidden {

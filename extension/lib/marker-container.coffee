@@ -219,28 +219,23 @@ class MarkerContainer
       {parentIndex} = marker.wrapper
 
       if parentIndex?
-        parent =
-          if parentIndex of visibleParentMap
-            visibleParentMap[parentIndex]
+        parent = @markerMap[parentIndex]
+        switch
+          when parentIndex of visibleParentMap
+            combined.push(wrappedMarker)
+          when parent.visible
+            visibleParentMap[parentIndex] = wrapTextFilteredMarker(parent)
+            combined.push(wrappedMarker)
           else
-            wrapTextFilteredMarker(@markerMap[parentIndex])
-
-        # If the parent isn’t visible, it’s because it didn’t match
-        # `@enteredText`. If so, promote this marker as the parent.
-        visibleParent = if parent.marker.visible then parent else wrappedMarker
-        visibleParentIndex = visibleParent.marker.wrapper.elementIndex
-        visibleParentMap[visibleParentIndex] = visibleParent
-
-        if visibleParent == wrappedMarker
-          markers.push(wrappedMarker)
-        else
-          combined.push(wrappedMarker)
-
+            # If the parent isn’t visible, it’s because it didn’t match
+            # `@enteredText`. If so, promote this marker as the parent.
+            visibleParentMap[parentIndex] = wrappedMarker
+            markers.push(wrappedMarker)
       else
         markers.push(wrappedMarker)
 
     # When creating hints after having filtered the markers by their text, it
-    # makes sense to give the elements with the _smallest_ area the best hints.
+    # makes sense to give the elements with the shortest text the best hints.
     # The idea is that the more of the element’s text is matched, the more
     # likely it is to be the intended target. However, using the (negative) area
     # as weight can result in really awful hints (such as “VVVS”) for larger
@@ -248,8 +243,7 @@ class MarkerContainer
     # broken. Instead this is achieved by using equal weight for all markers
     # (see `wrapTextFilteredMarker`) and sorting the markers by area (in
     # ascending order) beforehand.
-    markers
-      .sort((a, b) -> a.marker.wrapper.shape.area - b.marker.wrapper.shape.area)
+    markers.sort((a, b) -> a.marker.text.length - b.marker.text.length)
 
     tree = huffman.createTree(markers, @alphabet.length, {sorted: true})
     tree.assignCodeWords(@alphabet, ({marker}, hint) -> marker.setHint(hint))

@@ -234,15 +234,16 @@ simply begin typing the text of the link you wish to follow.
 
 `hints.auto_activate`
 
-The marker (or markers in the case where several links go to the same place and
-have gotten the same hint) with the best hint are highlighted in a different
-color. You may at any time press `<enter>` to activate those markers.
+The marker (or marker<strong>s</strong> in the case where several links go to
+the same place and have gotten the same hint) with the best hint are highlighted
+with a diagonal white stripe. You may at any time press `<enter>` to activate
+those markers.
 
 One workflow is to type non-hint characters until the hint marker of the element
-you want to activate gets highlighted, and then hit `<enter>`. However, if _all_
-hint markers end up highlighted (because the text you’ve typed uniquely
-identifies a single link) the highlighted markers will be activated
-_automatically._
+you want to activate gets highlighted, and then hit `<enter>`. To make this more
+obvious, the entire element text is selected, too. However, if _all_ hint
+markers end up highlighted (because the text you’ve typed uniquely identifies a
+single link) the highlighted markers will be activated _automatically._
 
 If you dislike that, disable this option. Then, you either have to press
 `<enter>` or a hint character to activate hint markers.

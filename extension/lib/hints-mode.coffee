@@ -84,19 +84,34 @@ getChar = (match, {markerContainer, matchText}) ->
     return {char: null, isHintChar: false}
 
 updateVisualFeedback = (vim, markerContainer, visibleMarkers) ->
-  if vim.options.notify_entered_keys
-    if markerContainer.enteredText == ''
-      vim.hideNotification()
-    else
-      vim.notify(markerContainer.enteredText)
+  hasEnteredText = (markerContainer.enteredText != '')
 
-  elementIndices = visibleMarkers.map((marker) -> marker.wrapper.elementIndex)
+  if vim.options.notify_entered_keys
+    if hasEnteredText
+      vim.notify(markerContainer.enteredText)
+    else
+      vim.hideNotification()
+
+  elements = visibleMarkers.map((marker) ->
+    return {
+      elementIndex: marker.wrapper.elementIndex
+      selectAll: marker.highlighted and hasEnteredText
+    }
+  )
   strings = markerContainer.splitEnteredText()
-  vim._send('highlightMarkableElements', {elementIndices, strings})
+  vim._send('highlightMarkableElements', {elements, strings})
+
+isMatched = (visibleMarkers, {enteredHint}) ->
+  isUnique = (new Set(visibleMarkers.map((marker) -> marker.hint)).size == 1)
+  if isUnique
+    return {byText: true, byHint: (enteredHint == visibleMarkers[0].hint)}
+  else
+    return {byText: false, byHint: false}
 
 module.exports = {
   activateMatch
   cleanup
   getChar
   updateVisualFeedback
+  isMatched
 }
