@@ -236,8 +236,8 @@ simply begin typing the text of the link you wish to follow.
 
 The marker (or marker<strong>s</strong> in the case where several links go to
 the same place and have gotten the same hint) with the best hint are highlighted
-with a diagonal white stripe. You may at any time press `<enter>` to activate
-those markers.
+with a different border. You may at any time press `<enter>` to activate those
+markers.
 
 One workflow is to type non-hint characters until the hint marker of the element
 you want to activate gets highlighted, and then hit `<enter>`. To make this more

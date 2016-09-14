@@ -101,7 +101,7 @@ toolbarpaletteitem[place="palette"] > #VimFxButton {
   --border-width: 1px;
   border: solid var(--border-width) var(--border-color);
   background-color: #ffd76e;
-  color: #302505;
+  color: black;
   font-size: 0.8em;
   line-height: 1;
   font-weight: bold;
@@ -123,12 +123,9 @@ toolbarpaletteitem[place="palette"] > #VimFxButton {
 }
 
 #VimFxMarkersContainer .marker--highlighted {
-  background-image: linear-gradient(
-    to bottom right,
-    transparent 25%,
-    white 50%,
-    transparent 75%
-  );
+  --border-color: black;
+  border-radius: 0.34em;
+  box-shadow: inset 0 0 0.28em 0 var(--border-color), 0 0 0 var(--border-width) white;
 }
 
 #VimFxMarkersContainer .marker--hidden {
@@ -142,7 +139,7 @@ toolbarpaletteitem[place="palette"] > #VimFxButton {
 }
 
 #VimFxMarkersContainer .marker[data-type="scrollable"] {
-  --width: 1px;
+  --width: 0.17em;
   padding-right: calc(var(--padding) + var(--border-width) + var(--width));
 }
 
