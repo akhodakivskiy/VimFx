@@ -280,7 +280,7 @@ For the `F` and `et` commands, holding ctrl makes them open links in the same
 tab instead, as if you’d used the `f` command. Holding alt toggles whether to
 open tabs in the background or foreground—it makes `F` work like `et`, and `et`
 like `F`. As mentioned in [Hint auto-activation], the best hint is highlighted
-with a different border, and can be activated by pressing `<enter>`. Holding alt
+with a different color, and can be activated by pressing `<enter>`. Holding alt
 or ctrl works there too: `<c-enter>` toggles same/new tab and `<a-enter>`
 toggles background/foreground tab.
 
