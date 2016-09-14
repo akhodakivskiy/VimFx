@@ -362,9 +362,10 @@ class MarkerContainer
     matchingMarkers = []
 
     @resetHighlightedMarkers()
+    splitEnteredText = @splitEnteredText()
     for marker in @markers when marker.isComplementary == @isComplementary
       marker.markMatchedPart(hint)
-      if marker.matchHint(hint)
+      if marker.matchHint(hint) and marker.matchText(splitEnteredText)
         marker.show()
         matchingMarkers.push(marker)
       @updateHighlightedMarkers(marker)
