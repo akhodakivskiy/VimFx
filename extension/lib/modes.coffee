@@ -278,7 +278,10 @@ mode('hints', {
     storage.markerContainer.rotateOverlapping(false)
 
   delete_char: ({storage}) ->
-    storage.markerContainer.deleteChar()
+    {markerContainer} = storage
+    visibleMarkers = markerContainer.deleteChar()
+    storage.isMatched =
+      hintsMode.isMatched(visibleMarkers or [], markerContainer)
 
   increase_count: ({storage}) ->
     storage.count += 1

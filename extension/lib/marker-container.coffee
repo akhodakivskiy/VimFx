@@ -372,7 +372,7 @@ class MarkerContainer
 
     @enteredHint = hint
     @updateVisualFeedback(matchingMarkers)
-    return true
+    return matchingMarkers
 
   deleteTextChar: ->
     return false if @enteredText == ''
@@ -392,7 +392,7 @@ class MarkerContainer
 
     @enteredText = text
     @updateVisualFeedback(matchingMarkers)
-    return true
+    return matchingMarkers
 
   updateVisualFeedback: (matchingMarkers) ->
     @visualFeedbackUpdater?(this, matchingMarkers)
