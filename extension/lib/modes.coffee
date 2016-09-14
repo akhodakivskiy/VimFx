@@ -146,9 +146,12 @@ mode('caret', {
 
   onInput: (args, match) ->
     args.vim.hideNotification()
-    if match.type == 'full'
-      match.command.run(args)
-      return true
+    switch match.type
+      when 'full'
+        match.command.run(args)
+        return true
+      when 'partial', 'count'
+        return true
     return false
 
 }, {
@@ -231,28 +234,32 @@ mode('hints', {
     changed = false
     visibleMarkers = null
 
-    if match.type == 'full'
-      match.command.run(Object.assign({match}, args))
+    switch match.type
+      when 'full'
+        match.command.run(Object.assign({match}, args))
 
-    else
-      {char, isHintChar} = hintsMode.getChar(match, storage)
-      return true unless char
+      when 'none', 'count'
+        # Make sure notifications for counts aren’t shown.
+        vim._refreshPersistentNotification()
 
-      return if storage.isMatched.byText and not isHintChar
+        {char, isHintChar} = hintsMode.getChar(match, storage)
+        return true unless char
 
-      visibleMarkers = markerContainer.addChar(char, isHintChar)
-      storage.isMatched = hintsMode.isMatched(visibleMarkers, markerContainer)
+        return true if storage.isMatched.byText and not isHintChar
 
-      if (storage.isMatched.byHint and isHintChar) or
-         (storage.isMatched.byText and not isHintChar and
-          vim.options['hints.auto_activate'])
-        hintsMode.activateMatch(
-          vim, storage, match, visibleMarkers, callback
-        )
+        visibleMarkers = markerContainer.addChar(char, isHintChar)
+        storage.isMatched = hintsMode.isMatched(visibleMarkers, markerContainer)
 
-        unless isHintChar
-          vim._parent.ignoreKeyEventsUntilTime =
-            Date.now() + vim.options['hints.timeout']
+        if (storage.isMatched.byHint and isHintChar) or
+           (storage.isMatched.byText and not isHintChar and
+            vim.options['hints.auto_activate'])
+          hintsMode.activateMatch(
+            vim, storage, match, visibleMarkers, callback
+          )
+
+          unless isHintChar
+            vim._parent.ignoreKeyEventsUntilTime =
+              Date.now() + vim.options['hints.timeout']
 
     return true
 
@@ -312,21 +319,33 @@ mode('ignore', {
   onInput: (args, match) ->
     {vim, storage} = args
     args.count = 1
+
     switch storage.count
       when null
-        if match.type == 'full'
-          match.command.run(args)
-          return true
+        switch match.type
+          when 'full'
+            match.command.run(args)
+            return true
+          when 'partial'
+            return true
+
+        # Make sure notifications for counts aren’t shown.
+        vim.hideNotification()
+        return false
+
       when 1
         vim._enterMode('normal')
+
       else
         storage.count -= 1
+
     return false
 
 }, {
   exit: ({vim, storage}) ->
     storage.type = null
     vim._enterMode('normal')
+
   unquote: ({vim}) ->
     vim._enterMode('normal', {returnTo: 'ignore'})
 })
@@ -347,6 +366,8 @@ mode('find', {
       when match.type == 'full'
         args.findBar = args.vim.window.gBrowser.getFindBar()
         match.command.run(args)
+        return true
+      when match.type == 'partial'
         return true
       when vim.focusType != 'findbar'
         # If we’re in Find mode but the find bar input hasn’t been focused yet,
@@ -385,12 +406,14 @@ mode('marks', {
 
   onInput: (args, match) ->
     {vim, storage} = args
-    if match.type == 'full'
-      match.command.run(args)
-    else
-      storage.callback(match.keyStr)
-      vim._enterMode('normal')
+    switch match.type
+      when 'full'
+        match.command.run(args)
+      when 'none', 'count'
+        storage.callback(match.keyStr)
+        vim._enterMode('normal')
     return true
+
 }, {
   exit: ({vim}) ->
     vim.hideNotification()

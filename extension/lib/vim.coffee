@@ -100,6 +100,9 @@ class Vim
       frameCanReceiveEvents: false
       scrollableElements: new ScrollableElements(@window)
       lastNotification: null
+      persistentNotification: null
+      enteredKeys: []
+      enteredKeysTimeout: null
     }
 
   _isBlacklisted: (url) -> @options.blacklist.some((regex) -> regex.test(url))
@@ -131,7 +134,18 @@ class Vim
     @_send('modeChange', {mode})
 
   _consumeKeyEvent: (event) ->
-    return @_parent.consumeKeyEvent(event, this)
+    match = @_parent.consumeKeyEvent(event, this)
+    return match if not match or typeof match == 'boolean'
+
+    if @options.notify_entered_keys
+      if match.type in ['none', 'full'] or match.likelyConflict
+        @_clearEnteredKeys()
+      else
+        @_pushEnteredKey(match.keyStr)
+    else
+      @hideNotification()
+
+    return match
 
   _onInput: (match, event) ->
     uiEvent = if @isUIEvent(event) then event else false
@@ -176,9 +190,41 @@ class Vim
       @_statusPanel.setAttribute('label', message)
       @_statusPanel.removeAttribute('inactive')
 
+  _notifyPersistent: (message) ->
+    @_state.persistentNotification = message
+    @notify(message)
+
+  _refreshPersistentNotification: ->
+    @notify(@_state.persistentNotification) if @_state.persistentNotification
+
   hideNotification: ->
     @_parent.emit('hideNotification', {vim: this})
     @_statusPanel.setAttribute('inactive', 'true')
+    @_state.lastNotification = null
+    @_state.persistentNotification = null
+
+  _clearEnteredKeys: ->
+    @_clearEnteredKeysTimeout()
+    return unless @_state.enteredKeys.length > 0
+
+    @_state.enteredKeys = []
+    if @_state.persistentNotification
+      @notify(@_state.persistentNotification)
+    else
+      @hideNotification()
+
+  _pushEnteredKey: (keyStr) ->
+    @_state.enteredKeys.push(keyStr)
+    @_clearEnteredKeysTimeout()
+    @notify(@_state.enteredKeys.join(''))
+    clear = @_clearEnteredKeys.bind(this)
+    @_state.enteredKeysTimeout =
+      @window.setTimeout((-> clear()), @options.timeout)
+
+  _clearEnteredKeysTimeout: ->
+    if @_state.enteredKeysTimeout?
+      @window.clearTimeout(@_state.enteredKeysTimeout)
+    @_state.enteredKeysTimeout = null
 
   _modal: (type, args, callback = null) ->
     @_run('modal', {type, args}, callback)

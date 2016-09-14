@@ -88,7 +88,7 @@ updateVisualFeedback = (vim, markerContainer, visibleMarkers) ->
 
   if vim.options.notify_entered_keys
     if hasEnteredText
-      vim.notify(markerContainer.enteredText)
+      vim._notifyPersistent(markerContainer.enteredText)
     else
       vim.hideNotification()
 

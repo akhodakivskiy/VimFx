@@ -255,6 +255,7 @@ commands.scroll_to_mark = ({vim}) ->
       vim, null, 'scrollTo', 'other', ['top', 'left'], keyStr,
       ['scrollTopMax', 'scrollLeftMax'], 0, 'scroll_to_mark'
     )
+    vim.hideNotification()
   )
   vim.notify(translate('notification.scroll_to_mark.enter'))
 
