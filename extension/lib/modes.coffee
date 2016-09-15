@@ -230,9 +230,7 @@ mode('hints', {
 
   onInput: (args, match) ->
     {vim, storage} = args
-    {markerContainer, callback, matchText} = storage
-    changed = false
-    visibleMarkers = null
+    {markerContainer, callback} = storage
 
     switch match.type
       when 'full'
