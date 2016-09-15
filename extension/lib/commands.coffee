@@ -691,11 +691,9 @@ commands.click_browser_element = ({vim}) ->
   if wrappers.length > 0
     viewport = viewportUtils.getWindowViewport(window)
 
-    hintChars =
-      utils.removeDuplicateChars(vim.options['hints.chars'].toLowerCase())
     markerContainer = new MarkerContainer({
       window
-      hintChars
+      hintChars: vim.options['hints.chars']
       adjustZoom: false
       getComplementaryWrappers: (callback) ->
         newWrappers = markableElements.find(

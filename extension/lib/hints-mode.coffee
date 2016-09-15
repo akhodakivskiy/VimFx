@@ -67,7 +67,6 @@ cleanup = (vim, storage) ->
 
 getChar = (match, {markerContainer, matchText}) ->
   {unmodifiedKey} = match
-  unmodifiedKey = unmodifiedKey.toLowerCase() unless matchText
 
   isHintChar = switch
     when not matchText
