@@ -44,7 +44,7 @@ importExported = (exportedString) ->
       errors: [error.message]
     }
 
-  unless typeof exported == 'object' and exported != null and
+  unless Object::toString.call(exported) == '[object Object]' and
          Object.keys(exported).length > 0
     return {
       numSuccesses: -1
