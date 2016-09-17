@@ -895,8 +895,7 @@ commands.reload_config_file = ({vim}) ->
 commands.edit_blacklist = ({vim}) ->
   url = vim.browser.currentURI.spec
   location = new vim.window.URL(url)
-  domain = location.host or location.href
-  newPattern = "*#{domain}*"
+  newPattern = if location.host then "*#{location.host}*" else location.href
   delimiter = '  '
   blacklistString = prefs.get('blacklist')
 
