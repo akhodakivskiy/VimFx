@@ -74,7 +74,7 @@ importExported = (exportedString) ->
 createImportErrorReport = ({numSuccesses, errors}) ->
   header =
     if numSuccesses == -1
-      'The stuff you pasted is invalid:'
+      'The stuff you entered is invalid:'
     else
       s1 = if numSuccesses == 1 then '' else 's'
       s2 = if errors.length == 1 then '' else 's'
