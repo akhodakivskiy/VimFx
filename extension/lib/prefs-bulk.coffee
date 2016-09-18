@@ -73,7 +73,7 @@ importExported = (exportedString) ->
 
 createImportErrorReport = ({numSuccesses, errors}) ->
   header =
-    if numSuccesses == -1
+    if numSuccesses <= 0
       'The stuff you entered is invalid:'
     else
       s1 = if numSuccesses == 1 then '' else 's'
@@ -81,13 +81,13 @@ createImportErrorReport = ({numSuccesses, errors}) ->
       """
         #{numSuccesses} option#{s1} imported successfully.
 
-        #{errors.length} error#{s2} occurred:
+        #{errors.length} error#{s2} also occurred:
       """
 
   return """
     #{header}
 
-    #{errors.join('\n')}
+    #{errors.join('\n\n')}
   """
 
 module.exports = {
