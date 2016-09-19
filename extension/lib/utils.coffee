@@ -108,7 +108,12 @@ isDevtoolsWindow = (window) ->
   ]
 
 isFocusable = (element) ->
-  return element.tabIndex > -1 and
+  # Focusable elements have `.tabIndex > 1` (but not necessarily a
+  # `tabindex="…"` attribute) …
+  return (element.tabIndex > -1 or
+          # … or an explicit `tabindex="-1"` attribute (which means that it is
+          # focusable, but not reachable with `<tab>`).
+          element.getAttribute?('tabindex') == '-1') and
          not (element.localName?.endsWith?('box') and
               element.localName != 'checkbox') and
          not (element.localName == 'toolbarbutton' and
