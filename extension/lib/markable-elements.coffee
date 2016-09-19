@@ -176,14 +176,14 @@ getElementShape = (elementData, tryRight, rects = null) ->
     offset = null
     if rects.length == 1
       lefts = boxQuads
-        .map(({bounds}) -> bounds.left)
-        .filter((left) -> left >= nonCoveredPointRect.left)
+        .map(({bounds}) -> Math.floor(bounds.left))
+        .filter((left) -> left >= Math.floor(nonCoveredPointRect.left))
       offset = if lefts.length == 0 then null else Math.min(lefts...)
     else
       {bounds: {left}} =
         boxQuads[Math.min(nonCoveredPointRect.index, boxQuads.length - 1)]
       offset = Math.max(nonCoveredPointRect.left, left)
-    result.textOffset = offset - nonCoveredPointRect.left if offset?
+    result.textOffset = Math.floor(offset - nonCoveredPointRect.left) if offset?
 
   return result
 

@@ -26,22 +26,20 @@ utils = require('./utils')
 class Marker
   # `@wrapper` is a stand-in for the element that the marker represents. See
   # `MarkerContainer::injectHints` for more information.
-  constructor: (@wrapper, @document, {@isComplementary}) ->
+  constructor: (options) ->
+    {
+      @wrapper, @document, @viewport, @zoom = 1, @isComplementary = false
+    } = options
     @elementShape  = @wrapper.shape
     @markerElement = utils.createBox(@document, 'marker')
     @markerElement.setAttribute('data-type', @wrapper.type)
     @weight = @wrapper.combinedArea
-    @width = 0
-    @height = 0
     @hint = ''
     @originalHint = null
     @text = @wrapper.text?.toLowerCase() ? ''
     @visible = true
     @highlighted = false
-    @zoom = 1
-    @viewport = null
     @position = null
-    @originalPosition = null
     @dx = 0
     @dy = 0
 
@@ -58,7 +56,7 @@ class Marker
 
   # To be called when the marker has been both assigned a hint and inserted
   # into the DOM, and thus gotten a width and height.
-  setPosition: (@viewport, @zoom) ->
+  setPosition: ->
     {
       textOffset
       width: elementWidth
@@ -67,15 +65,21 @@ class Marker
 
     rect = @markerElement.getBoundingClientRect()
 
-    @width  = rect.width  / @zoom
-    @height = rect.height / @zoom
+    # Take movements into account.
+    left += @dx
+    top  += @dy
 
-    # Center the marker vertically on the non-covered point.
-    top -= Math.ceil(@height / 2)
+    # Make the position relative to the top frame.
+    left += offset.left
+    top  += offset.top
+
+    # Take the current zoom into account.
+    left *= @zoom
+    top  *= @zoom
 
     if textOffset?
       # Move the marker just to the left of the text of its element.
-      left -= Math.max(0, @width - textOffset)
+      left -= Math.max(0, rect.width - textOffset * @zoom)
     else
       # Otherwise make sure that it doesn’t flow outside the right side of its
       # element. This is to avoid the following situation (where `+` is a small
@@ -87,25 +91,20 @@ class Marker
       #     bottom    +Link text     +Link text
       #     middle    DAG          DAG
       #     top       E              E
-      left -= Math.max(0, @width - elementWidth)
+      left -= Math.max(0, rect.width - elementWidth * @zoom)
 
-    # Make the position relative to the top frame.
-    left += offset.left
-    top  += offset.top
+    # Center the marker vertically on the non-covered point.
+    top -= Math.ceil(rect.height / 2)
 
-    @originalPosition = {left, top}
-    @moveTo(left + @dx, top + @dy)
-
-  moveTo: (left, top) ->
     # Make sure that the marker stays within the viewport.
-    left = Math.min(left, @viewport.right  - @width)
-    top  = Math.min(top,  @viewport.bottom - @height)
-    left = Math.max(left, @viewport.left)
-    top  = Math.max(top,  @viewport.top)
+    left = Math.min(left, @zoom * @viewport.right  - rect.width)
+    top  = Math.min(top,  @zoom * @viewport.bottom - rect.height)
+    left = Math.max(left, @zoom * @viewport.left)
+    top  = Math.max(top,  @zoom * @viewport.top)
 
-    # Take the current zoom into account.
-    left = Math.round(left * @zoom)
-    top  = Math.round(top  * @zoom)
+    # Use whole numbers for more deterministic positioning.
+    left = Math.round(left)
+    top  = Math.round(top)
 
     # The positioning is absolute.
     @markerElement.style.left = "#{left}px"
@@ -113,15 +112,15 @@ class Marker
 
     # For quick access.
     @position = {
-      left, right: left + @width,
-      top, bottom: top + @height,
+      left, right: Math.round(left + rect.width)
+      top, bottom: Math.round(top + rect.height)
     }
 
   updatePosition: (@dx, @dy) ->
-    @moveTo(@originalPosition.left + @dx, @originalPosition.top + @dy)
+    @setPosition()
 
   refreshPosition: ->
-    @setPosition(@viewport, @zoom)
+    @setPosition()
 
   setHint: (@hint) ->
     @originalHint ?= @hint

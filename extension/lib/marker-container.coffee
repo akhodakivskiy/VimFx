@@ -117,12 +117,23 @@ class MarkerContainer
   # only accessible in frame scripts) in `wrappers`, and insert them into
   # `@window`.
   injectHints: (wrappers, viewport, pass) ->
-    isComplementary = (pass == 'complementary')
     markers = Array(wrappers.length)
     markerMap = {}
 
+    zoom = 1
+    if @adjustZoom
+      {ZoomManager, gBrowser: {selectedBrowser: browser}} = @window
+      # If “full zoom” is not used, it means that “Zoom text only” is enabled.
+      # If so, that “zoom” does not need to be taken into account.
+      # `.getCurrentMode()` is added by the “Default FullZoom Level” extension.
+      if ZoomManager.getCurrentMode?(browser) ? ZoomManager.useFullZoom
+        zoom = ZoomManager.getZoomForBrowser(browser)
+
     for wrapper, index in wrappers
-      marker = new Marker(wrapper, @window.document, {isComplementary})
+      marker = new Marker({
+        wrapper, document: @window.document, viewport, zoom
+        isComplementary: (pass == 'complementary')
+      })
       markers[index] = marker
       markerMap[wrapper.elementIndex] = marker
       if marker.isComplementary != @isComplementary or @enteredHint != ''
@@ -181,22 +192,13 @@ class MarkerContainer
 
     @markHighlightedMarkers()
 
-    zoom = 1
-    if @adjustZoom
-      {ZoomManager, gBrowser: {selectedBrowser: browser}} = @window
-      # If “full zoom” is not used, it means that “Zoom text only” is enabled.
-      # If so, that “zoom” does not need to be taken into account.
-      # `.getCurrentMode()` is added by the “Default FullZoom Level” extension.
-      if ZoomManager.getCurrentMode?(browser) ? ZoomManager.useFullZoom
-        zoom = ZoomManager.getZoomForBrowser(browser)
-
     fragment = @window.document.createDocumentFragment()
     fragment.appendChild(marker.markerElement) for marker in markers
     @container.appendChild(fragment)
 
     # Must be done after the hints have been inserted into the DOM (see
     # `Marker::setPosition`).
-    marker.setPosition(viewport, zoom) for marker in markers
+    marker.setPosition() for marker in markers
 
     @markers.push(markers...)
     Object.assign(@markerMap, markerMap)
