@@ -128,7 +128,8 @@ are added in order. The methods may be run multiple times.
 A rule is an `Array` of length 2:
 
 1. The first item is a function that returns `true` if the rule should be
-   applied and `false` if not. This is called the matching function.
+   applied and `false` if not. This is called the matching function. The
+   matching function receives a [location object] as its only argument.
 2. The second item is the value that should be used if the rule is applied. This
    is called the override.
 
@@ -138,8 +139,6 @@ found it is applied. No more rules will be applied.
 #### `vimfx.addOptionOverrides(...rules)`
 
 The rules are matched any time the value of a VimFx option is needed.
-
-The matching function receives a [location object].
 
 The override is an object whose keys are VimFx option names and whose values
 override the option in question. The values should be formatted as in an
@@ -168,10 +167,7 @@ vimfx.addOptionOverrides(
 #### `vimfx.addKeyOverrides(...rules)`
 
 The rules are matched any time you press a key that is not part of the tail of a
-multi-key shortcut.
-
-The matching function receives a [location object] as well as the current
-mode name (one of the keys of [`vimfx.modes`]).
+multi-key Normal mode shortcut.
 
 The override is an array of keys which should not activate VimFx commands but be
 sent to the page.

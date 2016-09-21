@@ -123,9 +123,10 @@ createConfigAPI = (vimfx, {allowDeprecated = true} = {}) -> {
     unless vimfx.keyOverrides
       vimfx.keyOverrides = []
       vimfx.options.keyValidator = (keyStr, mode) ->
+        return true unless mode == 'normal'
         location = utils.getCurrentLocation()
         return true unless location
-        overrides = getOverrides(vimfx.keyOverrides, location, mode)
+        overrides = getOverrides(vimfx.keyOverrides, location)
         return keyStr not in (overrides ? [])
       onShutdown(vimfx, -> vimfx.keyOverrides = [])
     vimfx.keyOverrides.push(rules...)

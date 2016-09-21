@@ -250,6 +250,7 @@ exports['test vimfx.addKeyOverrides'] = (assert, $vimfx, teardown) ->
   $vimfx.options.translations = {}
   teardown(->
     resetScrollToBottom?() # Defined below.
+    resetExitIgnoreMode?() # Defined below.
     resetGetCurrentLocation?() # Defined below.
     $vimfx.options = originalOptions
     $vimfx.keyOverrides = originalKeyOverrides
@@ -257,16 +258,17 @@ exports['test vimfx.addKeyOverrides'] = (assert, $vimfx, teardown) ->
 
   vimfx.addKeyOverrides(
     [
-      (location, mode) -> mode == 'normal' and location.hostname == 'example.co'
+      (location) -> location.hostname == 'example.co'
       ['j', '<c-foobar>']
     ],
     [
-      (location, mode) -> mode == 'ignore' and location.href == 'about:blank'
+      (location) -> location.href == 'about:blank'
       ['<escape>']
     ]
   )
 
   resetScrollToBottom = prefs.tmp('mode.normal.scroll_to_bottom', '<foobar>j')
+  resetExitIgnoreMode = prefs.tmp('mode.ignore.exit', '<escape>')
   $vimfx.createKeyTrees()
   $vimfx.reset('normal')
 
@@ -321,7 +323,8 @@ exports['test vimfx.addKeyOverrides'] = (assert, $vimfx, teardown) ->
     {key: 'escape'},
     {mode: 'ignore', focusType: 'none'}
   )
-  assert.ok(not match)
+  assert.equal(match.type, 'full')
+  assert.ok(match)
 
   $vimfx.emit('shutdown')
 
