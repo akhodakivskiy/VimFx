@@ -471,6 +471,13 @@ much they scroll by adjusting the following options:
 (VimFx used to have a `scroll_step` option, but is has been replaced by the
 above.)
 
+#### `scroll.horizontal_boost` and `scroll.vertical_boost`
+
+When holding down `h`, `l`, `j` or `k` (rather than just tapping those keys),
+their scrolling speed is sped up, just like when you hold down an arrow key to
+scroll. These options control _how much_ the mentioned commands are sped up. The
+usual scroll distances are multiplied by these numbers.
+
 #### `scroll.full_page_adjustment` and `scroll.half_page_adjustment`
 
 An important use case for scrolling a full page down is to read an entire page

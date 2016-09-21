@@ -148,8 +148,7 @@ class Vim
     return match
 
   _onInput: (match, event) ->
-    uiEvent = if @isUIEvent(event) then event else false
-    suppress = @_call('onInput', {uiEvent, count: match.count}, match)
+    suppress = @_call('onInput', {event, count: match.count}, match)
     return suppress
 
   _onLocationChange: (url) ->

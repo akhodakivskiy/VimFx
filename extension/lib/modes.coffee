@@ -62,7 +62,7 @@ mode('normal', {
     vim._run('clear_inputs')
 
   onInput: (args, match) ->
-    {vim, storage, uiEvent} = args
+    {vim, storage, event} = args
     {keyStr} = match
 
     vim.hideNotification() if match.type in ['none', 'full']
@@ -93,13 +93,13 @@ mode('normal', {
     # Passing Escape through allows for stopping the loading of the page and
     # closing many custom dialogs (and perhaps other things; Escape is a very
     # commonly used key).
-    if uiEvent
+    if vim.isUIEvent(event)
       # In browser UI the biggest reasons are allowing to reset the location bar
       # when blurring it, and closing dialogs such as the “bookmark this page”
       # dialog (<c-d>). However, an exception is made for the devtools (<c-K>).
       # There, trying to unfocus the devtools using Escape would annoyingly
       # open the split console.
-      return utils.isDevtoolsElement(uiEvent.originalTarget)
+      return utils.isDevtoolsElement(event.originalTarget)
     else
       # In web pages content, an exception is made if an element that VimFx
       # cares about is focused. That allows for blurring an input in a custom

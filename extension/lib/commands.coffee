@@ -152,7 +152,7 @@ springConstant = {
   value: null
 }
 
-helper_scroll = (vim, uiEvent, args...) ->
+helper_scroll = (vim, event, args...) ->
   [
     method, type, directions, amounts
     properties = null, adjustment = 0, name = 'scroll'
@@ -183,7 +183,7 @@ helper_scroll = (vim, uiEvent, args...) ->
     ), vim.options['scroll.reset_timeout'])
 
   helpScroll = help.getHelp(vim.window)?.querySelector('.wrapper')
-  if uiEvent or helpScroll
+  if vim.isUIEvent(event) or helpScroll
     activeElement = helpScroll or utils.getActiveElement(vim.window)
     if vim._state.scrollableElements.has(activeElement) or helpScroll
       viewportUtils.scroll(activeElement, options)
@@ -193,35 +193,39 @@ helper_scroll = (vim, uiEvent, args...) ->
   vim._run(name, options, reset)
 
 
-helper_scrollByLinesX = (amount, {vim, uiEvent, count = 1}) ->
+helper_scrollByLinesX = (amount, {vim, event, count = 1}) ->
   distance = prefs.root.get('toolkit.scrollbox.horizontalScrollDistance')
+  boost = if event.repeat then vim.options['scroll.horizontal_boost'] else 1
   helper_scroll(
-    vim, uiEvent, 'scrollBy', 'lines', ['left'], [amount * distance * count * 5]
+    vim, event, 'scrollBy', 'lines', ['left'],
+    [amount * distance * boost * count * 5]
   )
 
-helper_scrollByLinesY = (amount, {vim, uiEvent, count = 1}) ->
+helper_scrollByLinesY = (amount, {vim, event, count = 1}) ->
   distance = prefs.root.get('toolkit.scrollbox.verticalScrollDistance')
+  boost = if event.repeat then vim.options['scroll.vertical_boost'] else 1
   helper_scroll(
-    vim, uiEvent, 'scrollBy', 'lines', ['top'], [amount * distance * count * 20]
+    vim, event, 'scrollBy', 'lines', ['top'],
+    [amount * distance * boost * count * 20]
   )
 
-helper_scrollByPagesY = (amount, type, {vim, uiEvent, count = 1}) ->
+helper_scrollByPagesY = (amount, type, {vim, event, count = 1}) ->
   adjustment = vim.options["scroll.#{type}_page_adjustment"]
   helper_scroll(
-    vim, uiEvent, 'scrollBy', 'pages', ['top'], [amount * count],
+    vim, event, 'scrollBy', 'pages', ['top'], [amount * count],
     ['clientHeight'], adjustment
   )
 
-helper_scrollToX = (amount, {vim, uiEvent}) ->
+helper_scrollToX = (amount, {vim, event}) ->
   helper_mark_last_scroll_position(vim)
   helper_scroll(
-    vim, uiEvent, 'scrollTo', 'other', ['left'], [amount], ['scrollLeftMax']
+    vim, event, 'scrollTo', 'other', ['left'], [amount], ['scrollLeftMax']
   )
 
-helper_scrollToY = (amount, {vim, uiEvent}) ->
+helper_scrollToY = (amount, {vim, event}) ->
   helper_mark_last_scroll_position(vim)
   helper_scroll(
-    vim, uiEvent, 'scrollTo', 'other', ['top'], [amount], ['scrollTopMax']
+    vim, event, 'scrollTo', 'other', ['top'], [amount], ['scrollTopMax']
   )
 
 commands.scroll_left           = helper_scrollByLinesX.bind(null, -1)

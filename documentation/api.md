@@ -600,8 +600,7 @@ with.
 
 The object passed to this method (see above) also has the following properties:
 
-- uiEvent: `Event` or `false`. The keydown event object if the event occurred in
-  the browser UI, `false` otherwise (if the event occurred in web page content).
+- event: `Event`. The keydown event object.
 - count: `Number`. The count for the command. `undefined` if no count. (This is
   simply a copy of `match.count`. `match` is defined below.)
 
