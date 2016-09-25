@@ -325,7 +325,7 @@ generateHTMLTask('hints.html', (filename) -> """
 testHTMLPrelude = '''
   <!doctype html>
   <meta charset=utf-8>
-  <title>VimFx help</title>
+  <title>VimFx test</title>
   <style>
     * {margin: 0;}
     body > :first-child {min-height: 100vh; width: 100vw;}
