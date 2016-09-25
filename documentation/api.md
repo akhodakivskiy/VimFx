@@ -437,10 +437,15 @@ This is a very low-level part of the API. It allows to:
     onEnter(args) {},
     onLeave(args) {},
     onInput(args, match) {
-      if (match.type === 'full') {
-        match.command.run(args)
+      switch (match.type) {
+        case 'full':
+          match.command.run(args)
+          return true
+        case 'partial':
+        case 'count':
+          return true
       }
-      return (match.type !== 'none')
+      return false
     },
   }
   ```
