@@ -1,3 +1,85 @@
+### 0.19.0 (2016-09-25)
+
+#### Changes and improvements to Hints mode
+
+**New feature:** Hint markers can now be filtered by element text, similar to
+Vimium, Vimperator and Pentadactyl. This is useful for people who simply prefer
+that workflow, and for clicking tiny pagination links (simply type its number!).
+
+By default, filtering by element text is done by typing _uppercase_ characters
+(hold down shift!). All characters other than the hint characters are now used
+to filter hint markers by element text (rather than just being ignored). Do you
+prefer filtering by element text, but dislike typing uppercase letters? Have a
+look at how [hint characters] work to make things the other way around!
+
+The markers with the best hint are now highlighted with a different color. You
+may at any time press `<enter>` to activate those markers (or `<c-enter>` or
+`<a-enter>` to change where and how to open links, just like you can hold ctrl
+or alt for the last hint character).
+
+Because of the above new features, the following default **Hints mode shortcuts
+had to be changed:**
+
+- `<space>` → `<c-space>` (`<s-space>` is left untouched)
+- `<s->` → `<c-s->` (hold ctrl _and_ shift to peek through hint markers)
+- `<enter>` → `<up>`
+- `<c-enter>` → `<c-backspace>`
+
+To make it easier to see the element text, hint markers are now nudged to the
+left if they cover the text.
+
+Other hint marker improvements:
+
+- Hint markers are now 20% smaller by default. While trying to match text sizes
+  set by your operating system, they ended up a bit too large on most systems.
+  Check out the [Styling] documentation if you’d like to change the font size.
+- Hint markers now have stronger contrast between the background color and the
+  text color, which should make them easier to read.
+- The CSS for hint markers have been improved, making it easier to use custom
+  [Styling].
+- When several elements have the same area, the best hint is now correctly given
+  to the _first_ of those elements. Previously, it happened to be the other way
+  around.
+- The hint marker for a smaller element can no longer cover the hint marker for
+  a larger element (unless you press `<c-space>` to rotate them).
+- Hint markers are now better positioned when having zoomed the page in or out.
+- Hints mode is now more robust in general. Several race conditions have been
+  fixed.
+
+[hint characters]: https://github.com/akhodakivskiy/VimFx/blob/8bafdf0454043c1630bac8b13d13f1fb4e5ee9e7/documentation/options.md#hint-characters
+[Styling]: https://github.com/akhodakivskiy/VimFx/blob/8bafdf0454043c1630bac8b13d13f1fb4e5ee9e7/documentation/styling.md
+
+#### Other updates
+
+- Added: The ability to **export, import and reset all** VimFx options. There
+  are three shiny new buttons for this in VimFx’s options page in the Add-ons
+  Manager!
+- Added: The `gB` command, which lets you **quickly blacklist** (and
+  un-blacklist) sites.
+- Added: The `ec` command, for opening the context menu of elements.
+- Added: The `ep` command, for opening links in new private windows.
+- Improved: `h`, `l`, `j` and `k` now feel more like scrolling with the arrow
+  keys when held down, by boosting the scrolling speed. See the
+  [`scroll.horizontal_boost` and `scroll.vertical_boost`][scroll-boost] options
+  for more information.
+- Fixed: VimFx’s find bar integration is now much more robust. Most notably, if
+  you start typing directly after pressing `/` and Firefox is slow at opening
+  the find bar, your keypresses can no longer trigger VimFx commands or Firefox
+  built-in commands.
+- Improved: VimFx no longer leaks keypresses to the web page in some modes. (For
+  example, counts in Caret mode).
+- Improved: The `eb` command now finds more clickable elements in the devtools.
+- Changed: `vimfx.addKeyOverrides` no longer lets you easily break for example
+  Hints mode, by now only being applied to Normal mode. You might need to change
+  your matchers from `(location, mode) => ...` to simply `location => ...`.
+  (Breaking API change.)
+- Changed: The object passed to custom commands (and custom modes) no longer
+  contains a `uiEvent` property. Instead, there’s an `event` property. This
+  property can be used the same way if you check `vim.isUIEvent(event)` first.
+  (Breaking API change.)
+
+[scroll-boost]: https://github.com/akhodakivskiy/VimFx/blob/8bafdf0454043c1630bac8b13d13f1fb4e5ee9e7/documentation/options.md#scrollhorizontal_boost-and-scrollvertical_boost
+
 ### 0.18.1 (2016-08-27)
 
 - Fixed: `vimfx.addOptionOverrides` no longer crashes on startup.
