@@ -198,8 +198,8 @@ elements as they usually do. (See also the [`focus_previous_key` and
 When invoking one of the hint commands (such as `f`, `et` or one of the [`v`
 commands]) you enter Hints mode. In Hints mode, markers with hints are shown for
 some elements. By typing the letters of a hint something is done to that
-element, depending on the command. You can also type the text of an element with
-a hint marker: See the [Hint characters] option for more information.
+element, depending on the command. You can also **type the text of an element**
+with a hint marker: See the [Hint characters] option for more information.
 
 Another way to find links on the page is to use `g/`. It’s like the regular find
 command (`/`), except that it searches links only.

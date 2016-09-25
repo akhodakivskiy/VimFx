@@ -98,9 +98,9 @@ Ignore mode. Example:
 
     *example.com*  http://example.org/editor/*
 
-The fastest way to blacklist the page you’re currently on, is to use the `gB`
-command. It opens a modal with a text input filled in with the blacklist, and
-with `*currentdomain.com*` added at the start for you! Edit it if needed, or
+**The fastest way** to blacklist the page you’re currently on, is to **use the
+`gB` command.** It opens a modal with a text input filled in with the blacklist,
+and with `*currentdomain.com*` added at the start for you! Edit it if needed, or
 just press `<enter>` straight away to save. Ignore mode is then automatically
 entered (if the URL patterns apply).
 
@@ -155,8 +155,40 @@ such a feature could be added if there’s demand for it.
 The characters used for the hints in Hints mode, which can be entered using one
 of the many [hint commands].
 
-Tip: Prefer filtering hints by element text? Use only uppercase hint characters,
-or only numbers.
+**Tip:** Prefer filtering hints by element text? Use only uppercase hint
+characters (such as `FJDKSLAGHRUEIWONC MV`), or only numbers (`01234567 89`).
+
+[hint commands]: commands.md#the-hint-commands--hints-mode
+
+#### Filtering hints by element text
+
+All characters other than the hint characters are used to filter hint markers by
+element text.
+
+The filtering works like in Firefox’s location bar. In short, that means:
+
+- It is case insensitive.
+- Your typed characters are split on spaces. Each part must be present in the
+  element text (in any order, and they may overlap).
+
+By default, “f” is a hint character. If you type an “f”, that character is used
+to match the hints on screen. If you type an “F” (uppercase), though, which is
+_not_ a hint character by default, you will filter the hints based on element
+text, causing some hints markers to disappear, and the rest to be replaced. Only
+the markable elements with text containing an “f” or “F” will now get a hint
+marker. All the “f”s and “F”s are highlighted on the page, to help you keep
+track of what’s going on. Keep typing other non-hint characters to further
+reduce the number of hint markers, and make the hints shorter all the time.
+
+Hint markers are usually displayed in uppercase, because it looks nicer.
+However, if you mix both lowercase and uppercase hint characters, they will be
+displayed as-is, so you can tell them apart. It is recommended to either use
+_only_ lowercase or _only_ uppercase characters, though.
+
+Some people prefer to filter hint markers by element text in the first hand,
+rather than typing hint characters. If so, it is a good idea to choose all
+uppercase hint characters, or only numbers. This way, you can press `f` and then
+simply begin typing the text of the link you wish to follow.
 
 #### Easy-to-type and performant hints
 
@@ -197,38 +229,6 @@ All of this also help you understand why hints may be slow on some pages:
 
 - Another reason could be that a page has a _huge_ amount of links. If that
   bothers you regularly, feel free to send a pull request with faster code!
-
-#### Filtering hints by element text
-
-All characters other than the hint characters are used to filter hint markers by
-element text.
-
-The filtering works like in Firefox’s location bar. In short, that means:
-
-- It is case insensitive.
-- Your typed characters are split on spaces. Each part must be present in the
-  element text (in any order, and they may overlap).
-
-By default, “f” is a hint character. If you type an “f”, that character is used
-to match the hints on screen. If you type an “F” (uppercase), though, which is
-_not_ a hint character by default, you will filter the hints based on element
-text, causing some hints markers to disappear, and the rest to be replaced. Only
-the markable elements with text containing an “f” or “F” will now get a hint
-marker. All the “f”s and “F”s are highlighted on the page, to help you keep
-track of what’s going on. Keep typing other non-hint characters to further
-reduce the number of hint markers, and make the hints shorter all the time.
-
-Hint markers are usually displayed in uppercase, because it looks nicer.
-However, if you mix both lowercase and uppercase hint characters, they will be
-displayed as-is, so you can tell them apart. It is recommended to either use
-_only_ lowercase or _only_ uppercase characters, though.
-
-Some people prefer to filter hint markers by element text in the first hand,
-rather than typing hint characters. If so, it is a good idea to choose all
-uppercase hint characters, or only numbers. This way, you can press `f` and then
-simply begin typing the text of the link you wish to follow.
-
-[hint commands]: commands.md#the-hint-commands--hints-mode
 
 ### Hint auto-activation
 

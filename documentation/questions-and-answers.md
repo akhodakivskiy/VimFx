@@ -18,8 +18,9 @@ installed.
 
 By adding `*currentdomain.com*` to the [blacklist] option you can make VimFx
 start out in Ignore mode on currentdomain.com. (Set the option to `*` to make
-VimFx start out in Ignore mode _everywhere._) The quickest way to edit the
-blacklist is to use the `gB` command.
+VimFx start out in Ignore mode _everywhere._)
+
+**The fastest way to edit the blacklist is to use the `gB` command.**
 
 Finally, there’s nothing stopping you from hitting the “Disable” button in the
 Add-ons Manager if you want to disable VimFx completely (just like you can with
@@ -51,20 +52,20 @@ the [Ignore keyboard layout] option.
 
 [Ignore keyboard layout]: options.md#ignore-keyboard-layout
 
+## Can I make Hints mode work with element text?
+
+… **like Vimium, Vimperator and Pentadactyl** can?
+
+Yes! By default, that is done by typing _uppercase_ characters (hold down
+shift!). Have a look at how [hint characters] work for more information.
+
+[hint characters]: options.md#hint-characters
+
 ## How do I change the font size of hint markers?
 
 Head over to the [Styling] documentation to learn how to do that.
 
 [Styling]: styling.md
-
-## Going back/forward doesn’t work!
-
-Pressing `H` is like hitting the back button. Use `L` for the forward button.
-
-`[` clicks the link labeled “Previous” on the page, and `]` the link labeled
-“Next.” (See also the [“Previous”/“Next” link patterns] option.)
-
-[“Previous”/“Next” link patterns]: options.md#previousnext-link-patterns
 
 ## How do I re-map `<escape>` to blur text inputs?
 
@@ -72,6 +73,15 @@ The default shortcut is actually `<force><escape>`! Don’t forget [`<force>`] a
 the beginning, and your new shortcut should work fine.
 
 [`<force>`]: shortcuts.md#force
+
+## Going back/forward doesn’t work!
+
+Pressing `H` is like hitting the back button. Use `L` for the forward button.
+
+`[` clicks the link labeled “Previous” on the page, and `]` the link labeled
+“Next.” (See also [“Previous”/“Next” link patterns].)
+
+[“Previous”/“Next” link patterns]: options.md#previousnext-link-patterns
 
 ## Can I search in the Keyboard Shortcuts help dialog?
 
@@ -81,22 +91,14 @@ which is specialized at searching your keyboard shortcuts.
 
 ## Can I edit shortcuts in the Keyboard Shortcuts help dialog?
 
-No, but clicking on any command in it opens VimFx’s options page in the Add-ons
-Manager and automatically selects the text input for that command. Tip: Use the
-`eb` command to click without using the mouse.
-
-## Can I make Hints mode work with element text?
-
-… like the modes Vimium, Vimperator and Pentadactyl provide?
-
-Yes! Have a look at [Filtering hints by element text] for more information.
-
-[Filtering hints by element text]: options.md#filtering-hints-by-element-text
+Clicking on any command in it opens VimFx’s options page in the Add-ons Manager
+and automatically selects the text input for that command. Tip: Use the `eb`
+command to click without using the mouse.
 
 ## Will VimFx provide advanced Find features?
 
 One of VimFx’s key features is to embrace standard Firefox features. As long as
-Firefox’s Find Bar doesn’t support for example reverse search (vim’s `?`
+Firefox’s Find Bar doesn’t support for example reverse search (Vim’s `?`
 command) or regex search, VimFx won’t either.
 
 ## Switching between tabs works oddly when [NoScript] is installed!
