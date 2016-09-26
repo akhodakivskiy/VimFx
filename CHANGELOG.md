@@ -1,3 +1,7 @@
+### 0.19.1 (2016-09-26)
+
+- Fixed: The `'` command no longer crashes. (Regression since 0.19.0.)
+
 ### 0.19.0 (2016-09-25)
 
 #### Changes and improvements to Hints mode
