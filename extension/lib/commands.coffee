@@ -183,7 +183,7 @@ helper_scroll = (vim, event, args...) ->
     ), vim.options['scroll.reset_timeout'])
 
   helpScroll = help.getHelp(vim.window)?.querySelector('.wrapper')
-  if vim.isUIEvent(event) or helpScroll
+  if (event and vim.isUIEvent(event)) or helpScroll
     activeElement = helpScroll or utils.getActiveElement(vim.window)
     if vim._state.scrollableElements.has(activeElement) or helpScroll
       viewportUtils.scroll(activeElement, options)
