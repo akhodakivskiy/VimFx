@@ -176,5 +176,6 @@ migrations[6] = ->
 
   for pref, newPref of prefMap when prefs.has(pref)
     prefs.set(newPref, prefs.get(pref))
+  return
 
 module.exports = migrations
