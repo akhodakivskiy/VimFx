@@ -186,10 +186,12 @@ vimfx.addKeyOverrides(
 ### `vimfx.send(vim, message, data = null, callback = null)`
 
 Send `message` (a string) to the instance of `frame.js` in the tab managed by
-[`vim`][vim object], and pass it `data`. If provided, `callback` must be a
-function that takes a single argument, which is the data that `frame.js`
-responds with. `frame.js` uses its [`vimfx.listen(...)`] method to listen for
-(and optionally respond to) `message`.
+[`vim`][vim object], and pass it `data`. `frame.js` uses its
+[`vimfx.listen(...)`] method to listen for (and optionally respond to)
+`message`.
+
+If provided, `callback` must be a function. That function will receive a single
+argument: The data that `frame.js` responds with.
 
 Here is an example:
 
@@ -205,6 +207,7 @@ vimfx.send(vim, 'getSelection', {example: 5}, selection => {
 // frame.js
 vimfx.listen('getSelection', ({example}, callback) => {
   console.log('`example` should be 5:', example)
+  // `content` is basically the same as the `window` of the page.
   let selection = content.getSelection().toString()
   callback(selection)
 })
@@ -212,7 +215,7 @@ vimfx.listen('getSelection', ({example}, callback) => {
 
 What if you want to do it the other way around: Send a message _from_ `frame.js`
 and listen for it in `config.js`? That’s not the common use case, so VimFx does
-not provide convenience functions for it. Yes, `vimfx.send(...)`, and
+not provide convenience functions for it. `vimfx.send(...)`, and
 `vimfx.listen(...)` in `frame.js`, are just light wrappers around the standard
 Firefox [Message Manager] to make it easier to create custom commands that ask
 `frame.js` for information about the current web page (as in the above example).
