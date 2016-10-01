@@ -440,6 +440,16 @@ commands.element_text_select = ({vim, elementIndex, full, scroll = false}) ->
   window.focus()
   selection.addRange(range)
 
+  if full
+    # Force the selected text to appear in the “selection clipboard”. Note:
+    # `selection.modify` would not make any difference here. That makes sense,
+    # since web pages that programmatically change the selection shouldn’t
+    # affect the user’s clipboard. `SelectionManager` uses an internal Firefox
+    # API with clipboard privileges.
+    selectionManager = new SelectionManager(window)
+    error = selectionManager.moveCaret('characterMove', BACKWARD)
+    selectionManager.moveCaret('characterMove', FORWARD) unless error
+
 commands.follow_pattern = ({vim, type, browserOffset, options}) ->
   {document} = vim.content
 
