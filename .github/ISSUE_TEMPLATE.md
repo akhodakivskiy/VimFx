@@ -1,8 +1,37 @@
-| ✦ First: Search for DUPLICATES – also closed issues.
-| ✦ Just updated VimFx? Check out the change log:
-|     https://github.com/akhodakivskiy/VimFx/blob/master/CHANGELOG.md
-| ✦ Remove lines starting with `|` when done.
+<!--
+Thank you for using VimFx!
 
+Before submitting an issue, you need to check the below items. :)
+(Change “[ ]” into “[x]”.)
+-->
+
+- [ ] I've searched for DUPLICATES – also closed issues
+- [ ] I've looked at the change log: https://github.com/akhodakivskiy/VimFx/blob/master/CHANGELOG.md
+- [ ] I've provided the below details:
+
+VimFx version: 
+Firefox version: 
+OS: 
+Keyboard language: 
+Example URL (if any): 
+
+This is … (pick one!)
+
+- [ ] A bug report
+  - [ ] I've filled in steps to reproduce below
+- [ ] A feature request
+  - [ ] I've given a **detailed** _example_ below
+- [ ] Somehting else
+
+
+
+<!-- For BUG REPORTS: (fill in the below) -->
+
+This bug is about … (pick one!)
+
+- [ ] A missing hint marker on a specific page
+- [ ] VimFx not recognizing a text input on a specific page
+- [ ] Something else
 
 Steps to reproduce:
 
@@ -14,44 +43,22 @@ Expected result:
 
 Actual result: 
 
+<!-- Example:
+Steps to reproduce:
 
-| OR, for feature requests:
+1. Go to https://www.mozilla.org/en-US/about/
+2. Scroll to the bottom of the page.
+2. Press `f`.
 
+Expected reult: There should be hint marker for the “Contact Us” link at the bottom.
 
-Detailed use case example: 
+Actual result: There is no hint marker for the “Contact Us” link.
+-->
 
-
-| ALWAYS include:
-
-
-VimFx version: 
-Firefox version: 
-OS: 
-Keyboard language: 
-Worked before: 
-Example URL(s): 
+<!-- Remember to delete the feature request stuff below :) -->
 
 
-| EXAMPLE:
-|
-| Steps to reproduce:
-|
-| 1. Go to one of the online terminals on codeacademy.com.
-| 2. Focus the online terminal.
-| 3. Type something into it.
-|
-| Expected reult: VimFx recognizes the terminal as a text input, automatically
-| allowing to type into it.
-|
-| Actual result: Instead of typing into the terminal I end up activating VimFx
-| commands.
-|
-| A work-around is to use Ignore mode.
-|
-| VimFx version: 0.11.0
-| Firefox version: 43
-| OS: Ubuntu 15.04
-| Keyboard language: en-US
-| Worked before: No
-| Example URL(s):
-| - https://www.codecademy.com/en/courses/learn-the-command-line/lessons/navigation/exercises/your-first-command
+
+<!-- For FEATURE REQUESTS: (edit the below example) -->
+
+When I go to https://www.mozilla.org/en-US/about/ and press `?`, _this_ and _that_ happens. I’d like _this_ to happen instead, because that really helps me with _that._ (Add more details here.) Perhaps something like _this_ should be added to VimFx?
