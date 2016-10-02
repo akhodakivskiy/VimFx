@@ -498,11 +498,12 @@ different page scrolling commands.
 - `scroll.full_page_adjustment`: `<space>, `<s-space>`
 - `scroll.half_page_adjustment`: `d`, `u`
 
-#### `scroll.last_position_mark`
+#### `scroll.last_position_mark` and `scroll.last_find_mark`
 
-The special mark for the [`'`][scroll-to-mark] command that takes you to the
-last position.
+These options allow you to customize the [special marks] for the
+[`'`][scroll-to-mark] command.
 
+[special marks]: commands.md#special-marks
 [scroll-to-mark]: commands.md#marks-m-and-
 
 ### `pattern_selector`

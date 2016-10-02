@@ -187,6 +187,7 @@ advanced_options =
   'scroll.full_page_adjustment':        40
   'scroll.half_page_adjustment':        20
   'scroll.last_position_mark':          "'"
+  'scroll.last_find_mark':              '/'
   'pattern_selector':                   ':-moz-any(
                                            a, button, input[type="button"]
                                          ):not([role="menu"]):not([role="tab"])'

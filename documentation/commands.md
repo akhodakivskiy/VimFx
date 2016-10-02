@@ -148,14 +148,23 @@ letter to associate the current scroll position with that letter. For example,
 press `ma` to save the position into mark _a._ Then you can return to that
 position by pressing `'` followed by the same letter, e.g. `'a`.
 
-One mark is special: `'`. Pressing `''` takes you to the scroll position before
-the last `gg`, `G`, `0`, `$`, `/`, `n`, `N` or `'`. (You can change this mark
-using the [`scroll.last_position_mark`] option.)
-
 Note: Firefox has a `'` shortcut by default. It opens the Quick Find bar. VimFx
 provides the `g/` shortcut instead.
 
-[`scroll.last_position_mark`]: options.md#scroll.last_position_mark
+#### Special marks
+
+Just like Vim, VimFx has a few special marks. These are set automatically.
+
+- `'`: Pressing `''` takes you to the scroll position before the last `gg`, `G`,
+  `0`, `$`, `/`, `a/`, `g/`, `n`, `N` or `'`.
+
+- `/`: Pressing `'/` takes you to the scroll position before the last `/`, `a/`
+  or `g/`.
+
+(You can change these marks by using the [`scroll.last_position_mark` and
+`scroll.last_find_mark`][mark-options] options.)
+
+[mark-options]: options.md#scroll.last_position_mark-and-scroll.last_find_mark
 
 #### Minor notes
 

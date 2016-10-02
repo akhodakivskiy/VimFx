@@ -808,6 +808,11 @@ helper_find = ({highlight, linksOnly = false}, {vim}) ->
   vim._enterMode('find')
 
   helper_mark_last_scroll_position(vim)
+  vim._run('mark_scroll_position', {
+    keyStr: vim.options['scroll.last_find_mark']
+    notify: false
+  })
+
   helper_find_from_top_of_viewport(vim, FORWARD, ->
     return unless vim.mode == 'find'
     findBar = vim.window.gBrowser.getFindBar()
