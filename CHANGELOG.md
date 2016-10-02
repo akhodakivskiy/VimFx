@@ -1,3 +1,20 @@
+### 0.20.0 (2016-10-02)
+
+- Added: The `g[` and `g]` commands, which let you scroll to previous and next
+  scroll positions of the current page. This is similar to Vim’s jump list.
+- Added: The `/` mark. Pressing `'/` takes you to the scroll position before the
+  last `/`, `a/` or `g/`.
+- Fixed: Pressing `''` multiple times in a row now flips back and forth
+  between two scroll positions as expected.
+- Fixed: Version 0.19.0 claimed to include the following improvement: “The hint
+  marker for a smaller element can no longer cover the hint marker for a larger
+  element (unless you press `<c-space>` to rotate them).” However, a silly
+  mistake caused that improvement not to work. Now it does. For real.
+- Fixed: All VimFx commands that copy text to the clipboard are now made sure to
+  also copy to the “selection clipboard” (if your system has such a thing). For
+  example, if you copy text using the `yv` command, the `p` command now uses
+  that copied text as expected.
+
 ### 0.19.1 (2016-09-26)
 
 - Fixed: The `'` command no longer crashes. (Regression since 0.19.0.)
