@@ -179,7 +179,7 @@ class MarkerContainer
     # for a larger element. Existing markers should also have higher `z-index`
     # than newer markers, which is why we start out large and not at zero.
     zIndex = MAX_Z_INDEX - markers.length - @markers.length + 1
-    markers.sort((a, b) -> a.wrapper.area - b.wrapper.area)
+    markers.sort((a, b) -> a.wrapper.shape.area - b.wrapper.shape.area)
     for marker in markers
       marker.markerElement.style.zIndex = zIndex
       zIndex += 1
