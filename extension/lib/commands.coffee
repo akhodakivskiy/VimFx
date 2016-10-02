@@ -155,10 +155,10 @@ springConstant = {
 helper_scroll = (vim, event, args...) ->
   [
     method, type, directions, amounts
-    properties = null, adjustment = 0, name = 'scroll'
+    properties = null, adjustment = 0, name = 'scroll', extra = {}
   ] = args
   options = {
-    method, type, directions, amounts, properties, adjustment
+    method, type, directions, amounts, properties, adjustment, extra
     smooth: (
       prefs.root.get('general.smoothScroll') and
       prefs.root.get("general.smoothScroll.#{type}")
@@ -253,11 +253,10 @@ commands.mark_scroll_position = ({vim}) ->
 
 commands.scroll_to_mark = ({vim}) ->
   vim._enterMode('marks', (keyStr) ->
-    unless keyStr == vim.options['scroll.last_position_mark']
-      helper_mark_last_scroll_position(vim)
     helper_scroll(
-      vim, null, 'scrollTo', 'other', ['top', 'left'], keyStr,
+      vim, null, 'scrollTo', 'other', ['top', 'left'], [0, 0]
       ['scrollTopMax', 'scrollLeftMax'], 0, 'scroll_to_mark'
+      {keyStr, lastPositionMark: vim.options['scroll.last_position_mark']}
     )
     vim.hideNotification()
   )

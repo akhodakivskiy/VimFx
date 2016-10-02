@@ -106,13 +106,16 @@ commands.mark_scroll_position = ({vim, keyStr, notify = true}) ->
     vim.notify(translate('notification.mark_scroll_position.success', keyStr))
 
 commands.scroll_to_mark = (args) ->
-  {vim, amounts: keyStr} = args
+  {vim, extra: {keyStr, lastPositionMark}} = args
+
   unless keyStr of vim.state.marks
     vim.notify(translate('notification.scroll_to_mark.none', keyStr))
     return
 
   args.amounts = vim.state.marks[keyStr]
   element = vim.state.scrollableElements.filterSuitableDefault()
+
+  commands.mark_scroll_position({vim, keyStr: lastPositionMark, notify: false})
   viewportUtils.scroll(element, args)
 
 helper_follow = (options, matcher, {vim, pass}) ->
