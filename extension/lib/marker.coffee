@@ -30,7 +30,7 @@ class Marker
     {
       @wrapper, @document, @viewport, @zoom = 1, @isComplementary = false
     } = options
-    @elementShape  = @wrapper.shape
+    @elementShape = @wrapper.shape
     @markerElement = utils.createBox(@document, 'marker')
     @markerElement.setAttribute('data-type', @wrapper.type)
     @weight = @wrapper.combinedArea
