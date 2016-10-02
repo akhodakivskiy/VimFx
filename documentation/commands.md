@@ -141,6 +141,22 @@ eating your best hint char on most pages; see [The hint commands]).
 
 [The hint commands]: #the-hint-commands--hints-mode
 
+### `g[` and `g]`
+
+Each time you use `gg`, `G`, `0`, `$`, `/`, `a/`, `g/`, `n`, `N` or `'`, the
+current scroll position is recorded in a list just before the scrolling command
+in question is performed. You can then travel back to the scroll positions in
+that list by using the `g[` command. Went too far back? Use the `g]` to go
+forward again.
+
+If the current scroll position already exists in the list, it is moved to the
+end. This way, repeating `g[` you will scroll back to old positions only once.
+
+Both `g[` and `g]` go _count_ steps in the list.
+
+This feature is inspired by Vim’s _jump list._ Some people prefer changing the
+shortcuts to `<c-o>` and `<c-i>` to match Vim’s.
+
 ### Marks: `m` and `'`
 
 Other than traditional scrolling, VimFx has _marks._ Press `m` followed by a
@@ -156,7 +172,7 @@ provides the `g/` shortcut instead.
 Just like Vim, VimFx has a few special marks. These are set automatically.
 
 - `'`: Pressing `''` takes you to the scroll position before the last `gg`, `G`,
-  `0`, `$`, `/`, `a/`, `g/`, `n`, `N` or `'`.
+  `0`, `$`, `/`, `a/`, `g/`, `n`, `N`, `'`, `g[` or `g]`.
 
 - `/`: Pressing `'/` takes you to the scroll position before the last `/`, `a/`
   or `g/`.

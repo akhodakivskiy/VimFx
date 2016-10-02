@@ -95,13 +95,14 @@ commands.scroll = (args) ->
       vim.state.scrollableElements.filterSuitableDefault()
   viewportUtils.scroll(element, args)
 
-commands.mark_scroll_position = ({vim, keyStr, notify = true}) ->
-  element = vim.state.scrollableElements.filterSuitableDefault()
-  vim.state.marks[keyStr] =
-    if element.ownerDocument.documentElement.localName == 'svg'
-      [element.ownerGlobal.scrollY, element.ownerGlobal.scrollX]
-    else
-      [element.scrollTop, element.scrollLeft]
+commands.mark_scroll_position = (args) ->
+  {vim, keyStr, notify = true, addToJumpList = false} = args
+
+  vim.state.marks[keyStr] = vim.state.scrollableElements.getPageScrollPosition()
+
+  if addToJumpList
+    vim.addToJumpList()
+
   if notify
     vim.notify(translate('notification.mark_scroll_position.success', keyStr))
 
@@ -115,8 +116,39 @@ commands.scroll_to_mark = (args) ->
   args.amounts = vim.state.marks[keyStr]
   element = vim.state.scrollableElements.filterSuitableDefault()
 
+  commands.mark_scroll_position({
+    vim
+    keyStr: lastPositionMark
+    notify: false
+    addToJumpList: true
+  })
+  viewportUtils.scroll(element, args)
+
+commands.scroll_to_position = (args) ->
+  {vim, extra: {count, direction, lastPositionMark}} = args
+
+  if direction == 'previous' and vim.state.jumpListIndex >= 0 and
+     vim.state.jumpListIndex == vim.state.jumpList.length - 1
+    vim.addToJumpList()
+
+  {jumpList, jumpListIndex} = vim.state
+  maxIndex = jumpList.length - 1
+
+  if (direction == 'previous' and jumpListIndex <= 0) or
+     (direction == 'next' and jumpListIndex >= maxIndex)
+    vim.notify(translate("notification.scroll_to_#{direction}_position.limit"))
+    return
+
+  index = jumpListIndex + count * (if direction == 'previous' then -1 else +1)
+  index = Math.max(index, 0)
+  index = Math.min(index, maxIndex)
+
+  args.amounts = jumpList[index]
+  element = vim.state.scrollableElements.filterSuitableDefault()
+
   commands.mark_scroll_position({vim, keyStr: lastPositionMark, notify: false})
   viewportUtils.scroll(element, args)
+  vim.state.jumpListIndex = index
 
 helper_follow = (options, matcher, {vim, pass}) ->
   {id, combine = true, selectors = FOLLOW_DEFAULT_SELECTORS} = options

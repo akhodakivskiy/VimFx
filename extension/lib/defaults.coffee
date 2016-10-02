@@ -58,6 +58,8 @@ shortcuts =
       '$':         'scroll_to_right'
       'm':         'mark_scroll_position'
       "'":         'scroll_to_mark'
+      'g[':        'scroll_to_previous_position'
+      'g]':        'scroll_to_next_position'
 
     'tabs':
       't':         'tab_new'

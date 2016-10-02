@@ -130,4 +130,11 @@ class ScrollableElements
       @reject((element) => not @isScrollable(element))
       return @largest ? @quirks(@window.document.documentElement)
 
+  getPageScrollPosition: ->
+    element = @filterSuitableDefault()
+    if element.ownerDocument.documentElement.localName == 'svg'
+      return [element.ownerGlobal.scrollX, element.ownerGlobal.scrollY]
+    else
+      return [element.scrollLeft, element.scrollTop]
+
 module.exports = ScrollableElements

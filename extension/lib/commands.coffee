@@ -243,7 +243,7 @@ commands.scroll_to_right       = helper_scrollToX.bind(null, Infinity)
 
 helper_mark_last_scroll_position = (vim) ->
   keyStr = vim.options['scroll.last_position_mark']
-  vim._run('mark_scroll_position', {keyStr, notify: false})
+  vim._run('mark_scroll_position', {keyStr, notify: false, addToJumpList: true})
 
 commands.mark_scroll_position = ({vim}) ->
   vim._enterMode('marks', (keyStr) ->
@@ -254,13 +254,27 @@ commands.mark_scroll_position = ({vim}) ->
 commands.scroll_to_mark = ({vim}) ->
   vim._enterMode('marks', (keyStr) ->
     helper_scroll(
-      vim, null, 'scrollTo', 'other', ['top', 'left'], [0, 0]
-      ['scrollTopMax', 'scrollLeftMax'], 0, 'scroll_to_mark'
+      vim, null, 'scrollTo', 'other', ['left', 'top'], [0, 0]
+      ['scrollLeftMax', 'scrollTopMax'], 0, 'scroll_to_mark'
       {keyStr, lastPositionMark: vim.options['scroll.last_position_mark']}
     )
     vim.hideNotification()
   )
   vim.notify(translate('notification.scroll_to_mark.enter'))
+
+helper_scroll_to_position = (direction, {vim, count = 1}) ->
+  lastPositionMark = vim.options['scroll.last_position_mark']
+  helper_scroll(
+    vim, null, 'scrollTo', 'other', ['left', 'top'], [0, 0]
+    ['scrollLeftMax', 'scrollTopMax'], 0, 'scroll_to_position'
+    {count, direction, lastPositionMark}
+  )
+
+commands.scroll_to_previous_position =
+  helper_scroll_to_position.bind(null, 'previous')
+
+commands.scroll_to_next_position =
+  helper_scroll_to_position.bind(null, 'next')
 
 
 

@@ -54,6 +54,8 @@ class VimFrame
         hasInteraction: false
         shouldRefocus: false
         marks: {}
+        jumpList: []
+        jumpListIndex: -1
         explicitBodyFocus: false
         hasFocusedTextInput: false
         lastFocusedTextInput: null
@@ -106,5 +108,13 @@ class VimFrame
       utils.setHover(element, false)
       utils.simulateMouseEvents(element, 'hover-end', browserOffset)
     @state.lastHover.element = null
+
+  addToJumpList: ->
+    [newX, newY] = position = @state.scrollableElements.getPageScrollPosition()
+    jumpList = @state.jumpList[..@state.jumpListIndex]
+      .filter(([x, y]) -> not (x == newX and y == newY))
+      .concat([position])
+    @state.jumpList = jumpList
+    @state.jumpListIndex = jumpList.length - 1
 
 module.exports = VimFrame
