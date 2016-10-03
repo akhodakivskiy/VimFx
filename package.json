@@ -16,9 +16,9 @@
     "vim-like-key-notation": "^1.0.1"
   },
   "devDependencies": {
-    "addons-linter": "^0.15.3",
-    "coffee-script": "jashkenas/coffeescript#87216ea5b64804aac584966b60063ddc77c69f2b",
-    "coffeelint": "^1.15.7",
+    "addons-linter": "^0.15.4",
+    "coffee-script": "–1.11.1",
+    "coffeelint": "^1.16.0",
     "coffeelint-forbidden-keywords": "^0.1.1",
     "gulp": "^3.9.1",
     "gulp-coffee": "^2.3.2",
