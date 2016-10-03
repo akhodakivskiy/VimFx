@@ -1,0 +1,24 @@
+<!ENTITY pref.hint_chars.title      "Ukazovatele a povolené písmená">
+<!ENTITY pref.hint_chars.desc       "Default: fjdkslaghrueiwovncm">
+
+<!ENTITY pref.black_list.title      "Zakázané stránky">
+<!ENTITY pref.black_list.desc       "Čiarkou oddelený zoznam URL adries, pre ktoré má býť VimFx zakázaný.
+Povolené zástupné znaky: *, !. Príklad: *example.com*,*foobar.org*">
+
+<!ENTITY pref.prev_patterns.title   "Predchádzajúca stránka">
+<!ENTITY pref.prev_patterns.desc    "Čiarkou oddelený zoznam zhôd pre odkazy na predchádzajúcu stránku.">
+
+<!ENTITY pref.next_patterns.title   "Nasledujúca stránka">
+<!ENTITY pref.next_patterns.desc    "Čiarkou oddelený zoznam zhôd pre odkazy na nasledujúcu stránku.">
+
+<!ENTITY pref.scroll_step_lines.title "Scroll Step">
+<!ENTITY pref.scroll_step_lines.desc  "Scroll Step">
+
+<!ENTITY pref.hints_bloom_on.title "Inteligentné priradzovanie">
+<!ENTITY pref.hints_bloom_on.desc  "Kratšie ukazovatele pre najčastejšie navštevované stránky">
+
+<!ENTITY pref.prevent_autofocus.title "Zabráni auto vyberaniu vstupných prvkov formulára">
+<!ENTITY pref.prevent_autofocus.desc  "Prvky nebudú vybraté po načítaní stránky">
+
+<!ENTITY customizeButton.title "Klávesové skratky">
+<!ENTITY customizeButton.label "Upraviť">
