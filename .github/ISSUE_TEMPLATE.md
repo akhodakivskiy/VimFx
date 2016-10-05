@@ -6,7 +6,7 @@ Before submitting an issue, you need to check the below items. :)
 -->
 
 - [ ] I've searched for DUPLICATES – also closed issues
-- [ ] I've looked at the change log: https://github.com/akhodakivskiy/VimFx/blob/master/CHANGELOG.md
+- [ ] I've looked at the [change log](https://github.com/akhodakivskiy/VimFx/blob/master/CHANGELOG.md)
 - [ ] I've provided the below details:
 
 VimFx version: 
