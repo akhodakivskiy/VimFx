@@ -5,7 +5,7 @@ Before submitting an issue, you need to check the below items. :)
 (Change “[ ]” into “[x]”.)
 -->
 
-- [ ] I've searched for DUPLICATES – also closed issues
+- [ ] I've searched for duplicates – also closed issues
 - [ ] I've looked at the [change log](https://github.com/akhodakivskiy/VimFx/blob/master/CHANGELOG.md)
 - [ ] I've provided the below details:
 
