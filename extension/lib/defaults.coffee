@@ -180,6 +180,7 @@ advanced_options =
   'prevent_autofocus_modes':            'normal'
   'config_file_directory':              ''
   'blur_timeout':                       50
+  'refocus_timeout':                    100
   'smoothScroll.lines.spring-constant': '1000'
   'smoothScroll.pages.spring-constant': '2500'
   'smoothScroll.other.spring-constant': '2500'

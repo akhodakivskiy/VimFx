@@ -425,6 +425,21 @@ shortcut instead of typing into the text input, which can be quite annoying. To
 avoid the problem, VimFx waits a bit before checking if you have left the text
 input.
 
+### `refocus_timeout`
+
+If you switch to another window while a text input is focused, Firefox actually
+blurs the text input. If you then switch back again, Firefox will re-focus the
+text input.
+
+VimFx tracks that case, so that the [Prevent autofocus] option does not think it
+should prevent that refocus. Unfortunately, the tracking requires a timeout.
+This option let’s you customize that timeout (measured in milliseconds).
+
+If you experience that text input focus is lost after switching back to Firefox
+from another window, you might want to increase this timeout.
+
+[Prevent autofocus]: #prevent-autofocus
+
 ### Scrolling options
 
 Apart from its own options, VimFx also respects a few built-in Firefox options.
