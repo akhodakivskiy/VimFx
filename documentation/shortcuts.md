@@ -42,17 +42,35 @@ be put inside `<` and `>`. If you want to specify a modifier, then letters need
 to be put inside `<` and `>` as well (as in the `<c-j>` example, which might be
 notated as “CTRL+J” in some other programs.)
 
-If you’re usure on how to express a key press you’d like to use as part of a
-shortcut, press `<c-q>` while inside one of the text inputs for a command and
-then press your desired key (optionally holding modifier keys). That will paste
-the key notation for that particular key press into the text input. `<c-d>`
-pastes the default shortcut(s), and `<c-r>` resets the text input to the default
-entirely. You can of course use the standard `<c-z>` to undo.
-
 You can specify any number of shortcuts for every command. Separate them from
 each other by one or more spaces.
 
-Here is a more formal description of all of the above:
+### Helper keyboard shortcuts
+
+When you have focused the text input for one of all commands, there are a few
+handy keyboard shortcuts that help you with editing your shortcuts:
+
+- `<c-q>`: Use this when you’re unsure on how to express a keypress you’d like
+  to use as part of a shortcut. First, press `<c-q>`. Then, press your desired
+  key (optionally holding modifier keys). That will paste the key notation for
+  that particular keypress into the text input. For example: First press
+  `<c-q>`. Then hold down ctrl and press `[`. That results in `<c-[>` being
+  inserted into the text input.
+
+- `<c-d>`: Pastes the default shortcut(s) into the text input.
+
+- `<c-r>`: Resets the text input to the default entirely.
+
+- `<c-z>`: Undo. (This is simply the standard undo feature of your operating
+  system. It’s just mentioned because it is easy to forget that it can actually
+  be used here.)
+
+(`<c-d>`, `<c-r>` and `<c-z>` also work in other VimFx setting inputs, such as
+the [“Previous”/“Next” link patterns].)
+
+[“Previous”/“Next” link patterns]: options.md#previousnext-link-patterns
+
+### A bit more formal description
 
 A _shortcut_ consists of one or more _keys_ that you need to press in order to
 activate the command. (See also the [timeout] option.)

@@ -67,10 +67,22 @@ Head over to the [Styling] documentation to learn how to do that.
 
 [Styling]: styling.md
 
-## How do I re-map `<escape>` to blur text inputs?
+## How do I re-map Escape (which blurs text inputs)?
 
-The default shortcut is actually `<force><escape>`! Don’t forget [`<force>`] at
-the beginning, and your new shortcut should work fine.
+… for example, **to ctrl+[ ?**
+
+First off, ctrl+[ is spelled `<c-[>` in VimFx. (Tip: [`<c-q>` helps you get the
+“spelling” correct automatically][helper-shortcuts].)
+
+Secondly, the default shortcut is not just `<escape>`, but actually
+`<force><escape>`! Don’t forget [`<force>`] at the beginning, and your new
+shortcut should work fine. For example:
+
+    <force><c-[>
+
+Or, if you’d like to you both `<escape>` _and_ something else:
+
+    <force><escape>    <force><c-[>
 
 [`<force>`]: shortcuts.md#force
 
@@ -81,6 +93,7 @@ Pressing `H` is like hitting the back button. Use `L` for the forward button.
 `[` clicks the link labeled “Previous” on the page, and `]` the link labeled
 “Next.” (See also [“Previous”/“Next” link patterns].)
 
+[helper-shortcuts]: shortcuts.md#helper-keyboard-shortcuts
 [“Previous”/“Next” link patterns]: options.md#previousnext-link-patterns
 
 ## Can I search in the Keyboard Shortcuts help dialog?
