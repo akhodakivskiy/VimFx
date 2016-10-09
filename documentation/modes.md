@@ -49,12 +49,11 @@ A mode does three things.
   while the point of Ignore mode is to have as few as possible. This is the most
   important point of modes.
 
-- It decides what happens when you press keys on your keyboard. If your key
-  press is part of the [shortcut] for a command, it is usually consumed by
-  VimFx. If not, Normal mode and Ignore mode pass the key press on (letting it
-  behave as if VimFx wasn’t even installed), while in [Hints mode][hint-commands]
-  _all_ key presses are captured, allowing you to type the letters of a hint
-  marker.
+- It decides what happens when you press keys on your keyboard. If your keypress
+  is part of the [shortcut] for a command, it is usually consumed by VimFx. If
+  not, Normal mode and Ignore mode pass the keypress on (letting it behave as if
+  VimFx wasn’t even installed), while in [Hints mode][hint-commands] _all_
+  keypresses are captured, allowing you to type the letters of a hint marker.
 
 - It tells all parts of VimFx what mode you’re in. (How surprising!) Some
   features are only enabled in certain modes. For example, [autofocus

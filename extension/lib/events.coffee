@@ -264,7 +264,7 @@ class UIEventManager
 
   anyPopupsOpen: ->
     # The autocomplete popup in text inputs (for example) is technically a
-    # panel, but it does not respond to key presses. Therefore
+    # panel, but it does not respond to keypresses. Therefore
     # `[ignorekeys="true"]` is excluded.
     #
     # coffeelint: disable=max_line_length

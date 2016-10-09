@@ -13,7 +13,7 @@ to reflect this.
 
 As you can see in VimFx’s Keyboard Shortcuts help dialog (which you can open by
 pressing `?`), Ignore mode only has two shortcuts. That means that almost all
-key presses will be ignored by VimFx, and will be handled as if VimFx wasn’t
+keypresses will be ignored by VimFx, and will be handled as if VimFx wasn’t
 installed.
 
 By adding `*currentdomain.com*` to the [blacklist] option you can make VimFx

@@ -99,7 +99,7 @@ keyboard layout] option.
 
 If you’d like see what VimFx interprets a key stroke as, you can (ab)use the
 [`m`] command. Press `m` followed by your desired key stroke. A [notification]
-will appear, including the interpreted key notation for that key press.
+will appear, including the interpreted key notation for that keypress.
 
 [Ignore keyboard layout]: options.md#ignore-keyboard-layout
 [`m`]: commands.md#marks-m-and-
@@ -151,10 +151,10 @@ mode.”
 ### `<late>`
 
 The `<late>` special key makes the shortcut in question run _after_ the handling
-of key presses in the current page, allowing the current page to override it.
+of keypresses in the current page, allowing the current page to override it.
 
 Normally, all of VimFx’s shortcuts are triggered _before_ the current page gets
-the key presses. This makes the VimFx shortcuts work consistently regardless of
+the keypresses. This makes the VimFx shortcuts work consistently regardless of
 what the current page happens to be up to.
 
 Sometimes, though, it is useful to let the page override a shortcut. For

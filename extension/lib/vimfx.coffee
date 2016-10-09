@@ -19,7 +19,7 @@
 
 # This file defines a top-level object to hold global state for VimFx. It keeps
 # track of all `Vim` instances (vim.coffee), all options and all keyboard
-# shortcuts. It can consume key presses according to its commands, and return
+# shortcuts. It can consume keypresses according to its commands, and return
 # the commands for UI presentation. There is only one `VimFx` instance.
 
 notation = require('vim-like-key-notation')

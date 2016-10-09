@@ -481,7 +481,7 @@ helper_follow = ({name, callback}, {vim, count, callbackOverride = null}) ->
       return callback(marker, timesLeft, keyStr)
 
   # Enter Hints mode immediately, with an empty set of markers. The user might
-  # press keys before any hints have been generated. Those key presses should be
+  # press keys before any hints have been generated. Those keypresses should be
   # handled in Hints mode, not Normal mode.
   vim._enterMode('hints', {
     markerContainer, count
