@@ -1,3 +1,16 @@
+### 0.20.1 (2016-10-09)
+
+- Improved: Caret mode is now a bit more robust. It can no longer make you end
+  up with [Firefox’s own Caret mode] accidentally enabled.
+- Improved: If you try use for example `<ctrl>-j` as a keyboard shortcut, VimFx
+  will now tell you that you probably want `<c-j>` instead.
+- Fixed: Using a keyboard shortcut to switch keyboard layout in GNOME while
+  inside a text input no longer causes the focus of that text input to be lost
+  when the Prevent autofocus option is enabled.
+- Updated locale: zh-CN. Thanks to @av2000ii!
+
+[Firefox’s own Caret mode]: http://kb.mozillazine.org/Accessibility_features_of_Firefox#Allow_text_to_be_selected_with_the_keyboard
+
 ### 0.20.0 (2016-10-02)
 
 - Added: The `g[` and `g]` commands, which let you scroll to previous and next
