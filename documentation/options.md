@@ -315,6 +315,10 @@ These options are _not_ available in VimFx’s options page in the Add-ons
 Manager. They can only be changed in [about:config] or using a [config file].
 They all start with `extensions.VimFx.`.
 
+Don’t feel that you have to go through all of these options in order to get the
+most from VimFx! Really, there’s no need at all to change the defaults unless
+you’ve run into some edge case.
+
 (There are actually a few more advanced options than those listed here. You can
 see them all in [defaults.coffee].)
 
