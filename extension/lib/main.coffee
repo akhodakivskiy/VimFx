@@ -96,7 +96,17 @@ module.exports = (data, reason) ->
   # their 'loadConfig' code manually.
   config.load(vimfx)
   vimfx.on('shutdown', -> messageManager.send('unloadConfig'))
+
+  # Since VimFx has its own Caret mode, it doesn’t make much sense having
+  # Firefox’s Caret mode always own, so make sure that it is disabled (or
+  # enabled if the user has chosen to explicitly have it always on.)
+  vimfx.resetCaretBrowsing()
+
   module.onShutdown(->
+    # Make sure that users are not left with Firefox’s own Caret mode
+    # accidentally enabled.
+    vimfx.resetCaretBrowsing()
+
     # Make sure to run the below lines in this order. The second line results in
     # removing all message listeners in frame scripts, including the one for
     # 'unloadConfig' (see above).

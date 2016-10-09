@@ -176,6 +176,7 @@ advanced_options =
   'prevent_target_blank':               true
   'counts_enabled':                     true
   'find_from_top_of_viewport':          true
+  'browsewithcaret':                    false
   'ignore_ctrl_alt':                    (Services.appinfo.OS == 'WINNT')
   'prevent_autofocus_modes':            'normal'
   'config_file_directory':              ''

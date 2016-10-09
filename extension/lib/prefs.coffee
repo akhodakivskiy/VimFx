@@ -99,6 +99,7 @@ module.exports = {
     set: set.bind(null, branches.root.user)
     has: has.bind(null, branches.root.user)
     tmp: tmp.bind(null, branches.root.user)
+    observe: observe.bind(null, branches.root.user)
     default: {
       get: get.bind(null, branches.root.default)
       set: set.bind(null, branches.root.default)

@@ -27,6 +27,7 @@ prefs = require('./prefs')
 utils = require('./utils')
 Vim = require('./vim')
 
+CARET_BROWSING_PREF = 'accessibility.browsewithcaret'
 DIGIT = /^\d$/
 
 class VimFx extends utils.EventEmitter
@@ -35,10 +36,12 @@ class VimFx extends utils.EventEmitter
     @vims = new WeakMap()
     @lastClosedVim = null
     @goToCommand = null
+    @skipObserveCaretBrowsing = false
     @ignoreKeyEventsUntilTime = 0
     @skipCreateKeyTrees = false
     @createKeyTrees()
     @reset()
+    @observeCaretBrowsing()
     @on('modeChange', ({vim}) => @reset(vim.mode))
 
   SPECIAL_KEYS: {
@@ -77,6 +80,17 @@ class VimFx extends utils.EventEmitter
     @currentKeyTree = @keyTrees[mode] ? {}
     @lastInputTime = 0
     @count = ''
+
+  resetCaretBrowsing: (value = @options.browsewithcaret) ->
+    @skipObserveCaretBrowsing = true
+    prefs.root.set(CARET_BROWSING_PREF, value)
+    @skipObserveCaretBrowsing = false
+
+  observeCaretBrowsing: ->
+    prefs.root.observe(CARET_BROWSING_PREF, =>
+      return if @skipObserveCaretBrowsing
+      prefs.set('browsewithcaret', prefs.root.get(CARET_BROWSING_PREF))
+    )
 
   createKeyTrees: ->
     return if @skipCreateKeyTrees

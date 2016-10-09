@@ -30,7 +30,6 @@ translate = require('./translate')
 utils = require('./utils')
 
 {FORWARD, BACKWARD} = SelectionManager
-CARET_BROWSING_PREF = 'accessibility.browsewithcaret'
 
 # Helper to create modes in a DRY way.
 mode = (modeName, obj, commands = null) ->
@@ -125,27 +124,29 @@ helper_move_caret = (method, direction, {vim, storage, count = 1}) ->
 mode('caret', {
   onEnter: ({vim, storage}, {select = false} = {}) ->
     storage.select = select
-    storage.caretBrowsingPref = prefs.root.get(CARET_BROWSING_PREF)
-    prefs.root.set(CARET_BROWSING_PREF, true)
+    vim._parent.resetCaretBrowsing(true)
     vim._run('enable_caret')
 
     listener = ->
       return unless newVim = vim._parent.getCurrentVim(vim.window)
-      prefs.root.set(
-        CARET_BROWSING_PREF,
-        if newVim.mode == 'caret' then true else storage.caretBrowsingPref
+      vim._parent.resetCaretBrowsing(
+        if newVim.mode == 'caret' then true else null
       )
     vim._parent.on('TabSelect', listener)
     storage.removeListener = -> vim._parent.off('TabSelect', listener)
 
   onLeave: ({vim, storage}) ->
-    prefs.root.set(CARET_BROWSING_PREF, storage.caretBrowsingPref)
+    vim._parent.resetCaretBrowsing()
     vim._run('clear_selection')
     storage.removeListener?()
     storage.removeListener = null
 
   onInput: (args, match) ->
     args.vim.hideNotification()
+
+    # In case the user turns Caret Browsing off while in Caret mode.
+    args.vim._parent.resetCaretBrowsing(true)
+
     switch match.type
       when 'full'
         match.command.run(args)

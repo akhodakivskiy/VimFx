@@ -961,7 +961,10 @@ commands.esc = ({vim}) ->
   vim.hideNotification()
   utils.blurActiveBrowserElement(vim)
   vim.window.gBrowser.getFindBar().close()
-  MarkerContainer.remove(vim.window) # Better safe than sorry.
+
+  # Better safe than sorry.
+  MarkerContainer.remove(vim.window)
+  vim._parent.resetCaretBrowsing()
 
   # Calling `.hide()` when the toolbar is not open can destroy it for the rest
   # of the Firefox session. The code here is taken from the `.toggle()` method.

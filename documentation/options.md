@@ -378,6 +378,21 @@ block of the text with lots of search matches and then continue going through
 matches with `n` after that block, without having to spam `n` lots and lots of
 times.
 
+### `browsewithcaret`
+
+[Caret mode] uses [Firefox’s own Caret mode] under the hood. This means that
+VimFx temporarily enables the Firefox option `accessibility.browsewithcaret`
+when you are in VimFx’s Caret mode. When you leave Caret mode, that option is
+turned off again.
+
+VimFx automatically syncs the `browsewithcaret` option with
+`accessibility.browsewithcaret`. If you change the latter manually (such as by
+using the Firefox default shortcut `<f7>`), VimFx’s option is changed as well,
+so you shouldn’t really have to touch this option at all.
+
+[Caret mode]: commands.md#caret-mode
+[Firefox’s own Caret mode]: http://kb.mozillazine.org/Accessibility_features_of_Firefox#Allow_text_to_be_selected_with_the_keyboard
+
 ### `ignore_ctrl_alt`
 
 This option is enabled by default on Windows, and disabled otherwise.
