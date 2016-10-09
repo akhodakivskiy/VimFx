@@ -86,6 +86,14 @@ Or, if you’d like to you both `<escape>` _and_ something else:
 
 [`<force>`]: shortcuts.md#force
 
+## Re-mapping Escape doesn’t always work!
+
+There are several default shortcuts which use `<escape>`. Apart from the Normal
+mode command for blurring text inputs, the Caret, Hints, Find and Marks modes
+have one command each for returning to Normal mode. All of these use `<escape>`.
+
+Perhaps you forgot to re-map some of them?
+
 ## Going back/forward doesn’t work!
 
 Pressing `H` is like hitting the back button. Use `L` for the forward button.
