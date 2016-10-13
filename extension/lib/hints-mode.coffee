@@ -25,9 +25,12 @@ activateMatch = (vim, storage, match, matchedMarkers, callback) ->
 
   marker.markMatched(true) for marker in matchedMarkers
 
+  [largestMatchedMarker] = matchedMarkers
+    .sort((a, b) -> b.wrapper.shape.area - a.wrapper.shape.area)
+
   # Prevent `onLeave` cleanup if the callback enters another mode.
   storage.skipOnLeaveCleanup = true
-  again = callback(matchedMarkers[0], storage.count, match.keyStr)
+  again = callback(largestMatchedMarker, storage.count, match.keyStr)
   storage.skipOnLeaveCleanup = false
 
   switchedMode = (vim.mode != 'hints')
