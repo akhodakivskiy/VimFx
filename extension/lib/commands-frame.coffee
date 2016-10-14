@@ -686,8 +686,8 @@ commands.collapse_selection = ({vim}) ->
   return unless selectionManager = helper_create_selection_manager(vim)
   selectionManager.collapse()
 
-commands.clear_selection = ({vim}) ->
-  utils.clearSelectionDeep(vim.content)
+commands.clear_selection = ({vim, skipBlurring}) ->
+  utils.clearSelectionDeep(vim.content, {skipBlurring})
 
 commands.modal = ({vim, type, args}) ->
   return vim.content[type](args...)

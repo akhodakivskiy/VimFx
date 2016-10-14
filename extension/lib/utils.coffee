@@ -372,14 +372,14 @@ checkElementOrAncestor = (element, fn) ->
     element = element.parentElement
   return false
 
-clearSelectionDeep = (window) ->
+clearSelectionDeep = (window, {skipBlurring = false} = {}) ->
   # The selection might be `null` in hidden frames.
   selection = window.getSelection()
   selection?.removeAllRanges()
   for frame in window.frames
     clearSelectionDeep(frame)
     # Allow parents to re-gain control of text selection.
-    frame.frameElement.blur()
+    frame.frameElement.blur() unless skipBlurring
   return
 
 containsDeep = (parent, element) ->

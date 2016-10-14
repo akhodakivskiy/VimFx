@@ -48,7 +48,10 @@ activateMatch = (vim, storage, match, matchedMarkers, callback) ->
     vim.window.setTimeout((->
       # Don’t clean up if Hints mode has been re-entered before the
       # timeout has passed.
-      cleanup(vim, storage) unless vim.mode == 'hints'
+      unless vim.mode == 'hints'
+        # Don’t blur frames (in `utils.clearSelectionDeep`) in case the callback
+        # has focused something in a frame.
+        cleanup(vim, storage, {skipBlurring: true})
     ), vim.options['hints.matched_timeout'])
 
     unless switchedMode
@@ -56,10 +59,10 @@ activateMatch = (vim, storage, match, matchedMarkers, callback) ->
       vim._enterMode('normal')
       storage.skipOnLeaveCleanup = false
 
-cleanup = (vim, storage) ->
+cleanup = (vim, storage, options = {}) ->
   {markerContainer, matchText} = storage
   markerContainer?.remove()
-  vim._run('clear_selection') if matchText and vim.mode != 'caret'
+  vim._run('clear_selection', options) if matchText and vim.mode != 'caret'
   if vim.options.notify_entered_keys and
      markerContainer.enteredText == vim._state.lastNotification
     vim.hideNotification()
