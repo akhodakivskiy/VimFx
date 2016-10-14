@@ -472,7 +472,14 @@ commands.element_text_select = ({vim, elementIndex, full, scroll = false}) ->
       range.setEndBefore(element)
 
   utils.clearSelectionDeep(vim.content)
+
+  # Focus the window so that the selection does not appear greyed out. However,
+  # if a text input was previously focused in that window (frame), that will
+  # cause the text input to be re-focused, so make sure to blur the active
+  # element, so that the caret does not end up there.
   window.focus()
+  window.document.activeElement?.blur?()
+
   selection.addRange(range)
 
   if full
