@@ -51,7 +51,7 @@ activateMatch = (vim, storage, match, matchedMarkers, callback) ->
       unless vim.mode == 'hints'
         # Don’t blur frames (in `utils.clearSelectionDeep`) in case the callback
         # has focused something in a frame.
-        cleanup(vim, storage, {skipBlurring: true})
+        cleanup(vim, storage, {blur: false})
     ), vim.options['hints.matched_timeout'])
 
     unless switchedMode
