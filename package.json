@@ -16,7 +16,7 @@
     "vim-like-key-notation": "^1.0.1"
   },
   "devDependencies": {
-    "addons-linter": "^0.15.4",
+    "addons-linter": "^0.15.5",
     "coffee-script": "^1.11.1",
     "coffeelint": "^1.16.0",
     "coffeelint-forbidden-keywords": "^0.1.1",
@@ -25,7 +25,7 @@
     "gulp-coffeelint": "^0.6.0",
     "gulp-git": "^1.11.3",
     "gulp-header": "^1.8.8",
-    "gulp-mustache": "^2.2.0",
+    "gulp-mustache": "^2.3.0",
     "gulp-preprocess": "^2.0.0",
     "gulp-sloc": "flosse/gulp-sloc#sloc-v0.1.x",
     "gulp-tap": "^0.1.3",
