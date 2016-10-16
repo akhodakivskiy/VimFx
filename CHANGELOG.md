@@ -1,3 +1,14 @@
+### 0.20.2 (2016-10-16)
+
+- Fixed: Text inputs and links inside frames can now be focused using hint
+  commands again. (Regression since 0.19.0.)
+- Improved: Previously focused text inputs inside frames no longer steal the
+  focus when entering Caret mode in that frame.
+- Improved: When several hint markers have the same hint (because their links
+  go to the same place), the _largest_ of those links is now chosen when
+  activating that hint. This might be noticeable via focus styling.
+- Updated locale: zh-CN. Thanks to @av2000ii!
+
 ### 0.20.1 (2016-10-09)
 
 - Improved: Caret mode is now a bit more robust. It can no longer make you end
