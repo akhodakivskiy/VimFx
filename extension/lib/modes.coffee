@@ -63,6 +63,7 @@ mode('normal', {
   onInput: (args, match) ->
     {vim, storage, event} = args
     {keyStr} = match
+    focusTypeBeforeCommand = vim.focusType
 
     vim.hideNotification() if match.type in ['none', 'full']
 
@@ -100,10 +101,11 @@ mode('normal', {
       # open the split console.
       return utils.isDevtoolsElement(event.originalTarget)
     else
-      # In web pages content, an exception is made if an element that VimFx
+      # In web page content, an exception is made if an element that VimFx
       # cares about is focused. That allows for blurring an input in a custom
-      # dialog without closing the dialog too.
-      return vim.focusType != 'none'
+      # dialog without closing the dialog too. Note that running a command might
+      # change `vim.focusType`, which is why this saved value is used here.
+      return focusTypeBeforeCommand != 'none'
 
     # Note that this special handling of Escape is only used in Normal mode.
     # There are two reasons we might suppress it in other modes. If some custom
