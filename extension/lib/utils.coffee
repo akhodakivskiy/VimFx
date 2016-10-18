@@ -465,10 +465,6 @@ isDetached = (element) ->
 isNonEmptyTextNode = (node) ->
   return node.nodeType == 3 and node.data.trim() != ''
 
-isPositionFixed = (element) ->
-  computedStyle = element.ownerGlobal.getComputedStyle(element)
-  return computedStyle?.getPropertyValue('position') == 'fixed'
-
 querySelectorAllDeep = (window, selector) ->
   elements = Array.from(window.document.querySelectorAll(selector))
   for frame in window.frames
@@ -773,7 +769,6 @@ module.exports = {
   insertText
   isDetached
   isNonEmptyTextNode
-  isPositionFixed
   querySelectorAllDeep
   selectAllSubstringMatches
   selectElement

@@ -23,6 +23,14 @@ utils = require('./utils')
 
 MINIMUM_EDGE_DISTANCE = 4
 
+getPosition = (element) ->
+  computedStyle = element.ownerGlobal.getComputedStyle(element)
+  return computedStyle?.getPropertyValue('position')
+
+isFixed = (element) -> getPosition(element) == 'fixed'
+
+isFixedOrAbsolute = (element) -> getPosition(element) in ['fixed', 'absolute']
+
 adjustRectToViewport = (rect, viewport) ->
   # The right and bottom values are subtracted by 1 because
   # `document.elementFromPoint(right, bottom)` does not return the element
@@ -145,7 +153,7 @@ getFirstVisibleText = (window, viewport) ->
     continue unless isInsideViewport(rect, viewport)
 
     if element.contentWindow and
-       not utils.checkElementOrAncestor(element, utils.isPositionFixed)
+       not utils.checkElementOrAncestor(element, isFixed)
       {viewport: frameViewport} = getFrameViewport(element, viewport) ? {}
       continue unless frameViewport
       result = getFirstVisibleText(element.contentWindow, frameViewport)
@@ -156,7 +164,7 @@ getFirstVisibleText = (window, viewport) ->
       Array.filter(element.childNodes, utils.isNonEmptyTextNode)
     continue if nonEmptyTextNodes.length == 0
 
-    continue if utils.checkElementOrAncestor(element, utils.isPositionFixed)
+    continue if utils.checkElementOrAncestor(element, isFixed)
 
     for textNode in nonEmptyTextNodes
       offset = getFirstVisibleNonWhitespaceOffset(textNode, viewport)
@@ -188,15 +196,15 @@ getFixedHeaderAndFooter = (window) ->
   for candidate in candidates
     rect = candidate.getBoundingClientRect()
     continue unless rect.height <= maxHeight and rect.width >= minWidth
-    # Checking for `position: fixed;` is the absolutely most expensive
-    # operation, so that is done last.
+    # Checking for `position: fixed;` or `position: absolute;` is the absolutely
+    # most expensive operation, so that is done last.
     switch
       when rect.top <= headerBottom and rect.bottom > headerBottom and
-           utils.isPositionFixed(candidate)
+           isFixedOrAbsolute(candidate)
         header = candidate
         headerBottom = rect.bottom
       when rect.bottom >= footerTop and rect.top < footerTop and
-           utils.isPositionFixed(candidate)
+           isFixedOrAbsolute(candidate)
         footer = candidate
         footerTop = rect.top
 
