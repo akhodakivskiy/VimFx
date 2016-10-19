@@ -550,7 +550,11 @@ helper_follow_clickable = (options, args) ->
         }, vim.browser)
         reset()
       )
-    else
+
+    # The point of “clicking” scrollable elements is focusing them (which is
+    # done above) so that scrolling commands may scroll them. Simulating a click
+    # here usually _unfocuses_ the element.
+    else if type != 'scrollable'
       vim._run('click_marker_element', {
         elementIndex, type
         browserOffset: vim._getBrowserOffset()
