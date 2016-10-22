@@ -1,3 +1,12 @@
+### 0.20.3 (2016-10-22)
+
+- Improved: Full page scrolling now recognizes the fixed footer on medium.com.
+- Fixed: Scrollable element can now be focused with the `f` command again (not
+  just with the `ef` command). (Regression since 0.19.0.)
+- Fixed: `<escape>` is no longer accidentally leaked to the page when used to
+  blur text inputs. This allows blurring text inputs in modals without closing
+  the modal (which `<escape>` commonly does otherwise).
+
 ### 0.20.2 (2016-10-16)
 
 - Fixed: Text inputs and links inside frames can now be focused using hint
