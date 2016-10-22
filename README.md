@@ -19,7 +19,7 @@ VimFx is made by [these awesome people][people].
 [Vimium]: http://vimium.github.io/
 [Vimperator]: http://www.vimperator.org/vimperator
 [config file]: https://github.com/akhodakivskiy/VimFx/blob/master/documentation/config-file.md
-[documentation]: https://github.com/akhodakivskiy/VimFx/tree/master/documentation
+[documentation]: https://github.com/akhodakivskiy/VimFx/tree/master/documentation#contents
 [wiki]: https://github.com/akhodakivskiy/VimFx/wiki
 [Questions & Answers]: https://github.com/akhodakivskiy/VimFx/tree/master/documentation/questions-and-answers.md
 [people]: https://github.com/akhodakivskiy/VimFx/blob/master/PEOPLE.md

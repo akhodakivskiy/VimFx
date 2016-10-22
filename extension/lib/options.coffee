@@ -117,7 +117,7 @@ class Observer extends BaseObserver
       'first-row': 'true'
     })
 
-    href = "#{@vimfx.info.homepageURL}/tree/master/documentation"
+    href = "#{@vimfx.info.homepageURL}/tree/master/documentation#contents"
     docsLink = @document.createElement('label')
     utils.setAttributes(docsLink, {
       value: translate('prefs.documentation')
