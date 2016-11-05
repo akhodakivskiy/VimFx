@@ -104,6 +104,27 @@ Pressing `H` is like hitting the back button. Use `L` for the forward button.
 [helper-shortcuts]: shortcuts.md#helper-keyboard-shortcuts
 [“Previous”/“Next” link patterns]: options.md#previousnext-link-patterns
 
+## How do I switch tabs?
+
+There are a bunch of VimFx commands for switching tabs, such as [`J` and `K`],
+[`gl`], [`gL`][gl-1] as well as [`g0`, `g^` and `g$`].
+
+Other than that, you can use the `eb` command to click tabs using hint markers.
+
+Firefox’s location bar also searches among your open tabs, and lets you switch
+to them. By typing a lone `%` in the location bar, _only_ open tabs are searched
+for. See [Handy standard Firefox features][location-bar] for more information.
+
+Finally, there’s nothing stopping you from also using [standard Firefox tab
+shortcuts]!
+
+[`J` and `K`]: commands.md#j-k
+[`gl`]: commands.md#gl
+[gl-1]: commands.md#gl-1
+[`g0`, `g^` and `g$`]: commands.md#g0-g-g
+[location-bar]: handy-standard-firefox-features.md#the-location-bar
+[standard Firefox tab shortcuts]: https://support.mozilla.org/en-US/kb/keyboard-shortcuts-perform-firefox-tasks-quickly#w_windows-tabs
+
 ## Can I search in the Keyboard Shortcuts help dialog?
 
 Yes! Pressing `/` while the help dialog is open makes a little search box appear

@@ -17,20 +17,21 @@ This section lists a few handy such standard features.
 Firefox’s location bar is sometimes called the “Awesomebar” because it is so
 powerful. Other than simply entering URLs, you can also use it to:
 
-- Search through bookmarks.
-- Search through history.
-- Search through open tabs.
+- Search through bookmarks. `*`
+- Search through history. `^`
+- Search through open tabs. `%`
 - Search using search engines.
 
-Type a lone `*` to restrict the results to bookmarks only. Use `<c-enter>` to
-open results in new tabs. There are [plenty more such tricks][location-bar].
+Type a lone `*`, `^` or `%` to search for _only_ bookmarks, history or tabs,
+respectively. If you use this a lot, you might be interested in adding a [custom
+command as a shortcut][location-bar-custom-command].
 
-If you use this a lot, you might be interested in the [Enter Selects] extension
-and adding a [custom command as a shortcut][location-bar-custom-command].
+Use `<c-enter>` to open results in new tabs.
+
+Here’s [documentation for all of the cool Awesomebar features][location-bar].
 
 [location-bar]: http://kb.mozillazine.org/Location_Bar_search
-[Enter Selects]: https://addons.mozilla.org/en-US/firefox/addon/enter-selects/
-[location-bar-custom-command]: https://github.com/akhodakivskiy/VimFx/wiki/Custom-Commands#search-bookmarks
+[location-bar-custom-command]: https://github.com/akhodakivskiy/VimFx/wiki/Custom-Commands#search-bookmarks--search-open-tabs
 
 
 ## Menus
