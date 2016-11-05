@@ -95,6 +95,7 @@ getAllElements = (document, selector) ->
       continue unless child instanceof Element
       elements.add(child)
       getAllRegular(child)
+      getAllAnonymous(child)
     return
   getAllRegular(document.documentElement)
   return Array.from(elements)
