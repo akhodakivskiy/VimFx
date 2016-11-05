@@ -865,14 +865,30 @@ helper_find_again = (direction, {vim}) ->
   helper_find_from_top_of_viewport(vim, direction, ->
     findBar._findField.value = findStorage.lastSearchString
 
-    # Temporarily hack `.onFindResult` to be able to know when the asynchronous
-    # `.onFindAgainCommand` is done.
+    # `.onFindResult` is temporarily hacked to be able to know when the
+    # asynchronous `.onFindAgainCommand` is done. When PDFs are shown using
+    # PDF.js, `.updateControlState` is called instead of `.onFindResult`, so
+    # hack that one too.
     originalOnFindResult = findBar.onFindResult
+    originalUpdateControlState = findBar.updateControlState
+
     findBar.onFindResult = (data) ->
       # Prevent the find bar from re-opening if there are no matches.
       data.storeResult = false
       findBar.onFindResult = originalOnFindResult
+      findBar.updateControlState = originalUpdateControlState
       findBar.onFindResult(data)
+      callback()
+
+    findBar.updateControlState = (args...) ->
+      # Firefox inconsistently _doesn’t_ re-open the find bar if there are no
+      # matches here, so no need to take care of that in this case.
+      findBar.onFindResult = originalOnFindResult
+      findBar.updateControlState = originalUpdateControlState
+      findBar.updateControlState(args...)
+      callback()
+
+    callback = ->
       message = findBar._findStatusDesc.textContent
       vim.notify(message) if message
       findStorage.busy = false
