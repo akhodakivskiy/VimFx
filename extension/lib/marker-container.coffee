@@ -190,6 +190,8 @@ class MarkerContainer
     # than newer markers, which is why we start out large and not at zero.
     zIndex = MAX_Z_INDEX - markers.length - @markers.length + 1
     markers.sort((a, b) -> a.wrapper.shape.area - b.wrapper.shape.area)
+
+    @resetHighlightedMarkers()
     for marker in markers
       marker.markerElement.style.zIndex = zIndex
       zIndex += 1
@@ -199,7 +201,6 @@ class MarkerContainer
         marker.setHint(parent.hint)
 
       @updateHighlightedMarkers(marker)
-
     @markHighlightedMarkers()
 
     fragment = @window.document.createDocumentFragment()
