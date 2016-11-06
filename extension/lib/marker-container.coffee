@@ -87,9 +87,9 @@ class MarkerContainer
         marker.hide()
     @markHighlightedMarkers()
 
-  resetHighlightedMarkers: ->
+  resetHighlightedMarkers: ({visuallyOnly = false} = {}) ->
     marker.markHighlighted(false) for marker in @highlightedMarkers
-    @highlightedMarkers = []
+    @highlightedMarkers = [] unless visuallyOnly
 
   markHighlightedMarkers: ->
     marker.markHighlighted(true) for marker in @highlightedMarkers
@@ -191,7 +191,7 @@ class MarkerContainer
     zIndex = MAX_Z_INDEX - markers.length - @markers.length + 1
     markers.sort((a, b) -> a.wrapper.shape.area - b.wrapper.shape.area)
 
-    @resetHighlightedMarkers()
+    @resetHighlightedMarkers({visuallyOnly: true})
     for marker in markers
       marker.markerElement.style.zIndex = zIndex
       zIndex += 1
