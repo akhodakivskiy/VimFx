@@ -177,14 +177,14 @@ getElementShape = (elementData, tryRight, rects = null) ->
     offset = null
     if rects.length == 1
       lefts = boxQuads
-        .map(({bounds}) -> Math.floor(bounds.left))
-        .filter((left) -> left >= Math.floor(nonCoveredPointRect.left))
+        .map(({bounds}) -> Math.round(bounds.left))
+        .filter((left) -> left >= Math.round(nonCoveredPointRect.left))
       offset = if lefts.length == 0 then null else Math.min(lefts...)
     else
       {bounds: {left}} =
         boxQuads[Math.min(nonCoveredPointRect.index, boxQuads.length - 1)]
       offset = Math.max(nonCoveredPointRect.left, left)
-    result.textOffset = Math.floor(offset - nonCoveredPointRect.left) if offset?
+    result.textOffset = Math.round(offset - nonCoveredPointRect.left) if offset?
 
   return result
 
@@ -209,7 +209,7 @@ getFirstNonCoveredPoint = (elementData, elementRect, tryRight) ->
   {left, top, bottom, height} = elementRect
   return tryPoint(
     elementData, elementRect,
-    left, +1, Math.floor(top + height / 2), 0, tryRight
+    left, +1, Math.round(top + height / 2), 0, tryRight
   )
 
 # Tries a point `(x + dx, y + dy)`. Returns `(x, y)` (and the frame offset) if

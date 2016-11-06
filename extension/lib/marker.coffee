@@ -94,7 +94,7 @@ class Marker
       left -= Math.max(0, rect.width - elementWidth * @zoom)
 
     # Center the marker vertically on the non-covered point.
-    top -= Math.ceil(rect.height / 2)
+    top -= Math.round(rect.height / 2)
 
     # Make sure that the marker stays within the viewport.
     left = Math.min(left, @zoom * @viewport.right  - rect.width)
