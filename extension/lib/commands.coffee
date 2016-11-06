@@ -667,7 +667,7 @@ commands.click_browser_element = ({vim}) ->
     return unless shape.nonCoveredPoint
 
     length = markerElements.push(element)
-    return {type, shape, elementIndex: length - 1}
+    return {type, shape, combinedArea: shape.area, elementIndex: length - 1}
 
   callback = (marker) ->
     element = markerElements[marker.wrapper.elementIndex]
