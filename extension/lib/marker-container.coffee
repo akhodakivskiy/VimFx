@@ -432,14 +432,17 @@ rotateOverlappingMarkers = (originalMarkers, forward) ->
       return a.markerElement.style.zIndex - b.markerElement.style.zIndex
     )
 
-    zIndices = (marker.markerElement.style.zIndex for marker in stack)
+    [first, middle..., last] =
+      (marker.markerElement.style.zIndex for marker in stack)
+
     # Shift the `z-index`:es one item forward or back. The higher the `z-index`,
     # the more important the element. `forward` should give the next-most
     # important element the best `z-index` and so on.
-    if forward
-      zIndices.push(zIndices.shift())
-    else
-      zIndices.unshift(zIndices.pop())
+    zIndices =
+      if forward
+        [middle..., last, first]
+      else
+        [last, first, middle...]
 
     for marker, index in stack
       marker.markerElement.style.zIndex = zIndices[index]
