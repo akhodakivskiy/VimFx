@@ -666,8 +666,22 @@ commands.click_browser_element = ({vim}) ->
     shape = getElementShape(element)
     return unless shape.nonCoveredPoint
 
+    # The tabs and their close buttons as well as the tab bar scroll arrows get
+    # better hints, since switching or closing tabs is the most common use case
+    # for the `eb` command.
+    isTab = element.classList?.contains('tabbrowser-tab')
+    isPrioritized =
+      isTab or
+      element.classList?.contains('tab-close-button') or
+      element.classList?.contains('scrollbutton-up') or
+      element.classList?.contains('scrollbutton-down')
+
     length = markerElements.push(element)
-    return {type, shape, combinedArea: shape.area, elementIndex: length - 1}
+    return {
+      type, shape, isTab, isPrioritized,
+      combinedArea: shape.area,
+      elementIndex: length - 1,
+    }
 
   callback = (marker) ->
     element = markerElements[marker.wrapper.elementIndex]
@@ -716,6 +730,7 @@ commands.click_browser_element = ({vim}) ->
       window
       hintChars: vim.options['hints.chars']
       adjustZoom: false
+      minWeightDiff: 0
       getComplementaryWrappers: (callback) ->
         newWrappers = markableElements.find(
           window, filter.bind(null, {complementary: true})
@@ -728,7 +743,32 @@ commands.click_browser_element = ({vim}) ->
       markerContainer.container
     )
 
-    markerContainer.injectHints(wrappers, viewport, 'single')
+    [firstWrappers, secondWrappers] =
+      utils.partition(wrappers, (wrapper) -> wrapper.isPrioritized)
+
+    numChars = markerContainer.alphabet.length
+    numPrimary = markerContainer.primaryHintChars.length
+    index = 0
+
+    for wrapper in firstWrappers
+      if wrapper.isTab
+        # Given the hint chars `abc de`, give the tabs weights so that the hints
+        # consistently become `a b ca cb cc cd cea ceb cec ced ceea ceeb` and so
+        # on. The rule is that the weight of a tab must be larger than the sum
+        # of all tabs with a longer hint. We start out at `1` and then use
+        # smaller and smaller fractions. This is to make sure that the tabs get
+        # consistent hints as the number of tabs or the size of the window
+        # changes.
+        exponent = (index - numPrimary + 1) // (numChars - 1) + 1
+        wrapper.combinedArea = 1 / numChars ** exponent
+        index += 1
+      else
+        # Make sure that the tab close buttons and the tab bar scroll buttons
+        # come after all the tabs. Treating them all as the same size is fine.
+        wrapper.combinedArea = 0
+
+    markerContainer.injectHints(firstWrappers, viewport, 'first')
+    markerContainer.injectHints(secondWrappers, viewport, 'second')
     vim._enterMode('hints', {markerContainer, callback, matchText: false})
 
   else
