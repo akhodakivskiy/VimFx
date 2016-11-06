@@ -47,7 +47,7 @@ adjustRectToViewport = (rect, viewport) ->
 
   width  = right - left
   height = bottom - top
-  area   = Math.floor(width * height)
+  area   = Math.round(width * height)
 
   return {
     left, right, top, bottom

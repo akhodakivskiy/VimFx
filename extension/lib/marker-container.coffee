@@ -39,6 +39,7 @@ class MarkerContainer
       @getComplementaryWrappers
       hintChars
       @adjustZoom = true
+      @minWeightDiff = 10 # Pixels of area.
     } = options
 
     [@primaryHintChars, @secondaryHintChars] = hintChars.split(' ')
@@ -112,6 +113,15 @@ class MarkerContainer
       @highlightedMarkers = [marker]
       return
 
+  createHuffmanTree: (markers, options = {}) ->
+    return huffman.createTree(
+      markers,
+      @alphabet.length,
+      Object.assign({
+        compare: compareWeights.bind(null, @minWeightDiff)
+      }, options)
+    )
+
   # Create `Marker`s for every element (represented by a regular object of data
   # about the element—a “wrapper,” a stand-in for the real element, which is
   # only accessible in frame scripts) in `wrappers`, and insert them into
@@ -162,7 +172,7 @@ class MarkerContainer
         # needed (and ignore any remaining ones).
         nonCombinedMarkers
 
-    tree = huffman.createTree(paddedMarkers, @alphabet.length)
+    tree = @createHuffmanTree(paddedMarkers)
 
     index = 0
     for node in tree.children by -1 when node.weight != Infinity
@@ -247,7 +257,7 @@ class MarkerContainer
     # ascending order) beforehand.
     markers.sort((a, b) -> a.marker.text.length - b.marker.text.length)
 
-    tree = huffman.createTree(markers, @alphabet.length, {sorted: true})
+    tree = @createHuffmanTree(markers, {sorted: true})
     tree.assignCodeWords(@alphabet, ({marker}, hint) -> marker.setHint(hint))
 
     for {marker} in combined
@@ -490,5 +500,18 @@ compareHints = (markerA, markerB, alphabet) ->
 
 getHintCharScores = (hint, alphabet) ->
   return hint.split('').map((char) -> alphabet.indexOf(char) + 1)
+
+compareWeights = (minDiff, a, b) ->
+  diff = a.weight - b.weight
+  if a instanceof huffman.BranchPoint or b instanceof huffman.BranchPoint
+    return diff
+  else
+    return switch
+      when diff <= -minDiff
+        -1
+      when diff >= minDiff
+        +1
+      else
+        0
 
 module.exports = MarkerContainer
