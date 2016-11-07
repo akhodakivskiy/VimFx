@@ -748,6 +748,7 @@ commands.click_browser_element = ({vim}) ->
 
     numChars = markerContainer.alphabet.length
     numPrimary = markerContainer.primaryHintChars.length
+    numTabs = firstWrappers.filter(({isTab}) -> isTab).length
     index = 0
 
     for wrapper in firstWrappers
@@ -765,7 +766,21 @@ commands.click_browser_element = ({vim}) ->
       else
         # Make sure that the tab close buttons and the tab bar scroll buttons
         # come after all the tabs. Treating them all as the same size is fine.
-        wrapper.combinedArea = 0
+        # Their sum must be small enough in order not to affect the tab hints.
+        # It might look like using `0` is a good idea, but that results in
+        # increasingly worse hints the more tab close buttons there are.
+        wrapper.combinedArea = 1 / numChars ** numTabs
+
+    # Since most of the best hint characters might be used for the tabs, make
+    # sure that all other elements don’t get really bad hints. First, favor
+    # larger elements by sorting them. Then, give them all the same weight so
+    # that larger elements (such as the location bar, search bar, the web
+    # console input and other large areas in the devtools) don’t overpower the
+    # smaller ones. The usual “the larger the element, the better the hint” rule
+    # doesn’t really apply the same way for browser UI elements as in web pages.
+    secondWrappers.sort((a, b) -> b.combinedArea - a.combinedArea)
+    for wrapper in secondWrappers
+      wrapper.combinedArea = 1
 
     markerContainer.injectHints(firstWrappers, viewport, 'first')
     markerContainer.injectHints(secondWrappers, viewport, 'second')
