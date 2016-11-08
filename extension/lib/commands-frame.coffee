@@ -48,7 +48,7 @@ createComplementarySelectors = (selectors) ->
   ]
 
 FOLLOW_DEFAULT_SELECTORS = createComplementarySelectors([
-  'a', 'button', 'input', 'textarea', 'select'
+  'a', 'button', 'input', 'textarea', 'select', 'label'
   '[role]', '[contenteditable]'
 ])
 
