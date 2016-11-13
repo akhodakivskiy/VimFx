@@ -79,7 +79,7 @@ class Marker
 
     if textOffset?
       # Move the marker just to the left of the text of its element.
-      left -= Math.max(0, rect.width - textOffset * @zoom)
+      left += textOffset * @zoom - rect.width
     else
       # Otherwise make sure that it doesn’t flow outside the right side of its
       # element. This is to avoid the following situation (where `+` is a small

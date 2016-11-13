@@ -21,7 +21,7 @@
 
 utils = require('./utils')
 
-MINIMUM_EDGE_DISTANCE = 4
+MIN_EDGE_DISTANCE = 4
 
 getPosition = (element) ->
   computedStyle = element.ownerGlobal.getComputedStyle(element)
@@ -74,8 +74,8 @@ getAllRangesInsideViewport = (window, viewport, offset = {left: 0, top: 0}) ->
       range = selection.getRangeAt(index)
       continue if range.collapsed
       rect = range.getBoundingClientRect()
-      if (rect.top >= headerBottom - MINIMUM_EDGE_DISTANCE and
-          rect.bottom <= footerTop + MINIMUM_EDGE_DISTANCE) or
+      if (rect.top >= headerBottom - MIN_EDGE_DISTANCE and
+          rect.bottom <= footerTop + MIN_EDGE_DISTANCE) or
          header?.contains(range.commonAncestorContainer) or
          footer?.contains(range.commonAncestorContainer)
         adjustedRect = {
@@ -135,7 +135,7 @@ getFirstVisibleOffset = (textNode, viewport) ->
     # Ideally, we should also make sure that the text node is visible
     # horizintally, but there seems to be no performant way of doing so.
     # Luckily, horizontal scrolling is much less common than vertical.
-    return rect.top >= headerBottom - MINIMUM_EDGE_DISTANCE
+    return rect.top >= headerBottom - MIN_EDGE_DISTANCE
   )
   return match
 
@@ -277,10 +277,10 @@ getWindowViewport = (window) ->
 
 isInsideViewport = (rect, viewport) ->
   return \
-    rect.left   <= viewport.right  - MINIMUM_EDGE_DISTANCE and
-    rect.top    <= viewport.bottom - MINIMUM_EDGE_DISTANCE and
-    rect.right  >= viewport.left   + MINIMUM_EDGE_DISTANCE and
-    rect.bottom >= viewport.top    + MINIMUM_EDGE_DISTANCE
+    rect.left   <= viewport.right  - MIN_EDGE_DISTANCE and
+    rect.top    <= viewport.bottom - MIN_EDGE_DISTANCE and
+    rect.right  >= viewport.left   + MIN_EDGE_DISTANCE and
+    rect.bottom >= viewport.top    + MIN_EDGE_DISTANCE
 
 windowScrollProperties = {
   clientHeight: 'innerHeight'
@@ -318,7 +318,7 @@ scroll = (
   element[method](options)
 
 module.exports = {
-  MINIMUM_EDGE_DISTANCE
+  MIN_EDGE_DISTANCE
   adjustRectToViewport
   getAllRangesInsideViewport
   getFirstNonWhitespace

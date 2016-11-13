@@ -28,6 +28,8 @@ viewportUtils = require('./viewport')
 Element = Ci.nsIDOMElement
 XULDocument = Ci.nsIDOMXULDocument
 
+MIN_TEXTNODE_SIZE = 4
+
 find = (window, filter, selector = '*') ->
   viewport = viewportUtils.getWindowViewport(window)
   wrappers = []
@@ -52,7 +54,7 @@ getMarkableElements = (
     continue unless element instanceof Element
     # `getRects` is fast and filters out most elements, so run it first of all.
     rects = getRects(element, viewport)
-    continue unless rects.length > 0
+    continue unless rects.insideViewport.length > 0
     continue unless wrapper = filter(
       element, (elementArg, tryRight = 1) ->
         return getElementShape(
@@ -106,10 +108,14 @@ getRects = (element, viewport) ->
   # However, if `element` is inline and line-wrapped, then it returns one
   # rectangle for each line, since each line may be of different length, for
   # example. That allows us to properly add hints to line-wrapped links.
-  return Array.filter(
-    element.getClientRects(),
-    (rect) -> viewportUtils.isInsideViewport(rect, viewport)
-  )
+  rects = element.getClientRects()
+  return {
+    all: rects,
+    insideViewport: Array.filter(
+      rects,
+      (rect) -> viewportUtils.isInsideViewport(rect, viewport)
+    )
+  }
 
 # Returns the “shape” of an element:
 #
@@ -121,7 +127,11 @@ getRects = (element, viewport) ->
 # - `area`: The area of the part of the element that is inside the viewport.
 # - `width`: The width of the visible rect at `nonCoveredPoint`.
 # - `textOffset`: The distance between the left edge of the element and the left
-#   edge of its text.
+#   edge of its text vertically near `nonCoveredPoint`. If the element is a
+#   block and has several lines of text, this is set to `null` so that the
+#   marker is placed at the edge of the block. That’s the case for “cards” with
+#   an image to the left and a title as well as some text to the right (where
+#   the entire “card” is a link).
 getElementShape = (elementData, tryRight, rects = null) ->
   {viewport, element} = elementData
   result = {nonCoveredPoint: null, area: 0, width: 0, textOffset: null}
@@ -129,7 +139,7 @@ getElementShape = (elementData, tryRight, rects = null) ->
   rects ?= getRects(element, viewport)
   totalArea = 0
   visibleRects = []
-  for rect, index in rects
+  for rect, index in rects.insideViewport
     visibleRect = viewportUtils.adjustRectToViewport(rect, viewport)
     continue if visibleRect.area == 0
     visibleRect.index = index
@@ -137,8 +147,8 @@ getElementShape = (elementData, tryRight, rects = null) ->
     visibleRects.push(visibleRect)
 
   if visibleRects.length == 0
-    if rects.length == 1 and totalArea == 0
-      [rect] = rects
+    if rects.all.length == 1 and totalArea == 0
+      [rect] = rects.all
       if rect.width > 0 or rect.height > 0
         # If we get here, it means that everything inside `element` is floated
         # and/or absolutely positioned (and that `element` hasn’t been made to
@@ -170,21 +180,36 @@ getElementShape = (elementData, tryRight, rects = null) ->
 
   result.width = nonCoveredPointRect.width
 
-  boxQuads = utils.getFirstNonEmptyTextNodeBoxQuads(element)
-  if boxQuads?.length > 0
-    # Care is taken below to ignore negative offsets, such as when text is
-    # hidden using `text-indent: -9999px`.
-    offset = null
-    if rects.length == 1
-      lefts = boxQuads
-        .map(({bounds}) -> Math.round(bounds.left))
-        .filter((left) -> left >= Math.round(nonCoveredPointRect.left))
-      offset = if lefts.length == 0 then null else Math.min(lefts...)
-    else
-      {bounds: {left}} =
-        boxQuads[Math.min(nonCoveredPointRect.index, boxQuads.length - 1)]
-      offset = Math.max(nonCoveredPointRect.left, left)
-    result.textOffset = Math.round(offset - nonCoveredPointRect.left) if offset?
+  lefts = []
+  smallestBottom = Infinity
+  hasSingleRect = (rects.all.length == 1)
+
+  utils.walkTextNodes(element, (node) ->
+    unless node.data.trim() == ''
+      for {bounds} in node.getBoxQuads()
+        if bounds.width < MIN_TEXTNODE_SIZE or bounds.height < MIN_TEXTNODE_SIZE
+          continue
+
+        if utils.overlaps(bounds, nonCoveredPointRect)
+          lefts.push(bounds.left)
+
+        if hasSingleRect
+          # The element is likely a block and has several lines of text; ignore
+          # the `textOffset` (see the description of `textOffset` at the
+          # beginning of the function).
+          if bounds.top > smallestBottom
+            lefts = []
+            return true
+
+          if bounds.bottom < smallestBottom
+            smallestBottom = bounds.bottom
+
+    return false
+  )
+
+  if lefts.length > 0
+    result.textOffset =
+      Math.round(Math.min(lefts...) - nonCoveredPointRect.left)
 
   return result
 

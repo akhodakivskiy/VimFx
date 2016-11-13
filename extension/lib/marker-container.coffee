@@ -456,17 +456,11 @@ rotateOverlappingMarkers = (originalMarkers, forward) ->
 getStackFor = (marker, markers) ->
   stack = [marker]
 
-  {top, bottom, left, right} = marker.position
-
   index = 0
   while index < markers.length
     nextMarker = markers[index]
 
-    next = nextMarker.position
-    overlapsVertically   = (next.bottom >= top  and next.top  <= bottom)
-    overlapsHorizontally = (next.right  >= left and next.left <= right)
-
-    if overlapsVertically and overlapsHorizontally
+    if utils.overlaps(nextMarker.position, marker.position)
       # Also get all markers overlapping this one.
       markers.splice(index, 1)
       stack = stack.concat(getStackFor(nextMarker, markers))

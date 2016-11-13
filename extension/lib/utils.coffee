@@ -401,17 +401,6 @@ createBox = (document, className = '', parent = null, text = null) ->
   parent.appendChild(box) if parent?
   return box
 
-getFirstNonEmptyTextNodeBoxQuads = (element) ->
-  for node in element.childNodes then switch node.nodeType
-    when 3 # TextNode.
-      unless node.data.trim() == ''
-        boxQuads = node.getBoxQuads()
-        return boxQuads if boxQuads?.length > 0
-    when 1 # Element.
-      result = getFirstNonEmptyTextNodeBoxQuads(node)
-      return result if result
-  return null
-
 # In quirks mode (when the page lacks a doctype), such as on Hackernews,
 # `<body>` is considered the root element rather than `<html>`.
 getRootElement = (document) ->
@@ -644,6 +633,13 @@ interval = (window, interval, fn) ->
 
 nextTick = (window, fn) -> window.setTimeout((-> fn()) , 0)
 
+overlaps = (rectA, rectB) ->
+  return \
+    Math.round(rectA.right) >= Math.round(rectB.left) and
+    Math.round(rectA.left) <= Math.round(rectB.right) and
+    Math.round(rectA.bottom) >= Math.round(rectB.top) and
+    Math.round(rectA.top) <= Math.round(rectB.bottom)
+
 partition = (array, fn) ->
   matching = []
   nonMatching = []
@@ -761,7 +757,6 @@ module.exports = {
   clearSelectionDeep
   containsDeep
   createBox
-  getFirstNonEmptyTextNodeBoxQuads
   getRootElement
   getText
   getTopOffset
@@ -784,6 +779,7 @@ module.exports = {
   includes
   interval
   nextTick
+  overlaps
   partition
   regexEscape
   removeDuplicateChars
