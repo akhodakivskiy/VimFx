@@ -78,7 +78,7 @@ toolbarpaletteitem[place="palette"] > #VimFxButton {
 /***** Markers *****/
 
 #VimFxMarkersContainer {
-  position: absolute;
+  position: relative;
   pointer-events: none;
   font: menu;
 }
@@ -163,7 +163,7 @@ toolbarpaletteitem[place="palette"] > #VimFxButton {
 /***** Help Dialog *****/
 
 #VimFxHelpDialogContainer {
-  position: absolute;
+  position: relative;
 
   opacity: 0.92;
   background-color: Window;
