@@ -1,3 +1,32 @@
+### 0.20.4 (2016-11-16)
+
+- Fixed: The `n` and `N` commands now work in Firefox’s PDF viewer.
+- Fixed: The `eb` command can now click the tab bar scroll buttons.
+- Fixed: Elements marked by the `eb` command now correctly get hints based on
+  their area again.
+- Improved: The `eb` command now favors the browser tabs and their close
+  buttons, giving them better hints.
+- Improved: The hints given to the browser tabs by the `eb` command are now
+  consistent no matter how many tabs you have open. This means that the first
+  tab always gets the same hint, the second tab always get the same hint, and so
+  on.
+- Improved: Hint markers are now placed next to the text of the element if
+  appropriate. For example, the hint marker for a button with centered text is
+  now placed just to the left of the text rather than at the left edge of
+  button. This is nice because it means that hint markers usually end up where
+  you were just reading.
+- Improved: The positioning of hint markers has been fine-tuned by a pixel or so
+  in some cases.
+- Improved: Custom styled checkboxes and radio buttons now get hint markers
+  faster (they are now found in the first pass rather than the second).
+- Improved: Compatibility with the [Tab Center] add-on.
+- Improved: Blurring the location bar is now more consistent. Previously, its
+  text wasn’t reset if the autocomplete popup was open when you pressed
+  `<escape>` to blur it.
+- Fixed: An edge case where the wrong hint markers could be highlighted.
+
+[Tab Center]: https://testpilot.firefox.com/experiments/tab-center/
+
 ### 0.20.3 (2016-10-22)
 
 - Improved: Full page scrolling now recognizes the fixed footer on medium.com.
