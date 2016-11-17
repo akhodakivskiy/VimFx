@@ -107,6 +107,12 @@ createConfigAPI = (vimfx, {allowDeprecated = true} = {}) -> {
     onShutdown(vimfx, -> delete vimfx.modes[mode].commands[name])
 
   addOptionOverrides: (rules...) ->
+    validateRules(rules, (override) ->
+      unless Object::toString.call(override) == '[object Object]'
+        return 'an object'
+      return null
+    )
+
     unless vimfx.optionOverrides
       vimfx.optionOverrides = []
       vimfx.options = new Proxy(vimfx.options, {
@@ -117,9 +123,17 @@ createConfigAPI = (vimfx, {allowDeprecated = true} = {}) -> {
           return overrides?[pref] ? options[pref]
       })
       onShutdown(vimfx, -> vimfx.optionOverrides = [])
+
     vimfx.optionOverrides.push(rules...)
 
   addKeyOverrides: (rules...) ->
+    validateRules(rules, (override) ->
+      unless Array.isArray(override) and
+             override.every((item) -> typeof item == 'string')
+        return 'an array of strings'
+      return null
+    )
+
     unless vimfx.keyOverrides
       vimfx.keyOverrides = []
       vimfx.options.keyValidator = (keyStr, mode) ->
@@ -129,6 +143,7 @@ createConfigAPI = (vimfx, {allowDeprecated = true} = {}) -> {
         overrides = getOverrides(vimfx.keyOverrides, location)
         return keyStr not in (overrides ? [])
       onShutdown(vimfx, -> vimfx.keyOverrides = [])
+
     vimfx.keyOverrides.push(rules...)
 
   send: (vim, message, data = null, callback = null) ->
@@ -152,10 +167,14 @@ createConfigAPI = (vimfx, {allowDeprecated = true} = {}) -> {
     vim._send(message, data, callback, {prefix: 'config:'})
 
   on: (event, listener) ->
+    validateEventListener(event, listener)
     vimfx.on(event, listener)
     onShutdown(vimfx, -> vimfx.off(event, listener))
 
-  off: vimfx.off.bind(vimfx)
+  off: (event, listener) ->
+    validateEventListener(event, listener)
+    vimfx.off(event, listener)
+
   modes: vimfx.modes
 }
 
@@ -185,9 +204,44 @@ renamedPrefs = {
 }
 
 getOverrides = (rules, args...) ->
-  for [match, overrides] in rules
-    return overrides if match(args...)
+  for [matcher, override] in rules
+    return override if matcher(args...)
   return null
+
+validateRules = (rules, overrideValidator) ->
+  for rule in rules
+    unless Array.isArray(rule)
+      throw new Error(
+        "VimFx: An override rule must be an array. Got: #{rule}"
+      )
+    unless rule.length == 2
+      throw new Error(
+        "VimFx: An override rule array must be of length 2. Got: #{rule.length}"
+      )
+    [matcher, override] = rule
+    unless typeof matcher == 'function'
+      throw new Error(
+        "VimFx: The first item of an override rule array must be a function.
+         Got: #{matcher}"
+      )
+    overrideValidationMessage = overrideValidator(override)
+    if overrideValidationMessage
+      throw new Error(
+        "VimFx: The second item of an override rule array must be
+         #{overrideValidationMessage}. Got: #{override}"
+      )
+  return
+
+validateEventListener = (event, listener) ->
+  unless typeof event == 'string'
+    throw new Error(
+      "VimFx: The first argument must be a string. Got: #{event}"
+    )
+  unless typeof listener == 'function'
+    throw new Error(
+      "VimFx: The second argument must be a function. Got: #{listener}"
+    )
+  return
 
 onShutdown = (vimfx, handler) ->
   fn = ->

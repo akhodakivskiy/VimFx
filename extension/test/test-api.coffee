@@ -213,7 +213,7 @@ exports['test vimfx.addOptionOverrides'] = (assert, $vimfx, teardown) ->
   vimfx = createConfigAPI($vimfx)
 
   originalOptions = Object.assign({}, $vimfx.options)
-  originalOptionOverrides = Object.assign({}, $vimfx.optionOverrides)
+  originalOptionOverrides = $vimfx.optionOverrides?[..]
   $vimfx.optionOverrides = null
   $vimfx.options.prevent_autofocus = true
   teardown(->
@@ -244,7 +244,7 @@ exports['test vimfx.addKeyOverrides'] = (assert, $vimfx, teardown) ->
   vimfx = createConfigAPI($vimfx)
 
   originalOptions = Object.assign({}, $vimfx.options)
-  originalKeyOverrides = Object.assign({}, $vimfx.keyOverrides)
+  originalKeyOverrides = $vimfx.keyOverrides?[..]
   $vimfx.options.keyValidator = null
   $vimfx.options.ignore_keyboard_layout = false
   $vimfx.options.translations = {}
@@ -474,6 +474,100 @@ exports['test vimfx.addCommand errors'] = (assert, $vimfx) ->
 
   throws(assert, /function/i, 'false', ->
     vimfx.addCommand({name: 'test_command', description: 'Test command'}, false)
+  )
+
+exports['test vimfx.add{Option,Key}Overrides errors'] = (assert, $vimfx) ->
+  vimfx = createConfigAPI($vimfx)
+
+  # Passing nothing is OK, and just shouldn’t throw.
+  vimfx.addOptionOverrides()
+  vimfx.addKeyOverrides()
+
+  throws(assert, /array/i, '1', ->
+    vimfx.addOptionOverrides(1)
+  )
+
+  throws(assert, /array/i, '1', ->
+    vimfx.addKeyOverrides(1)
+  )
+
+  throws(assert, /length 2/i, '0', ->
+    vimfx.addOptionOverrides([])
+  )
+
+  throws(assert, /length 2/i, '0', ->
+    vimfx.addKeyOverrides([])
+  )
+
+  throws(assert, /length 2/i, '1', ->
+    vimfx.addOptionOverrides([1])
+  )
+
+  throws(assert, /length 2/i, '1', ->
+    vimfx.addKeyOverrides([1])
+  )
+
+  throws(assert, /length 2/i, '3', ->
+    vimfx.addOptionOverrides([1, 2, 3])
+  )
+
+  throws(assert, /length 2/i, '3', ->
+    vimfx.addKeyOverrides([1, 2, 3])
+  )
+
+  throws(assert, /function/i, 'null', ->
+    vimfx.addOptionOverrides([null, 2])
+  )
+
+  throws(assert, /function/i, 'null', ->
+    vimfx.addKeyOverrides([null, 2])
+  )
+
+  throws(assert, /object/i, 'null', ->
+    vimfx.addOptionOverrides([(-> true), null])
+  )
+
+  throws(assert, /array of strings/i, '[object Object]', ->
+    vimfx.addKeyOverrides([(-> true), {j: false}])
+  )
+
+  throws(assert, /array of strings/i, '1,2', ->
+    vimfx.addKeyOverrides([(-> true), [1, 2]])
+  )
+
+exports['test vimfx.{on,off} errors'] = (assert, $vimfx) ->
+  vimfx = createConfigAPI($vimfx)
+
+  throws(assert, /string/i, 'undefined', ->
+    vimfx.on()
+  )
+
+  throws(assert, /string/i, 'undefined', ->
+    vimfx.off()
+  )
+
+  throws(assert, /string/i, '1', ->
+    vimfx.on(1)
+  )
+
+  throws(assert, /string/i, '1', ->
+    vimfx.off(1)
+  )
+
+  throws(assert, /function/i, 'undefined', ->
+    vimfx.on('event')
+  )
+
+  throws(assert, /function/i, 'undefined', ->
+    vimfx.off('event')
+  )
+
+  throws(assert, /function/i, 'null', ->
+    vimfx.on('event', null)
+  )
+
+  throws(assert, /function/i, 'null', ->
+    vimfx.off('event', null)
   )
 
 exports['test vimfx.send errors'] = (assert, $vimfx) ->
