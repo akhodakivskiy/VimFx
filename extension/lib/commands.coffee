@@ -147,9 +147,10 @@ commands.stop_all = ({vim}) ->
 
 
 
-springConstant = {
+scrollData = {
   nonce: null
-  value: null
+  springConstant: null
+  lastRepeat: 0
 }
 
 helper_scroll = (vim, event, args...) ->
@@ -157,6 +158,14 @@ helper_scroll = (vim, event, args...) ->
     method, type, directions, amounts
     properties = null, adjustment = 0, name = 'scroll', extra = {}
   ] = args
+
+  elapsed = event.timeStamp - scrollData.lastRepeat
+
+  if event.repeat and elapsed < vim.options['scroll.repeat_timeout']
+    return
+
+  scrollData.lastRepeat = event.timeStamp
+
   options = {
     method, type, directions, amounts, properties, adjustment, extra
     smooth: (
@@ -168,18 +177,18 @@ helper_scroll = (vim, event, args...) ->
   # Temporarily set Firefox’s “spring constant” pref to get the desired smooth
   # scrolling speed. Reset it `reset_timeout` milliseconds after the last
   # scrolling command was invoked.
-  springConstant.nonce = nonce = {}
-  springConstant.value ?= prefs.root.get(SPRING_CONSTANT_PREF)
+  scrollData.nonce = nonce = {}
+  scrollData.springConstant ?= prefs.root.get(SPRING_CONSTANT_PREF)
   prefs.root.set(
     SPRING_CONSTANT_PREF,
     vim.options["smoothScroll.#{type}.spring-constant"]
   )
   reset = ->
     vim.window.setTimeout((->
-      return unless springConstant.nonce == nonce
-      prefs.root.set(SPRING_CONSTANT_PREF, springConstant.value)
-      springConstant.nonce = null
-      springConstant.value = null
+      return unless scrollData.nonce == nonce
+      prefs.root.set(SPRING_CONSTANT_PREF, scrollData.springConstant)
+      scrollData.nonce = null
+      scrollData.springConstant = null
     ), vim.options['scroll.reset_timeout'])
 
   helpScroll = help.getHelp(vim.window)?.querySelector('.wrapper')

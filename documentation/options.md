@@ -486,6 +486,15 @@ Firefox’s `layout.css.scroll-behavior.spring-constant` option. It is reset aga
 after one second (by default). If that doesn’t work out for you, you can
 customize that timeout using the `scroll.reset_timeout` option.
 
+Another quirk of Firefox’s smooth scrolling is that it doesn’t like if you ask
+for smooth scrolling too often: The scrolling can get stuttery, progressively
+slower and even grind to a halt. On a long page with lots of elements, simply
+holding `d`, `u`, `<space>` or `<s-space>` can be too much. By default, keyboard
+software typically repeats keypresses every 30ms when holding keys. Because of
+this, VimFx only asks for smooth scrolling if more than 65ms (two repeats) has
+passed since the last request. You can customize that timeout via the
+`scroll.repeat_timeout` option.
+
 The Firefox option `general.smoothScroll` lets you turn off smooth scrolling
 entirely, including all of VimFx’s scrolling commands.
 
