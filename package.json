@@ -16,7 +16,7 @@
     "vim-like-key-notation": "^1.0.1"
   },
   "devDependencies": {
-    "addons-linter": "^0.15.11",
+    "addons-linter": "^0.15.12",
     "coffee-script": "^1.11.1",
     "coffeelint": "^1.16.0",
     "coffeelint-forbidden-keywords": "^0.1.1",
@@ -32,7 +32,7 @@
     "gulp-zip": "^3.2.0",
     "marked": "^0.3.6",
     "merge2": "^1.0.2",
-    "request": "^2.78.0",
+    "request": "^2.79.0",
     "require-precompute": "^0.2.0",
     "rimraf": "^2.5.4",
     "run-sequence": "^1.2.2"
