@@ -17,19 +17,18 @@
 # along with VimFx.  If not, see <http://www.gnu.org/licenses/>.
 ###
 
-testUtils       = require('./utils')
+assert = require('./assert')
+testUtils = require('./utils')
 createConfigAPI = require('../lib/api-frame')
 
-{throws} = testUtils
-
-exports['test exports'] = (assert, $vim) ->
+exports['test exports'] = ($vim) ->
   vimfx = createConfigAPI($vim)
 
   assert.equal(typeof vimfx.listen, 'function', 'listen')
   assert.equal(typeof vimfx.setHintMatcher, 'function', 'setHintMatcher')
   assert.equal(typeof vimfx.getMarkerElement, 'function', 'getMarkerElement')
 
-exports['test vimfx.listen'] = (assert, $vim, teardown) ->
+exports['test vimfx.listen'] = ($vim, teardown) ->
   shutdownHandlers = []
   onShutdown = (fn) -> shutdownHandlers.push(fn)
   vimfx = createConfigAPI($vim, onShutdown)
@@ -57,7 +56,7 @@ exports['test vimfx.listen'] = (assert, $vim, teardown) ->
   assert.equal(messageManager.addMessageListenerCalls, 1)
   assert.equal(messageManager.removeMessageListenerCalls, 1)
 
-exports['test vimfx.setHintMatcher'] = (assert, $vim) ->
+exports['test vimfx.setHintMatcher'] = ($vim) ->
   shutdownHandlers = []
   onShutdown = (fn) -> shutdownHandlers.push(fn)
   vimfx = createConfigAPI($vim, onShutdown)
@@ -72,7 +71,7 @@ exports['test vimfx.setHintMatcher'] = (assert, $vim) ->
   shutdownHandlers[0]()
   assert.ok(not $vim.hintMatcher)
 
-exports['test vimfx.getMarkerElement'] = (assert, $vim, teardown) ->
+exports['test vimfx.getMarkerElement'] = ($vim, teardown) ->
   teardown(->
     $vim.state.markerElements = []
   )
@@ -88,32 +87,32 @@ exports['test vimfx.getMarkerElement'] = (assert, $vim, teardown) ->
   $vim.state.markerElements = []
   assert.equal(vimfx.getMarkerElement(0), null)
 
-exports['test vimfx.listen errors'] = (assert, $vim) ->
+exports['test vimfx.listen errors'] = ($vim) ->
   vimfx = createConfigAPI($vim)
 
-  throws(assert, /message string/i, 'undefined', ->
+  assert.throws(/message string/i, 'undefined', ->
     vimfx.listen()
   )
 
-  throws(assert, /message string/i, 'false', ->
+  assert.throws(/message string/i, 'false', ->
     vimfx.listen(false)
   )
 
-  throws(assert, /listener function/i, 'undefined', ->
+  assert.throws(/listener function/i, 'undefined', ->
     vimfx.listen('message')
   )
 
-  throws(assert, /listener function/i, 'false', ->
+  assert.throws(/listener function/i, 'false', ->
     vimfx.listen('message', false)
   )
 
-exports['test vimfx.setHintMatcher errors'] = (assert, $vim) ->
+exports['test vimfx.setHintMatcher errors'] = ($vim) ->
   vimfx = createConfigAPI($vim)
 
-  throws(assert, /function/i, 'undefined', ->
+  assert.throws(/function/i, 'undefined', ->
     vimfx.setHintMatcher()
   )
 
-  throws(assert, /function/i, 'false', ->
+  assert.throws(/function/i, 'false', ->
     vimfx.setHintMatcher(false)
   )

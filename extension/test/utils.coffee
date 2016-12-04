@@ -26,13 +26,6 @@ stub = (obj, method, fn) ->
   obj[method] = fn
   return -> obj[method] = originalFn
 
-throws = (assert, regex, badValue, fn) ->
-  assert.throws(fn)
-  try fn() catch error
-    assert.ok(error.message.startsWith('VimFx:'), 'start with VimFx')
-    assert.ok(error.message.endsWith(": #{badValue}"), 'show bad value')
-    assert.ok(regex.test(error.message), 'regex match')
-
 class MockMessageManager
   constructor: ->
     @sendAsyncMessageCalls      = 0
@@ -48,7 +41,6 @@ class MockVim extends Vim
 
 module.exports = {
   stub
-  throws
   MockMessageManager
   MockVim
 }

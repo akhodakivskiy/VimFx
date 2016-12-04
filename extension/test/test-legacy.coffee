@@ -1,5 +1,5 @@
 ###
-# Copyright Simon Lydell 2015.
+# Copyright Simon Lydell 2015, 2016.
 #
 # This file is part of VimFx.
 #
@@ -17,21 +17,22 @@
 # along with VimFx.  If not, see <http://www.gnu.org/licenses/>.
 ###
 
+assert = require('./assert')
 legacy = require('../lib/legacy')
 
-exports['test convertKey'] = (assert) ->
-  assert.deepEqual(legacy.convertKey('a'), ['a'])
-  assert.deepEqual(legacy.convertKey('Esc'), ['<escape>'])
-  assert.deepEqual(legacy.convertKey('a,Esc'), ['a', '<escape>'])
-  assert.deepEqual(legacy.convertKey(','), [','])
-  assert.deepEqual(legacy.convertKey(',,a'), [',', 'a'])
-  assert.deepEqual(legacy.convertKey('a,,'), ['a', ','])
-  assert.deepEqual(legacy.convertKey('a,,,b'), ['a', ',', 'b'])
-  assert.deepEqual(legacy.convertKey(',,,,a'), [',', ',', 'a'])
-  assert.deepEqual(legacy.convertKey('a,,,,'), ['a', ',', ','])
-  assert.deepEqual(legacy.convertKey(' a '), ['a'])
-  assert.deepEqual(legacy.convertKey(''), [])
-  assert.deepEqual(legacy.convertKey('    '), [])
+exports['test convertKey'] = ->
+  assert.arrayEqual(legacy.convertKey('a'), ['a'])
+  assert.arrayEqual(legacy.convertKey('Esc'), ['<escape>'])
+  assert.arrayEqual(legacy.convertKey('a,Esc'), ['a', '<escape>'])
+  assert.arrayEqual(legacy.convertKey(','), [','])
+  assert.arrayEqual(legacy.convertKey(',,a'), [',', 'a'])
+  assert.arrayEqual(legacy.convertKey('a,,'), ['a', ','])
+  assert.arrayEqual(legacy.convertKey('a,,,b'), ['a', ',', 'b'])
+  assert.arrayEqual(legacy.convertKey(',,,,a'), [',', ',', 'a'])
+  assert.arrayEqual(legacy.convertKey('a,,,,'), ['a', ',', ','])
+  assert.arrayEqual(legacy.convertKey(' a '), ['a'])
+  assert.arrayEqual(legacy.convertKey(''), [])
+  assert.arrayEqual(legacy.convertKey('    '), [])
 
-exports['test convertPattern'] = (assert) ->
+exports['test convertPattern'] = ->
   assert.equal(legacy.convertPattern('aB.   t*o!	*!'), 'aB\\.\\s+t.*o.\\s+.*.')

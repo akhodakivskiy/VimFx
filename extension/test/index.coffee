@@ -19,11 +19,6 @@
 
 # This file implements a simple test runner.
 
-utils = require('../lib/utils')
-
-{Assert} = Cu.import('chrome://specialpowers/content/Assert.jsm', {})
-assert = new Assert()
-
 list = do -> # @echo TESTS
 
 module.exports = (topLevelObject) ->
@@ -40,13 +35,13 @@ module.exports = (topLevelObject) ->
       teardowns = []
       teardown = (fn) -> teardowns.push(fn)
       try
-        fn(assert, topLevelObject, teardown)
+        fn(topLevelObject, teardown)
         passed += 1
       catch error then null
       finally
         (try fn()) for fn in teardowns
       report.push("  #{if error then '✘' else '✔'} #{key}")
-      report.push(utils.formatError(error).replace(/^/gm, '    ')) if error
+      report.push("#{error}\n#{error.stack}".replace(/^/gm, '    ')) if error
 
   type = if IS_FRAME_SCRIPT then 'frame' else 'regular'
   report.push("\n#{passed}/#{total} #{type} tests passed.\n")

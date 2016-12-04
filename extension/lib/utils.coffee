@@ -668,14 +668,6 @@ expandPath = (path) ->
   else
     return path
 
-formatError = (error) ->
-  stack = String(error.stack?.formattedStack ? error.stack ? '')
-    .split('\n')
-    .filter((line) -> line.includes('.xpi!'))
-    .map((line) -> '  ' + line.replace(/(?:\/<)*@.+\.xpi!/g, '@'))
-    .join('\n')
-  return "#{error}\n#{stack}"
-
 getCurrentLocation = ->
   return unless window = getCurrentWindow()
   return new window.URL(window.gBrowser.selectedBrowser.currentURI.spec)
@@ -787,7 +779,6 @@ module.exports = {
   sum
 
   expandPath
-  formatError
   getCurrentLocation
   getCurrentWindow
   hasEventListeners

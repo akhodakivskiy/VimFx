@@ -17,6 +17,7 @@
 # along with VimFx.  If not, see <http://www.gnu.org/licenses/>.
 ###
 
+assert = require('./assert')
 prefs = require('../lib/prefs')
 
 resetPrefOnTeardown = (pref, teardown) ->
@@ -26,7 +27,7 @@ resetPrefOnTeardown = (pref, teardown) ->
   )
 
 testPref = (pref, fn) ->
-  return (assert, $vimfx, teardown) ->
+  return ($vimfx, teardown) ->
     resetPrefOnTeardown(pref, teardown)
     test = (input, output) ->
       prefs.set(pref, input)
@@ -41,12 +42,12 @@ testPref = (pref, fn) ->
     fn(test)
 
 testPrefParsed = (pref, fn) ->
-  return (assert, $vimfx, teardown) ->
+  return ($vimfx, teardown) ->
     resetPrefOnTeardown(pref, teardown)
     test = (input, fn2) ->
       prefs.set(pref, input)
       fn2($vimfx.options[pref])
-    fn(assert, test)
+    fn(test)
 
 exports['test hints.chars'] = testPref('hints.chars', (test) ->
   # Invalid values.
@@ -98,7 +99,7 @@ spaceDelimitedStringPrefs.forEach((pref) ->
 )
 
 ['prev_patterns', 'next_patterns'].forEach((pref) ->
-  exports["test #{pref} regex"] = testPrefParsed(pref, (assert, test) ->
+  exports["test #{pref} regex"] = testPrefParsed(pref, (test) ->
     test('previous  previous\\S*  foo(', (parsed) ->
       # Case insensitivity.
       assert.ok(parsed[0].test('previous'))
@@ -131,7 +132,7 @@ spaceDelimitedStringPrefs.forEach((pref) ->
   )
 )
 
-exports['test blacklist regex'] = testPrefParsed('blacklist', (assert, test) ->
+exports['test blacklist regex'] = testPrefParsed('blacklist', (test) ->
   test('example  *EXAMPLE*  *example.com/?*=}*', (parsed) ->
     # Case insensitivity.
     assert.ok(parsed[0].test('example'))
