@@ -1,3 +1,14 @@
+### 0.20.5 (2016-12-04)
+
+- Fixed: Scrolling by holding `d`, `u`, `<space>` or `<s-space>` no longer goes
+  slower and slower (and finally grinding to a halt) on long pages with lots of
+  elements. (See also the [`scroll.repeat_timeout`] pref.)
+- Improved: All config API functions now validate all their parameters properly.
+  This provides a better user experience, and, most importantly, prevents VimFx
+  from crashing on certain invalid input.
+
+[`scroll.repeat_timeout`]: https://github.com/akhodakivskiy/VimFx/blob/58deb3f7b7c470a4d705f1dabf7aa13e095e8d09/documentation/options.md#smooth-scrolling
+
 ### 0.20.4 (2016-11-16)
 
 - Fixed: The `n` and `N` commands now work in Firefox’s PDF viewer.
