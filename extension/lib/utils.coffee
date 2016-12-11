@@ -377,7 +377,7 @@ clearSelectionDeep = (window, {blur = true} = {}) ->
   selection = window.getSelection()
   selection?.removeAllRanges()
   for frame in window.frames
-    clearSelectionDeep(frame)
+    clearSelectionDeep(frame, {blur})
     # Allow parents to re-gain control of text selection.
     frame.frameElement.blur() if blur
   return
