@@ -127,14 +127,16 @@ getRects = (element, viewport) ->
 # - `area`: The area of the part of the element that is inside the viewport.
 # - `width`: The width of the visible rect at `nonCoveredPoint`.
 # - `textOffset`: The distance between the left edge of the element and the left
-#   edge of its text vertically near `nonCoveredPoint`. If the element is a
-#   block and has several lines of text, this is set to `null` so that the
-#   marker is placed at the edge of the block. That’s the case for “cards” with
-#   an image to the left and a title as well as some text to the right (where
-#   the entire “card” is a link).
+#   edge of its text vertically near `nonCoveredPoint`. Might be `null`. The
+#   calculation might stop early if `isBlock`.
+# - `isBlock`: `true` if the element is a block and has several lines of text
+#   (which is the case for “cards” with an image to the left and a title as well
+#   as some text to the right (where the entire “card” is a link)). This is used
+#   to place the the marker at the edge of the block.
 getElementShape = (elementData, tryRight, rects = null) ->
   {viewport, element} = elementData
-  result = {nonCoveredPoint: null, area: 0, width: 0, textOffset: null}
+  result =
+    {nonCoveredPoint: null, area: 0, width: 0, textOffset: null, isBlock: false}
 
   rects ?= getRects(element, viewport)
   totalArea = 0
@@ -198,7 +200,7 @@ getElementShape = (elementData, tryRight, rects = null) ->
           # the `textOffset` (see the description of `textOffset` at the
           # beginning of the function).
           if bounds.top > smallestBottom
-            lefts = []
+            result.isBlock = true
             return true
 
           if bounds.bottom < smallestBottom

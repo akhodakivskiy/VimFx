@@ -58,7 +58,7 @@ class Marker
   # into the DOM, and thus gotten a width and height.
   setPosition: ->
     {
-      textOffset
+      textOffset, isBlock
       width: elementWidth
       nonCoveredPoint: {x: left, y: top, offset}
     } = @elementShape
@@ -78,8 +78,11 @@ class Marker
     top  *= @zoom
 
     if textOffset?
-      # Move the marker just to the left of the text of its element.
-      left += textOffset * @zoom - rect.width
+      # Move the marker just to the left of the text of its element, unless the
+      # element is a “block” (see `getElementShape` in markable-elements.coffee)
+      # and the marker wouldn’t cover text.
+      unless isBlock and rect.width < textOffset
+        left += textOffset * @zoom - rect.width
     else
       # Otherwise make sure that it doesn’t flow outside the right side of its
       # element. This is to avoid the following situation (where `+` is a small
