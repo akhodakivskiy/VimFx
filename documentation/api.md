@@ -898,16 +898,6 @@ returns the DOM element associated with that id. If no element can be found,
 `null` is returned.
 
 
-## Stability
-
-The API is currently **experimental** and therefore **unstable.** Things might
-break with new VimFx versions. However, no breaking changes are planned, and
-will be avoided if feasible.
-
-As soon as VimFx 1.0.0 (which does not seem to be too far away) is released
-backwards compatibility will be a priority and won’t be broken until VimFx
-2.0.0.
-
 [option overrides]: #vimfxaddoptionoverridesrules
 [`vimfx.send(...)`]: #vimfxsendvim-message-data--null-callback--null
 [`vimfx.listen(...)`]: #vimfxlistenmessage-listener

@@ -71,11 +71,11 @@ Finally send a pull request to same branch as you based your topic branch on
 
 VimFx uses three numbers to describe its version: x.y.z, or major.minor.patch.
 
-Version 1.0.0 will soon be released. When that’s the case, the first number
-(major) will only be incremented when there are backwards-incompatible changes,
-such as changes to defaults or to the [config file API]. This should be avoided.
-The idea is that when a user installs a new major release, they should expect
-changes that they need to get familiar with.
+When version 1.0.0 has been released, the first number (major) will only be
+incremented when there are backwards-incompatible changes, such as changes to
+defaults or to the [config file API]. This should be avoided. The idea is that
+when a user installs a new major release, they should expect changes that they
+need to get familiar with.
 
 The middle number (minor) is incremented when a release contains new features,
 or larger changes/refactors to code. Users should expect things to be roughly
