@@ -191,8 +191,9 @@ helper_scroll = (vim, event, args...) ->
       scrollData.springConstant = null
     ), vim.options['scroll.reset_timeout'])
 
+  {isUIEvent = vim.isUIEvent(event)} = extra
   helpScroll = help.getHelp(vim.window)?.querySelector('.wrapper')
-  if (event and vim.isUIEvent(event)) or helpScroll
+  if isUIEvent or helpScroll
     activeElement = helpScroll or utils.getActiveElement(vim.window)
     if vim._state.scrollableElements.has(activeElement) or helpScroll
       viewportUtils.scroll(activeElement, options)
@@ -260,23 +261,24 @@ commands.mark_scroll_position = ({vim}) ->
   )
   vim.notify(translate('notification.mark_scroll_position.enter'))
 
-commands.scroll_to_mark = ({vim}) ->
+commands.scroll_to_mark = ({vim, event}) ->
   vim._enterMode('marks', (keyStr) ->
+    lastPositionMark = vim.options['scroll.last_position_mark']
     helper_scroll(
-      vim, null, 'scrollTo', 'other', ['left', 'top'], [0, 0]
+      vim, event, 'scrollTo', 'other', ['left', 'top'], [0, 0]
       ['scrollLeftMax', 'scrollTopMax'], 0, 'scroll_to_mark'
-      {keyStr, lastPositionMark: vim.options['scroll.last_position_mark']}
+      {keyStr, lastPositionMark, isUIEvent: false}
     )
     vim.hideNotification()
   )
   vim.notify(translate('notification.scroll_to_mark.enter'))
 
-helper_scroll_to_position = (direction, {vim, count = 1}) ->
+helper_scroll_to_position = (direction, {vim, event, count = 1}) ->
   lastPositionMark = vim.options['scroll.last_position_mark']
   helper_scroll(
-    vim, null, 'scrollTo', 'other', ['left', 'top'], [0, 0]
+    vim, event, 'scrollTo', 'other', ['left', 'top'], [0, 0]
     ['scrollLeftMax', 'scrollTopMax'], 0, 'scroll_to_position'
-    {count, direction, lastPositionMark}
+    {count, direction, lastPositionMark, isUIEvent: false}
   )
 
 commands.scroll_to_previous_position =
