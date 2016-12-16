@@ -119,10 +119,10 @@ createConfigAPI = (vimfx, {allowDeprecated = true} = {}) -> {
         get: (options, pref) ->
           location = utils.getCurrentLocation()
           return options[pref] unless location
-          overrides = getOverrides(vimfx.optionOverrides, location)
+          overrides = getOverrides(vimfx.optionOverrides ? [], location)
           return overrides?[pref] ? options[pref]
       })
-      onShutdown(vimfx, -> vimfx.optionOverrides = [])
+      onShutdown(vimfx, -> vimfx.optionOverrides = null)
 
     vimfx.optionOverrides.push(rules...)
 
@@ -140,9 +140,9 @@ createConfigAPI = (vimfx, {allowDeprecated = true} = {}) -> {
         return true unless mode == 'normal'
         location = utils.getCurrentLocation()
         return true unless location
-        overrides = getOverrides(vimfx.keyOverrides, location)
+        overrides = getOverrides(vimfx.keyOverrides ? [], location)
         return keyStr not in (overrides ? [])
-      onShutdown(vimfx, -> vimfx.keyOverrides = [])
+      onShutdown(vimfx, -> vimfx.keyOverrides = null)
 
     vimfx.keyOverrides.push(rules...)
 
