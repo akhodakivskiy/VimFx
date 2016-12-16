@@ -13,6 +13,7 @@ Anton Khodakivskiy (@akhodakivskiy)
 - Frank Hase (@Kambfhase) – de
 - Benedikt (@benediktg) – de
 - @just-barcodes – de
+- @interleaved – de
 - @strel – es
 - Mickaël RAYBAUD-ROIG (@m-r-r) – fr
 - Yoppy Halilintar (@comepradz) – id
