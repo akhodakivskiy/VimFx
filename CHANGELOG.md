@@ -1,3 +1,15 @@
+### 0.20.6 (2016-12-16)
+
+- Fixed: The `'`, `g[` and `g]` commands no longer crash. (Regression since
+  0.20.5.)
+- Fixed: The `ef` command can now focus elements in deeply nested frames again.
+  (Regression since 0.19.0.)
+- Fixed: `vimfx.addOptionOverrides` and `vimfx.addKeyOverrides` are now properly
+  undone when reloading a config file (`gC`).
+- Improved: Hint markers for elements with multiline text no longer cover the
+  text.
+- Updated locale: de. Thanks to @interleaved!
+
 ### 0.20.5 (2016-12-04)
 
 - Fixed: Scrolling by holding `d`, `u`, `<space>` or `<s-space>` no longer goes
