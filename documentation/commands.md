@@ -99,6 +99,8 @@ Other than the above, the count and wrap semantics work like `J` and `K`.
 
 Closes the current tab and _count_ minus one of the following tabs.
 
+If you don't want that FF exits when that last tab is closed, you can change the corresponding FF setting in the [about:config](https://support.mozilla.org/de/questions/1015675): Set "browser.tabs.closeWindowWithLastTab" to false.
+
 ### `X`
 
 Restores the _count_ last closed tabs.
