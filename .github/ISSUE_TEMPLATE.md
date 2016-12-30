@@ -50,7 +50,7 @@ Steps to reproduce:
 2. Scroll to the bottom of the page.
 2. Press `f`.
 
-Expected reult: There should be hint marker for the “Contact Us” link at the bottom.
+Expected result: There should be hint marker for the “Contact Us” link at the bottom.
 
 Actual result: There is no hint marker for the “Contact Us” link.
 -->
