@@ -71,6 +71,9 @@ Finally send a pull request to same branch as you based your topic branch on
 
 VimFx uses three numbers to describe its version: x.y.z, or major.minor.patch.
 
+For the time being, it is the most likely that only the last number (patch) is
+going to change. See [issue #860] for more information.
+
 When version 1.0.0 has been released, the first number (major) will only be
 incremented when there are backwards-incompatible changes, such as changes to
 defaults or to the [config file API]. This should be avoided. The idea is that
@@ -99,4 +102,5 @@ branch, while most other things go into the master branch.
 Trying to choose the right branch is important in order to be able to keep a
 rapid release cycle.
 
+[issue #860]: https://github.com/akhodakivskiy/VimFx/issues/860
 [config file API]: api.md

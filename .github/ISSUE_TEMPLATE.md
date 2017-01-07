@@ -20,7 +20,9 @@ This is … (pick one!)
 - [ ] A bug report
   - [ ] I've filled in steps to reproduce below
 - [ ] A feature request
-  - [ ] I've given a **detailed** _example_ below
+  - Sorry, feature requests are not accepted.
+    See [issue #860](https://github.com/akhodakivskiy/VimFx/issues/860)
+- [ ] A question
 - [ ] Somehting else
 
 
@@ -48,17 +50,16 @@ Steps to reproduce:
 
 1. Go to https://www.mozilla.org/en-US/about/
 2. Scroll to the bottom of the page.
-2. Press `f`.
+3. Press `f`.
 
 Expected result: There should be hint marker for the “Contact Us” link at the bottom.
 
 Actual result: There is no hint marker for the “Contact Us” link.
 -->
 
-<!-- Remember to delete the feature request stuff below :) -->
 
 
-
-<!-- For FEATURE REQUESTS: (edit the below example) -->
-
-When I go to https://www.mozilla.org/en-US/about/ and press `?`, _this_ and _that_ happens. I’d like _this_ to happen instead, because that really helps me with _that._ (Add more details here.) Perhaps something like _this_ should be added to VimFx?
+<!-- For FEATURE REQUESTS:
+Sorry, feature requests are not accepted. See issue #860:
+https://github.com/akhodakivskiy/VimFx/issues/860
+-->

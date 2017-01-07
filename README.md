@@ -11,7 +11,8 @@ for browsing and navigation, for a near mouseless experience.
 
 **New to VimFx?** Check out [Questions & Answers]!  
 Power user? Make a [config file]!  
-In either case, have look at the the [documentation] and the [wiki].
+In either case, have look at the the [documentation] and the [wiki].  
+Also check out **[the future of VimFx].**
 
 VimFx is made by [these awesome people][people].
 
@@ -22,6 +23,7 @@ VimFx is made by [these awesome people][people].
 [documentation]: https://github.com/akhodakivskiy/VimFx/tree/master/documentation#contents
 [wiki]: https://github.com/akhodakivskiy/VimFx/wiki
 [Questions & Answers]: https://github.com/akhodakivskiy/VimFx/tree/master/documentation/questions-and-answers.md
+[the future of VimFx]: https://github.com/akhodakivskiy/VimFx/issues/860
 [people]: https://github.com/akhodakivskiy/VimFx/blob/master/PEOPLE.md
 
 ## Why VimFx was created
