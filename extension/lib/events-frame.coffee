@@ -279,7 +279,11 @@ class FrameEventManager
     @listen('blur', (event) =>
       target = event.originalTarget
 
-      @vim.clearHover() if target == @vim.state.lastHover.element
+      if target == @vim.state.lastHover.element and
+         # Facebook “like” button exception. The “emoji picker” immediately
+         # closes otherwise.
+         not target.classList?.contains('UFILikeLink')
+        @vim.clearHover()
 
       @vim.content.setTimeout((=>
         @sendFocusType()
