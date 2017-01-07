@@ -365,7 +365,7 @@ commands.follow_focus = helper_follow.bind(
   null, {id: 'focus', combine: false},
   ({vim, element}) ->
     type = switch
-      when element.tabIndex > -1
+      when utils.isFocusable(element)
         'focusable'
       when element != vim.state.scrollableElements.largest and
            vim.state.scrollableElements.has(element)
