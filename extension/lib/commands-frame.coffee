@@ -518,6 +518,10 @@ commands.follow_pattern = ({vim, type, browserOffset, options}) ->
   attrs = options.pattern_attrs
 
   matchingLink = do ->
+    # Special-case for Google searches.
+    googleLink = document.getElementById("pn#{type}")
+    return googleLink if googleLink
+
     # First search in attributes (favoring earlier attributes) as it's likely
     # that they are more specific than text contexts.
     for attr in attrs
