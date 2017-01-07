@@ -1,3 +1,10 @@
+### 0.20.7 (2017-01-07)
+
+- Improved: The `[` and `]` commands now work in Google search results.
+- Improved: You can now show the “emoji picker” of the “like” button on Facebook
+  by using the `ef` command.
+- Updated locale: de. Thanks to @interleaved!
+
 ### 0.20.6 (2016-12-16)
 
 - Fixed: The `'`, `g[` and `g]` commands no longer crash. (Regression since
