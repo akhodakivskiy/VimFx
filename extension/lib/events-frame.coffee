@@ -1,5 +1,5 @@
 ###
-# Copyright Simon Lydell 2015, 2016.
+# Copyright Simon Lydell 2015, 2016, 2017.
 #
 # This file is part of VimFx.
 #
