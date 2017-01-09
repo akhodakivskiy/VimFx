@@ -40,9 +40,10 @@ defaultOptions = {
 load = (uri, options = {}) ->
   args = Object.assign({}, defaultOptions, options)
   # Randomize URI to work around bug 1051238.
-  args.messageManager.loadFrameScript("#{uri}?#{Math.random()}", true)
+  randomizedUri = "#{uri}?#{Math.random()}"
+  args.messageManager.loadFrameScript(randomizedUri, true)
   args.onShutdown(->
-    args.messageManager.removeDelayedFrameScript(uri)
+    args.messageManager.removeDelayedFrameScript(randomizedUri)
   )
 
 listen = (name, listener, options = {}) ->
