@@ -1,3 +1,11 @@
+### 0.20.8 (2017-01-14)
+
+- Improved: The scrolling commands now scroll the closest scrollable parent of
+  the currently focused element (if it is not scrollable itself). This is
+  noticeable for Twitter’s modals, which are often scrollable. No longer any
+  need to use the `f` or `ef` commands to scroll those modals!
+
+
 ### 0.20.7 (2017-01-07)
 
 - Improved: The `[` and `]` commands now work in Google search results.
