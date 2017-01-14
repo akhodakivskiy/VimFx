@@ -123,9 +123,12 @@ Firefox lets you scroll with the arrow keys, page down, page up, home, end and
 space by default. VimFx provides similar scrolling commands (and actually
 overrides `<space>`), but they work a little bit differently.
 
-They scroll _the currently focused element._ If the currently focused element
-isn’t scrollable, the largest scrollable element on the page (if any, and
-including the entire page itself) is scrolled.
+VimFx chooses which element to scroll in this order:
+
+1. The currently focused element, if it is scrollable.
+2. The closest scrollable parent element for the currently focused element.
+3. The largest scrollable element on the page (if any, and including the entire
+   page itself).
 
 You can focus scrollable elements using the `ef` command (or the `f` command).
 Scrollable browser elements, such as in the dev tools, can be focused using the
