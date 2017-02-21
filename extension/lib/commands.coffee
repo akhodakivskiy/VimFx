@@ -1,6 +1,6 @@
 ###
 # Copyright Anton Khodakivskiy 2012, 2013, 2014.
-# Copyright Simon Lydell 2013, 2014, 2015, 2016.
+# Copyright Simon Lydell 2013, 2014, 2015, 2016, 2017.
 # Copyright Wang Zhuochun 2013, 2014.
 #
 # This file is part of VimFx.
