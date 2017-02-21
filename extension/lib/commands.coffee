@@ -40,6 +40,7 @@ viewportUtils = require('./viewport')
 {ContentClick} = Cu.import('resource:///modules/ContentClick.jsm', {})
 {FORWARD, BACKWARD} = SelectionManager
 
+READER_VIEW_PREFIX = 'about:reader?url='
 SPRING_CONSTANT_PREF = 'layout.css.scroll-behavior.spring-constant'
 
 commands = {}
@@ -67,7 +68,13 @@ commands.paste_and_go = helper_paste_and_go.bind(null, null)
 commands.paste_and_go_in_tab = helper_paste_and_go.bind(null, {altKey: true})
 
 commands.copy_current_url = ({vim}) ->
-  utils.writeToClipboard(vim.window.gBrowser.currentURI.spec)
+  url = vim.window.gBrowser.currentURI.spec
+  adjustedUrl =
+    if url.startsWith(READER_VIEW_PREFIX)
+      decodeURIComponent(url[READER_VIEW_PREFIX.length..])
+    else
+      url
+  utils.writeToClipboard(adjustedUrl)
   vim.notify(translate('notification.copy_current_url.success'))
 
 commands.go_up_path = ({vim, count}) ->
