@@ -84,7 +84,7 @@ There’s also an [article on ghacks.net][ghacks] which is a good introduction.
 
 Enjoying VimFx? [Write a review][review]!
 
-Found a bug? Report it in the [issue tracker]!
+Having a problem? Report it in the [issue tracker]!
 
 [review]: https://addons.mozilla.org/firefox/addon/vimfx/reviews/add
 [issue tracker]: https://github.com/akhodakivskiy/VimFx/issues

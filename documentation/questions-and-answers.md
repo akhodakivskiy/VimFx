@@ -167,4 +167,7 @@ See also [issue 588].
 
 ## My question isn’t listed here!
 
-Tell us, and we’ll add it. Let’s make this a great resource for new users.
+[Tell us][issue-tracker], and we’ll add it. Let’s make this a great resource for
+new users.
+
+[issue-tracker]: https://github.com/akhodakivskiy/VimFx/issues
