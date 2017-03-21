@@ -307,6 +307,10 @@ class FrameEventManager
         )
     )
 
+    @listen('popstate', () =>
+      @vim.markPageInteraction(false)
+    )
+
     messageManager.listen('checkFocusType', @sendFocusType.bind(this))
 
   sendFocusType: ({ignore = []} = {}) ->
