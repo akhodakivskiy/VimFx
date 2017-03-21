@@ -229,7 +229,7 @@ class FrameEventManager
       # event below).
       if target == @vim.content.document
         if @vim.state.shouldRefocus
-          @vim.state.hasInteraction = true
+          @vim.markPageInteraction(true)
           # When Firefox is re-focused after using a keyboard shortcut to switch
           # keyboard layout in GNOME, _two_ focus events for the document are
           # triggered, about 50ms apart. Therefore, reset the `shouldRefocus`
@@ -238,7 +238,7 @@ class FrameEventManager
             @vim.state.shouldRefocus = false
           ), prefs.get('refocus_timeout'))
         else
-          @vim.state.hasInteraction = false
+          @vim.markPageInteraction(false)
         return
 
       if utils.isTextInputElement(target)
