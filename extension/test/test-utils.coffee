@@ -1,5 +1,5 @@
 ###
-# Copyright Simon Lydell 2014, 2016.
+# Copyright Simon Lydell 2014, 2016, 2017.
 #
 # This file is part of VimFx.
 #
@@ -20,7 +20,7 @@
 assert = require('./assert')
 utils = require('../lib/utils')
 
-exports['test selectAllSubstringMatches'] = ->
+exports['test selectAllSubstringMatches'] = ($vimfx, teardown) ->
   window = utils.getCurrentWindow()
   {document} = window
   selection = window.getSelection()
@@ -36,6 +36,11 @@ exports['test selectAllSubstringMatches'] = ->
 
   test = (name, element, string, options, expected) ->
     msg = (message) -> "#{name}: #{message}"
+
+    document.documentElement.appendChild(element)
+    teardown(->
+      element.remove()
+    )
 
     selection.removeAllRanges()
     utils.selectAllSubstringMatches(element, string, options)
