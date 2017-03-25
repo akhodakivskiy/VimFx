@@ -591,7 +591,7 @@ exports['test vimfx.send errors'] = ($vimfx) ->
     vimfx.send(vim, false)
   )
 
-  assert.throws(/not.+function/i, 'function () {}', ->
+  assert.throws(/not.+function/i, 'function() {}', ->
     vimfx.send(vim, 'message', ->)
   )
 
