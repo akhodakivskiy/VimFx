@@ -307,7 +307,7 @@ class FrameEventManager
         )
     )
 
-    @listen('popstate', () =>
+    @listen('popstate', =>
       @vim.markPageInteraction(false)
     )
 
