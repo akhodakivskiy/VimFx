@@ -1,3 +1,9 @@
+### 0.20.10 (2017-03-25)
+
+- Improved: Autofocus is now prevented when going back in history on pages that
+  use `history.pushState()` (in other words, on the 'popstate' event).
+- Updated locale: ja. Thanks to Kaoru Esashika (@pluser)!
+
 ### 0.20.9 (2017-02-21)
 
 - Fixed: The `yy` command now works as expected in Reader Mode.
