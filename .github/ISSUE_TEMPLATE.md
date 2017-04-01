@@ -9,15 +9,16 @@ Before submitting an issue, you need to check the below items. :)
 - [ ] I've looked at the [change log](https://github.com/akhodakivskiy/VimFx/blob/master/CHANGELOG.md)
 - [ ] I've provided the below details:
 
-VimFx version: 
-Firefox version: 
-OS: 
-Keyboard language: 
-Example URL (if any): 
+VimFx version:
+Firefox version:
+OS:
+Keyboard language:
+Example URL (if any):
 
 This is … (pick one!)
 
 - [ ] A bug report
+  - [ ] I've tried below debgging methods.
   - [ ] I've filled in steps to reproduce below
 - [ ] A feature request
   - Sorry, feature requests are not accepted.
@@ -37,13 +38,21 @@ This bug is about … (pick one!)
 
 Steps to reproduce:
 
-1. 
-2. 
-3. 
+1.
+2.
+3.
 
-Expected result: 
+Expected result:
 
-Actual result: 
+Actual result:
+
+
+I've tried following methods:
+
+- [ ] Test on different URLs.
+- [ ] Disable keyboard hijacking softwares, e.g: AutoHotkey, Unikey...
+  [ ] Restart Firefox
+- [ ] Create new empty firefox profile and install only VimFx for testing.
 
 <!-- Example:
 Steps to reproduce:
