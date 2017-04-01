@@ -18,6 +18,7 @@ Example URL (if any):
 This is … (pick one!)
 
 - [ ] A bug report
+  - [ ] I've tested in a new [Firefox profile](https://support.mozilla.org/kb/profile-manager-create-and-remove-firefox-profiles)
   - [ ] I've filled in steps to reproduce below
 - [ ] A feature request
   - Sorry, feature requests are not accepted.
