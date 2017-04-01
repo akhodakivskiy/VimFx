@@ -22,7 +22,7 @@ This is … (pick one!)
   - [ ] I've filled in steps to reproduce below
 - [ ] A feature request
   - Sorry, feature requests are not accepted.
-    See [issue #860](https://github.com/akhodakivskiy/VimFx/issues/860)
+    See [issue 860](https://github.com/akhodakivskiy/VimFx/issues/860)
 - [ ] A question
 - [ ] Somehting else
 
@@ -61,6 +61,6 @@ Actual result: There is no hint marker for the “Contact Us” link.
 
 
 <!-- For FEATURE REQUESTS:
-Sorry, feature requests are not accepted. See issue #860:
+Sorry, feature requests are not accepted. See issue 860:
 https://github.com/akhodakivskiy/VimFx/issues/860
 -->
