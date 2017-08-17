@@ -78,8 +78,8 @@ console]. There you should see an entry with the message “This is vimfx:” as
 well as an interactive inspection of the `vimfx` object.
 
 Note: The [**browser** console][browser console] (default Firefox shortcut:
-`<c-J>`) is not the same as the [_web_ console][web console] (default Firefox
-shortcut: `<c-K>`). It’s easy to mix them up as a beginner!
+`<c-s-J>`) is not the same as the [_web_ console][web console] (default Firefox
+shortcut: `<c-s-K>`). It’s easy to mix them up as a beginner!
 
 [browser console]: https://developer.mozilla.org/en-US/docs/Tools/Browser_Console
 [web console]: https://developer.mozilla.org/en-US/docs/Tools/Web_Console
