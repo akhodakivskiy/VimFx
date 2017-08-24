@@ -1,9 +1,3 @@
-<!--
-This is part of the VimFx documentation.
-Copyright Simon Lydell 2015, 2016, 2017.
-See the file README.md for copying conditions.
--->
-
 # Contributing code
 
 **This document is meant to _help,_ not to scare you off!** Contributions are

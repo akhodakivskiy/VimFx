@@ -1,9 +1,3 @@
-<!--
-This is part of the VimFx documentation.
-Copyright Simon Lydell 2015, 2016.
-See the file README.md for copying conditions.
--->
-
 # Tools
 
 This section describes how to install and use the tools needed to:

@@ -5,7 +5,7 @@
     "min": "45.0",
     "max": "*"
   },
-  "license": "GPL-3.0+",
+  "license": "MIT",
   "private": true,
   "scripts": {
     "gulp": "gulp",

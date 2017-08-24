@@ -1,15 +1,10 @@
 The source code is available at https://github.com/akhodakivskiy/VimFx.
 The source code is licensed as follows:
 
-All ".coffee" files are licensed with GPL-3.0+. That is also explicitly noted at
-the top of each file. A copy of the license is included in the file "COPYING".
+All ".coffee" files are licensed with MIT. A copy of the license is included in
+the file "LICENSE-MIT".
 
-All ".tmpl", ".xul" and ".json" files are in the public domain. So are all ".md"
-files, except the ones in the "documentation/" directory.
-
-All files in the "documentation/" directory are licensed with GFDL-1.3+.
-That is also explicitly noted at the top of each file. A copy of the license is
-included in the file "documentation/GNU Free Documentation License".
+All ".md", ".tmpl", ".xul" and ".json" files are in the public domain.
 
 All files in the "extension/locale/" directory and its subdirectories are in the
 public domain. Translators are credited in "PEOPLE.md" and the "About" dialog of

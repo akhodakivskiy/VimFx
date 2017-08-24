@@ -1,9 +1,3 @@
-<!--
-This is part of the VimFx documentation.
-Copyright Simon Lydell 2015, 2016.
-See the file README.md for copying conditions.
--->
-
 # Button
 
 VimFx has a toolbar button. It looks like this: ![VimFx button icon].

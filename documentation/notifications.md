@@ -1,9 +1,3 @@
-<!--
-This is part of the VimFx documentation.
-Copyright Simon Lydell 2015, 2016.
-See the file README.md for copying conditions.
--->
-
 # Notifications
 
 Some commands may show notifications, such as the `n` and `N` commands which

@@ -1,9 +1,3 @@
-<!--
-This is part of the VimFx documentation.
-Copyright Simon Lydell 2016.
-See the file README.md for copying conditions.
--->
-
 # Modes
 
 ## Summary

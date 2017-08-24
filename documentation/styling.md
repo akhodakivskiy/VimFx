@@ -1,9 +1,3 @@
-<!--
-This is part of the VimFx documentation.
-Copyright Simon Lydell 2015, 2016.
-See the file README.md for copying conditions.
--->
-
 # Styling
 
 It is possible to change the style of VimFx’s hint markers (such as the font

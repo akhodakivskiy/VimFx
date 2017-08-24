@@ -1,9 +1,3 @@
-<!--
-This is part of the VimFx documentation.
-Copyright Simon Lydell 2015, 2016.
-See the file README.md for copying conditions.
--->
-
 # Shortcuts
 
 All of VimFx’s keyboard shortcuts can be customized in VimFx’s options page in

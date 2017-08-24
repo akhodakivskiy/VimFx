@@ -1,9 +1,3 @@
-<!--
-This is part of the VimFx documentation.
-Copyright Simon Lydell 2015, 2016.
-See the file README.md for copying conditions.
--->
-
 # Handy standard Firefox features
 
 One of VimFx’s key features is embracing standard Firefox features. That is
