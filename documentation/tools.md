@@ -41,6 +41,9 @@ Note that the built .xpi file is [unsigned].
 
 ### Development
 
+First off, you need a Firefox version old enough to support _legacy_ extensions.
+See [README.md] for more information.
+
 1. Create a new [Firefox profile] for development.
 
 2. Install the [Extension Auto-Installer] add-on in your development profile.
@@ -48,6 +51,7 @@ Note that the built .xpi file is [unsigned].
 An easy workflow is code, `gulp`, test, repeat. (Use `gulp -t` to also run the
 unit tests.)
 
+[README.md]: ../README.md
 [Firefox Profile]: https://support.mozilla.org/en-US/kb/profile-manager-create-and-remove-firefox-profiles
 [Extension Auto-Installer]: https://addons.mozilla.org/firefox/addon/autoinstaller
 
@@ -181,9 +185,8 @@ Steps:
 
 1. Add a list of changes since the last version at the top of `CHANGELOG.md`.
 
-2. Update the version in `package.json` ([versioning guidelines]), the minimum
-   Firefox version (if needed) and the maximum Firefox version (ideally to the
-   latest nightly). See [valid Firefox versions].
+2. Update the version in `package.json` and the minimum Firefox version (if
+   needed).
 
 3. Run `gulp release`, which does the following for you:
 
@@ -214,6 +217,3 @@ Steps:
 
 The idea is to use the contents of `README.md` as the add-on description on
 addons.mozilla.org. You can print it as HTML by running `gulp readme`.
-
-[versioning guidelines]: CONTRIBUTING-CODE.md#versioning-and-branches
-[valid Firefox versions]: https://addons.mozilla.org/en-US/firefox/pages/appversions/

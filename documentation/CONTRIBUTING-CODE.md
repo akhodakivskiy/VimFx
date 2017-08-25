@@ -1,7 +1,12 @@
 # Contributing code
 
-**This document is meant to _help,_ not to scare you off!** Contributions are
-more than welcome. Don’t be afraid to make mistakes–we’ll help you out!
+Feel free to contribute stuff that you think might help people, but please
+remember that VimFx is a dead project so there’s a risk that your pull request
+won’t be merged.
+
+See [README.md] for more information.
+
+[README.md]: ../README.md
 
 
 ## Localizations
@@ -59,42 +64,3 @@ Finally send a pull request to same branch as you based your topic branch on
 (master or develop).
 
 [tools.md]: tools.md
-
-
-## Versioning and branches
-
-VimFx uses three numbers to describe its version: x.y.z, or major.minor.patch.
-
-For the time being, it is the most likely that only the last number (patch) is
-going to change. See [issue #860] for more information.
-
-When version 1.0.0 has been released, the first number (major) will only be
-incremented when there are backwards-incompatible changes, such as changes to
-defaults or to the [config file API]. This should be avoided. The idea is that
-when a user installs a new major release, they should expect changes that they
-need to get familiar with.
-
-The middle number (minor) is incremented when a release contains new features,
-or larger changes/refactors to code. Users should expect things to be roughly
-the same, but with a few new features (and the potential bugs along with them),
-when installing a new minor release.
-
-The last number (patch) is incremented when a release contains only (simple)
-bugfixes, new localizations and updates to localizations. If a user installs a
-new patch release they shouldn’t have to get familiar with anything. Things
-should be like they were before, just a little better. Code released as a patch
-version should ideally have a low risk of bugs.
-
-VimFx uses two branches: **master** and **develop**. master is the latest
-stable version plus trivial bugfixes. develop is the next minor version. master
-is merged into develop when needed, and develop is merged into master before it
-is going to be released.
-
-In short, “backwards-incompatible” changes and new features go into the develop
-branch, while most other things go into the master branch.
-
-Trying to choose the right branch is important in order to be able to keep a
-rapid release cycle.
-
-[issue #860]: https://github.com/akhodakivskiy/VimFx/issues/860
-[config file API]: api.md

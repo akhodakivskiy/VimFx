@@ -92,8 +92,6 @@ class Vim
            @_isUIElement(event.originalTarget)
 
   _isUIElement: (element) ->
-    # TODO: The `element.ownerGlobal` check will be redundant when
-    # non-multi-process is removed from Firefox.
     return element.ownerGlobal instanceof ChromeWindow and
            element != @window.gBrowser.selectedBrowser
 

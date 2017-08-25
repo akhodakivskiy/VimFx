@@ -1,5 +1,15 @@
 # Questions & Answers
 
+## I can’t install VimFx!
+
+That’s probably because VimFx is a _legacy_ Firefox extension, which is **not**
+[compatible with Firefox 57+][firefox-57+].
+
+See [README.md] for more information.
+
+[firefox-57+]: https://support.mozilla.org/en-US/kb/firefox-add-technology-modernizing
+[README.md]: ../README.md
+
 ## How do I disable VimFx?
 
 If you press `i` you will enter Ignore mode. VimFx’s toolbar [button] turns red
@@ -158,10 +168,3 @@ See also [issue 588].
 [ClearClick]: https://noscript.net/faq/#clearclick
 [hackademix-clickjacking]: https://hackademix.net/2011/07/11/fancy-clickjacking-tougher-noscript/
 [issue 588]: https://github.com/akhodakivskiy/VimFx/issues/588
-
-## My question isn’t listed here!
-
-[Tell us][issue-tracker], and we’ll add it. Let’s make this a great resource for
-new users.
-
-[issue-tracker]: https://github.com/akhodakivskiy/VimFx/issues

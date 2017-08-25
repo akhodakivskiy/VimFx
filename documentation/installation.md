@@ -1,5 +1,11 @@
 # Installation
 
+First off, you need a Firefox version old enough to support _legacy_ extensions.
+See [README.md] for more information.
+
+[README.md]: ../README.md
+
+
 ## Option 1: [addons.mozilla.org] \(AMO)
 
 **<https://addons.mozilla.org/firefox/addon/VimFx>**

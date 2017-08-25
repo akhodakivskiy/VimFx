@@ -1,5 +1,23 @@
 # VimFx – Vim keyboard shortcuts for Firefox
 
+**Note:** VimFx is a _legacy_ Firefox extension, which is **not**  [compatible
+with Firefox 57+][firefox-57+].
+
+If you’re looking for a replacement for VimFx, check out these extensions:
+
+- [Vimium-FF]
+- [Saka Key]
+
+(VimFx won’t be updated to work with newer Firefox versions, because it is a big
+task that nobody has felt like tackling. However, the source code is free, so if
+you feel like giving it a shot you can totally do so!)
+
+[firefox-57+]: https://support.mozilla.org/en-US/kb/firefox-add-technology-modernizing
+[Vimium-FF]: https://addons.mozilla.org/firefox/addon/vimium-ff/
+[Saka Key]: https://addons.mozilla.org/firefox/addon/saka-key/
+
+---
+
 <img src="extension/skin/icon128.png" alt="" align="right">
 
 [VimFx] is a Firefox extension which adds short, Vim-style keyboard shortcuts
@@ -12,7 +30,6 @@ for browsing and navigation, for a near mouseless experience.
 **New to VimFx?** Check out [Questions & Answers]!  
 Power user? Make a [config file]!  
 In either case, have look at the the [documentation] and the [wiki].  
-Also check out **[the future of VimFx].**
 
 VimFx is made by [these awesome people][people].
 
@@ -23,7 +40,6 @@ VimFx is made by [these awesome people][people].
 [documentation]: https://github.com/akhodakivskiy/VimFx/tree/master/documentation#contents
 [wiki]: https://github.com/akhodakivskiy/VimFx/wiki
 [Questions & Answers]: https://github.com/akhodakivskiy/VimFx/tree/master/documentation/questions-and-answers.md
-[the future of VimFx]: https://github.com/akhodakivskiy/VimFx/issues/860
 [people]: https://github.com/akhodakivskiy/VimFx/blob/master/PEOPLE.md
 
 ## Why VimFx was created
@@ -79,12 +95,3 @@ There’s also an [article on ghacks.net][ghacks] which is a good introduction.
 [default shortcuts]: https://github.com/akhodakivskiy/VimFx/blob/master/extension/lib/defaults.coffee
 [blacklist]: https://github.com/akhodakivskiy/VimFx/blob/master/documentation/options.md#blacklist
 [ghacks]: http://www.ghacks.net/2016/07/01/vimfx-improve-firefox-keyboard-use/
-
-## Feedback
-
-Enjoying VimFx? [Write a review][review]!
-
-Having a problem? Report it in the [issue tracker]!
-
-[review]: https://addons.mozilla.org/firefox/addon/vimfx/reviews/add
-[issue tracker]: https://github.com/akhodakivskiy/VimFx/issues
