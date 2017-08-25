@@ -16,25 +16,25 @@
     "vim-like-key-notation": "^1.0.1"
   },
   "devDependencies": {
-    "addons-linter": "^0.17.0",
-    "coffee-script": "^1.12.4",
+    "addons-linter": "^0.24.0",
+    "coffee-script": "^1.12.7",
     "coffeelint": "^1.16.0",
     "coffeelint-forbidden-keywords": "^0.1.1",
     "gulp": "^3.9.1",
     "gulp-coffee": "^2.3.4",
     "gulp-coffeelint": "^0.6.0",
-    "gulp-git": "^2.1.0",
-    "gulp-header": "^1.8.8",
-    "gulp-mustache": "^2.3.0",
+    "gulp-git": "^2.4.2",
+    "gulp-header": "^1.8.9",
+    "gulp-mustache": "^3.0.0",
     "gulp-preprocess": "^2.0.0",
     "gulp-sloc": "flosse/gulp-sloc#sloc-v0.1.x",
-    "gulp-tap": "^0.1.3",
+    "gulp-tap": "^1.0.1",
     "gulp-zip": "^4.0.0",
     "marked": "^0.3.6",
-    "merge2": "^1.0.3",
+    "merge2": "^1.1.0",
     "request": "^2.81.0",
     "require-precompute": "^0.2.0",
     "rimraf": "^2.6.1",
-    "run-sequence": "^1.2.2"
+    "run-sequence": "^2.1.0"
   }
 }
