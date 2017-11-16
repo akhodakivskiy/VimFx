@@ -1,7 +1,7 @@
 # VimFx – Vim keyboard shortcuts for Firefox
 
 **Note:** VimFx is a _legacy_ Firefox extension, which is **not**  [compatible
-with Firefox 57+][firefox-57+].
+with Firefox 57+][firefox-57+]. (And never will be.)
 
 If you’re looking for a replacement for VimFx, check out these extensions:
 
