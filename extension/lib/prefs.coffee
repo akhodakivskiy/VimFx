@@ -23,7 +23,10 @@ get = (branch, key) ->
     when branch.PREF_INT
       branch.getIntPref(key)
     when branch.PREF_STRING
-      branch.getComplexValue(key, Ci.nsISupportsString).data
+      if branch.getStringPref
+        branch.getStringPref(key)
+      else
+        branch.getComplexValue(key, Ci.nsISupportsString).data
 
 set = (branch, key, value) ->
   switch typeof value
@@ -32,10 +35,13 @@ set = (branch, key, value) ->
     when 'number'
       branch.setIntPref(key, value) # `value` will be `Math.floor`ed.
     when 'string'
-      str = Cc['@mozilla.org/supports-string;1']
-        .createInstance(Ci.nsISupportsString)
-      str.data = value
-      branch.setComplexValue(key, Ci.nsISupportsString, str)
+      if branch.setStringPref
+        branch.setStringPref(key, value)
+      else
+        str = Cc['@mozilla.org/supports-string;1']
+          .createInstance(Ci.nsISupportsString)
+        str.data = value
+        branch.setComplexValue(key, Ci.nsISupportsString, str)
     else
       if value == null
         branch.clearUserPref(key)
