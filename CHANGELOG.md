@@ -1,8 +1,7 @@
-### 0.20.10 (2017-03-25)
+### 0.20.11 (2017-11-19)
 
-- Improved: Autofocus is now prevented when going back in history on pages that
-  use `history.pushState()` (in other words, on the 'popstate' event).
-- Updated locale: ja. Thanks to Kaoru Esashika (@pluser)!
+- Fixed: VimFx should now work in Firefox 58 (if you have enabled legacy
+  extensions). Thanks to 依云 (@lilydjwg)!
 
 ### 0.20.9 (2017-02-21)
 
