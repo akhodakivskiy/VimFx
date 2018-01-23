@@ -1,7 +1,3 @@
-/* Allow file:/// prefix for testing using `gulp {help,hints}.html`. */
-@-moz-document url(chrome://browser/content/browser.xul), url-prefix(file:///)
-{
-
 /***** Button *****/
 
 #VimFxButton {
@@ -328,5 +324,3 @@ toolbarpaletteitem[place="palette"] > #VimFxButton {
     background-color: Highlight;
     color: HighlightText;
   }
-
-}
