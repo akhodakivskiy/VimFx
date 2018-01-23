@@ -13,13 +13,15 @@ nsIStyleSheetService = Cc['@mozilla.org/content/style-sheet-service;1']
 nsIWindowMediator = Cc['@mozilla.org/appshell/window-mediator;1']
   .getService(Ci.nsIWindowMediator)
 
-try
-  nsIDomUtils = Cc['@mozilla.org/inspector/dom-utils;1']
-    .getService(Ci.inIDOMUtils)
-catch e
-  # This interface was removed from Firefox with no alternative. Try to use it
-  # if supported but otherwise just ignore it. Code in this module handles this
-  # variable being undefined.
+# This interface was removed from Firefox with no alternative. Try to use it if
+# available but otherwise just ignore it. Code in this module handles this
+# variable being `null`.
+nsIDomUtils =
+  try
+    Cc['@mozilla.org/inspector/dom-utils;1']
+      .getService(Ci.inIDOMUtils)
+  catch
+    null
 
 # For XUL, `instanceof` checks are often better than `.localName` checks,
 # because some of the below interfaces are extended by many elements.
