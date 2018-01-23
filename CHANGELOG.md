@@ -1,3 +1,9 @@
+### 0.20.12 (2018-01-23)
+
+- Fixed: VimFx should now work in Firefox 59 (if you have enabled legacy
+  extensions). Thanks to Kevin Cox (@kevincox) and 依云 (@lilydjwg)!
+- Updated locale: es. Thanks to @strel!
+
 ### 0.20.11 (2017-11-19)
 
 - Fixed: VimFx should now work in Firefox 58 (if you have enabled legacy
