@@ -4,8 +4,6 @@
 
 nsIClipboardHelper = Cc['@mozilla.org/widget/clipboardhelper;1']
   .getService(Ci.nsIClipboardHelper)
-nsIDomUtils = Cc['@mozilla.org/inspector/dom-utils;1']
-  .getService(Ci.inIDOMUtils)
 nsIEventListenerService = Cc['@mozilla.org/eventlistenerservice;1']
   .getService(Ci.nsIEventListenerService)
 nsIFocusManager = Cc['@mozilla.org/focus-manager;1']
@@ -14,6 +12,14 @@ nsIStyleSheetService = Cc['@mozilla.org/content/style-sheet-service;1']
   .getService(Ci.nsIStyleSheetService)
 nsIWindowMediator = Cc['@mozilla.org/appshell/window-mediator;1']
   .getService(Ci.nsIWindowMediator)
+
+try
+  nsIDomUtils = Cc['@mozilla.org/inspector/dom-utils;1']
+    .getService(Ci.inIDOMUtils)
+catch e
+  # This interface was removed from Firefox with no alternative. Try to use it
+  # if supported but otherwise just ignore it. Code in this module handles this
+  # variable being undefined.
 
 # For XUL, `instanceof` checks are often better than `.localName` checks,
 # because some of the below interfaces are extended by many elements.
@@ -494,6 +500,8 @@ setAttributes = (element, attributes) ->
   return
 
 setHover = (element, hover) ->
+  return unless nsIDomUtils
+
   method = if hover then 'addPseudoClassLock' else 'removePseudoClassLock'
   while element.parentElement
     nsIDomUtils[method](element, ':hover')
