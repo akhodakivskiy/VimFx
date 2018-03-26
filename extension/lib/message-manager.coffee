@@ -5,12 +5,16 @@
 
 namespace = (name, prefix) -> "#{ADDON_PATH}/#{BUILD_TIME}/#{prefix}#{name}"
 
-defaultMessageManager =
-  if IS_FRAME_SCRIPT
-    FRAME_SCRIPT_ENVIRONMENT
-  else
-    Cc['@mozilla.org/globalmessagemanager;1']
-      .getService(Ci.nsIMessageListenerManager)
+try
+  defaultMessageManager =
+    if IS_FRAME_SCRIPT
+      FRAME_SCRIPT_ENVIRONMENT
+    else
+      Cc['@mozilla.org/globalmessagemanager;1']
+        .getService(Ci.nsIMessageListenerManager)
+catch error
+  defaultMessageManager =
+    Cc['@mozilla.org/globalmessagemanager;1'].getService()
 
 defaultOptions = {
   messageManager: defaultMessageManager
