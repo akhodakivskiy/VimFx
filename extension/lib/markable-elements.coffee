@@ -6,7 +6,6 @@ viewportUtils = require('./viewport')
 {devtools} = Cu.import('resource://devtools/shared/Loader.jsm', {})
 
 Element = Ci.nsIDOMElement
-XULDocument = Ci.nsIDOMXULDocument
 
 MIN_TEXTNODE_SIZE = 4
 
@@ -57,7 +56,7 @@ getMarkableElements = (
   return
 
 getAllElements = (document, selector) ->
-  unless document instanceof XULDocument
+  unless utils.isXULDocument(document)
     return document.querySelectorAll(selector)
 
   # Use a `Set` since this algorithm may find the same element more than once.
