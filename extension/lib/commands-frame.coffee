@@ -13,8 +13,6 @@ viewportUtils = require('./viewport')
 {FORWARD, BACKWARD} = SelectionManager
 {isProperLink, isTextInputElement, isTypingElement, isContentEditable} = utils
 
-XULDocument = Ci.nsIDOMXULDocument
-
 # <http://www.w3.org/html/wg/drafts/html/master/dom.html#wai-aria>
 CLICKABLE_ARIA_ROLES = [
   'link', 'button', 'tab'
@@ -141,7 +139,7 @@ commands.scroll_to_position = (args) ->
 
 helper_follow = (options, matcher, {vim, pass}) ->
   {id, combine = true, selectors = FOLLOW_DEFAULT_SELECTORS} = options
-  if vim.content.document instanceof XULDocument
+  if utils.isXULDocument(vim.content.document)
     selectors = ['*']
 
   if pass == 'auto'
@@ -242,7 +240,7 @@ commands.follow = helper_follow.bind(
   null, {id: 'normal'},
   ({vim, element, getElementShape}) ->
     document = element.ownerDocument
-    isXUL = (document instanceof XULDocument)
+    isXUL = utils.isXULDocument(document)
     type = null
     switch
       # Bootstrap. Match these before regular links, because especially slider
@@ -405,7 +403,7 @@ commands.click_marker_element = (
   if type == 'clickable-special'
     element.click()
   else
-    isXUL = (element.ownerDocument instanceof XULDocument)
+    isXUL = utils.isXULDocument(element.ownerDocument)
     sequence = switch
       when isXUL
         if element.localName == 'tab' then ['mousedown'] else 'click-xul'

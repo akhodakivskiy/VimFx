@@ -9,8 +9,6 @@ utils = require('./utils')
 nsIFocusManager = Cc['@mozilla.org/focus-manager;1']
   .getService(Ci.nsIFocusManager)
 
-XULDocument = Ci.nsIDOMXULDocument
-
 class FrameEventManager
   constructor: (@vim) ->
     @numFocusToSuppress = 0
@@ -247,7 +245,7 @@ class FrameEventManager
          # …and the target may steal most keystrokes…
          utils.isTypingElement(target) and
          # …and the page isn’t a Firefox internal page (like `about:config`).
-         @vim.content.document not instanceof XULDocument
+         not utils.isXULDocument(@vim.content.document)
         # Some sites (such as icloud.com) re-focuses inputs if they are blurred,
         # causing an infinite loop of autofocus prevention and re-focusing.
         # Therefore, blur events that happen just after an autofocus prevention

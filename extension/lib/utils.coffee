@@ -25,11 +25,13 @@ nsIDomUtils =
 
 # For XUL, `instanceof` checks are often better than `.localName` checks,
 # because some of the below interfaces are extended by many elements.
-XULDocument = Ci.nsIDOMXULDocument
 XULButtonElement = Ci.nsIDOMXULButtonElement
 XULControlElement = Ci.nsIDOMXULControlElement
 XULMenuListElement = Ci.nsIDOMXULMenuListElement
 XULTextBoxElement = Ci.nsIDOMXULTextBoxElement
+
+isXULDocument = (doc) ->
+  doc.toString() == '[object XULDocument]'
 
 # Full chains of events for different mouse actions. Note: 'click' is fired
 # by Firefox automatically after 'mousedown' and 'mouseup'. Similarly,
@@ -144,7 +146,7 @@ isProperLink = (element) ->
   # href="">`s used as buttons on some sites.
   return element.getAttribute?('href') and
          (element.localName == 'a' or
-          element.ownerDocument instanceof XULDocument) and
+          isXULDocument(element.ownerDocument)) and
          not element.href?.endsWith?('#') and
          not element.href?.endsWith?('#?') and
          not element.href?.startsWith?('javascript:')
@@ -687,7 +689,7 @@ observe = (topic, observer) ->
 
 # Try to open a button’s dropdown menu, if any.
 openDropdown = (element) ->
-  if element.ownerDocument instanceof XULDocument and
+  if isXULDocument(element.ownerDocument) and
      element.getAttribute?('type') == 'menu' and
      element.open == false # Only change `.open` if it is already a boolean.
     element.open = true
