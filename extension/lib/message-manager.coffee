@@ -9,8 +9,11 @@ defaultMessageManager =
   if IS_FRAME_SCRIPT
     FRAME_SCRIPT_ENVIRONMENT
   else
-    Cc['@mozilla.org/globalmessagemanager;1']
-      .getService(Ci.nsIMessageListenerManager)
+    try
+      Cc['@mozilla.org/globalmessagemanager;1']
+        .getService(Ci.nsIMessageListenerManager)
+    catch
+      Cc['@mozilla.org/globalmessagemanager;1'].getService()
 
 defaultOptions = {
   messageManager: defaultMessageManager
