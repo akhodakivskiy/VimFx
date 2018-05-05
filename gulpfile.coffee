@@ -15,7 +15,6 @@ merge = require('merge2')
 precompute = require('require-precompute')
 request = require('request')
 rimraf = require('rimraf')
-runSequence = require('run-sequence')
 pkg = require('./package.json')
 
 DEST = 'build'
@@ -34,8 +33,6 @@ argv = process.argv.slice(2)
 {join} = path
 read = (filepath) -> fs.readFileSync(filepath).toString()
 template = (data) -> mustache(data, {extension: ''})
-
-gulp.task('default', ['push'])
 
 gulp.task('clean', (callback) ->
   rimraf(DEST, callback)
@@ -122,30 +119,29 @@ gulp.task('install.rdf', ->
     .pipe(gulp.dest(DEST))
 )
 
-gulp.task('templates', [
+gulp.task('templates', gulp.parallel(
   'bootstrap-frame.js'
   'chrome.manifest'
   'install.rdf'
-])
+))
 
-gulp.task('build', (callback) ->
-  runSequence(
-    'clean',
-    ['copy', 'node_modules', 'coffee', 'templates'],
-    callback
-  )
-)
+gulp.task('build', gulp.series(
+  'clean',
+  gulp.parallel('copy', 'node_modules', 'coffee', 'templates')
+))
 
-gulp.task('xpi', ['build'], ->
+gulp.task('xpi', gulp.series('build', ->
   gulp.src("#{DEST}/**/*")
     .pipe(zip(XPI, {compress: false}))
     .pipe(gulp.dest(DEST))
-)
+))
 
-gulp.task('push', ['xpi'], ->
+gulp.task('push', gulp.series('xpi', ->
   body = fs.readFileSync(join(DEST, XPI))
   request.post({url: 'http://localhost:8888', body})
-)
+))
+
+gulp.task('default', gulp.series('push'))
 
 gulp.task('lint', ->
   gulp.src(['extension/**/*.coffee', 'gulpfile.coffee'])
