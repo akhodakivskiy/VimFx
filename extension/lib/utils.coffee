@@ -28,7 +28,6 @@ nsIDomUtils =
 XULButtonElement = Ci.nsIDOMXULButtonElement
 XULControlElement = Ci.nsIDOMXULControlElement
 XULMenuListElement = Ci.nsIDOMXULMenuListElement
-XULTextBoxElement = Ci.nsIDOMXULTextBoxElement
 
 isXULDocument = (doc) ->
   doc.toString() == '[object XULDocument]'
@@ -155,8 +154,7 @@ isTextInputElement = (element) ->
   return (element.localName == 'input' and element.type in [
            'text', 'search', 'tel', 'url', 'email', 'password', 'number'
          ]) or
-         element.localName == 'textarea' or
-         element instanceof XULTextBoxElement or
+         element.localName in [ 'textarea', 'textbox' ] or
          isContentEditable(element)
 
 isTypingElement = (element) ->
