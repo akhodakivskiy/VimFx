@@ -130,16 +130,20 @@ gulp.task('build', gulp.series(
   gulp.parallel('copy', 'node_modules', 'coffee', 'templates')
 ))
 
-gulp.task('xpi', gulp.series('build', ->
+gulp.task('xpi-only', ->
   gulp.src("#{DEST}/**/*")
     .pipe(zip(XPI, {compress: false}))
     .pipe(gulp.dest(DEST))
-))
+)
 
-gulp.task('push', gulp.series('xpi', ->
+gulp.task('xpi', gulp.series('build', 'xpi-only'))
+
+gulp.task('push-only', ->
   body = fs.readFileSync(join(DEST, XPI))
   request.post({url: 'http://localhost:8888', body})
-))
+)
+
+gulp.task('push', gulp.series('xpi', 'push-only'))
 
 gulp.task('default', gulp.series('push'))
 
