@@ -174,16 +174,18 @@ gulp.task('release', (callback) ->
   return
 )
 
-gulp.task('changelog', ->
+gulp.task('changelog', (callback) ->
   num = 1
   for arg in argv when /^-[1-9]$/.test(arg)
     num = Number(arg[1])
   entries = read('CHANGELOG.md').split(/^### .+/m)[1..num].join('')
   process.stdout.write(html(entries))
+  callback()
 )
 
-gulp.task('readme', ->
+gulp.task('readme', (callback) ->
   process.stdout.write(html(read('README.md')))
+  callback()
 )
 
 # Reduce markdown to the small subset of HTML that AMO allows. Note that AMO
@@ -209,7 +211,7 @@ gulp.task('faster', ->
     .pipe(gulp.dest('.'))
 )
 
-gulp.task('sync-locales', ->
+gulp.task('sync-locales', (callback) ->
   baseLocale = BASE_LOCALE
   compareLocale = null
   for arg in argv when arg[...2] == '--'
@@ -232,6 +234,8 @@ gulp.task('sync-locales', ->
         if localeName == compareLocale
           report.push(strings.map((string) -> "    #{string}")...)
     process.stdout.write(report.join('\n') + '\n')
+
+  callback()
 )
 
 syncLocale = (baseLocaleName, fileName) ->
@@ -277,9 +281,10 @@ parseLocaleFile = (fileContents) ->
   return {keys, template: lines, newline}
 
 generateHTMLTask = (filename, message) ->
-  gulp.task(filename, ->
+  gulp.task(filename, (callback) ->
     unless fs.existsSync(filename)
       process.stdout.write(message(filename))
+      callback()
       return
     gulp.src(filename)
       .pipe(tap((file) ->
