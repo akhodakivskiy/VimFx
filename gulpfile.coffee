@@ -147,11 +147,20 @@ gulp.task('push', gulp.series('xpi', 'push-only'))
 
 gulp.task('default', gulp.series('push'))
 
-gulp.task('lint', ->
+# coffeelint-forbidden-keywords has `require('coffee-script/register');` in its
+# index.js :(
+gulp.task('lint-workaround', ->
+  gulp.src('node_modules/coffeescript/')
+    .pipe(gulp.symlink('node_modules/coffee-script'))
+)
+
+gulp.task('lint-only', ->
   gulp.src(['extension/**/*.coffee', 'gulpfile.coffee'])
     .pipe(coffeelint())
     .pipe(coffeelint.reporter())
 )
+
+gulp.task('lint', gulp.series('lint-workaround', 'lint-only'))
 
 gulp.task('sloc', ->
   gulp.src([
