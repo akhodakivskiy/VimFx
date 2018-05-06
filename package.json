@@ -17,7 +17,7 @@
   },
   "devDependencies": {
     "addons-linter": "^0.24.0",
-    "coffee-script": "^1.12.7",
+    "coffeescript": "^1.12.7",
     "coffeelint": "^1.16.0",
     "coffeelint-forbidden-keywords": "^0.1.1",
     "gulp": "^4.0",
