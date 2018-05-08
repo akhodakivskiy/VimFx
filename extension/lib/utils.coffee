@@ -663,6 +663,16 @@ getCurrentLocation = ->
 # This function might return `null` on startup.
 getCurrentWindow = -> nsIWindowMediator.getMostRecentWindow('navigator:browser')
 
+# gBrowser getFindBar() used to return the findBar directly, but in recent
+# versions it returns a promise. This function should be removed once these old
+# versions are no longer supported.
+getFindBar = (gBrowser) ->
+  promiseOrFindBar = gBrowser.getFindBar()
+  if promiseOrFindBar instanceof Promise
+    promiseOrFindBar
+  else
+    Promise.resolve(promiseOrFindBar)
+
 hasEventListeners = (element, type) ->
   for listener in nsIEventListenerService.getListenerInfoFor(element)
     if listener.listenerObject and listener.type == type
@@ -769,6 +779,7 @@ module.exports = {
   expandPath
   getCurrentLocation
   getCurrentWindow
+  getFindBar
   hasEventListeners
   loadCss
   observe
