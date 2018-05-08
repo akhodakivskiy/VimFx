@@ -5,7 +5,12 @@ viewportUtils = require('./viewport')
 
 {devtools} = Cu.import('resource://devtools/shared/Loader.jsm', {})
 
-Element = Ci.nsIDOMElement
+_Element = Ci.nsIDOMElement
+if not _Element
+  Cu.importGlobalProperties(["Element"])
+  isElementInstance = (el) -> Element.isInstance(el)
+else
+  isElementInstance = (el) -> el instanceof _Element
 
 MIN_TEXTNODE_SIZE = 4
 
@@ -30,7 +35,7 @@ getMarkableElements = (
   {document} = window
 
   for element in getAllElements(document, selector)
-    continue unless element instanceof Element
+    continue unless isElementInstance(element)
     # `getRects` is fast and filters out most elements, so run it first of all.
     rects = getRects(element, viewport)
     continue unless rects.insideViewport.length > 0
@@ -73,7 +78,7 @@ getAllElements = (document, selector) ->
     return
   getAllAnonymous = (element) ->
     for child in document.getAnonymousNodes(element) or []
-      continue unless child instanceof Element
+      continue unless isElementInstance(child)
       elements.add(child)
       getAllRegular(child)
       getAllAnonymous(child)
