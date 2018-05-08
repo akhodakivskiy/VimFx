@@ -1,3 +1,9 @@
+### 0.20.13 (2018-05-06)
+
+- Fixed: VimFx should now work in Firefox 61 (if you have enabled legacy
+  extensions). Thanks to Kevin Cox (@kevincox), 依云 (@lilydjwg) and Jan
+  Kokemüller (@jiixyj)!
+
 ### 0.20.12 (2018-01-23)
 
 - Fixed: VimFx should now work in Firefox 59 (if you have enabled legacy

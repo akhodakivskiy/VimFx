@@ -15,7 +15,6 @@ merge = require('merge2')
 precompute = require('require-precompute')
 request = require('request')
 rimraf = require('rimraf')
-runSequence = require('run-sequence')
 pkg = require('./package.json')
 
 DEST = 'build'
@@ -34,8 +33,6 @@ argv = process.argv.slice(2)
 {join} = path
 read = (filepath) -> fs.readFileSync(filepath).toString()
 template = (data) -> mustache(data, {extension: ''})
-
-gulp.task('default', ['push'])
 
 gulp.task('clean', (callback) ->
   rimraf(DEST, callback)
@@ -122,36 +119,48 @@ gulp.task('install.rdf', ->
     .pipe(gulp.dest(DEST))
 )
 
-gulp.task('templates', [
+gulp.task('templates', gulp.parallel(
   'bootstrap-frame.js'
   'chrome.manifest'
   'install.rdf'
-])
+))
 
-gulp.task('build', (callback) ->
-  runSequence(
-    'clean',
-    ['copy', 'node_modules', 'coffee', 'templates'],
-    callback
-  )
-)
+gulp.task('build', gulp.series(
+  'clean',
+  gulp.parallel('copy', 'node_modules', 'coffee', 'templates')
+))
 
-gulp.task('xpi', ['build'], ->
+gulp.task('xpi-only', ->
   gulp.src("#{DEST}/**/*")
     .pipe(zip(XPI, {compress: false}))
     .pipe(gulp.dest(DEST))
 )
 
-gulp.task('push', ['xpi'], ->
+gulp.task('xpi', gulp.series('build', 'xpi-only'))
+
+gulp.task('push-only', ->
   body = fs.readFileSync(join(DEST, XPI))
   request.post({url: 'http://localhost:8888', body})
 )
 
-gulp.task('lint', ->
+gulp.task('push', gulp.series('xpi', 'push-only'))
+
+gulp.task('default', gulp.series('push'))
+
+# coffeelint-forbidden-keywords has `require('coffee-script/register');` in its
+# index.js :(
+gulp.task('lint-workaround', ->
+  gulp.src('node_modules/coffeescript/')
+    .pipe(gulp.symlink('node_modules/coffee-script'))
+)
+
+gulp.task('lint-only', ->
   gulp.src(['extension/**/*.coffee', 'gulpfile.coffee'])
     .pipe(coffeelint())
     .pipe(coffeelint.reporter())
 )
+
+gulp.task('lint', gulp.series('lint-workaround', 'lint-only'))
 
 gulp.task('sloc', ->
   gulp.src([
@@ -178,16 +187,18 @@ gulp.task('release', (callback) ->
   return
 )
 
-gulp.task('changelog', ->
+gulp.task('changelog', (callback) ->
   num = 1
   for arg in argv when /^-[1-9]$/.test(arg)
     num = Number(arg[1])
   entries = read('CHANGELOG.md').split(/^### .+/m)[1..num].join('')
   process.stdout.write(html(entries))
+  callback()
 )
 
-gulp.task('readme', ->
+gulp.task('readme', (callback) ->
   process.stdout.write(html(read('README.md')))
+  callback()
 )
 
 # Reduce markdown to the small subset of HTML that AMO allows. Note that AMO
@@ -213,7 +224,7 @@ gulp.task('faster', ->
     .pipe(gulp.dest('.'))
 )
 
-gulp.task('sync-locales', ->
+gulp.task('sync-locales', (callback) ->
   baseLocale = BASE_LOCALE
   compareLocale = null
   for arg in argv when arg[...2] == '--'
@@ -236,6 +247,8 @@ gulp.task('sync-locales', ->
         if localeName == compareLocale
           report.push(strings.map((string) -> "    #{string}")...)
     process.stdout.write(report.join('\n') + '\n')
+
+  callback()
 )
 
 syncLocale = (baseLocaleName, fileName) ->
@@ -281,9 +294,10 @@ parseLocaleFile = (fileContents) ->
   return {keys, template: lines, newline}
 
 generateHTMLTask = (filename, message) ->
-  gulp.task(filename, ->
+  gulp.task(filename, (callback) ->
     unless fs.existsSync(filename)
       process.stdout.write(message(filename))
+      callback()
       return
     gulp.src(filename)
       .pipe(tap((file) ->

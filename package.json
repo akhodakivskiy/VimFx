@@ -1,6 +1,6 @@
 {
   "name": "VimFx",
-  "version": "0.20.12",
+  "version": "0.20.13",
   "firefoxVersions": {
     "min": "45.0",
     "max": "*"
@@ -17,10 +17,10 @@
   },
   "devDependencies": {
     "addons-linter": "^0.24.0",
-    "coffee-script": "^1.12.7",
+    "coffeescript": "^1.12.7",
     "coffeelint": "^1.16.0",
     "coffeelint-forbidden-keywords": "^0.1.1",
-    "gulp": "^3.9.1",
+    "gulp": "^4.0.0",
     "gulp-coffee": "^2.3.4",
     "gulp-coffeelint": "^0.6.0",
     "gulp-git": "^2.4.2",
@@ -34,7 +34,6 @@
     "merge2": "^1.1.0",
     "request": "^2.81.0",
     "require-precompute": "^0.2.0",
-    "rimraf": "^2.6.1",
-    "run-sequence": "^2.1.0"
+    "rimraf": "^2.6.1"
   }
 }
