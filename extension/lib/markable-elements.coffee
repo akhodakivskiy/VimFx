@@ -6,11 +6,11 @@ viewportUtils = require('./viewport')
 {devtools} = Cu.import('resource://devtools/shared/Loader.jsm', {})
 
 _Element = Ci.nsIDOMElement
-if not _Element
-  Cu.importGlobalProperties(["Element"])
-  isElementInstance = (el) -> Element.isInstance(el)
-else
+if _Element
   isElementInstance = (el) -> el instanceof _Element
+else
+  Cu.importGlobalProperties(['Element'])
+  isElementInstance = (el) -> Element.isInstance(el)
 
 MIN_TEXTNODE_SIZE = 4
 

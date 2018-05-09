@@ -1042,7 +1042,7 @@ commands.esc = ({vim}) ->
   vim.window.gURLBar.closePopup()
 
   utils.blurActiveBrowserElement(vim)
-  utils.getFindBar(vim.window.gBrowser).then((findBar) => findBar.close())
+  utils.getFindBar(vim.window.gBrowser).then((findBar) -> findBar.close())
 
   # Better safe than sorry.
   MarkerContainer.remove(vim.window)
