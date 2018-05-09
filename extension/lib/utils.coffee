@@ -719,6 +719,7 @@ module.exports = {
   isProperLink
   isTextInputElement
   isTypingElement
+  isXULDocument
 
   blurActiveBrowserElement
   blurActiveElement
