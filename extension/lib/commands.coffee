@@ -16,7 +16,9 @@ translate = require('./translate')
 utils = require('./utils')
 viewportUtils = require('./viewport')
 
-gDevToolsBrowser = Cu.import('resource://devtools/client/framework/gDevTools.jsm').browser
+ffRequire = Cu.import('resource://devtools/shared/Loader.jsm').require
+
+{gDevToolsBrowser} = ffRequire("devtools/client/framework/devtools-browser")
 {ContentClick} = Cu.import('resource:///modules/ContentClick.jsm', {})
 {FORWARD, BACKWARD} = SelectionManager
 
