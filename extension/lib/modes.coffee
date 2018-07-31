@@ -347,7 +347,7 @@ mode('find', {
     {vim} = args
     switch
       when match.type == 'full'
-        utils.getFindBar(vim.window.gBrowser, (findBar) ->
+        utils.getFindBar(vim.window.gBrowser).then((findBar) ->
           args.findBar = findBar
           match.command.run(args)
         )
