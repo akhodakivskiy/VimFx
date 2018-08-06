@@ -18,7 +18,7 @@ viewportUtils = require('./viewport')
 
 ffRequire = Cu.import('resource://devtools/shared/Loader.jsm').require
 
-{gDevToolsBrowser} = ffRequire("devtools/client/framework/devtools-browser")
+{gDevToolsBrowser} = ffRequire('devtools/client/framework/devtools-browser')
 {ContentClick} = Cu.import('resource:///modules/ContentClick.jsm', {})
 {FORWARD, BACKWARD} = SelectionManager
 
