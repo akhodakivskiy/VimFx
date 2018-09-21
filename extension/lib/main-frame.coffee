@@ -31,7 +31,7 @@ module.exports = ->
     configDir = prefs.get('config_file_directory')
     scope = {
       vimfx: createConfigAPI(vim, onShutdown)
-      content: content
+      content
     }
     error = config.loadFile(configDir, 'frame.js', scope)
     return error
