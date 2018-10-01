@@ -18,7 +18,6 @@ viewportUtils = require('./viewport')
 
 ffRequire = Cu.import('resource://devtools/shared/Loader.jsm').require
 
-{gDevToolsBrowser} = ffRequire('devtools/client/framework/devtools-browser')
 {ContentClick} = Cu.import('resource:///modules/ContentClick.jsm', {})
 {FORWARD, BACKWARD} = SelectionManager
 
@@ -1047,12 +1046,6 @@ commands.esc = ({vim}) ->
   # Better safe than sorry.
   MarkerContainer.remove(vim.window)
   vim._parent.resetCaretBrowsing()
-
-  # Calling `.hide()` when the toolbar is not open can destroy it for the rest
-  # of the Firefox session. The code here is taken from the `.toggle()` method.
-  developerToolbar = gDevToolsBrowser.getDeveloperToolbar(vim.window)
-  if developerToolbar.visible
-    developerToolbar.hide().catch(console.error)
 
   unless help.getSearchInput(vim.window)?.getAttribute('focused')
     help.removeHelp(vim.window)
