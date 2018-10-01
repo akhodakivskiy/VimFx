@@ -546,6 +546,7 @@ helper_follow_clickable = (options, args) ->
           ctrlKey: true
           metaKey: true
           originAttributes: window.document.nodePrincipal?.originAttributes ? {}
+          triggeringPrincipal: window.document.nodePrincipal
         }, vim.browser)
         reset()
       )
