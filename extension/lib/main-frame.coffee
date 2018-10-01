@@ -29,7 +29,10 @@ module.exports = ->
 
   loadConfig = ->
     configDir = prefs.get('config_file_directory')
-    scope = {vimfx: createConfigAPI(vim, onShutdown)}
+    scope = {
+      vimfx: createConfigAPI(vim, onShutdown)
+      content
+    }
     error = config.loadFile(configDir, 'frame.js', scope)
     return error
 

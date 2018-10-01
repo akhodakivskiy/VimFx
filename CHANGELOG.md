@@ -1,3 +1,7 @@
+### 0.20.15 (2018-08-06)
+
+- Fixed: Find mode now works properly again. Thanks to @matsuhav!
+
 ### 0.20.14 (2018-05-15)
 
 - Fixed: VimFx should now work properly in Firefox 61 (if you have enabled
