@@ -7,6 +7,8 @@ Anton Khodakivskiy (@akhodakivskiy)
 # Contributors
 - Wang Zhuochun (@zhuochun)
 - Alan Wu (@XrXr)
+- @matsuhav
+- Tobias Girstmair (//gir.st/)
 - Heidi Xu – icon design
 
 # Translators

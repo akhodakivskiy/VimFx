@@ -1,3 +1,8 @@
+### 0.21.0 (2019-05-12)
+
+- Waterfox 68 compatibility (tested on FF/WF56, FF64 and WF68) by @matsuhav and
+  @girst
+
 ### 0.20.15 (2018-08-06)
 
 - Fixed: Find mode now works properly again. Thanks to @matsuhav!
