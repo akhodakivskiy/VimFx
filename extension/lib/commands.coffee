@@ -1029,9 +1029,6 @@ commands.edit_blacklist = ({vim}) ->
 commands.help = ({vim}) ->
   help.toggleHelp(vim.window, vim._parent)
 
-commands.dev = ({vim}) ->
-  vim.window.DeveloperToolbar.show(true) # `true` to focus.
-
 commands.esc = ({vim}) ->
   vim._run('esc')
   vim.hideNotification()
