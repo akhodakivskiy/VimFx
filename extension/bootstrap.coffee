@@ -49,7 +49,7 @@ do (global = this) ->
       require.scopes[normalizedUri] = scope = {
         require: (path) -> require.call(null, path, moduleRoot, currentDir)
         module, exports: module.exports
-        Cc, Ci, Cu
+        Cc, Ci, Cu, Services
         ADDON_PATH, BUILD_TIME
         IS_FRAME_SCRIPT
         FRAME_SCRIPT_ENVIRONMENT: if IS_FRAME_SCRIPT then global else null
