@@ -29,6 +29,7 @@ module.exports = ->
 
   loadConfig = ->
     configDir = prefs.get('config_file_directory')
+    return null unless configDir
     scope = {
       vimfx: createConfigAPI(vim, onShutdown)
       content

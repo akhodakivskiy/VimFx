@@ -95,7 +95,7 @@ getRects = (element, viewport) ->
   rects = element.getClientRects()
   return {
     all: rects,
-    insideViewport: Array.filter(
+    insideViewport: Array.filter( # NOTE: replacing with Array.prototype.filter breaks things!
       rects,
       (rect) -> viewportUtils.isInsideViewport(rect, viewport)
     )

@@ -169,7 +169,10 @@ class UIEventManager
   setFocusType: ->
     return unless vim = @vimfx.getCurrentVim(@window)
 
-    activeElement = utils.getActiveElement(@window)
+    try
+      activeElement = utils.getActiveElement(@window)
+    catch
+      return # NOTE: throws "TypeError: utils is null" when clicking on a doorhanger
 
     if activeElement == @window.gBrowser.selectedBrowser
       vim._send('checkFocusType')
