@@ -6,12 +6,13 @@ See [README.md] for more information.
 [README.md]: ../README.md
 
 
-## Option 1: [addons.mozilla.org] \(AMO)
+## ⚠️ NO LONGER AVAILABLE ⚠️<br>Option 1: [addons.mozilla.org] \(AMO)
 
 **<https://addons.mozilla.org/firefox/addon/VimFx>**
 
-Follow the above link and hit the green “Install” button and you should be ready
-to go!
+You used to be able to follow the above link and hit the green “Install” button
+and then be ready to go, but Mozilla has removed all legacy extensions from
+their site.
 
 - [Signed][signed] and reviewed by Mozilla.
 - Hosted on AMO.
