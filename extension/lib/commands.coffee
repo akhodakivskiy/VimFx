@@ -739,7 +739,7 @@ commands.click_browser_element = ({vim}) ->
     })
     MarkerContainer.remove(window) # Better safe than sorry.
     markerContainer.container.classList.add('ui')
-    window.document.getElementById('browser-panel').appendChild(
+    window.document.getElementById('main-window').appendChild(
       markerContainer.container
     )
 
