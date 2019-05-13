@@ -170,9 +170,10 @@ class UIEventManager
     return unless vim = @vimfx.getCurrentVim(@window)
 
     try
+      # Throws "TypeError: utils is null" when clicking on a doorhanger.
       activeElement = utils.getActiveElement(@window)
     catch
-      return # NOTE: throws "TypeError: utils is null" when clicking on a doorhanger
+      return
 
     if activeElement == @window.gBrowser.selectedBrowser
       vim._send('checkFocusType')

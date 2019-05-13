@@ -86,7 +86,6 @@ isContentEditable = (element) ->
 
 isDevtoolsElement = (element) ->
   return false unless element.ownerGlobal
-  # NOTE: cannot use Array.prototype.some(), or *.top.frames breaks!
   return Array.some(element.ownerGlobal.top.frames, isDevtoolsWindow)
 
 isDevtoolsWindow = (window) ->
@@ -334,11 +333,11 @@ simulateMouseEvents = (element, sequence, browserOffset) ->
       # The last `true` below marks the event as trusted, which some APIs
       # require, such as `requestFullscreen()`.
       # (`element.dispatchEvent(mouseEvent)` is not able to do this.)
-      windowUtils = window.windowUtils
-      if not windowUtils
-        windowUtils = window
-            .QueryInterface(Ci.nsIInterfaceRequestor)
-            .getInterface(Ci.nsIDOMWindowUtils) # removed in ff63
+      windowUtils =
+        window.windowUtils or
+        window
+          .QueryInterface(Ci.nsIInterfaceRequestor)
+          .getInterface(Ci.nsIDOMWindowUtils) # Removed in Firefox 63.
       windowUtils
         .dispatchDOMEventViaPresShell(element, mouseEvent, true)
 

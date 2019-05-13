@@ -16,8 +16,6 @@ translate = require('./translate')
 utils = require('./utils')
 viewportUtils = require('./viewport')
 
-ffRequire = Cu.import('resource://devtools/shared/Loader.jsm').require
-
 {ContentClick} = Cu.import('resource:///modules/ContentClick.jsm', {})
 {FORWARD, BACKWARD} = SelectionManager
 
@@ -1030,7 +1028,7 @@ commands.help = ({vim}) ->
   help.toggleHelp(vim.window, vim._parent)
 
 commands.esc = ({vim}) ->
-  vim._run('esc') # NOTE: this causes a TypeError somewhere in the call-stack
+  vim._run('esc') # NOTE: this causes a TypeError somewhere in the call stack.
   vim.hideNotification()
 
   # Firefox does things differently when blurring the location bar, depending on

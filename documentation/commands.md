@@ -472,16 +472,3 @@ press after `<s-f1>` is not part of any Normal mode command, the key is sent to
 the page. (Another way is for example `<s-f1>I<s-escape>`.)
 
 [blacklisted]: options.md#blacklist
-
-
-## Ex commands
-
-Vim has something called “ex” commands. Want something similar in VimFx? True to
-its spirit, VimFx embraces a standard Firefox feature for this purpose: The
-[Developer Toolbar]. That link also includes instructions on how to extend it
-with your own commands.
-
-In the future VimFx might even ship with a few extra “ex” commands by default.
-We’re open for suggestions!
-
-[Developer Toolbar]: https://developer.mozilla.org/en-US/docs/Tools/GCLI

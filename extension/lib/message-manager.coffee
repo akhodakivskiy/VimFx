@@ -64,8 +64,8 @@ send = (name, data = null, callback = null, options = {}) ->
   if args.messageManager.broadcastAsyncMessage
     args.messageManager.broadcastAsyncMessage?(namespacedName, wrappedData)
   else
-    try # NOTE: throws NS_ERROR_NOT_INITIALIZED sometimes
-      args.messageManager.sendAsyncMessage?(namespacedName, wrappedData)
+    # Throws NS_ERROR_NOT_INITIALIZED sometimes.
+    try args.messageManager.sendAsyncMessage?(namespacedName, wrappedData)
 
 # Unwraps the data from `send` and invokes `listener` with it.
 invokeListener = (listener, args, {data: {data, callbackName} = {}, target}) ->
