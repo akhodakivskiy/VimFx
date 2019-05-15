@@ -333,9 +333,12 @@ simulateMouseEvents = (element, sequence, browserOffset) ->
       # The last `true` below marks the event as trusted, which some APIs
       # require, such as `requestFullscreen()`.
       # (`element.dispatchEvent(mouseEvent)` is not able to do this.)
-      window
-        .QueryInterface(Ci.nsIInterfaceRequestor)
-        .getInterface(Ci.nsIDOMWindowUtils)
+      windowUtils =
+        window.windowUtils or
+        window
+          .QueryInterface(Ci.nsIInterfaceRequestor)
+          .getInterface(Ci.nsIDOMWindowUtils) # Removed in Firefox 63.
+      windowUtils
         .dispatchDOMEventViaPresShell(element, mouseEvent, true)
 
   return

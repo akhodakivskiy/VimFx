@@ -16,9 +16,6 @@ translate = require('./translate')
 utils = require('./utils')
 viewportUtils = require('./viewport')
 
-ffRequire = Cu.import('resource://devtools/shared/Loader.jsm').require
-
-{gDevToolsBrowser} = ffRequire('devtools/client/framework/devtools-browser')
 {ContentClick} = Cu.import('resource:///modules/ContentClick.jsm', {})
 {FORWARD, BACKWARD} = SelectionManager
 
@@ -547,6 +544,7 @@ helper_follow_clickable = (options, args) ->
           ctrlKey: true
           metaKey: true
           originAttributes: window.document.nodePrincipal?.originAttributes ? {}
+          triggeringPrincipal: window.document.nodePrincipal
         }, vim.browser)
         reset()
       )
@@ -739,7 +737,7 @@ commands.click_browser_element = ({vim}) ->
     })
     MarkerContainer.remove(window) # Better safe than sorry.
     markerContainer.container.classList.add('ui')
-    window.document.getElementById('browser-panel').appendChild(
+    window.document.getElementById('main-window').appendChild(
       markerContainer.container
     )
 
@@ -1029,11 +1027,8 @@ commands.edit_blacklist = ({vim}) ->
 commands.help = ({vim}) ->
   help.toggleHelp(vim.window, vim._parent)
 
-commands.dev = ({vim}) ->
-  vim.window.DeveloperToolbar.show(true) # `true` to focus.
-
 commands.esc = ({vim}) ->
-  vim._run('esc')
+  vim._run('esc') # NOTE: this causes a TypeError somewhere in the call stack.
   vim.hideNotification()
 
   # Firefox does things differently when blurring the location bar, depending on
@@ -1047,12 +1042,6 @@ commands.esc = ({vim}) ->
   # Better safe than sorry.
   MarkerContainer.remove(vim.window)
   vim._parent.resetCaretBrowsing()
-
-  # Calling `.hide()` when the toolbar is not open can destroy it for the rest
-  # of the Firefox session. The code here is taken from the `.toggle()` method.
-  developerToolbar = gDevToolsBrowser.getDeveloperToolbar(vim.window)
-  if developerToolbar.visible
-    developerToolbar.hide().catch(console.error)
 
   unless help.getSearchInput(vim.window)?.getAttribute('focused')
     help.removeHelp(vim.window)

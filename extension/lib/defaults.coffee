@@ -97,7 +97,6 @@ shortcuts =
       'gB':        'edit_blacklist'
       'gC':        'reload_config_file'
       '?':         'help'
-      ':':         'dev'
       '<force><escape>': 'esc'
 
   'caret':
