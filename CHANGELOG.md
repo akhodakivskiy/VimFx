@@ -1,3 +1,16 @@
+### 0.21.0 (2019-05-15)
+
+### 0.21.0 (2019-05-15)
+
+### 0.21.0 (2019-05-15)
+
+- Removed: The Developer Toolbar integration, such as the `:` shortcut. That
+  feature has been removed from Firefox and the integration was causing issues
+  on newer Firefox versions. Thanks to Tobias Girstmair (@girst)!
+- Fixed: VimFx should now work on Waterfox again. Tested with Waterfox 56,
+  Firefox 56, Firefox 64 and Waterfox 68. Thanks to Tobias Girstmair (@girst)
+  and @matsuhav!
+
 ### 0.20.15 (2018-08-06)
 
 - Fixed: Find mode now works properly again. Thanks to @matsuhav!
