@@ -1028,7 +1028,7 @@ commands.help = ({vim}) ->
   help.toggleHelp(vim.window, vim._parent)
 
 commands.esc = ({vim}) ->
-  vim._run('esc') # NOTE: this causes a TypeError somewhere in the call stack.
+  vim._run('esc')
   vim.hideNotification()
 
   # Firefox does things differently when blurring the location bar, depending on

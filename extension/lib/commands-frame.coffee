@@ -638,6 +638,9 @@ commands.esc = (args) ->
   utils.clearSelectionDeep(vim.content)
 
   {document} = vim.content
+
+  return unless document.fullscreenElement
+
   if document.exitFullscreen
     document.exitFullscreen()
   else
