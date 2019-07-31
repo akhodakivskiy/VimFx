@@ -545,7 +545,7 @@ commands.focus_text_input = ({vim, count = null}) ->
   candidates = utils.querySelectorAllDeep(
     vim.content, 'input, textarea, textbox, [contenteditable]'
   )
-  inputs = Array.filter(candidates, (element) ->
+  inputs = Array.prototype.filter.call(candidates, (element) ->
     return isTextInputElement(element) and utils.area(element) > 0
   )
   if lastFocusedTextInput and lastFocusedTextInput not in inputs

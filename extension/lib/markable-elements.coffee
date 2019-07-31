@@ -95,7 +95,7 @@ getRects = (element, viewport) ->
   rects = element.getClientRects()
   return {
     all: rects,
-    insideViewport: Array.filter(
+    insideViewport: Array.prototype.filter.call(
       rects,
       (rect) -> viewportUtils.isInsideViewport(rect, viewport)
     )
@@ -172,7 +172,8 @@ getElementShape = (elementData, tryRight, rects = null) ->
 
   utils.walkTextNodes(element, (node) ->
     unless node.data.trim() == ''
-      for {bounds} in node.getBoxQuads()
+      for quads in node.getBoxQuads()
+        bounds = quads.getBounds()
         if bounds.width < MIN_TEXTNODE_SIZE or bounds.height < MIN_TEXTNODE_SIZE
           continue
 

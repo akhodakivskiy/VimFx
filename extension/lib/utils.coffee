@@ -46,7 +46,7 @@ EVENTS_HOVER_END   = ['mouseout',  'mouseleave']
 # Element classification helpers
 
 hasMarkableTextNode = (element) ->
-  return Array.some(element.childNodes, (node) ->
+  return Array.prototype.some.call(element.childNodes, (node) ->
     # Ignore whitespace-only text nodes, and single-letter ones (which are
     # common in many syntax highlighters).
     return node.nodeType == 3 and node.data.trim().length > 1
@@ -86,7 +86,7 @@ isContentEditable = (element) ->
 
 isDevtoolsElement = (element) ->
   return false unless element.ownerGlobal
-  return Array.some(element.ownerGlobal.top.frames, isDevtoolsWindow)
+  return Array.prototype.some.call(element.ownerGlobal.top.frames, isDevtoolsWindow)
 
 isDevtoolsWindow = (window) ->
   return window.location?.href in [
