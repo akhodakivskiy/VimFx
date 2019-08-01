@@ -649,8 +649,7 @@ commands.click_browser_element = ({vim}) ->
         'scrollable'
       when getButtonMenu(element)
         'dropmarker'
-      when utils.isFocusable(element) or
-           (element.onclick and element.localName != 'statuspanel')
+      when utils.isFocusable(element) or element.onclick
         'clickable'
 
     if complementary
