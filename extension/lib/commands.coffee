@@ -345,7 +345,7 @@ helper_is_visited = (tab) ->
 commands.tab_select_most_recent = ({vim, count = 1}) ->
   {gBrowser} = vim.window
   tabsSorted =
-    Array.filter(
+    Array.prototype.filter.call(
       gBrowser.tabs,
       (tab) -> not tab.closing and helper_is_visited(tab)
     ).sort((a, b) -> b.lastAccessed - a.lastAccessed)[1..] # Remove current tab.
@@ -358,7 +358,7 @@ commands.tab_select_most_recent = ({vim, count = 1}) ->
 commands.tab_select_oldest_unvisited = ({vim, count = 1}) ->
   {gBrowser} = vim.window
   tabsSorted =
-    Array.filter(
+    Array.prototype.filter.call(
       gBrowser.tabs,
       (tab) -> not tab.closing and not helper_is_visited(tab)
     ).sort((a, b) -> a.lastAccessed - b.lastAccessed)
@@ -649,8 +649,7 @@ commands.click_browser_element = ({vim}) ->
         'scrollable'
       when getButtonMenu(element)
         'dropmarker'
-      when utils.isFocusable(element) or
-           (element.onclick and element.localName != 'statuspanel')
+      when utils.isFocusable(element) or element.onclick
         'clickable'
 
     if complementary
@@ -1028,7 +1027,7 @@ commands.help = ({vim}) ->
   help.toggleHelp(vim.window, vim._parent)
 
 commands.esc = ({vim}) ->
-  vim._run('esc') # NOTE: this causes a TypeError somewhere in the call stack.
+  vim._run('esc')
   vim.hideNotification()
 
   # Firefox does things differently when blurring the location bar, depending on

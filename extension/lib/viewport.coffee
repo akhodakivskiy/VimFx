@@ -142,7 +142,7 @@ getFirstVisibleText = (window, viewport) ->
       continue
 
     nonEmptyTextNodes =
-      Array.filter(element.childNodes, utils.isNonEmptyTextNode)
+      Array.prototype.filter.call(element.childNodes, utils.isNonEmptyTextNode)
     continue if nonEmptyTextNodes.length == 0
 
     continue if utils.checkElementOrAncestor(element, isFixed)

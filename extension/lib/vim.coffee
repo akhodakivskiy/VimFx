@@ -6,7 +6,6 @@
 
 messageManager = require('./message-manager')
 ScrollableElements = require('./scrollable-elements')
-statusPanel = require('./status-panel')
 utils = require('./utils')
 
 ChromeWindow = Ci.nsIDOMChromeWindow
@@ -69,9 +68,6 @@ class Vim
   _setBrowser: (@browser, {addListeners = true} = {}) ->
     @window = @browser.ownerGlobal
     @_messageManager = @browser.messageManager
-
-    @_statusPanel?.remove()
-    @_statusPanel = statusPanel.injectStatusPanel(@browser)
 
     @_addListeners() if addListeners
 
@@ -164,8 +160,7 @@ class Vim
     @_state.lastNotification = message
     @_parent.emit('notification', {vim: this, message})
     if @options.notifications_enabled
-      @_statusPanel.setAttribute('label', message)
-      @_statusPanel.removeAttribute('inactive')
+      @window.StatusPanel._label = message;
 
   _notifyPersistent: (message) ->
     @_state.persistentNotification = message
@@ -176,7 +171,7 @@ class Vim
 
   hideNotification: ->
     @_parent.emit('hideNotification', {vim: this})
-    @_statusPanel.setAttribute('inactive', 'true')
+    @window.StatusPanel._label = ""; # or .update()
     @_state.lastNotification = null
     @_state.persistentNotification = null
 

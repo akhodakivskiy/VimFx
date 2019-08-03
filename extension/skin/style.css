@@ -55,6 +55,7 @@ toolbarpaletteitem[place="palette"] > #VimFxButton {
 /***** Markers *****/
 
 #VimFxMarkersContainer {
+  display: -moz-box;
   position: relative;
   pointer-events: none;
   font: menu;
@@ -140,6 +141,7 @@ toolbarpaletteitem[place="palette"] > #VimFxButton {
 /***** Help Dialog *****/
 
 #VimFxHelpDialogContainer {
+  display: -moz-box;
   position: relative;
 
   opacity: 0.92;
