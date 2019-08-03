@@ -1,6 +1,13 @@
-### 0.21.0 (2019-05-15)
+### 0.21.1 (2019-08-03)
 
-### 0.21.0 (2019-05-15)
+- Fixed: Hints mode and VimFx’s Keyboard Shortcuts help dialog now works in
+  Firefox 69b. The screen used to go white whenever you entered any mode that
+  displays an overlay.
+- Fixed: The statusbar now works again.
+- Fixed: VimFx should now work with Nightly 70, by removing usage of the
+  deprecated `Array.filter()` method and others.
+
+Thanks to Tobias Girstmair (@girst)!
 
 ### 0.21.0 (2019-05-15)
 
