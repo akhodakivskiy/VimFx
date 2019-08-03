@@ -160,7 +160,7 @@ class Vim
     @_state.lastNotification = message
     @_parent.emit('notification', {vim: this, message})
     if @options.notifications_enabled
-      @window.StatusPanel._label = message;
+      @window.StatusPanel._label = message
 
   _notifyPersistent: (message) ->
     @_state.persistentNotification = message
@@ -171,7 +171,7 @@ class Vim
 
   hideNotification: ->
     @_parent.emit('hideNotification', {vim: this})
-    @window.StatusPanel._label = ""; # or .update()
+    @window.StatusPanel._label = '' # or .update()
     @_state.lastNotification = null
     @_state.persistentNotification = null
 

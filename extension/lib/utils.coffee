@@ -86,7 +86,9 @@ isContentEditable = (element) ->
 
 isDevtoolsElement = (element) ->
   return false unless element.ownerGlobal
-  return Array.prototype.some.call(element.ownerGlobal.top.frames, isDevtoolsWindow)
+  return Array.prototype.some.call(
+    element.ownerGlobal.top.frames, isDevtoolsWindow
+   )
 
 isDevtoolsWindow = (window) ->
   return window.location?.href in [
