@@ -14,8 +14,8 @@ TYPE_MAP = {
 
 observe = (options) ->
   observer = new Observer(options)
-  utils.observe('addon-options-displayed', observer)
-  utils.observe('addon-options-hidden',    observer)
+  utils.observe('vimfx-options-displayed', observer)
+  utils.observe('vimfx-options-hidden',    observer)
   module.onShutdown(->
     observer.destroy()
   )
@@ -43,17 +43,79 @@ class BaseObserver
   injectSettings: ->
 
   appendSetting: (attributes) ->
-    setting = @document.createElement('setting')
-    utils.setAttributes(setting, attributes)
-    @container.appendChild(setting)
-    return setting
+    outer = @document.createElement('div')
+    outer.classList.add('setting')
+    outer.classList.add('first-row') if attributes['first-row']
+    outer.classList.add(attributes.class)
+    outer.setAttribute('data-pref', attributes.pref)
+    outer.setAttribute('data-type', attributes.type)
+    label = @document.createElement('label')
+    title = @document.createElement('span')
+    title.className = 'title'
+    title.innerText = attributes.title
+    label.appendChild(title)
+    help = @document.createElement('span')
+    help.className = 'desc'
+    help.innerText = attributes.desc or ''
+    input = @document.createElement('input')
+    _this = this
+    switch attributes.type
+      when 'bool'
+        input.type = 'checkbox'
+        input.checked = prefs.root.get(attributes.pref)
+        input.addEventListener('change', ->
+          prefs.root.set(attributes.pref, input.checked)
+        )
+        prefobserver = prefs.root.observe(attributes.pref, ->
+          input.checked = prefs.root.get(attributes.pref)
+        )
+        @document.defaultView.addEventListener('unload', ->
+          prefs?.root.unobserve(attributes.pref, prefobserver)
+        )
+      when 'integer'
+        input.type = 'number'
+        input.value = prefs.root.get(attributes.pref)
+        input.addEventListener('input', ->
+          prefs.root.set(attributes.pref, parseInt(input.value, 10))
+        )
+        prefobserver = prefs.root.observe(attributes.pref, ->
+          input.value = prefs.root.get(attributes.pref)
+        )
+        @document.defaultView.addEventListener('unload', ->
+          prefs?.root.unobserve(attributes.pref, prefobserver)
+        )
+      when 'string'
+        input.type = 'text'
+        input.value = prefs.root.get(attributes.pref)
+        input.addEventListener('input', ->
+          prefs.root.set(attributes.pref, input.value)
+          if outer.classList.contains('is-shortcut')
+            _this.refreshShortcutErrors()
+        )
+        prefobserver = prefs.root.observe(attributes.pref, ->
+          input.value = prefs.root.get(attributes.pref)
+        )
+        @document.defaultView.addEventListener('unload', ->
+          prefs?.root.unobserve(attributes.pref, prefobserver)
+        )
+      when 'control' # injectHeader special case
+        control = @document.createElement('span')
+        control.className = 'control'
+        # can't use <label> when control has multiple buttons:
+        label = @document.createElement('span')
+        label.appendChild(title)
+        label.appendChild(control)
+    label.appendChild(input) if attributes.pref # some nodes are just headlines
+    outer.appendChild(label)
+    outer.appendChild(help) # needed even if empty, as validator puts error here
+    @container.appendChild(outer)
+    return outer
 
   observe: (@document, topic, addonId) ->
-    return unless addonId == @options.id
     switch topic
-      when 'addon-options-displayed'
+      when 'vimfx-options-displayed'
         @init()
-      when 'addon-options-hidden'
+      when 'vimfx-options-hidden'
         @destroy()
 
   init: ->
@@ -73,14 +135,13 @@ class Observer extends BaseObserver
     @injectOptions()
     @injectShortcuts()
     @setupKeybindings()
-    @setupValidation()
 
     if @vimfx.goToCommand
       utils.nextTick(@document.ownerGlobal, =>
         {pref} = @vimfx.goToCommand
-        setting = @container.querySelector("setting[pref='#{pref}']")
+        setting = @container.querySelector("[data-pref='#{pref}']")
         setting.scrollIntoView()
-        setting.input.select()
+        setting.querySelector('input').select()
         @vimfx.goToCommand = null
       )
 
@@ -97,29 +158,28 @@ class Observer extends BaseObserver
       )
       'first-row': 'true'
     })
+    setting.id = 'header'
 
     href = "#{@vimfx.info.homepageURL}/tree/master/documentation#contents"
-    docsLink = @document.createElement('label')
+    docsLink = @document.createElement('a')
+    docsLink.innerText = translate('prefs.documentation')
     utils.setAttributes(docsLink, {
-      value: translate('prefs.documentation')
       href
-      crop: 'end'
-      class: 'text-link'
+      target: '_blank'
     })
-    docsLink.style.MozBoxFlex = '1'
-    setting.appendChild(docsLink)
+    setting.querySelector('.control').appendChild(docsLink)
 
     for key, fn of BUTTONS
       button = @document.createElement('button')
-      button.setAttribute('label', translate("prefs.#{key}.label"))
+      button.innerText = translate("prefs.#{key}.label")
       button.onclick = runWithVim.bind(null, @vimfx, fn)
-      setting.appendChild(button)
+      setting.querySelector('.control').appendChild(button)
 
     return
 
   injectOptions: ->
     for key, value of defaults.options
-      setting = @appendSetting({
+      @appendSetting({
         pref: "#{defaults.BRANCH}#{key}"
         type: @type(value)
         title: translate("pref.#{key}.title")
@@ -165,10 +225,11 @@ class Observer extends BaseObserver
     # element in these listeners!
     quote = false
     @listen(@container, 'keydown', (event) =>
-      setting = event.target
-      isString = (setting.type == 'string')
+      input = event.target
+      isString = (input.type == 'text')
 
-      {input, pref} = setting
+      setting = input.closest('.setting')
+      pref = setting.getAttribute('data-pref')
       keyString = @vimfx.stringifyKeyEvent(event)
 
       # Some shortcuts only make sense for string settings. We still match
@@ -182,6 +243,7 @@ class Observer extends BaseObserver
         when quote
           break unless isString
           utils.insertText(input, keyString)
+          prefs.root.set(pref, input.value)
           quote = false
         when keyString == @vimfx.options['options.key.quote']
           break unless isString
@@ -192,40 +254,21 @@ class Observer extends BaseObserver
         when keyString == @vimfx.options['options.key.insert_default']
           break unless isString
           utils.insertText(input, prefs.root.default.get(pref))
+          prefs.root.set(pref, input.value)
         when keyString == @vimfx.options['options.key.reset_default']
           prefs.root.set(pref, null)
         else
           return
 
       event.preventDefault()
-      setting.valueToPreference()
       @refreshShortcutErrors()
     )
     @listen(@container, 'blur', -> quote = false)
 
-  setupValidation: ->
-    @listen(@container, 'input', (event) =>
-      setting = event.target
-      # Disable default behavior of updating the pref of the setting on each
-      # input. Do it on the 'change' event instead (see below), because all
-      # settings are validated and auto-adjusted as soon as the pref changes.
-      event.stopPropagation()
-      if setting.classList.contains('is-shortcut')
-        # However, for the shortcuts we _do_ want live validation, because they
-        # cannot be auto-adjusted. Instead an error message is shown.
-        setting.valueToPreference()
-        @refreshShortcutErrors()
-    )
-
-    @listen(@container, 'change', (event) ->
-      setting = event.target
-      unless setting.classList.contains('is-shortcut')
-        setting.valueToPreference()
-    )
-
   refreshShortcutErrors: ->
     for setting in @container.getElementsByClassName('is-shortcut')
-      setting.setAttribute('desc', @generateErrorMessage(setting.pref))
+      setting.querySelector('.desc').innerText =
+        @generateErrorMessage(setting.getAttribute('data-pref'))
     return
 
 resetAllPrefs = (vim) ->

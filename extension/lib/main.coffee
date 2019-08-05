@@ -33,7 +33,7 @@ module.exports = (data, reason) ->
   vimfx = new VimFx(modes, parsedOptions)
   vimfx.id = data.id
   vimfx.version = data.version
-  AddonManager.getAddonByID(vimfx.id, (info) -> vimfx.info = info)
+  AddonManager.getAddonByID(vimfx.id).then( (info) -> vimfx.info = info )
 
   utils.loadCss("#{ADDON_PATH}/skin/style.css")
 

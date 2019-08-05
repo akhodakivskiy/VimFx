@@ -163,10 +163,11 @@ splitSequence = (sequence, specialKeys) ->
 goToCommandSetting = (window, vimfx, command) ->
   vimfx.goToCommand = command
   removeHelp(window)
-  # Randomize URI to force a reload of the Add-ons Manager if it’s already open.
-  uri = "addons://detail/#{vimfx.id}/preferences?#{Math.random()}"
+  uri = "#{ADDON_PATH}/content/options.xhtml"
   utils.nextTick(window, ->
-    window.BrowserOpenAddonsMgr(uri)
+    window.gBrowser.selectedTab = window.gBrowser.addTab(uri, {
+      triggeringPrincipal: Services.scriptSecurityManager.getSystemPrincipal()
+    })
   )
 
 search = (content, term) ->

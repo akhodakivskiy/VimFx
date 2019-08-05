@@ -1,6 +1,0 @@
-<!--
-Dummy file to enable inline options. All elements are added by
-lib/options.coffee. Include an empty element so that an 'no element found' error
-is not logged to the error console.
--->
-<vbox />

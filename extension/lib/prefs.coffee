@@ -65,6 +65,10 @@ observe = (branch, domain, callback) ->
   module.onShutdown(->
     branch.removeObserver(domain, observer)
   )
+  return observer
+
+unobserve = (branch, domain, observer) ->
+  branch.removeObserver(domain, observer)
 
 module.exports = {
   get: get.bind(null, branches.addon.user)
@@ -72,6 +76,7 @@ module.exports = {
   has: has.bind(null, branches.addon.user)
   tmp: tmp.bind(null, branches.addon.user)
   observe: observe.bind(null, branches.addon.user)
+  unobserve: unobserve.bind(null, branches.addon.user)
   default: {
     get: get.bind(null, branches.addon.default)
     set: set.bind(null, branches.addon.default)
@@ -86,6 +91,7 @@ module.exports = {
     has: has.bind(null, branches.root.user)
     tmp: tmp.bind(null, branches.root.user)
     observe: observe.bind(null, branches.root.user)
+    unobserve: unobserve.bind(null, branches.root.user)
     default: {
       get: get.bind(null, branches.root.default)
       set: set.bind(null, branches.root.default)
