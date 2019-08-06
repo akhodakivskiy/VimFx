@@ -12,6 +12,12 @@ TYPE_MAP = {
   boolean: 'bool'
 }
 
+INPUT_MAP = {
+  string: 'text'
+  integer: 'number'
+  bool: 'checkbox'
+}
+
 observe = (options) ->
   observer = new Observer(options)
   utils.observe('vimfx-options-displayed', observer)
@@ -43,73 +49,58 @@ class BaseObserver
   injectSettings: ->
 
   appendSetting: (attributes) ->
-    outer = @document.createElement('div')
-    outer.classList.add('setting')
-    outer.classList.add('first-row') if attributes['first-row']
-    outer.classList.add(attributes.class)
-    outer.setAttribute('data-pref', attributes.pref)
-    outer.setAttribute('data-type', attributes.type)
-    label = @document.createElement('label')
+    isControl = attributes.type == 'control'
+    setting = @document.createElement('div')
+    setting.classList.add('setting', attributes.class)
+    utils.setAttributes(setting, {
+      'data-pref': attributes.pref
+      'data-type': attributes.type
+    })
+
+    label = @document.createElement(if isControl then 'span' else 'label')
+    #^NOTE: can't use <label> when control has multiple buttons
+
     title = @document.createElement('span')
     title.className = 'title'
     title.innerText = attributes.title
     label.appendChild(title)
-    help = @document.createElement('span')
+
+    control = @document.createElement(if isControl then 'span' else 'input')
+    switch attributes.type
+      when 'bool', 'integer', 'string'
+        @setupInput(control, INPUT_MAP[attributes.type], attributes)
+      when 'control'
+        control.className = 'control'
+    label.appendChild(control)
+
+    setting.appendChild(label)
+
+    help = @document.createElement('div')
     help.className = 'desc'
     help.innerText = attributes.desc or ''
-    input = @document.createElement('input')
-    _this = this
-    switch attributes.type
-      when 'bool'
-        input.type = 'checkbox'
-        input.checked = prefs.root.get(attributes.pref)
-        input.addEventListener('change', ->
-          prefs.root.set(attributes.pref, input.checked)
-        )
-        prefobserver = prefs.root.observe(attributes.pref, ->
-          input.checked = prefs.root.get(attributes.pref)
-        )
-        @document.defaultView.addEventListener('unload', ->
-          prefs?.root.unobserve(attributes.pref, prefobserver)
-        )
-      when 'integer'
-        input.type = 'number'
-        input.value = prefs.root.get(attributes.pref)
-        input.addEventListener('input', ->
-          prefs.root.set(attributes.pref, parseInt(input.value, 10))
-        )
-        prefobserver = prefs.root.observe(attributes.pref, ->
-          input.value = prefs.root.get(attributes.pref)
-        )
-        @document.defaultView.addEventListener('unload', ->
-          prefs?.root.unobserve(attributes.pref, prefobserver)
-        )
-      when 'string'
-        input.type = 'text'
-        input.value = prefs.root.get(attributes.pref)
-        input.addEventListener('input', ->
-          prefs.root.set(attributes.pref, input.value)
-          if outer.classList.contains('is-shortcut')
-            _this.refreshShortcutErrors()
-        )
-        prefobserver = prefs.root.observe(attributes.pref, ->
-          input.value = prefs.root.get(attributes.pref)
-        )
-        @document.defaultView.addEventListener('unload', ->
-          prefs?.root.unobserve(attributes.pref, prefobserver)
-        )
-      when 'control' # injectHeader special case
-        control = @document.createElement('span')
-        control.className = 'control'
-        # can't use <label> when control has multiple buttons:
-        label = @document.createElement('span')
-        label.appendChild(title)
-        label.appendChild(control)
-    label.appendChild(input) if attributes.pref # some nodes are just headlines
-    outer.appendChild(label)
-    outer.appendChild(help) # needed even if empty, as validator puts error here
-    @container.appendChild(outer)
-    return outer
+    setting.appendChild(help)
+
+    @container.appendChild(setting)
+    return setting
+
+  setupInput: (control, type, attributes) ->
+    what = if type == 'checkbox' then 'checked' else 'value'
+    cast = if type == 'number' then (e) -> parseInt(e, 10) else (e) -> e
+
+    control.type = type
+    control[what] = prefs.root.get(attributes.pref)
+
+    control.addEventListener('input', =>
+      prefs.root.set(attributes.pref, cast(control[what]))
+      if attributes.class == 'is-shortcut'
+        @refreshShortcutErrors()
+    )
+    prefobserver = prefs.root.observe(attributes.pref, ->
+      control[what] = prefs.root.get(attributes.pref)
+    )
+    @document.defaultView.addEventListener('unload', ->
+      prefs?.root.unobserve(attributes.pref, prefobserver)
+    )
 
   observe: (@document, topic, addonId) ->
     switch topic
@@ -156,7 +147,7 @@ class Observer extends BaseObserver
         @vimfx.options['options.key.reset_default'],
         '<c-z>'
       )
-      'first-row': 'true'
+      class: 'first-row'
     })
     setting.id = 'header'
 
@@ -192,7 +183,7 @@ class Observer extends BaseObserver
       @appendSetting({
         type: 'control'
         title: mode.name
-        'first-row': 'true'
+        class: 'first-row'
       })
 
       for category in mode.categories
@@ -200,7 +191,7 @@ class Observer extends BaseObserver
           @appendSetting({
             type: 'control'
             title: category.name
-            'first-row': 'true'
+            class: 'first-row'
           })
 
         for {command} in category.commands

@@ -11,42 +11,44 @@
   line-height: 20px;
 }
 .setting>:first-child {
-  /* usually the <label>, except when it has a .control */
   display: flex;
 }
 .setting.first-row {
   border-top: none;
   margin-top: 2em;
 }
+.setting .title,
+.setting .desc,
+.setting .control {
+  padding: 4px;
+}
 .setting .title {
   flex: 1;
   min-width: 15em;
   max-width: 25em;
-  padding: 4px;
 }
 .setting .desc {
   color: graytext;
-  display: block;
-  margin: 4px 0;
   margin-inline-start: 2em;
 }
 .setting .desc:empty {
   display: none;
 }
-.setting input[type="checkbox"] {
-  width: 24px;
-  height: 24px;
+.setting input[type] {
+  border-radius: 4px;
   margin: 2px 0;
+}
+.setting input[type="checkbox"] {
+  width: 30px;
+  height: 30px;
 }
 .setting input[type="text"],
 .setting input[type="number"] {
   flex: 1;
   min-width: 200px;
-  margin: 2px 0;
-  padding: 0.5em !important;
+  padding: 0.5em;
   background: #fff;
   border: 1px solid #ccc;
-  border-radius: 4px;
   color: #333;
 }
 
@@ -56,6 +58,5 @@
   height: 1px; /* let it overlap the empty part of the description */
 }
 #header .control a {
-  padding-top: 4px; /* match .title */
   float: left;
 }
