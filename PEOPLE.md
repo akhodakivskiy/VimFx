@@ -3,12 +3,12 @@ Anton Khodakivskiy (@akhodakivskiy)
 
 # Developers
 - Simon Lydell (@lydell)
+- Tobias Girstmair (//gir.st/)
 
 # Contributors
 - Wang Zhuochun (@zhuochun)
 - Alan Wu (@XrXr)
 - @matsuhav
-- Tobias Girstmair (//gir.st/)
 - Heidi Xu – icon design
 
 # Translators

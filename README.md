@@ -10,15 +10,21 @@ If you’re looking for a replacement for VimFx, check out these extensions:
 - [Vim Vixen]
 - [Tridactyl]
 
-(VimFx won’t be updated to work with newer Firefox versions, because it is a big
-task that nobody has felt like tackling. However, the source code is free, so if
-you feel like giving it a shot you can totally do so!)
+You might also want to check out how to [patch Firefox to work with VimFx] and
+its accompanying [blog post].
+
+(VimFx won’t be transformed into a WebExtension, because it is a big task that
+nobody has felt like tackling and not all necessary APIs are available. However,
+the source code is free, so if you feel like giving it a shot you can totally do
+so!)
 
 [firefox-57+]: https://support.mozilla.org/en-US/kb/firefox-add-technology-modernizing
 [Vimium-FF]: https://addons.mozilla.org/firefox/addon/vimium-ff/
 [Saka Key]: https://addons.mozilla.org/firefox/addon/saka-key/
 [Vim Vixen]: https://addons.mozilla.org/firefox/addon/vim-vixen/
 [Tridactyl]: https://addons.mozilla.org/firefox/addon/tridactyl-vim/
+[patch Firefox to work with VimFx]: https://github.com/girst/LegacyFox
+[blog post]: https://gir.st/blog/legacyfox.htm
 
 ---
 
