@@ -1,3 +1,9 @@
+### 0.21.2 (2019-08-15)
+
+- Fixed: VimFx' settings work on modern Firefox
+- Fixed: blurring of URL bar in Nightly 70
+- Fixed: statusbar in Waterfox 56
+
 ### 0.21.1 (2019-08-03)
 
 - Fixed: Hints mode and VimFx’s Keyboard Shortcuts help dialog now works in
