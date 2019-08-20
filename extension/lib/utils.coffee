@@ -30,7 +30,8 @@ XULControlElement = Ci.nsIDOMXULControlElement
 XULMenuListElement = Ci.nsIDOMXULMenuListElement
 
 isXULDocument = (doc) ->
-  doc.toString() == '[object XULDocument]'
+  XUL_NS = 'http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul'
+  doc.documentElement.namespaceURI == XUL_NS
 
 # Full chains of events for different mouse actions. Note: 'click' is fired
 # by Firefox automatically after 'mousedown' and 'mouseup'. Similarly,
