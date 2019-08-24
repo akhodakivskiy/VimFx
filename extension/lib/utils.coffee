@@ -29,6 +29,14 @@ XULButtonElement = Ci.nsIDOMXULButtonElement
 XULControlElement = Ci.nsIDOMXULControlElement
 XULMenuListElement = Ci.nsIDOMXULMenuListElement
 
+# Traverse the DOM upwards until we hit its containing document (most likely an
+# HTMLDocument or (<=fx68) XULDocument) or the ShadowRoot.
+getDocument = (e) -> if e.parentNode? then arguments.callee(e.parentNode) else e
+# for shadow DOM custom elements, as they require special handling.
+# (ShadowRoot is only available in mozilla63+)
+isInShadowRoot = (element) ->
+  ShadowRoot? and getDocument(element) instanceof ShadowRoot
+
 isXULDocument = (doc) ->
   XUL_NS = 'http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul'
   doc.documentElement.namespaceURI == XUL_NS
@@ -194,6 +202,10 @@ blurActiveElement = (window) ->
   # focus to the `<body>` of its containing frame, while blurring the top-most
   # frame gives focus to the top-most `<body>`. This allows to blur fancy text
   # editors which use an `<iframe>` as their text area.
+  # Note that this trick does not work with Web Components; for them, recursing
+  # is necessary.
+  if window.document.activeElement?.shadowRoot?
+    return getActiveElement(window)?.blur()
   window.document.activeElement?.blur()
 
 # Focus an element and tell Firefox that the focus happened because of a user
@@ -209,7 +221,7 @@ focusElement = (element, options = {}) ->
 #
 #     return unless activeElement = utils.getActiveElement(window)
 getActiveElement = (window) ->
-  {activeElement} = window.document
+  {activeElement} = window.shadowRoot or window.document
   return null unless activeElement
   # If the active element is a frame, recurse into it. The easiest way to detect
   # a frame that works both in browser UI and in web page content is to check
@@ -221,12 +233,15 @@ getActiveElement = (window) ->
   # dialogs in `about:preferences`. Checking the `contextmenu` attribute seems
   # to be a reliable test, catching both the main tab `<browser>`s and bookmarks
   # opened in the sidebar.
-  if (activeElement.localName == 'browser' and
-      activeElement.getAttribute?('contextmenu') == 'contentAreaContextMenu') or
-     not activeElement.contentWindow
-    return activeElement
-  else
+  # We also want to recurse into the (open) shadow DOM of custom elements.
+  if activeElement.shadowRoot?
+    return getActiveElement(activeElement)
+  else if activeElement.contentWindow and
+      not (activeElement.localName == 'browser' and
+      activeElement.getAttribute?('contextmenu') == 'contentAreaContextMenu')
     return getActiveElement(activeElement.contentWindow)
+  else
+    return activeElement
 
 getFocusType = (element) -> switch
   when isIgnoreModeFocusType(element)
@@ -331,6 +346,11 @@ simulateMouseEvents = (element, sequence, browserOffset) ->
     if type == 'mousemove'
       # If the below technique is used for this event, the “URL popup” (shown
       # when hovering or focusing links) does not appear.
+      element.dispatchEvent(mouseEvent)
+    else if isInShadowRoot(element)
+      # click events for links and other clickables inside the shadow DOM are
+      # caught by the callee (.click_marker_element()).
+      element.focus() if type == 'contextmenu' # for <input type=text>
       element.dispatchEvent(mouseEvent)
     else
       # The last `true` below marks the event as trusted, which some APIs
@@ -736,6 +756,7 @@ module.exports = {
   isTextInputElement
   isTypingElement
   isXULDocument
+  isInShadowRoot
 
   blurActiveBrowserElement
   blurActiveElement

@@ -400,7 +400,8 @@ commands.click_marker_element = (
   if element.target == '_blank' and preventTargetBlank
     targetReset = element.target
     element.target = ''
-  if type == 'clickable-special'
+  if type == 'clickable-special' or
+     type in ['clickable', 'link'] and utils.isInShadowRoot(element)
     element.click()
   else
     isXUL = utils.isXULDocument(element.ownerDocument)
@@ -465,7 +466,7 @@ commands.element_text_select = ({vim, elementIndex, full, scroll = false}) ->
   # cause the text input to be re-focused, so make sure to blur the active
   # element, so that the caret does not end up there.
   window.focus()
-  window.document.activeElement?.blur?()
+  utils.getActiveElement(window)?.blur?()
 
   selection.addRange(range)
 

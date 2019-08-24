@@ -60,9 +60,20 @@ getMarkableElements = (
 
   return
 
+findAllDOMs = (dom) ->
+  return [dom].concat(
+    Array.from(dom.querySelectorAll('*'))
+      .filter((e) -> e.shadowRoot?)
+      .map((e) -> findAllDOMs(e.shadowRoot))...
+  )
+
 getAllElements = (document, selector) ->
   unless utils.isXULDocument(document)
-    return document.querySelectorAll(selector)
+    return [].concat(
+      findAllDOMs(document).map((d) ->
+        Array.from(d.querySelectorAll(selector))
+      )...
+    )
 
   # Use a `Set` since this algorithm may find the same element more than once.
   # Ideally we should find a way to find all elements without duplicates.
@@ -308,10 +319,12 @@ tryPoint = (elementData, elementRect, x, dx, y, dy, tryRight = 0) ->
 
 # In XUL documents there are “anonymous” elements. These are never returned by
 # `document.elementFromPoint` but their closest non-anonymous parents are.
+# The same is true for Web Components (where their hosts are returned), with
+# the further caveat that they might be nested.
 normalize = (element) ->
-  normalized = element.ownerDocument.getBindingParent(element) or element
-  normalized = normalized.parentNode while normalized.prefix?
-  return normalized
+  element = elem while (elem = element.ownerDocument.getBindingParent(element))?
+  element = element.parentNode while element.prefix?
+  return element
 
 # Returns whether `element` corresponds to `elementAtPoint`. This is only
 # complicated for browser elements in the web page content area.
