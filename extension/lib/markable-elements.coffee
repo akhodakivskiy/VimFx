@@ -253,7 +253,6 @@ tryPoint = (elementData, elementRect, x, dx, y, dy, tryRight = 0) ->
       # If leaving the devtools container take the devtools zoom into account.
       if utils.isDevtoolsWindow(currentWindow)
         docShell = currentWindow
-          .QueryInterface(Ci.nsIInterfaceRequestor)
           .getInterface(Ci.nsIWebNavigation)
           .QueryInterface(Ci.nsIDocShell)
         if docShell

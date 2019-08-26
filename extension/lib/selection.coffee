@@ -8,7 +8,6 @@ class SelectionManager
   constructor: (@window) ->
     @selection = @window.getSelection()
     @nsISelectionController = @window
-      .QueryInterface(Ci.nsIInterfaceRequestor)
       .getInterface(Ci.nsIWebNavigation)
       .QueryInterface(Ci.nsIInterfaceRequestor)
       .getInterface(Ci.nsISelectionDisplay)
