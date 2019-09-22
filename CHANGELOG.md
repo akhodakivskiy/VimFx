@@ -1,3 +1,11 @@
+### 0.22.0 (2019-09-22)
+
+- Experimental ShadowDOM support
+
+### 0.21.3 (2019-09-22)
+
+- Fixed: Visual mode for upcoming Firefox 70
+
 ### 0.21.2 (2019-08-15)
 
 - Fixed: VimFx' settings work on modern Firefox
