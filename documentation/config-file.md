@@ -44,7 +44,13 @@ Follow these steps to get started:
    `/home/you/.config/vimfx` or `C:\Users\you\vimfx`, or start with a `~` (which
    is a shortcut to your home directory) such as `~/.config/vimfx` or `~\vimfx`.
 
-4. Run the `gC` command in VimFx. That needs to be done any time you change
+4. If you are running Firefox 57+, whitelist the `config_file_directory` by
+   setting `security.sandbox.content.read_path_whitelist` (Linux and Windows) or
+   `security.sandbox.content.mac.testing_read_path1` (OS X) to the absolute path
+   of the config directory (`~` not supported) ending on `/` (or `\`). Restart
+   the browser after modifying these prefs.
+
+5. Run the `gC` command in VimFx. That needs to be done any time you change
    `config_file_directory`, or edit `config.js` or `frame.js`. This tells VimFx
    to reload the config file. If everything went well, a [notification] should
    appear (in the bottom-right corner of the window) telling you that the config
@@ -180,3 +186,32 @@ each open tab. `frame.js` also runs every time you open a new tab.
 (See also [the `shutdown` event].)
 
 [the `shutdown` event]: api.md#the-shutdown-event
+
+
+## On Process Sandboxing
+
+Electrolysis (e10s) introduced a process sandbox; a security feature limiting
+the impact of exploits in a content process. With the release of Firefox
+Quantum (57) the sandbox was tightened to disallow file system reads, which
+requires `frame.js` and other files accessed from a content process to be
+whitelisted. Mozilla provides a pref,
+`security.sandbox.content.read_path_whitelist`, that accepts a comma-separated
+list of paths. If a path ends with a path separator (i.e. `/` or `\`), the
+whole directory will become whitelisted. This pref is unavailable on OS X,
+where you instead get two [undocumented prefs],
+`security.sandbox.content.mac.testing_read_path1` and
+`security.sandbox.content.mac.testing_read_path2`, each accepting one directory
+path to whitelist.
+
+If you want to read other files from the file system from `frame.js`, place
+them inside the whitelisted directory or add their paths to the
+`read_path_whitelist`. Analogously, a `write_path_whitelist` exists on non-OSX
+systems; OS X users may be able to write to the `extensions` and `chrome`
+subdirectories inside the profile directory instead.
+
+If all fails, one can also weaken the sandbox by setting
+`security.sandbox.content.level` to 2, but keep in mind that this will open up
+a [potentially devastating security hole].
+
+[undocumented prefs]: https://hg.mozilla.org/mozilla-central/file/c31591e0b66f277398bee74da03c49e8f8a0ede0/dom/ipc/ContentChild.cpp#l1701
+[potentially devesatating security hole]: https://bugzilla.mozilla.org/show_bug.cgi?id=1221148#c30
