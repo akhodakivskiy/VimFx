@@ -1,3 +1,9 @@
+### 0.22.1 (2019-09-28)
+
+- Document config file e10s sandboxing issues (#939)
+
+Thanks to @azuwis
+
 ### 0.22.0 (2019-09-22)
 
 - Experimental ShadowDOM support
