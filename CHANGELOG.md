@@ -1,3 +1,7 @@
+### 0.22.2 (2019-10-19)
+
+- Fix `eb` in Nightly 71
+
 ### 0.22.1 (2019-09-28)
 
 - Document config file e10s sandboxing issues (#939)
