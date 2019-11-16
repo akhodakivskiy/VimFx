@@ -736,7 +736,8 @@ commands.click_browser_element = ({vim}) ->
     })
     MarkerContainer.remove(window) # Better safe than sorry.
     markerContainer.container.classList.add('ui')
-    mainWindow = window.document.getElementById('main-window')
+    mainWindow = window.document.body or
+      window.document.getElementById('main-window') # fallback <fx72
     mainWindow.insertBefore(
       markerContainer.container,
       mainWindow.firstChild
