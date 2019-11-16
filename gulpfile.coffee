@@ -158,6 +158,7 @@ gulp.task('lint-only', ->
   gulp.src(['extension/**/*.coffee', 'gulpfile.coffee'])
     .pipe(coffeelint())
     .pipe(coffeelint.reporter())
+    .pipe(coffeelint.reporter('fail'))
 )
 
 gulp.task('lint', gulp.series('lint-workaround', 'lint-only'))
