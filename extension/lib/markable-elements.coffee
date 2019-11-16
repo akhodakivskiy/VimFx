@@ -103,7 +103,7 @@ getRects = (element, viewport) ->
   # However, if `element` is inline and line-wrapped, then it returns one
   # rectangle for each line, since each line may be of different length, for
   # example. That allows us to properly add hints to line-wrapped links.
-  rects = element.getClientRects()
+  rects = element.getClientRects?() or []
   return {
     all: rects,
     insideViewport: Array.prototype.filter.call(
