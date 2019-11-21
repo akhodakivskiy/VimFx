@@ -298,9 +298,10 @@ tryPoint = (elementData, elementRect, x, dx, y, dy, tryRight = 0) ->
 # `document.elementFromPoint` but their closest non-anonymous parents are.
 # The same is true for Web Components (where their hosts are returned), with
 # the further caveat that they might be nested.
+# Note: getBindingParent() has been removed from fx72.
 normalize = (element) ->
-  element = elem while (elem = element.ownerDocument.getBindingParent(element))? # <fx71
-  element = elem while (elem = element.containingShadowRoot?.host)? # >=fx72
+  element = e while (e = element.ownerDocument.getBindingParent?(element))?
+  element = e while (e = element.containingShadowRoot?.host)? # >=fx72
   element = element.parentNode while element.prefix?
   return element
 
