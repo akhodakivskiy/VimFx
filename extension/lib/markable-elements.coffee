@@ -68,35 +68,11 @@ findAllDOMs = (dom) ->
   )
 
 getAllElements = (document, selector) ->
-  unless utils.isXULDocument(document) and document.getAnonymousNodes?
-    return [].concat(
-      findAllDOMs(document).map((d) ->
-        Array.from(d.querySelectorAll(selector))
-      )...
-    )
-
-  # Note: getAnonymousNodes() has been removed from fx72. FIXME: remove.
-  # Use a `Set` since this algorithm may find the same element more than once.
-  # Ideally we should find a way to find all elements without duplicates.
-  elements = new Set()
-  getAllRegular = (element) ->
-    # The first time `eb` is run `.getElementsByTagName('*')` may oddly include
-    # `undefined` in its result! Filter those out. (Also, `selector` is ignored
-    # here since it doesn’t make sense in XUL documents because of all the
-    # trickery around anonymous elements.)
-    for child in element.getElementsByTagName('*') when child
-      elements.add(child)
-      getAllAnonymous(child)
-    return
-  getAllAnonymous = (element) ->
-    for child in document.getAnonymousNodes(element) or []
-      continue unless isElementInstance(child)
-      elements.add(child)
-      getAllRegular(child)
-      getAllAnonymous(child)
-    return
-  getAllRegular(document.documentElement)
-  return Array.from(elements)
+  return [].concat(
+    findAllDOMs(document).map((d) ->
+      Array.from(d.querySelectorAll(selector))
+    )...
+  )
 
 getRects = (element, viewport) ->
   # `element.getClientRects()` returns a list of rectangles, usually just one,
