@@ -68,13 +68,14 @@ findAllDOMs = (dom) ->
   )
 
 getAllElements = (document, selector) ->
-  unless utils.isXULDocument(document)
+  unless utils.isXULDocument(document) and document.getAnonymousNodes?
     return [].concat(
       findAllDOMs(document).map((d) ->
         Array.from(d.querySelectorAll(selector))
       )...
     )
 
+  # Note: getAnonymousNodes() has been removed from fx72. FIXME: remove.
   # Use a `Set` since this algorithm may find the same element more than once.
   # Ideally we should find a way to find all elements without duplicates.
   elements = new Set()
@@ -322,7 +323,8 @@ tryPoint = (elementData, elementRect, x, dx, y, dy, tryRight = 0) ->
 # The same is true for Web Components (where their hosts are returned), with
 # the further caveat that they might be nested.
 normalize = (element) ->
-  element = elem while (elem = element.ownerDocument.getBindingParent(element))?
+  element = elem while (elem = element.ownerDocument.getBindingParent(element))? # <fx71
+  element = elem while (elem = element.containingShadowRoot?.host)? # >=fx72
   element = element.parentNode while element.prefix?
   return element
 
