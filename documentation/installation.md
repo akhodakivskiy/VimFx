@@ -1,9 +1,11 @@
 # Installation
 
-First off, you need a Firefox version old enough to support _legacy_ extensions.
+First off, you need Firefox version 68+ (or a compatible fork) and the
+[LegacyFox] shim.
 See [README.md] for more information.
 
 [README.md]: ../README.md
+[LegacyFox]: https://github.com/girst/LegacyFox
 
 
 ## ⚠️ NO LONGER AVAILABLE ⚠️<br>Option 1: [addons.mozilla.org] \(AMO)

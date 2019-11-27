@@ -1,30 +1,23 @@
 # VimFx – Vim keyboard shortcuts for Firefox
 
-**Note:** VimFx is a _legacy_ Firefox extension, which is **not**  [compatible
-with Firefox 57+][firefox-57+]. (And never will be.)
+**Note:** VimFx is a _legacy_ extension for Firefox 68+, requiring the
+[LegacyFox] shim ([see also]).
 
-If you’re looking for a replacement for VimFx, check out these extensions:
+If you’re looking for a WebExtension replacement for VimFx, check out these
+extensions:
 
 - [Vimium-FF]
 - [Saka Key]
 - [Vim Vixen]
 - [Tridactyl]
 
-You might also want to check out how to [patch Firefox to work with VimFx] and
-its accompanying [blog post].
-
-(VimFx won’t be transformed into a WebExtension, because it is a big task that
-nobody has felt like tackling and not all necessary APIs are available. However,
-the source code is free, so if you feel like giving it a shot you can totally do
-so!)
-
 [firefox-57+]: https://support.mozilla.org/en-US/kb/firefox-add-technology-modernizing
 [Vimium-FF]: https://addons.mozilla.org/firefox/addon/vimium-ff/
 [Saka Key]: https://addons.mozilla.org/firefox/addon/saka-key/
 [Vim Vixen]: https://addons.mozilla.org/firefox/addon/vim-vixen/
 [Tridactyl]: https://addons.mozilla.org/firefox/addon/tridactyl-vim/
-[patch Firefox to work with VimFx]: https://github.com/girst/LegacyFox
-[blog post]: https://gir.st/blog/legacyfox.htm
+[LegacyFox]: https://github.com/girst/LegacyFox
+[see also]: https://gir.st/blog/legacyfox.htm
 
 ---
 

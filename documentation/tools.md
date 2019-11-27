@@ -41,8 +41,7 @@ Note that the built .xpi file is [unsigned].
 
 ### Development
 
-First off, you need a Firefox version old enough to support _legacy_ extensions.
-See [README.md] for more information.
+First off, you need Firefox version 68 (or a compatible fork) and [LegacyFox].
 
 1. Create a new [Firefox profile] for development.
 
@@ -51,9 +50,12 @@ See [README.md] for more information.
 An easy workflow is code, `gulp`, test, repeat. (Use `gulp -t` to also run the
 unit tests.)
 
+Note that loading VimFx as temporary extension does not work in Firefox Quantum.
+
 [README.md]: ../README.md
 [Firefox Profile]: https://support.mozilla.org/en-US/kb/profile-manager-create-and-remove-firefox-profiles
 [Extension Auto-Installer]: https://addons.mozilla.org/firefox/addon/autoinstaller
+[LegacyFox]: https://github.com/girst/LegacyFox
 
 
 ## Gulp tasks
