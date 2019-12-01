@@ -322,7 +322,6 @@ commands.follow = helper_follow.bind(
            (element.classList?.contains('overflowing') or
             element.classList?.contains('shrinkToFit'))
         type = 'clickable'
-    type = null if isXUL and element.classList?.contains('textbox-input')
     return type
 )
 
