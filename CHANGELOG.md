@@ -1,3 +1,11 @@
+### 0.23.0 (2019-12-01)
+
+- Fixed: Hints on about:preferences and 'eb' mode in Firefox 72
+- Removed: getAnonymousNodes() and getBindingParent() usage and support for XBL
+  anonymous content
+- New release script
+- **Require Firefox 68** and Update Documentation
+
 ### 0.22.2 (2019-10-19)
 
 - Fix `eb` in Nightly 71
