@@ -105,11 +105,12 @@ printf "continue pushing to upstream repository [y/N]: " >&2
 read -r confirm
 case "$confirm" in
 [!yY])	git reset --hard "$old_head"
+	git tag --delete "v$next_version"
 	die "ok, aborting and resetting."
 esac
 
 # push commits and tags to upstream repo
-git push --follow-tags
+git push ${release%%/*} --follow-tags
 
 # open prepopulated release form (don't forget to upload xpi!)
 tmpdir=$(mktemp -d) && cp build/VimFx.xpi "$tmpdir" && xdg-open "$tmpdir" &
