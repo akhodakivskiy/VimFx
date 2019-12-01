@@ -37,9 +37,11 @@ getDocument = (e) -> if e.parentNode? then arguments.callee(e.parentNode) else e
 isInShadowRoot = (element) ->
   ShadowRoot? and getDocument(element) instanceof ShadowRoot
 
+XUL_NS = 'http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul'
 isXULDocument = (doc) ->
-  XUL_NS = 'http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul'
   doc.documentElement.namespaceURI == XUL_NS
+isXULElement = (element) ->
+  element.namespaceURI == XUL_NS
 
 # Full chains of events for different mouse actions. Note: 'click' is fired
 # by Firefox automatically after 'mousedown' and 'mouseup'. Similarly,
@@ -156,7 +158,9 @@ isProperLink = (element) ->
   # href="">`s used as buttons on some sites.
   return element.getAttribute?('href') and
          (element.localName == 'a' or
-          isXULDocument(element.ownerDocument)) and
+           (isXULElement(element) and
+            element.localName == 'label' and
+            element.getAttribute('is') == 'text-link')) and
          not element.href?.endsWith?('#') and
          not element.href?.endsWith?('#?') and
          not element.href?.startsWith?('javascript:')
@@ -723,7 +727,7 @@ observe = (topic, observer) ->
 
 # Try to open a button’s dropdown menu, if any.
 openDropdown = (element) ->
-  if isXULDocument(element.ownerDocument) and
+  if isXULElement(element) and
      element.getAttribute?('type') == 'menu' and
      element.open == false # Only change `.open` if it is already a boolean.
     element.open = true
@@ -756,6 +760,7 @@ module.exports = {
   isTextInputElement
   isTypingElement
   isXULDocument
+  isXULElement
   isInShadowRoot
 
   blurActiveBrowserElement

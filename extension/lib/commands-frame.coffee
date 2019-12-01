@@ -240,7 +240,6 @@ commands.follow = helper_follow.bind(
   null, {id: 'normal'},
   ({vim, element, getElementShape}) ->
     document = element.ownerDocument
-    isXUL = utils.isXULDocument(document)
     type = null
     switch
       # Bootstrap. Match these before regular links, because especially slider
@@ -292,14 +291,16 @@ commands.follow = helper_follow.bind(
       # its `<input>` gets one. However, some sites hide the actual `<input>`
       # but keeps the `<label>` to click, either for styling purposes or to keep
       # the `<input>` hidden until it is used. In those cases we should add a
-      # marker for the `<label>`. Trying to access `.control` on an element in
-      # `about:config` throws an error, so exclude XUL pages.
-      when not isXUL and element.localName == 'label' and element.control and
+      # marker for the `<label>`. Trying to access `.control` on the XUL <label>
+      # element returns a string instead of an HTMLElement, so we don't do that.
+      when not utils.isXULElement(element) and
+           element.localName == 'label' and
+           element.control and
            not getElementShape(element.control).nonCoveredPoint
         type = 'clickable'
       # Last resort checks for elements that might be clickable because of
       # JavaScript.
-      when (not isXUL and
+      when (not utils.isXULDocument(document) and
             # It is common to listen for clicks on `<html>` or `<body>`. Don’t
             # waste time on them.
             element not in [document.documentElement, document.body]) and
@@ -403,9 +404,8 @@ commands.click_marker_element = (
      type in ['clickable', 'link'] and utils.isInShadowRoot(element)
     element.click()
   else
-    isXUL = utils.isXULDocument(element.ownerDocument)
     sequence = switch
-      when isXUL
+      when utils.isXULElement(element)
         if element.localName == 'tab' then ['mousedown'] else 'click-xul'
       when type == 'context'
         'context'

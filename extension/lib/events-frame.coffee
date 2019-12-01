@@ -242,10 +242,8 @@ class FrameEventManager
          not @vim.state.hasInteraction and
          # …and the event is programmatic (not caused by clicks or keypresses)…
          nsIFocusManager.getLastFocusMethod(null) == 0 and
-         # …and the target may steal most keystrokes…
-         utils.isTypingElement(target) and
-         # …and the page isn’t a Firefox internal page (like `about:config`).
-         not utils.isXULDocument(@vim.content.document)
+         # …and the target may steal most keystrokes
+         utils.isTypingElement(target)
         # Some sites (such as icloud.com) re-focuses inputs if they are blurred,
         # causing an infinite loop of autofocus prevention and re-focusing.
         # Therefore, blur events that happen just after an autofocus prevention
