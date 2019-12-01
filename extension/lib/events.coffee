@@ -238,7 +238,7 @@ class UIEventManager
     mainWindow = @window.document.documentElement
     modifiers =
       if filterCurrentOnly
-        mainWindow.getAttribute(HELD_MODIFIERS_ATTRIBUTE)
+        mainWindow.getAttribute(HELD_MODIFIERS_ATTRIBUTE) or ''
       else
         if @suppress == null then 'alt ctrl meta shift' else ''
     isHeld = (modifier) -> event["#{modifier}Key"]
