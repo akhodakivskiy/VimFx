@@ -1,3 +1,9 @@
+### 0.23.1 (2019-12-05)
+
+- Fixed: following links in new tab (`F`) in Firefox 72
+- Fixed: search box on about:preferences and about:config
+- more correct handling of XUL pages
+
 ### 0.23.0 (2019-12-01)
 
 - Fixed: Hints on about:preferences and 'eb' mode in Firefox 72
