@@ -357,16 +357,9 @@ simulateMouseEvents = (element, sequence, browserOffset) ->
       element.focus() if type == 'contextmenu' # for <input type=text>
       element.dispatchEvent(mouseEvent)
     else
-      # The last `true` below marks the event as trusted, which some APIs
-      # require, such as `requestFullscreen()`.
-      # (`element.dispatchEvent(mouseEvent)` is not able to do this.)
-      windowUtils =
-        window.windowUtils or
-        window
-          .QueryInterface(Ci.nsIInterfaceRequestor)
-          .getInterface(Ci.nsIDOMWindowUtils) # Removed in Firefox 63.
-      windowUtils
-        .dispatchDOMEventViaPresShell(element, mouseEvent, true)
+      (window.windowUtils.dispatchDOMEventViaPresShellForTesting or
+       window.windowUtils.dispatchDOMEventViaPresShell # < fx73
+      )(element, mouseEvent)
 
   return
 
