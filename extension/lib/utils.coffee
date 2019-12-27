@@ -37,10 +37,8 @@ getDocument = (e) -> if e.parentNode? then arguments.callee(e.parentNode) else e
 isInShadowRoot = (element) ->
   ShadowRoot? and getDocument(element) instanceof ShadowRoot
 
-XUL_NS = 'http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul'
-isXULDocument = (doc) ->
-  doc.documentElement.namespaceURI == XUL_NS
 isXULElement = (element) ->
+  XUL_NS = 'http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul'
   element.namespaceURI == XUL_NS
 
 # Full chains of events for different mouse actions. Note: 'click' is fired
@@ -752,7 +750,6 @@ module.exports = {
   isProperLink
   isTextInputElement
   isTypingElement
-  isXULDocument
   isXULElement
   isInShadowRoot
 

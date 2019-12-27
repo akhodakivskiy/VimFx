@@ -139,8 +139,6 @@ commands.scroll_to_position = (args) ->
 
 helper_follow = (options, matcher, {vim, pass}) ->
   {id, combine = true, selectors = FOLLOW_DEFAULT_SELECTORS} = options
-  if utils.isXULDocument(vim.content.document)
-    selectors = ['*']
 
   if pass == 'auto'
     pass = if selectors.length == 2 then 'first' else 'single'
@@ -300,10 +298,9 @@ commands.follow = helper_follow.bind(
         type = 'clickable'
       # Last resort checks for elements that might be clickable because of
       # JavaScript.
-      when (not utils.isXULDocument(document) and
-            # It is common to listen for clicks on `<html>` or `<body>`. Don’t
-            # waste time on them.
-            element not in [document.documentElement, document.body]) and
+      # It is common to listen for clicks on `<html>` or `<body>`. Don’t
+      # waste time on them.
+      when element not in [document.documentElement, document.body] and
            (utils.includes(element.className, 'button') or
             utils.includes(element.getAttribute?('aria-label'), 'close') or
             # Do this last as it’s a potentially expensive check.
@@ -327,7 +324,7 @@ commands.follow = helper_follow.bind(
 )
 
 commands.follow_in_tab = helper_follow.bind(
-  null, {id: 'tab', selectors: ['a']},
+  null, {id: 'tab', selectors: ['a', 'label[is="text-link"]']},
   ({element}) ->
     type = if isProperLink(element) then 'link' else null
     return type
