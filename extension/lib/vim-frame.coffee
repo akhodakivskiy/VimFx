@@ -77,7 +77,6 @@ class VimFrame
   markPageInteraction: (value = true) -> @state.hasInteraction = value
 
   setHover: (element, browserOffset) ->
-    utils.setHover(element, true)
     utils.simulateMouseEvents(element, 'hover-start', browserOffset)
     @state.lastHover.element = element
     @state.lastHover.browserOffset = browserOffset
@@ -85,7 +84,6 @@ class VimFrame
   clearHover: ->
     if @state.lastHover.element
       {element, browserOffset} = @state.lastHover
-      utils.setHover(element, false)
       utils.simulateMouseEvents(element, 'hover-end', browserOffset)
     @state.lastHover.element = null
 

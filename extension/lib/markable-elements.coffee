@@ -161,10 +161,7 @@ getElementShape = (elementData, tryRight, rects = null) ->
   utils.walkTextNodes(element, (node) ->
     unless node.data.trim() == ''
       for quads in node.getBoxQuads()
-        try
-          bounds = quads.getBounds()
-        catch
-          bounds = quads.bounds # waterfox 56
+        bounds = quads.getBounds()
         if bounds.width < MIN_TEXTNODE_SIZE or bounds.height < MIN_TEXTNODE_SIZE
           continue
 

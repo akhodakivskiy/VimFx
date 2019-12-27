@@ -13,16 +13,6 @@ nsIStyleSheetService = Cc['@mozilla.org/content/style-sheet-service;1']
 nsIWindowMediator = Cc['@mozilla.org/appshell/window-mediator;1']
   .getService(Ci.nsIWindowMediator)
 
-# This interface was removed from Firefox with no alternative. Try to use it if
-# available but otherwise just ignore it. Code in this module handles this
-# variable being `null`.
-nsIDomUtils =
-  try
-    Cc['@mozilla.org/inspector/dom-utils;1']
-      .getService(Ci.inIDOMUtils)
-  catch
-    null
-
 # For XUL, `instanceof` checks are often better than `.localName` checks,
 # because some of the below interfaces are extended by many elements.
 XULButtonElement = Ci.nsIDOMXULButtonElement
@@ -32,10 +22,8 @@ XULMenuListElement = Ci.nsIDOMXULMenuListElement
 # Traverse the DOM upwards until we hit its containing document (most likely an
 # HTMLDocument or (<=fx68) XULDocument) or the ShadowRoot.
 getDocument = (e) -> if e.parentNode? then arguments.callee(e.parentNode) else e
-# for shadow DOM custom elements, as they require special handling.
-# (ShadowRoot is only available in mozilla63+)
-isInShadowRoot = (element) ->
-  ShadowRoot? and getDocument(element) instanceof ShadowRoot
+
+isInShadowRoot = (element) -> getDocument(element) instanceof ShadowRoot
 
 isXULElement = (element) ->
   XUL_NS = 'http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul'
@@ -522,15 +510,6 @@ setAttributes = (element, attributes) ->
     element.setAttribute(attribute, value)
   return
 
-setHover = (element, hover) ->
-  return unless nsIDomUtils
-
-  method = if hover then 'addPseudoClassLock' else 'removePseudoClassLock'
-  while element.parentElement
-    nsIDomUtils[method](element, ':hover')
-    element = element.parentElement
-  return
-
 walkTextNodes = (element, fn) ->
   for node in element.childNodes then switch node.nodeType
     when 3 # TextNode.
@@ -781,7 +760,6 @@ module.exports = {
   selectAllSubstringMatches
   selectElement
   setAttributes
-  setHover
   walkTextNodes
 
   Counter

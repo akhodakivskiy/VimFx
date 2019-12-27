@@ -1061,10 +1061,7 @@ commands.esc = ({vim}) ->
   # Firefox does things differently when blurring the location bar, depending on
   # whether the autocomplete popup is open or not. To be consistent, always
   # close the autocomplete popup before blurring.
-  try
-    vim.window.gURLBar.view.close()
-  catch
-    vim.window.gURLBar.closePopup() # pre mozilla64
+  vim.window.gURLBar.view.close()
 
   utils.blurActiveBrowserElement(vim)
   utils.getFindBar(vim.window.gBrowser).then((findBar) -> findBar.close())
