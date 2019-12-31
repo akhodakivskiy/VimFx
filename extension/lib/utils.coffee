@@ -343,9 +343,13 @@ simulateMouseEvents = (element, sequence, browserOffset) ->
       element.focus() if type == 'contextmenu' # for <input type=text>
       element.dispatchEvent(mouseEvent)
     else
-      (window.windowUtils.dispatchDOMEventViaPresShellForTesting or
-       window.windowUtils.dispatchDOMEventViaPresShell # < fx73
-      )(element, mouseEvent)
+      try
+        (window.windowUtils.dispatchDOMEventViaPresShellForTesting or
+         window.windowUtils.dispatchDOMEventViaPresShell # < fx73
+        )(element, mouseEvent)
+      catch error
+        if error.result != Cr.NS_ERROR_UNEXPECTED
+          throw error
 
   return
 
