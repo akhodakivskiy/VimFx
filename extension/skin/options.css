@@ -16,6 +16,7 @@
 .setting.first-row {
   border-top: none;
   margin-top: 2em;
+  font-weight: bold;
 }
 .setting .title,
 .setting .desc,
