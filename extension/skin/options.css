@@ -16,6 +16,8 @@
 .setting.first-row {
   border-top: none;
   margin-top: 2em;
+}
+.setting.first-row .title {
   font-weight: bold;
 }
 .setting .title,
