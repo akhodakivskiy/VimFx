@@ -1,6 +1,6 @@
 ### 0.23.2 (2020-01-05)
 
-- Fix following links in Firefox 72
+- Fix following links in Firefox 73
 - More correct handling of XUL pages
 - Make options section headings bold
 - Some internal cleanups
