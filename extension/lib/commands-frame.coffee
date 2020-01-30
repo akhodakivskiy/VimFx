@@ -252,13 +252,15 @@ commands.follow = helper_follow.bind(
       when isTypingElement(element)
         type = 'text'
       when element.localName in ['a', 'button'] or
-           element.getAttribute?('role') in CLICKABLE_ARIA_ROLES or
-           # <http://www.w3.org/TR/wai-aria/states_and_properties>
-           element.hasAttribute?('aria-controls') or
-           element.hasAttribute?('aria-pressed') or
-           element.hasAttribute?('aria-checked') or
-           (element.hasAttribute?('aria-haspopup') and
-            element.getAttribute?('role') != 'menu')
+           (element.getAttribute?('role') in CLICKABLE_ARIA_ROLES or
+            # <http://www.w3.org/TR/wai-aria/states_and_properties>
+            element.hasAttribute?('aria-controls') or
+            element.hasAttribute?('aria-pressed') or
+            element.hasAttribute?('aria-checked') or
+            (element.hasAttribute?('aria-haspopup') and
+             element.getAttribute?('role') != 'menu')) and
+           (element.localName not in ['div', 'span'] or
+            utils.hasEventListeners(element, 'click'))
         type = 'clickable'
       when utils.isFocusable(element) and
            # Google Drive Documents. The hint for this element would cover the
