@@ -1,3 +1,8 @@
+### 0.23.3 (2020-03-19)
+
+- Fix GitHub search box hint
+- Fix `o` in Nightly 76 (Bug 1610479)
+
 ### 0.23.2 (2020-01-05)
 
 - Fix following links in Firefox 73
