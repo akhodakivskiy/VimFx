@@ -30,7 +30,10 @@ commands = {}
 
 
 commands.focus_location_bar = ({vim}) ->
-  vim.window.focusAndSelectUrlBar()
+  try
+    vim.window.gURLBar.select() # fx76+
+  catch
+    vim.window.focusAndSelectUrlBar()
 
 commands.focus_search_bar = ({vim, count}) ->
   # The `.webSearch()` method opens a search engine in a tab if the search bar
