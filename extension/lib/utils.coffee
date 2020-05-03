@@ -120,7 +120,7 @@ isIframeEditor = (element) ->
          element.classList?.contains('htmlarea-content-body') or
          # The wasavi extension.
          element.hasAttribute?('data-wasavi-state') or
-				 element.src.endsWith("NeovimFrame.html")
+         element.src.endsWith("NeovimFrame.html")
 
 isIgnoreModeFocusType = (element) ->
   return \
