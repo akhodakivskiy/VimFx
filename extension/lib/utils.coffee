@@ -89,7 +89,10 @@ isDevtoolsElement = (element) ->
    )
 
 isDevtoolsWindow = (window) ->
-  return window.location?.href in [
+  # Note: this function is called for each frame by isDevtoolsElement. When
+  # called on an out-of-process iframe, accessing .href will fail with
+  # SecurityError; the `try` around it makes it `undefined` in such a case.
+  return (try window.location?.href) in [
     'about:devtools-toolbox'
     'chrome://devtools/content/framework/toolbox.xul'
     'chrome://devtools/content/framework/toolbox.xhtml' # fx72+
@@ -235,11 +238,20 @@ getActiveElement = (window) ->
   else if activeElement.contentWindow and
       not (activeElement.localName == 'browser' and
       activeElement.getAttribute?('contextmenu') == 'contentAreaContextMenu')
+    # with Fission enabled, the iframe might be located in a different process
+    # (oop). Then, recursing into it isn't possible (throws SecurityError).
+    return activeElement unless (try activeElement.contentWindow.document)
+
     return getActiveElement(activeElement.contentWindow)
   else
     return activeElement
 
 getFocusType = (element) -> switch
+  when element.tagName in ['FRAME', 'IFRAME'] and
+       not (try element.contentWindow.document)
+    # Encountered an out-of-process iframe, which we can't inspect. We fall
+    # back to insert mode, so any text inputs it may contain are still usable.
+    'editable'
   when isIgnoreModeFocusType(element)
     'ignore'
   when isTypingElement(element)
@@ -381,7 +393,8 @@ clearSelectionDeep = (window, {blur = true} = {}) ->
   # The selection might be `null` in hidden frames.
   selection = window.getSelection()
   selection?.removeAllRanges()
-  for frame in window.frames
+  # Note: accessing frameElement fails on oop iframes (fission); skip those.
+  for frame in window.frames when (try frame.frameElement)
     clearSelectionDeep(frame, {blur})
     # Allow parents to re-gain control of text selection.
     frame.frameElement.blur() if blur

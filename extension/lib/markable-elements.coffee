@@ -48,7 +48,9 @@ getMarkableElements = (
     )
     wrappers.push(wrapper)
 
-  for frame in window.frames when frame.frameElement
+  # Note: with fission's out-of-process iframes, accessing frameElement might
+  # result in a SecurityError. In this case, squelch it and don't drill down.
+  for frame in window.frames when (try frame.frameElement)
     continue unless result = viewportUtils.getFrameViewport(
       frame.frameElement, viewport
     )

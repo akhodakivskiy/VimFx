@@ -69,7 +69,8 @@ getAllRangesInsideViewport = (window, viewport, offset = {left: 0, top: 0}) ->
         }
         ranges.push({range, rect: adjustedRect})
 
-  for frame in window.frames
+  # Note: accessing frameElement fails on oop iframes (fission), so we skip them
+  for frame in window.frames when (try frame.frameElement)
     {viewport: frameViewport, offset: frameOffset} =
       getFrameViewport(frame.frameElement, viewport) ? {}
     continue unless frameViewport

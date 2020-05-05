@@ -110,6 +110,10 @@ class FrameEventManager
     )
 
     @listen('overflow', (event) =>
+      # XXX(fission): this eventually calls utils::containsDeep(), which if the
+      # element that caused the event sits in an out-of-process iframe, might
+      # cause a SecurityError. However, as of Nightly 78, events originating
+      # from such frames are not raised.
       target = event.originalTarget
       @vim.state.scrollableElements.addChecked(target)
     )
