@@ -32,6 +32,9 @@
 - [Handy standard Firefox features](handy-standard-firefox-features.md)
   – Tips and tricks that are standard Firefox stuff, but very useful to VimFx.
 
+- [Known Bugs](known-bugs.md)
+  – A list of known deficiencies and how to work around them.
+
 Also check out the [wiki](https://github.com/akhodakivskiy/VimFx/wiki)!
 
 [button-icon]: ../extension/skin/icon16.png
