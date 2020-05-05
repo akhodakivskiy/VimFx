@@ -110,7 +110,7 @@ case "$confirm" in
 esac
 
 # push commits and tags to upstream repo
-git push ${release%%/*} --follow-tags
+git push --follow-tags ${release%%/*}
 
 # open prepopulated release form (don't forget to upload xpi!)
 tmpdir=$(mktemp -d) && cp build/VimFx.xpi "$tmpdir" && xdg-open "$tmpdir" &
