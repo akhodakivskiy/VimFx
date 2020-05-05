@@ -88,7 +88,8 @@ class Vim
            @_isUIElement(event.originalTarget)
 
   _isUIElement: (element) ->
-    return element.ownerGlobal instanceof ChromeWindow and
+    return (element.ownerGlobal instanceof ChromeWindow or
+            utils.isDockedDevtoolsElement(element)) and
            element != @window.gBrowser.selectedBrowser
 
   # `args...` is passed to the mode's `onEnter` method.

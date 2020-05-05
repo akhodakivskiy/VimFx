@@ -91,7 +91,12 @@ isDevtoolsWindow = (window) ->
   return window.location?.href in [
     'about:devtools-toolbox'
     'chrome://devtools/content/framework/toolbox.xul'
+    'chrome://devtools/content/framework/toolbox.xhtml' # fx72+
   ]
+
+# Note: this is possibly a bit overzealous, but Works For Now™.
+isDockedDevtoolsElement = (element) ->
+  return element.ownerDocument.URL.startsWith('chrome://devtools/content/')
 
 isFocusable = (element) ->
   # Focusable elements have `.tabIndex > 1` (but not necessarily a
@@ -727,6 +732,7 @@ module.exports = {
   isContentEditable
   isDevtoolsElement
   isDevtoolsWindow
+  isDockedDevtoolsElement
   isFocusable
   isIframeEditor
   isIgnoreModeFocusType
