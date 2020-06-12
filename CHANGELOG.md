@@ -1,3 +1,9 @@
+### 0.24.0 (2020-06-12)
+
+- Fix getting stuck in normal mode in docked DevTools after refocusing
+- Fix switching browser tabs with `eb`
+- Document known bugs and their workarounds
+
 ### 0.23.3 (2020-03-19)
 
 - Fix GitHub search box hint
