@@ -1,23 +1,10 @@
 # VimFx – Vim keyboard shortcuts for Firefox
 
 **Note:** VimFx is a _legacy_ extension for Firefox 68+, requiring the
-[LegacyFox] shim ([see also]).
+[LegacyFox] shim ([see below]).
 
-If you’re looking for a WebExtension replacement for VimFx, check out these
-extensions:
-
-- [Vimium-FF]
-- [Saka Key]
-- [Vim Vixen]
-- [Tridactyl]
-
-[firefox-57+]: https://support.mozilla.org/en-US/kb/firefox-add-technology-modernizing
-[Vimium-FF]: https://addons.mozilla.org/firefox/addon/vimium-ff/
-[Saka Key]: https://addons.mozilla.org/firefox/addon/saka-key/
-[Vim Vixen]: https://addons.mozilla.org/firefox/addon/vim-vixen/
-[Tridactyl]: https://addons.mozilla.org/firefox/addon/tridactyl-vim/
-[LegacyFox]: https://github.com/girst/LegacyFox
-[see also]: https://gir.st/blog/legacyfox.htm
+[LegacyFox]: https://gir.st/blog/legacyfox.htm
+[see below]: #installation-instructions
 
 ---
 
@@ -43,6 +30,20 @@ VimFx is made by [these awesome people][people].
 [wiki]: https://github.com/akhodakivskiy/VimFx/wiki
 [Questions & Answers]: https://github.com/akhodakivskiy/VimFx/tree/master/documentation/questions-and-answers.md
 [people]: https://github.com/akhodakivskiy/VimFx/blob/master/PEOPLE.md
+
+## Installation Instructions
+
+Before installing VimFx, make sure LegacyFox is installed. On Linux, you can
+issue the commands below; on other operating systems, you can copy the files
+from the [LegacyFox repository] into your Firefox installation directory.
+
+[LegacyFox repository]: https://git.gir.st/LegacyFox.git
+
+```
+git clone https://git.gir.st/LegacyFox.git 
+cd LegacyFox
+sudo make install  # set DESTDIR= for custom install location
+```
 
 ## Why VimFx was created
 
@@ -97,3 +98,19 @@ There’s also an [article on ghacks.net][ghacks] which is a good introduction.
 [default shortcuts]: https://github.com/akhodakivskiy/VimFx/blob/master/extension/lib/defaults.coffee
 [blacklist]: https://github.com/akhodakivskiy/VimFx/blob/master/documentation/options.md#blacklist
 [ghacks]: http://www.ghacks.net/2016/07/01/vimfx-improve-firefox-keyboard-use/
+
+## Alternatives
+
+If you’re looking for a WebExtension replacement for VimFx, check out these
+extensions:
+
+- [Vimium-FF]
+- [Saka Key]
+- [Vim Vixen]
+- [Tridactyl]
+
+[firefox-57+]: https://support.mozilla.org/en-US/kb/firefox-add-technology-modernizing
+[Vimium-FF]: https://addons.mozilla.org/firefox/addon/vimium-ff/
+[Saka Key]: https://addons.mozilla.org/firefox/addon/saka-key/
+[Vim Vixen]: https://addons.mozilla.org/firefox/addon/vim-vixen/
+[Tridactyl]: https://addons.mozilla.org/firefox/addon/tridactyl-vim/

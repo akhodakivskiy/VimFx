@@ -17,7 +17,7 @@ DOCS
 : "${release=upstream/master}"
 : "${git_user=girst}"
 : "${git_email=girst@users.noreply.github.com}"
-: "${devel_url=https://github.com/girst/VimFx}"
+: "${devel_url=git@git.gir.st:VimFx.git}"
 : "${release_url=https://github.com/akhodakivskiy/VimFx}"
 
 set -e
