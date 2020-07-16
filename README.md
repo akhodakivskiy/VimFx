@@ -37,7 +37,7 @@ Before installing VimFx, make sure LegacyFox is installed. On Linux, you can
 issue the commands below; on other operating systems, you can copy the files
 from the [LegacyFox repository] into your Firefox installation directory.
 
-[LegacyFox repository]: https://git.gir.st/LegacyFox.git
+[LegacyFox repository]: https://git.gir.st/LegacyFox.git/tree
 
 ```
 git clone https://git.gir.st/LegacyFox.git 
