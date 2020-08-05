@@ -1,3 +1,8 @@
+### 0.24.1 (2020-08-05)
+
+- Fix for Firefox 80: Make new tabs appear next to current
+- Docs: update LegacyFox repository location and installation instruction
+
 ### 0.24.0 (2020-06-12)
 
 - Fix getting stuck in normal mode in docked DevTools after refocusing
