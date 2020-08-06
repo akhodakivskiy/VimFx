@@ -552,7 +552,7 @@ helper_follow_clickable = (options, args) ->
           triggeringPrincipal: json.triggeringPrincipal,
           csp: if json.csp then E10SUtils.deserializeCSP(json.csp) else null,
           frameOuterWindowID: json.frameOuterWindowID, # <=fx79
-          frameID: data.frameID,  # >=fx80
+          frameID: json.frameID,  # >=fx80
           allowInheritPrincipal: true,
         }
         if json.originAttributes.userContextId
