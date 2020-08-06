@@ -1,3 +1,7 @@
+### 0.24.2 (2020-08-06)
+
+- Hotfix: Last update broke `F`
+
 ### 0.24.1 (2020-08-05)
 
 - Fix for Firefox 80: Make new tabs appear next to current
