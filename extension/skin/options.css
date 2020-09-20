@@ -50,9 +50,6 @@
   flex: 1;
   min-width: 200px;
   padding: 0.5em;
-  background: #fff;
-  border: 1px solid #ccc;
-  color: #333;
 }
 
 #header .control {
