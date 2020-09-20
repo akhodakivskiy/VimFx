@@ -1,50 +1,28 @@
 # Installation
 
-First off, you need Firefox version 68+ (or a compatible fork) and the
-[LegacyFox] shim.
-See [README.md] for more information.
+Independently from the installation method chosen, you need Firefox version 68+
+(or a compatible fork) and the [LegacyFox] shim. Both options are unsigned and
+don't offer automatic updates. You may want to *watch releases* on GitHub.
 
-[README.md]: ../README.md
-[LegacyFox]: https://github.com/girst/LegacyFox
-
-
-## ⚠️ NO LONGER AVAILABLE ⚠️<br>Option 1: [addons.mozilla.org] \(AMO)
-
-**<https://addons.mozilla.org/firefox/addon/VimFx>**
-
-You used to be able to follow the above link and hit the green “Install” button
-and then be ready to go, but Mozilla has removed all legacy extensions from
-their site.
-
-- [Signed][signed] and reviewed by Mozilla.
-- Hosted on AMO.
-- Automatic updates.
-
-[addons.mozilla.org]: https://addons.mozilla.org/
+[LegacyFox]: https://git.gir.st/LegacyFox.git
 
 
-## Option 2: [GitHub releases][releases]
+## Option 1: [GitHub releases][releases]
 
 Go to VimFx’s [releases] page and click the link to “VimFx.xpi” for the version
 you’re interested in (most likely the latest). Firefox should then ask you about
 allowing the installation. (If not, download the .xpi file and [open it in
 Firefox][open-xpi].)
 
-- [Signed][signed] by Mozilla (but not reviewed).
-- Available as a backup alternative, and in case of slow reviews on AMO.
-- No automatic updates.
-
 [releases]: https://github.com/akhodakivskiy/VimFx/releases
 
 
-## Option 3: Build from source
+## Option 2: Build from source
 
 [Build VimFx] and then [open the produced `build/VimFx.xpi` file][open-xpi].
 
-- [Unsigned][signed].
 - Bleeding edge.
 - Allows you to fiddle with the code.
-- No automatic updates.
 
 [Build VimFx]: tools.md#how-to-build-and-install-the-latest-version-from-source
 
@@ -59,17 +37,4 @@ installing them:
 - Use “Install from file…” in the top-right menu in the Add-ons Manager.
 
 
-## What is a signed add-on?
-
-By default it is not possible to install add-ons which haven’t been signed by
-Mozilla. In order for an add-on to be signed it must pass some code checks. The
-idea is to protect users from malware.
-
-If you’re interested in installing an unsigned add-on (such as if you’ve built
-a VimFx .xpi from source yourself), read all about extension signing here:
-
-<https://wiki.mozilla.org/Addons/Extension_Signing>
-
-
 [open-xpi]: #how-to-install-an-xpi-file-in-firefox
-[signed]: #what-is-a-signed-add-on

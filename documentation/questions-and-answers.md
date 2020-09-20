@@ -2,13 +2,10 @@
 
 ## I can’t install VimFx!
 
-That’s probably because VimFx is a _legacy_ Firefox extension, which is **not**
-[compatible with Firefox 57+][firefox-57+].
+That’s probably because VimFx is a _legacy_ Firefox extension, which requires
+[LegacyFox] for installation.
 
-See [README.md] for more information.
-
-[firefox-57+]: https://support.mozilla.org/en-US/kb/firefox-add-technology-modernizing
-[README.md]: ../README.md
+[LegacyFox]: https://git.gir.st/LegacyFox.git
 
 ## How do I disable VimFx?
 
