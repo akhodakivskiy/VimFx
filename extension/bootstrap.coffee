@@ -16,11 +16,9 @@ do (global = this) ->
   BUILD_TIME = do -> # @echo BUILD_TIME
   REQUIRE_DATA = do -> # @echo REQUIRE_DATA
 
-  unless IS_FRAME_SCRIPT
-    # Make `Services` and `console` available globally, just like they are in
-    # frame scripts by default.
-    Cu.import('resource://gre/modules/Services.jsm')
-    Cu.import('resource://gre/modules/Console.jsm')
+  # Make `Services` and `console` available globally and in frame scripts.
+  Cu.import('resource://gre/modules/Services.jsm')
+  Cu.import('resource://gre/modules/Console.jsm')
 
   shutdownHandlers = []
 

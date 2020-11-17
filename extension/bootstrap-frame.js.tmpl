@@ -1,3 +1,4 @@
+const { Services } = Cu.import('resource://gre/modules/Services.jsm');
 Services.scriptloader.loadSubScript(
   Services.io.newURI('{{{ ADDON_PATH }}}/content/bootstrap.js', null, null).spec,
   this,
