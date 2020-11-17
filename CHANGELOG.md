@@ -1,3 +1,11 @@
+### 0.24.3 (2020-11-17)
+
+- Fix Extension Bootstrap for Firefox 84
+- Support in-content dark mode on options.xhtml
+- Don't crash on pages with out-of-process iframes with Fission enabled in
+  Nightly
+- Update Documentation
+
 ### 0.24.2 (2020-08-06)
 
 - Hotfix: Last update broke `F`
