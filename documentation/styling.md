@@ -4,10 +4,14 @@ It is possible to change the style of VimFx’s hint markers (such as the font
 size), help dialog and button with CSS. In fact, using the techniques shown here
 you can re-style almost _any_ part of Firefox.
 
-1. Copy stuff from the below examples or from [style.css] into [userChrome.css]
-   or a new [Stylish] style. You get far just by copying and pasting.
+1. Copy stuff from the below examples or from [style.css] into [userChrome.css].
+   You get far just by copying and pasting.
 
-2. Make sure that the following code is at the top of the file:
+2. Since Firefox 69, you must set
+   `toolkit.legacyUserProfileCustomizations.stylesheets` in `about:config` to
+   `true`.
+
+3. Make sure that the following code is at the top of the file:
 
    ```css
    @namespace url(http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul);
@@ -15,15 +19,16 @@ you can re-style almost _any_ part of Firefox.
 
    It makes sure that your CSS only affects the browser UI and not web pages.
 
-3. Adjust the CSS to your likings. Make sure to end lines with `!important;`, so
+4. Adjust the CSS to your likings. Make sure to end lines with `!important;`, so
    that they override VimFx’s default styles properly.
 
 If you use `userChrome.css` you need to restart Firefox for your changes to take
-effect, while Stylish applies them instantly.
+effect. Since Firefox 69, you have to enable `userChrome.css` by setting
+`toolkit.legacyUserProfileCustomizations.stylesheets` to `true` in
+`about:config`.
 
 [style.css]: ../extension/skin/style.css
 [userChrome.css]: http://kb.mozillazine.org/UserChrome.css
-[Stylish]: https://addons.mozilla.org/firefox/addon/stylish/
 
 
 ## Examples

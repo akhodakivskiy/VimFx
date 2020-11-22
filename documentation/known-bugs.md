@@ -21,17 +21,22 @@ The [new RDM] does not have this bug; it can be enabled by switching
 
 ## Fission
 
-**Affected**: (future versions)  
+**Affected**: some Nightly users, future versions  
 **Workaround**: `fission.autostart;false`
 
 With [Fission] enabled, VimFx can't inspect out-of-process iframes.
 
-Fission is not (yet) turned on by default, but can be disabled by switching
-`fission.autostart` to `false` in `about:config`. With Fission, VimFx cannot
-place hint markers or determine whether an editable element is active in iframes
-from a different domain to the top document. We will instead enter insert mode
-whenever such an iframe is active (so input elements are usable; click outside
-the iframe to let VimFx re-gain control).
+Fission, sometimes called *Site Isolation*, is not (yet) turned on by default,
+but can be disabled by switching `fission.autostart` to `false` in
+`about:config`. With Fission, VimFx cannot place hint markers or determine
+whether an editable element is active in iframes from a different domain to the
+top document. We will instead enter insert mode whenever such an iframe is
+active (so input elements are usable; hit Escape or click outside the iframe to
+let VimFx re-gain control).
+
+<!-- Mozilla are doing a/b testing on around 5% of Nightly 83+ installations,
+where they enable Fission.
+https://bugzilla.mozilla.org/show_bug.cgi?id=1660366 -->
 
 <!-- For full OOP-iframe support it is way too early.
 As of May 2020, not even Firefox' DevTools support it, let alone other Vim
@@ -49,6 +54,4 @@ APIs that just don't exist right now. -->
 For some as-of-yet undetermined reason, the addon sometimes breaks after
 installation (or upgrade)<!-- possibly Gecko internals changed and the
 BootstrapLoader is failing -->. Fastest way to restart Firefox is pressing
-`<Ctrl-Shift-j>` to open the browser console, then `<Ctrl-Alt-r>` to restart.
-Alternatively, navigate to `about:profiles` and hit the *Restart normally*
-button.
+`<c-s-j>` to open the browser console, then `<c-a-r>` to restart.

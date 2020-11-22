@@ -18,11 +18,9 @@ That’s completely OK.
 
 ## Code
 
-Create a new topic branch, based on either master or develop.
+Create a new topic branch.
 
     git checkout -b my-topic-branch master
-    # or
-    git checkout -b my-topic-branch develop
 
 Code! Try to follow these simple rules:
 
@@ -52,7 +50,6 @@ Break up your pull request in several commits if necessary. The first line of
 commit messages should be a short summary. If needed, add a blank line and then
 a nicely formatted markdown description.
 
-Finally send a pull request to same branch as you based your topic branch on
-(master or develop).
+Finally send a pull request.
 
 [tools.md]: tools.md

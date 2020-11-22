@@ -160,7 +160,8 @@ Run `./release` with argument `minor` or `patch`, which does the following for y
 
   - Updates the version in `package.json`.
   - Adds a heading with the new version number and today’s date at the top of
-    `CHANGELOG.md`.
+    `CHANGELOG.md`, and the summary of commits since the last version. Then
+    opens an editor and waits to let you modify the changelog.
   - Commits `CHANGELOG.md` and `package.json`.
   - Tags the commit.
   - Lints the code and builds an xpi.

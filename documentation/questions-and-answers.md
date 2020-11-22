@@ -143,25 +143,3 @@ command to click without using the mouse.
 One of VimFx’s key features is to embrace standard Firefox features. As long as
 Firefox’s Find Bar doesn’t support for example reverse search (Vim’s `?`
 command) or regex search, VimFx won’t either.
-
-## Switching between tabs works oddly when [NoScript] is installed!
-
-This is a [known bug][noscript-bug] in NoScript. To work around it, either
-switch to multi-process Firefox or set `noscript.clearClick.rapidFireCheck` to
-`false` in [about:config].
-
-You’re not really missing out security-wise by disabling
-`noscript.clearClick.rapidFireCheck`. All it does is preventing one specific,
-less common type of “clickjacking” attack, that isn’t even mentioned in
-NoScript’s [ClearClick] documentation. It is, however, quickly mentionend in a
-[blog post][hackademix-clickjacking] by NoScript’s author (which links to
-another site explaining the attack in more detail).
-
-See also [issue 588].
-
-[NoScript]: https://noscript.net/
-[noscript-bug]: https://forums.informaction.com/viewtopic.php?f=10&t=21597
-[about:config]: http://kb.mozillazine.org/About:config
-[ClearClick]: https://noscript.net/faq/#clearclick
-[hackademix-clickjacking]: https://hackademix.net/2011/07/11/fancy-clickjacking-tougher-noscript/
-[issue 588]: https://github.com/akhodakivskiy/VimFx/issues/588

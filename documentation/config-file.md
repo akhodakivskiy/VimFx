@@ -213,4 +213,4 @@ Weakening the sandbox by setting `security.sandbox.content.level` to 2 is not
 recommended, as this will open up a [potentially devastating security hole].
 
 [undocumented prefs]: https://hg.mozilla.org/mozilla-central/file/c31591e0b66f277398bee74da03c49e8f8a0ede0/dom/ipc/ContentChild.cpp#l1701
-[potentially devesatating security hole]: https://bugzilla.mozilla.org/show_bug.cgi?id=1221148#c30
+[potentially devastating security hole]: https://bugzilla.mozilla.org/show_bug.cgi?id=1221148#c30
