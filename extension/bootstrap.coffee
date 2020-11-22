@@ -18,7 +18,8 @@ do (global = this) ->
 
   # Make `Services` and `console` available globally and in frame scripts.
   Cu.import('resource://gre/modules/Services.jsm')
-  Cu.import('resource://gre/modules/Console.jsm')
+  unless IS_FRAME_SCRIPT
+    Cu.import('resource://gre/modules/Console.jsm')
 
   shutdownHandlers = []
 
