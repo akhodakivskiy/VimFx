@@ -608,6 +608,7 @@ helper_follow_in_window = (options, args) ->
   callback = (marker) ->
     vim._focusMarkerElement(marker.wrapper.elementIndex)
     {href} = marker.wrapper
+    options.triggeringPrincipal = vim.window.document.nodePrincipal
     vim.window.openLinkIn(href, 'window', options) if href
     return false
 
