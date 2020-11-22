@@ -25,7 +25,7 @@ injectHelp = (window, vimfx) ->
   content = createContent(window, vimfx)
   wrapper.appendChild(content)
 
-  searchInput = document.createElement('textbox')
+  searchInput = document.createElement('input')
   utils.setAttributes(searchInput, {
     class: 'search-input'
     placeholder: translate('help.search')

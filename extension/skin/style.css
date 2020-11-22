@@ -310,7 +310,7 @@ toolbarpaletteitem[place="palette"] > #VimFxButton {
     bottom: 0;
   }
 
-    #VimFxHelpDialogContainer .search-input:not([focused="true"]) {
+    #VimFxHelpDialogContainer .search-input:not(:focus) {
       opacity: 0;
       pointer-events: none;
     }
