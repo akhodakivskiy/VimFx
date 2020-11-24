@@ -1,3 +1,9 @@
+### 0.24.4 (2020-11-24)
+
+- Fix crashes on google Drive and about:logins
+- Fix `ew` and `ep` commands
+- Fix search on help screen
+
 ### 0.24.3 (2020-11-17)
 
 - Fix Extension Bootstrap for Firefox 84
