@@ -545,7 +545,7 @@ helper_follow_clickable = (options, args) ->
         params = {
           charset: browser.characterSet,
           referrerInfo: E10SUtils.deserializeReferrerInfo(json.referrerInfo),
-          allowMixedContent: json.allowMixedContent,
+          allowMixedContent: json.allowMixedContent, # <=fx88
           isContentWindowPrivate: json.isContentWindowPrivate,
           originPrincipal: json.originPrincipal,
           originStoragePrincipal: json.originStoragePrincipal,
