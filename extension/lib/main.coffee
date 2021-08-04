@@ -116,6 +116,19 @@ module.exports = (data, reason) ->
         help.removeHelp(window)
       )
 
+      # check whether Fission is enabled, and warn the user if so.
+      FISSION_ENABLED_PREF = 'fission.autostart'
+      IGNORE_FISSION_PREF = 'ignore_fission'
+      isFissionWindow = window.docShell.nsILoadContext.useRemoteSubframes
+      isFissionEnabled = Services.appinfo.fissionAutostart and # current session
+        prefs.root.get(FISSION_ENABLED_PREF) # future sessions
+      isFissionIgnored = prefs.has(IGNORE_FISSION_PREF) and
+        prefs.get(IGNORE_FISSION_PREF) == true
+      if isFissionWindow and isFissionEnabled and not isFissionIgnored
+        console.error('VimFx: Fission is enabled in your browser.'
+          'VimFx will not be able to interact with third party iframes.')
+        console.info("Please consult VimFx' documentation on Known Bugs.")
+
     callback(true)
   )
 
