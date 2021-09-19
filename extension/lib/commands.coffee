@@ -24,6 +24,7 @@ viewportUtils = require('./viewport')
 
 READER_VIEW_PREFIX = 'about:reader?url='
 SPRING_CONSTANT_PREF = 'layout.css.scroll-behavior.spring-constant'
+USER_CONTEXT_ID_ATTRIBUTE_NAME = 'usercontextid'
 
 commands = {}
 
@@ -509,6 +510,18 @@ helper_follow = ({name, callback}, {vim, count, callbackOverride = null}) ->
 
   vim._run(name, {pass: 'auto'}, injectHints)
 
+
+helper_add_user_context_id = (gBrowser, objectToAugment) ->
+  contextAttribute = gBrowser.selectedTab.attributes.getNamedItem(
+    USER_CONTEXT_ID_ATTRIBUTE_NAME)
+
+  # default has no context attribute so only set if it exists
+  if contextAttribute
+    objectToAugment.userContextId = contextAttribute.value
+
+  return objectToAugment
+
+
 helper_follow_clickable = (options, args) ->
   {vim} = args
 
@@ -539,8 +552,8 @@ helper_follow_clickable = (options, args) ->
 
     if inTab
       contentAreaClick = (json, browser) ->
-	# Note this function is shortened from the same-named one currently in
-	# mozilla-central/browser/actors/ClickHandlerParent.jsm. Keep in sync!
+        # Note this function is shortened from the same-named one currently in
+        # mozilla-central/browser/actors/ClickHandlerParent.jsm. Keep in sync!
         window = browser.ownerGlobal
         params = {
           charset: browser.characterSet,
@@ -572,7 +585,10 @@ helper_follow_clickable = (options, args) ->
           shiftKey: not inBackground
           ctrlKey: true
           metaKey: true
-          originAttributes: window.document.nodePrincipal?.originAttributes ? {}
+          originAttributes: helper_add_user_context_id(
+            vim.browser.ownerGlobal.gBrowser,
+            window.document.nodePrincipal?.originAttributes ? {}
+          )
           triggeringPrincipal: window.document.nodePrincipal
         }, vim.browser)
         reset()
@@ -609,6 +625,8 @@ helper_follow_in_window = (options, args) ->
     vim._focusMarkerElement(marker.wrapper.elementIndex)
     {href} = marker.wrapper
     options.triggeringPrincipal = vim.window.document.nodePrincipal
+    options = helper_add_user_context_id(vim.window.gBrowser, options)
+
     vim.window.openLinkIn(href, 'window', options) if href
     return false
 
