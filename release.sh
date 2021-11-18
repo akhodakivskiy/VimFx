@@ -42,9 +42,9 @@ major)	die "no." ;;
 esac
 
 # make sure my idiosyncratic development setup is present
-test "$(git config --show user.name | cut -f2)" = "$git_user" ||
+test "$(git config --show-origin user.name | cut -f2)" = "$git_user" ||
 	die "username not set to $git_user, aborting."
-test "$(git config --show user.email | cut -f2)" = "$git_email" ||
+test "$(git config --show-origin user.email | cut -f2)" = "$git_email" ||
 	die "email not set to $git_email, aborting."
 git remote show | grep -q "${devel%%/*}" ||
 	die "there is no development remote, aborting."
