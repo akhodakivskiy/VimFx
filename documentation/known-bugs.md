@@ -5,20 +5,6 @@ are some things that VimFx doesn't play along with well. This page lists
 problems that affect VimFx when run on versions of Firefox we support
 (latest *Release* and *ESR* versions).
 
-## Responsive Design Mode
-
-**Affected**: Firefox <= 78  
-**Workaround**: `devtools.responsive.browserUI.enabled;true`
-
-Launching the (old) Responsive Design Mode breaks VimFx for this tab. The only
-way to recover is to copy-paste the URL into a new tab.
-
-The [new RDM] does not have this bug; it can be enabled by switching
-`devtools.responsive.browserUI.enabled` to `true` in `about:config` in Firefox
-78 ESR. There is no workaround for Firefox 68 ESR.
-
-[new RDM]: https://mail.mozilla.org/pipermail/firefox-dev/2020-March/007397.html
-
 ## Fission
 
 **Affected**: Firefox >= 96  
