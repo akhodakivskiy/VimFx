@@ -3,8 +3,6 @@
 utils = require('./utils')
 viewportUtils = require('./viewport')
 
-{devtools} = Cu.import('resource://devtools/shared/Loader.jsm', {})
-
 _Element = Ci.nsIDOMElement
 if _Element
   isElementInstance = (el) -> el instanceof _Element
