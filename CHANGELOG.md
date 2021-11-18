@@ -1,3 +1,8 @@
+### 0.24.5 (2021-11-18)
+
+- Fix bootstrapping in Firefox 96
+- Warn in Browser Console when Fission (site isolation) is enabled
+
 ### 0.24.4 (2020-11-24)
 
 - Fix crashes on google Drive and about:logins

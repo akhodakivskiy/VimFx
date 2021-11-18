@@ -1,6 +1,6 @@
 {
   "name": "VimFx",
-  "version": "0.24.4",
+  "version": "0.24.5",
   "firefoxVersions": {
     "min": "68.0",
     "max": "*"
