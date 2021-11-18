@@ -21,28 +21,24 @@ The [new RDM] does not have this bug; it can be enabled by switching
 
 ## Fission
 
-**Affected**: some Nightly users, future versions  
-**Workaround**: `fission.autostart;false`
+**Affected**: Firefox >= 96  
+**Workaround**: `fission.webContentIsolationStrategy;0`
 
 With [Fission] enabled, VimFx can't inspect out-of-process iframes.
 
-Fission, sometimes called *Site Isolation*, is not (yet) turned on by default,
-but can be disabled by switching `fission.autostart` to `false` in
-`about:config`. With Fission, VimFx cannot place hint markers or determine
-whether an editable element is active in iframes from a different domain to the
-top document. We will instead enter insert mode whenever such an iframe is
-active (so input elements are usable; hit Escape or click outside the iframe to
-let VimFx re-gain control).
+With Fission, sometimes called *Site Isolation*, VimFx cannot place hint markers
+or detect input elements inside iframes from a different domain to the top
+document. We will instead enter insert mode whenever such an iframe is active.
+Hit Escape or click outside the iframe to let VimFx re-gain control. Setting
+`fission.webContentIsolationStrategy` to `0` in `about:config` only disables the
+iframe part of Fission, but is available only since Firefox 94. Some Nightly
+installations were opted into Fission earlier; set `fission.autostart`
+to `false` if the main workaround is unavailable.
 
-<!-- Mozilla are doing a/b testing on around 5% of Nightly 83+ installations,
-where they enable Fission.
-https://bugzilla.mozilla.org/show_bug.cgi?id=1660366 -->
-
-<!-- For full OOP-iframe support it is way too early.
-As of May 2020, not even Firefox' DevTools support it, let alone other Vim
-like (web)extensions. Further, I suspect that to avoid a huge rewrite of how
-VimFx handles element discovery and interaction, we'd need cross-process-DOM
-APIs that just don't exist right now. -->
+<!-- VimFx will probably never support Fission. Its architecture assumes that
+all elements can be interacted with from a single point. It would require
+revisiting 8a33140f and injecting a script into each frame and postMessage'ing
+them instead of directly accessing elements within them. -->
 
 [Fission]: https://wiki.mozilla.org/Project_Fission
 
