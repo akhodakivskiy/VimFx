@@ -30,7 +30,7 @@
     "gulp-sloc": "flosse/gulp-sloc#sloc-v0.1.x",
     "gulp-tap": "^1.0.1",
     "gulp-zip": "^4.0.0",
-    "marked": "^0.7.0",
+    "marked": "^4.0.10",
     "merge2": "^1.1.0",
     "request": "^2.81.0",
     "require-precompute": "^0.2.0",
