@@ -454,7 +454,7 @@ getTopOffset = (element) ->
   return {x, y}
 
 injectTemporaryPopup = (document, contents) ->
-  popup = document.createElement('menupopup')
+  popup = document.createXULElement('menupopup')
   popup.appendChild(contents)
   document.getElementById('mainPopupSet').appendChild(popup)
   listenOnce(popup, 'popuphidden', popup.remove.bind(popup))
