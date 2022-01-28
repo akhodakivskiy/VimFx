@@ -324,8 +324,9 @@ contentAreaClick = (data, browser) ->
     triggeringPrincipal: data.triggeringPrincipal,
     csp: if data.csp then E10SUtils.deserializeCSP(data.csp) else null,
     frameOuterWindowID: data.frameOuterWindowID, # <=fx79
-    frameID: data.frameID,  # >=fx80
+    frameID: data.frameID, # >=fx80
     allowInheritPrincipal: true,
+    openerBrowser: browser, # >=fx98
   }
 
   if data.originAttributes.userContextId
