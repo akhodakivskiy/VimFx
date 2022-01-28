@@ -16,10 +16,6 @@ translate = require('./translate')
 utils = require('./utils')
 viewportUtils = require('./viewport')
 
-{PlacesUIUtils} = Cu.import('resource:///modules/PlacesUIUtils.jsm', {})
-{PrivateBrowsingUtils} =
-  Cu.import('resource://gre/modules/PrivateBrowsingUtils.jsm', {})
-{E10SUtils} = Cu.import('resource://gre/modules/E10SUtils.jsm', {})
 {FORWARD, BACKWARD} = SelectionManager
 
 READER_VIEW_PREFIX = 'about:reader?url='
@@ -551,36 +547,13 @@ helper_follow_clickable = (options, args) ->
     vim._focusMarkerElement(elementIndex)
 
     if inTab
-      contentAreaClick = (json, browser) ->
-        # Note this function is shortened from the same-named one currently in
-        # mozilla-central/browser/actors/ClickHandlerParent.jsm. Keep in sync!
-        window = browser.ownerGlobal
-        params = {
-          charset: browser.characterSet,
-          referrerInfo: E10SUtils.deserializeReferrerInfo(json.referrerInfo),
-          allowMixedContent: json.allowMixedContent, # <=fx88
-          isContentWindowPrivate: json.isContentWindowPrivate,
-          originPrincipal: json.originPrincipal,
-          originStoragePrincipal: json.originStoragePrincipal,
-          triggeringPrincipal: json.triggeringPrincipal,
-          csp: if json.csp then E10SUtils.deserializeCSP(json.csp) else null,
-          frameOuterWindowID: json.frameOuterWindowID, # <=fx79
-          frameID: json.frameID,  # >=fx80
-          allowInheritPrincipal: true,
-        }
-        if json.originAttributes.userContextId
-          params.userContextId = json.originAttributes.userContextId
-        try if not PrivateBrowsingUtils.isWindowPrivate(window)
-          PlacesUIUtils.markPageAsFollowedLink(json.href)
-        window.openLinkIn(json.href, window.whereToOpenLink(json), params)
-
       utils.nextTick(window, ->
         # `ContentClick.contentAreaClick` is what Firefox invokes when you click
         # links using the mouse. Using that instead of simply
         # `gBrowser.loadOneTab(url, options)` gives better interoperability with
         # other add-ons, such as Tree Style Tab and BackTrack Tab History.
         reset = prefs.root.tmp('browser.tabs.loadInBackground', true)
-        contentAreaClick({
+        utils.contentAreaClick({
           href: marker.wrapper.href
           shiftKey: not inBackground
           ctrlKey: true

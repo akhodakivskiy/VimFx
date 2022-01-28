@@ -1,6 +1,10 @@
 # This file contains lots of different helper functions.
 
+{E10SUtils} = Cu.import('resource://gre/modules/E10SUtils.jsm', {})
 {OS} = Components.utils.import('resource://gre/modules/osfile.jsm', {})
+{PlacesUIUtils} = Cu.import('resource:///modules/PlacesUIUtils.jsm', {})
+{PrivateBrowsingUtils} =
+  Cu.import('resource://gre/modules/PrivateBrowsingUtils.jsm', {})
 
 nsIClipboardHelper = Cc['@mozilla.org/widget/clipboardhelper;1']
   .getService(Ci.nsIClipboardHelper)
@@ -302,6 +306,35 @@ onRemoved = (element, fn) ->
   module.onShutdown(disconnect)
 
   return disconnect
+
+contentAreaClick = (data, browser) ->
+  # This function is adapted from the same-named one currently in
+  # mozilla-central/browser/actors/ClickHandlerParent.jsm. Keep in sync!
+  # Note: Our version is shortened substantially and unlike Mozilla, we pass in
+  # the browser object instead of extracting it from the browsingContext.
+  window = browser.ownerGlobal
+
+  params = {
+    charset: browser.characterSet,
+    referrerInfo: E10SUtils.deserializeReferrerInfo(data.referrerInfo),
+    allowMixedContent: data.allowMixedContent, # <=fx88
+    isContentWindowPrivate: data.isContentWindowPrivate,
+    originPrincipal: data.originPrincipal,
+    originStoragePrincipal: data.originStoragePrincipal,
+    triggeringPrincipal: data.triggeringPrincipal,
+    csp: if data.csp then E10SUtils.deserializeCSP(data.csp) else null,
+    frameOuterWindowID: data.frameOuterWindowID, # <=fx79
+    frameID: data.frameID,  # >=fx80
+    allowInheritPrincipal: true,
+  }
+
+  if data.originAttributes.userContextId
+    params.userContextId = data.originAttributes.userContextId
+
+  try if not PrivateBrowsingUtils.isWindowPrivate(window)
+    PlacesUIUtils.markPageAsFollowedLink(data.href)
+
+  window.openLinkIn(data.href, window.whereToOpenLink(data), params)
 
 simulateMouseEvents = (element, sequence, browserOffset) ->
   window = element.ownerGlobal
@@ -765,6 +798,7 @@ module.exports = {
   listen
   listenOnce
   onRemoved
+  contentAreaClick
   simulateMouseEvents
   suppressEvent
 
