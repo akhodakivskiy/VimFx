@@ -1,3 +1,7 @@
+### 0.24.6 (2022-01-28)
+
+- fix 'gX' menupopup
+
 ### 0.24.5 (2021-11-18)
 
 - Fix bootstrapping in Firefox 96
