@@ -1,7 +1,6 @@
 "use strict";
 
-const { utils: Cu } = Components;
-const { Services } = Cu.import("resource://gre/modules/Services.jsm", {});
+const { Services } = ChromeUtils.import("resource://gre/modules/Services.jsm");
 
 window.addEventListener("load", () => {
   Services.obs.notifyObservers(document, "vimfx-options-displayed", "");

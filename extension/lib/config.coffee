@@ -5,7 +5,7 @@ messageManager = require('./message-manager')
 utils = require('./utils')
 prefs = require('./prefs')
 
-{OS} = Components.utils.import('resource://gre/modules/osfile.jsm', {})
+{OS} = ChromeUtils.import('resource://gre/modules/osfile.jsm')
 
 load = (vimfx, options = null, callback = ->) ->
   configDir = vimfx.options.config_file_directory
@@ -50,7 +50,8 @@ loadFile = (dir, file, scope) ->
   try
     Services.scriptloader.loadSubScriptWithOptions(uri, {
       target: Object.assign({
-        __dirname: OS.Path.toFileURI(expandedDir)
+        __dirname: OS.Path.toFileURI(expandedDir),
+        Services: Services
       }, scope)
       charset: 'UTF-8'
       ignoreCache: true

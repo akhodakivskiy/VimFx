@@ -16,10 +16,7 @@ do (global = this) ->
   BUILD_TIME = do -> # @echo BUILD_TIME
   REQUIRE_DATA = do -> # @echo REQUIRE_DATA
 
-  # Make `Services` and `console` available globally and in frame scripts.
-  Cu.import('resource://gre/modules/Services.jsm')
-  unless IS_FRAME_SCRIPT
-    Cu.import('resource://gre/modules/Console.jsm')
+  {Services} = ChromeUtils.import('resource://gre/modules/Services.jsm')
 
   shutdownHandlers = []
 

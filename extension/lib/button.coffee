@@ -4,14 +4,14 @@ help = require('./help')
 translate = require('./translate')
 utils = require('./utils')
 
-cui = Cu.import('resource:///modules/CustomizableUI.jsm', {}).CustomizableUI
+{CustomizableUI} = ChromeUtils.import('resource:///modules/CustomizableUI.jsm')
 
 BUTTON_ID = 'VimFxButton'
 
 injectButton = (vimfx) ->
-  cui.createWidget({
+  CustomizableUI.createWidget({
     id: BUTTON_ID
-    defaultArea: cui.AREA_NAVBAR
+    defaultArea: CustomizableUI.AREA_NAVBAR
     label: 'VimFx'
     tooltiptext: translate('button.tooltip.normal')
     onCommand: (event) ->
@@ -30,7 +30,7 @@ injectButton = (vimfx) ->
       else
         vim._enterMode('normal')
   })
-  module.onShutdown(-> cui.destroyWidget(BUTTON_ID))
+  module.onShutdown(-> CustomizableUI.destroyWidget(BUTTON_ID))
 
   vimfx.on('modeDisplayChange', ({vim}) ->
     {window} = vim

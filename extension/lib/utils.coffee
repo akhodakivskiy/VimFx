@@ -1,10 +1,10 @@
 # This file contains lots of different helper functions.
 
-{E10SUtils} = Cu.import('resource://gre/modules/E10SUtils.jsm', {})
-{OS} = Components.utils.import('resource://gre/modules/osfile.jsm', {})
-{PlacesUIUtils} = Cu.import('resource:///modules/PlacesUIUtils.jsm', {})
+{E10SUtils} = ChromeUtils.import('resource://gre/modules/E10SUtils.jsm')
+{OS} = ChromeUtils.import('resource://gre/modules/osfile.jsm')
+{PlacesUIUtils} = ChromeUtils.import('resource:///modules/PlacesUIUtils.jsm')
 {PrivateBrowsingUtils} =
-  Cu.import('resource://gre/modules/PrivateBrowsingUtils.jsm', {})
+  ChromeUtils.import('resource://gre/modules/PrivateBrowsingUtils.jsm')
 
 nsIClipboardHelper = Cc['@mozilla.org/widget/clipboardhelper;1']
   .getService(Ci.nsIClipboardHelper)
