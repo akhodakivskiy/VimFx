@@ -3,12 +3,7 @@
 utils = require('./utils')
 viewportUtils = require('./viewport')
 
-_Element = Ci.nsIDOMElement
-if _Element
-  isElementInstance = (el) -> el instanceof _Element
-else
-  Cu.importGlobalProperties(['Element'])
-  isElementInstance = (el) -> Element.isInstance(el)
+isElementInstance = (el) -> Element.isInstance(el)
 
 MIN_TEXTNODE_SIZE = 4
 
