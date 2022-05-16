@@ -1,3 +1,8 @@
+### 0.24.7 (2022-05-16)
+
+- Add support for user contexts (containers)
+- Switch from deprecated Cu.import to ChromeUtils.import
+
 ### 0.24.6 (2022-01-28)
 
 - fix 'gX' menupopup
