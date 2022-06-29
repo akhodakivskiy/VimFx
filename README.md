@@ -44,6 +44,8 @@ git clone https://git.gir.st/LegacyFox.git
 cd LegacyFox
 sudo make install  # set DESTDIR= for custom install location
 ```
+Get the latest release from [releases]: https://github.com/akhodakivskiy/VimFx/releases/
+Download the xpi (right click -> save link as), and open the downloaded file in firefox. Don't click on the release itself, as you won't be able to install it that way.
 
 ## Why VimFx was created
 
