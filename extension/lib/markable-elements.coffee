@@ -3,6 +3,7 @@
 utils = require('./utils')
 viewportUtils = require('./viewport')
 
+Cu.importGlobalProperties(['Element'])
 isElementInstance = (el) -> Element.isInstance(el)
 
 MIN_TEXTNODE_SIZE = 4
