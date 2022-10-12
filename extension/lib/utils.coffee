@@ -327,6 +327,7 @@ contentAreaClick = (data, browser) ->
     frameID: data.frameID, # >=fx80
     allowInheritPrincipal: true,
     openerBrowser: browser, # >=fx98
+    hasValidUserGestureActivation: true, # >=fx103
   }
 
   if data.originAttributes.userContextId
