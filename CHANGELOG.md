@@ -1,3 +1,8 @@
+### 0.25.0 (2022-11-11)
+
+- fix installation on localized/l10n versions of firefox
+- fix 'eb'
+
 ### 0.24.7 (2022-05-16)
 
 - Add support for user contexts (containers)
