@@ -32,7 +32,7 @@
     "gulp-zip": "^4.0.0",
     "marked": "^0.7.0",
     "merge2": "^1.1.0",
-    "request": "^2.81.0",
+    "request": "^2.88.2",
     "require-precompute": "^0.2.0",
     "rimraf": "^2.6.1"
   }
