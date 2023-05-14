@@ -5,8 +5,6 @@ messageManager = require('./message-manager')
 utils = require('./utils')
 prefs = require('./prefs')
 
-{OS} = ChromeUtils.import('resource://gre/modules/osfile.jsm')
-
 load = (vimfx, options = null, callback = ->) ->
   configDir = vimfx.options.config_file_directory
 
@@ -46,11 +44,11 @@ checkSandbox = (expandedDir) ->
 
 loadFile = (dir, file, scope) ->
   expandedDir = utils.expandPath(dir)
-  uri = OS.Path.toFileURI(OS.Path.join(expandedDir, file))
+  uri = PathUtils.toFileURI(PathUtils.join(expandedDir, file))
   try
     Services.scriptloader.loadSubScriptWithOptions(uri, {
       target: Object.assign({
-        __dirname: OS.Path.toFileURI(expandedDir),
+        __dirname: PathUtils.toFileURI(expandedDir),
         Services: Services
       }, scope)
       charset: 'UTF-8'

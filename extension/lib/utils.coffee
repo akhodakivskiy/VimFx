@@ -1,7 +1,6 @@
 # This file contains lots of different helper functions.
 
 {E10SUtils} = ChromeUtils.import('resource://gre/modules/E10SUtils.jsm')
-{OS} = ChromeUtils.import('resource://gre/modules/osfile.jsm')
 {PlacesUIUtils} = ChromeUtils.import('resource:///modules/PlacesUIUtils.jsm')
 {PrivateBrowsingUtils} =
   ChromeUtils.import('resource://gre/modules/PrivateBrowsingUtils.jsm')
@@ -710,7 +709,7 @@ sum = (numbers) -> numbers.reduce(((sum, number) -> sum + number), 0)
 
 expandPath = (path) ->
   if path.startsWith('~/') or path.startsWith('~\\')
-    return OS.Constants.Path.homeDir + path[1..]
+    return Services.dirsvc.get('Home', Ci.nsIFile).path + path[1..]
   else
     return path
 
