@@ -27,7 +27,7 @@ XULMenuListElement = Ci.nsIDOMXULMenuListElement
 getDocument = (e) -> if e.parentNode? then arguments.callee(e.parentNode) else e
 
 isInShadowRoot = (element) ->
-  ShadowRoot? and getDocument(element) instanceof ShadowRoot
+  getDocument(element) instanceof element.ownerGlobal.ShadowRoot
 
 isXULElement = (element) ->
   XUL_NS = 'http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul'
