@@ -1,3 +1,9 @@
+### 0.26.0 (2023-06-03)
+
+- Port osfile.jsm usage to IOUtils (#993)
+- Fix following links in shadow roots
+- **Require Firefox 84**
+
 ### 0.25.0 (2022-11-11)
 
 - fix installation on localized/l10n versions of firefox
