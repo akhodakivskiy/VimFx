@@ -287,14 +287,10 @@ tryPoint = (elementData, elementRect, x, dx, y, dy, tryRight = 0) ->
   return false if newX > viewport.right or newX > elementRect.right
   return tryPoint(elementData, elementRect, newX, 0, y, 0, tryRight - 1)
 
-# In XUL documents there are “anonymous” elements. These are never returned by
-# `document.elementFromPoint` but their closest non-anonymous parents are.
-# The same is true for Web Components (where their hosts are returned), with
-# the further caveat that they might be nested.
-# Note: getBindingParent() has been removed from fx72.
+# Elements in shadows roots may be “anonymous”. These are never returned by
+# `document.elementFromPoint` but their host elements are.
 normalize = (element) ->
-  element = e while (e = element.ownerDocument.getBindingParent?(element))?
-  element = e while (e = element.containingShadowRoot?.host)? # >=fx72
+  element = e while (e = element.containingShadowRoot?.host)?
   element = element.parentNode while element.prefix?
   return element
 
