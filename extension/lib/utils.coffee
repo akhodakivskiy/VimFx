@@ -325,6 +325,8 @@ contentAreaClick = (data, browser) ->
     allowInheritPrincipal: true,
     openerBrowser: browser, # >=fx98
     hasValidUserGestureActivation: true, # >=fx103
+    triggeringRemoteType: browser.browsingContext.currentWindowGlobal
+      .domProcess?.remoteType, # >=fx109
   }
 
   if data.originAttributes.userContextId
