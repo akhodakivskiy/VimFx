@@ -27,7 +27,10 @@ commands = {}
 
 
 commands.focus_location_bar = ({vim}) ->
-  vim.window.gURLBar.select()
+  try
+    vim.window.gURLBar.select() # fx76+
+  catch
+    vim.window.focusAndSelectUrlBar()
 
 commands.focus_search_bar = ({vim, count}) ->
   # The `.webSearch()` method opens a search engine in a tab if the search bar
@@ -754,7 +757,8 @@ commands.click_browser_element = ({vim}) ->
     })
     MarkerContainer.remove(window) # Better safe than sorry.
     markerContainer.container.classList.add('ui')
-    mainWindow = window.document.body
+    mainWindow = window.document.body or
+      window.document.getElementById('main-window') # fallback <fx72
     mainWindow.insertBefore(
       markerContainer.container,
       mainWindow.firstChild
