@@ -1,3 +1,8 @@
+### 0.26.1 (2023-06-05)
+
+- Fix loading config file in parent process (#994)
+- Revert minimal Firefox version to 68
+
 ### 0.26.0 (2023-06-03)
 
 - Port osfile.jsm usage to IOUtils (#993)
