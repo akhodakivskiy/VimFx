@@ -1,3 +1,7 @@
+### 0.26.2 (2023-06-09)
+
+- Fix loading config file under Windows (#994)
+
 ### 0.26.1 (2023-06-05)
 
 - Fix loading config file in parent process (#994)
