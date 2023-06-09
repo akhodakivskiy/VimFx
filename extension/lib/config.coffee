@@ -30,7 +30,8 @@ load = (vimfx, options = null, callback = ->) ->
 
   messageManager.send('loadConfig', null, callback)
 
-checkSandbox = (expandedDir) ->
+checkSandbox = (dir) ->
+  expandedDir = utils.expandPath(dir)
   prefix = 'security.sandbox.content'
   if prefs.root.get("#{prefix}.level") > 2
     return true
@@ -45,13 +46,14 @@ checkSandbox = (expandedDir) ->
   return not whitelisted.some((e) -> e.startsWith(expandedDir))
 
 loadFile = (dir, file, scope) ->
-  expandedDir = utils.expandPath(dir)
-  expandedFile = expandedDir + '/' + file
-  uri = Services.io.newFileURI(new FileUtils.File(expandedFile)).spec
+  expandedPath = new FileUtils.File(utils.expandPath(dir))
+  dirUri = Services.io.newFileURI(expandedPath).spec
+  expandedPath.append(file)
+  uri = Services.io.newFileURI(expandedPath).spec
   try
     Services.scriptloader.loadSubScriptWithOptions(uri, {
       target: Object.assign({
-        __dirname: Services.io.newFileURI(new FileUtils.File(expandedDir)).spec,
+        __dirname: dirUri,
         Services: Services
       }, scope)
       charset: 'UTF-8'
@@ -64,7 +66,7 @@ loadFile = (dir, file, scope) ->
     # without explanation.
     if typeof error == 'string' and
        error.startsWith('Error opening input stream (invalid filename?)') and
-       checkSandbox(expandedDir)
+       checkSandbox(dir)
       console.error("VimFx: Error loading #{file} likely due to e10s sandbox")
       console.info("Please consult VimFx' documentation on config files.")
     else
