@@ -30,11 +30,12 @@ load = (vimfx, options = null, callback = ->) ->
 
   messageManager.send('loadConfig', null, callback)
 
-checkSandbox = (dir) ->
+sandboxPreventsAccess = (dir) ->
   expandedDir = utils.expandPath(dir)
+
   prefix = 'security.sandbox.content'
-  if prefs.root.get("#{prefix}.level") > 2
-    return true
+  if prefs.root.get("#{prefix}.level") <= 2
+    return false
 
   if Services.appinfo.OS == 'Darwin'
     whitelisted = [
@@ -43,6 +44,7 @@ checkSandbox = (dir) ->
     ]
   else
     whitelisted = prefs.root.get("#{prefix}.read_path_whitelist").split(',')
+
   return not whitelisted.some((e) -> e.startsWith(expandedDir))
 
 loadFile = (dir, file, scope) ->
@@ -66,7 +68,7 @@ loadFile = (dir, file, scope) ->
     # without explanation.
     if typeof error == 'string' and
        error.startsWith('Error opening input stream (invalid filename?)') and
-       checkSandbox(dir)
+       sandboxPreventsAccess(dir)
       console.error("VimFx: Error loading #{file} likely due to e10s sandbox")
       console.info("Please consult VimFx' documentation on config files.")
     else
