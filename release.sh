@@ -96,7 +96,7 @@ sed -i "/\"version\":/s/$last_version/$next_version/" package.json
 # commit and tag release
 git add CHANGELOG.md package.json
 git commit -m "VimFx v$next_version"
-git tag "v$next_version"
+git tag -a "v$next_version" -m "VimFx v$next_version"
 
 # build xpi for release on github
 npm --silent run -- gulp --silent xpi --unlisted
