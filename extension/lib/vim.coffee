@@ -8,8 +8,6 @@ messageManager = require('./message-manager')
 ScrollableElements = require('./scrollable-elements')
 utils = require('./utils')
 
-ChromeWindow = Ci.nsIDOMChromeWindow
-
 class Vim
   constructor: (browser, @_parent) ->
     @mode = undefined
@@ -88,7 +86,7 @@ class Vim
            @_isUIElement(event.originalTarget)
 
   _isUIElement: (element) ->
-    return (element.ownerGlobal instanceof ChromeWindow or
+    return (element.ownerGlobal.isChromeWindow or
             utils.isDockedDevtoolsElement(element)) and
            element != @window.gBrowser.selectedBrowser
 
