@@ -1,3 +1,9 @@
+### 0.26.3 (2023-07-02)
+
+- fix input field detection on Firefox 116 (#996)
+
+Thanks to @askii2
+
 ### 0.26.2 (2023-06-09)
 
 - Fix loading config file under Windows (#994)
