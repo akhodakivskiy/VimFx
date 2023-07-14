@@ -16,7 +16,8 @@ do (global = this) ->
   BUILD_TIME = do -> # @echo BUILD_TIME
   REQUIRE_DATA = do -> # @echo REQUIRE_DATA
 
-  {Services} = ChromeUtils.import('resource://gre/modules/Services.jsm')
+  Services = globalThis.Services or
+    ChromeUtils.import('resource://gre/modules/Services.jsm').Services # <=fx103
 
   shutdownHandlers = []
 
