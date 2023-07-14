@@ -1,3 +1,7 @@
+### 0.26.4 (2023-07-14)
+
+- make compatible with Firefox 117 (Services.jsm removal)
+
 ### 0.26.3 (2023-07-02)
 
 - fix input field detection on Firefox 116 (#996)
