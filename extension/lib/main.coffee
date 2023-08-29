@@ -120,9 +120,9 @@ module.exports = (data, reason) ->
       FISSION_ISOLATION_PREF = 'fission.webContentIsolationStrategy'
       IGNORE_FISSION_PREF = 'ignore_fission'
       isFissionWindow = window.docShell.nsILoadContext.useRemoteSubframes
-      isFissionEnabled = prefs.root.get(FISSION_ENABLED_PREF)
-      isIsolateNothing = (try prefs.root.get(FISSION_ISOLATION_PREF)) == 0
-      isFissionIgnored = (try prefs.get(IGNORE_FISSION_PREF)) == true
+      isFissionEnabled = prefs.root.get(FISSION_ENABLED_PREF, false)
+      isIsolateNothing = prefs.root.get(FISSION_ISOLATION_PREF, null) == 0
+      isFissionIgnored = prefs.get(IGNORE_FISSION_PREF, false)
       if isFissionWindow and isFissionEnabled and not isIsolateNothing and
           not isFissionIgnored
         console.error('VimFx: Fission is enabled in your browser.'

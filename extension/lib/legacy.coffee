@@ -10,7 +10,7 @@ applyMigrations = (migrations) ->
     pref = "migration.#{index}.applied"
     # This allows to manually choose migrations to apply. Be careful, though,
     # since some migrations might have to run in order!
-    unless prefs.has(pref) and prefs.get(pref)
+    unless prefs.get(pref, false)
       migration()
       prefs.set(pref, true)
   return

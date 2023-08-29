@@ -16,17 +16,16 @@ branches = {
   }
 }
 
-get = (branch, key) ->
+get = (branch, key, fallback) ->
+  args = [arguments...][1..] # passes key and optionally fallback to get*Pref()
+
   return switch branch.getPrefType(key)
     when branch.PREF_BOOL
-      branch.getBoolPref(key)
+      branch.getBoolPref(args...)
     when branch.PREF_INT
-      branch.getIntPref(key)
+      branch.getIntPref(args...)
     when branch.PREF_STRING
-      if branch.getStringPref
-        branch.getStringPref(key)
-      else
-        branch.getComplexValue(key, Ci.nsISupportsString).data
+      branch.getStringPref(args...)
 
 set = (branch, key, value) ->
   switch typeof value
@@ -35,13 +34,7 @@ set = (branch, key, value) ->
     when 'number'
       branch.setIntPref(key, value) # `value` will be `Math.floor`ed.
     when 'string'
-      if branch.setStringPref
-        branch.setStringPref(key, value)
-      else
-        str = Cc['@mozilla.org/supports-string;1']
-          .createInstance(Ci.nsISupportsString)
-        str.data = value
-        branch.setComplexValue(key, Ci.nsISupportsString, str)
+      branch.setStringPref(key, value)
     else
       if value == null
         branch.clearUserPref(key)

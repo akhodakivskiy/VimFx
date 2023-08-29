@@ -2,7 +2,7 @@ assert = require('./assert')
 prefs = require('../lib/prefs')
 
 resetPrefOnTeardown = (pref, teardown) ->
-  previousValue = if prefs.has(pref) then prefs.get(pref) else null
+  previousValue = prefs.get(pref, null)
   teardown(->
     prefs.set(pref, previousValue)
   )

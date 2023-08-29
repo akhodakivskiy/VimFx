@@ -40,7 +40,7 @@ createConfigAPI = (vimfx, {allowDeprecated = true} = {}) -> {
         vimfx.options[pref] = value
         onShutdown(vimfx, -> vimfx.options[pref] = previousValue)
       when pref of defaults.all_prefs or pref?.startsWith('custom.')
-        previousValue = if prefs.has(pref) then prefs.get(pref) else null
+        previousValue = prefs.get(pref, null)
         prefs.set(pref, value)
         onShutdown(vimfx, -> prefs.set(pref, previousValue))
       else
