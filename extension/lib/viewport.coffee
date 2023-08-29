@@ -10,8 +10,6 @@ getPosition = (element) ->
 
 isFixed = (element) -> getPosition(element) == 'fixed'
 
-isFixedOrAbsolute = (element) -> getPosition(element) in ['fixed', 'absolute']
-
 adjustRectToViewport = (rect, viewport) ->
   # The right and bottom values are subtracted by 1 because
   # `document.elementFromPoint(right, bottom)` does not return the element
@@ -178,15 +176,15 @@ getFixedHeaderAndFooter = (window) ->
   for candidate in candidates
     rect = candidate.getBoundingClientRect()
     continue unless rect.height <= maxHeight and rect.width >= minWidth
-    # Checking for `position: fixed;` or `position: absolute;` is the absolutely
-    # most expensive operation, so that is done last.
+    # Checking for `position: fixed;` is the absolutely most expensive
+    # operation, so that is done last.
     switch
       when rect.top <= headerBottom and rect.bottom > headerBottom and
-           isFixedOrAbsolute(candidate)
+           isFixed(candidate)
         header = candidate
         headerBottom = rect.bottom
       when rect.bottom >= footerTop and rect.top < footerTop and
-           isFixedOrAbsolute(candidate)
+           isFixed(candidate)
         footer = candidate
         footerTop = rect.top
 
