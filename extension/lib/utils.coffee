@@ -4,6 +4,8 @@
   .importESModule('resource:///modules/PlacesUIUtils.sys.mjs')
 {PrivateBrowsingUtils} = ChromeUtils
   .importESModule('resource://gre/modules/PrivateBrowsingUtils.sys.mjs')
+{WebNavigationFrames} = ChromeUtils
+  .importESModule('resource://gre/modules/WebNavigationFrames.sys.mjs')
 
 nsIClipboardHelper = Cc['@mozilla.org/widget/clipboardhelper;1']
   .getService(Ci.nsIClipboardHelper)
@@ -313,16 +315,17 @@ contentAreaClick = (data, browser) ->
   # our version is only invoked from the parent process, so we can pass
   # data.csp and data.referrerInfo without calling the E10SUtils helpers.
   window = browser.ownerGlobal
+  wgp = window.browsingContext.currentWindowGlobal
 
   params = {
     charset: browser.characterSet,
     referrerInfo: data.referrerInfo # passed unserialized
-    isContentWindowPrivate: data.isContentWindowPrivate,
-    originPrincipal: data.originPrincipal,
-    originStoragePrincipal: data.originStoragePrincipal,
+    isContentWindowPrivate: wgp.browsingContext.usePrivateBrowsing,
+    originPrincipal: wgp.documentPrincipal,
+    originStoragePrincipal: wgp.documentStoragePrincipal,
     triggeringPrincipal: data.triggeringPrincipal,
     csp: data.csp # passed unserialized
-    frameID: data.frameID,
+    frameID: WebNavigationFrames.getFrameId(wgp.browsingContext),
     allowInheritPrincipal: true,
     openerBrowser: browser,
     hasValidUserGestureActivation: true,
