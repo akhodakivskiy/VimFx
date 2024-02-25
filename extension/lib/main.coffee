@@ -125,7 +125,8 @@ module.exports = (data, reason) ->
           not isFissionIgnored
         console.error('VimFx: Fission is enabled in your browser.'
           'VimFx will not be able to interact with third party iframes.')
-        console.info("Please consult VimFx' documentation on Known Bugs.")
+        docs = "#{HOMEPAGE}/blob/master/documentation/known-bugs.md#fission"
+        console.info("Please consult VimFx' documentation: #{docs}")
 
     callback(true)
   )

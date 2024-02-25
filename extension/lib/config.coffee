@@ -69,8 +69,11 @@ loadFile = (dir, file, scope) ->
     if typeof error == 'string' and
        error.startsWith('Error opening input stream (invalid filename?)') and
        sandboxPreventsAccess(dir)
+      # coffeelint: disable=max_line_length
+      docs = "#{HOMEPAGE}/blob/master/documentation/config-file.md#on-process-sandboxing"
+      # coffeelint: enable=max_line_length
       console.error("VimFx: Error loading #{file} likely due to e10s sandbox")
-      console.info("Please consult VimFx' documentation on config files.")
+      console.info("Please consult VimFx' documentation: {docs}")
     else
       console.error("VimFx: Error loading #{file}", uri, error)
     return error
