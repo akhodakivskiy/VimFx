@@ -12,6 +12,7 @@ do (global = this) ->
 
   {classes: Cc, interfaces: Ci, utils: Cu} = Components
   ADDON_PATH = do -> # @echo ADDON_PATH
+  HOMEPAGE = do -> # @echo HOMEPAGE
   IS_FRAME_SCRIPT = (typeof content != 'undefined')
   BUILD_TIME = do -> # @echo BUILD_TIME
   REQUIRE_DATA = do -> # @echo REQUIRE_DATA
@@ -47,7 +48,7 @@ do (global = this) ->
         require: (path) -> require.call(null, path, moduleRoot, currentDir)
         module, exports: module.exports
         Cc, Ci, Cu, Services
-        ADDON_PATH, BUILD_TIME
+        ADDON_PATH, BUILD_TIME, HOMEPAGE
         IS_FRAME_SCRIPT
         FRAME_SCRIPT_ENVIRONMENT: if IS_FRAME_SCRIPT then global else null
       }

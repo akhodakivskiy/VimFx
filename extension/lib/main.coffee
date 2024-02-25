@@ -20,8 +20,6 @@ VimFx = require('./vimfx')
 test = require('../test/index')
 # @endif
 
-{AddonManager} = ChromeUtils.import('resource://gre/modules/AddonManager.jsm')
-
 module.exports = (data, reason) ->
   # Set default prefs and apply migrations as early as possible.
   prefs.default.init()
@@ -33,7 +31,6 @@ module.exports = (data, reason) ->
   vimfx = new VimFx(modes, parsedOptions)
   vimfx.id = data.id
   vimfx.version = data.version
-  AddonManager.getAddonByID(vimfx.id).then( (info) -> vimfx.info = info )
 
   utils.loadCss("#{ADDON_PATH}/skin/style.css")
 

@@ -5,6 +5,7 @@
     "min": "68.0",
     "max": "*"
   },
+  "homepage": "https://github.com/akhodakivskiy/VimFx",
   "license": "MIT",
   "private": true,
   "scripts": {

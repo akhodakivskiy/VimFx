@@ -66,6 +66,7 @@ gulp.task('coffee', ->
     .pipe(preprocess({context: {
       BUILD_TIME
       ADDON_PATH: JSON.stringify(ADDON_PATH)
+      HOMEPAGE: JSON.stringify(pkg.homepage)
       REQUIRE_DATA: JSON.stringify(precompute('.'), null, 2)
       TESTS:
         if test
@@ -110,6 +111,7 @@ gulp.task('install.rdf', ->
     .pipe(template({
       idSuffix: if '--unlisted' in argv or '-u' in argv then '-unlisted' else ''
       version: pkg.version
+      homepage: pkg.homepage
       minVersion: pkg.firefoxVersions.min
       maxVersion: pkg.firefoxVersions.max
       creator, developers, contributors, translators
