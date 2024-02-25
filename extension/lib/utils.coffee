@@ -1,7 +1,5 @@
 # This file contains lots of different helper functions.
 
-{E10SUtils} = ChromeUtils
-  .importESModule('resource://gre/modules/E10SUtils.sys.mjs')
 {PlacesUIUtils} = ChromeUtils
   .importESModule('resource:///modules/PlacesUIUtils.sys.mjs')
 {PrivateBrowsingUtils} = ChromeUtils
@@ -311,17 +309,19 @@ contentAreaClick = (data, browser) ->
   # This function is adapted from the same-named one currently in
   # mozilla-central/browser/actors/ClickHandlerParent.jsm. Keep in sync!
   # Note: Our version is shortened substantially and unlike Mozilla, we pass in
-  # the browser object instead of extracting it from the browsingContext.
+  # the browser object instead of extracting it from the browsingContext. Also,
+  # our version is only invoked from the parent process, so we can pass
+  # data.csp and data.referrerInfo without calling the E10SUtils helpers.
   window = browser.ownerGlobal
 
   params = {
     charset: browser.characterSet,
-    referrerInfo: E10SUtils.deserializeReferrerInfo(data.referrerInfo),
+    referrerInfo: data.referrerInfo # passed unserialized
     isContentWindowPrivate: data.isContentWindowPrivate,
     originPrincipal: data.originPrincipal,
     originStoragePrincipal: data.originStoragePrincipal,
     triggeringPrincipal: data.triggeringPrincipal,
-    csp: if data.csp then E10SUtils.deserializeCSP(data.csp) else null,
+    csp: data.csp # passed unserialized
     frameID: data.frameID,
     allowInheritPrincipal: true,
     openerBrowser: browser,

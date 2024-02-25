@@ -549,19 +549,26 @@ helper_follow_clickable = (options, args) ->
         # links using the mouse. Using that instead of simply
         # `gBrowser.loadOneTab(url, options)` gives better interoperability with
         # other add-ons, such as Tree Style Tab and BackTrack Tab History.
-        reset = prefs.root.tmp('browser.tabs.loadInBackground', true)
+        referrerInfo = Cc['@mozilla.org/referrer-info;1']
+          .createInstance(Ci.nsIReferrerInfo)
+        referrerInfo.initWithDocument(window.document)
+        loadInBackground = prefs.root.get('browser.tabs.loadInBackground')
+
         utils.contentAreaClick({
           href: marker.wrapper.href
-          shiftKey: not inBackground
+          shiftKey: inBackground != loadInBackground
           ctrlKey: true
           metaKey: true
+          altKey: false
+          button: 0 # primary
+          csp: window.document.csp
+          referrerInfo
           originAttributes: helper_add_user_context_id(
             vim.browser.ownerGlobal.gBrowser,
             window.document.nodePrincipal?.originAttributes ? {}
           )
           triggeringPrincipal: window.document.nodePrincipal
         }, vim.browser)
-        reset()
       )
 
     # The point of “clicking” scrollable elements is focusing them (which is
