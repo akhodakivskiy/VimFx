@@ -2,7 +2,7 @@
   "name": "VimFx",
   "version": "0.26.4",
   "firefoxVersions": {
-    "min": "68.0",
+    "min": "115.0",
     "max": "*"
   },
   "homepage": "https://github.com/akhodakivskiy/VimFx",

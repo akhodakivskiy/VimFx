@@ -5,7 +5,8 @@ messageManager = require('./message-manager')
 utils = require('./utils')
 prefs = require('./prefs')
 
-{FileUtils} = ChromeUtils.import('resource://gre/modules/FileUtils.jsm')
+{FileUtils} =
+  ChromeUtils.importESModule('resource://gre/modules/FileUtils.sys.mjs')
 
 load = (vimfx, options = null, callback = ->) ->
   configDir = vimfx.options.config_file_directory

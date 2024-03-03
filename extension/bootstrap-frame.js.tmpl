@@ -1,4 +1,3 @@
-const Services = globalThis.Services || ChromeUtils.import("resource://gre/modules/Services.jsm").Services;
 Services.scriptloader.loadSubScript(
   Services.io.newURI('{{{ ADDON_PATH }}}/content/bootstrap.js', null, null).spec,
   this,

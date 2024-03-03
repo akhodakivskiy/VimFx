@@ -1,6 +1,6 @@
 # VimFx – Vim keyboard shortcuts for Firefox
 
-**Note:** VimFx is a _legacy_ extension for Firefox 68+, requiring the
+**Note:** VimFx is a _legacy_ extension for Firefox 115+, requiring the
 [LegacyFox] shim ([see below]).
 
 [LegacyFox]: https://gir.st/blog/legacyfox.htm
