@@ -24,8 +24,8 @@ XULButtonElement = Ci.nsIDOMXULButtonElement
 XULControlElement = Ci.nsIDOMXULControlElement
 XULMenuListElement = Ci.nsIDOMXULMenuListElement
 
-# Traverse the DOM upwards until we hit its containing document (most likely an
-# HTMLDocument or (<=fx68) XULDocument) or the ShadowRoot.
+# Traverse the DOM upwards until we hit its containing document or the
+# ShadowRoot.
 getDocument = (e) -> if e.parentNode? then arguments.callee(e.parentNode) else e
 
 isInShadowRoot = (element) ->
@@ -99,8 +99,7 @@ isDevtoolsWindow = (window) ->
   # SecurityError; the `try` around it makes it `undefined` in such a case.
   return (try window.location?.href) in [
     'about:devtools-toolbox'
-    'chrome://devtools/content/framework/toolbox.xul'
-    'chrome://devtools/content/framework/toolbox.xhtml' # fx72+
+    'chrome://devtools/content/framework/toolbox.xhtml'
   ]
 
 # Note: this is possibly a bit overzealous, but Works For Now™.
@@ -318,19 +317,17 @@ contentAreaClick = (data, browser) ->
   params = {
     charset: browser.characterSet,
     referrerInfo: E10SUtils.deserializeReferrerInfo(data.referrerInfo),
-    allowMixedContent: data.allowMixedContent, # <=fx88
     isContentWindowPrivate: data.isContentWindowPrivate,
     originPrincipal: data.originPrincipal,
     originStoragePrincipal: data.originStoragePrincipal,
     triggeringPrincipal: data.triggeringPrincipal,
     csp: if data.csp then E10SUtils.deserializeCSP(data.csp) else null,
-    frameOuterWindowID: data.frameOuterWindowID, # <=fx79
-    frameID: data.frameID, # >=fx80
+    frameID: data.frameID,
     allowInheritPrincipal: true,
-    openerBrowser: browser, # >=fx98
-    hasValidUserGestureActivation: true, # >=fx103
+    openerBrowser: browser,
+    hasValidUserGestureActivation: true,
     triggeringRemoteType: browser.browsingContext.currentWindowGlobal
-      .domProcess?.remoteType, # >=fx109
+      .domProcess?.remoteType,
   }
 
   if data.originAttributes.userContextId
@@ -400,9 +397,8 @@ simulateMouseEvents = (element, sequence, browserOffset) ->
       element.dispatchEvent(mouseEvent)
     else
       try
-        (window.windowUtils.dispatchDOMEventViaPresShellForTesting or
-         window.windowUtils.dispatchDOMEventViaPresShell # < fx73
-        )(element, mouseEvent)
+        window.windowUtils
+          .dispatchDOMEventViaPresShellForTesting(element, mouseEvent)
       catch error
         if error.result != Cr.NS_ERROR_UNEXPECTED
           throw error

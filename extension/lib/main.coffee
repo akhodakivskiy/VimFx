@@ -114,8 +114,8 @@ module.exports = (data, reason) ->
       )
 
       # check whether Fission is enabled, and warn the user if so.
-      FISSION_ENABLED_PREF = 'fission.autostart' # fx68+
-      FISSION_ISOLATION_PREF = 'fission.webContentIsolationStrategy' # fx94+
+      FISSION_ENABLED_PREF = 'fission.autostart'
+      FISSION_ISOLATION_PREF = 'fission.webContentIsolationStrategy'
       IGNORE_FISSION_PREF = 'ignore_fission'
       isFissionWindow = window.docShell.nsILoadContext.useRemoteSubframes
       isFissionEnabled = prefs.root.get(FISSION_ENABLED_PREF)
