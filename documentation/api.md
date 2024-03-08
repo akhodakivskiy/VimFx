@@ -932,13 +932,14 @@ returns the DOM element associated with that id. If no element can be found,
 [commands.coffee]: ../extension/lib/commands.coffee
 [vim.coffee]: ../extension/lib/vim.coffee
 
+<!-- NOTE: documentation for Browser, Message Manager and TabSelect did not survive the MDN purge -->
 [`event.key`]: https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key
 [`event.code`]: https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/code
 [`Window`]: https://developer.mozilla.org/en-US/docs/Web/API/Window
-[`Browser`]: https://developer.mozilla.org/en-US/docs/Mozilla/Tech/XUL/browser
+[`Browser`]: https://web.archive.org/web/20210216134001/https://developer.mozilla.org/en-US/docs/Archive/Mozilla/XUL/browser
 [`window.location`]: https://developer.mozilla.org/en-US/docs/Web/API/Location
 [`URL`]: https://developer.mozilla.org/en-US/docs/Web/API/URL
-[Message Manager]: https://developer.mozilla.org/en-US/Firefox/Multiprocess_Firefox/Message_Manager
-[TabSelect]: https://developer.mozilla.org/en-US/docs/Web/Events/TabSelect
-[web console]: https://developer.mozilla.org/en-US/docs/Tools/Web_Console
-[about:config]: http://kb.mozillazine.org/About:config
+[Message Manager]: https://web.archive.org/web/20210515122642/https://developer.mozilla.org/en-US/docs/Mozilla/Firefox/Multiprocess_Firefox/Message_manager
+[TabSelect]: https://web.archive.org/web/20180512135723/https://developer.mozilla.org/en-US/docs/Web/Events/TabSelect
+[web console]: https://firefox-source-docs.mozilla.org/devtools-user/web_console/index.html
+[about:config]: https://kb.mozillazine.org/About:config

@@ -24,23 +24,21 @@ the bug.
 IPC between processes. It is likely that the BootstrapLoader would need to be
 adapted to handle this, which is not happening unless someone else does it. -->
 
-[bfcache]: https://web.dev/bfcache/
+[bfcache]: https://web.dev/articles/bfcache
 
 ## Fission
 
 **Affected**: Firefox >= 96  
 **Workaround**: `fission.webContentIsolationStrategy;0`
 
-With [Fission] enabled, VimFx can't inspect out-of-process iframes.
+With [Fission] enabled, VimFx doesn't work in out-of-process iframes.
 
 With Fission, sometimes called *Site Isolation*, VimFx cannot place hint markers
 or detect input elements inside iframes from a different domain to the top
 document. We will instead enter insert mode whenever such an iframe is active.
 Hit Escape or click outside the iframe to let VimFx re-gain control. Setting
 `fission.webContentIsolationStrategy` to `0` in `about:config` only disables the
-iframe part of Fission, but is available only since Firefox 94. Some Nightly
-installations were opted into Fission earlier; set `fission.autostart`
-to `false` if the main workaround is unavailable.
+iframe part of Fission.
 
 Note that as of now (Firefox 119), when `webContentIsolationStrategy` is set,
 reloading a webpage causes additional entries in the history and loss of forward

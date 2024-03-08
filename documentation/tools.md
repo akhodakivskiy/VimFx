@@ -20,7 +20,7 @@ This section describes how to install and use the tools needed to:
    If you prefer not to install `gulp` globally, you can use `npm run gulp`
    instead. For example, to create an .xpi file: `npm run gulp -- xpi`.
 
-[Node.js]: http://nodejs.org/
+[Node.js]: https://nodejs.org/
 [gulp]: https://github.com/gulpjs/gulp
 
 
@@ -48,7 +48,7 @@ To test a new verison, open the build directory in the browser and install the
 XPI from there. Sometimes, you'll have to restart Firefox after
 installation/upgrade.
 
-[Firefox Profile]: https://support.mozilla.org/en-US/kb/profile-manager-create-and-remove-firefox-profiles
+[Firefox Profile]: https://support.mozilla.org/en-US/kb/profile-manager-create-remove-switch-firefox-profiles
 [LegacyFox]: https://git.gir.st/LegacyFox.git
 
 
@@ -82,7 +82,7 @@ internally by other tasks.)
 
 - `gulp clean` removes the `build/` directory.
 
-[browser console]: https://developer.mozilla.org/en-US/docs/Tools/Browser_Console
+[browser console]: https://firefox-source-docs.mozilla.org/devtools-user/browser_console/index.html
 
 ### Management
 

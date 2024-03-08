@@ -407,7 +407,7 @@ trigger a keyboard shortcut containing `$`. _With_ this option the result is
 to trigger keyboard shortcuts such as `<a-c-a>`, but ctrl+alt keyboard shortcuts
 are [discouraged on Windows][wikipedia-altgr] anyway because of this reason.
 
-[wikipedia-altgr]: https://en.wikipedia.org/wiki/AltGr_key#Control_.2B_Alt_as_a_substitute
+[wikipedia-altgr]: https://en.wikipedia.org/wiki/AltGr_key#Ctrl.2BAlt
 
 ### `prevent_autofocus_modes`
 

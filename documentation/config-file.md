@@ -81,8 +81,8 @@ Note: The [**browser** console][browser console] (default Firefox shortcut:
 `<c-J>`) is not the same as the [_web_ console][web console] (default Firefox
 shortcut: `<c-K>`). It’s easy to mix them up as a beginner!
 
-[browser console]: https://developer.mozilla.org/en-US/docs/Tools/Browser_Console
-[web console]: https://developer.mozilla.org/en-US/docs/Tools/Web_Console
+[browser console]: https://firefox-source-docs.mozilla.org/devtools-user/browser_console/index.html
+[web console]: https://firefox-source-docs.mozilla.org/devtools-user/web_console/index.html
 [notification]: notifications.md
 
 
@@ -110,15 +110,16 @@ Both `config.js` and `frame.js` have access to the following variables:
 `frame.js` also has access to the entire standard Firefox [frame script
 environment], which might be interesting to advanced users.
 
+<!-- NOTE: docs for Components, Services, frame script environment did not survive the MDN purge -->
 [`config.js` API]: api.md#configjs-api
 [`frame.js` API]: api.md#framejs-api
 [`console`]: https://developer.mozilla.org/en-US/docs/Web/API/console
-[`Components`]: https://developer.mozilla.org/en-US/docs/Mozilla/Tech/XPCOM/Language_Bindings/Components_object
-[`Services`]: https://developer.mozilla.org/en-US/docs/Mozilla/JavaScript_code_modules/Services.jsm
-[frame script environment]: https://developer.mozilla.org/en-US/Firefox/Multiprocess_Firefox/Frame_script_environment
+[`Components`]: https://web.archive.org/web/20210614111450/https://developer.mozilla.org/en-US/docs/Mozilla/Tech/XPCOM/Language_Bindings/Components_object
+[`Services`]: https://web.archive.org/web/20210415055941/https://developer.mozilla.org/en-US/docs/Mozilla/JavaScript_code_modules/Services.jsm
+[frame script environment]: https://web.archive.org/web/20201221164134/https://developer.mozilla.org/en-US/docs/Mozilla/Firefox/Multiprocess_Firefox/Frame_script_environment
 [`Window`]: https://developer.mozilla.org/en-US/docs/Web/API/Window
-[browser console]: https://developer.mozilla.org/en-US/docs/Tools/Browser_Console
-[web console]: https://developer.mozilla.org/en-US/docs/Tools/Web_Console
+[browser console]: https://firefox-source-docs.mozilla.org/devtools-user/browser_console/index.html
+[web console]: https://firefox-source-docs.mozilla.org/devtools-user/web_console/index.html
 
 
 ## config.js
@@ -148,7 +149,7 @@ Object.entries(options).forEach(([option, value]) => vimfx.set(option, value))
 ```
 
 [custom-command-shortcuts]: api.md#user-content-custom-command-shortcuts
-[e10s]: https://developer.mozilla.org/en-US/Firefox/Multiprocess_Firefox
+[e10s]: https://firefox-source-docs.mozilla.org/dom/ipc/process_model.html
 
 
 ## frame.js
@@ -171,7 +172,7 @@ However, that’s a legacy Firefox feature that can stop working at any time, an
 can even slow Firefox down! Don’t use such methods if you come across them.)
 
 [`vimfx.send(...)`]: api.md#vimfxsendvim-message-data--null-callback--null
-[e10s]: https://developer.mozilla.org/en-US/Firefox/Multiprocess_Firefox
+[e10s]: https://firefox-source-docs.mozilla.org/dom/ipc/process_model.html
 
 
 ## When is the config file executed?
