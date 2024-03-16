@@ -1,3 +1,10 @@
+### 0.27.0 (2024-03-16)
+
+- **Require Firefox 115** and update Documentation
+- Fix (half/full) page scrolling on Github
+- Display documentation URL in browser console warnings
+- Improve opening links in background tabs (`F`)
+
 ### 0.26.4 (2023-07-14)
 
 - make compatible with Firefox 117 (Services.jsm removal)
