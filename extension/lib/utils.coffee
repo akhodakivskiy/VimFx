@@ -309,7 +309,7 @@ onRemoved = (element, fn) ->
 
 contentAreaClick = (data, browser) ->
   # This function is adapted from the same-named one currently in
-  # mozilla-central/browser/actors/ClickHandlerParent.jsm. Keep in sync!
+  # mozilla-central/browser/actors/ClickHandlerParent.sys.mjs. Keep in sync!
   # Note: Our version is shortened substantially and unlike Mozilla, we pass in
   # the browser object instead of extracting it from the browsingContext. Also,
   # our version is only invoked from the parent process, so we can pass
