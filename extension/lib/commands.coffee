@@ -32,6 +32,7 @@ commands.focus_location_bar = ({vim}) ->
 commands.focus_search_bar = ({vim, count}) ->
   # The `.webSearch()` method opens a search engine in a tab if the search bar
   # has been removed. Therefore we first check if it exists.
+  # TODO(Bug 1880913): might move to BrowserCommands too
   if vim.window.BrowserSearch.searchBar
     vim.window.BrowserSearch.webSearch()
   else
@@ -63,7 +64,7 @@ commands.go_to_root = ({vim}) ->
   vim._run('go_to_root')
 
 commands.go_home = ({vim}) ->
-  vim.window.BrowserHome()
+  (vim.window.BrowserCommands?.home or vim.window.BrowserHome)() # fx126
 
 helper_go_history = (direction, {vim, count = 1}) ->
   {window} = vim
@@ -83,9 +84,9 @@ helper_go_history = (direction, {vim, count = 1}) ->
   # better interoperability.
   if count == 1
     if direction == 'back'
-      window.BrowserBack()
+      (window.BrowserCommands?.back or window.BrowserBack)() # fx126
     else
-      window.BrowserForward()
+      (window.BrowserCommands?.forward or window.BrowserForward)() # fx126
     return
 
   SessionStore.getSessionHistory(gBrowser.selectedTab, (sessionHistory) ->
@@ -107,10 +108,16 @@ commands.history_list = ({vim}) ->
     vim.notify(translate('notification.history_list.none'))
 
 commands.reload = ({vim}) ->
-  vim.window.BrowserReload()
+  try
+    vim.window.BrowserCommands.reload() # >=fx126
+  catch
+    vim.window.BrowserReload() # <=fx125
 
 commands.reload_force = ({vim}) ->
-  vim.window.BrowserReloadSkipCache()
+  try
+    vim.window.BrowserCommands.reloadSkipCache() # >=fx126
+  catch
+    vim.window.BrowserReloadSkipCache() # <=fx125
 
 commands.reload_all = ({vim}) ->
   vim.window.gBrowser.reloadAllTabs()
@@ -124,7 +131,7 @@ commands.reload_all_force = ({vim}) ->
   return
 
 commands.stop = ({vim}) ->
-  vim.window.BrowserStop()
+  (vim.window.BrowserCommands?.stop or vim.window.BrowserStop)() # fx126
 
 commands.stop_all = ({vim}) ->
   for tab in vim.window.gBrowser.visibleTabs
@@ -277,7 +284,7 @@ commands.scroll_to_next_position =
 
 commands.tab_new = ({vim}) ->
   utils.nextTick(vim.window, ->
-    vim.window.BrowserOpenTab()
+    (vim.window.BrowserCommands?.openTab or vim.window.BrowserOpenTab)() # fx126
   )
 
 commands.tab_new_after_current = ({vim}) ->
@@ -288,7 +295,7 @@ commands.tab_new_after_current = ({vim}) ->
       newTab = event.originalTarget
       window.gBrowser.moveTabTo(newTab, newTabPosition)
     )
-    window.BrowserOpenTab()
+    (window.BrowserCommands?.openTab or window.BrowserOpenTab)() # fx126
   )
 
 commands.tab_duplicate = ({vim}) ->
