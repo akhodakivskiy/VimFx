@@ -1,3 +1,7 @@
+### 0.27.1 (2024-04-13)
+
+- fix 'H', 'L', 't', 'T', 'r', 'R', 's', 'gh' in Firefox 126
+
 ### 0.27.0 (2024-03-16)
 
 - **Require Firefox 115** and update Documentation
