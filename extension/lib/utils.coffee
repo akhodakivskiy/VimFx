@@ -339,7 +339,11 @@ contentAreaClick = (data, browser) ->
   try if not PrivateBrowsingUtils.isWindowPrivate(window)
     PlacesUIUtils.markPageAsFollowedLink(data.href)
 
-  window.openLinkIn(data.href, window.whereToOpenLink(data), params)
+  where = try
+    window.BrowserUtils.whereToOpenLink(data)  # >=fx127
+  catch
+    window.whereToOpenLink(data) # <=fx126
+  window.openLinkIn(data.href, where, params)
 
 simulateMouseEvents = (element, sequence, browserOffset) ->
   window = element.ownerGlobal
