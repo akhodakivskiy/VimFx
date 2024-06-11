@@ -21,7 +21,7 @@
     "coffeescript": "^1.12.7",
     "coffeelint": "^1.16.0",
     "coffeelint-forbidden-keywords": "^0.1.1",
-    "gulp": "^4.0.0",
+    "gulp": "^5.0.0",
     "gulp-coffee": "^2.3.4",
     "gulp-coffeelint": "^0.6.0",
     "gulp-git": "^2.4.2",
