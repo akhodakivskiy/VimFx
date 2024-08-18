@@ -102,6 +102,15 @@ isDevtoolsWindow = (window) ->
     'chrome://devtools/content/framework/toolbox.xhtml'
   ]
 
+isDisplayNone = (element) ->
+  # NOTE: this implementation relies on a quirk of firefox's offsetParent
+  # handling. the spec requires elements that have position:fixed to return
+  # null here, which firefox doesn't do. if mozilla fixes this discrepancy
+  # (bugzil.la/434678, bugzil.la/1887458), check commit history for a
+  # spec-compliant version.
+  return element.offsetParent == null and
+    element.nodeName not in ['BODY', 'HTML']
+
 # Note: this is possibly a bit overzealous, but Works For Now™.
 isDockedDevtoolsElement = (element) ->
   return element.ownerDocument.URL.startsWith('chrome://devtools/content/')
@@ -787,6 +796,7 @@ module.exports = {
   isContentEditable
   isDevtoolsElement
   isDevtoolsWindow
+  isDisplayNone
   isDockedDevtoolsElement
   isFocusable
   isIframeEditor

@@ -400,7 +400,8 @@ commands.click_marker_element = (
     targetReset = element.target
     element.target = ''
   if type == 'clickable-special' or
-     type in ['clickable', 'link'] and utils.isInShadowRoot(element)
+     type in ['clickable', 'link'] and utils.isInShadowRoot(element) or
+     utils.isDisplayNone(element) # can happen if mouseout/leave event triggered
     element.click()
   else
     sequence = switch
