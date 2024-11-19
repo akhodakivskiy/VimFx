@@ -311,7 +311,7 @@ absoluteTabIndex = (relativeIndex, gBrowser, {pinnedSeparate}) ->
   currentIndex = tabs.indexOf(selectedTab)
   absoluteIndex = currentIndex + relativeIndex
   numTabsTotal = tabs.length
-  numPinnedTabs = gBrowser._numPinnedTabs
+  numPinnedTabs = gBrowser.pinnedTabCount ? gBrowser._numPinnedTabs # fx132
 
   [numTabs, min] = switch
     when not pinnedSeparate
@@ -396,7 +396,8 @@ commands.tab_select_first = ({vim, count = 1}) ->
   )
 
 commands.tab_select_first_non_pinned = ({vim, count = 1}) ->
-  firstNonPinned = vim.window.gBrowser._numPinnedTabs
+  gBrowser = vim.window.gBrowser
+  firstNonPinned = gBrowser.pinnedTabCount ? gBrowser._numPinnedTabs # fx132
   utils.nextTick(vim.window, ->
     vim.window.gBrowser.selectTabAtIndex(firstNonPinned + count - 1)
   )
