@@ -1,6 +1,30 @@
 # Contributing code
 
 
+## Compatibility Guidelines
+
+We strive to provide a pleasant experience for our remaining users. This means
+that they should not have to worry about breaking their setup when installing
+updates (either to Firefox, VimFx, or both at the same time), as long as they
+are reasonably/somewhat up-to-date.
+
+VimFx' current maintainer, @girst, has adopted the following policy regarding
+breaking changes and Firefox compatibility:
+
+* VimFx tries to always support all versions supported by Mozilla
+  * This usually boils down to the latest ESR release of Firefox.
+  * Reason for this is that this should usually give enough overlap to
+    let users **independently update Firefox and VimFx without breakage**.
+* If a change can trivially be made backwards compatible, that is preferred.
+* Only if the patch would require major surgery, and the ESR support
+  clause is not violated, the minimum supported Firefox version will be bumped.
+  All obsolete backwards compatibility code should then be cleaned up, too.
+* This is a soft policy; if an exception cannot be avoided, so be it.
+
+Hence, a release is ideally tested on the latest Firefox release, ESR release
+and current nightly.
+
+
 ## Localizations
 
 Contribute your localization! Copy the `extension/locale/en-US` directory and go
