@@ -4,10 +4,45 @@
 
 utils = require('./utils')
 
+Cu.importGlobalProperties(['Element'])
+
 class ScrollableElements
   constructor: (@window) ->
     @elements = new Set()
     @largest = null
+
+  observeDocument: (document) ->
+    # monitors all nodes we attach this to for resize events. the callback is
+    # also triggered immediately when begining observation of an element; hence
+    # we don't need to call @addChecked/deleteChecked() seperately.
+    resizeObserver = new @window.ResizeObserver(
+      (entries, observer) =>
+        for entry in entries
+          @addChecked(entry.target)    # element may have overflowed ...
+          @deleteChecked(entry.target) # ... or underflowed.
+    )
+
+    # install an observer so we notice any newly added elements
+    mutationObserver = new @window.MutationObserver(
+      (mutationList, observer) =>
+        for mutationRecord in mutationList
+          for node in mutationRecord.addedNodes when Element.isInstance(node)
+            resizeObserver.observe(node) # cannot observe text nodes
+          for node in mutationRecord.removedNodes
+            @delete(node)
+    )
+    mutationObserver.observe(document.documentElement, {
+      childList: true # monitor added/removed nodes, ...
+      subtree: true   # ... recursively
+    })
+
+    # ingest all already existing elements once
+    ni = document.createNodeIterator(
+      document.documentElement, NodeFilter.SHOW_ELEMENT
+    )
+    while(currentNode = ni.nextNode())
+      resizeObserver.observe(currentNode)
+    return
 
   MIN_SCROLL: 5
   MIN_SCROLLABLE_ELEMENT_AREA: 25

@@ -53,6 +53,8 @@ class FrameEventManager
     @listen('pageshow', (event) =>
       [oldUrl, @currentUrl] = [@currentUrl, @vim.content.location.href]
 
+      @vim.state.scrollableElements.observeDocument(event.target)
+
       # When navigating the history, `event.persisted` is `true` (meaning that
       # the page loaded from cache) and 'readystatechange' won’t be fired, so
       # send a 'locationChange' message to make sure that the blacklist is
@@ -109,11 +111,10 @@ class FrameEventManager
       return
     )
 
+    # NOTE: overflow and underflow events are not generated for regular
+    # webpages any more since fx>=131. they are still needed on privileged
+    # pages like about:preferences.
     @listen('overflow', (event) =>
-      # XXX(fission): this eventually calls utils::containsDeep(), which if the
-      # element that caused the event sits in an out-of-process iframe, might
-      # cause a SecurityError. However, as of Nightly 78, events originating
-      # from such frames are not raised.
       target = event.originalTarget
       @vim.state.scrollableElements.addChecked(target)
     )
