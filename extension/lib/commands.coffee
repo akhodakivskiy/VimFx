@@ -33,8 +33,14 @@ commands.focus_search_bar = ({vim, count}) ->
   # The `.webSearch()` method opens a search engine in a tab if the search bar
   # has been removed. Therefore we first check if it exists.
   # TODO(Bug 1880913): might move to BrowserCommands too
-  if vim.window.BrowserSearch.searchBar
-    vim.window.BrowserSearch.webSearch()
+  if (
+    vim.window.document.getElementById('searchbar') or # >=fx137
+    vim.window.BrowserSearch?.searchBar # <=fx136
+  )
+    try
+      vim.window.SearchUIUtils.webSearch(vim.window) # >=fx137
+    catch
+      vim.window.BrowserSearch.webSearch() # <=fx136
   else
     vim.notify(translate('notification.focus_search_bar.none'))
 
