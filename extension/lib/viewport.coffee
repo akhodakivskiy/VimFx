@@ -242,6 +242,7 @@ getWindowViewport = (window) ->
     scrollWidth, scrollHeight
   } = utils.getRootElement(window.document)
   {innerWidth, innerHeight} = window # Viewport size including scrollbars.
+  #^XXX(fission): can raise NS_ERROR_XPC_SECURITY_MANAGER_VETO - see github#1011
   # When there are no scrollbars `clientWidth` and `clientHeight` might be too
   # small. Then we use `innerWidth` and `innerHeight` instead.
   width  = if scrollWidth  > innerWidth  then clientWidth  else innerWidth

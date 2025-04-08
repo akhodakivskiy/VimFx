@@ -41,6 +41,7 @@ class ScrollableElements
     @updateLargest()
 
   isScrollable: (element) ->
+    return false if Cu.isDeadWrapper(element)
     element = @quirks(element)
     return element.scrollTopMax  >= @MIN_SCROLL or
            element.scrollLeftMax >= @MIN_SCROLL

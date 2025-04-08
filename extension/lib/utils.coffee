@@ -90,7 +90,7 @@ isContentEditable = (element) ->
 isDevtoolsElement = (element) ->
   return false unless element.ownerGlobal
   return Array.prototype.some.call(
-    element.ownerGlobal.top.frames, isDevtoolsWindow
+    (try element.ownerGlobal.top.frames) or [], isDevtoolsWindow
    )
 
 isDevtoolsWindow = (window) ->
@@ -441,13 +441,16 @@ checkElementOrAncestor = (element, fn) ->
 
 clearSelectionDeep = (window, {blur = true} = {}) ->
   # The selection might be `null` in hidden frames.
-  selection = window.getSelection()
+  # accessing the selection of an out-of-process iframe raises
+  # NS_ERROR_XPC_SECURITY_MANAGER_VETO when fission is enabled.
+  # same can happen for window.frames and frameElement later.
+  selection = try window.getSelection()
   selection?.removeAllRanges()
-  # Note: accessing frameElement fails on oop iframes (fission); skip those.
-  for frame in window.frames when (try frame.frameElement)
-    clearSelectionDeep(frame, {blur})
-    # Allow parents to re-gain control of text selection.
-    frame.frameElement.blur() if blur
+  try
+    for frame in window.frames when (try frame.frameElement)
+      clearSelectionDeep(frame, {blur})
+      # Allow parents to re-gain control of text selection.
+      frame.frameElement.blur() if blur
   return
 
 containsDeep = (parent, element) ->
