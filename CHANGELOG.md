@@ -1,3 +1,11 @@
+### 0.27.3 (2025-04-08)
+
+- fix pinned tab counting for firefox 133
+- handle clicking elements that went hidden during click handler
+- fix 'O' (focus search bar) in firefox 137
+- improve stability when fission is enabled
+- fix scrolling within elements in firefox 131
+
 ### 0.27.2 (2024-05-18)
 
 - fix 'F' and 'et' in Firefox 127
