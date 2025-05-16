@@ -17,7 +17,8 @@ DOCS
 : "${release=upstream/master}"
 : "${git_user=girst}"
 : "${git_email=girst@users.noreply.github.com}"
-: "${devel_url=git@git.gir.st:VimFx.git}"
+: "${devel_url=https://git.gir.st/VimFx.git}"
+: "${devel_push=git@git.gir.st:VimFx.git}"
 : "${release_url=https://github.com/akhodakivskiy/VimFx}"
 
 set -e
@@ -51,7 +52,9 @@ git remote show | grep -q "${devel%%/*}" ||
 git remote show | grep -q "${release%%/*}" ||
 	die "there is no release remote, aborting."
 test "$(git remote get-url "${devel%%/*}")" = "$devel_url" ||
-	die "development remote not set up, aborting."
+	die "development remote (fetch) not set up, aborting."
+test "$(git remote get-url --push "${devel%%/*}")" = "$devel_push" ||
+	die "development remote (push) not set up, aborting."
 test "$(git remote get-url "${release%%/*}")" = "$release_url" ||
 	die "release remote not set up, aborting."
 
