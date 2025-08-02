@@ -1,3 +1,7 @@
+### 0.27.4 (2025-08-02)
+
+- fix startup on firefox 141
+
 ### 0.27.3 (2025-04-08)
 
 - fix pinned tab counting for firefox 133
