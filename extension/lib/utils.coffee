@@ -1,11 +1,29 @@
 # This file contains lots of different helper functions.
 
-{PlacesUIUtils} = ChromeUtils
-  .importESModule('resource:///modules/PlacesUIUtils.sys.mjs')
-{PrivateBrowsingUtils} = ChromeUtils
-  .importESModule('resource://gre/modules/PrivateBrowsingUtils.sys.mjs')
-{WebNavigationFrames} = ChromeUtils
-  .importESModule('resource://gre/modules/WebNavigationFrames.sys.mjs')
+{PlacesUIUtils} = try
+  ChromeUtils.importESModule(
+    'moz-src:///browser/components/places/PlacesUIUtils.sys.mjs'
+  )
+catch
+  ChromeUtils.importESModule(
+    'resource:///modules/PlacesUIUtils.sys.mjs'
+  )
+{PrivateBrowsingUtils} = try
+  ChromeUtils.importESModule(
+    'moz-src:///toolkit/modules/PrivateBrowsingUtils.sys.mjs'
+  )
+catch
+  ChromeUtils.importESModule(
+    'resource://gre/modules/PrivateBrowsingUtils.sys.mjs'
+  )
+{WebNavigationFrames} = try
+  ChromeUtils.importESModule(
+    'moz-src:///toolkit/components/extensions/WebNavigationFrames.sys.mjs'
+  )
+catch
+  ChromeUtils.importESModule(
+    'resource://gre/modules/WebNavigationFrames.sys.mjs'
+  )
 
 nsIClipboardHelper = Cc['@mozilla.org/widget/clipboardhelper;1']
   .getService(Ci.nsIClipboardHelper)

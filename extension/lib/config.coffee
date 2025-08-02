@@ -5,7 +5,9 @@ messageManager = require('./message-manager')
 utils = require('./utils')
 prefs = require('./prefs')
 
-{FileUtils} =
+{FileUtils} = try
+  ChromeUtils.importESModule('moz-src:///toolkit/modules/FileUtils.sys.mjs')
+catch
   ChromeUtils.importESModule('resource://gre/modules/FileUtils.sys.mjs')
 
 load = (vimfx, options = null, callback = ->) ->

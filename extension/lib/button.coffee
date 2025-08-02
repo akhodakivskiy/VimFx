@@ -4,7 +4,11 @@ help = require('./help')
 translate = require('./translate')
 utils = require('./utils')
 
-{CustomizableUI} =
+{CustomizableUI} = try
+  ChromeUtils.importESModule(
+    'moz-src:///browser/components/customizableui/CustomizableUI.sys.mjs'
+  )
+catch
   ChromeUtils.importESModule('resource:///modules/CustomizableUI.sys.mjs')
 
 BUTTON_ID = 'VimFxButton'
