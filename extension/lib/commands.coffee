@@ -298,7 +298,13 @@ commands.tab_new_after_current = ({vim}) ->
   utils.nextTick(window, ->
     utils.listenOnce(window, 'TabOpen', (event) ->
       newTab = event.originalTarget
-      window.gBrowser.moveTabTo(newTab, newTabPosition)
+      index = if window.gBrowser.moveTabTo.length == 1
+        # fx>=138: moveTabTo(element, {tabIndex, ...}={})
+        {tabIndex: newTabPosition}
+      else
+        # fx<=137: moveTabTo(aTab, aIndex, aKeepRelatedTabs)
+        newTabPosition
+      window.gBrowser.moveTabTo(newTab, index)
     )
     (window.BrowserCommands?.openTab ? window.BrowserOpenTab)() # fx126
   )
@@ -384,6 +390,10 @@ helper_move_tab = (direction, {vim, count = 1}) ->
   {gBrowser} = vim.window
   index = absoluteTabIndex(direction * count, gBrowser, {pinnedSeparate: true})
   utils.nextTick(vim.window, ->
+    index = if gBrowser.moveTabTo.length == 1
+      {tabIndex: index} # fx>=138
+    else
+      index # fx<=137 (c.f. tab_new_after_current)
     gBrowser.moveTabTo(gBrowser.selectedTab, index)
   )
 
