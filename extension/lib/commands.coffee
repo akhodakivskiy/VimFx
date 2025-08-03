@@ -432,7 +432,10 @@ commands.tab_close = ({vim, count = 1}) ->
 commands.tab_restore = ({vim, count = 1}) ->
   utils.nextTick(vim.window, ->
     for index in [0...count] by 1
-      restoredTab = vim.window.undoCloseTab()
+      restoredTab = try
+        vim.window.SessionWindowUI.undoCloseTab(vim.window); # >=fx141
+      catch
+        vim.window.undoCloseTab() # <=fx140
       if not restoredTab and index == 0
         vim.notify(translate('notification.tab_restore.none'))
         break
