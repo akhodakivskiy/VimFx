@@ -1,3 +1,8 @@
+### 0.27.5 (2025-08-05)
+
+- fix 'X' in mozilla141 (#1015)
+- fix 'T', 'gJ', 'gK' in mozilla138
+
 ### 0.27.4 (2025-08-02)
 
 - fix startup on firefox 141
