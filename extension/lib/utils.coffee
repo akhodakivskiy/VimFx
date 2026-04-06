@@ -339,8 +339,8 @@ contentAreaClick = (data, browser) ->
   # mozilla-central/browser/actors/ClickHandlerParent.sys.mjs. Keep in sync!
   # Note: Our version is shortened substantially and unlike Mozilla, we pass in
   # the browser object instead of extracting it from the browsingContext. Also,
-  # our version is only invoked from the parent process, so we can pass
-  # data.csp and data.referrerInfo without calling the E10SUtils helpers.
+  # our version is only invoked from the parent process, so we can pass .csp,
+  # .referrerInfo and .policyContainer without calling the E10SUtils helpers.
   window = browser.ownerGlobal
   wgp = window.browsingContext.currentWindowGlobal
 
@@ -351,7 +351,8 @@ contentAreaClick = (data, browser) ->
     originPrincipal: wgp.documentPrincipal,
     originStoragePrincipal: wgp.documentStoragePrincipal,
     triggeringPrincipal: data.triggeringPrincipal,
-    csp: data.csp # passed unserialized
+    csp: data.csp # passed unserialized; fx<=141
+    policyContainer: data.policyContainer, # passed unserialized; fx>=142
     frameID: WebNavigationFrames.getFrameId(wgp.browsingContext),
     allowInheritPrincipal: true,
     openerBrowser: browser,
