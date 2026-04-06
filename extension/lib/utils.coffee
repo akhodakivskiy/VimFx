@@ -356,6 +356,7 @@ contentAreaClick = (data, browser) ->
     allowInheritPrincipal: true,
     openerBrowser: browser,
     hasValidUserGestureActivation: true,
+    textDirectiveUserActivation: true,
     triggeringRemoteType: browser.browsingContext.currentWindowGlobal
       .domProcess?.remoteType,
   }
