@@ -1,7 +1,7 @@
 # This file manages a collection of hint markers. This involves creating them,
 # assigning hints to them and matching them against pressed keys.
 
-huffman = require('n-ary-huffman')
+huffman = require('./n-ary-huffman')
 Marker = require('./marker')
 utils = require('./utils')
 

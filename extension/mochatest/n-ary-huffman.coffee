@@ -4,7 +4,7 @@
 ###
 
 assert  = require('assert')
-huffman = require('../index.coffee')
+huffman = require('../lib/n-ary-huffman.coffee')
 
 verifyCode = (item, code) ->
   assert(code == item.expected,
