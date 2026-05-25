@@ -7,7 +7,7 @@ createTree = (elements, numBranches, options = {}) ->
   {sorted = false, compare = (a, b) -> a.weight - b.weight} = options
 
   unless numBranches >= 2
-    throw new RangeError("`n` must be at least 2")
+    throw new RangeError('`n` must be at least 2')
 
   numElements = elements.length
 
@@ -66,8 +66,8 @@ createTree = (elements, numBranches, options = {}) ->
       element = elements[elementIndex]
       children[childIndex] = element
       weight += element.weight
-      elementIndex--
-      childIndex++
+      elementIndex -= 1
+      childIndex += 1
     branchPoints[0] = new BranchPoint(children, weight)
     latestBranchPointIndex = 1
 
@@ -84,17 +84,17 @@ createTree = (elements, numBranches, options = {}) ->
       if not nextElement? or # No elements, only branch points left.
          (nextBranchPoint? and compare(nextBranchPoint, nextElement) <= 0)
         lowestWeight = nextBranchPoint
-        branchPointIndex++
+        branchPointIndex += 1
         nextBranchPoint = branchPoints[branchPointIndex]
       else
         lowestWeight = nextElement
-        elementIndex--
+        elementIndex -= 1
         nextElement = if elementIndex >= 0 then elements[elementIndex] else null
       children[childIndex] = lowestWeight
       weight += lowestWeight.weight
-      childIndex++
+      childIndex += 1
     branchPoints[latestBranchPointIndex] = new BranchPoint(children, weight)
-    latestBranchPointIndex++
+    latestBranchPointIndex += 1
 
   root = branchPoints[numBranchPoints - 1]
   root
@@ -102,10 +102,11 @@ createTree = (elements, numBranches, options = {}) ->
 class BranchPoint
   constructor: (@children, @weight) ->
 
-  assignCodeWords: (alphabet, callback, prefix = "") ->
+  assignCodeWords: (alphabet, callback, prefix = '') ->
     index = 0
     for node in @children by -1
-      codeWord = prefix + alphabet[index++]
+      codeWord = prefix + alphabet[index]
+      index += 1
       if node instanceof BranchPoint
         node.assignCodeWords(alphabet, callback, codeWord)
       else
