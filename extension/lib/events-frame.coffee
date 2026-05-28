@@ -241,12 +241,13 @@ class FrameEventManager
       )
 
       # Blur the focus target, if autofocus prevention is enabled…
+      focusMask = nsIFocusManager.METHOD_MASK & ~nsIFocusManager.FLAG_BYJS
       if options.prevent_autofocus and
          @vim.mode in options.prevent_autofocus_modes and
          # …and the user has interacted with the page…
          not @vim.state.hasInteraction and
          # …and the event is programmatic (not caused by clicks or keypresses)…
-         nsIFocusManager.getLastFocusMethod(null) == 0 and
+         (nsIFocusManager.getLastFocusMethod(null) & focusMask) == 0 and
          # …and the target may steal most keystrokes
          utils.isTypingElement(target)
         # Some sites (such as icloud.com) re-focuses inputs if they are blurred,
