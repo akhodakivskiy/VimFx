@@ -21,7 +21,7 @@ injectButton = (vimfx) ->
     tooltiptext: translate('button.tooltip.normal')
     onCommand: (event) ->
       button = event.originalTarget
-      window = button.ownerGlobal
+      window = button.documentGlobal ? button.ownerGlobal # fx152
       return unless vim = vimfx.getCurrentVim(window)
 
       helpVisible = help.getHelp(window)

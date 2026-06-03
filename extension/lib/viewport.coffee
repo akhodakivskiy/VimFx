@@ -5,7 +5,8 @@ utils = require('./utils')
 MIN_EDGE_DISTANCE = 4
 
 getPosition = (element) ->
-  computedStyle = element.ownerGlobal.getComputedStyle(element)
+  window = element.documentGlobal ? element.ownerGlobal # fx152
+  computedStyle = window.getComputedStyle(element)
   return computedStyle?.getPropertyValue('position')
 
 isFixed = (element) -> getPosition(element) == 'fixed'
@@ -82,7 +83,7 @@ getAllRangesInsideViewport = (window, viewport, offset = {left: 0, top: 0}) ->
   return ranges
 
 getFirstNonWhitespace = (element) ->
-  window = element.ownerGlobal
+  window = element.documentGlobal ? element.ownerGlobal # fx152
   viewport = getWindowViewport(window)
   result = null
   utils.walkTextNodes(element, (textNode) ->
@@ -104,7 +105,8 @@ getFirstVisibleNonWhitespaceOffset = (textNode, viewport) ->
 getFirstVisibleOffset = (textNode, viewport) ->
   {length} = textNode.data
   return null if length == 0
-  {headerBottom} = getFixedHeaderAndFooter(textNode.ownerGlobal, viewport)
+  window = textNode.documentGlobal ? textNode.ownerGlobal # fx152
+  {headerBottom} = getFixedHeaderAndFooter(window, viewport)
   [nonMatch, match] = utils.bisect(0, length - 1, (offset) ->
     range = textNode.ownerDocument.createRange()
     # Using a zero-width range sometimes gives a bad rect, so make it span one
@@ -196,7 +198,8 @@ getFrameViewport = (frame, parentViewport) ->
 
   # `.getComputedStyle()` may return `null` if the computed style isn’t availble
   # yet. If so, consider the element not visible.
-  return null unless computedStyle = frame.ownerGlobal.getComputedStyle(frame)
+  frameGlobal = frame.documentGlobal ? frame.ownerGlobal # fx152
+  return null unless computedStyle = frameGlobal.getComputedStyle(frame)
   offset = {
     left: rect.left +
       parseFloat(computedStyle.getPropertyValue('border-left-width')) +
@@ -231,7 +234,7 @@ getFrameViewport = (frame, parentViewport) ->
 # Returns the minimum of `element.clientHeight` and the height of the viewport,
 # taking fixed headers and footers into account.
 getViewportCappedClientHeight = (element) ->
-  window = element.ownerGlobal
+  window = element.documentGlobal ? element.ownerGlobal # fx152
   viewport = getWindowViewport(window)
   {headerBottom, footerTop} = getFixedHeaderAndFooter(window)
   return Math.min(element.clientHeight, footerTop - headerBottom)
@@ -273,7 +276,7 @@ scroll = (
   element, {method, type, directions, amounts, properties, adjustment, smooth}
 ) ->
   if element.ownerDocument.documentElement.localName == 'svg'
-    element = element.ownerGlobal
+    element = element.documentGlobal ? element.ownerGlobal # fx152
     properties = properties?.map(
       (property) -> windowScrollProperties[property] ? property
     )

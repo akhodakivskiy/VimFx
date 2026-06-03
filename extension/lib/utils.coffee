@@ -47,7 +47,8 @@ XULMenuListElement = Ci.nsIDOMXULMenuListElement
 getDocument = (e) -> if e.parentNode? then arguments.callee(e.parentNode) else e
 
 isInShadowRoot = (element) ->
-  getDocument(element) instanceof element.ownerGlobal.ShadowRoot
+  window = element.documentGlobal ? element.ownerGlobal # fx152
+  getDocument(element) instanceof window.ShadowRoot
 
 isXULElement = (element) ->
   XUL_NS = 'http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul'
@@ -106,9 +107,10 @@ isContentEditable = (element) ->
          element.classList?.contains('real-terminal')
 
 isDevtoolsElement = (element) ->
-  return false unless element.ownerGlobal
+  return false unless element.documentGlobal ? element.ownerGlobal # fx152
   return Array.prototype.some.call(
-    (try element.ownerGlobal.top.frames) or [], isDevtoolsWindow
+    (try (element.documentGlobal ? element.ownerGlobal).top.frames) or [],#fx152
+    isDevtoolsWindow
    )
 
 isDevtoolsWindow = (window) ->
@@ -311,7 +313,7 @@ listenOnce = (element, eventName, listener, useCapture = true) ->
   listen(element, eventName, fn, useCapture)
 
 onRemoved = (element, fn) ->
-  window = element.ownerGlobal
+  window = element.documentGlobal ? element.ownerGlobal # fx152
 
   disconnected = false
   disconnect = ->
@@ -341,7 +343,7 @@ contentAreaClick = (data, browser) ->
   # the browser object instead of extracting it from the browsingContext. Also,
   # our version is only invoked from the parent process, so we can pass .csp,
   # .referrerInfo and .policyContainer without calling the E10SUtils helpers.
-  window = browser.ownerGlobal
+  window = browser.documentGlobal ? browser.ownerGlobal # fx152
   wgp = window.browsingContext.currentWindowGlobal
 
   params = {
@@ -375,7 +377,7 @@ contentAreaClick = (data, browser) ->
   window.openLinkIn(data.href, where, params)
 
 simulateMouseEvents = (element, sequence, browserOffset) ->
-  window = element.ownerGlobal
+  window = element.documentGlobal ? element.ownerGlobal # fx152
   rect = element.getBoundingClientRect()
   topOffset = getTopOffset(element)
 
@@ -453,7 +455,7 @@ area = (element) ->
   return element.clientWidth * element.clientHeight
 
 checkElementOrAncestor = (element, fn) ->
-  window = element.ownerGlobal
+  window = element.documentGlobal ? element.ownerGlobal # fx152
   while element.parentElement
     return true if fn(element)
     element = element.parentElement
@@ -474,14 +476,14 @@ clearSelectionDeep = (window, {blur = true} = {}) ->
   return
 
 containsDeep = (parent, element) ->
-  parentWindow = parent.ownerGlobal
-  elementWindow = element.ownerGlobal
+  parentWindow = parent.documentGlobal ? parent.ownerGlobal # fx152
+  elementWindow = element.documentGlobal ? element.ownerGlobal # fx152
 
   # Owner windows might be missing when opening the devtools.
   while elementWindow and parentWindow and
         elementWindow != parentWindow and elementWindow.top != elementWindow
     element = elementWindow.frameElement
-    elementWindow = element.ownerGlobal
+    elementWindow = element.documentGlobal ? element.ownerGlobal # fx152
 
   return parent.contains(element)
 
@@ -505,7 +507,7 @@ getText = (element) ->
   return text.trim().replace(/\s+/, ' ')
 
 getTopOffset = (element) ->
-  window = element.ownerGlobal
+  window = element.documentGlobal ? element.ownerGlobal # fx152
 
   {left: x, top: y} = element.getBoundingClientRect()
   while window.frameElement
@@ -514,7 +516,8 @@ getTopOffset = (element) ->
     x += frameRect.left
     y += frameRect.top
 
-    computedStyle = frame.ownerGlobal.getComputedStyle(frame)
+    frameGlobal = frame.documentGlobal ? frame.ownerGlobal # fx152
+    computedStyle = frameGlobal.getComputedStyle(frame)
     if computedStyle
       x +=
         parseFloat(computedStyle.getPropertyValue('border-left-width')) +
@@ -552,7 +555,7 @@ querySelectorAllDeep = (window, selector) ->
   return elements
 
 selectAllSubstringMatches = (element, substring, {caseSensitive = true} = {}) ->
-  window = element.ownerGlobal
+  window = element.documentGlobal ? element.ownerGlobal # fx152
   selection = window.getSelection()
   {textContent} = element
 
@@ -595,7 +598,7 @@ selectAllSubstringMatches = (element, substring, {caseSensitive = true} = {}) ->
   )
 
 selectElement = (element) ->
-  window = element.ownerGlobal
+  window = element.documentGlobal ? element.ownerGlobal # fx152
   selection = window.getSelection()
   range = window.document.createRange()
   range.selectNodeContents(element)
@@ -799,7 +802,7 @@ openDropdown = (element) ->
     element.open = true
 
 openPopup = (popup) ->
-  window = popup.ownerGlobal
+  window = popup.documentGlobal ? popup.ownerGlobal # fx152
   # Show the popup so it gets a height and width.
   popup.openPopupAtScreen(0, 0)
   # Center the popup inside the window.

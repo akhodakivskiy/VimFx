@@ -306,7 +306,7 @@ contains = (element, elementAtPoint) ->
   return false unless elementAtPoint
   container = normalize(element)
   if elementAtPoint.localName == 'tabbrowser' and elementAtPoint.id == 'content'
-    {gBrowser} = element.ownerGlobal.top
+    {gBrowser} = (element.documentGlobal ? element.ownerGlobal).top # fx152
     tabpanel = gBrowser.getNotificationBox(gBrowser.selectedBrowser)
     return tabpanel.contains(element)
   else

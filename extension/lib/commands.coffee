@@ -589,8 +589,8 @@ helper_follow_clickable = (options, args) ->
           button: 0 # primary
           csp: window.document.csp
           referrerInfo
-          originAttributes: helper_add_user_context_id(
-            vim.browser.ownerGlobal.gBrowser,
+          originAttributes: helper_add_user_context_id( # fx152:
+            (vim.browser.documentGlobal ? vim.browser.ownerGlobal).gBrowser,
             window.document.nodePrincipal?.originAttributes ? {}
           )
           triggeringPrincipal: window.document.nodePrincipal

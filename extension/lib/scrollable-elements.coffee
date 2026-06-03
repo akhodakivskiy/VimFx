@@ -150,7 +150,8 @@ class ScrollableElements
   getPageScrollPosition: ->
     element = @filterSuitableDefault()
     if element.ownerDocument.documentElement.localName == 'svg'
-      return [element.ownerGlobal.scrollX, element.ownerGlobal.scrollY]
+      window = element.documentGlobal ? element.ownerGlobal # fx152
+      return [window.scrollX, window.scrollY]
     else
       return [element.scrollLeft, element.scrollTop]
 

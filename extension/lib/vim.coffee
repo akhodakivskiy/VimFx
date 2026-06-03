@@ -64,7 +64,7 @@ class Vim
     )
 
   _setBrowser: (@browser, {addListeners = true} = {}) ->
-    @window = @browser.ownerGlobal
+    @window = @browser.documentGlobal ? @browser.ownerGlobal # fx152
     @_messageManager = @browser.messageManager
 
     @_addListeners() if addListeners
@@ -86,7 +86,8 @@ class Vim
            @_isUIElement(event.originalTarget)
 
   _isUIElement: (element) ->
-    return (element.ownerGlobal.isChromeWindow or
+    window = element.documentGlobal ? element.ownerGlobal # fx152
+    return (window.isChromeWindow or
             utils.isDockedDevtoolsElement(element)) and
            element != @window.gBrowser.selectedBrowser
 
