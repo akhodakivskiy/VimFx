@@ -3,7 +3,7 @@
 # shortcuts. It can consume keypresses according to its commands, and return
 # the commands for UI presentation. There is only one `VimFx` instance.
 
-notation = require('vim-like-key-notation')
+notation = require('./vim-like-key-notation')
 prefs = require('./prefs')
 utils = require('./utils')
 Vim = require('./vim')

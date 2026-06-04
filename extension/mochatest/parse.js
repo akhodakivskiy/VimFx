@@ -1,7 +1,7 @@
 var expect    = require("chai").expect
 var testError = require("./test-error")
 
-var parse = require("../").parse
+var parse = require("../lib/vim-like-key-notation").parse
 
 
 suite("parse", function() {

@@ -1,6 +1,6 @@
 # This file is the equivalent to events.coffee, but for frame scripts.
 
-notation = require('vim-like-key-notation')
+notation = require('./vim-like-key-notation')
 commands = require('./commands-frame')
 messageManager = require('./message-manager')
 prefs = require('./prefs')

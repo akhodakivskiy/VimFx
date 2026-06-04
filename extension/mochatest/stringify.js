@@ -1,7 +1,7 @@
 var expect    = require("chai").expect
 var testError = require("./test-error.js")
 
-var stringify = require("../").stringify
+var stringify = require("../lib/vim-like-key-notation").stringify
 
 
 suite("stringify", function() {

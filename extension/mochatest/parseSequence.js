@@ -1,6 +1,6 @@
 var expect = require("chai").expect
 
-var parseSequence = require("../").parseSequence
+var parseSequence = require("../lib/vim-like-key-notation").parseSequence
 
 
 suite("parseSequence", function() {

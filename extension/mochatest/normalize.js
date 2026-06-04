@@ -1,7 +1,7 @@
 var expect    = require("chai").expect
 var testError = require("./test-error")
 
-var normalize = require("../").normalize
+var normalize = require("../lib/vim-like-key-notation").normalize
 
 
 suite("normalize", function() {
