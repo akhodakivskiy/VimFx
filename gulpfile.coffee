@@ -43,17 +43,6 @@ gulp.task('copy', ->
     .pipe(gulp.dest(DEST))
 )
 
-gulp.task('node_modules', ->
-  dependencies = (name for name of pkg.dependencies)
-  # Note: When installing or updating node modules, make sure that the following
-  # glob does not include too much or too little!
-  gulp.src(
-    "node_modules/+(#{dependencies.join('|')})/\
-     {LICENSE*,{,**/!(test|examples)/}!(*min|*test*|*bench*).js}"
-  )
-    .pipe(gulp.dest("#{DEST}/node_modules"))
-)
-
 gulp.task('coffee', ->
   test = '--test' in argv or '-t' in argv
   gulp.src(
@@ -129,7 +118,7 @@ gulp.task('templates', gulp.parallel(
 
 gulp.task('build', gulp.series(
   'clean',
-  gulp.parallel('copy', 'node_modules', 'coffee', 'templates')
+  gulp.parallel('copy', 'coffee', 'templates')
 ))
 
 gulp.task('xpi-only', ->
