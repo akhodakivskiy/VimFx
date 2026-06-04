@@ -6,6 +6,7 @@ This section describes how to install and use the tools needed to:
 - Lint code
 - Sync locales
 - Prepare releases
+- Debug changes in Firefox
 
 
 ## Installation
@@ -167,3 +168,73 @@ Run `./release` with argument `minor` or `patch`, which does the following for y
   - Lints the code and builds an xpi.
   - Opens the browser to help publish the release on GitHub, and to attach an
     .xpi to it.
+
+## Finding which Firefox change breaks VimFx
+
+VimFx, being a legacy extension, uses a lot of internal APIs that are changing
+from time to time. This means that after updating Firefox, VimFx might stop
+working partially or altogether.
+
+A useful tool for finding which change in Firefox is responsible for the
+breakage is [mozregression]. It (semi-)automates [bisection] of Firefox releases,
+nightlies and autoland builds to narrow down the list of commits responsible for
+a particular change - often down to a single changeset.
+
+In order to automatically patch Firefox with LegacyFox and install VimFx into
+each test build, some configuration is necessary. Please adjust filesystem paths
+as necessary for your operating system of choice.
+
+1. install `mozregression`, e.g. using `pip install --user mozregression`
+2. create the wrapper script somewhere on your `$PATH`, e.g. at
+   `~/.local/bin/vimfx-mozregression`, and make it executable (`chmod+x`).
+   Replace paths to VimFx and LegacyFox to where they reside on your system.
+
+   ```bash
+   #!/bin/bash
+   FIREFOX_DIR="$(dirname "$MOZREGRESSION_BINARY")"
+   tar xf ~/LegacyFox/legacyfox.tar.gz -C "$FIREFOX_DIR"
+   install -DT ~/VimFx/build/VimFx.xpi "$FIREFOX_DIR/distribution/extensions/VimFx@akhodakivskiy.github.com.xpi"
+
+   for pref in "$@"; do  # set prefs before startup
+       IFS=: read -r key value <<< "$pref"
+       case "$value" in
+           +[0-9]|true|false) Q='';;
+           *) Q='"';;
+       esac
+       echo "pref(\"$key\", $Q$value$Q);" >> "$FIREFOX_DIR/defaults/pref/mozreg-prefs.js"
+   done
+
+   "$MOZREGRESSION_BINARY" --jsconsole &  # run firefox and automatically open Browser Console
+
+   trap "kill $!" EXIT
+   read -rp "[g]ood, [b]ad? " result
+   case "$result" in
+       g*) exit 0;;
+       b*) exit 1;;
+   esac
+   ```
+
+3. run mozregression with our wrapper script. Pass it the last known working
+   Firefox version with the `-g` parameter, and optionally the first known bad
+   version with `-b`. Both take either a release version number, or the date of
+   a nightly build.
+
+   ```sh
+   mozregression --command vimfx-mozregression -g 143 -b 2026-06-01
+   ```
+
+At this point, mozregression will start to download a bunch of Firefox versions,
+and <!--(through our script)--> ask you whether it was working or not. First,
+mozregression will step through release versions, then nightly builds, and—if
+the regression was introduced recently enough—even autoland builds that are done
+after each set of patches lands in mozilla-central. At the end, you will get a
+URL to hg.mozilla.org that gives a list of the likely offending commit(s).
+
+In some circumstances, the commit returned might simply have switched an
+about:config flag. In that case, it might make sense to re-run mozregression,
+but with `--command 'vimfx-mozregression KEY:VALUE'` set to always follow the
+code path where this feature was enabled.
+
+[mozregression]: https://mozilla.github.io/mozregression/
+[bisection]: https://en.wikipedia.org/wiki/Bisection_(software_engineering)
+[configuration file]: https://mozilla.github.io/mozregression/documentation/configuration.html
