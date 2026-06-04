@@ -1,5 +1,4 @@
-Overview [![Build Status](https://travis-ci.org/lydell/n-ary-huffman.svg?branch=master)](https://travis-ci.org/lydell/n-ary-huffman)
-========
+# `n-ary-huffman` Module
 
 ```js
 var huffman = require("n-ary-huffman")
@@ -32,21 +31,9 @@ console.log(items)
 // ]
 ```
 
-Installation
-============
+## Usage
 
-`npm install n-ary-huffman`
-
-```js
-var huffman = require('n-ary-huffman')
-```
-
-
-Usage
-=====
-
-`createTree(elements, n, [options])`
-------------------------------------
+### `createTree(elements, n, [options])`
 
 `elements` is an array of objects. Each object is expected to have a `weight`
 property which represents the _weight_ of the object, which is a number.
@@ -76,8 +63,7 @@ all the items in `elements` as well as `BranchPoint`s. Each `BranchPoint` has
   This lets you define custom comparisons, for example if you want to consider
   weights that are close to each other to be equal.
 
-`new BranchPoint(children, weight)`
------------------------------------
+### `new BranchPoint(children, weight)`
 
 Instance properties:
 
@@ -86,8 +72,7 @@ Instance properties:
 
 See `createTree(…)` above for more information.
 
-`BranchPoint.prototype.assignCodeWords(alphabet, callback, prefix="")`
-----------------------------------------------------------------------
+### `BranchPoint.prototype.assignCodeWords(alphabet, callback, prefix="")`
 
 Assign a _code word_ to each element in the tree. The larger the weight of an
 element, the shorter the code word.
@@ -99,9 +84,3 @@ repeat characters, or you’ll get invalid code words.
 `callback(element, codeWord)` is run for each object in the tree.
 
 `prefix` (optional) will be added at the beginning of each code word.
-
-
-License
-=======
-
-[The X11 “MIT” License](LICENSE).

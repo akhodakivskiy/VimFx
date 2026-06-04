@@ -1,5 +1,4 @@
-Overview [![Build Status](https://travis-ci.org/lydell/vim-like-key-notation.svg?branch=master)](https://travis-ci.org/lydell/vim-like-key-notation)
-========
+# `vim-like-key-notation` Module
 
 Parse and generate vim-like key notation for modern browsers, with support for
 different keyboard layouts especially in mind.
@@ -26,34 +25,17 @@ document.addEventListener("keydown", function(event) {
 }, true)
 ```
 
-vim-like-key-notation is used by [VimFx].
 
-[VimFx]: https://github.com/akhodakivskiy/VimFx
+## The notation
 
-
-Installation
-============
-
-`npm install vim-like-key-notation`
-
-```js
-var notation = require("vim-like-key-notation")
-```
-
-
-The notation
-============
-
-In short
---------
+### In short
 
 - Simple characters: `a`, `A`, `/`, `>`.
 - Others: `<Escape>`, `<Enter>`, `<ArrowLeft>`.
 - Modifiers: `<c-a>`, `<c-A>`, `<a-m-/>`, `<c-gt>`.
 - Sequences: `<c-w>a`, `<2j`, `<Esc>>`, `<lt>Esc>>`.
 
-In detail
----------
+### In detail
 
 The basic rule is that each character represents itself.
 
@@ -223,8 +205,7 @@ Nah. You just might to get used to it.
 [MDN]: https://developer.mozilla.org/
 
 
-Technical notes
-===============
+## Technical notes
 
 vim-like-key-notation requires that [`event.key`] and [`event.code`] are
 available on keyboard events. When this was written, only Firefox 38+ supports
@@ -362,11 +343,9 @@ QWERTY is used (depending on if the current layout is set to be ignored).
 [`event.getModifierState`]: https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/getModifierState
 
 
-API
-===
+## API
 
-`stringify(event, options)`
----------------------------
+### `stringify(event, options)`
 
 Takes a keyboard event `event`—that has the `key` and `code` properties—and
 returns the equivalent vim-like-key-notation, in a standardized way.
@@ -445,8 +424,7 @@ returns the equivalent vim-like-key-notation, in a standardized way.
 
 [wikipedia-altgr]: https://en.wikipedia.org/wiki/AltGr_key#Control_.2B_Alt_as_a_substitute
 
-`parse(keyString)`
-------------------
+### `parse(keyString)`
 
 The inverse of `stringify`. Takes a `keyString`, and returns an event-like
 object. Throws errors for invalid `keyString`s.
@@ -466,14 +444,12 @@ parse("<c-m-a>")    // {key: "a", ctrlKey: true, metaKey: true}
 parse("<s-escape>") // {key: "escape", shiftKey: true}
 ```
 
-`normalize(keyString)`
-----------------------
+### `normalize(keyString)`
 
 Simply a shortcut for `stringify(parse(keyString))`. Useful to compare different
 keyStrings: `normalize("<c-s-esc>") === normalize("<s-c-Escape>")`.
 
-`parseSequence(keySequence)`
-----------------------------
+### `parseSequence(keySequence)`
 
 Takes a `keySequence` and splits it into an array of individual keys. It does
 not validate each individual key; you may use `parse` or `normalize` for that.
@@ -489,8 +465,7 @@ parseSequence("<x-a><s-a><ctrl-a> <++>").map(parse) // Throws an error.
 ```
 
 
-Errors
-======
+## Errors
 
 All errors thrown by vim-like-key-notation have an `id` property, which is a
 string, and a `subject` key, which is what caused the error. Some errors have a
@@ -499,35 +474,30 @@ stated).
 
 These are the different ids:
 
-bad\_translation
-----------------
+### bad\_translation
 
 - thrown by: `stringify(event, options)`
 - context: a key in `options.translations` mapped to a bad value
 - subject: the bad value (which may be of any type)
 
-invalid\_key
-------------
+### invalid\_key
 
 - thrown by: `parse(keyString)` and `normalize(keyString)`
 - subject: the invalid `keyString`
 
-unknown\_modifier
------------------
+### unknown\_modifier
 
 - thrown by: `parse(keyString)` and `normalize(keyString)`
 - context: the `keyString` containing the invalid modifier
 - subject: an unknown modifier in `keyString`
 
-duplicate\_modifier
--------------------
+### duplicate\_modifier
 
 - thrown by: `parse(keyString)` and `normalize(keyString)`
 - context: the `keyString` containing the duplicate modifier
 - subject: a duplicate modifier in `keyString`
 
-disallowed\_modifier
---------------------
+### disallowed\_modifier
 
 - thrown by: `parse(keyString)` and `normalize(keyString)`
 - context: the `keyString` containing the disallowed modifier
@@ -535,9 +505,3 @@ disallowed\_modifier
 
 This error is thrown if you try to parse a key such as `<s-a>` (explained in
 detail the notation section).
-
-
-License
-=======
-
-[MIT](LICENSE).

@@ -54,3 +54,9 @@ Also check out the [wiki](https://github.com/akhodakivskiy/VimFx/wiki)!
 
 - [Tools](tools.md)
   – Automation for building and maintaining VimFx.
+
+- [`n-ary-huffman`](n-ary-huffman.md)
+  – An n-ary Huffman algorithm implementation.
+
+- [`vim-like-key-notation`](vim-like-key-notation.md)
+  – Parse and generate vim-like key notation for modern browsers.
