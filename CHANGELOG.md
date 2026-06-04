@@ -1,3 +1,12 @@
+### 0.27.6 (2026-06-04)
+
+- fix startup on mozilla152
+- fix `prevent_autofocus` for mozilla90 (#1024)
+- simplify build process by vendoring modules
+- modernize prefs utils and contentAreaClick
+
+Thanks to @KuxaBeast
+
 ### 0.27.5 (2025-08-05)
 
 - fix 'X' in mozilla141 (#1015)
