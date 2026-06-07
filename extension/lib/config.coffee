@@ -76,7 +76,7 @@ loadFile = (dir, file, scope) ->
       docs = "#{HOMEPAGE}/blob/master/documentation/config-file.md#on-process-sandboxing"
       # coffeelint: enable=max_line_length
       console.error("VimFx: Error loading #{file} likely due to e10s sandbox")
-      console.info("Please consult VimFx' documentation: {docs}")
+      console.info("Please consult VimFx' documentation: #{docs}")
     else
       console.error("VimFx: Error loading #{file}", uri, error)
     return error
