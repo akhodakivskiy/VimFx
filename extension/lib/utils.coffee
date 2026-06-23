@@ -550,7 +550,7 @@ isNonEmptyTextNode = (node) ->
 
 querySelectorAllDeep = (window, selector) ->
   elements = Array.from(window.document.querySelectorAll(selector))
-  for frame in window.frames
+  for frame in window.frames when (try frame.frameElement)
     elements.push(querySelectorAllDeep(frame, selector)...)
   return elements
 
