@@ -255,7 +255,8 @@ class UIEventManager
     # <https://developer.mozilla.org/en-US/docs/Mozilla/Tech/XUL/PopupGuide/PopupKeys#Ignoring_Keys>
     # coffeelint: enable=max_line_length
     popups = utils.querySelectorAllDeep(
-      @window, ':-moz-any(menupopup, panel):not([ignorekeys="true"])'
+      @window,
+      ':-moz-any(menupopup, panel):not([ignorekeys="true"], [role="tooltip"])'
     )
     for popup in popups
       return true if popup.state == 'open'
