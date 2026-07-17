@@ -128,7 +128,7 @@ class Observer extends BaseObserver
     @setupKeybindings()
 
     if @vimfx.goToCommand
-      utils.nextTick(@document.documentGlobal ? @document.ownerGlobal, => #fx152
+      utils.nextTick(@document.documentGlobal, =>
         {pref} = @vimfx.goToCommand
         setting = @container.querySelector("[data-pref='#{pref}']")
         setting.scrollIntoView()

@@ -32,14 +32,8 @@ commands.focus_location_bar = ({vim}) ->
 commands.focus_search_bar = ({vim, count}) ->
   # The `.webSearch()` method opens a search engine in a tab if the search bar
   # has been removed. Therefore we first check if it exists.
-  if (
-    vim.window.document.getElementById('searchbar') ? # >=fx137
-    vim.window.BrowserSearch?.searchBar # <=fx136
-  )
-    try
-      vim.window.SearchUIUtils.webSearch(vim.window) # >=fx137
-    catch
-      vim.window.BrowserSearch.webSearch() # <=fx136
+  if vim.window.document.getElementById('searchbar')
+    vim.window.SearchUIUtils.webSearch(vim.window)
   else
     vim.notify(translate('notification.focus_search_bar.none'))
 
@@ -69,7 +63,7 @@ commands.go_to_root = ({vim}) ->
   vim._run('go_to_root')
 
 commands.go_home = ({vim}) ->
-  (vim.window.BrowserCommands?.home ? vim.window.BrowserHome)() # fx126
+  vim.window.BrowserCommands?.home()
 
 helper_go_history = (direction, {vim, count = 1}) ->
   {window} = vim
@@ -89,9 +83,9 @@ helper_go_history = (direction, {vim, count = 1}) ->
   # better interoperability.
   if count == 1
     if direction == 'back'
-      (window.BrowserCommands?.back ? window.BrowserBack)() # fx126
+      window.BrowserCommands?.back()
     else
-      (window.BrowserCommands?.forward ? window.BrowserForward)() # fx126
+      window.BrowserCommands?.forward()
     return
 
   SessionStore.getSessionHistory(gBrowser.selectedTab, (sessionHistory) ->
@@ -113,16 +107,10 @@ commands.history_list = ({vim}) ->
     vim.notify(translate('notification.history_list.none'))
 
 commands.reload = ({vim}) ->
-  try
-    vim.window.BrowserCommands.reload() # >=fx126
-  catch
-    vim.window.BrowserReload() # <=fx125
+  vim.window.BrowserCommands.reload()
 
 commands.reload_force = ({vim}) ->
-  try
-    vim.window.BrowserCommands.reloadSkipCache() # >=fx126
-  catch
-    vim.window.BrowserReloadSkipCache() # <=fx125
+  vim.window.BrowserCommands.reloadSkipCache()
 
 commands.reload_all = ({vim}) ->
   vim.window.gBrowser.reloadAllTabs()
@@ -136,7 +124,7 @@ commands.reload_all_force = ({vim}) ->
   return
 
 commands.stop = ({vim}) ->
-  (vim.window.BrowserCommands?.stop ? vim.window.BrowserStop)() # fx126
+  vim.window.BrowserCommands?.stop()
 
 commands.stop_all = ({vim}) ->
   for tab in vim.window.gBrowser.visibleTabs
@@ -288,9 +276,7 @@ commands.scroll_to_next_position =
 
 
 commands.tab_new = ({vim}) ->
-  utils.nextTick(vim.window, ->
-    (vim.window.BrowserCommands?.openTab ? vim.window.BrowserOpenTab)() # fx126
-  )
+  utils.nextTick(vim.window, -> vim.window.BrowserCommands?.openTab())
 
 commands.tab_new_after_current = ({vim}) ->
   {window} = vim
@@ -301,15 +287,9 @@ commands.tab_new_after_current = ({vim}) ->
   utils.nextTick(window, ->
     utils.listenOnce(window, 'TabOpen', (event) ->
       newTab = event.originalTarget
-      index = if window.gBrowser.moveTabTo.length == 1
-        # fx>=138: moveTabTo(element, {tabIndex, ...}={})
-        {tabIndex: newTabPosition}
-      else
-        # fx<=137: moveTabTo(aTab, aIndex, aKeepRelatedTabs)
-        newTabPosition
-      window.gBrowser.moveTabTo(newTab, index)
+      window.gBrowser.moveTabTo(newTab, {tabIndex: newTabPosition})
     )
-    (window.BrowserCommands?.openTab ? window.BrowserOpenTab)() # fx126
+    window.BrowserCommands?.openTab()
   )
 
 commands.tab_duplicate = ({vim}) ->
@@ -325,7 +305,7 @@ absoluteTabIndex = (relativeIndex, gBrowser, {pinnedSeparate}) ->
   currentIndex = tabs.indexOf(selectedTab)
   absoluteIndex = currentIndex + relativeIndex
   numTabsTotal = tabs.length
-  numPinnedTabs = gBrowser.pinnedTabCount ? gBrowser._numPinnedTabs # fx132
+  numPinnedTabs = gBrowser.pinnedTabCount
 
   [numTabs, min] = switch
     when not pinnedSeparate
@@ -393,11 +373,7 @@ helper_move_tab = (direction, {vim, count = 1}) ->
   {gBrowser} = vim.window
   index = absoluteTabIndex(direction * count, gBrowser, {pinnedSeparate: true})
   utils.nextTick(vim.window, ->
-    index = if gBrowser.moveTabTo.length == 1
-      {tabIndex: index} # fx>=138
-    else
-      index # fx<=137 (c.f. tab_new_after_current)
-    gBrowser.moveTabTo(gBrowser.selectedTab, index)
+    gBrowser.moveTabTo(gBrowser.selectedTab, {tabIndex: index})
   )
 
 commands.tab_move_backward = helper_move_tab.bind(null, -1)
@@ -415,7 +391,7 @@ commands.tab_select_first = ({vim, count = 1}) ->
 
 commands.tab_select_first_non_pinned = ({vim, count = 1}) ->
   gBrowser = vim.window.gBrowser
-  firstNonPinned = gBrowser.pinnedTabCount ? gBrowser._numPinnedTabs # fx132
+  firstNonPinned = gBrowser.pinnedTabCount
   utils.nextTick(vim.window, ->
     vim.window.gBrowser.selectTabAtIndex(firstNonPinned + count - 1)
   )
@@ -445,10 +421,7 @@ commands.tab_close = ({vim, count = 1}) ->
 commands.tab_restore = ({vim, count = 1}) ->
   utils.nextTick(vim.window, ->
     for index in [0...count] by 1
-      restoredTab = try
-        vim.window.SessionWindowUI.undoCloseTab(vim.window); # >=fx141
-      catch
-        vim.window.undoCloseTab() # <=fx140
+      restoredTab = vim.window.SessionWindowUI.undoCloseTab(vim.window)
       if not restoredTab and index == 0
         vim.notify(translate('notification.tab_restore.none'))
         break
@@ -592,8 +565,8 @@ helper_follow_clickable = (options, args) ->
           button: 0 # primary
           csp: window.document.csp
           referrerInfo
-          originAttributes: helper_add_user_context_id( # fx152:
-            (vim.browser.documentGlobal ? vim.browser.ownerGlobal).gBrowser,
+          originAttributes: helper_add_user_context_id(
+            vim.browser.documentGlobal.gBrowser,
             window.document.nodePrincipal?.originAttributes ? {}
           )
           triggeringPrincipal: window.document.nodePrincipal

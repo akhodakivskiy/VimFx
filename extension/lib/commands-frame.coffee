@@ -161,7 +161,7 @@ helper_follow = (options, matcher, {vim, pass}) ->
       # Targeting those are the only reliable way of focusing CodeMirror
       # editors, and doing so without moving the caret.
       when id == 'normal' and element.localName == 'textarea' and
-           (element.documentGlobal ? element.ownerGlobal) == vim.content # fx152
+           element.documentGlobal == vim.content
         rect = element.getBoundingClientRect()
         # Use `.clientWidth` instead of `rect.width` because the latter includes
         # the width of the borders of the textarea, which are unreliable.
@@ -421,7 +421,7 @@ commands.copy_marker_element = ({vim, elementIndex, property}) ->
 
 commands.element_text_select = ({vim, elementIndex, full, scroll = false}) ->
   {element} = vim.state.markerElements[elementIndex]
-  window = element.documentGlobal ? element.ownerGlobal # fx152
+  window = element.documentGlobal
   selection = window.getSelection()
   range = window.document.createRange()
 
@@ -600,9 +600,7 @@ commands.find_from_top_of_viewport = ({vim, direction}) ->
 
   range = viewportUtils.getFirstVisibleRange(vim.content, viewport)
   if range
-    window =
-      range.startContainer.documentGlobal ? # >=fx152
-      range.startContainer.ownerGlobal # <=fx151
+    window = range.startContainer.documentGlobal
     selection = window.getSelection()
     utils.clearSelectionDeep(vim.content)
     window.focus()
@@ -625,7 +623,7 @@ commands.find_from_top_of_viewport = ({vim, direction}) ->
   [textNode, offset] = result
 
   utils.clearSelectionDeep(vim.content)
-  window = textNode.documentGlobal ? textNode.ownerGlobal # fx152
+  window = textNode.documentGlobal
   window.focus()
   range = window.document.createRange()
   range.setStart(textNode, offset)
@@ -653,8 +651,7 @@ commands.blur_active_element = ({vim}) ->
   utils.blurActiveElement(vim.content)
 
 helper_create_selection_manager = (vim) ->
-  element = utils.getActiveElement(vim.content)
-  window = element?.documentGlobal ? element?.ownerGlobal ? vim.content # fx152
+  window = utils.getActiveElement(vim.content)?.documentGlobal ? vim.content
   return new SelectionManager(window)
 
 commands.enable_caret = ({vim}) ->

@@ -1,13 +1,8 @@
 # This file contains lots of different helper functions.
 
-{PlacesUIUtils} = try # >=fx141
-  ChromeUtils.importESModule(
-    'moz-src:///browser/components/places/PlacesUIUtils.sys.mjs'
-  )
-catch
-  ChromeUtils.importESModule(
-    'resource:///modules/PlacesUIUtils.sys.mjs'
-  )
+{PlacesUIUtils} = ChromeUtils.importESModule(
+  'moz-src:///browser/components/places/PlacesUIUtils.sys.mjs'
+)
 {PrivateBrowsingUtils} = try
   ChromeUtils.importESModule(
     'moz-src:///toolkit/modules/PrivateBrowsingUtils.sys.mjs'
@@ -47,8 +42,7 @@ XULMenuListElement = Ci.nsIDOMXULMenuListElement
 getDocument = (e) -> if e.parentNode? then arguments.callee(e.parentNode) else e
 
 isInShadowRoot = (element) ->
-  window = element.documentGlobal ? element.ownerGlobal # fx152
-  getDocument(element) instanceof window.ShadowRoot
+  getDocument(element) instanceof element.documentGlobal.ShadowRoot
 
 isXULElement = (element) ->
   XUL_NS = 'http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul'
@@ -107,10 +101,9 @@ isContentEditable = (element) ->
          element.classList?.contains('real-terminal')
 
 isDevtoolsElement = (element) ->
-  return false unless element.documentGlobal ? element.ownerGlobal # fx152
+  return false unless element.documentGlobal
   return Array.prototype.some.call(
-    (try (element.documentGlobal ? element.ownerGlobal).top.frames) or [],#fx152
-    isDevtoolsWindow
+    (try element.documentGlobal.top.frames) or [], isDevtoolsWindow
    )
 
 isDevtoolsWindow = (window) ->
@@ -313,7 +306,7 @@ listenOnce = (element, eventName, listener, useCapture = true) ->
   listen(element, eventName, fn, useCapture)
 
 onRemoved = (element, fn) ->
-  window = element.documentGlobal ? element.ownerGlobal # fx152
+  window = element.documentGlobal
 
   disconnected = false
   disconnect = ->
@@ -343,7 +336,7 @@ contentAreaClick = (data, browser) ->
   # the browser object instead of extracting it from the browsingContext. Also,
   # our version is only invoked from the parent process, so we can pass .csp,
   # .referrerInfo and .policyContainer without calling the E10SUtils helpers.
-  window = browser.documentGlobal ? browser.ownerGlobal # fx152
+  window = browser.documentGlobal
   wgp = window.browsingContext.currentWindowGlobal
 
   params = {
@@ -353,8 +346,7 @@ contentAreaClick = (data, browser) ->
     originPrincipal: wgp.documentPrincipal,
     originStoragePrincipal: wgp.documentStoragePrincipal,
     triggeringPrincipal: data.triggeringPrincipal,
-    csp: data.csp # passed unserialized; fx<=141
-    policyContainer: data.policyContainer, # passed unserialized; fx>=142
+    policyContainer: data.policyContainer, # passed unserialized
     frameID: WebNavigationFrames.getFrameId(wgp.browsingContext),
     allowInheritPrincipal: true,
     openerBrowser: browser,
@@ -370,14 +362,11 @@ contentAreaClick = (data, browser) ->
   try if not PrivateBrowsingUtils.isWindowPrivate(window)
     PlacesUIUtils.markPageAsFollowedLink(data.href)
 
-  where = try
-    window.BrowserUtils.whereToOpenLink(data)  # >=fx127
-  catch
-    window.whereToOpenLink(data) # <=fx126
+  where = window.BrowserUtils.whereToOpenLink(data)
   window.openLinkIn(data.href, where, params)
 
 simulateMouseEvents = (element, sequence, browserOffset) ->
-  window = element.documentGlobal ? element.ownerGlobal # fx152
+  window = element.documentGlobal
   rect = element.getBoundingClientRect()
   topOffset = getTopOffset(element)
 
@@ -455,7 +444,7 @@ area = (element) ->
   return element.clientWidth * element.clientHeight
 
 checkElementOrAncestor = (element, fn) ->
-  window = element.documentGlobal ? element.ownerGlobal # fx152
+  window = element.documentGlobal
   while element.parentElement
     return true if fn(element)
     element = element.parentElement
@@ -476,14 +465,14 @@ clearSelectionDeep = (window, {blur = true} = {}) ->
   return
 
 containsDeep = (parent, element) ->
-  parentWindow = parent.documentGlobal ? parent.ownerGlobal # fx152
-  elementWindow = element.documentGlobal ? element.ownerGlobal # fx152
+  parentWindow = parent.documentGlobal
+  elementWindow = element.documentGlobal
 
   # Owner windows might be missing when opening the devtools.
   while elementWindow and parentWindow and
         elementWindow != parentWindow and elementWindow.top != elementWindow
     element = elementWindow.frameElement
-    elementWindow = element.documentGlobal ? element.ownerGlobal # fx152
+    elementWindow = element.documentGlobal
 
   return parent.contains(element)
 
@@ -507,7 +496,7 @@ getText = (element) ->
   return text.trim().replace(/\s+/, ' ')
 
 getTopOffset = (element) ->
-  window = element.documentGlobal ? element.ownerGlobal # fx152
+  window = element.documentGlobal
 
   {left: x, top: y} = element.getBoundingClientRect()
   while window.frameElement
@@ -516,8 +505,7 @@ getTopOffset = (element) ->
     x += frameRect.left
     y += frameRect.top
 
-    frameGlobal = frame.documentGlobal ? frame.ownerGlobal # fx152
-    computedStyle = frameGlobal.getComputedStyle(frame)
+    computedStyle = frame.documentGlobal.getComputedStyle(frame)
     if computedStyle
       x +=
         parseFloat(computedStyle.getPropertyValue('border-left-width')) +
@@ -555,7 +543,7 @@ querySelectorAllDeep = (window, selector) ->
   return elements
 
 selectAllSubstringMatches = (element, substring, {caseSensitive = true} = {}) ->
-  window = element.documentGlobal ? element.ownerGlobal # fx152
+  window = element.documentGlobal
   selection = window.getSelection()
   {textContent} = element
 
@@ -598,7 +586,7 @@ selectAllSubstringMatches = (element, substring, {caseSensitive = true} = {}) ->
   )
 
 selectElement = (element) ->
-  window = element.documentGlobal ? element.ownerGlobal # fx152
+  window = element.documentGlobal
   selection = window.getSelection()
   range = window.document.createRange()
   range.selectNodeContents(element)
@@ -802,7 +790,7 @@ openDropdown = (element) ->
     element.open = true
 
 openPopup = (popup) ->
-  window = popup.documentGlobal ? popup.ownerGlobal # fx152
+  window = popup.documentGlobal
   # Show the popup so it gets a height and width.
   popup.openPopupAtScreen(0, 0)
   # Center the popup inside the window.

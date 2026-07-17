@@ -50,9 +50,7 @@ module.exports = (data, reason) ->
     window.document.documentElement.setAttribute("vimfx-#{name}", value)
 
   onModeDisplayChange = (data) ->
-    window = data.vim?.window ?
-      data.event.originalTarget.documentGlobal ? # >=fx152
-      data.event.originalTarget.ownerGlobal # <=fx151
+    window = data.vim?.window ? data.event.originalTarget.documentGlobal
 
     # The 'modeChange' event provides the `vim` object that changed mode, but
     # it might not be the current `vim` anymore so always get the current one.
@@ -101,7 +99,7 @@ module.exports = (data, reason) ->
       callback(false)
       return
 
-    window = browser.documentGlobal ? browser.ownerGlobal # fx152
+    window = browser.documentGlobal
     vimfx.addVim(browser)
 
     unless windows.has(window)

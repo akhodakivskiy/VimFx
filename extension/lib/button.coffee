@@ -4,12 +4,9 @@ help = require('./help')
 translate = require('./translate')
 utils = require('./utils')
 
-{CustomizableUI} = try # >=fx143
-  ChromeUtils.importESModule(
-    'moz-src:///browser/components/customizableui/CustomizableUI.sys.mjs'
-  )
-catch
-  ChromeUtils.importESModule('resource:///modules/CustomizableUI.sys.mjs')
+{CustomizableUI} = ChromeUtils.importESModule(
+  'moz-src:///browser/components/customizableui/CustomizableUI.sys.mjs'
+)
 
 BUTTON_ID = 'VimFxButton'
 
@@ -21,7 +18,7 @@ injectButton = (vimfx) ->
     tooltiptext: translate('button.tooltip.normal')
     onCommand: (event) ->
       button = event.originalTarget
-      window = button.documentGlobal ? button.ownerGlobal # fx152
+      window = button.documentGlobal
       return unless vim = vimfx.getCurrentVim(window)
 
       helpVisible = help.getHelp(window)
