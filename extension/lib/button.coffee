@@ -4,7 +4,7 @@ help = require('./help')
 translate = require('./translate')
 utils = require('./utils')
 
-{CustomizableUI} = try
+{CustomizableUI} = try # >=fx143
   ChromeUtils.importESModule(
     'moz-src:///browser/components/customizableui/CustomizableUI.sys.mjs'
   )

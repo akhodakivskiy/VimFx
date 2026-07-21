@@ -1,6 +1,6 @@
 # This file contains lots of different helper functions.
 
-{PlacesUIUtils} = try
+{PlacesUIUtils} = try # >=fx141
   ChromeUtils.importESModule(
     'moz-src:///browser/components/places/PlacesUIUtils.sys.mjs'
   )
