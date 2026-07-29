@@ -1,3 +1,8 @@
+### 0.27.7 (2026-07-29)
+
+- keep VimFx working when Tab Hover Preview is displayed
+- fix 'gi' when third party iframes are present in page
+
 ### 0.27.6 (2026-06-04)
 
 - fix startup on mozilla152
