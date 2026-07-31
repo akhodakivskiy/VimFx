@@ -25,9 +25,6 @@ TEST = 'extension/test'
 BASE_LOCALE = 'en-US'
 UPDATE_ALL = /\s*UPDATE_ALL$/
 
-ADDON_PATH = 'chrome://vimfx'
-BUILD_TIME = Date.now()
-
 argv = process.argv.slice(2)
 
 {join} = path
@@ -53,8 +50,7 @@ gulp.task('coffee', ->
     {base: 'extension'}
   )
     .pipe(preprocess({context: {
-      BUILD_TIME
-      ADDON_PATH: JSON.stringify(ADDON_PATH)
+      BUILD_TIME: Date.now()
       HOMEPAGE: JSON.stringify(pkg.homepage)
       REQUIRE_DATA: JSON.stringify(precompute('.'), null, 2)
       TESTS:
@@ -67,15 +63,6 @@ gulp.task('coffee', ->
           null
     }}))
     .pipe(coffee({bare: true}))
-    .pipe(gulp.dest(DEST))
-)
-
-gulp.task('bootstrap-frame.js', ->
-  gulp.src('extension/bootstrap-frame.js.tmpl')
-    .pipe(mustache({ADDON_PATH}))
-    .pipe(tap((file) ->
-      file.path = file.path.replace(/\.js\.tmpl$/, "-#{BUILD_TIME}.js")
-    ))
     .pipe(gulp.dest(DEST))
 )
 
@@ -111,7 +98,6 @@ gulp.task('install.rdf', ->
 )
 
 gulp.task('templates', gulp.parallel(
-  'bootstrap-frame.js'
   'chrome.manifest'
   'install.rdf'
 ))

@@ -11,7 +11,7 @@
 do (global = this) ->
 
   {classes: Cc, interfaces: Ci, utils: Cu} = Components
-  ADDON_PATH = do -> # @echo ADDON_PATH
+  ADDON_PATH = 'chrome://vimfx'
   HOMEPAGE = do -> # @echo HOMEPAGE
   IS_FRAME_SCRIPT = (typeof content != 'undefined')
   BUILD_TIME = do -> # @echo BUILD_TIME
