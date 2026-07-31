@@ -14,21 +14,13 @@ do (global = this) ->
   ADDON_PATH = 'chrome://vimfx'
   HOMEPAGE = do -> # @echo HOMEPAGE
   IS_FRAME_SCRIPT = (typeof content != 'undefined')
-  REQUIRE_DATA = do -> # @echo REQUIRE_DATA
 
   shutdownHandlers = []
 
   dirname = (uri) -> uri.split('/')[...-1].join('/') or '.'
 
-  require = (path, moduleRoot = '.', dir = '.') ->
-    unless path[0] == '.'
-      # Allow `require('module/lib/foo')` in additon to `require('module')`.
-      [match, name, subPath] = path.match(///^ ([^/]+) (?: /(.+) )? ///)
-      base = REQUIRE_DATA[moduleRoot]?[name] ? moduleRoot
-      dir  = "#{base}/node_modules/#{name}"
-      main = REQUIRE_DATA[dir]?['']
-      path = subPath ? main ? 'index'
-      moduleRoot = dir
+  require = (path, dir = '.') ->
+    throw new Error('VimFx: Relative imports only') unless path[0] == '.'
 
     prefix = "#{ADDON_PATH}/content"
     uri = "#{prefix}/#{dir}/#{path}.js"
@@ -41,7 +33,7 @@ do (global = this) ->
         onShutdown: (fn) -> shutdownHandlers.push(fn)
       }
       require.scopes[normalizedUri] = scope = {
-        require: (path) -> require.call(null, path, moduleRoot, currentDir)
+        require: (path) -> require.call(null, path, currentDir)
         module, exports: module.exports
         Cc, Ci, Cu, Services
         ADDON_PATH, HOMEPAGE

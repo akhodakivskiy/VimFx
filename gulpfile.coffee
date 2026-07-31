@@ -12,7 +12,6 @@ tap = require('gulp-tap')
 zip = require('gulp-zip')
 marked = require('marked')
 merge = require('merge2')
-precompute = require('require-precompute')
 request = require('request')
 rimraf = require('rimraf')
 pkg = require('./package.json')
@@ -51,7 +50,6 @@ gulp.task('coffee', ->
   )
     .pipe(preprocess({context: {
       HOMEPAGE: JSON.stringify(pkg.homepage)
-      REQUIRE_DATA: JSON.stringify(precompute('.'), null, 2)
       TESTS:
         if test
           JSON.stringify(fs.readdirSync(TEST)
