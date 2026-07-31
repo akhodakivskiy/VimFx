@@ -50,7 +50,6 @@ gulp.task('coffee', ->
     {base: 'extension'}
   )
     .pipe(preprocess({context: {
-      BUILD_TIME: Date.now()
       HOMEPAGE: JSON.stringify(pkg.homepage)
       REQUIRE_DATA: JSON.stringify(precompute('.'), null, 2)
       TESTS:
