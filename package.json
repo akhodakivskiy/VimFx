@@ -14,7 +14,7 @@
     "addons-linter": "npm run gulp -- xpi && addons-linter -o text build/VimFx.xpi"
   },
   "devDependencies": {
-    "addons-linter": "0.24.0",
+    "addons-linter": "10.9.0",
     "chai": "^3.5.0",
     "coffeescript": "^1.12.7",
     "coffeelint": "^1.16.0",
