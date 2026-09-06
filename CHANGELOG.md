@@ -1,7 +1,9 @@
 ### 0.27.8 (2026-09-06)
 
-- fix loading config files in firefox 155 and esr 153.2
+- fix loading config files in firefox 155 and esr 153.2 (#1028)
 - internal simplifications for addon startup and module loading
+
+Thanks to @neeshy
 
 ### 0.27.7 (2026-07-29)
 
