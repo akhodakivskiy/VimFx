@@ -249,14 +249,11 @@ class UIEventManager
   anyPopupsOpen: ->
     # The autocomplete popup in text inputs (for example) is technically a
     # panel, but it does not respond to keypresses. Therefore
-    # `[ignorekeys="true"]` is excluded.
-    #
-    # coffeelint: disable=max_line_length
-    # <https://developer.mozilla.org/en-US/docs/Mozilla/Tech/XUL/PopupGuide/PopupKeys#Ignoring_Keys>
-    # coffeelint: enable=max_line_length
+    # `[ignorekeys="true"]` is excluded. Hovering on tabs opens a panel with
+    # `[role="tooltip"]` that is also not clickable.
     popups = utils.querySelectorAllDeep(
       @window,
-      ':-moz-any(menupopup, panel):not([ignorekeys="true"], [role="tooltip"])'
+      ':is(menupopup, panel):not([ignorekeys="true"], [role="tooltip"])'
     )
     for popup in popups
       return true if popup.state == 'open'
