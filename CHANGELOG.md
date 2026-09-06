@@ -1,3 +1,8 @@
+### 0.27.8 (2026-09-06)
+
+- fix loading config files in firefox 155 and esr 153.2
+- internal simplifications for addon startup and module loading
+
 ### 0.27.7 (2026-07-29)
 
 - keep VimFx working when Tab Hover Preview is displayed
