@@ -63,6 +63,7 @@ loadFile = (dir, file, scope) ->
       }, scope)
       charset: 'UTF-8'
       ignoreCache: true
+      allowUnsafeURL: true
     })
     return null
   catch error
