@@ -294,7 +294,10 @@ commands.tab_new = ({vim}) ->
 
 commands.tab_new_after_current = ({vim}) ->
   {window} = vim
-  newTabPosition = window.gBrowser.selectedTab._tPos + 1
+  newTabPosition = (
+    window.gBrowser.selectedTab.index ? # >=fx156
+    window.gBrowser.selectedTab._tPos   # <=fx155
+  ) + 1
   utils.nextTick(window, ->
     utils.listenOnce(window, 'TabOpen', (event) ->
       newTab = event.originalTarget
